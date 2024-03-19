@@ -1370,6 +1370,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick";
         if (typeNameFlag) {
+            MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent->GetPointerId(),
+                pointerEvent->DumpPointerAction());
             pointerEvent->MarkProcessed();
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);

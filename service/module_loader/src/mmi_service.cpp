@@ -450,7 +450,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 
 int32_t MMIService::SetMouseScrollRows(int32_t rows)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetMouseScrollRows, MouseEventHdr, rows));
     if (ret != RET_OK) {
@@ -463,7 +463,7 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
 
 int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
         IPointerDrawingManager::GetInstance(), pixelMap, pid, windowId, focusX, focusY)));
@@ -477,7 +477,7 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
 
 int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
         IPointerDrawingManager::GetInstance(), pid, windowId, pixelMap)));
@@ -491,7 +491,7 @@ int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 
 int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
         IPointerDrawingManager::GetInstance(), pid, windowId, hotSpotX, hotSpotY));
@@ -505,7 +505,7 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
 
 int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
     return RET_OK;
 }
@@ -520,7 +520,7 @@ int32_t MMIService::ReadMouseScrollRows(int32_t &rows)
 
 int32_t MMIService::GetMouseScrollRows(int32_t &rows)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMouseScrollRows, this, std::ref(rows)));
     if (ret != RET_OK) {
@@ -533,7 +533,7 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
 
 int32_t MMIService::SetPointerSize(int32_t size)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerSize,
         IPointerDrawingManager::GetInstance(), size));
@@ -555,7 +555,7 @@ int32_t MMIService::ReadPointerSize(int32_t &size)
 
 int32_t MMIService::GetPointerSize(int32_t &size)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSize, this, std::ref(size)));
     if (ret != RET_OK) {
@@ -568,7 +568,7 @@ int32_t MMIService::GetPointerSize(int32_t &size)
 
 int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MouseEventNormalize::SetMousePrimaryButton, MouseEventHdr, primaryButton));
@@ -590,7 +590,7 @@ int32_t MMIService::ReadMousePrimaryButton(int32_t &primaryButton)
 
 int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMousePrimaryButton, this, std::ref(primaryButton)));
@@ -604,7 +604,7 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 
 int32_t MMIService::SetPointerVisible(bool visible)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
@@ -652,7 +652,7 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
 
 int32_t MMIService::SetPointerColor(int32_t color)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerColor,
         IPointerDrawingManager::GetInstance(), color));
@@ -674,7 +674,7 @@ int32_t MMIService::ReadPointerColor(int32_t &color)
 
 int32_t MMIService::GetPointerColor(int32_t &color)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerColor, this, std::ref(color)));
     if (ret != RET_OK) {
@@ -687,7 +687,7 @@ int32_t MMIService::GetPointerColor(int32_t &color)
 
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerSpeed, MouseEventHdr, speed));
     if (ret != RET_OK) {
@@ -708,7 +708,7 @@ int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::GetPointerSpeed(int32_t &speed)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
     if (ret != RET_OK) {
@@ -735,7 +735,7 @@ int32_t MMIService::RemoveInputEventObserver()
 
 int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle));
@@ -763,7 +763,7 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 
 int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
@@ -777,7 +777,7 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle
 
 int32_t MMIService::SetHoverScrollState(bool state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetHoverScrollState, WinMgr, state));
     if (ret != RET_OK) {
@@ -798,7 +798,7 @@ int32_t MMIService::ReadHoverScrollState(bool &state)
 
 int32_t MMIService::GetHoverScrollState(bool &state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadHoverScrollState, this, std::ref(state)));
     if (ret != RET_OK) {
@@ -845,7 +845,7 @@ int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 
 int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, std::ref(ids)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get deviceids failed, ret:%{public}d", ret);
@@ -867,7 +867,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &
 
 int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this, deviceId, std::ref(inputDevice)));
     if (ret != RET_OK) {
@@ -918,6 +918,7 @@ int32_t MMIService::UnregisterDevListener()
 
 int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
+    CALL_DEBUG_ENTER;
     int32_t ret = InputDevMgr->GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
         MMI_HILOGE("GetKeyboardType call failed");
@@ -928,7 +929,7 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 
 int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this, deviceId, std::ref(keyboardType)));
     if (ret != RET_OK) {
@@ -940,7 +941,7 @@ int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 
 int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::SetKeyboardRepeatDelay, KeyRepeat, delay));
     if (ret != RET_OK) {
@@ -953,7 +954,7 @@ int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
 
 int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::SetKeyboardRepeatRate, KeyRepeat, rate));
     if (ret != RET_OK) {
@@ -966,7 +967,7 @@ int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
 
 int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::GetKeyboardRepeatDelay, KeyRepeat, std::ref(delay)));
@@ -980,7 +981,7 @@ int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
 
 int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::GetKeyboardRepeatRate, KeyRepeat, std::ref(rate)));
@@ -1302,7 +1303,7 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
 
 int32_t MMIService::SetAnrObserver()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ANRManager::SetANRNoticedPid, ANRMgr, pid));
     if (ret != RET_OK) {
@@ -1314,7 +1315,7 @@ int32_t MMIService::SetAnrObserver()
 
 int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
     if (ret != RET_OK) {
@@ -1326,14 +1327,14 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
 
 int32_t MMIService::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     NapProcess::GetInstance()->GetAllMmiSubscribedEvents(datas);
     return RET_OK;
 }
 
 int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
     if (ret != RET_OK) {
@@ -1377,7 +1378,7 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
 
 int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerLocation, MouseEventHdr, x, y));
     if (ret != RET_OK) {
@@ -1541,7 +1542,7 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 
 int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&InputWindowsManager::SetMouseCaptureMode, WinMgr, windowId, isCaptureMode));
     if (ret != RET_OK) {
@@ -1564,7 +1565,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
 
 int32_t MMIService::GetWindowPid(int32_t windowId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t windowPid = -1;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetWindowPid, this, windowId, std::ref(windowPid)));
@@ -1634,7 +1635,7 @@ int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t del
 
 int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::UpdateSettingsXml, this, businessId, delay));
     if (ret != RET_OK) {
         MMI_HILOGE("Set key down duration failed: %{public}d", ret);
@@ -1696,7 +1697,7 @@ int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
 
 int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadScrollSwitch,
         MouseEventHdr, switchFlag));
@@ -1710,7 +1711,7 @@ int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
 
 int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadScrollSwich, this,
         std::ref(switchFlag)));
@@ -1724,7 +1725,7 @@ int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
 
 int32_t MMIService::SetTouchpadScrollDirection(bool state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadScrollDirection,
         MouseEventHdr, state));
@@ -1738,7 +1739,7 @@ int32_t MMIService::SetTouchpadScrollDirection(bool state)
 
 int32_t MMIService::GetTouchpadScrollDirection(bool &state)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadScrollDirection, this,
         std::ref(state)));
@@ -1752,7 +1753,7 @@ int32_t MMIService::GetTouchpadScrollDirection(bool &state)
 
 int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadTapSwitch,
         MouseEventHdr, switchFlag));
@@ -1766,7 +1767,7 @@ int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
 
 int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadTapSwitch, this,
         std::ref(switchFlag)));
@@ -1780,7 +1781,7 @@ int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
 
 int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadPointerSpeed,
         MouseEventHdr, speed));
@@ -1794,7 +1795,7 @@ int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
 
 int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadPointerSpeed, this,
         std::ref(speed)));
@@ -1808,7 +1809,7 @@ int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadPinchSwitch,
         TouchEventHdr, switchFlag));
@@ -1822,7 +1823,7 @@ int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
 
 int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadPinchSwitch, this,
         std::ref(switchFlag)));
@@ -1836,7 +1837,7 @@ int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
 
 int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadSwipeSwitch,
         TouchEventHdr, switchFlag));
@@ -1850,7 +1851,7 @@ int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
 
 int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadSwipeSwitch, this,
         std::ref(switchFlag)));
@@ -1864,7 +1865,7 @@ int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
 
 int32_t MMIService::SetTouchpadRightClickType(int32_t type)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadRightClickType,
         MouseEventHdr, type));
@@ -1878,7 +1879,7 @@ int32_t MMIService::SetTouchpadRightClickType(int32_t type)
 
 int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadRightMenuType, this,
         std::ref(type)));
@@ -1892,7 +1893,7 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadRotateSwitch,
         TouchEventHdr, rotateSwitch));
@@ -1906,7 +1907,7 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
 
 int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadRotateSwitch, this,
         std::ref(rotateSwitch)));
@@ -1920,7 +1921,7 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
 
 int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::SetShieldStatus, &sMsgHandler_, shieldMode, isShield));
     if (ret != RET_OK) {
@@ -1931,7 +1932,7 @@ int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
 
 int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::GetShieldStatus, &sMsgHandler_, shieldMode, std::ref(isShield)));
     if (ret != RET_OK) {
@@ -1942,7 +1943,7 @@ int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
 
 int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyState, this, std::ref(pressedKeys),
         std::ref(specialKeysState)));
