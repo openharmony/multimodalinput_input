@@ -2062,7 +2062,8 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     CHKPV(udsServer_);
     CHKPV(lastTouchEvent_);
     if (pointerAction == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
-        WindowInfo *touchWindow = nullptr;
+        WindowInfo touchWindow;
+        bool isChanged { false };
         for (auto item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -2070,16 +2071,17 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
                 continue;
             }
             if (IsInHotArea(lastTouchLogicX_, lastTouchLogicY_, item.defaultHotAreas, item)) {
-                touchWindow = &item;
+                touchWindow = item;
+                isChanged = true;
                 break;
             }
         }
-        if (touchWindow == nullptr) {
-            MMI_HILOGE("touchWindow is nullptr");
+        if (!isChanged) {
+            MMI_HILOGE("touchWindow is not init");
             return;
         }
-        if (touchWindow->id != lastTouchWindowInfo_.id) {
-            lastTouchWindowInfo_ = *touchWindow;
+        if (touchWindow.id != lastTouchWindowInfo_.id) {
+            lastTouchWindowInfo_ = touchWindow;
         }
     }
     auto pointerEvent = PointerEvent::Create();
