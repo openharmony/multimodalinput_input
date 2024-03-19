@@ -106,12 +106,20 @@ bool MMIClient::StartEventRunner()
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     if (eventHandler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-        MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
-        int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
-        if (ret != 0) {
-            MMI_HILOGW("Add watchdog thread failed, ret: %{public}d", ret);
+        auto mainEventRunner = AppExecFwk::EventRunner::GetMainEventRunner();
+        const std::string sceneboard = "com.ohos.sceneboard";
+        const std::string programName(GetProgramName());
+        if (mainEventRunner != nullptr && programName == sceneboard) {
+            MMI_HILOGI("MainEventRunner is available");
+            eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(mainEventRunner);
+        } else {
+            auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+            eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+            MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
+            int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
+            if (ret != 0) {
+                MMI_HILOGW("Add watchdog thread failed, ret: %{public}d", ret);
+            }
         }
     }
 
