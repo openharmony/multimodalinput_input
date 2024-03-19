@@ -213,6 +213,7 @@ declare_args() {
     "src/virtual_single_touchscreen.cpp",
     "src/virtual_stylus.cpp",
     "src/virtual_touchpad.cpp",
+    "src/virtual_touchpad_klv.cpp",
     "src/virtual_touchscreen.cpp",
     "src/virtual_trackball.cpp",
     "src/virtual_trackpad.cpp",
