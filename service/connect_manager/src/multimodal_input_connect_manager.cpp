@@ -75,7 +75,7 @@ int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &info
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
@@ -86,7 +86,7 @@ int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::map<std::t
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
@@ -96,7 +96,7 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
@@ -106,7 +106,7 @@ int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->GetWindowPid(windowId);
@@ -117,7 +117,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
@@ -127,7 +127,7 @@ int32_t MultimodalInputConnectManager::NotifyNapOnline()
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->NotifyNapOnline();
@@ -137,7 +137,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->RemoveInputEventObserver();
@@ -147,7 +147,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
