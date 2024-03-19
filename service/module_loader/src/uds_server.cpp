@@ -56,6 +56,7 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 {
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
+        MMI_HILOGE("Not found pid:%{public}d", pid);
         return INVALID_FD;
     }
     return it->second;
@@ -65,6 +66,7 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
+        MMI_HILOGE("Not found fd:%{public}d", fd);
         return INVALID_PID;
     }
     return it->second->GetPid();
@@ -376,6 +378,7 @@ void UDSServer::DelSession(int32_t fd)
         return;
     }
     auto pid = GetClientPid(fd);
+    MMI_HILOGI("pid:%{public}d", pid);
     if (pid > 0) {
         idxPidMap_.erase(pid);
     }
