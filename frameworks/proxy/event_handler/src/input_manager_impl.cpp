@@ -438,7 +438,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(pointerEvent);
@@ -448,7 +448,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
@@ -482,7 +482,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     pkt << displayGroupInfo_.width << displayGroupInfo_.height << displayGroupInfo_.focusWindowId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write logical data failed");
@@ -541,7 +541,7 @@ int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
@@ -560,7 +560,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.displaysInfo.size());
     pkt << num;
     for (const auto &item : displayGroupInfo_.displaysInfo) {
