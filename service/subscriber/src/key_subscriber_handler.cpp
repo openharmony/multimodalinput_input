@@ -217,6 +217,17 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return true;
     }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT) {
+        MMI_HILOGD("subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
+        for (const auto &item : keyEvent->GetKeyItems()) {
+            int32_t keyCode = item.GetKeyCode();
+            if (keyCode != KeyEvent::KEYCODE_CTRL_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+                keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT) {
+                    return enableCombineKey_;
+            }
+        }
+        return true;
+    }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
         for (const auto &item : keyEvent->GetKeyItems()) {
             int32_t keyCode = item.GetKeyCode();
