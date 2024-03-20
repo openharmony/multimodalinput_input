@@ -682,7 +682,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    return AddMonitor(consumer);
+    return AddMonitor(consumer, HANDLE_EVENT_TYPE_KEY);
 #else
     MMI_HILOGW("Keyboard device or monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -695,14 +695,14 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    return AddMonitor(consumer);
+    return AddMonitor(consumer, HANDLE_EVENT_TYPE_POINTER);
 #else
     MMI_HILOGW("Pointer/touchscreen device or monitor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 }
 
-int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
+int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -712,7 +712,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return IMonitorMgr->AddMonitor(consumer);
+    return IMonitorMgr->AddMonitor(consumer, eventType);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
