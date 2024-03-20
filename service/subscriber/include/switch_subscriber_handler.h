@@ -77,4 +77,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // SWITCH_SUBSCRIBER_HANDLER_H
+#endif // SWITCH_SUBSCRIBER_HANDLER_H
