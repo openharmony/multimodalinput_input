@@ -500,7 +500,11 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() && InputDevMgr->HasPointerDevice()) {
+#else
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         UpdatePointerChangeAreas(displayGroupInfo);
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
