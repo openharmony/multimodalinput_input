@@ -116,4 +116,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // KEY_SUBSCRIBER_HANDLER_H
+#endif // KEY_SUBSCRIBER_HANDLER_H
