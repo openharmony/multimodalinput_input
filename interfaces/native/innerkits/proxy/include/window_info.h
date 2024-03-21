@@ -193,6 +193,13 @@ struct WindowInfo {
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
 
     /**
+     * Only handwriting window
+     *
+     * @since 12
+     */
+    static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
+
+    /**
      * Globally unique identifier of the window
      *
      * @since 9
