@@ -24,16 +24,6 @@ std::mutex mutex_;
 AppObserverManager::AppObserverManager() {}
 AppObserverManager::~AppObserverManager() {}
 
-void ApplicationStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("change app name = %{public}s, uid = %{public}d, state = %{public}d ",
-        appStateData.bundleName.c_str(),
-        appStateData.uid,
-        appStateData.state);
-}
-
 void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &processData)
 {
     CALL_DEBUG_ENTER;
