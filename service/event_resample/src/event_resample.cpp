@@ -48,7 +48,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         if (PointerEvent::POINTER_ACTION_UNKNOWN == inputEvent_.pointerAction) {
             result = ConsumeBatch(frameTime_, &outEvent);
             frameTime_ = 0;
-            if ((ERR_OK == result) && (NULL != outEvent)) {
+            if ((ERR_OK == result) && (nullptr != outEvent)) {
                 status = result;
                 break;
             } else {
@@ -70,7 +70,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         return pointerEvent_;
     } while (0);
 
-    if ((ERR_OK == result) && (NULL != outEvent)) {
+    if ((ERR_OK == result) && (nullptr != outEvent)) {
         // Update pointer event
         UpdatePointerEvent(outEvent);
         EventLogHelper::PrintEventData(pointerEvent_);
