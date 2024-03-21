@@ -219,7 +219,7 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT) {
         MMI_HILOGD("subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
-        return IsEnableCombineKeySwipe(keyEvent); 
+        return IsEnableCombineKeySwipe(keyEvent);
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
         for (const auto &item : keyEvent->GetKeyItems()) {
