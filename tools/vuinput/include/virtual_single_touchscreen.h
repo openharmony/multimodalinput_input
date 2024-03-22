@@ -28,4 +28,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_SINGLE_TOUCHSCREEN_H
+#endif // VIRTUAL_SINGLE_TOUCHSCREEN_H

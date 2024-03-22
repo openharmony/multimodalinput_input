@@ -41,4 +41,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_MANAGER_H
+#endif // HDF_DEVICE_EVENT_MANAGER_H

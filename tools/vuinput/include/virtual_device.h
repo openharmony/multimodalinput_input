@@ -84,4 +84,4 @@ protected:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_DEVICE_H
+#endif // VIRTUAL_DEVICE_H

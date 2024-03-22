@@ -28,4 +28,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_KEYBOARD_H
+#endif // VIRTUAL_KEYBOARD_H

@@ -28,4 +28,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_MOUSE_H
+#endif // VIRTUAL_MOUSE_H

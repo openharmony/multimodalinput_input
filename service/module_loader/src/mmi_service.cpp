@@ -948,7 +948,7 @@ int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
         MMI_HILOGE("Set keyboard repeat delay failed, ret:%{public}d", ret);
         return ret;
     }
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -961,7 +961,7 @@ int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
         MMI_HILOGE("Set keyboard repeat rate failed, ret:%{public}d", ret);
         return ret;
     }
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -975,7 +975,7 @@ int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
         MMI_HILOGE("Get keyboard repeat delay failed, ret:%{public}d", ret);
         return ret;
     }
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -989,7 +989,7 @@ int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
         MMI_HILOGE("Get keyboard repeat rate failed, ret:%{public}d", ret);
         return ret;
     }
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
