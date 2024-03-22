@@ -138,6 +138,7 @@ group("mmi_tests") {
   deps = [
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerManualTest",
+    "frameworks/proxy:InputManagerSimulateTest",
     "frameworks/proxy:InputManagerTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
