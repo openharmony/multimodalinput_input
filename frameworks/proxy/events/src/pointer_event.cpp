@@ -485,6 +485,7 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
+    MMI_HILOGI("Pointer id is not found");
     AddPointerItem(pointerItem);
 }
 

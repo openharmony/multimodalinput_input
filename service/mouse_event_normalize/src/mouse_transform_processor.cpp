@@ -276,6 +276,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+        MMI_HILOGI("Libinput event axis source type is finger");
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     } else {
         if (TimerMgr->IsExist(timerId_)) {
@@ -289,7 +290,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 CALL_DEBUG_ENTER;
                 auto sharedPtr = weakPtr.lock();
                 CHKPV(sharedPtr);
-                MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
+                MMI_HILOGI("Timer:%{public}d", sharedPtr->timerId_);
                 sharedPtr->timerId_ = -1;
                 auto pointerEvent = sharedPtr->GetPointerEvent();
                 CHKPV(pointerEvent);
@@ -301,7 +302,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
             });
 
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-            MMI_HILOGD("Axis begin");
+            MMI_HILOGI("Axis begin");
         }
     }
 
