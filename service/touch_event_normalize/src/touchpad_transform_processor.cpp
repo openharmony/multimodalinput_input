@@ -51,7 +51,7 @@ TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, RET_ERR);
@@ -152,7 +152,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, RET_ERR);
@@ -231,6 +231,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
             break;
         }
         default: {
+            MMI_HILOGW("Touch pad action is not found");
             return nullptr;
         }
     }
@@ -245,7 +246,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         pointerEvent_->GetPointerIds().size());
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("The id:%{public}d event created by:%{public}s, type:%{public}d",
+               pointerEvent_->GetId(), device->GetName().c_str(), type);
     return pointerEvent_;
 }
 
