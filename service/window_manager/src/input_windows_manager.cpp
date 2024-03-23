@@ -1186,7 +1186,6 @@ void InputWindowsManager::SetGlobalDefaultPointerStyle()
             }
         }
     }
-    return;
 }
 
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
