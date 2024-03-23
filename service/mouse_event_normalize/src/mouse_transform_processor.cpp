@@ -276,7 +276,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGD("Libinput event axis source type is finger");
+        MMI_HILOGI("Libinput event axis source type is finger");
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     } else {
         if (TimerMgr->IsExist(timerId_)) {
