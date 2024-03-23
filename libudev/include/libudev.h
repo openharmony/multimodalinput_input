@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef LIBUDEV_H
+#define LIBUDEV_H
+
 #pragma once
 
 #include <stdarg.h>
@@ -191,3 +194,4 @@ int udev_util_encode_string(const char *str, char *str_enc, size_t len);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif // __cplusplus
+#endif // LIBUDEV_H
