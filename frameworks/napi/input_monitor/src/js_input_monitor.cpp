@@ -287,9 +287,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std:
         return;
     }
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
-        auto& jsMonitor { JsInputMonMgr.GetMonitor(jsId, jsFingers) };
-        CHKPV(jsMonitor);
-        jsMonitor->OnPointerEvent(pointerEvent);
+        JsInputMonMgr.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
@@ -310,9 +308,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
         return;
     }
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
-        auto& jsMonitor { JsInputMonMgr.GetMonitor(jsId, jsFingers) };
-        CHKPV(jsMonitor);
-        jsMonitor->OnPointerEvent(pointerEvent);
+        JsInputMonMgr.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);

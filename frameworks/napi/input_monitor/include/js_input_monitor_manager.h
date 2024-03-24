@@ -41,6 +41,7 @@ public:
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers = 0);
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, const int32_t fingers = 0);
     void RemoveMonitor(napi_env jsEnv);
+    void OnPointerEventByMonitorId(int32_t id, int32_t fingers, std::shared_ptr<PointerEvent> pointEvent);
     const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id, int32_t fingers);
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
     void RemoveEnv(napi_env env);
