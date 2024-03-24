@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUAL_TOUCHPAD_KLV_H
-#define VIRTUAL_TOUCHPAD_KLV_H
+#ifndef VIRTUAL_PC_TOUCHPAD_H
+#define VIRTUAL_PC_TOUCHPAD_H
 
 #include "virtual_device.h"
 
 namespace OHOS {
 namespace MMI {
-class VirtualTouchpadKLV : public VirtualDevice {
+class VirtualPcTouchpad : public VirtualDevice {
 public:
-    VirtualTouchpadKLV();
-    DISALLOW_COPY_AND_MOVE(VirtualTouchpadKLV);
-    ~VirtualTouchpadKLV() = default;
+    VirtualPcTouchpad();
+    DISALLOW_COPY_AND_MOVE(VirtualPcTouchpad);
+    ~VirtualPcTouchpad() = default;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // VIRTUAL_TOUCHPAD_KLV_H
+#endif // VIRTUAL_PC_TOUCHPAD_H

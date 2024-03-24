@@ -41,7 +41,7 @@
 #include "virtual_trackpad.h"
 #include "virtual_trackpad_sys_ctrl.h"
 #include "virtual_touchpad.h"
-#include "virtual_touchpad_klv.h"
+#include "virtual_pc_touchpad.h"
 #include "virtual_touchscreen.h"
 #include "virtual_trackpad_mouse.h"
 
@@ -92,7 +92,7 @@ static bool CheckFileName(const std::string& fileName)
     std::vector<std::string> validFileNames = {
         "mouse", "keyboard", "joystick", "trackball", "remotecontrol",
         "trackpad", "knob", "gamepad", "touchpad", "touchscreen",
-        "pen", "klv", "all"
+        "pen", "pc", "all"
     };
     std::string deviceName = fileName.substr(pos + 1);
     bool result = std::any_of(validFileNames.begin(), validFileNames.end(), [deviceName](const std::string& str) {
@@ -186,10 +186,10 @@ static void StartTrackpad()
     virtualTrackpadSysCtrl.SetUp();
 }
 
-static void StartKlv()
+static void StartPc()
 {
-    static VirtualTouchpadKLV virtualKlv;
-    virtualKlv.SetUp();
+    static VirtualPcTouchpad virtualPc;
+    virtualPc.SetUp();
 }
 
 static void StartKnob()
@@ -251,7 +251,7 @@ std::map<std::string, virtualFun> mapFun = {
     {"knob", &StartKnob},
     {"gamepad", &StartGamePad},
     {"touchpad", &StartTouchPad},
-    {"klv", &StartKlv},
+    {"pc", &StartPc},
     {"touchscreen", &StartTouchScreen},
     {"pen", &StartPen}
 };
@@ -413,7 +413,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual SingleFinger",         "touchpad"},
         {"Virtual Stylus",               "touchpad"},
         {"Virtual Touchpad",             "touchpad"},
-        {"Virtual TouchPadKLV",          "klv"},
+        {"Virtual PcTouchPad",           "pc"},
         {"Virtual RemoteControl",        "remotecontrol"},
         {"Virtual Joystick",             "joystick"},
         {"Virtual GamePad",              "gamepad"},
