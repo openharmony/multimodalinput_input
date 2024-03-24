@@ -774,8 +774,12 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     }
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
         std::optional<WindowInfo> windowInfo;
-        if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
-            lastPointerEvent_->GetPressedButtons().empty()) {
+        int32_t eventAction = lastPointerEvent_->GetPointerAction();
+        bool checkFlag = (eventAction == PointerEvent::POINTER_ACTION_MOVE &&
+            lastPointerEvent_->GetPressedButtons().empty()) ||
+            (eventAction >= PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+            eventAction <= PointerEvent::POINTER_ACTION_AXIS_END);
+        if (checkFlag) {
             windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
         } else {
             windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEvent_);
