@@ -163,6 +163,18 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
     }
 }
 
+void JsInputMonitorManager::OnPointerEventByMonitorId(int32_t id, int32_t fingers,
+    std::shared_ptr<PointerEvent> pointEvent)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if ((item != nullptr) && (item->GetId() == id && item->GetFingers() == fingers)) {
+            item->OnPointerEvent(pointEvent);
+        }
+    }
+}
+
 const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id, int32_t fingers)
 {
     CALL_DEBUG_ENTER;

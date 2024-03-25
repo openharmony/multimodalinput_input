@@ -303,7 +303,6 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             return RET_ERR;
         }
     }
-    
     WinMgr->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
 }
@@ -376,6 +375,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPR(monitorHandler, ERROR_NULL_POINTER);
         monitorHandler->RemoveInputHandler(handlerType, eventType, sess);
+        ANRMgr->RemoveTimersByType(sess, ANR_MONITOR);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
