@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 int64_t g_nextEventId = 1;
+constexpr uint32_t DATA_LENGTH_LIMIT = 1024; // 1024: max length
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEvent" };
 } // namespace
 
@@ -227,7 +228,7 @@ void InputEvent::MarkProcessed()
 
 void InputEvent::SetExtraData(const std::shared_ptr<const uint8_t[]> data, uint32_t length)
 {
-    if (data && length != 0) {
+    if (data && (length > 0) && (length <= DATA_LENGTH_LIMIT)) {
         extraData_ = data;
         extraDataLength_ = length;
     }
@@ -279,12 +280,22 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, agentWindowId_);
     READUINT32(in, bitwise_);
     READUINT32(in, extraDataLength_);
-    if (extraDataLength_ != 0) {
-        const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
-        std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
-        std::copy(buffer, buffer + extraDataLength_, sp.get());
-        extraData_ = sp;
+    
+    if (extraDataLength_ == 0) {
+        return true;
     }
+    if (extraDataLength_ > DATA_LENGTH_LIMIT) {
+        extraDataLength_ = 0;
+        return false;
+    }
+    const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
+    std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
+    if ((buffer == nullptr) || (sp == nullptr)) {
+        extraDataLength_ = 0;
+        return false;
+    }
+    std::copy(buffer, buffer + extraDataLength_, sp.get());
+    extraData_ = sp;
     return true;
 }
 } // namespace MMI
