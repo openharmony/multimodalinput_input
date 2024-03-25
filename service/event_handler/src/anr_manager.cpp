@@ -83,6 +83,22 @@ void ANRManager::RemoveTimers(SessionPtr sess)
     }
 }
 
+void ANRManager::RemoveTimersByType(SessionPtr sess, int32_t type)
+{
+    CHKPV(sess);
+    if (type != ANR_DISPATCH && type != ANR_MONITOR) {
+        MMI_HILOGE("remove times failed, your input parm is %{public}d, which is not legal", type);
+        return;
+    }
+    std::vector<int32_t> timerIds = sess->GetTimerIds(ANR_MONITOR);
+    for (int32_t item : timerIds) {
+        if (item != -1) {
+            TimerMgr->RemoveTimer(item);
+            anrTimerCount_--;
+        }
+    }
+}
+
 void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, SessionPtr sess)
 {
     CHKPV(sess);

@@ -368,7 +368,6 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
         interceptorHandler->RemoveInputHandler(handlerType, eventType, priority, deviceTags, sess);
-        ANRMgr->RemoveTimers(sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -376,7 +375,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPR(monitorHandler, ERROR_NULL_POINTER);
         monitorHandler->RemoveInputHandler(handlerType, eventType, sess);
-        ANRMgr->RemoveTimers(sess);
+        ANRMgr->RemoveTimersByType(sess, ANR_MONITOR);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
