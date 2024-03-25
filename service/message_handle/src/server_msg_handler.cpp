@@ -303,7 +303,6 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             return RET_ERR;
         }
     }
-
     WinMgr->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
 }
