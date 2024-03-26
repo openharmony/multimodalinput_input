@@ -289,7 +289,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
     const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
-    if ((buffer == nullptr)) {
+    if (buffer == nullptr) {
         extraDataLength_ = 0;
         return false;
     }
