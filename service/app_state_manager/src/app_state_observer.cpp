@@ -24,14 +24,14 @@ std::mutex mutex_;
 AppObserverManager::AppObserverManager() {}
 AppObserverManager::~AppObserverManager() {}
 
-void ApplicationStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
+void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &processData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("change app name = %{public}s, uid = %{public}d, state = %{public}d ",
-        appStateData.bundleName.c_str(),
-        appStateData.uid,
-        appStateData.state);
+    MMI_HILOGD("process state change app name = %{public}s, uid = %{public}d, state = %{public}d ",
+        processData.bundleName.c_str(),
+        processData.uid,
+        processData.state);
     std::vector<AppExecFwk::AppStateData> list {};
     GetForegroundApplicationInfo(list);
 }
