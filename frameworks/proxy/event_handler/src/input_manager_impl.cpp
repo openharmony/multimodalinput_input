@@ -830,7 +830,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;MAX_SIMULATE_EVENT_ID
+    CALL_INFO_TRACE;
     int maxPointerId = SIMULATE_EVENT_START_ID;
     std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetPointerItems();
     for (auto &pointerItem : pointerItems) {
@@ -846,6 +846,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     pointerEvent->SetPointers(pointerItems);
     if (-1 == pointerEvent->GetPointerId() && !pointerItems.empty()) {
         pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
+        MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
 }
 
