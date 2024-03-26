@@ -40,6 +40,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
+constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer& udsServer)
@@ -239,6 +240,11 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t userId = sess->GetUid();
+    if (userId != SECURITY_COMPONENT_SERVICE_ID) {
+        MMI_HILOGE("Session is not security component service");
+        return RET_ERR;
+    }
     uint32_t num = 0;
     pkt >> num;
     uint8_t cfg[num];
