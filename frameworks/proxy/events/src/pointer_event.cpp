@@ -542,12 +542,12 @@ std::vector<int32_t> PointerEvent::GetPointerIds() const
     return pointerIdList;
 }
 
-std::list<PointerItem> PointerEvent::GetPointers() const
+std::list<PointerEvent::PointerItem> PointerEvent::GetPointers() const
 {
     return pointers_;
 }
 
-void PointerEvent::SetPointers(std::list<PointerItem> &pointers)
+void PointerEvent::SetPointers(std::list<PointerEvent::PointerItem> &pointers)
 {
     pointers_ = pointers;
 }
