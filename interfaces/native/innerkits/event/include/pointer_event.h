@@ -1025,14 +1025,14 @@ public:
          * @since 9
          */
         bool ReadFromParcel(Parcel &in);
-		
+
         /**
          * @brief Obtains the raw X coordinate.
          * @return Returns the raw X coordinate.
          * @since 9
          */
         int32_t GetRawDx() const;
-		
+
         /**
          * @brief Sets the raw X coordinate.
          * @param rawDx Indicates the raw X coordinate to set.
@@ -1046,7 +1046,7 @@ public:
          * @since 9
          */
         int32_t GetRawDy() const;
-		
+
         /**
          * @brief Sets the raw Y coordinate.
          * @param rawDy Indicates the raw Y coordinate to set.
@@ -1055,7 +1055,7 @@ public:
          */
         void SetRawDy(int32_t rawDy);
     private:
-        int32_t pointerId_ {};
+        int32_t pointerId_ { -1 };
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
@@ -1169,6 +1169,28 @@ public:
      * @since 9
      */
     void RemovePointerItem(int32_t pointerId);
+
+    /**
+     * @brief All of the pointer items is be removed.
+     * @return void
+     * @since 9
+     */
+    void RemoveAllPointerItems();
+
+    /**
+     * @brief Update all pointerItems of pointers_.
+     * @param pointers Indicates container for storing pointer item.
+     * @return void
+     * @since 9
+     */
+    void SetPointers(std::list<PointerItem> &pointers);
+
+    /**
+     * @brief Return all the pointerItems.
+     * @return Returns pointers_.
+     * @since 9
+     */
+    std::list<PointerItem> GetPointers() const;
 
     /**
      * @brief Updates a pointer item based on the pointer ID.

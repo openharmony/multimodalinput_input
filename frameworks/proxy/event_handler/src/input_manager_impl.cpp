@@ -36,6 +36,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr size_t MAX_FILTER_NUM = 4;
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
+constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -774,6 +775,27 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;MAX_SIMULATE_EVENT_ID
+    int maxPointerId = SIMULATE_EVENT_START_ID;
+    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetPointerItems();
+    for (auto &pointerItem : pointerItems) {
+        int32_t pointerId = pointerItem.GetPointerId();
+        if (pointerId != -1) {
+            maxPointerId = (maxPointerId > pointerId) ? maxPointerId : pointerId;
+            continue;
+        }
+        maxPointerId += 1;
+        pointerItem.SetPointerId(maxPointerId);
+    }
+    pointerEvent->RemoveAllPointerItems();
+    pointerEvent->SetPointers(pointerItems);
+    if (-1 == pointerEvent->GetPointerId() && !pointerItems.empty()) {
+        pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
+    }
+}
+
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -798,6 +820,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         return;
     }
 #endif
+    HandleSimulateInputEvent(pointerEvent);
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
