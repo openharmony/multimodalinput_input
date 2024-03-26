@@ -1192,19 +1192,11 @@ public:
     void RemoveAllPointerItems();
 
     /**
-     * @brief Update all pointerItems of pointers_.
-     * @param pointers Indicates container for storing pointer item.
-     * @return void
-     * @since 9
-     */
-    void SetPointers(std::list<PointerItem> &pointers);
-
-    /**
      * @brief Return all the pointerItems.
      * @return Returns pointers_.
      * @since 9
      */
-    std::list<PointerItem> GetPointers() const;
+    std::list<PointerItem> GetAllPointerItems() const;
 
     /**
      * @brief Updates a pointer item based on the pointer ID.
