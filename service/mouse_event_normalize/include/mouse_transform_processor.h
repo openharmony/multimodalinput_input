@@ -83,7 +83,7 @@ private:
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button);
+    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
     void DumpInner();
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
     int32_t GetTouchpadSpeed(void);
@@ -93,7 +93,6 @@ private:
     static int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
 
 public:
-    static void InitAbsolution();
     static void OnDisplayLost(int32_t displayId);
     static int32_t GetDisplayId();
     static int32_t SetMousePrimaryButton(int32_t primaryButton);
@@ -115,9 +114,6 @@ public:
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
 
 private:
-    static double absolutionX_;
-    static double absolutionY_;
-    static int32_t currentDisplayId_;
     static int32_t globalPointerSpeed_;
 
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

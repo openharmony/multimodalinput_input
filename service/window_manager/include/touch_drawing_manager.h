@@ -40,6 +40,8 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchDrawingManager);
     void TouchDrawHandler(const std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+        int32_t &physicalX, int32_t &physicalY);
 
 private:
     void StartTouchDraw(const std::shared_ptr<PointerEvent> pointerEvent);
@@ -57,7 +59,7 @@ private:
     Rosen::Drawing::Brush brush_;
     Rosen::Drawing::Pen pen_;
 };
-#define TOUCH_DRAWING_MANAGER ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
+#define TouchDrawingMgr ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_DRAWING_MANAGER_H

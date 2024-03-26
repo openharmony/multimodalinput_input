@@ -24,8 +24,8 @@ namespace MMI {
 namespace {
 std::shared_ptr<KeyboardInject> g_instance = nullptr;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject" };
-constexpr int32_t INPUT_KEY_BACK = 2;
-constexpr int32_t LINUX_KEY_BACK = 158;
+constexpr int32_t INPUT_KEY_BACK { 2 };
+constexpr int32_t LINUX_KEY_BACK { 158 };
 } // namespace
 std::mutex KeyboardInject::mutex_;
 std::unique_ptr<VirtualKeyboard> g_pKeyboard = nullptr;

@@ -56,9 +56,9 @@ public:
     DISALLOW_COPY_AND_MOVE(JsShortKeyManager);
 
     void ResetEnv();
-    napi_value SetKeyDownDuration(napi_env env, const std::string &key, int32_t keyDownDuration, napi_value handle = nullptr);
+    napi_value SetKeyDownDuration(napi_env env, const std::string &key, int32_t keyDownDuration,
+        napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_SHORT_KEY_MANAGER_H

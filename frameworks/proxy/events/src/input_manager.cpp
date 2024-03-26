@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,14 +52,14 @@ int32_t InputManager::GetWindowPid(int32_t windowId)
     return InputMgrImpl.GetWindowPid(windowId);
 }
 
-void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
-    InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
+    return InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
-void InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
+int32_t InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    return InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
 }
 
 int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
@@ -458,6 +458,17 @@ int32_t InputManager::GetTouchpadRightClickType(int32_t &type)
 {
     return InputMgrImpl.GetTouchpadRightClickType(type);
 }
+
+int32_t InputManager::SetTouchpadRotateSwitch(bool rotateSwitch)
+{
+    return InputMgrImpl.SetTouchpadRotateSwitch(rotateSwitch);
+}
+
+int32_t InputManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
+{
+    return InputMgrImpl.GetTouchpadRotateSwitch(rotateSwitch);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
@@ -485,6 +496,26 @@ int32_t InputManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 int32_t InputManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     return InputMgrImpl.GetShieldStatus(shieldMode, isShield);
+}
+
+void InputManager::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    InputMgrImpl.AddServiceWatcher(watcher);
+}
+
+void InputManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    InputMgrImpl.RemoveServiceWatcher(watcher);
+}
+
+int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime)
+{
+    return InputMgrImpl.MarkProcessed(eventId, actionTime);
+}
+
+int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+{
+    return InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
 }
 } // namespace MMI
 } // namespace OHOS

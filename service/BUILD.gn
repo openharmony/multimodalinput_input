@@ -204,8 +204,7 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (security_component_enable) {
-    external_deps +=
-        [ "security_component_manager:libsecurity_component_enhance_sdk" ]
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
 
   if (resource_schedule_service_enabled) {
@@ -232,6 +231,7 @@ ohos_shared_library("libmmi-server") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
+    "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",

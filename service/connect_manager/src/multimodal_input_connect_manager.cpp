@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &info
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
@@ -86,7 +86,7 @@ int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::map<std::t
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
@@ -96,7 +96,7 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
@@ -106,7 +106,7 @@ int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->GetWindowPid(windowId);
@@ -117,7 +117,7 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
@@ -127,7 +127,7 @@ int32_t MultimodalInputConnectManager::NotifyNapOnline()
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->NotifyNapOnline();
@@ -137,7 +137,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->RemoveInputEventObserver();
@@ -147,7 +147,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        MMI_HILOGE("multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
@@ -456,13 +456,16 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
         auto sharedPtr = weakPtr.lock();
         if (sharedPtr != nullptr) {
-            sharedPtr->OnDeath();
+            sharedPtr->OnDeath(object);
         }
     };
 
     multimodalInputConnectRecipient_ = new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
     CHKPF(multimodalInputConnectRecipient_);
-    sa->AddDeathRecipient(multimodalInputConnectRecipient_);
+    if (!sa->AddDeathRecipient(multimodalInputConnectRecipient_)) {
+        MMI_HILOGE("Failed to add death recipient");
+        return false;
+    }
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("Get multimodalinput service failed");
@@ -472,32 +475,45 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     return true;
 }
 
-void MultimodalInputConnectManager::OnDeath()
+void MultimodalInputConnectManager::OnDeath(const wptr<IRemoteObject> &remoteObj)
 {
     CALL_DEBUG_ENTER;
-    Clean();
+    Clean(remoteObj);
+    NotifyServiceDeath();
     NotifyDeath();
 }
 
-void MultimodalInputConnectManager::Clean()
+void MultimodalInputConnectManager::Clean(const wptr<IRemoteObject> &remoteObj)
 {
-    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
-        multimodalInputConnectService_.clear();
+        auto serviceObj = multimodalInputConnectService_->AsObject();
+        if (serviceObj != nullptr) {
+            if (serviceObj != remoteObj.promote()) {
+                return;
+            }
+            if (multimodalInputConnectRecipient_ != nullptr) {
+                MMI_HILOGI("Remove death recipient on service death");
+                serviceObj->RemoveDeathRecipient(multimodalInputConnectRecipient_);
+            }
+        }
+        MMI_HILOGI("Reset proxy on service death");
+        multimodalInputConnectRecipient_ = nullptr;
         multimodalInputConnectService_ = nullptr;
     }
+}
 
-    if (multimodalInputConnectRecipient_ != nullptr) {
-        multimodalInputConnectRecipient_.clear();
-        multimodalInputConnectRecipient_ = nullptr;
+void MultimodalInputConnectManager::NotifyServiceDeath()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    for (const auto &watcher : watchers_) {
+        watcher->OnServiceDied();
     }
 }
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
     CALL_DEBUG_ENTER;
-
     int32_t retryCount = 50;
     do {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -622,6 +638,18 @@ int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
     return multimodalInputConnectService_->GetTouchpadRightClickType(type);
 }
 
+int32_t MultimodalInputConnectManager::SetTouchpadRotateSwitch(bool rotateSwitch)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadRotateSwitch(rotateSwitch);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
+}
+
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
@@ -632,6 +660,26 @@ int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool 
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
+}
+
+int32_t MultimodalInputConnectManager::GetKeyState(std::vector<int32_t> &pressedKeys,
+    std::map<int32_t, int32_t> &specialKeysState)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetKeyState(pressedKeys, specialKeysState);
+}
+
+void MultimodalInputConnectManager::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    CHKPV(watcher);
+    std::lock_guard<std::mutex> guard(lock_);
+    watchers_.insert(watcher);
+}
+
+void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    watchers_.erase(watcher);
 }
 } // namespace MMI
 } // namespace OHOS

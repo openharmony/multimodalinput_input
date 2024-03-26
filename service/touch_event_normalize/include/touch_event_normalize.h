@@ -54,6 +54,8 @@ public:
     int32_t GetTouchpadPinchSwitch(bool &switchFlag) const;
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) const;
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch) const;
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) const;
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(

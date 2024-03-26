@@ -44,13 +44,15 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, INVALID_HANDLER_ID);
-    eventType = HANDLE_EVENT_TYPE_NONE;
-    if ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD)) != 0) {
-        eventType |= HANDLE_EVENT_TYPE_KEY;
-    }
-    if ((deviceTags & (CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) -
-        CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0) {
-        eventType |= HANDLE_EVENT_TYPE_POINTER;
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        eventType = HANDLE_EVENT_TYPE_NONE;
+        if ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD)) != 0) {
+            eventType |= HANDLE_EVENT_TYPE_KEY;
+        }
+        if ((deviceTags & (CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) -
+            CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0) {
+            eventType |= HANDLE_EVENT_TYPE_POINTER;
+        }
     }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     if ((monitorHandlers_.size() + interHandlers_.size()) >= MAX_N_INPUT_HANDLERS) {

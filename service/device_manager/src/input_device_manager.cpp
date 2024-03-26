@@ -278,7 +278,6 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     devListener_.remove(sess);
-    MMI_HILOGI("sess with fd%{public}d with pid %{public}d has been deleted", sess->GetFd(), sess->GetPid());
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -660,6 +659,12 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
                 CHKPR(listener, ERROR_NULL_POINTER);
                 NotifyMessage(listener, item.first, enable ? "add" : "remove");
             }
+        }
+    }
+    for (const auto &item : inputDevice_) {
+        if (item.second.isPointerDevice && item.second.enable) {
+            NotifyPointerDevice(true, true);
+            break;
         }
     }
     return RET_OK;
