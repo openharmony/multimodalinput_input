@@ -1092,7 +1092,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "The first parameter type is invalid");
+        THROWERR(env, "First parameter type is invalid");
         return nullptr;
     }
 
@@ -1105,7 +1105,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
         return jsPointerMgr->EnterCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second parameter type is invalid");
+        THROWERR(env, "Second parameter type is invalid");
         return nullptr;
     }
     return jsPointerMgr->EnterCaptureMode(env, windowId, argv[1]);
@@ -1122,7 +1122,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "The first parameter type is invalid");
+        THROWERR(env, "First parameter type is invalid");
         return nullptr;
     }
 
@@ -1136,7 +1136,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         return jsPointerMgr->LeaveCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second parameter type is invalid");
+        THROWERR(env, "Second parameter type is invalid");
         return nullptr;
     }
     return jsPointerMgr->LeaveCaptureMode(env, windowId, argv[1]);
@@ -1540,6 +1540,32 @@ napi_value JsPointerContext::GetTouchpadRightClickType(napi_env env, napi_callba
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::SetTouchpadRotateSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool rotateSwitch, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadRotateSwitch(env, rotateSwitch, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadRotateSwitch(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1591,6 +1617,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadSwipeSwitch", GetTouchpadSwipeSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRightClickType", SetTouchpadRightClickType),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRightClickType", GetTouchpadRightClickType),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRotateSwitch", SetTouchpadRotateSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRotateSwitch", GetTouchpadRotateSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),

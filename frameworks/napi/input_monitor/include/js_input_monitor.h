@@ -30,14 +30,13 @@
 
 #include "i_input_event_consumer.h"
 #include "js_touch_event.h"
+#include "js_joystick_event.h"
 
 namespace OHOS {
 namespace MMI {
 using MapFun = std::map<std::string, std::function<int64_t()>>;
 
-
-class InputMonitor final : public IInputEventConsumer,
-                           public std::enable_shared_from_this<InputMonitor> {
+class InputMonitor final : public IInputEventConsumer, public std::enable_shared_from_this<InputMonitor> {
 public:
     InputMonitor() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitor);
@@ -110,11 +109,16 @@ private:
     int32_t TransformSwipeEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformRotateEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformMultiTapEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    std::optional<int32_t> GetJoystickAction(int32_t action);
+    int32_t GetJoystickButton(int32_t button);
+    int32_t GetJoystickPointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
         const PointerEvent::PointerItem& item, napi_value result);
     bool GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value element);
     bool GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result);
+    bool GetJoystickPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
@@ -124,6 +128,7 @@ private:
     bool IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };

@@ -194,7 +194,7 @@ HWTEST_F(InputManagerManualTest, HandleKeyEventFilter_003, TestSize.Level1)
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }

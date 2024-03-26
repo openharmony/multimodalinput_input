@@ -14,6 +14,7 @@
  */
 
 #include "virtual_trackpad.h"
+
 namespace OHOS {
 namespace MMI {
 VirtualTrackpad::VirtualTrackpad() : VirtualDevice("Virtual Trackpad", BUS_USB, 0x62a, 0x8255)

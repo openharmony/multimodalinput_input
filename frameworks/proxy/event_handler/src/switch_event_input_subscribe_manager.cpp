@@ -122,6 +122,5 @@ void SwitchEventInputSubscribeManager::OnConnected()
         }
     }
 }
-
 } // namespace MMI
 } // namespace OHOS

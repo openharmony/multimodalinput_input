@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_KEYBOARD_H
 #define VIRTUAL_KEYBOARD_H
+
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -27,4 +28,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_KEYBOARD_H
+#endif // VIRTUAL_KEYBOARD_H

@@ -35,6 +35,7 @@ public:
     void AddTimer(int32_t type, int32_t id, int64_t currentTime, SessionPtr sess);
     int32_t MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId);
     void RemoveTimers(SessionPtr sess);
+    void RemoveTimersByType(SessionPtr sess, int32_t type);
 private:
     int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ { nullptr };

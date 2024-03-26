@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
-constexpr int64_t FINGER_BLOCK_TIME = 6;
+constexpr int64_t FINGER_BLOCK_TIME { 6 };
 } // namespace
 
 int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem &fingerEventArrays,

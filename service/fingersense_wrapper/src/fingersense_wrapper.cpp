@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include <dlfcn.h>
 #include "fingersense_wrapper.h"
+
+#include <dlfcn.h>
 
 #include "define_multimodal.h"
 #include "pointer_event.h"

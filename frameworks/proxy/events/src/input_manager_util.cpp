@@ -109,7 +109,7 @@ constexpr double POINTER_ITEM_TITLE_X_THREE = 10.0;
 constexpr double POINTER_ITEM_TITLE_Y_ONE = 5.43;
 constexpr double POINTER_ITEM_TITLE_Y_TWO = 15.33;
 constexpr double POINTER_ITEM_TITLE_Y_THREE = -9.0;
-}  // namespace
+} // namespace
 
 std::shared_ptr<KeyOption> InputManagerUtil::InitOption(
     const std::set<int32_t> &preKeys, int32_t finalKey, bool isFinalKeyDown, int32_t duration)
@@ -498,7 +498,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent016()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     return pointerEvent;
 }
-#endif  // OHOS_BUILD_ENABLE_JOYSTICK
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 std::shared_ptr<PointerEvent> InputManagerUtil::SetupMouseEvent001()
 {
@@ -649,7 +649,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep1()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     return pointerEvent;
 }
@@ -673,7 +673,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep2()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     return pointerEvent;
 }
@@ -705,7 +705,7 @@ void InputManagerUtil::TestMarkConsumedStep4()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -728,7 +728,7 @@ void InputManagerUtil::TestMarkConsumedStep5()
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -753,7 +753,7 @@ void InputManagerUtil::TestMarkConsumedStep6()
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_FOCUS);
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -799,7 +799,7 @@ void InputManagerUtil::TestMonitor(int32_t monitorId, std::shared_ptr<PointerEve
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
 
     if (IsValidHandlerId(monitorId)) {
         TestRemoveMonitor(monitorId);
@@ -814,12 +814,12 @@ void InputManagerUtil::TestInterceptorIdAndPointerEvent(
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
@@ -860,5 +860,5 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTabletToolEvent001()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 #include "input_display_bind_helper.h"
 
 #include <fstream>
@@ -67,9 +68,9 @@ public:
     friend std::istream &operator >> (std::istream &is, BindInfo &r);
 
 private:
-    int32_t inputDeviceId_{ -1 };
+    int32_t inputDeviceId_ { -1 };
     std::string inputDeviceName_;
-    int32_t displayId_{ -1 };
+    int32_t displayId_ { -1 };
     std::string displayName_;
 };
 

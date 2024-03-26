@@ -48,7 +48,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         if (PointerEvent::POINTER_ACTION_UNKNOWN == inputEvent_.pointerAction) {
             result = ConsumeBatch(frameTime_, &outEvent);
             frameTime_ = 0;
-            if ((ERR_OK == result) && (NULL != outEvent)) {
+            if ((ERR_OK == result) && (nullptr != outEvent)) {
                 status = result;
                 break;
             } else {
@@ -65,20 +65,16 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         // Update touch state object
         EventDump("UpdateTouchState", inputEvent_);
         EventLogHelper::PrintEventData(pointerEvent_);
-        auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
-        CHKPP(device);
-        MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+        PrintfDeviceName();
         UpdateTouchState(inputEvent_);
         return pointerEvent_;
     } while (0);
 
-    if ((ERR_OK == result) && (NULL != outEvent)) {
+    if ((ERR_OK == result) && (nullptr != outEvent)) {
         // Update pointer event
         UpdatePointerEvent(outEvent);
         EventLogHelper::PrintEventData(pointerEvent_);
-        auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
-        CHKPP(device);
-        MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+        PrintfDeviceName();
         return pointerEvent_;
     }
 
@@ -122,9 +118,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
     // Check that event can be consumed and initialize motion event.
     if (nullptr != pointerEvent) {
         EventLogHelper::PrintEventData(pointerEvent_);
-        auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
-        CHKPR(device, RET_ERR);
-        MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+        PrintfDeviceName();
         pointerAction = pointerEvent->GetPointerAction();
         MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,
                    pointerAction, pointerEvent->GetActionTime(), frameTime_);
@@ -158,7 +152,7 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result)
         Batch& batch = batches_.at(batchIndex);
         if (CanAddSample(batch, inputEvent_)) {
             batch.samples.push_back(inputEvent_);
-            MMI_HILOGD("Event added to batch: %{public}d %{public}d %{public}d",
+            MMI_HILOGD("Event added to batch:%{public}d %{public}d %{public}d",
                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
             return true;
         }
@@ -203,7 +197,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             } else if (PointerEvent::POINTER_ACTION_UP == outEvent->pointerAction) {
                 item.SetPressed(false);
             } else {
-                MMI_HILOGD("Output event: Pointer action: %{public}d", outEvent->pointerAction);
+                MMI_HILOGD("Output event:Pointer action:%{public}d", outEvent->pointerAction);
             }
             pointerEvent_->UpdatePointerItem(it.first, item);
         }
@@ -510,6 +504,16 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
         default:
             return false;
     }
+}
+
+void EventResample::PrintfDeviceName()
+{
+    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    if (device == nullptr) {
+        MMI_HILOGW("The device is not found");
+        return;
+    }
+    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
 }
 
 } // namespace MMI

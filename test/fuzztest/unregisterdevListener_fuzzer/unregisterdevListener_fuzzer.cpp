@@ -37,7 +37,7 @@ public:
     };
 };
 
-void UnregisterDevListenerFuzzTest(const uint8_t* data, size_t  size)
+void UnregisterDevListenerFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= 0)) {
         return;

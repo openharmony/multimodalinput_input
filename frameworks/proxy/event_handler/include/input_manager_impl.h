@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_anr_observer.h"
+#include "i_input_service_watcher.h"
 #include "mmi_event_observer.h"
 #include "i_window_checker.h"
 #include "key_option.h"
@@ -56,8 +57,8 @@ public:
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
-    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
-    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
+    int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
@@ -91,7 +92,8 @@ public:
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
 
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
@@ -108,6 +110,9 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+    template<typename T>
+    bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
+    void OnDisconnected();
 
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
     int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
@@ -158,6 +163,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
     int32_t SetTouchpadRightClickType(int32_t type);
     int32_t GetTouchpadRightClickType(int32_t &type);
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
@@ -175,15 +182,23 @@ public:
     void AppendExtraData(const ExtraData& extraData);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+
+    void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
+
+    int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
+    void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
     void PrintWindowGroupInfo();
-    void SendDisplayInfo();
-    void SendWindowInfo();
+    int32_t SendDisplayInfo();
+    int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -205,6 +220,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
     std::shared_ptr<MMIEventObserver> eventObserver_ { nullptr };
@@ -218,6 +234,7 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

@@ -30,7 +30,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
 const std::set<std::string> ACTION_TYPE = {
-    "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap"
+    "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick"
 };
 constexpr int32_t TWO_PARAMETERS = 2;
 constexpr int32_t THREE_PARAMETERS = 3;
