@@ -107,6 +107,7 @@ public:
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);

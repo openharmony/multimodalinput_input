@@ -1039,6 +1039,7 @@ public:
          * @return void
          * @since 9
          */
+
         void SetRawDx(int32_t rawDx);
         /**
          * @brief Obtains the raw Y coordinate.
