@@ -102,6 +102,7 @@ private:
     int32_t GetSwipeAction(int32_t action) const;
     int32_t GetRotateAction(int32_t action) const;
     int32_t GetMultiTapAction(int32_t action) const;
+    int32_t GetFingerprintAction(int32_t action) const;
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
     int32_t TransformTsActionValue(int32_t pointerAction);
     int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
@@ -110,6 +111,7 @@ private:
     int32_t TransformRotateEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformMultiTapEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransfromFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     std::optional<int32_t> GetJoystickAction(int32_t action);
     int32_t GetJoystickButton(int32_t button);
@@ -129,6 +131,7 @@ private:
     bool IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
