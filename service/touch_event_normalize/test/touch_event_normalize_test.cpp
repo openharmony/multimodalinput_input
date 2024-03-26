@@ -34,6 +34,7 @@ public:
 private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
+    bool preRotateSwitch_ { true };
 };
 
 void TouchEventNormalizeTest::SetUpTestCase(void)
@@ -48,12 +49,14 @@ void TouchEventNormalizeTest::SetUp()
 {
     TouchEventHdr->GetTouchpadPinchSwitch(prePinchSwitch_);
     TouchEventHdr->GetTouchpadSwipeSwitch(preSwipeSwitch_);
+    TouchEventHdr->GetTouchpadRotateSwitch(preRotateSwitch_);
 }
 
 void TouchEventNormalizeTest::TearDown()
 {
     TouchEventHdr->SetTouchpadPinchSwitch(prePinchSwitch_);
     TouchEventHdr->SetTouchpadSwipeSwitch(preSwipeSwitch_);
+    TouchEventHdr->SetTouchpadRotateSwitch(preRotateSwitch_);
 }
 
 /**
@@ -108,6 +111,33 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
     bool newFlag = true;
     ASSERT_TRUE(TouchEventHdr->GetTouchpadSwipeSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_SetTouchpadRotateSwitch_05
+ * @tc.desc: Test SetTouchpadRotateSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitch_05, TestSize.Level1)
+{
+    bool rotateSwitch = false;
+    ASSERT_TRUE(TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_GetTouchpadRotateSwitch_06
+ * @tc.desc: Test GetTouchpadRotateSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitch_06, TestSize.Level1)
+{
+    bool rotateSwitch = true;
+    TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 }
 }

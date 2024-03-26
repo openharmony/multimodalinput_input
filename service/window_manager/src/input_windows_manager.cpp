@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include <linux/input.h>
 
 #include "dfx_hisysevent.h"
+#include "event_log_helper.h"
 #include "fingersense_wrapper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -53,6 +54,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
+constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 #endif // OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t OUTWINDOW_HOT_AREA = 20;
 constexpr int32_t SCALE_X = 0;
@@ -68,6 +70,8 @@ constexpr int32_t LEFT_AREA = 7;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT = 1;
 #endif // OHOS_BUILD_ENABLE_ANCO
+constexpr double HALF_RATIO = 0.5;
+constexpr int32_t TWOFOLD = 2;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
@@ -159,6 +163,12 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
     CHKPR(udsServer_, INVALID_FD);
+    if (windowInfo == nullptr) {
+        MMI_HILOGD("window info is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
+            windowInfo = &lastWindowInfo_;
+        }
+    }
     if (windowInfo != nullptr) {
         MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
@@ -241,7 +251,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
     }
     CHKPR(windowInfo, INVALID_PID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (IsAncoWindow(*windowInfo)) {
+    if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOGD("focusWindowId:%{public}d is anco window.", focusWindowId);
         return INVALID_PID;
     }
@@ -360,7 +370,7 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
 
 void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     PrintWindowGroupInfo(windowGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (windowGroupInfo.windowsInfo.size() == SHELL_WINDOW_COUNT && IsAncoWindow(windowGroupInfo.windowsInfo[0])) {
@@ -764,8 +774,12 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     }
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
         std::optional<WindowInfo> windowInfo;
-        if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
-            lastPointerEvent_->GetPressedButtons().empty()) {
+        int32_t eventAction = lastPointerEvent_->GetPointerAction();
+        bool checkFlag = (eventAction == PointerEvent::POINTER_ACTION_MOVE &&
+            lastPointerEvent_->GetPressedButtons().empty()) ||
+            (eventAction >= PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+            eventAction <= PointerEvent::POINTER_ACTION_AXIS_END);
+        if (checkFlag) {
             windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
         } else {
             windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEvent_);
@@ -805,6 +819,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
+    EventLogHelper::PrintEventData(pointerEvent);
     auto filter = InputHandler->GetFilterHandler();
     filter->HandlePointerEvent(pointerEvent);
 }
@@ -814,12 +829,7 @@ void InputWindowsManager::NotifyPointerToWindow()
     CALL_INFO_TRACE;
     std::optional<WindowInfo> windowInfo;
     CHKPV(lastPointerEvent_);
-    if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
-        lastPointerEvent_->GetPressedButtons().empty()) {
-        windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
-    } else {
-        windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEvent_);
-    }
+    windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
         return;
@@ -849,6 +859,8 @@ void InputWindowsManager::NotifyPointerToWindow()
 
 void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
+    std::string window;
+    window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
@@ -867,6 +879,7 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
 
+        window += StringPrintf("%d,", item.id);
         std::string dump;
         dump += StringPrintf("pointChangeAreas:[");
         for (auto it : item.pointerChangeAreas) {
@@ -885,10 +898,15 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
             MMI_HILOGD("%{public}s", line.c_str());
         }
     }
+    window += StringPrintf("]\n");
+    MMI_HILOGI("%{public}s", window.c_str());
 }
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
         windowGroupInfo.focusWindowId, windowGroupInfo.displayId);
     PrintWindowInfo(windowGroupInfo.windowsInfo);
@@ -896,6 +914,9 @@ void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGrou
 
 void InputWindowsManager::PrintDisplayInfo()
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
@@ -1084,7 +1105,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         touchWindow->id, windowId);
     return false;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputWindowsManager::OnSessionLost(SessionPtr session)
 {
@@ -1134,7 +1155,7 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         pointerStyle_[scenePid] = {};
-        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d  does not exist on pointerStyle_",
+        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on pointerStyle_",
             scenePid, sceneWinId);
     }
     pointerStyle_[scenePid][sceneWinId] = pointerStyle;
@@ -1158,11 +1179,25 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     return RET_OK;
 }
 
+void InputWindowsManager::SetGlobalDefaultPointerStyle()
+{
+    for (auto &iter : pointerStyle_) {
+        for (auto &item : iter.second) {
+            if (item.second.id == DEFAULT_POINTER_STYLE) {
+                item.second.id = globalStyle_.id;
+            } else if (item.second.id == CURSOR_CIRCLE_STYLE) {
+                item.second.id = globalStyle_.id;
+            }
+        }
+    }
+}
+
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         globalStyle_.id = pointerStyle.id;
+        SetGlobalDefaultPointerStyle();
         MMI_HILOGD("Setting global pointer style");
         return RET_OK;
     }
@@ -1284,8 +1319,8 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             MMI_HILOGE("The addition of displayMaxY overflows");
             return;
         }
-        if (((x >= item.x) && (x < displayMaxX)) &&
-            (y >= item.y) && (y < displayMaxY)) {
+        if (((x > item.x) && (x <= displayMaxX)) &&
+            (y > item.y) && (y <= displayMaxY)) {
             findFlag = true;
             pointerStyle.id = areaNum;
         }
@@ -1376,7 +1411,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
-        (action == PointerEvent::POINTER_ACTION_PULL_UP);
+        (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
+        (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
@@ -1604,14 +1640,14 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
     std::string name = "isEnableHoverScroll";
-    return PREFERENCES_MANAGER->SetBoolValue(name, mouseFileName, state);
+    return PreferencesMgr->SetBoolValue(name, mouseFileName, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
     std::string name = "isEnableHoverScroll";
-    bool state = PREFERENCES_MANAGER->GetBoolValue(name, true);
+    bool state = PreferencesMgr->GetBoolValue(name, true);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
@@ -1710,11 +1746,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         dragFlag_ = false;
     }
     Direction direction = DIRECTION0;
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayY();
     if (physicalDisplayInfo->displayDirection == DIRECTION0) {
         direction = physicalDisplayInfo->direction;
+        TouchDrawingMgr->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
+            physicalDisplayInfo->height, physicalX, physicalY);
     }
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, static_cast<int32_t>(absolutionX_),
-        static_cast<int32_t>(absolutionY_), dragPointerStyle_, direction);
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
@@ -1846,11 +1885,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
+    MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
         for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                win.x, win.y, win.width, win.height);
+            MMI_HILOGD("targetWindowId:%{public}d,defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,"
+                "height:%{public}d", targetWindowId, win.x, win.y, win.width, win.height);
         }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
@@ -1865,6 +1905,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
         checkToolType = checkToolType || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
         if (checkToolType) {
+            MMI_HILOGD("Enter checkToolType");
             if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas, item)) {
                 touchWindow = &item;
                 break;
@@ -1886,8 +1927,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
-                logicalX, logicalY);
+            MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d, pointerId:%{public}d",
+                logicalX, logicalY, pointerId);
             return RET_ERR;
         }
         touchWindow = &it->second.window;
@@ -1897,11 +1938,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE); //&&
-            // MMI_GE(pointerEvent->GetZOrder(), 0.0f);
+        // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
+        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
         if (isCompensatePointer) {
             SimulatePointerExt(pointerEvent);
         } else {
@@ -1929,7 +1970,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-    MMI_HILOGD("touch event send to window:%{public}d", touchWindow->id);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(physicalX);
@@ -1953,12 +1993,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         lastTouchEvent_ = nullptr;
         lastTouchWindowInfo_.id = -1;
     }
-    MMI_HILOGI("pid:%{public}d,eventId:%{public}d,", touchWindow->pid, pointerEvent->GetId());
-    MMI_HILOGD("logicalX:%{public}d,logicalY:%{public}d,"
-               "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
-               "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
-               logicalX, logicalY, physicalX, physicalY, windowX, windowY, displayId,
-               pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+    MMI_HILOGI("pointerAction:%{public}s,pid:%{public}d,targetWindowId:%{public}d,foucsWindowId:%{public}d,"
+               "eventId:%{public}d,logicalX:%{public}d,logicalY:%{public}d,displayX:%{public}d,displayY:%{public}d,"
+               "windowX:%{public}d,windowY:%{public}d,width:%{public}d,height:%{public}d,area.x:%{public}d,"
+               "area.y:%{public}d,flags:%{public}d,displayId:%{public}d,TargetWindowId:%{public}d,"
+               "AgentWindowId:%{public}d,zOrder:%{public}f", pointerEvent->DumpPointerAction(), touchWindow->pid,
+               touchWindow->id, displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
+               physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+               touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
+               pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -1990,6 +2034,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
         touchItemDownInfos_[pointerId] = windowInfoEX;
+        MMI_HILOGI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
@@ -2027,7 +2072,8 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     CHKPV(udsServer_);
     CHKPV(lastTouchEvent_);
     if (pointerAction == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
-        WindowInfo *touchWindow = nullptr;
+        WindowInfo touchWindow;
+        bool isChanged { false };
         for (auto item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -2035,16 +2081,17 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
                 continue;
             }
             if (IsInHotArea(lastTouchLogicX_, lastTouchLogicY_, item.defaultHotAreas, item)) {
-                touchWindow = &item;
+                touchWindow = item;
+                isChanged = true;
                 break;
             }
         }
-        if (touchWindow == nullptr) {
-            MMI_HILOGE("touchWindow is nullptr");
+        if (!isChanged) {
+            MMI_HILOGE("touchWindow is not init");
             return;
         }
-        if (touchWindow->id != lastTouchWindowInfo_.id) {
-            lastTouchWindowInfo_ = *touchWindow;
+        if (touchWindow.id != lastTouchWindowInfo_.id) {
+            lastTouchWindowInfo_ = touchWindow;
         }
     }
     auto pointerEvent = PointerEvent::Create();
@@ -2082,6 +2129,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
         return;
     }
 
+    EventLogHelper::PrintEventData(pointerEvent);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {
@@ -2095,7 +2143,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    int32_t pointerAction =  pointerEvent->GetPointerAction();
+    int32_t pointerAction = pointerEvent->GetPointerAction();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
@@ -2168,8 +2216,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    TOUCH_DRAWING_MANAGER->UpdateDisplayInfo(*physicDisplayInfo);
-    TOUCH_DRAWING_MANAGER->TouchDrawHandler(pointerEvent);
+    TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
+    TouchDrawingMgr->TouchDrawHandler(pointerEvent);
 }
 
 template <class T>
@@ -2324,8 +2372,11 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
-    absolutionX_ = x;
-    absolutionY_ = y;
+
+    cursorPos_.displayId = displayId;
+    cursorPos_.cursorPos.x = x;
+    cursorPos_.cursorPos.y = y;
+
     if (displayInfo->displayDirection == DIRECTION0) {
         LogicalCoordinate coord {
             .x = integerX,
@@ -2338,19 +2389,46 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         mouseLocation_.physicalX = integerX;
         mouseLocation_.physicalY = integerY;
     }
+    mouseLocation_.displayId = displayId;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
-    if (mouseLocation_.physicalX == -1 || mouseLocation_.physicalY == -1) {
-        if (!displayGroupInfo_.displaysInfo.empty()) {
-            mouseLocation_.physicalX = displayGroupInfo_.displaysInfo[0].width / 2;
-            mouseLocation_.physicalY = displayGroupInfo_.displaysInfo[0].height / 2;
-        }
+    if ((mouseLocation_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        mouseLocation_.displayId = displayInfo.id;
+        mouseLocation_.physicalX = displayInfo.width / TWOFOLD;
+        mouseLocation_.physicalY = displayInfo.height / TWOFOLD;
     }
     return mouseLocation_;
+}
+
+CursorPosition InputWindowsManager::GetCursorPos()
+{
+    if ((cursorPos_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        cursorPos_.displayId = displayInfo.id;
+        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+    }
+    return cursorPos_;
+}
+
+CursorPosition InputWindowsManager::ResetCursorPos()
+{
+    if (!displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        cursorPos_.displayId = displayInfo.id;
+        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+    } else {
+        cursorPos_.displayId = -1;
+        cursorPos_.cursorPos.x = 0;
+        cursorPos_.cursorPos.y = 0;
+    }
+    return cursorPos_;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -2420,6 +2498,7 @@ void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> poin
             break;
         }
     }
+    MMI_HILOGD("pointerAction:%{public}s", pointerEvent->DumpPointerAction());
 }
 
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)

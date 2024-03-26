@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_SINGLE_TOUCHSCREEN_H
 #define VIRTUAL_SINGLE_TOUCHSCREEN_H
+
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -27,4 +28,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_SINGLE_TOUCHSCREEN_H
+#endif // VIRTUAL_SINGLE_TOUCHSCREEN_H

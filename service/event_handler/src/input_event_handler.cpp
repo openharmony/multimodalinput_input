@@ -166,7 +166,7 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    eventInterceptorHandler_  = std::make_shared<EventInterceptorHandler>();
+    eventInterceptorHandler_ = std::make_shared<EventInterceptorHandler>();
     handler->SetNext(eventInterceptorHandler_);
     handler = eventInterceptorHandler_;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR

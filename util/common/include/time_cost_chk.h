@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace MMI {
-inline constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
-inline constexpr int64_t MAX_OVER_TIME = 300;
+inline constexpr int64_t MAX_INPUT_EVENT_TIME { 1000 };
+inline constexpr int64_t MAX_OVER_TIME { 300 };
 static std::map<int32_t, std::string> paramType = {
     { 1, "device_added" },
     { 2, "device_removed" },
@@ -89,9 +89,9 @@ private:
     const std::chrono::time_point<std::chrono::high_resolution_clock> beginTime_;
     const std::string strOutput_ = "";
     const std::string strReason_ = "";
-    const int64_t uiTime_{ 0 };
-    const int64_t llParam1_{ 0 };
-    const int64_t llParam2_{ 0 };
+    const int64_t uiTime_ { 0 };
+    const int64_t llParam1_ { 0 };
+    const int64_t llParam2_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

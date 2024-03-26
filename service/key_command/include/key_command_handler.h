@@ -156,7 +156,7 @@ public:
 public:
 #else
 private:
-#endif
+#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     bool ParseConfig();

@@ -16,7 +16,6 @@
 #include "touchpad_transform_processor.h"
 
 #include <sstream>
-
 #include <linux/input.h>
 
 #include "event_log_helper.h"
@@ -52,7 +51,7 @@ TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, RET_ERR);
@@ -153,7 +152,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, RET_ERR);
@@ -232,6 +231,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
             break;
         }
         default: {
+            MMI_HILOGW("Touch pad action is not found");
             return nullptr;
         }
     }
@@ -246,7 +246,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         pointerEvent_->GetPointerIds().size());
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("The id:%{public}d event created by:%{public}s, type:%{public}d",
+               pointerEvent_->GetId(), device->GetName().c_str(), type);
     return pointerEvent_;
 }
 
@@ -308,6 +309,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetPointerAction(action);
+    pointerEvent_->SetDeviceId(deviceId_);
 
     int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
     if (fingerCount < 0 || fingerCount > FINGER_COUNT_MAX) {
@@ -340,7 +342,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
 
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
-        MMI_HILOGE("lisenhao-app go in to report POINTER_ACTION_SWIPE_BEGIN");
+        MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
 
@@ -537,14 +539,38 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
     return RET_OK;
 }
 
+int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
+{
+    std::string name = "touchpadRotate";
+    if (PutConfigDataToDatabase(name, rotateSwitch) != RET_OK) {
+        MMI_HILOGE("PutConfigDataToDatabase failed");
+        return RET_ERR;
+    }
+
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_ROTATE_SETTING,
+        rotateSwitch);
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
+{
+    std::string name = "touchpadRotate";
+    if (GetConfigDataFromDatabase(name, rotateSwitch) != RET_OK) {
+        MMI_HILOGE("GetConfigDataFromDatabase failed");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PREFERENCES_MANAGER->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
+    return PreferencesMgr->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
 }
 
 int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    value = PREFERENCES_MANAGER->GetBoolValue(key, true);
+    value = PreferencesMgr->GetBoolValue(key, true);
     return RET_OK;
 }
 
