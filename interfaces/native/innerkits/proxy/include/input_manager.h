@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,7 @@
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
+#include "i_input_service_watcher.h"
 #include "mmi_event_observer.h"
 #include "i_window_checker.h"
 #include "input_device.h"
@@ -57,14 +58,14 @@ public:
      * @param displayGroupInfo Indicates the logical screen information.
      * @since 9
      */
-    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 
     /**
      * @brief Updates the windows information.
      * @param windowGroupInfo Indicates the window group information.
      * @since 9
      */
-    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
+    int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
 
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
@@ -775,6 +776,9 @@ public:
     */
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
+
+    int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.
@@ -790,6 +794,25 @@ public:
     void SimulateInputEventExt(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEventExt(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+    void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+
+    /**
+     * @brief Set the switch of touchpad rotate.
+     * @param rotateSwitch Indicates the touchpad rotate switch state.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
+
+    /**
+     * @brief Get the switch of touchpad rotate.
+     * @param rotateSwitch Indicates the touchpad rotate switch state.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
 private:
     InputManager() = default;

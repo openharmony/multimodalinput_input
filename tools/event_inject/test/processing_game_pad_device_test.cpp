@@ -20,7 +20,6 @@
 #include "processing_game_pad_device.h"
 #include "proto.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {

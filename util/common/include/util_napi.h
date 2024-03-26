@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef UTIL_NAPI_H
 #define UTIL_NAPI_H
 
@@ -110,5 +111,4 @@ bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 } // namespace UtilNapi
 } // namespace MMI
 } // namespace OHOS
-
 #endif // UTIL_NAPI_H

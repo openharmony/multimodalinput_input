@@ -41,7 +41,7 @@ namespace MMI {
 
 #define UNLIKELY(x)    __builtin_expect(!!(x), 0)
 
-static int g_fd_klog = -1;
+static int g_fd = -1;
 
 constexpr int32_t MAX_LOG_SIZE = 1024;
 
@@ -53,7 +53,7 @@ void KLogOpenLogDevice(void)
     int fd = open("/dev/kmsg", O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IRGRP);
 #endif
     if (fd >= 0) {
-        g_fd_klog = fd;
+        g_fd = fd;
     }
     return;
 }
@@ -61,9 +61,9 @@ void KLogOpenLogDevice(void)
 void kMsgLog(const char* fileName, int line, const char* kLevel,
     const char* fmt, ...)
 {
-    if (UNLIKELY(g_fd_klog < 0)) {
+    if (UNLIKELY(g_fd < 0)) {
         KLogOpenLogDevice();
-        if (g_fd_klog < 0) {
+        if (g_fd < 0) {
             return;
         }
     }
@@ -72,8 +72,8 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
     char tmpFmt[MAX_LOG_SIZE];
     if (vsnprintf_s(tmpFmt, MAX_LOG_SIZE, MAX_LOG_SIZE - 1, fmt, vargs) == -1) {
         va_end(vargs);
-        close(g_fd_klog);
-        g_fd_klog = -1;
+        close(g_fd);
+        g_fd = -1;
         return;
     }
 
@@ -82,15 +82,15 @@ void kMsgLog(const char* fileName, int line, const char* kLevel,
         "%s[dm=%08X][pid=%d][%s:%d][%s][%s] %s",
         kLevel, 0x0D002800, getpid(), fileName, line, "klog", "info", tmpFmt) == -1) {
         va_end(vargs);
-        close(g_fd_klog);
-        g_fd_klog = -1;
+        close(g_fd);
+        g_fd = -1;
         return;
     }
     va_end(vargs);
 
-    if (write(g_fd_klog, logInfo, strlen(logInfo)) < 0) {
-        close(g_fd_klog);
-        g_fd_klog = -1;
+    if (write(g_fd, logInfo, strlen(logInfo)) < 0) {
+        close(g_fd);
+        g_fd = -1;
     }
     return;
 }

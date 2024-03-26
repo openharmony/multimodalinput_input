@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-
 #include <fstream>
 
 #include "event_monitor_handler.h"
@@ -83,6 +82,5 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_001, Tes
     ASSERT_EQ(eventMonitorHandler.OnHandleEvent(keyEvent), false);
     ASSERT_EQ(eventMonitorHandler.OnHandleEvent(pointerEvent), false);
 }
-
 } // namespace MMI
 } // namespace OHOS

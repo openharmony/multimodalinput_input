@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 #include "nocopyable.h"
@@ -152,6 +153,17 @@ public:
 
     static constexpr int32_t POINTER_ACTION_QUADTAP = 24;
 
+    /**
+     * Indicates that the hover action.
+     *
+     * @since 11
+     */
+    static constexpr int32_t POINTER_ACTION_HOVER_MOVE = 25;
+
+    static constexpr int32_t POINTER_ACTION_HOVER_ENTER = 26;
+
+    static constexpr int32_t POINTER_ACTION_HOVER_EXIT = 27;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -169,7 +181,8 @@ public:
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the horizontal scroll axis.
+         * When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          *
          * @since 9
@@ -1240,6 +1253,8 @@ public:
      */
     void ClearButtonPressed();
 
+    int32_t GetPointerCount() const;
+
     /**
      * @brief Obtains all pointers in this event.
      * @return Returns all the pointer IDs.
@@ -1465,7 +1480,7 @@ private:
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
-    float zOrder_{ -1.0f};
+    float zOrder_ { -1.0f };
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;

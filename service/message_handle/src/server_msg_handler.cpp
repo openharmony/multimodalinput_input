@@ -42,7 +42,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
-#endif
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer& udsServer)
@@ -154,8 +154,8 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            if ((action < PointerEvent::POINTER_ACTION_PULL_DOWN ||
-                action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) &&
+            if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+                (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
@@ -168,8 +168,22 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             break;
         }
     }
-    if (source == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && action == PointerEvent::POINTER_ACTION_DOWN) {
-        targetWindowId_ = pointerEvent->GetTargetWindowId();
+    return SaveTargetWindowId(pointerEvent);
+}
+
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
+        int32_t pointerId = pointerEvent->GetPointerId();
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+            return RET_ERR;
+        }
+        int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        targetWindowIds_[pointerId] = targetWindowId;
     }
     return RET_OK;
 }
@@ -178,24 +192,31 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
 {
-    if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId_ < 0) {
-        MMI_HILOGD("Down event or targetWindowId_ less 0 is not need fix window id");
+    int32_t targetWindowId = -1;
+    auto iter = targetWindowIds_.find(pointerEvent->GetPointerId());
+    if (iter != targetWindowIds_.end()) {
+        targetWindowId = iter->second;
+    }
+    MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
+    if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
+        action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
+        MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
         return true;
     }
-    pointerEvent->SetTargetWindowId(targetWindowId_);
-    PointerEvent::PointerItem pointerItem;
     auto pointerIds = pointerEvent->GetPointerIds();
     if (pointerIds.empty()) {
         MMI_HILOGE("GetPointerIds is empty");
         return false;
     }
-    auto id = pointerIds.front();
-    if (!pointerEvent->GetPointerItem(id, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item");
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
     }
-    pointerItem.SetTargetWindowId(targetWindowId_);
-    pointerEvent->UpdatePointerItem(id, pointerItem);
+    pointerEvent->SetTargetWindowId(targetWindowId);
+    pointerItem.SetTargetWindowId(targetWindowId);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -282,7 +303,6 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             return RET_ERR;
         }
     }
-    
     WinMgr->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
 }
@@ -355,6 +375,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPR(monitorHandler, ERROR_NULL_POINTER);
         monitorHandler->RemoveInputHandler(handlerType, eventType, sess);
+        ANRMgr->RemoveTimersByType(sess, ANR_MONITOR);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;

@@ -1175,14 +1175,14 @@ bool KeyCommandHandler::ParseConfig()
     const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
 #else
     const char *testPathSuffix = "/data/test/test.json";
-#endif
+#endif // UNIT_TEST
     char buf[MAX_PATH_LEN] = { 0 };
     char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
 #ifndef UNIT_TEST
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
 #else
     std::string defaultConfig = "/data/test/test.json";
-#endif
+#endif // UNIT_TEST
     if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
         MMI_HILOGD("Can not get customization config file");
         return ParseJson(defaultConfig);
@@ -1909,7 +1909,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
 {
     CALL_DEBUG_ENTER;
-    return PREFERENCES_MANAGER->GetShortKeyDuration(businessId);
+    return PreferencesMgr->GetShortKeyDuration(businessId);
 }
 
 bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
@@ -2106,7 +2106,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         MMI_HILOGE("delay is not in valid range.");
         return COMMON_PARAMETER_ERROR;
     }
-    return PREFERENCES_MANAGER->SetShortKeyDuration(businessId, delay);
+    return PreferencesMgr->SetShortKeyDuration(businessId, delay);
 }
 
 KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()

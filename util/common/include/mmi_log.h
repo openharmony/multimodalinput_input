@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 #ifndef MMI_LOG_H
 #define MMI_LOG_H
 
@@ -93,11 +94,11 @@ inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 
 namespace OHOS {
 namespace MMI {
-inline constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
-inline constexpr int32_t TIMEOUT = 100000;
-inline constexpr int32_t POINTER_ACTION_UP = 4;
-inline constexpr int32_t POINTER_ACTION_MOVE = 3;
-inline constexpr int32_t FINAL_FINGER = 1;
+inline constexpr int32_t EVENT_TYPE_POINTER { 0X00020000 };
+inline constexpr int32_t TIMEOUT { 100000 };
+inline constexpr int32_t POINTER_ACTION_UP { 4 };
+inline constexpr int32_t POINTER_ACTION_MOVE { 3 };
+inline constexpr int32_t FINAL_FINGER { 1 };
 
 class InnerFunctionTracer {
 public:

@@ -80,7 +80,7 @@ constexpr int32_t POINTER_ITEM_WINDOW_FOUR = 600;
 constexpr double POINTER_AXIS_VALUE = 30.0;
 constexpr double POINTER_ITEM_PRESSURE_ONE = 5.0;
 constexpr double POINTER_ITEM_PRESSURE_TWO = 7.0;
-}  // namespace
+} // namespace
 
 class InputManagerSimulateTest : public testing::Test {
 public:
@@ -120,6 +120,7 @@ std::string InputManagerSimulateTest::GetEventDump()
 HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    sleep(10);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
@@ -132,7 +133,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
@@ -146,7 +147,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -170,7 +171,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_002
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -194,7 +195,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
@@ -207,7 +208,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003
     injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -231,7 +232,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_004
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     TestSimulateInputEvent(injectDownEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -255,7 +256,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_005
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
@@ -269,7 +270,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_005
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -286,7 +287,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulatePointerEvent
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -303,7 +304,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulatePointerEvent
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -320,7 +321,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -339,7 +340,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     pointerEvent->SetPointerId(POINTER_ID);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -356,7 +357,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -373,7 +374,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -390,7 +391,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -409,7 +410,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     pointerEvent->SetPointerId(POINTER_ID);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -425,7 +426,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -441,7 +442,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -477,7 +478,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -513,7 +514,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -550,7 +551,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -567,7 +568,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
     ASSERT_NE(pointerEvent, nullptr);
     SimulateInputEventUtilTest(pointerEvent);
 }
-#endif  // OHOS_BUILD_ENABLE_JOYSTICK
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 /**
  * @tc.name: MultimodalEventHandler_SimulatePencil2Event_001
@@ -582,7 +583,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePencil2Event_0
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -598,7 +599,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePencil2Event_0
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -614,7 +615,7 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePencil2Event_0
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -633,7 +634,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_Pencil2InputEvent_004, TestSize.
     pointerEvent->SetPointerId(POINTER_ID);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -757,7 +758,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_004, TestSize.Level
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
 #else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -774,7 +775,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_004, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
         if (IsValidHandlerId(ids[i])) {
             InputManager::GetInstance()->RemoveInterceptor(ids[i]);
         }
@@ -847,12 +848,8 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_006, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
@@ -886,12 +883,12 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_007, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
@@ -929,7 +926,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_008, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -940,7 +937,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_008, TestSize.Level
     ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -977,7 +974,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_009, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -988,7 +985,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_009, TestSize.Level
     ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1023,7 +1020,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_010, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
@@ -1034,7 +1031,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_010, TestSize.Level
     ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1071,7 +1068,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_011, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
@@ -1082,7 +1079,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_011, TestSize.Level
     ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1121,7 +1118,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_012, TestSize.Level
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1132,7 +1129,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_012, TestSize.Level
     ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1176,7 +1173,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_013, TestSize.Level
 #else
     EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
     EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
@@ -1191,7 +1188,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_013, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
     }
 
     InputManagerUtil::TestInterceptorId(interceptorId1, interceptorId2);
@@ -1232,7 +1229,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_014, TestSize.Level
 #else
     EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
     EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
@@ -1247,7 +1244,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_014, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     }
 
     InputManagerUtil::TestInterceptorId(interceptorId1, interceptorId2);
@@ -1286,7 +1283,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_015, TestSize.Level
 #else
     EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
     EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId1)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1305,7 +1302,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_015, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     }
 
     if (IsValidHandlerId(interceptorId2)) {
@@ -1329,7 +1326,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_016, TestSize.Level
     ASSERT_NE(interceptorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
     }
@@ -1351,7 +1348,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_001, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t stepTime = GetSysClockTime();
@@ -1389,7 +1386,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t measureTime = GetSysClockTime();
@@ -1427,7 +1424,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_003, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t deedTime = GetSysClockTime();
@@ -1465,7 +1462,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_004, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
@@ -1500,5 +1497,5 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_004, 
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

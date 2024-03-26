@@ -173,11 +173,10 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
 static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("isFinalKeydown:%{public}d,keyAction:%{public}d", isFinalKeydown, keyAction);
+    MMI_HILOGD("isFinalKeydown:%{public}d, keyAction:%{public}d", isFinalKeydown, keyAction);
     if (isFinalKeydown && keyAction == KeyEvent::KEY_ACTION_DOWN) {
         return true;
     }
-
     if (!isFinalKeydown && keyAction == KeyEvent::KEY_ACTION_UP) {
         return true;
     }
@@ -204,12 +203,10 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     }
     std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
     int32_t infoSize = 0;
-    auto it = infoPreKeys.begin();
-    while (it != infoPreKeys.end()) {
+    for (auto it = infoPreKeys.begin(); it != infoPreKeys.end(); ++it) {
         if (*it >= 0) {
             infoSize++;
         }
-        ++it;
     }
     int32_t count = 0;
     for (const auto &item : items) {
@@ -223,7 +220,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         }
         count++;
     }
-    MMI_HILOGD("kevEventSize:%{public}d,infoSize:%{public}d", count, infoSize);
+    MMI_HILOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
     if (!keyItem) {
         MMI_HILOGE("The keyItem is nullopt");

@@ -31,7 +31,8 @@ class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputCo
 public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
-    ~MultimodalInputConnectProxy() override = default;
+    ~MultimodalInputConnectProxy() override;
+
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
@@ -110,8 +111,11 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
     int32_t SetTouchpadRightClickType(int32_t type) override;
     int32_t GetTouchpadRightClickType(int32_t &type) override;
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch) override;
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
+    int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 #ifndef INPUT_WINDOWS_MANAGER_H
 #define INPUT_WINDOWS_MANAGER_H
 
@@ -35,8 +36,19 @@
 namespace OHOS {
 namespace MMI {
 struct MouseLocation {
+    int32_t displayId { -1 };
     int32_t physicalX { 0 };
     int32_t physicalY { 0 };
+};
+
+struct Coordinate2D {
+    double x;
+    double y;
+};
+
+struct CursorPosition {
+    int32_t displayId { -1 };
+    Coordinate2D cursorPos {};
 };
 
 struct DevMode {
@@ -82,6 +94,9 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
+    CursorPosition GetCursorPos();
+    CursorPosition ResetCursorPos();
+    void SetGlobalDefaultPointerStyle();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetHoverScrollState(bool state);
@@ -112,6 +127,7 @@ public:
     void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
     bool IsAncoWindow(const WindowInfo &window) const;
+    bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -228,8 +244,7 @@ private:
     PointerStyle lastPointerStyle_ {.id = -1};
     PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
-    double absolutionX_ {};
-    double absolutionY_ {};
+    CursorPosition cursorPos_ {};
     std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;

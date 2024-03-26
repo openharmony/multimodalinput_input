@@ -199,12 +199,27 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     if (enableCombineKey_) {
         return true;
     }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
+        auto items = keyEvent->GetKeyItems();
+        return items.size() != 1 ? enableCombineKey_ : true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+        auto items = keyEvent->GetKeyItems();
+        return items.size() != 1 ? enableCombineKey_ : true;
+    }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         auto items = keyEvent->GetKeyItems();
         if (items.size() != 1) {
             return enableCombineKey_;
         }
         return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT) {
+        MMI_HILOGD("subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
+        return IsEnableCombineKeySwipe(keyEvent);
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
         for (const auto &item : keyEvent->GetKeyItems()) {
@@ -219,6 +234,18 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     return enableCombineKey_;
 }
 
+bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    for (const auto &item : keyEvent->GetKeyItems()) {
+        int32_t keyCode = item.GetKeyCode();
+        if (keyCode != KeyEvent::KEYCODE_CTRL_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+            keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT) {
+            return enableCombineKey_;
+        }
+    }
+    return true;
+}
+ 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);

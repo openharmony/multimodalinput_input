@@ -57,5 +57,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_TOUCH_EVENT

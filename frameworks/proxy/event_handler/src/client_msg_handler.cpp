@@ -245,7 +245,7 @@ int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_SWITCH
 
 int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {

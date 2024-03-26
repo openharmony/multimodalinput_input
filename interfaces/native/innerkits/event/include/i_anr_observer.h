@@ -26,6 +26,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
-
 #endif // I_ANR_OBSERVER_H

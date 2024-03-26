@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_MOUSE_H
 #define VIRTUAL_MOUSE_H
+
 #include "virtual_device.h"
 
 namespace OHOS {
@@ -27,4 +28,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_MOUSE_H
+#endif // VIRTUAL_MOUSE_H
