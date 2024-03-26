@@ -49,6 +49,11 @@ constexpr int32_t FOUR_FINGERS = 4;
 constexpr int32_t GESTURE_BEGIN = 1;
 constexpr int32_t GESTURE_UPDATE = 2;
 constexpr int32_t GESTURE_END = 3;
+constexpr int32_t FINGERPRINT_DOWN = 0;
+constexpr int32_t FINGERPRINT_UP = 1;
+constexpr int32_t FINGERPRINT_SLIDE = 2;
+constexpr int32_t FINGERPRINT_CLICK = 3;
+
 enum TypeName : int32_t {
     TOUCH = 0,
     MOUSE = 1,
@@ -58,7 +63,9 @@ enum TypeName : int32_t {
     ROTATE = 5,
     THREE_FINGERS_TAP = 6,
     JOYSTICK = 7,
+    FINGERPRINT = 8,
 };
+
 std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "touch", TOUCH },
     { "mouse", MOUSE },
@@ -67,8 +74,10 @@ std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "fourFingersSwipe", FOUR_FINGERS_SWIPE },
     { "rotate", ROTATE },
     { "threeFingersTap", THREE_FINGERS_TAP },
-    { "joystick", JOYSTICK}
+    { "joystick", JOYSTICK},
+    { "fingerprint", FINGERPRINT},
 };
+
 struct MonitorInfo {
     int32_t monitorId;
     int32_t fingers;
@@ -648,6 +657,29 @@ int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
     }
 }
 
+int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
+{
+    MMI_HILOGD("GetFingerprintAction enter, action is %{public}d", action);
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN: {
+            return FINGERPRINT_DOWN;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_UP: {
+            return FINGERPRINT_UP;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE: {
+            return FINGERPRINT_SLIDE;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK: {
+            return FINGERPRINT_CLICK;
+        }
+        default: {
+            MMI_HILOGE("wrong action is %{public}d", action);
+            return RET_ERR;
+        }
+    }
+}
+
 MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
 {
     MapFun mapFun;
@@ -1126,6 +1158,29 @@ int32_t JsInputMonitor::TransformJoystickPointerEvent(const std::shared_ptr<Poin
     return RET_OK;
 }
 
+int32_t JsInputMonitor::TransfromFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t actionValue = GetFingerprintAction(pointerEvent->GetPointerAction());
+    if (actionValue == RET_ERR) {
+        MMI_HILOGE("Get action value failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
+        MMI_HILOGE("Set name property failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "distanceX", pointerEvent->GetFingerprintDistanceX()) != napi_ok) {
+        MMI_HILOGE("Set distanceX property failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "distanceY", pointerEvent->GetFingerprintDistanceY()) != napi_ok) {
+        MMI_HILOGE("Set distanceY property failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 
 int32_t JsInputMonitor::Start()
 {
@@ -1345,6 +1400,14 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 ret = TransformJoystickPointerEvent(pointerEvent, napiPointer);
                 break;
             }
+            case TypeName::FINGERPRINT: {
+                if (!IsFingerprint(pointerEvent)) {
+                    MMI_HILOGE("the event is not fingerprintEvent");
+                    napi_close_handle_scope(jsEnv_, scope);
+                }
+                ret = TransfromFingerprintEvent(pointerEvent, napiPointer);
+                break;
+            }
             default: {
                 MMI_HILOGE("This event is invalid");
                 break;
@@ -1368,7 +1431,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
-            typeName == "joystick";
+            typeName == "joystick" || typeName == "fingerprint";
         if (typeNameFlag) {
             MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent->GetPointerId(),
                 pointerEvent->DumpPointerAction());
@@ -1495,6 +1558,17 @@ bool JsInputMonitor::IsJoystick(std::shared_ptr<PointerEvent> pointerEvent)
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE));
+}
+
+bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
+        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
+            return true;
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -164,6 +164,19 @@ public:
 
     static constexpr int32_t POINTER_ACTION_HOVER_EXIT = 27;
 
+    /**
+     * Indicates that the fingerprint action.
+     *
+     * @since 12
+     */
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_DOWN = 28;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_UP = 29;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_SLIDE = 30;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 31;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -310,6 +323,13 @@ public:
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_JOYSTICK = 4;
+
+    /**
+     * Indicates that the input source generates a fingerprint event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_FINGERPRINT = 5;
 
     /**
      * Indicates an invalid button ID.
@@ -1038,14 +1058,14 @@ public:
          * @since 9
          */
         bool ReadFromParcel(Parcel &in);
-		
+
         /**
          * @brief Obtains the raw X coordinate.
          * @return Returns the raw X coordinate.
          * @since 9
          */
         int32_t GetRawDx() const;
-		
+
         /**
          * @brief Sets the raw X coordinate.
          * @param rawDx Indicates the raw X coordinate to set.
@@ -1059,7 +1079,7 @@ public:
          * @since 9
          */
         int32_t GetRawDy() const;
-		
+
         /**
          * @brief Sets the raw Y coordinate.
          * @param rawDy Indicates the raw Y coordinate to set.
@@ -1431,6 +1451,38 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    /**
+     * @brief Set the fingerprint distance X.
+     * @param X Indicates the distance X.
+     * @return void.
+     * @since 12
+     */
+    void SetFingerprintDistanceX(double x);
+
+    /**
+     * @brief Set the fingerprint distance Y.
+     * @param Y Indicates the distance Y.
+     * @return void.
+     * @since 12
+     */
+    void SetFingerprintDistanceY(double y);
+
+    /**
+     * @brief Get the fingerprint distance X.
+     * @return distance X.
+     * @since 12
+     */
+    double GetFingerprintDistanceX();
+
+    /**
+     * @brief Get the fingerprint distance Y.
+     * @return distance Y.
+     * @since 12
+     */
+    double GetFingerprintDistanceY();
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -1465,6 +1517,10 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    double fingerprintDistanceX_ { 0.0 };
+    double fingerprintDistanceY_ { 0.0 };
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
