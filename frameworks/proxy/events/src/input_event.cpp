@@ -280,7 +280,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, agentWindowId_);
     READUINT32(in, bitwise_);
     READUINT32(in, extraDataLength_);
-    
+
     if (extraDataLength_ == 0) {
         return true;
     }
