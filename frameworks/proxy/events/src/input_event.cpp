@@ -280,7 +280,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, agentWindowId_);
     READUINT32(in, bitwise_);
     READUINT32(in, extraDataLength_);
-    
+
     if (extraDataLength_ == 0) {
         return true;
     }
@@ -289,8 +289,12 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         return false;
     }
     const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
+    if (buffer == nullptr) {
+        extraDataLength_ = 0;
+        return false;
+    }
     std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
-    if ((buffer == nullptr) || (sp == nullptr)) {
+    if (sp == nullptr) {
         extraDataLength_ = 0;
         return false;
     }
