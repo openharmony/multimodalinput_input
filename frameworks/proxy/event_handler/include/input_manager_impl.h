@@ -109,6 +109,7 @@ public:
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
     template<typename T>
     bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
