@@ -468,6 +468,11 @@ void PointerEvent::RemovePointerItem(int32_t pointerId)
     }
 }
 
+void PointerEvent::RemoveAllPointerItems()
+{
+    pointers_.clear();
+}
+
 void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 {
     if (pointers_.size() >= MAX_N_POINTER_ITEMS) {
@@ -535,6 +540,11 @@ std::vector<int32_t> PointerEvent::GetPointerIds() const
         pointerIdList.push_back(item.GetPointerId());
     }
     return pointerIdList;
+}
+
+std::list<PointerEvent::PointerItem> PointerEvent::GetAllPointerItems() const
+{
+    return pointers_;
 }
 
 int32_t PointerEvent::GetSourceType() const
