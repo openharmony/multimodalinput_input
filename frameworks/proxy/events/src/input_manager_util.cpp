@@ -715,6 +715,8 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep1()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
     item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
     item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
     item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
