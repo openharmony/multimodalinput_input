@@ -109,6 +109,12 @@ constexpr double POINTER_ITEM_TITLE_X_THREE = 10.0;
 constexpr double POINTER_ITEM_TITLE_Y_ONE = 5.43;
 constexpr double POINTER_ITEM_TITLE_Y_TWO = 15.33;
 constexpr double POINTER_ITEM_TITLE_Y_THREE = -9.0;
+constexpr int32_t POINTER_ITEM_ID_INVALID = -1;
+constexpr int32_t POINTER_ITEM_ID_ONE = 1;
+constexpr int32_t POINTER_ITEM_ID_TWO = 2;
+constexpr int32_t POINTER_ITEM_ID_THREE = 3;
+constexpr int32_t POINTER_ITEM_ID_FOUR = 4;
+
 } // namespace
 
 std::shared_ptr<KeyOption> InputManagerUtil::InitOption(
@@ -597,14 +603,14 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent001()
     CHKPP(pointerEvent);
 
     PointerEvent::PointerItem item;
-    SetPointerItem(item, 1);
+    SetPointerItem(item, POINTER_ITEM_ID_ONE);
     pointerEvent->AddPointerItem(item);
 
-    SetPointerItem(item, 2);
+    SetPointerItem(item, POINTER_ITEM_ID_TWO);
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_ONE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
@@ -615,14 +621,14 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent002()
     CHKPP(pointerEvent);
 
     PointerEvent::PointerItem item;
-    SetPointerItem(item, 2);
+    SetPointerItem(item, POINTER_ITEM_ID_TWO);
     pointerEvent->AddPointerItem(item);
 
-    SetPointerItem(item, -1);
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(2);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_TWO);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
@@ -633,14 +639,14 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent003()
     CHKPP(pointerEvent);
 
     PointerEvent::PointerItem item;
-    SetPointerItem(item, -1);
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
     pointerEvent->AddPointerItem(item);
 
-    SetPointerItem(item, -1);
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(-1);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_INVALID);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
@@ -651,16 +657,27 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent004()
     CHKPP(pointerEvent);
 
     PointerEvent::PointerItem item;
-    SetPointerItem(item, -1);
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
     pointerEvent->AddPointerItem(item);
 
-    SetPointerItem(item, -1);
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(4);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_FOUR);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
+}
+
+void InputManagerUtil::PrintPointerEventId(PointerEvent &pointerEvent)
+{
+    auto pointerItems = pointerEvent.GetAllPointerItems();
+    auto it = pointerItems.begin();
+    int32_t count = 1;
+    for (pointerItems.begin(); it != pointerItems.end(); ++it) {
+        MMI_HILOGI("PointerItem%{public}d : pointerId = %{public}d", count, *it->GetPointerId());
+        count++;
+    }
 }
 
 std::shared_ptr<KeyEvent> InputManagerUtil::SetupKeyEvent001()

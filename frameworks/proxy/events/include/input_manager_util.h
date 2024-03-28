@@ -53,6 +53,7 @@ public:
     static std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
     static std::shared_ptr<PointerEvent> SetupTouchScreenEvent002();
     static void SetPointerItem(PointerEvent::PointerItem &item, int32_t pointerId);
+    static void PrintPointerEventId(PointerEvent &pointerEvent);
     static std::shared_ptr<PointerEvent> SetupSimulateEvent001();
     static std::shared_ptr<PointerEvent> SetupSimulateEvent002();
     static std::shared_ptr<PointerEvent> SetupSimulateEvent003();
