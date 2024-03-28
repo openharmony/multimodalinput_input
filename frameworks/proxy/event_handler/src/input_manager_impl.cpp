@@ -846,7 +846,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     for (auto &pointerItem : pointerItems) {
         pointerEvent->AddPointerItem(pointerItem);
     }
-    if (!pointerItems.empty()) {
+    if ((pointerEvent->GetPointerId() < 0) && !pointerItems.empty()) {
         pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
         MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
