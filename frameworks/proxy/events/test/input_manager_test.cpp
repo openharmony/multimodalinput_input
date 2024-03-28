@@ -1654,7 +1654,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
-    
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
@@ -1709,7 +1709,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventZorder_001, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
-    
+
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
 }
 
@@ -1982,6 +1982,58 @@ HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, Test
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent001();
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent002();
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent003();
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent004();
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
 #ifdef INPUT_MANAGER_TEST_ENABLE_DEMO

@@ -582,6 +582,87 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTouchScreenEvent002()
     return pointerEvent;
 }
 
+void InputManagerUtil::SetPointerItem(PointerEvent::PointerItem &item, int32_t pointerId)
+{
+    item.SetPointerId(pointerId);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
+    item.SetDeviceId(1);
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent001()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, 1);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, 2);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent002()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, 2);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, -1);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(2);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent003()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, -1);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, -1);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent004()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, -1);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, -1);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(4);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
 std::shared_ptr<KeyEvent> InputManagerUtil::SetupKeyEvent001()
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -634,8 +715,6 @@ std::shared_ptr<PointerEvent> InputManagerUtil::TestMarkConsumedStep1()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
     item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
     item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_THIRTEEN);
     item.SetPressure(POINTER_ITEM_PRESSURE_ONE);
