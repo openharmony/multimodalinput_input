@@ -1520,7 +1520,7 @@ void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vecto
     CALL_DEBUG_ENTER;
     Rect newTopRect;
     newTopRect.x = windowArea.x + pointerChangeAreas[TOP_LEFT_AREA];
-    newTopRect.y = windowArea.y - pointerChangeAreas[TOP_LEFT_AREA];
+    newTopRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
     newTopRect.width = windowArea.width - pointerChangeAreas[TOP_LEFT_AREA] - pointerChangeAreas[TOP_RIGHT_AREA];
     newTopRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[TOP_AREA];
     Rect newBottomRect;
