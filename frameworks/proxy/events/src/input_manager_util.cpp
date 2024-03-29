@@ -669,13 +669,13 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent004()
     return pointerEvent;
 }
 
-void InputManagerUtil::PrintPointerEventId(PointerEvent &pointerEvent)
+void InputManagerUtil::PrintPointerEventId(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    auto pointerItems = pointerEvent.GetAllPointerItems();
+    auto pointerItems = pointerEvent->GetAllPointerItems();
     auto it = pointerItems.begin();
     int32_t count = 1;
     for (pointerItems.begin(); it != pointerItems.end(); ++it) {
-        MMI_HILOGI("PointerItem%{public}d : pointerId = %{public}d", count, *it->GetPointerId());
+        MMI_HILOGI("PointerItem%{public}d : pointerId = %{public}d", count, it->GetPointerId());
         count++;
     }
 }
