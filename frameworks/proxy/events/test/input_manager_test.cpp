@@ -1995,10 +1995,10 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupSimulateEvent001();
     MMI_HILOGI("Before handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     MMI_HILOGI("After handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
 }
 
 /**
@@ -2012,10 +2012,10 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupSimulateEvent002();
     MMI_HILOGI("Before handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     MMI_HILOGI("After handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
 }
 
 /**
@@ -2029,10 +2029,10 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_003, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupSimulateEvent003();
     MMI_HILOGI("Before handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     MMI_HILOGI("After handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
 }
 
 /**
@@ -2046,10 +2046,10 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_004, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupSimulateEvent004();
     MMI_HILOGI("Before handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     MMI_HILOGI("After handle SimulateInputEvent");
-    PrintPointerEventId(pointerEvent);
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
 }
 
 #ifdef INPUT_MANAGER_TEST_ENABLE_DEMO

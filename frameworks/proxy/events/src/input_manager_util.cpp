@@ -112,7 +112,6 @@ constexpr double POINTER_ITEM_TITLE_Y_THREE = -9.0;
 constexpr int32_t POINTER_ITEM_ID_INVALID = -1;
 constexpr int32_t POINTER_ITEM_ID_ONE = 1;
 constexpr int32_t POINTER_ITEM_ID_TWO = 2;
-constexpr int32_t POINTER_ITEM_ID_THREE = 3;
 constexpr int32_t POINTER_ITEM_ID_FOUR = 4;
 
 } // namespace
