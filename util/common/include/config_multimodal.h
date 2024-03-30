@@ -31,7 +31,7 @@ namespace MMI {
 #define DEF_SCREEN_MAX_HEIGHT 960
 
 // Maximum buffer size of network packets
-#define MAX_PACKET_BUF_SIZE (1024*8)
+#define MAX_PACKET_BUF_SIZE (1024*128)
 // Maximum buffer size of socket stream
 #define MAX_STREAM_BUF_SIZE (MAX_PACKET_BUF_SIZE*2)
 #define MAX_VECTOR_SIZE 1000
