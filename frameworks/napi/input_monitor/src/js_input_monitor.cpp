@@ -1224,19 +1224,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             }
             return;
         }
-        int32_t ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
-        if (ret != 0) {
-            MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
-            if (monitorInfo != nullptr) {
-                delete monitorInfo;
-                monitorInfo = nullptr;
-            }
-            if (work != nullptr) {
-                delete work;
-                work = nullptr;
-            }
-        }
+        uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
     }
 }
 
