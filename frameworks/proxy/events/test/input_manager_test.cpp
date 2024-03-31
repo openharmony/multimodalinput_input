@@ -1311,7 +1311,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    ASSERT_EQ(InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
+    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
 }
 
 /**
