@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef INPUT_WINDOWS_MANAGER_H
 #define INPUT_WINDOWS_MANAGER_H
 
@@ -92,6 +92,7 @@ public:
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
+    int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();

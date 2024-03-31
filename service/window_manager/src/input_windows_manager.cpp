@@ -2604,5 +2604,16 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
     }
     return dst == RET_OK;
 }
+
+int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    int32_t checkingPid  = GetWindowPid(windowId);
+    if (checkingPid != pid) {
+        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
