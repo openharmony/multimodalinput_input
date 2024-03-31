@@ -1642,17 +1642,6 @@ int32_t MMIService::CheckPidPermission(int32_t pid)
     return RET_OK;
 }
 
-int32_t MMIService::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    int32_t checkingPid  = WinMgr->GetWindowPid(windowId);
-    if (checkingPid != pid) {
-        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t MMIService::EnableCombineKey(bool enable)
 {
     CALL_DEBUG_ENTER;
