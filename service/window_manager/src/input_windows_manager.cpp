@@ -563,7 +563,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         std::optional<WindowInfo> windowInfo;
         if (lastPointerEvent_ == nullptr) {
             MMI_HILOGD("lastPointerEvent_ is nullptr");
-            terurn;
+            return;
         }
         if ((lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
             lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
