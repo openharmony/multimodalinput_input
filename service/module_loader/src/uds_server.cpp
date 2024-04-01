@@ -146,8 +146,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
 int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    static constexpr size_t bufferSize = 1024 * 1024;
-    static constexpr size_t nativeBufferSize = 2048 * 1024;
+    static constexpr size_t bufferSize = 32 * 1024;
+    static constexpr size_t nativeBufferSize = 64 * 1024;
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
         MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
         return RET_ERR;
