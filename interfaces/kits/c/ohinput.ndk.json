@@ -15,7 +15,7 @@
         "first_introduced": "12",
         "name": "OH_Input_SetKeyCode"
     },
-    { 
+    {
         "first_introduced": "12",
         "name": "OH_Input_GetKeyCode"
     },
@@ -34,5 +34,165 @@
     {
         "first_introduced": "12",
         "name": "OH_Input_GetKeySwitch"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_InjectKeyEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CreateKeyEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_DestroyKeyEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetKeyEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeyEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetKeyEventKeyCode"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeyEventKeyCode"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetKeyEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeyEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_InjectMouseEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CreateMouseEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_DestroyMouseEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventDisplayX"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventDisplayX"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventDisplayY"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventDisplayY"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventButton"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventButton"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventAxisType"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventAxisType"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventAxisValue"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventAxisValue"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetMouseEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetMouseEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_InjectTouchEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CreateTouchEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_DestroyTouchEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetTouchEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetTouchEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetTouchEventFingerId"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetTouchEventFingerId"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetTouchEventDisplayX"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetTouchEventDisplayX"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetTouchEventDisplayY"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetTouchEventDisplayY"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetTouchEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetTouchEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CancelInjection"
     }
 ]

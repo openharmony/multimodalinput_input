@@ -17,7 +17,9 @@
 
 #include <cinttypes>
 
+#include "ability_manager_client.h"
 #include "anr_manager.h"
+#include "authorization_dialog.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -35,6 +37,7 @@
 #include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -82,10 +85,23 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    if (isNativeInject) {
+        CurrentPID_ = pid;
+        auto iter = authorizationCollection_.find(pid);
+        if (iter == authorizationCollection_.end()) {
+            InjectionType_ = InjectionType::KEYEVENT;
+            keyEvent_ = keyEvent;
+            LaunchAbility();
+            return RET_OK;
+        }
+        if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+    }
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
@@ -127,10 +143,24 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (isNativeInject) {
+        CurrentPID_ = pid;
+        auto iter = authorizationCollection_.find(pid);
+        if (iter == authorizationCollection_.end()) {
+            InjectionType_ = InjectionType::POINTEREVENT;
+            pointerEvent_ = pointerEvent;
+            LaunchAbility();
+            return RET_OK;
+        }
+        if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+    }
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     auto source = pointerEvent->GetSourceType();
@@ -483,6 +513,48 @@ int32_t ServerMsgHandler::SetShieldStatus(int32_t shieldMode, bool isShield)
 int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     return KeyEventHdr->GetShieldStatus(shieldMode, isShield);
+}
+
+void ServerMsgHandler::LaunchAbility()
+{
+    OHOS::MMI::AuthorizationDialog authorizationDialog;
+    authorizationDialog.ConnectSystemUi();
+}
+
+int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
+{
+    if (isAuthorize) {
+        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
+        if (!ret.second) {
+            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+        }
+        if (InjectionType_ == InjectionType::KEYEVENT) {
+            OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
+        }
+        if (InjectionType_ == InjectionType::POINTEREVENT) {
+            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
+        }
+        return ERR_OK;
+    } else {
+        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
+        if (!ret.second) {
+            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+        }
+        return ERR_OK;
+    }
+}
+
+int32_t ServerMsgHandler::OnCancelInjection()
+{
+    auto iter = authorizationCollection_.find(CurrentPID_);
+    if (iter != authorizationCollection_.end()) {
+        authorizationCollection_.erase(iter);
+        CurrentPID_ = -1;
+        InjectionType_ = InjectionType::UNKNOWN;
+        keyEvent_ = nullptr;
+        pointerEvent_ = nullptr;
+    }
+    return ERR_OK;
 }
 } // namespace MMI
 } // namespace OHOS

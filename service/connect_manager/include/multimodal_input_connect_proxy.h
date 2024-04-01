@@ -78,12 +78,12 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     int32_t SubscribeSwitchEvent(int32_t subscribeId) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) override;
@@ -116,6 +116,8 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
+    int32_t Authorize(bool isAuthorize) override;
+    int32_t CancelInjection() override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
