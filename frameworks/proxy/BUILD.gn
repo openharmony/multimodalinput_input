@@ -117,7 +117,6 @@ ohos_shared_library("libmmi-client") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
-    "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
   ]
@@ -307,7 +306,6 @@ ohos_unittest("PointerEventTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
-    "image_framework:image_native",
     "ipc:ipc_single",
     "window_manager:libwm",
     "window_manager:libwsutils",
