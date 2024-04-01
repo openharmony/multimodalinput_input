@@ -2578,5 +2578,36 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     }
     return true;
 }
+
+bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
+{
+    CALL_DEBUG_ENTER;
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("The pixelmap is nullptr");
+        return false;
+    }
+
+    uint32_t dst = 0;
+    OHOS::Media::Position pos { logicalY, logicalX };
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    CHKPF(pixelMapPtr);
+    uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
+    if (result != RET_OK) {
+        MMI_HILOGE("Failed to read pixelmap");
+        return false;
+    }
+    return dst == RET_OK;
+}
+
+int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    int32_t checkingPid  = GetWindowPid(windowId);
+    if (checkingPid != pid) {
+        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
