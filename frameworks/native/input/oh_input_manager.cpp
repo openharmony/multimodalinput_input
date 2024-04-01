@@ -145,7 +145,7 @@ int32_t OH_Input_GetKeySwitch(struct Input_KeyState* keyState)
     return keyState->keySwitch;
 }
 
-void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::KeyEvent::KeyItem &item)
+static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::KeyEvent::KeyItem &item)
 {
     if (keyEvent->action == KEY_ACTION_DOWN) {
         g_keyEvent->AddPressedKeyItems(item);
@@ -233,7 +233,7 @@ void OH_Input_SetKeyEventAction(struct Input_KeyEvent* keyEvent, int32_t action)
 
 int32_t OH_Input_GetKeyEventAction(const struct Input_KeyEvent* keyEvent)
 {
-    CHKPR(keyEvent, -1);
+    CHKPR(keyEvent, RET_ERR);
     return keyEvent->action;
 }
 
@@ -257,12 +257,11 @@ void OH_Input_SetKeyEventActionTime(struct Input_KeyEvent* keyEvent, int64_t act
 
 int64_t OH_Input_GetKeyEventActionTime(const struct Input_KeyEvent* keyEvent)
 {
-    CHKPR(keyEvent, -1);
+    CHKPR(keyEvent, RET_ERR);
     return keyEvent->actionTime;
 }
 
-static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent,
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent)
+static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent)
 {
     int32_t button = mouseEvent->button;
     if (button < MOUSE_BUTTON_NONE || button > MOUSE_BUTTON_BACK) {
@@ -286,16 +285,15 @@ static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent,
             break;
     }
     if (mouseEvent->action == MOUSE_ACTION_BUTTON_DOWN) {
-        pointerEvent->SetButtonPressed(button);
+        g_mouseEvent->SetButtonPressed(button);
     } else if (mouseEvent->action == MOUSE_ACTION_BUTTON_UP) {
-        pointerEvent->DeleteReleaseButton(button);
+        g_mouseEvent->DeleteReleaseButton(button);
     }
-    pointerEvent->SetButtonId(button);
+    g_mouseEvent->SetButtonId(button);
     return INPUT_SUCCESS;
 }
 
-static int32_t HandleMouseAction(const struct Input_MouseEvent* mouseEvent,
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+static int32_t HandleMouseAction(const struct Input_MouseEvent* mouseEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     if (mouseEvent->action < MOUSE_ACTION_CANCEL || mouseEvent->action > MOUSE_ACTION_AXIS_END) {
         MMI_HILOGE("action:%{public}d is invalid", mouseEvent->action);
@@ -303,49 +301,49 @@ static int32_t HandleMouseAction(const struct Input_MouseEvent* mouseEvent,
     }
     switch (mouseEvent->action) {
         case MOUSE_ACTION_MOVE:
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
             break;
         case MOUSE_ACTION_BUTTON_DOWN:
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN);
             item.SetPressed(true);
             break;
         case MOUSE_ACTION_BUTTON_UP:
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_UP);
             item.SetPressed(false);
             break;
         case MOUSE_ACTION_AXIS_BEGIN:
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN);
             break;
         case MOUSE_ACTION_AXIS_UPDATE:
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE);
             break;
         case MOUSE_ACTION_AXIS_END:
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
             break;
         default:
             MMI_HILOGE("action is unknown");
             break;
     }
     if (mouseEvent->axisType == MOUSE_AXIS_SCROLL_VERTICAL) {
-        pointerEvent->SetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, mouseEvent->axisValue);
+        g_mouseEvent->SetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, mouseEvent->axisValue);
     }
     if (mouseEvent->axisType == MOUSE_AXIS_SCROLL_HORIZONTAL) {
-        pointerEvent->SetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, mouseEvent->axisValue);
+        g_mouseEvent->SetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, mouseEvent->axisValue);
     }
-    return HandleMouseButton(mouseEvent, pointerEvent);
+    return HandleMouseButton(mouseEvent);
 }
 
 static int32_t HandleMouseProperty(const struct Input_MouseEvent* mouseEvent,
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+    OHOS::MMI::PointerEvent::PointerItem &item)
 {
     int32_t screenX = mouseEvent->displayX;
     int32_t screenY = mouseEvent->displayY;
-    pointerEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE);
+    g_mouseEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE);
     item.SetPointerId(0);
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
+    g_mouseEvent->SetPointerId(0);
+    g_mouseEvent->UpdatePointerItem(g_mouseEvent->GetPointerId(), item);
     return INPUT_SUCCESS;
 }
 
@@ -364,11 +362,11 @@ int32_t OH_Input_InjectMouseEvent(const struct Input_MouseEvent* mouseEvent)
     g_mouseEvent->SetActionTime(time);
     OHOS::MMI::PointerEvent::PointerItem item;
     item.SetDownTime(time);
-    int32_t result = HandleMouseAction(mouseEvent, g_mouseEvent, item);
+    int32_t result = HandleMouseAction(mouseEvent, item);
     if (result != 0) {
         return result;
     }
-    result = HandleMouseProperty(mouseEvent, g_mouseEvent, item);
+    result = HandleMouseProperty(mouseEvent, item);
     if (result != 0) {
         return result;
     }
@@ -407,7 +405,7 @@ void OH_Input_SetMouseEventAction(struct Input_MouseEvent* mouseEvent, int32_t a
 int32_t OH_Input_GetMouseEventAction(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->action;
 }
 
@@ -421,7 +419,7 @@ void OH_Input_SetMouseEventDisplayX(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventDisplayX(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->displayX;
 }
 
@@ -435,7 +433,7 @@ void OH_Input_SetMouseEventDisplayY(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventDisplayY(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->displayY;
 }
 
@@ -449,7 +447,7 @@ void OH_Input_SetMouseEventButton(struct Input_MouseEvent* mouseEvent, int32_t b
 int32_t OH_Input_GetMouseEventButton(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->button;
 }
 
@@ -463,7 +461,7 @@ void OH_Input_SetMouseEventAxisType(struct Input_MouseEvent* mouseEvent, int32_t
 int32_t OH_Input_GetMouseEventAxisType(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->axisType;
 }
 
@@ -477,7 +475,7 @@ void OH_Input_SetMouseEventAxisValue(struct Input_MouseEvent* mouseEvent, float 
 float OH_Input_GetMouseEventAxisValue(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->axisValue;
 }
 
@@ -491,12 +489,11 @@ void OH_Input_SetMouseEventActionTime(struct Input_MouseEvent* mouseEvent, int64
 int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(mouseEvent, -1);
+    CHKPR(mouseEvent, RET_ERR);
     return mouseEvent->actionTime;
 }
 
-static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent,
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_DEBUG_ENTER;
     int64_t time = touchEvent->actionTime;
@@ -506,30 +503,30 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent,
     int32_t action = touchEvent->action;
     switch (action) {
         case TOUCH_ACTION_DOWN: {
-            auto pointIds = pointerEvent->GetPointerIds();
+            auto pointIds = g_touchEvent->GetPointerIds();
             if (pointIds.empty()) {
-                pointerEvent->SetActionStartTime(time);
-                pointerEvent->SetTargetDisplayId(0);
+                g_touchEvent->SetActionStartTime(time);
+                g_touchEvent->SetTargetDisplayId(0);
             }
-            pointerEvent->SetActionTime(time);
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+            g_touchEvent->SetActionTime(time);
+            g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
             item.SetDownTime(time);
             item.SetPressed(true);
             break;
         }
         case TOUCH_ACTION_MOVE: {
-            pointerEvent->SetActionTime(time);
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
-            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
+            g_touchEvent->SetActionTime(time);
+            g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
+            if (!(g_touchEvent->GetPointerItem(touchEvent->id, item))) {
                 MMI_HILOGE("Get pointer parameter failed");
                 return INPUT_PARAMETER_ERROR;
             }
             break;
         }
         case TOUCH_ACTION_UP: {
-            pointerEvent->SetActionTime(time);
-            pointerEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_UP);
-            if (!(pointerEvent->GetPointerItem(touchEvent->id, item))) {
+            g_touchEvent->SetActionTime(time);
+            g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_UP);
+            if (!(g_touchEvent->GetPointerItem(touchEvent->id, item))) {
                 MMI_HILOGE("Get pointer parameter failed");
                 return INPUT_PARAMETER_ERROR;
             }
@@ -545,7 +542,7 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent,
 }
 
 static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
-    std::shared_ptr<OHOS::MMI::PointerEvent> pointerEvent, OHOS::MMI::PointerEvent::PointerItem &item)
+    OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_DEBUG_ENTER;
     int32_t id = touchEvent->id;
@@ -558,12 +555,12 @@ static int32_t HandleTouchProperty(const struct Input_TouchEvent* touchEvent,
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
     item.SetPointerId(id);
-    pointerEvent->SetPointerId(id);
-    pointerEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    g_touchEvent->SetPointerId(id);
+    g_touchEvent->SetSourceType(OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     if (touchEvent->action == TOUCH_ACTION_DOWN) {
-        pointerEvent->AddPointerItem(item);
+        g_touchEvent->AddPointerItem(item);
     } else if ((touchEvent->action == TOUCH_ACTION_MOVE) || (touchEvent->action == TOUCH_ACTION_UP)) {
-        pointerEvent->UpdatePointerItem(id, item);
+        g_touchEvent->UpdatePointerItem(id, item);
     }
     return INPUT_SUCCESS;
 }
@@ -575,11 +572,11 @@ int32_t OH_Input_InjectTouchEvent(const struct Input_TouchEvent* touchEvent)
     CHKPR(g_touchEvent, INPUT_PARAMETER_ERROR);
     g_touchEvent->ClearFlag();
     OHOS::MMI::PointerEvent::PointerItem item;
-    int32_t result = HandleTouchAction(touchEvent, g_touchEvent, item);
+    int32_t result = HandleTouchAction(touchEvent, item);
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
-    result = HandleTouchProperty(touchEvent, g_touchEvent, item);
+    result = HandleTouchProperty(touchEvent, item);
     if (result != 0) {
         return INPUT_PARAMETER_ERROR;
     }
@@ -626,7 +623,7 @@ void OH_Input_SetTouchEventAction(struct Input_TouchEvent* touchEvent, int32_t a
 int32_t OH_Input_GetTouchEventAction(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, -1);
+    CHKPR(touchEvent, RET_ERR);
     return touchEvent->action;
 }
 
@@ -640,7 +637,7 @@ void OH_Input_SetTouchEventFingerId(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventFingerId(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, -1);
+    CHKPR(touchEvent, RET_ERR);
     return touchEvent->id;
 }
 
@@ -654,7 +651,7 @@ void OH_Input_SetTouchEventDisplayX(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventDisplayX(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, -1);
+    CHKPR(touchEvent, RET_ERR);
     return touchEvent->displayX;
 }
 
@@ -668,7 +665,7 @@ void OH_Input_SetTouchEventDisplayY(struct Input_TouchEvent* touchEvent, int32_t
 int32_t OH_Input_GetTouchEventDisplayY(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, -1);
+    CHKPR(touchEvent, RET_ERR);
     return touchEvent->displayY;
 }
 
@@ -682,7 +679,7 @@ void OH_Input_SetTouchEventActionTime(struct Input_TouchEvent* touchEvent, int64
 int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(touchEvent, -1);
+    CHKPR(touchEvent, RET_ERR);
     return touchEvent->actionTime;
 }
 
