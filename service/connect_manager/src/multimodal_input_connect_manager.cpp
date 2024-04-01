@@ -685,11 +685,13 @@ void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputS
 
 int32_t MultimodalInputConnectManager::Authorize(bool isAuthorize)
 {
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->Authorize(isAuthorize);
 }
 
 int32_t MultimodalInputConnectManager::CancelInjection()
 {
+    CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->CancelInjection();
 }
 } // namespace MMI
