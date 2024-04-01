@@ -28,6 +28,7 @@
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "input_scene_board_judgement.h"
+#include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
 namespace OHOS {
@@ -546,11 +547,27 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        pkt << item.id << item.pid << item.uid << item.area
-            << item.defaultHotAreas << item.pointerHotAreas
-            << item.agentWindowId << item.flags << item.action
-            << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform;
+        size_t size = 0 ;
+        pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
+            << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
+            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform;
+        if (item.pixelMap != nullptr) {
+            OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
+            if (pixelMapPtr != nullptr) {
+                const uint8_t* dataPtr = pixelMapPtr->GetPixels();
+                const char* chars = reinterpret_cast<const char*>(dataPtr);
+                size  = static_cast<size_t>(pixelMapPtr->GetByteCount());
+                MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d",
+                    size, pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
+                pkt << size << pixelMapPtr->GetWidth() << pixelMapPtr->GetHeight();
+                pkt.Write(chars, size);
+            } else {
+                MMI_HILOGD("The pixelMapPtr is null");
+                pkt << size;
+            }
+        } else {
+            pkt << size;
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
