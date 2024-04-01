@@ -291,6 +291,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEY_STATE):
             return StubGetKeyState(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_AUTHORIZE):
+            return StubAuthorize(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION):
+            return StubCancelInjection(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1208,10 +1214,6 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1222,8 +1224,14 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
         MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
+    bool isNativeInject { false };
+    READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (!isNativeInject && !PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     event->UpdateId();
-    int32_t ret = InjectKeyEvent(event);
+    int32_t ret = InjectKeyEvent(event, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);
         return ret;
@@ -1234,10 +1242,6 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1248,7 +1252,13 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
         MMI_HILOGE("Read Pointer Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    int32_t ret = InjectPointerEvent(pointerEvent);
+    bool isNativeInject { false };
+    READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (!isNativeInject && !PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t ret = InjectPointerEvent(pointerEvent, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("Call InjectPointerEvent failed ret:%{public}d", ret);
         return ret;
@@ -2030,6 +2040,34 @@ int32_t MultimodalInputConnectStub::StubGetKeyState(MessageParcel& data, Message
         return RET_ERR;
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool isAuthorize { false };
+    READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = Authorize(isAuthorize);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call Authorize failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubCancelInjection(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = CancelInjection();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call CancelInjection failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

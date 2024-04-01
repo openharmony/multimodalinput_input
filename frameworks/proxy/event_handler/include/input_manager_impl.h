@@ -107,8 +107,8 @@ public:
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     void RemoveInterceptor(int32_t interceptorId);
 
-    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
     template<typename T>
@@ -190,6 +190,8 @@ public:
     int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
 
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+    void Authorize(bool isAuthorize);
+    int32_t CancelInjection();
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
