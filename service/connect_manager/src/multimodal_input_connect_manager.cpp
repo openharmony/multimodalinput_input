@@ -398,16 +398,17 @@ int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t o
     return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
 }
 
-int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event)
+int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event, bool isNativeInject)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->InjectKeyEvent(event);
+    return multimodalInputConnectService_->InjectKeyEvent(event, isNativeInject);
 }
 
-int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    bool isNativeInject)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->InjectPointerEvent(pointerEvent);
+    return multimodalInputConnectService_->InjectPointerEvent(pointerEvent, isNativeInject);
 }
 
 int32_t MultimodalInputConnectManager::SetAnrObserver()
@@ -680,6 +681,18 @@ void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputS
 {
     std::lock_guard<std::mutex> guard(lock_);
     watchers_.erase(watcher);
+}
+
+int32_t MultimodalInputConnectManager::Authorize(bool isAuthorize)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->Authorize(isAuthorize);
+}
+
+int32_t MultimodalInputConnectManager::CancelInjection()
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->CancelInjection();
 }
 } // namespace MMI
 } // namespace OHOS
