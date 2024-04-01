@@ -500,8 +500,11 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
     if (time < 0) {
         time = OHOS::MMI::GetSysClockTime();
     }
-    int32_t action = touchEvent->action;
-    switch (action) {
+    if (touchEvent->action < TOUCH_ACTION_CANCEL || touchEvent->action > TOUCH_ACTION_UP) {
+        MMI_HILOGE("action:%{public}d is invalid", touchEvent->action);
+        return INPUT_PARAMETER_ERROR;
+    }
+    switch (touchEvent->action) {
         case TOUCH_ACTION_DOWN: {
             auto pointIds = g_touchEvent->GetPointerIds();
             if (pointIds.empty()) {
