@@ -1417,10 +1417,6 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         for (const auto &item : windowsInfo) {
-            if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
-                MMI_HILOGE("It's an abnormal window and pointer find the next window");
-                continue;
-            }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
                 MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
@@ -1890,10 +1886,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
-        if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
-            MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
-            continue;
-        }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -2026,7 +2018,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
     } else {
         if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            if (!checkExtraData) {
+            if ((!checkExtraData) && (!(extraData_.appended &&
+                extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
+                MMI_HILOGD("PointerAction is to leave the window");
                 DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             }
