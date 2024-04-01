@@ -155,7 +155,7 @@ static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::Ke
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_HILOGE("Find pressed key failed, keyCode:%{public}d", keyEvent->keyCode);
+            MMI_HILOGW("Find pressed key failed, keyCode:%{public}d", keyEvent->keyCode);
         }
         g_keyEvent->RemoveReleasedKeyItems(item);
         g_keyEvent->AddPressedKeyItems(item);
@@ -264,25 +264,34 @@ int64_t OH_Input_GetKeyEventActionTime(const struct Input_KeyEvent* keyEvent)
 static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent)
 {
     int32_t button = mouseEvent->button;
-    if (button < MOUSE_BUTTON_NONE || button > MOUSE_BUTTON_BACK) {
-        MMI_HILOGE("button:%{public}d is invalid", button);
-        return INPUT_PARAMETER_ERROR;
-    }
     switch (button) {
-        case MOUSE_BUTTON_MIDDLE:
+        case MOUSE_BUTTON_NONE: {
+            button = OHOS::MMI::PointerEvent::BUTTON_NONE;
+            break;
+        }
+        case MOUSE_BUTTON_LEFT: {
+            button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_LEFT;
+        }
+        case MOUSE_BUTTON_MIDDLE: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_MIDDLE;
             break;
-        case MOUSE_BUTTON_RIGHT:
+        }
+        case MOUSE_BUTTON_RIGHT: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_RIGHT;
             break;
-        case MOUSE_BUTTON_FORWARD:
+        }
+        case MOUSE_BUTTON_FORWARD: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_FORWARD;
             break;
-        case MOUSE_BUTTON_BACK:
+        }
+        case MOUSE_BUTTON_BACK: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_BACK;
             break;
-        default:
-            break;
+        }
+        default: {
+            MMI_HILOGE("button:%{public}d is invalid", button);
+            return INPUT_PARAMETER_ERROR;
+        }
     }
     if (mouseEvent->action == MOUSE_ACTION_BUTTON_DOWN) {
         g_mouseEvent->SetButtonPressed(button);
@@ -295,11 +304,10 @@ static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent)
 
 static int32_t HandleMouseAction(const struct Input_MouseEvent* mouseEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
-    if (mouseEvent->action < MOUSE_ACTION_CANCEL || mouseEvent->action > MOUSE_ACTION_AXIS_END) {
-        MMI_HILOGE("action:%{public}d is invalid", mouseEvent->action);
-        return INPUT_PARAMETER_ERROR;
-    }
     switch (mouseEvent->action) {
+        case MOUSE_ACTION_CANCEL:
+            g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL);
+            break;
         case MOUSE_ACTION_MOVE:
             g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE);
             break;
@@ -321,8 +329,8 @@ static int32_t HandleMouseAction(const struct Input_MouseEvent* mouseEvent, OHOS
             g_mouseEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END);
             break;
         default:
-            MMI_HILOGE("action is unknown");
-            break;
+            MMI_HILOGE("action:%{public}d is invalid", mouseEvent->action);
+            return INPUT_PARAMETER_ERROR;
     }
     if (mouseEvent->axisType == MOUSE_AXIS_SCROLL_VERTICAL) {
         g_mouseEvent->SetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, mouseEvent->axisValue);
@@ -500,11 +508,17 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
     if (time < 0) {
         time = OHOS::MMI::GetSysClockTime();
     }
-    if (touchEvent->action < TOUCH_ACTION_CANCEL || touchEvent->action > TOUCH_ACTION_UP) {
-        MMI_HILOGE("action:%{public}d is invalid", touchEvent->action);
-        return INPUT_PARAMETER_ERROR;
-    }
     switch (touchEvent->action) {
+        case TOUCH_ACTION_CANCEL:{
+            g_touchEvent->SetActionTime(time);
+            g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL);
+            if (!(g_touchEvent->GetPointerItem(touchEvent->id, item))) {
+                MMI_HILOGE("Get pointer parameter failed");
+                return INPUT_PARAMETER_ERROR;
+            }
+            item.SetPressed(false);
+            break;
+        }
         case TOUCH_ACTION_DOWN: {
             auto pointIds = g_touchEvent->GetPointerIds();
             if (pointIds.empty()) {
@@ -537,8 +551,8 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
             break;
         }
         default: {
-            MMI_HILOGE("action is unknown");
-            break;
+            MMI_HILOGE("action:%{public}d is invalid", touchEvent->action);
+            return INPUT_PARAMETER_ERROR;
         }
     }
     return INPUT_SUCCESS;
