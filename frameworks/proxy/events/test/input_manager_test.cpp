@@ -1344,9 +1344,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot, TestSize.Level1)
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::CROSS;
     int32_t fakeWindoId = 100;
-    int32_t MOUSE_ICON_HOT_SPOT = 20;
+    int32_t mouseIcon = 20;
     ASSERT_TRUE(
-        InputManager::GetInstance()->SetMouseHotSpot(fakeWindoId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_ERR);
+        InputManager::GetInstance()->SetMouseHotSpot(fakeWindoId, mouseIcon, mouseIcon) == RET_ERR);
 }
 
 
