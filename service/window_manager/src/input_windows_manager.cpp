@@ -151,7 +151,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     const WindowInfo* windowInfo = nullptr;
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
     if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
-        MMI_HILOGI("Drop event");
+        MMI_HILOGD("Drop event");
         return INVALID_FD;
     }
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
@@ -370,7 +370,7 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
 
 void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     PrintWindowGroupInfo(windowGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (windowGroupInfo.windowsInfo.size() == SHELL_WINDOW_COUNT && IsAncoWindow(windowGroupInfo.windowsInfo[0])) {
@@ -561,7 +561,10 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         int32_t logicX = mouseLocation.physicalX + displayInfo->x;
         int32_t logicY = mouseLocation.physicalY + displayInfo->y;
         std::optional<WindowInfo> windowInfo;
-        CHKPV(lastPointerEvent_);
+        if (lastPointerEvent_ == nullptr) {
+            MMI_HILOGD("lastPointerEvent_ is nullptr");
+            return;
+        }
         if ((lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
             lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
             lastPointerEvent_->GetPressedButtons().empty()) {
@@ -826,9 +829,12 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 
 void InputWindowsManager::NotifyPointerToWindow()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::optional<WindowInfo> windowInfo;
-    CHKPV(lastPointerEvent_);
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOGD("lastPointerEvent_ is nullptr");
+        return;
+    }
     windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
@@ -1327,7 +1333,7 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
         areaNum++;
     }
     if (!findFlag) {
-        MMI_HILOGW("pointer not match any area");
+        MMI_HILOGD("pointer not match any area");
         return;
     }
     switch (pointerStyle.id) {
@@ -1467,7 +1473,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
         } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
             return std::make_optional(item);
         } else {
-            MMI_HILOGW("Continue searching for the dispatch window");
+            MMI_HILOGD("Continue searching for the dispatch window");
         }
     }
     return std::nullopt;
