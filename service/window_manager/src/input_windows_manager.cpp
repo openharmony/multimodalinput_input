@@ -1417,10 +1417,6 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         for (const auto &item : windowsInfo) {
-            if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
-                MMI_HILOGE("It's an abnormal window and pointer find the next window");
-                continue;
-            }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
                 MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
@@ -1890,10 +1886,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
-        if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
-            MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
-            continue;
-        }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -2585,26 +2577,6 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
         return false;
     }
     return true;
-}
-
-bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
-{
-    CALL_DEBUG_ENTER;
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelmap is nullptr");
-        return false;
-    }
-
-    uint32_t dst = 0;
-    OHOS::Media::Position pos { logicalY, logicalX };
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
-    CHKPF(pixelMapPtr);
-    uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
-    if (result != RET_OK) {
-        MMI_HILOGE("Failed to read pixelmap");
-        return false;
-    }
-    return dst == RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
