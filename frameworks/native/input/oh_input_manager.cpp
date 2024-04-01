@@ -219,6 +219,7 @@ struct Input_KeyEvent* OH_Input_CreateKeyEvent()
 
 void OH_Input_DestroyKeyEvent(struct Input_KeyEvent** keyEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(*keyEvent);
     delete *keyEvent;
@@ -397,10 +398,9 @@ void OH_Input_DestroyMouseEvent(struct Input_MouseEvent** mouseEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(mouseEvent);
-    if (*mouseEvent != nullptr) {
-        delete *mouseEvent;
-        *mouseEvent = nullptr;
-    }
+    CHKPV(*mouseEvent);
+    delete *mouseEvent;
+    *mouseEvent = nullptr;
 }
 
 void OH_Input_SetMouseEventAction(struct Input_MouseEvent* mouseEvent, int32_t action)
@@ -624,10 +624,9 @@ void OH_Input_DestroyTouchEvent(struct Input_TouchEvent** touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (*touchEvent != nullptr) {
-        delete *touchEvent;
-        *touchEvent = nullptr;
-    }
+    CHKPV(*touchEvent);
+    delete *touchEvent;
+    *touchEvent = nullptr;
 }
 
 void OH_Input_SetTouchEventAction(struct Input_TouchEvent* touchEvent, int32_t action)
