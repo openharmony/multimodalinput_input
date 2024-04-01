@@ -54,7 +54,7 @@ bool AuthorizationDialog::ConnectSystemUi()
     }
     auto abilityMgr = AAFwk::AbilityManagerClient::GetInstance();
     if (abilityMgr == nullptr) {
-        MMI_HILOGW("AbilityManagerClient is nullptr");
+        MMI_HILOGW("abilityMgr is nullptr");
         return false;
     }
 
@@ -74,7 +74,7 @@ void AuthorizationDialog::DialogAbilityConnection::OnAbilityConnectDone(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(mutex_);
-    CHKPV(remoteObject == nullptr);
+    CHKPV(remoteObject);
     if (g_remoteObject == nullptr) {
         g_remoteObject = remoteObject;
     }
