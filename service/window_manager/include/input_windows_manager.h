@@ -144,6 +144,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER
+    bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
