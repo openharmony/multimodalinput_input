@@ -422,12 +422,11 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusY, IPC_PROXY_DEAD_OBJECT_ERR);
-
-    OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     if (windowId <= 0) {
         MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
         return RET_ERR;
     }
+    OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     if (pixelMap == nullptr) {
         MMI_HILOGE("pixelMap is nullptr");
         return RET_ERR;
@@ -463,14 +462,13 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("Reading windowid the tlv count %{public}d", windowId);
-
+    if (windowId <= 0) {
+        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        return RET_ERR;
+    }
     OHOS::Media::PixelMap* pixelMap = OHOS::Media::PixelMap::DecodeTlv(buff);
     if (pixelMap == nullptr) {
         MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
-        return RET_ERR;
-    }
-    if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
         return RET_ERR;
     }
     int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
