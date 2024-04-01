@@ -1110,7 +1110,7 @@ int32_t MultimodalInputConnectProxy::MoveMouseEvent(int32_t offsetX, int32_t off
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t MultimodalInputConnectProxy::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERR_INVALID_VALUE);
@@ -1123,6 +1123,7 @@ int32_t MultimodalInputConnectProxy::InjectKeyEvent(const std::shared_ptr<KeyEve
         MMI_HILOGE("Failed to write inject event");
         return ERR_INVALID_VALUE;
     }
+    WRITEBOOL(data, isNativeInject, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1232,7 +1233,8 @@ int32_t MultimodalInputConnectProxy::UnsubscribeSwitchEvent(int32_t subscribeId)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    bool isNativeInject)
 {
     CHKPR(pointerEvent, ERR_INVALID_VALUE);
     MessageParcel data;
@@ -1244,6 +1246,7 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
         MMI_HILOGE("Failed to write inject point event");
         return ERR_INVALID_VALUE;
     }
+    WRITEBOOL(data, isNativeInject, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1844,6 +1847,49 @@ int32_t MultimodalInputConnectProxy::GetKeyState(std::vector<int32_t> &pressedKe
     specialKeysState[KeyEvent::KEYCODE_CAPS_LOCK] = specialKeysStateTmp[SPECIAL_ARRAY_INDEX0];
     specialKeysState[KeyEvent::KEYCODE_SCROLL_LOCK] = specialKeysStateTmp[SPECIAL_ARRAY_INDEX1];
     specialKeysState[KeyEvent::KEYCODE_NUM_LOCK] = specialKeysStateTmp[SPECIAL_ARRAY_INDEX2];
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::Authorize(bool isAuthorize)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEBOOL(data, isAuthorize, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_AUTHORIZE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::CancelInjection()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 } // namespace MMI

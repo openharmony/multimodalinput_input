@@ -815,12 +815,12 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    if (MMIEventHdl.InjectEvent(keyEvent) != RET_OK) {
+    if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
 #else
@@ -852,7 +852,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     }
 }
 
-void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -877,7 +877,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
     HandleSimulateInputEvent(pointerEvent);
-    if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
+    if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
@@ -1987,6 +1987,22 @@ int32_t InputManagerImpl::GetKeyState(std::vector<int32_t> &pressedKeys, std::ma
     if (ret != RET_OK) {
         MMI_HILOGE("Get key state failed, ret:%{public}d", ret);
         return ret;
+    }
+    return RET_OK;
+}
+
+void InputManagerImpl::Authorize(bool isAuthorize)
+{
+    if (MMIEventHdl.Authorize(isAuthorize) != RET_OK) {
+        MMI_HILOGE("Failed to authorize");
+    }
+}
+
+int32_t InputManagerImpl::CancelInjection()
+{
+    if (MMIEventHdl.CancelInjection() != RET_OK) {
+        MMI_HILOGE("CancelInjection failed");
+        return RET_ERR;
     }
     return RET_OK;
 }

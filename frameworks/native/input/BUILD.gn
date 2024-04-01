@@ -24,15 +24,25 @@ ohos_shared_library("oh_input_manager") {
     debug = false
   }
   include_dirs = [
+    "${mmi_path}/frameworks/native/input/",
     "${mmi_path}/interfaces/kits/c/input/",
     "${mmi_path}/interfaces/native/innerkits/",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/network/include",
   ]
 
   sources = [ "./oh_input_manager.cpp" ]
 
   cflags = [ "-Werror" ]
 
-  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "c_utils:utils",

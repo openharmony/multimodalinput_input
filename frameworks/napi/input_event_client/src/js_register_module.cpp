@@ -616,6 +616,32 @@ static napi_value InjectJoystickEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value PermitInjection(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        MMI_HILOGE("Parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
+    }
+
+    bool bResult = false;
+    if (!UtilNapi::TypeOf(env, argv[0], napi_boolean)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "boolean");
+        MMI_HILOGE("The first parameter is not boolean");
+        return nullptr;
+    }
+
+    CHKRP(napi_get_value_bool(env, argv[0], &bResult), GET_VALUE_BOOL);
+    MMI_HILOGI("Parameter bResult:%{public}d ok", bResult);
+    
+    return result;
+}
+
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
@@ -625,6 +651,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("injectMouseEvent", InjectMouseEvent),
         DECLARE_NAPI_FUNCTION("injectTouchEvent", InjectTouchEvent),
         DECLARE_NAPI_FUNCTION("injectJoystickEvent", InjectJoystickEvent),
+        DECLARE_NAPI_FUNCTION("permitInjection", PermitInjection),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
