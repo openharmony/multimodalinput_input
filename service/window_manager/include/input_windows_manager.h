@@ -91,7 +91,6 @@ public:
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
