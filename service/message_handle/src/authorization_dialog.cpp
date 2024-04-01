@@ -26,8 +26,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "AuthorizationDialog" };
-static constexpr int32_t INVALID_USERID = -1;
-static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
+constexpr int32_t INVALID_USERID = -1;
+constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 std::atomic_bool g_isDialogShow = false;
 sptr<IRemoteObject> g_remoteObject = nullptr;
 }
@@ -45,6 +45,7 @@ AuthorizationDialog::~AuthorizationDialog()
 
 bool AuthorizationDialog::ConnectSystemUi()
 {
+    CHKPR(dialogConnectionCallback_, false);
     if (g_isDialogShow) {
         AppExecFwk::ElementName element;
         dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
@@ -61,10 +62,10 @@ bool AuthorizationDialog::ConnectSystemUi()
     want.SetElementName("com.ohos.systemui", "com.ohos.systemui.dialog");
     ErrCode result = abilityMgr->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
     if (result != ERR_OK) {
-        MMI_HILOGW("ConnectAbility systemui dialog failed, result = %{public}d", result);
+        MMI_HILOGW("ConnectAbility systemui dialog failed, result:%{public}d", result);
         return false;
     }
-    MMI_HILOGI("ConnectAbility systemui dialog success.");
+    MMI_HILOGI("ConnectAbility systemui dialog success");
     return true;
 }
 
@@ -73,10 +74,7 @@ void AuthorizationDialog::DialogAbilityConnection::OnAbilityConnectDone(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard lock(mutex_);
-    if (remoteObject == nullptr) {
-        MMI_HILOGW("remoteObject is nullptr");
-        return;
-    }
+    CHKPV(remoteObject == nullptr);
     if (g_remoteObject == nullptr) {
         g_remoteObject = remoteObject;
     }
