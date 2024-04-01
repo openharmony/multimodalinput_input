@@ -1295,6 +1295,61 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetWindowPid_001, TestSize.Level1)
     }
 }
 
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursor
+ * @tc.desc: Test set the wrong windowId for SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindowId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ASSERT_TRUE(InputManager::GetInstance()->SetCustomCursor(fakeWindowId, (void *)pixelMap.get(), 32, 32) == RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon
+ * @tc.desc: Test set the wrong windowId for SetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t fakeWindoId = 100;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ASSERT_TRUE(InputManager::GetInstance()->SetMouseIcon(fakeWindoId, (void *)pixelMap.get()) == RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseHotSpot
+ * @tc.desc: Test set the wrong windowId for SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::CROSS;
+    int32_t fakeWindoId = 100;
+    int32_t mouseIcon = 20;
+    ASSERT_TRUE(
+        InputManager::GetInstance()->SetMouseHotSpot(fakeWindoId, mouseIcon, mouseIcon) == RET_ERR);
+}
+
+
 /**
  * @tc.name: InputManagerTest_SetKeyDownDuration_001
  * @tc.desc: Customize the delay time for starting the ability by using the shortcut key.
@@ -1654,7 +1709,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
-    
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
@@ -1709,7 +1764,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventZorder_001, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(10.0);
-    
+
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
 }
 
