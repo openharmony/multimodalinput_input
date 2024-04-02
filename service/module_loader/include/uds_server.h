@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef UDS_SERVER_H
 #define UDS_SERVER_H
 
@@ -88,6 +88,7 @@ protected:
     std::map<int32_t, int32_t> idxPidMap_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
+    std::mutex epollEventMutex_;
     std::map<int32_t, std::shared_ptr<mmi_epoll_event>> epollEventMap_;
 };
 } // namespace MMI
