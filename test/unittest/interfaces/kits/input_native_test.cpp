@@ -46,7 +46,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeyState_001, TestSize.Level1)
         ASSERT_EQ(keyState, nullptr);
     } else {
         ASSERT_NE(keyState, nullptr);
-        OH_Input_DestroyKeyState(keyState);
+        OH_Input_DestroyKeyState(&keyState);
     }
 }
 
@@ -63,7 +63,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeyCode_001, TestSize.Level1)
     OH_Input_SetKeyCode(keyState, 2000);
     int32_t keyCode = OH_Input_GetKeyCode(keyState);
     ASSERT_EQ(keyCode, 2000);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 
 /**
@@ -79,7 +79,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeyPressed_001, TestSize.Level1)
     OH_Input_SetKeyPressed(keyState, 0);
     int32_t keyAction = OH_Input_GetKeyPressed(keyState);
     ASSERT_EQ(keyAction, 0);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 
 /**
@@ -95,7 +95,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeySwitch_001, TestSize.Level1)
     OH_Input_SetKeySwitch(keyState, 2);
     int32_t keySwitch = OH_Input_GetKeySwitch(keyState);
     ASSERT_EQ(keySwitch, 2);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 
 /**
@@ -113,7 +113,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
     ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
     ASSERT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
     ASSERT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 } // namespace MMI
 } // namespace OHOS
