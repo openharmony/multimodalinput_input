@@ -62,7 +62,7 @@ public:
     {
         int64_t ullCost = GetElapsed_micro();
         if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
-            if (llParam1_ != 0 || llParam2_ != 0) {
+            if ((llParam1_ != 0 || llParam2_ != 0) && (paramType.find(llParam1_) != paramType.end())) {
                 MMI_HILOGD("Time cost overtime (%{public}" PRId64 ",(us)>%{public}" PRId64
                     "(us)) when Reason:%{public}s,chk:%{public}s,"
                     "paramType:%{public}s, param2:%{public}" PRId64 "",
