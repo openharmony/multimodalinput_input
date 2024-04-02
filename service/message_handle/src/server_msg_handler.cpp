@@ -265,9 +265,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
+        size_t size = 0;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform >> size;
+        if (size != 0) {
+            CreatPixelMap(size, pkt, info);
+        }
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -281,9 +285,9 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
@@ -555,6 +559,34 @@ int32_t ServerMsgHandler::OnCancelInjection()
         pointerEvent_ = nullptr;
     }
     return ERR_OK;
+}
+
+void ServerMsgHandler::CreatPixelMap(size_t size, NetPacket &pkt, WindowInfo &info)
+{
+    CALL_DEBUG_ENTER;
+    int32_t width = 0;
+    int32_t height = 0;
+    pkt >> width >> height;
+    int32_t length = width * height;
+    std::vector<char> buf (size);
+    pkt.Read(buf.data(), size);
+    MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d", size, width, height);
+
+    OHOS::Media::InitializationOptions ops;
+    ops.size.width = width;
+    ops.size.height = height;
+    ops.pixelFormat = OHOS::Media::PixelFormat::BGRA_8888;
+    ops.alphaType = OHOS::Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    ops.scaleMode = OHOS::Media::ScaleMode::FIT_TARGET_SIZE;
+    const uint32_t* datas = reinterpret_cast<const uint32_t*>(buf.data());
+    std::unique_ptr<Media::PixelMap> pixelMapPtr = Media::PixelMap::Create(datas, length, ops);
+    CHKPV(pixelMapPtr);
+    if (pixelMapPtr->GetCapacity() == 0) {
+        MMI_HILOGE("The pixelMap is empty");
+        return;
+    }
+    auto iter = transparentWins_.insert_or_assign(info.id, std::move(pixelMapPtr));
+    info.pixelMap = iter.first->second.get();
 }
 } // namespace MMI
 } // namespace OHOS
