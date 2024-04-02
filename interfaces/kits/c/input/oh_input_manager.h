@@ -217,7 +217,7 @@ struct Input_KeyState* OH_Input_CreateKeyState();
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-void OH_Input_DestroyKeyState(struct Input_KeyState* keyState);
+void OH_Input_DestroyKeyState(struct Input_KeyState** keyState);
 
 /**
  * @brief Sets the key value of a key status enumeration object.
@@ -237,7 +237,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode);
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-int32_t OH_Input_GetKeyCode(struct Input_KeyState* keyState);
+int32_t OH_Input_GetKeyCode(const struct Input_KeyState* keyState);
 
 /**
  * @brief Sets whether the key specific to a key status enumeration object is pressed.
@@ -257,7 +257,7 @@ void OH_Input_SetKeyPressed(struct Input_KeyState* keyState, int32_t keyAction);
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-int32_t OH_Input_GetKeyPressed(struct Input_KeyState* keyState);
+int32_t OH_Input_GetKeyPressed(const struct Input_KeyState* keyState);
 
 /**
  * @brief Sets the key switch of the key status enumeration object.
@@ -277,7 +277,7 @@ void OH_Input_SetKeySwitch(struct Input_KeyState* keyState, int32_t keySwitch);
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-int32_t OH_Input_GetKeySwitch(struct Input_KeyState* keyState);
+int32_t OH_Input_GetKeySwitch(const struct Input_KeyState* keyState);
 
 /**
  * @brief Inject system keys.
