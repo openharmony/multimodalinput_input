@@ -1423,6 +1423,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         for (const auto &item : windowsInfo) {
+            if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+                MMI_HILOGE("It's an abnormal window and pointer find the next window");
+                continue;
+            }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
                 MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
@@ -1892,6 +1896,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
+        if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+            MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
+            continue;
+        }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -2585,6 +2593,17 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     return true;
 }
 
+int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    int32_t checkingPid  = GetWindowPid(windowId);
+    if (checkingPid != pid) {
+        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
 {
     CALL_DEBUG_ENTER;
@@ -2603,17 +2622,6 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
         return false;
     }
     return dst == RET_OK;
-}
-
-int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    int32_t checkingPid  = GetWindowPid(windowId);
-    if (checkingPid != pid) {
-        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
-        return RET_ERR;
-    }
-    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

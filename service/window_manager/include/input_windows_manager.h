@@ -91,7 +91,6 @@ public:
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -144,6 +143,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER
+    bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
