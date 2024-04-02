@@ -135,7 +135,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     OnConnected(sess);
     return RET_OK;
-    
+
     CLOSE_SOCK:
     close(serverFd);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
@@ -303,12 +303,14 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
 void UDSServer::AddEpollEvent(int32_t fd, std::shared_ptr<mmi_epoll_event> epollEvent)
 {
     MMI_HILOGI("add %{public}d in epollEvent map", fd);
+    std::lock_guard guard(epollEventMutex_);
     epollEventMap_[fd] = epollEvent;
 }
 
 void UDSServer::RemoveEpollEvent(int32_t fd)
 {
     MMI_HILOGI("remove %{public}d in epollEvent map", fd);
+    std::lock_guard guard(epollEventMutex_);
     epollEventMap_.erase(fd);
 }
 
