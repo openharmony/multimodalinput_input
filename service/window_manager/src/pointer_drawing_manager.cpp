@@ -644,14 +644,12 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
-    int32_t ret = UpdateCursorProperty(pixelMap);
+    int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
     }
     mouseIconUpdate_ = true;
-    userIconHotSpotX_ = focusX;
-    userIconHotSpotY_ = focusY;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     lastMouseStyle_ = style;
@@ -665,7 +663,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     return ret;
 }
 
-int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
+int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY)
 {
     CHKPR(pixelMap, RET_ERR);
     Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(pixelMap);
@@ -683,7 +681,12 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
     float yAxis = (float)cursorHeight / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
     userIcon_.reset(newPixelMap);
-    MMI_HILOGI("cursorWidth: %{public}d, cursorHeight: %{public}d", cursorWidth, cursorHeight);
+    userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
+    userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
+    MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
+        "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
+        "userIconHotSpotY_:%{public}d", cursorWidth, cursorHeight, imageInfo.size.width, imageInfo.size.height,
+        focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
     return RET_OK;
 }
 
