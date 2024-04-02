@@ -517,5 +517,10 @@ int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 {
     return InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
 }
+
+void InputManager::Authorize(bool isAuthorize)
+{
+    InputMgrImpl.Authorize(isAuthorize);
+}
 } // namespace MMI
 } // namespace OHOS
