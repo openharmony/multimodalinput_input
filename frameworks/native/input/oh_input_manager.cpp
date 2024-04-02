@@ -272,6 +272,7 @@ static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent)
         }
         case MOUSE_BUTTON_LEFT: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_LEFT;
+            break;
         }
         case MOUSE_BUTTON_MIDDLE: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_MIDDLE;
