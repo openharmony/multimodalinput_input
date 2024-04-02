@@ -98,11 +98,13 @@ struct Input_KeyState* OH_Input_CreateKeyState()
     return keyState;
 }
 
-void OH_Input_DestroyKeyState(struct Input_KeyState* keyState)
+void OH_Input_DestroyKeyState(struct Input_KeyState** keyState)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(keyState);
-    delete keyState;
-    keyState = nullptr;
+    CHKPV(*keyState);
+    delete *keyState;
+    *keyState = nullptr;
 }
 
 void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
@@ -115,7 +117,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
     keyState->keyCode = keyCode;
 }
 
-int32_t OH_Input_GetKeyCode(struct Input_KeyState* keyState)
+int32_t OH_Input_GetKeyCode(const struct Input_KeyState* keyState)
 {
     CHKPR(keyState, KEYCODE_UNKNOWN);
     return keyState->keyCode;
@@ -127,7 +129,7 @@ void OH_Input_SetKeyPressed(struct Input_KeyState* keyState, int32_t keyAction)
     keyState->keyState = keyAction;
 }
 
-int32_t OH_Input_GetKeyPressed(struct Input_KeyState* keyState)
+int32_t OH_Input_GetKeyPressed(const struct Input_KeyState* keyState)
 {
     CHKPR(keyState, KEY_DEFAULT);
     return keyState->keyState;
@@ -139,7 +141,7 @@ void OH_Input_SetKeySwitch(struct Input_KeyState* keyState, int32_t keySwitch)
     keyState->keySwitch = keySwitch;
 }
 
-int32_t OH_Input_GetKeySwitch(struct Input_KeyState* keyState)
+int32_t OH_Input_GetKeySwitch(const struct Input_KeyState* keyState)
 {
     CHKPR(keyState, KEY_DEFAULT);
     return keyState->keySwitch;
