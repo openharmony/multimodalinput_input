@@ -2039,6 +2039,74 @@ HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, Test
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
 }
 
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent001();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent002();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent003();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent004();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
 #ifdef INPUT_MANAGER_TEST_ENABLE_DEMO
 class ServiceWatcher final : public IInputServiceWatcher {
 public:
