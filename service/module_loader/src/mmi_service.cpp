@@ -465,7 +465,11 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
         IPointerDrawingManager::GetInstance(), pixelMap, pid, windowId, focusX, focusY)));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the custom cursor failed, ret: %{public}d", ret);
@@ -479,7 +483,11 @@ int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
         IPointerDrawingManager::GetInstance(), pid, windowId, pixelMap)));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse icon failed, return %{public}d", ret);
@@ -493,7 +501,11 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
         IPointerDrawingManager::GetInstance(), pid, windowId, hotSpotX, hotSpotY));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse hot spot failed, return %{public}d", ret);
@@ -506,6 +518,10 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
 int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_INFO_TRACE;
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
     return RET_OK;
 }
@@ -751,7 +767,11 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
+    int32_t ret = CheckPidPermission(pid);
+    if (ret != RET_OK) {
+        return ret;
+    }
+    ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
         IPointerDrawingManager::GetInstance(), pid, windowId));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
@@ -1112,7 +1132,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 
-int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1120,7 +1140,9 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectKeyEventExt(keyEvent);
 #else
-    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    int32_t pid = GetCallingPid();
+    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent,
+        pid, isNativeInject));
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
@@ -1131,10 +1153,10 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnInjectKeyEvent(keyEvent);
+    return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
 }
 
 int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
@@ -1153,14 +1175,15 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+    bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
+    return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -1168,7 +1191,9 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent);
 #else
-    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    int32_t pid = GetCallingPid();
+    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent,
+        pid, isNativeInject));
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
@@ -1615,6 +1640,17 @@ int32_t MMIService::UpdateCombineKeyState(bool enable)
     return ret;
 }
 
+int32_t MMIService::CheckPidPermission(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    int32_t checkingPid = GetCallingPid();
+    if (checkingPid != pid) {
+        MMI_HILOGE("check pid failed, input pid is %{public}d, but checking pid is %{public}d", pid, checkingPid);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::EnableCombineKey(bool enable)
 {
     CALL_DEBUG_ENTER;
@@ -1953,6 +1989,38 @@ int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int3
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
+}
+
+int32_t MMIService::Authorize(bool isAuthorize)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnAuthorize, this, isAuthorize));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnAuthorize failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnAuthorize(bool isAuthorize)
+{
+    return sMsgHandler_.OnAuthorize(isAuthorize);
+}
+
+int32_t MMIService::CancelInjection()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnCancelInjection, this));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnAuthorize failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnCancelInjection()
+{
+    return sMsgHandler_.OnCancelInjection();
 }
 } // namespace MMI
 } // namespace OHOS

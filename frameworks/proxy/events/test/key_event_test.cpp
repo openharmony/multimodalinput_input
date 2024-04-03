@@ -282,6 +282,20 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_004, TestSize.Level1)
 }
 
 /**
+ * @tc.name: KeyEventTest_GetKeyIntention_001
+ * @tc.desc: GetKey intention
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetKeyIntention_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t result = keyEvent->GetKeyIntention();
+    ASSERT_EQ(result, -1);
+}
+
+/**
  * @tc.name: KeyEventTest_GetFunctionKey_005
  * @tc.desc: Set Scrolllock for keyevent to false
  * @tc.type: FUNC

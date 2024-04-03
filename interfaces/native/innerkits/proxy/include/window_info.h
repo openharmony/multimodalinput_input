@@ -294,7 +294,7 @@ struct WindowInfo {
     std::vector<float> transform;
 
     /**
-     * pixelMap Indicates the special-shaped window. Its actual type must be std::shared_ptr<OHOS::Media::PixelMap>,
+     * pixelMap Indicates the special-shaped window. Its actual type must be OHOS::Media::PixelMap*,
      * which is used to determine whether an event is dispatched to the current window.
      *
      * @since 12
