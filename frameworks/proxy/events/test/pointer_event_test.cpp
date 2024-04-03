@@ -738,7 +738,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const uint32_t length = 5;
-    std::shared_ptr<const uint8_t[]> data(new uint8_t[length]{1, 2, 3, 4, 5});
+    std::shared_ptr<const uint8_t[]> data(std::make_shared uint8_t[length]{1, 2, 3, 4, 5});
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->SetExtraData(data, length);
@@ -754,7 +754,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     const uint32_t testDataLength = 4;
-    std::shared_ptr<const uint8_t[]> testData(new uint8_t[testDataLength]{1, 2, 3, 4});
+    std::shared_ptr<const uint8_t[]> testData(std::make_shared uint8_t[testDataLength]{1, 2, 3, 4});
     auto inputEvent = InputEvent::Create();
     std::shared_ptr<const uint8_t[]> retrievedData;
     uint32_t retrievedLength;
