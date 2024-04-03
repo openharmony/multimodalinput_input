@@ -2313,5 +2313,221 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1
     InputManager::GetInstance()->AddServiceWatcher(watcher);
     InputManager::GetInstance()->RemoveServiceWatcher(watcher);
 }
+
+/**
+ * @tc.name: InputManagerTest_MoveMouse_001
+ * @tc.desc: MoveMouse interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t offsetX = 20;
+    int32_t offsetY = 20;
+    InputManager::GetInstance()->MoveMouse(offsetX, offsetY);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseScrollRows_001
+ * @tc.desc: SetMouseScrollRows and GetMouseScrollRows interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    int32_t result = InputManager::GetInstance()->SetMouseScrollRows(rows);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetMouseScrollRows(rows);
+    ASSERT_EQ(rows, 1);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetCustomCursor_001
+ * @tc.desc: SetCustomCursor interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCustomCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 500;
+    void* pixelMap = nullptr;
+    int32_t result = InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap);
+    ASSERT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon_001
+ * @tc.desc: SetMouseIcon interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 500;
+    void* pixelMap = nullptr;
+    int32_t result = InputManager::GetInstance()->SetMouseIcon(windowId, pixelMap);
+    ASSERT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseHotSpot_001
+ * @tc.desc: SetMouseHotSpot interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 500;
+    int32_t hotSpotX = 20;
+    int32_t hotSpotY = 20;
+    int32_t result = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    ASSERT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_PointerSize_001
+ * @tc.desc: SetPointerSize and GetPointerSize interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_PointerSize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t size = 5;
+    int32_t result = InputManager::GetInstance()->SetPointerSize(size);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetPointerSize(size);
+    ASSERT_EQ(size, 5);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_MousePrimaryButton_001
+ * @tc.desc: SetMousePrimaryButton and GetMousePrimaryButton interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MousePrimaryButton_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t primaryButton = 2;
+    int32_t result = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    ASSERT_EQ(result, RET_ERR);
+    primaryButton = 1;
+    result = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
+    ASSERT_EQ(primaryButton, 1);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadScrollDirection_001
+ * @tc.desc: SetTouchpadScrollDirection and GetTouchpadScrollDirection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollDirection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool state = true;
+    int32_t result = InputManager::GetInstance()->SetTouchpadScrollDirection(state);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadScrollDirection(state);
+    ASSERT_EQ(state, true);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadScrollDirection_001
+ * @tc.desc: SetTouchpadScrollDirection and GetTouchpadScrollDirection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t result = InputManager::GetInstance()->SetTouchpadScrollSwitch(switchFlag);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadScrollSwitch(switchFlag);
+    ASSERT_EQ(switchFlag, true);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadPointerSpeed_001
+ * @tc.desc: SetTouchpadPointerSpeed and GetTouchpadPointerSpeed interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadPointerSpeed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t speed = 1;
+    int32_t result = InputManager::GetInstance()->SetTouchpadPointerSpeed(speed);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
+    ASSERT_EQ(speed, 1);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadPinchSwitch_001
+ * @tc.desc: SetTouchpadPinchSwitch and GetTouchpadPinchSwitch interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadPinchSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t result = InputManager::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadPinchSwitch(switchFlag);
+    ASSERT_EQ(switchFlag, true);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadSwipeSwitch_001
+ * @tc.desc: SetTouchpadSwipeSwitch and GetTouchpadSwipeSwitch interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t result = InputManager::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
+    ASSERT_EQ(switchFlag, true);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadRightClickType_001
+ * @tc.desc: SetTouchpadRightClickType and GetTouchpadRightClickType interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadRightClickType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t type = 1;
+    int32_t result = InputManager::GetInstance()->SetTouchpadRightClickType(type);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadRightClickType(type);
+    ASSERT_EQ(type, 1);
+    ASSERT_EQ(result, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
