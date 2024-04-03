@@ -23,6 +23,8 @@
 #include "image_type.h"
 #include "image_utils.h"
 
+#include "setting_datashare.h"
+#include "i_multimodal_input_connect.h"
 #include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
@@ -76,7 +78,15 @@ namespace OHOS {
 namespace MMI {
 PointerDrawingManager::PointerDrawingManager()
 {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (UseMgaicCursor()) {
+        MAGIC_CURSOR->InitStyle();
+    } else {
+        InitStyle();
+    }
+#else
     InitStyle();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -104,11 +114,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     }
     lastMouseStyle_ = pointerStyle;
     surfaceNode_->SetVisible(false);
-    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t ret = MAGIC_CURSOR->InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #else
     int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (ret != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
@@ -144,14 +150,18 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
         return;
     }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (UseMgaicCursor()) {
+        MAGIC_CURSOR->CreatePointerWindow(displayId, physicalX, physicalY, direction, surfaceNode_);
+    } else {
+        CreatePointerWindow(displayId, physicalX, physicalY, direction);
+    }
+#else
     CreatePointerWindow(displayId, physicalX, physicalY, direction);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     CHKPV(surfaceNode_);
     UpdateMouseStyle();
-    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t ret = MAGIC_CURSOR->InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #else
     int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return;
@@ -179,7 +189,34 @@ void PointerDrawingManager::UpdateMouseStyle()
     }
 }
 
+bool PointerDrawingManager::UseMgaicCursor()
+{
+    std::string name = "isMagicCursor";
+    bool status { false };
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(name, status);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get value from setting date fail");
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    return status;
+}
+
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
+{
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (UseMgaicCursor()) {
+        return MAGIC_CURSOR->InitLayer(mouseStyle);
+    } else {
+        return DrawCursor(mouseStyle);
+    }
+#else
+    return DrawCursor(mouseStyle);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ == nullptr) {
@@ -464,11 +501,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
     if (mouseDisplayState_ != state) {
         mouseDisplayState_ = state;
         if (mouseDisplayState_) {
-            #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-            MAGIC_CURSOR->InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-            #else
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-            #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         }
         MMI_HILOGI("state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
@@ -799,11 +832,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
     }
 
-    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    ret = MAGIC_CURSOR->InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #else
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
@@ -867,12 +896,16 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     }
     AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
         physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (UseMgaicCursor()) {
+        MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
+    } else {
+        CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
+    }
+#else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
-    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    ret = MAGIC_CURSOR->InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #else
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
@@ -1033,11 +1066,7 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     }
     if (it != pidInfos_.end()) {
         if (IsPointerVisible()) {
-            #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-            MAGIC_CURSOR->InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-            #else
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-            #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         }
         UpdatePointerVisible();
     }
