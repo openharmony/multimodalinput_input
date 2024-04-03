@@ -23,12 +23,26 @@
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "msg_handler.h"
+#include "pixel_map.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
+enum class AuthorizationStatus : int32_t {
+    UNKNOWN,
+    AUTHORIZED,
+    UNAUTHORIZED
+};
+
+enum class InjectionType : int32_t {
+    UNKNOWN,
+    KEYEVENT,
+    POINTEREVENT
+};
+
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
 class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
@@ -62,12 +76,12 @@ public:
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
     int32_t OnGetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t OnSetFunctionKeyState(int32_t funcKey, bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
     int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -77,6 +91,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+    int32_t OnAuthorize(bool isAuthorize);
+    int32_t OnCancelInjection();
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
@@ -85,15 +101,23 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    void CreatPixelMap(size_t size, NetPacket &pkt, WindowInfo &info);
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    void LaunchAbility();
 
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> targetWindowIds_;
+    std::map<int32_t, AuthorizationStatus> authorizationCollection_;
+    int32_t CurrentPID_ { -1 };
+    InjectionType InjectionType_ { InjectionType::UNKNOWN };
+    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 };
 } // namespace MMI
 } // namespace OHOS

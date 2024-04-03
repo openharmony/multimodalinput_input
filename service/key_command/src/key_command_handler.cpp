@@ -848,7 +848,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         default:
             // Don't care about other actions
-            MMI_HILOGW("other action not match.");
+            MMI_HILOGD("other action not match.");
             break;
     }
 }

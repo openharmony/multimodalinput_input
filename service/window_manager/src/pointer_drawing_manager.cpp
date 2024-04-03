@@ -313,7 +313,7 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
         DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_RIGHT].iconPath);
     CHKPV(pixelmap);
     MMI_HILOGD("set mouseicon to OHOS system");
-    
+
 #ifndef USE_ROSEN_DRAWING
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
     canvas->DrawPixelMap(pixelmap, 0, 0, SkSamplingOptions(), nullptr);
@@ -327,7 +327,7 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     canvas->DrawPixelMapRect(pixelmap, src, dst, Rosen::Drawing::SamplingOptions());
     canvas->DetachBrush();
 #endif
-    
+
     canvasNode_->FinishRecording();
 
     Rosen::RSAnimationTimingProtocol protocol;
@@ -576,7 +576,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 #else
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
-    
+
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
     surfaceNode_->AttachToDisplay(screenId_);
@@ -688,15 +688,16 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
         return RET_ERR;
     }
-
-    int32_t ret = UpdateCursorProperty(pixelMap);
+    if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("windowId not in right pid");
+        return RET_ERR;
+    }
+    int32_t ret = UpdateCursorProperty(pixelMap, focusX, focusY);
     if (ret != RET_OK) {
         MMI_HILOGE("UpdateCursorProperty is failed");
         return ret;
     }
     mouseIconUpdate_ = true;
-    userIconHotSpotX_ = focusX;
-    userIconHotSpotY_ = focusY;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     lastMouseStyle_ = style;
@@ -710,7 +711,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     return ret;
 }
 
-int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
+int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY)
 {
     CHKPR(pixelMap, RET_ERR);
     Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(pixelMap);
@@ -728,7 +729,12 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
     float yAxis = (float)cursorHeight / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
     userIcon_.reset(newPixelMap);
-    MMI_HILOGI("cursorWidth: %{public}d, cursorHeight: %{public}d", cursorWidth, cursorHeight);
+    userIconHotSpotX_ = static_cast<int32_t>((float)focusX * xAxis);
+    userIconHotSpotY_ = static_cast<int32_t>((float)focusY * yAxis);
+    MMI_HILOGI("cursorWidth:%{public}d, cursorHeight:%{public}d, imageWidth:%{public}d, imageHeight:%{public}d,"
+        "focusX:%{public}d, focuxY:%{public}d, xAxis:%{public}f, yAxis:%{public}f, userIconHotSpotX_:%{public}d,"
+        "userIconHotSpotY_:%{public}d", cursorWidth, cursorHeight, imageInfo.size.width, imageInfo.size.height,
+        focusX, focusY, xAxis, yAxis, userIconHotSpotX_, userIconHotSpotY_);
     return RET_OK;
 }
 
@@ -745,6 +751,10 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     }
     if (windowId < 0) {
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
@@ -768,6 +778,10 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
     }
     if (windowId < 0) {
         MMI_HILOGE("invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
     if (hotSpotX < 0 || hotSpotY < 0 || userIcon_ == nullptr) {
