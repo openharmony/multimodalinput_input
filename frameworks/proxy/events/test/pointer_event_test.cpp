@@ -741,7 +741,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level1)
     std::shared_ptr<const uint8_t[]> data(new uint8_t[length]{1, 2, 3, 4, 5});
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
-    inputEvent->SetExtraData(data,length);
+    inputEvent->SetExtraData(data, length);
 }
 
 /**
