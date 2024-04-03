@@ -75,6 +75,8 @@ public:
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
     std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
+    bool UseMgaicCursor();
+    int32_t DrawCursor(const MOUSE_ICON mouseStyle);
 private:
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
