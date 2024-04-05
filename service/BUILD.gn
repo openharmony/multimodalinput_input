@@ -93,8 +93,8 @@ config("libmmi_server_config") {
   if (input_ext_feature_magiccursor) {
     include_dirs += [
       "${mmi_ext_path}/magic_cursor/include",
-      "${g2d_ext_path}/sdf/include"
-     ]
+      "${g2d_ext_path}/sdf/include",
+    ]
   }
 
   if (input_feature_combination_key) {
@@ -208,13 +208,6 @@ ohos_shared_library("libmmi-server") {
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
-  }
-
-  if (input_ext_feature_magiccursor) {
-    include_dirs += [
-      "${mmi_ext_path}/magic_cursor/include",
-      "${g2d_ext_path}/sdf/include"
-     ]
   }
 
   if (security_component_enable) {
