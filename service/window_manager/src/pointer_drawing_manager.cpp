@@ -15,30 +15,30 @@
 
 #include "pointer_drawing_manager.h"
 
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-#include "magic_pointer_drawing_manager.h"
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+#include "magic_pointer_drawing_manager.h"
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
-#include "setting_datashare.h"
-#include "i_multimodal_input_connect.h"
 #include "define_multimodal.h"
+#include "i_multimodal_input_connect.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
 #include "pipeline/rs_recording_canvas.h"
 #include "preferences.h"
 #include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
-#include "multimodal_input_preferences_manager.h"
-#include "util.h"
 #include "render/rs_pixel_map_util.h"
+#include "setting_datashare.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
