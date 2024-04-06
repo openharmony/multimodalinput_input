@@ -210,6 +210,13 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
+  if (input_ext_feature_magiccursor) {
+    external_deps += [
+      "graphic_2d_ext:libsdf",
+      "eventhandler:libeventhandler"
+    ]
+  }
+
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
