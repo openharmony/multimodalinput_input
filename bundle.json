@@ -72,7 +72,8 @@
         "data_share",
         "relational_store",
         "faultloggerd",
-        "ffrt"
+        "ffrt",
+        "graphic_2d_ext"
       ],
       "third_party": [
         "cJSON",
