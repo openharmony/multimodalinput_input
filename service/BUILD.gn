@@ -212,8 +212,8 @@ ohos_shared_library("libmmi-server") {
 
   if (input_ext_feature_magiccursor) {
     external_deps += [
+      "eventhandler:libeventhandler",
       "graphic_2d_ext:libsdf",
-      "eventhandler:libeventhandler"
     ]
   }
 
