@@ -32,7 +32,7 @@ ohos_unittest("InputNativeTest") {
 
   deps = [
     "${mmi_path}/frameworks/native/input:oh_input_manager",
-    "${mmi_path}/frameworks/proxy:libmmi_client",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
