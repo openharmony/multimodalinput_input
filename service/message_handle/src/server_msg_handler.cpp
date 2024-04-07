@@ -96,7 +96,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
@@ -155,7 +155,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
