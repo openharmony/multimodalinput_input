@@ -174,7 +174,8 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    MMI_HILOGI("InputTracking id:%{public}d PointerEvent ReceivedMsg", pointerEvent->GetId());
+    MMI_HILOGI("InputTracking id:%{public}d action:%{public}d PointerEvent ReceivedMsg",
+        pointerEvent->GetId(), pointerEvent->GetPointerAction());
     EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
