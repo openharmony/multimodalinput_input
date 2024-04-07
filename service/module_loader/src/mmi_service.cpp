@@ -1137,10 +1137,10 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, boo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret;
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectKeyEventExt(keyEvent);
-#else
     int32_t pid = GetCallingPid();
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    ret = InjectKeyEventExt(keyEvent, pid, isNativeInject);
+#else
     ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent,
         pid, isNativeInject));
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1188,10 +1188,10 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectPointerEventExt(pointerEvent);
-#else
     int32_t pid = GetCallingPid();
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject);
+#else
     ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent,
         pid, isNativeInject));
 #endif // OHOS_BUILD_ENABLE_ANCO

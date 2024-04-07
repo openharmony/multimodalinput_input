@@ -137,8 +137,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
-    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent);
-    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 protected:

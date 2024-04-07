@@ -119,23 +119,69 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputNativeTest_Authorize_001
- * @tc.desc: Verify the Authorize
+ * @tc.name: InputNativeTest_InjectKeyEvent_001
+ * @tc.desc: Verify the InjectKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputNativeTest, InputNativeTest_Authorize_001, TestSize.Level1)
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_001, TestSize.Level1)
 {
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
     OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_DOWN);
     OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_A);
-    OH_Input_InjectKeyEvent(keyEvent);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    ASSERT_EQ(retResult, INPUT_SUCCESS);
     OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_UP);
     OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_A);
-    OH_Input_InjectKeyEvent(keyEvent);
+    retResult = OH_Input_InjectKeyEvent(keyEvent);
+    ASSERT_EQ(retResult, INPUT_SUCCESS);
     InputManager::GetInstance()->Authorize(true);
     OH_Input_DestroyKeyEvent(&keyEvent);
     ASSERT_EQ(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectMouseEvent_001
+ * @tc.desc: Verify the InjectMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_MOVE);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
+    OH_Input_SetMouseEventButton(mouseEvent, -1);
+    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
+    ASSERT_EQ(retResult, INPUT_SUCCESS);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    ASSERT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectTouchEvent_001
+ * @tc.desc: Verify the InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_DOWN);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 671);
+    OH_Input_SetTouchEventDisplayY(touchEvent, 696);
+    int32_t retResult = OH_Input_InjectTouchEvent(touchEvent);
+    ASSERT_EQ(retResult, INPUT_SUCCESS);
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_UP);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 671);
+    OH_Input_SetTouchEventDisplayY(touchEvent, 696);
+    retResult = OH_Input_InjectTouchEvent(touchEvent);
+    ASSERT_EQ(retResult, INPUT_SUCCESS);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    ASSERT_EQ(touchEvent, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -521,17 +521,20 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 
 void ServerMsgHandler::LaunchAbility()
 {
+    CALL_DEBUG_ENTER;
     OHOS::MMI::AuthorizationDialog authorizationDialog;
     authorizationDialog.ConnectSystemUi();
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
+    CALL_DEBUG_ENTER;
     if (isAuthorize) {
         auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
         if (InjectionType_ == InjectionType::KEYEVENT) {
             OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
         }
@@ -544,15 +547,18 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
         return ERR_OK;
     }
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()
 {
+    CALL_DEBUG_ENTER;
     auto iter = authorizationCollection_.find(CurrentPID_);
     if (iter != authorizationCollection_.end()) {
         authorizationCollection_.erase(iter);
+        MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
         CurrentPID_ = -1;
         InjectionType_ = InjectionType::UNKNOWN;
         keyEvent_ = nullptr;
