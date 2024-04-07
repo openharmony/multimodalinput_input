@@ -962,7 +962,11 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, LogicalCoordinat
     if (direction == DIRECTION90) {
         MMI_HILOGD("direction is DIRECTION90");
         int32_t temp = coord.x;
-        coord.x = info.width - coord.y;
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            coord.x = info.height - coord.y;
+        } else {
+            coord.x = info.width - coord.y;
+        }
         coord.y = temp;
         MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
         return;
@@ -977,7 +981,11 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, LogicalCoordinat
     if (direction == DIRECTION270) {
         MMI_HILOGD("direction is DIRECTION270");
         int32_t temp = coord.y;
-        coord.y = info.height - coord.x;
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            coord.y = info.width - coord.x;
+        } else {
+            coord.y = info.height - coord.x;
+        }
         coord.x = temp;
         MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
     }
@@ -988,14 +996,18 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
 {
     auto width = info.width;
     auto height = info.height;
-    if (info.direction == DIRECTION90 || info.direction == DIRECTION270) {
-        width = info.height;
-        height = info.width;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (info.direction == DIRECTION90 || info.direction == DIRECTION270) {
+            width = info.height;
+            height = info.width;
+        }
     }
     LogicalCoordinate coord {
         .x = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, width)),
         .y = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, height)),
     };
+    MMI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
+        width, height, coord.x, coord.y);
     RotateScreen(info, coord);
     touchInfo.point.x = coord.x;
     touchInfo.point.y = coord.y;
@@ -1341,6 +1353,12 @@ void InputWindowsManager::AdjustDisplayCoordinate(
 {
     int32_t width = displayInfo.width;
     int32_t height = displayInfo.height;
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+            width = displayInfo.height;
+            height = displayInfo.width;
+        }
+    }
     if (physicalX <= 0) {
         physicalX = 0;
     }
@@ -1984,7 +2002,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
     } else {
         if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            if (!checkExtraData) {
+            if ((!checkExtraData) && (!(extraData_.appended &&
+                extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
+                MMI_HILOGD("PointerAction is to leave the window");
                 DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
                 IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             }
