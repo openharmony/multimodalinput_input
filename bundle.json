@@ -122,6 +122,17 @@
           "type": "so"
         },
         {
+          "name": "//foundation/multimodalinput/input/frameworks/native/input:oh_input_manager",
+          "header": {
+            "header_files": [
+              "input/oh_input_manager.h",
+              "input/oh_key_code.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/interfaces/kits/c"
+          },
+          "type": "so"
+        },
+        {
           "name": "//foundation/multimodalinput/input/util:libmmi-util",
           "header": {
             "header_files": [
