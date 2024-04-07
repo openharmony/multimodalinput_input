@@ -2529,5 +2529,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadRightClickType_001, TestSize
     ASSERT_EQ(type, 1);
     ASSERT_EQ(result, RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_SetTouchpadTapSwitch_001
+ * @tc.desc: Set touchpad tap switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    InputManager::GetInstance()->Authorize(true);
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadTapSwitch(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadTapSwitch_001
+ * @tc.desc: Get touchpad tap switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadTapSwitch(flag);
+    bool newFlag = true;
+    InputManager::GetInstance()->Authorize(true);
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+}
 } // namespace MMI
 } // namespace OHOS
