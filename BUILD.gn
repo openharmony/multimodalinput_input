@@ -145,6 +145,7 @@ group("mmi_tests") {
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
     "service:EventFilterDeathRecipientTest",
+    "service:EventFilterHandlerTest",
     "service:TransformPointTest",
     "service:TwoFingerLongTouchTest",
     "service:event_resample_test",
