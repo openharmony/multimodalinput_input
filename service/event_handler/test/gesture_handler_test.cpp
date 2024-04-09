@@ -177,7 +177,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
- HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Level1)
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Level1)
 {
     int32_t originType = 999;
     int32_t seatSlot = 0;
@@ -185,7 +185,6 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
     double logicalY = 0.0;
     auto actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
     ASSERT_EQ(actionType, PointerEvent::POINTER_ACTION_UNKNOWN);
-
 }
 
 /**
@@ -194,7 +193,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
- HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadDownEvent_001, TestSize.Level1)
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadDownEvent_001, TestSize.Level1)
 {
     int32_t seatSlot = 2;
     double logicalX = 0.0;
@@ -210,7 +209,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
- HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_001, TestSize.Level1)
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_001, TestSize.Level1)
 {
     int32_t seatSlot = 0;
     double logicalX = 0.0;
@@ -226,7 +225,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
- HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_002, TestSize.Level1)
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_002, TestSize.Level1)
 {
     int32_t seatSlot = 0;
     double logicalX = 0.0;
@@ -242,7 +241,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
- HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadUpEvent_001, TestSize.Level1)
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadUpEvent_001, TestSize.Level1)
 {
     int32_t seatSlot = 0;
     double logicalX = 0.0;
