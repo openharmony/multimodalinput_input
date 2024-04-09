@@ -36,21 +36,21 @@ public:
 
 /**
  * @tc.name: ApplicationStateObserverTest_ForegroundAppData_001
- * @tc.desc: Verify the SetForegroundAppData and GetForegroundAppData
+ * @tc.desc: Verify the SetForegroundAppData and GetForegroundAppData functions
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_ForegroundAppData_001, TestSize.Level1)
 {
-    std::vector<AppExecFwk::AppStateData> list {};
-    APP_OBSERVER_MGR->SetForegroundAppData(list);
+    std::vector<AppExecFwk::AppStateData> appDatas {};
+    APP_OBSERVER_MGR->SetForegroundAppData(appDatas);
     auto result = APP_OBSERVER_MGR->GetForegroundAppData();
-    EXPECT_EQ(list.size(), result.size());
+    EXPECT_EQ(appDatas.size(), result.size());
 }
 
 /**
  * @tc.name: ApplicationStateObserverTest_InitAppStateObserver_001
- * @tc.desc: Verify the InitAppStateObserver
+ * @tc.desc: Verify the action of the InitAppStateObserver function when hasInit_ is true and false respectively
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -64,7 +64,7 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_InitAppState
 
 /**
  * @tc.name: ApplicationStateObserverTest_GetAppMgr_001
- * @tc.desc: Verify the GetAppMgr
+ * @tc.desc: Verify the first and non-first entry into the GetAppMgr function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -79,21 +79,21 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_00
 
 /**
  * @tc.name: ApplicationStateObserverTest_GetForegroundApplicationInfo_001
- * @tc.desc: Verify the GetForegroundApplicationInfo
+ * @tc.desc: Verify the results of obtaining foreground application information
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetForegroundApplicationInfo_001, TestSize.Level1)
 {
     ApplicationStateObserver obsever;
-    std::vector<AppExecFwk::AppStateData> list {};
-    int32_t ret = obsever.GetForegroundApplicationInfo(list);
+    std::vector<AppExecFwk::AppStateData> appDatas {};
+    int32_t ret = obsever.GetForegroundApplicationInfo(appDatas);
     EXPECT_NE(ret, RET_OK);
-    EXPECT_TRUE(list.empty());
+    EXPECT_TRUE(appDatas.empty());
     auto appManager = obsever.GetAppMgr();
     EXPECT_NE(appManager, nullptr);
-    std::vector<AppExecFwk::AppStateData> list2 {};
-    ret = obsever.GetForegroundApplicationInfo(list2);
+    std::vector<AppExecFwk::AppStateData> appStateDatas {};
+    ret = obsever.GetForegroundApplicationInfo(appStateDatas);
     EXPECT_NE(ret, RET_OK);
 }
 } // namespace MMI

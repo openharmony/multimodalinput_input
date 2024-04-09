@@ -539,6 +539,8 @@ ohos_unittest("ApplicationStateObserverTest") {
   ]
 
   external_deps = [
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -546,11 +548,9 @@ ohos_unittest("ApplicationStateObserverTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "preferences:native_preferences",
-    "window_manager:libwm",
-    "ability_runtime:app_manager",
-    "ability_runtime:ability_manager",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libwm",
   ]
 }
 
