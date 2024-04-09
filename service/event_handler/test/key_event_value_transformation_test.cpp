@@ -470,7 +470,8 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_Transf
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
-HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputTransformationKeyValue_001, TestSize.Level1)
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputTransformationKeyValue_001,
+     TestSize.Level1)
 {
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
