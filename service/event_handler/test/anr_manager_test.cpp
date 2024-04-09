@@ -86,7 +86,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_001, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
 {
     SessionPtr session;
-    int32_t dispatchType = ANR_DISPATCH;
+    int32_t dispatchType = -1;
     ANRMgr->RemoveTimersByType(session, dispatchType);
 }
 
@@ -99,7 +99,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_002, TestSize.Level1)
 {
     SessionPtr session;
-    int32_t monitorType = ANR_MONITOR;
+    int32_t monitorType = 0;
     ANRMgr->RemoveTimersByType(session, monitorType);
 }
 
@@ -131,7 +131,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
 
 /**
  * @tc.name: AnrManagerTest_SetANRNoticedPid_002
- * @tc.desc: Set ANR noticed pid
+ * @tc.desc: Set noticed pid
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
