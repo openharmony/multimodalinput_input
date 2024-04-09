@@ -88,7 +88,6 @@ protected:
     std::map<int32_t, int32_t> idxPidMap_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
-    std::mutex epollEventMutex_;
     std::map<int32_t, std::shared_ptr<mmi_epoll_event>> epollEventMap_;
 };
 } // namespace MMI

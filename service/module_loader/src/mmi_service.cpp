@@ -1451,15 +1451,11 @@ void MMIService::OnThread()
         MMI_HILOGD("timeout:%{public}d", timeout);
         int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
-            std::shared_ptr<mmi_epoll_event> mmiEd = nullptr;
-            {
-                std::lock_guard guard(epollEventMutex_);
-                auto mmiEdIter = epollEventMap_.find(ev[i].data.fd);
-                if (mmiEdIter == epollEventMap_.end()) {
-                    return;
-                }
-                mmiEd = mmiEdIter->second;
+            auto mmiEdIter = epollEventMap_.find(ev[i].data.fd);
+            if (mmiEdIter == epollEventMap_.end()) {
+                return;
             }
+            std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
