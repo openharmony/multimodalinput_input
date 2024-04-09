@@ -172,12 +172,12 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
 }
 
 /**
- * @tc.name: GestureHandlerTest_GestureIdentify_001
+ * @tc.name: GestureHandlerTest_GestureIdentify_005
  * @tc.desc: Gesture identify
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
-HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Level1)
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_005, TestSize.Level1)
 {
     int32_t originType = 999;
     int32_t seatSlot = 0;
