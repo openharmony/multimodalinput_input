@@ -118,7 +118,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_003, TestSize.Level1)
 
 /**
  * @tc.name: AnrManagerTest_SetANRNoticedPid_001
- * @tc.desc: Set ANR noticed pid
+ * @tc.desc: Set noticed pid
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
