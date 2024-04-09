@@ -18,7 +18,6 @@
 
 #include "anr_manager.h"
 
-
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -142,8 +141,5 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
     int32_t ret = ANRMgr->SetANRNoticedPid(pid);
     ASSERT_EQ(ret, RET_OK);
 }
-
-
-
 } // namespace MMI
 } // namespace OHOS
