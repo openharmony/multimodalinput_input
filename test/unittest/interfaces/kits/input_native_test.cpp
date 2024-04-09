@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include "input_manager.h"
+#include "key_event.h"
 #include "oh_input_manager.h"
 #include "oh_key_code.h"
 
@@ -46,7 +48,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeyState_001, TestSize.Level1)
         ASSERT_EQ(keyState, nullptr);
     } else {
         ASSERT_NE(keyState, nullptr);
-        OH_Input_DestroyKeyState(keyState);
+        OH_Input_DestroyKeyState(&keyState);
     }
 }
 
@@ -63,7 +65,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeyCode_001, TestSize.Level1)
     OH_Input_SetKeyCode(keyState, 2000);
     int32_t keyCode = OH_Input_GetKeyCode(keyState);
     ASSERT_EQ(keyCode, 2000);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 
 /**
@@ -79,7 +81,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeyPressed_001, TestSize.Level1)
     OH_Input_SetKeyPressed(keyState, 0);
     int32_t keyAction = OH_Input_GetKeyPressed(keyState);
     ASSERT_EQ(keyAction, 0);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 
 /**
@@ -95,7 +97,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeySwitch_001, TestSize.Level1)
     OH_Input_SetKeySwitch(keyState, 2);
     int32_t keySwitch = OH_Input_GetKeySwitch(keyState);
     ASSERT_EQ(keySwitch, 2);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
 }
 
 /**
@@ -113,7 +115,29 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
     ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
     ASSERT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
     ASSERT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
-    OH_Input_DestroyKeyState(keyState);
+    OH_Input_DestroyKeyState(&keyState);
+}
+
+/**
+ * @tc.name: InputNativeTest_Authorize_001
+ * @tc.desc: Verify the Authorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_Authorize_001, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_DOWN);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KeyEvent::UNKNOWN_FUNCTION_KEY);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    ASSERT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_UP);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KeyEvent::UNKNOWN_FUNCTION_KEY);
+    retResult = OH_Input_InjectKeyEvent(keyEvent);
+    ASSERT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    InputManager::GetInstance()->Authorize(true);
+    OH_Input_DestroyKeyEvent(&keyEvent);
+    ASSERT_EQ(keyEvent, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

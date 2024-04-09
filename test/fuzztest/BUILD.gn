@@ -32,6 +32,7 @@ group("test") {
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "pointerspeed_fuzzer:fuzztest",
+    "pointerstyle_fuzzer:fuzztest",
     "pointervisible_fuzzer:fuzztest",
     "registerdevListener_fuzzer:fuzztest",
     "removeinterceptor_fuzzer:fuzztest",
@@ -48,5 +49,6 @@ group("test") {
     "subscribeswitchevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
+    "updatedisplayinfo_fuzzer:fuzztest",
   ]
 }

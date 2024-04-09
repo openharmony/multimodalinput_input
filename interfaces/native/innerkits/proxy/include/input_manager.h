@@ -779,6 +779,8 @@ public:
     int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
 
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+
+    void Authorize(bool isAuthorize);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.
