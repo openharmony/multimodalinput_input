@@ -973,7 +973,11 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, LogicalCoordinat
     if (direction == DIRECTION90) {
         MMI_HILOGD("direction is DIRECTION90");
         int32_t temp = coord.x;
-        coord.x = info.width - coord.y;
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            coord.x = info.height - coord.y;
+        } else {
+            coord.x = info.width - coord.y;
+        }
         coord.y = temp;
         MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
         return;
@@ -988,7 +992,11 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, LogicalCoordinat
     if (direction == DIRECTION270) {
         MMI_HILOGD("direction is DIRECTION270");
         int32_t temp = coord.y;
-        coord.y = info.height - coord.x;
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            coord.y = info.width - coord.x;
+        } else {
+            coord.y = info.height - coord.x;
+        }
         coord.x = temp;
         MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
     }
@@ -999,14 +1007,18 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
 {
     auto width = info.width;
     auto height = info.height;
-    if (info.direction == DIRECTION90 || info.direction == DIRECTION270) {
-        width = info.height;
-        height = info.width;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (info.direction == DIRECTION90 || info.direction == DIRECTION270) {
+            width = info.height;
+            height = info.width;
+        }
     }
     LogicalCoordinate coord {
         .x = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, width)),
         .y = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, height)),
     };
+    MMI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
+        width, height, coord.x, coord.y);
     RotateScreen(info, coord);
     touchInfo.point.x = coord.x;
     touchInfo.point.y = coord.y;
@@ -1372,6 +1384,12 @@ void InputWindowsManager::AdjustDisplayCoordinate(
 {
     int32_t width = displayInfo.width;
     int32_t height = displayInfo.height;
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        if (displayInfo.direction == DIRECTION90 || displayInfo.direction == DIRECTION270) {
+            width = displayInfo.height;
+            height = displayInfo.width;
+        }
+    }
     if (physicalX <= 0) {
         physicalX = 0;
     }
@@ -1423,6 +1441,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         for (const auto &item : windowsInfo) {
+            if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+                MMI_HILOGE("It's an abnormal window and pointer find the next window");
+                continue;
+            }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
                 MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
@@ -1732,7 +1754,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
     GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-    dragPointerStyle_ = pointerStyle;
     if (!touchWindow) {
         MMI_HILOGE("TouchWindow is nullptr");
         return RET_ERR;
@@ -1892,6 +1913,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
+        if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+            MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
+            continue;
+        }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -1988,10 +2013,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
-    } else {
-        pointerEvent->ClearBuffer();
-        lastTouchEvent_ = nullptr;
-        lastTouchWindowInfo_.id = -1;
     }
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
@@ -2042,6 +2063,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
+        pointerEvent->ClearBuffer();
+        lastTouchEvent_ = nullptr;
+        lastTouchWindowInfo_.id = -1;
         ClearExtraData();
     }
     return ERR_OK;
@@ -2585,6 +2609,17 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     return true;
 }
 
+int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    int32_t checkingPid  = GetWindowPid(windowId);
+    if (checkingPid != pid) {
+        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
 {
     CALL_DEBUG_ENTER;
@@ -2603,17 +2638,6 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
         return false;
     }
     return dst == RET_OK;
-}
-
-int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    int32_t checkingPid  = GetWindowPid(windowId);
-    if (checkingPid != pid) {
-        MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
-        return RET_ERR;
-    }
-    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

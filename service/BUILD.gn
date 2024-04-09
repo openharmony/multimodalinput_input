@@ -90,6 +90,13 @@ config("libmmi_server_config") {
     include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
   }
 
+  if (input_ext_feature_magiccursor) {
+    include_dirs += [
+      "${mmi_ext_path}/magic_cursor/include",
+      "${g2d_ext_path}/sdf/include",
+    ]
+  }
+
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -203,6 +210,13 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
+  if (input_ext_feature_magiccursor) {
+    external_deps += [
+      "eventhandler:libeventhandler",
+      "graphic_2d_ext:libsdf",
+    ]
+  }
+
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
@@ -226,7 +240,9 @@ ohos_shared_library("libmmi-server") {
     "faultloggerd:libbacktrace_local",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -429,6 +445,75 @@ ohos_unittest("TransformPointTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+  ]
+}
+
+ohos_unittest("EventFilterDeathRecipientTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/filter/include" ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  cflags = [ "-DUNIT_TEST" ]
+
+  sources = [
+    "${mmi_path}/service/filter/src/event_filter_death_recipient.cpp",
+    "${mmi_path}/service/filter/test/event_filter_death_recipient_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "preferences:native_preferences",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("EventFilterHandlerTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/filter/include" ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  cflags = [ "-DUNIT_TEST" ]
+
+  sources = [
+    "${mmi_path}/service/filter/src/event_filter_handler.cpp",
+    "${mmi_path}/service/filter/test/event_filter_handler_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "preferences:native_preferences",
+    "window_manager:libwm",
   ]
 }
 

@@ -72,7 +72,8 @@
         "data_share",
         "relational_store",
         "faultloggerd",
-        "ffrt"
+        "ffrt",
+        "graphic_2d_ext"
       ],
       "third_party": [
         "cJSON",
@@ -117,6 +118,17 @@
               "event/include/mmi_event_observer.h"
             ],
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
+          },
+          "type": "so"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/frameworks/native/input:oh_input_manager",
+          "header": {
+            "header_files": [
+              "input/oh_input_manager.h",
+              "input/oh_key_code.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/interfaces/kits/c"
           },
           "type": "so"
         },

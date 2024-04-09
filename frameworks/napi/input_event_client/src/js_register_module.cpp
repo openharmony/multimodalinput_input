@@ -639,6 +639,8 @@ static napi_value PermitInjection(napi_env env, napi_callback_info info)
     CHKRP(napi_get_value_bool(env, argv[0], &bResult), GET_VALUE_BOOL);
     MMI_HILOGI("Parameter bResult:%{public}d ok", bResult);
     
+    InputManager::GetInstance()->Authorize(bResult);
+    CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
 

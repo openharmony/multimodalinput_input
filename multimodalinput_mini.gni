@@ -38,6 +38,7 @@ declare_args() {
   input_feature_coverage = false
   input_ext_feature_anco = false
   input_ext_feature_fingersense = false
+  input_ext_feature_magiccursor = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -318,4 +319,12 @@ if (input_ext_feature_anco) {
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]
+}
+
+if (input_ext_feature_magiccursor) {
+  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
+  g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
+  libmmi_service_sources +=
+      [ "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp" ]
 }
