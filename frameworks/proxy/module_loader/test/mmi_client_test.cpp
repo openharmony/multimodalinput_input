@@ -54,5 +54,53 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
     MMIClient mmiClient;
     ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterDisconnectedFunction(connectFun));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_Start_001
+ * @tc.desc: Create a connection to server
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
+{
+    MMIClient client;
+    EXPECT_FALSE(client.Start());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_GetCurrentConnectedStatus_001
+ * @tc.desc: Get current connection status
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.Level1)
+{
+    MMIClient client;
+    EXPECT_TRUE(client.GetCurrentConnectedStatus());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_Reconnect_001
+ * @tc.desc: Socket reconnection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
+{
+    MMIClient client;
+    EXPECT_TRUE(client.Reconnect());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_OnDisconnect_001
+ * @tc.desc: Disconnected from server
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
+{
+    MMIClient client;
+    client.OnDisconnect();
+}
 }
 } // namespace MMI
