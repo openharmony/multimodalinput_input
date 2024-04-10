@@ -179,7 +179,6 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_001, TestSize.Leve
     int64_t mockFrameTime = 123456789;
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
     ASSERT_NO_FATAL_FAILURE(inputHandler->OnEvent(mockEvent, mockFrameTime));
-    
 }
 } // namespace MMI
 } // namespace OHOS
