@@ -76,6 +76,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
 HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.Level1)
 {
     MMIClient client;
+    client.Start();
     EXPECT_TRUE(client.GetCurrentConnectedStatus());
 }
 
@@ -88,6 +89,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.L
 HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
 {
     MMIClient client;
+    client.Start();
     EXPECT_TRUE(client.Reconnect());
 }
 
@@ -100,6 +102,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
 HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
 {
     MMIClient client;
+    client.Start();
     client.OnDisconnect();
 }
 }
