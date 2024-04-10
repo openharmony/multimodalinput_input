@@ -270,7 +270,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnClientDisconnectTest_002, TestSi
     secPtr->GetUid();
     secPtr->GetModuleType();
     secPtr->GetProgramName();
-    ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR));
+    ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1,
+OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR));
     ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT));
     secPtr = nullptr;
     ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT));
