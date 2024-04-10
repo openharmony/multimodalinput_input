@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,18 +40,6 @@ public:
 };
 
 /**
- * @tc.name: AnrManagerTest_Init_001
- * @tc.desc: Init
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(AnrManagerTest, AnrManagerTest_Init_001, TestSize.Level1)
-{
-    UDSServer udsServer;
-    ANRMgr->Init(udsServer);
-}
-
-/**
  * @tc.name: AnrManagerTest_MarkProcessed_001
  * @tc.desc: Mark processed
  * @tc.type: FUNC
@@ -59,6 +47,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_Init_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     int32_t pid = 123;
     int32_t eventType = 1;
     int32_t eventId = 456;
@@ -73,6 +63,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_001, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     SessionPtr sess;
     ANRMgr->RemoveTimers(sess);
 }
@@ -85,6 +77,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     SessionPtr session;
     int32_t dispatchType = -1;
     ANRMgr->RemoveTimersByType(session, dispatchType);
@@ -98,6 +92,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_002, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     SessionPtr session;
     int32_t monitorType = 0;
     ANRMgr->RemoveTimersByType(session, monitorType);
@@ -111,6 +107,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_002, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_003, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     SessionPtr session;
     int32_t illegalType = 123;
     ANRMgr->RemoveTimersByType(session, illegalType);
@@ -124,6 +122,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_003, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     int32_t pid = 1234;
     int32_t ret = ANRMgr->SetANRNoticedPid(pid);
     ASSERT_EQ(ret, RET_OK);
@@ -137,6 +137,8 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
 {
+    UDSServer udsServer;
+    ANRMgr->Init(udsServer);
     int32_t pid = -1;
     int32_t ret = ANRMgr->SetANRNoticedPid(pid);
     ASSERT_EQ(ret, RET_OK);
