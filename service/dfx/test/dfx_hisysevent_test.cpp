@@ -238,7 +238,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidDistanceTest_00
 
 /**
  * @tc.name: DfxHisysEventTest_OnDeviceConnectTest_002
- * @tc.desc: OnDeviceConnect
+ * @tc.desc: On device connect verify
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -258,7 +258,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnDeviceConnectTest_002, TestSize.
 
 /**
  * @tc.name: DfxHisysEventTest_OnClientDisconnectTest_002
- * @tc.desc: OnClientDisconnect
+ * @tc.desc: On client disconnect verify
  * @tc.type: FUNC
  * @tc.require:
  */
