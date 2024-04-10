@@ -134,7 +134,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
-    ev.data.ptr = eventData.get();
+    ev.data.fd = fd;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
     if (ret < 0) {
         eventData = nullptr;
@@ -1451,7 +1451,11 @@ void MMIService::OnThread()
         MMI_HILOGD("timeout:%{public}d", timeout);
         int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
-            auto mmiEd = reinterpret_cast<mmi_epoll_event *>(ev[i].data.ptr);
+            auto mmiEdIter = epollEventMap_.find(ev[i].data.fd);
+            if (mmiEdIter == epollEventMap_.end()) {
+                return;
+            }
+            std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
