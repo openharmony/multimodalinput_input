@@ -26,7 +26,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-// constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
 constexpr int32_t UID_ROOT { 0 };
 } // namespace
 
