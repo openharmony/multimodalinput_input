@@ -41,89 +41,89 @@ public:
 
 /**
  * @tc.name: AnrManagerTest_MarkProcessed_001
- * @tc.desc: Mark processed
+ * @tc.desc: Features of the mark processed function
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = 123;
     int32_t eventType = 1;
     int32_t eventId = 456;
-    ANRMgr->MarkProcessed(pid, eventType, eventId);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->MarkProcessed(pid, eventType, eventId));
 }
 
 /**
  * @tc.name: AnrManagerTest_RemoveTimers_001
- * @tc.desc: Remove timers
+ * @tc.desc: Features of the remove timers function
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_001, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr sess;
-    ANRMgr->RemoveTimers(sess);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimers(sess));
 }
 
 /**
  * @tc.name: AnrManagerTest_RemoveTimersByType_001
- * @tc.desc: Remove timers by type
+ * @tc.desc: Remove timers by type abnormal
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr session;
     int32_t dispatchType = -1;
-    ANRMgr->RemoveTimersByType(session, dispatchType);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimersByType(session, dispatchType));
 }
 
 /**
  * @tc.name: AnrManagerTest_RemoveTimersByType_002
- * @tc.desc: Remove timers by type
+ * @tc.desc: Remove timers by type abnormal
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_002, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr session;
     int32_t monitorType = 0;
-    ANRMgr->RemoveTimersByType(session, monitorType);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimersByType(session, monitorType));
 }
 
 /**
  * @tc.name: AnrManagerTest_RemoveTimersByType_003
- * @tc.desc: Remove timers by type
+ * @tc.desc: Remove timers by type normal
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_003, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr session;
     int32_t illegalType = 123;
-    ANRMgr->RemoveTimersByType(session, illegalType);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->RemoveTimersByType(session, illegalType));
 }
 
 /**
  * @tc.name: AnrManagerTest_SetANRNoticedPid_001
- * @tc.desc: Set noticed pid
+ * @tc.desc: Set noticed pid normal
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = 1234;
     int32_t ret = ANRMgr->SetANRNoticedPid(pid);
     ASSERT_EQ(ret, RET_OK);
@@ -131,14 +131,14 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
 
 /**
  * @tc.name: AnrManagerTest_SetANRNoticedPid_002
- * @tc.desc: Set noticed pid
+ * @tc.desc: Set noticed pid abnormal
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
 {
     UDSServer udsServer;
-    ANRMgr->Init(udsServer);
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = -1;
     int32_t ret = ANRMgr->SetANRNoticedPid(pid);
     ASSERT_EQ(ret, RET_OK);
