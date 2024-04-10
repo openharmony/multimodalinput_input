@@ -65,6 +65,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
 {
     MMIClient client;
     EXPECT_FALSE(client.Start());
+    client.Stop();
 }
 
 /**
@@ -78,6 +79,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.L
     MMIClient client;
     client.Start();
     EXPECT_TRUE(client.GetCurrentConnectedStatus());
+    client.Stop();
 }
 
 /**
@@ -91,6 +93,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
     MMIClient client;
     client.Start();
     EXPECT_TRUE(client.Reconnect());
+    client.Stop();
 }
 
 /**
@@ -104,6 +107,8 @@ HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
     MMIClient client;
     client.Start();
     client.OnDisconnect();
+    ASSERT_NO_FATAL_FAILURE(client.OnDisconnect());
+    client.Stop();
 }
 }
 } // namespace MMI
