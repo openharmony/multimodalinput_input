@@ -57,9 +57,9 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_ForegroundAp
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_InitAppStateObserver_001, TestSize.Level1)
 {
     APP_OBSERVER_MGR->hasInit_ = true;
-    APP_OBSERVER_MGR->InitAppStateObserver();
+    ASSERT_NO_FATAL_FAILURE(APP_OBSERVER_MGR->InitAppStateObserver());
     APP_OBSERVER_MGR->hasInit_ = false;
-    APP_OBSERVER_MGR->InitAppStateObserver();
+    ASSERT_NO_FATAL_FAILURE(APP_OBSERVER_MGR->InitAppStateObserver());
 }
 
 /**
