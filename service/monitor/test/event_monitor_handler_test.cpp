@@ -27,16 +27,16 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t UID_ROOT { 0 };
+static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
+int32_t moduleType_ = 3;
+static inline int32_t pid_ = 0;
+int32_t writeFd_ = -1;
 } // namespace
 
 class EventMonitorHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-    const int32_t moduleType_ = 3;
-    static inline int32_t pid_ = 0;
-    int32_t writeFd_ = -1;
 };
 
 /**
@@ -139,7 +139,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_001, T
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_001, TestSize.Level1)
 {
     EventMonitorHandler eventMonitorHandler;
-    InputHandlerType handlerType = InputHandlerType::NONE; 
+    InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 1;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
