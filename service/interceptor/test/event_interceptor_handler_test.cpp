@@ -42,7 +42,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_001, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_001, TestSize.Level1)
 {
     EventInterceptorHandler handler;
     std::shared_ptr<KeyEvent>event = KeyEvent::Create();
@@ -55,7 +55,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_002, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_002, TestSize.Level1)
 {
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
@@ -68,7 +68,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_003, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_003, TestSize.Level1)
 {
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
@@ -81,7 +81,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_004, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_004, TestSize.Level1)
 {
     EventInterceptorHandler handler;
     std::shared_ptr<KeyEvent>event = KeyEvent::Create();
@@ -94,7 +94,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize.Level1)
 {
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
@@ -107,7 +107,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_006, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_006, TestSize.Level1)
 {
     EventInterceptorHandler handler;
     handler.InitSessionLostCallback();
@@ -119,7 +119,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_007, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_007, TestSize.Level1)
 {
     EventInterceptorHandler::InterceptorCollection interceptorHandler;
     std::shared_ptr<KeyEvent>KeyEvent = KeyEvent::Create();
@@ -133,23 +133,23 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
- HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize.Level1)
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize.Level1)
 {
     EventInterceptorHandler::InterceptorCollection interceptorHandler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t deviceTags = 4;
-    bool ret = interceptorHandler.CheckInputDeviceSource(pointerEvent,deviceTags);
+    bool ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     deviceTags = 2;
-    ret = interceptorHandler.CheckInputDeviceSource(pointerEvent,deviceTags);
+    ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     deviceTags = 2;
-    ret = interceptorHandler.CheckInputDeviceSource(pointerEvent,deviceTags);
+    ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 }
 
