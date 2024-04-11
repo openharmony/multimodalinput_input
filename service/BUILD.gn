@@ -517,6 +517,45 @@ ohos_unittest("EventFilterHandlerTest") {
   ]
 }
 
+ohos_unittest("ApplicationStateObserverTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/app_state_manager/include" ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  cflags = [ "-DUNIT_TEST" ]
+
+  sources = [
+    "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/app_state_manager/test/app_state_observer_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libwm",
+  ]
+}
+
 group("mmi-service-tests") {
   testonly = true
   deps = [ "libinput_adapter/test" ]
