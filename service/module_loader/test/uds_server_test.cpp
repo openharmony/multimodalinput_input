@@ -245,7 +245,7 @@ HWTEST_F(UDSServerTest, ReleaseSession_001, TestSize.Level1)
     UDSServer UDS_server;
     int32_t fd = 1;
     epoll_event ev;
-    UDS_server.ReleaseSession(fd,ev);
+    UDS_server.ReleaseSession(fd, ev);
 }
 
 /**
@@ -260,7 +260,7 @@ HWTEST_F(UDSServerTest, OnEpollRecv_001, TestSize.Level1)
     int32_t size = 100;
     epoll_event ev;
     int32_t fd = epoll_create(size);
-    UDS_server.OnEpollRecv(fd,ev);
+    UDS_server.OnEpollRecv(fd, ev);
 }
 
 /**
@@ -274,7 +274,7 @@ HWTEST_F(UDSServerTest, OnEpollRecv_002, TestSize.Level1)
     UDSServer UDS_server;
     epoll_event ev;
     int32_t fd = -1;
-    UDS_server.OnEpollRecv(fd,ev);
+    UDS_server.OnEpollRecv(fd, ev);
 }
 
 /**
@@ -288,7 +288,7 @@ HWTEST_F(UDSServerTest, AddEpollEvent_001, TestSize.Level1)
     UDSServer UDS_server;
     std::shared_ptr<mmi_epoll_event> epollEvent=std::make_shared<mmi_epoll_event>();
     int32_t fd = 1;
-    UDS_server.AddEpollEvent(fd,epollEvent);
+    UDS_server.AddEpollEvent(fd, epollEvent);
 }
 
 /**
