@@ -38,7 +38,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_001
- * @tc.desc: Test The Function HandleKeyEvent
+ * @tc.desc: Test the function HandleKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -51,7 +51,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_002
- * @tc.desc: Test The Function HandlePointerEvent
+ * @tc.desc: Test the function HandlePointerEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -64,7 +64,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_003
- * @tc.desc: Test The Function HandleTouchEvent
+ * @tc.desc: Test the function HandleTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -77,7 +77,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_004
- * @tc.desc: Test The Function OnHandleEvent
+ * @tc.desc: Test the function OnHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -90,7 +90,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_005
- * @tc.desc: Test The Function OnHandleEvent
+ * @tc.desc: Test the function OnHandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -103,7 +103,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_006
- * @tc.desc: Test The Function InitSessionLostCallback
+ * @tc.desc: Test the function InitSessionLostCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -115,7 +115,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_007
- * @tc.desc: Test The Function HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -129,7 +129,7 @@ public:
 
 /**
  * @tc.name: EventInterceptorHandler_Test_008
- * @tc.desc: Test The Function HandleEvent
+ * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
  * @tc.require:
  */
