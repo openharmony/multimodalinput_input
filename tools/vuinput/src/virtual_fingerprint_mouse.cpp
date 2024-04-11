@@ -17,11 +17,10 @@
 
 namespace OHOS {
 namespace MMI {
-
-VirtualFingerprintMouse::VirtualFingerprintMouse() : VirtualDevice("FingerprintMouse", BUS_SUB, 0x12d1, 0x10a5)
+VirtualFingerprintMouse::VirtualFingerprintMouse() : VirtualDevice("FingerprintMouse", BUS_USB, 0x12d1, 0x10a5)
 {
     eventTypes_ = { EV_KEY, EV_REL, EV_MSC };
-    keys_ = { BIN_LEFT, BIN_RIGHT, BIN_MIDDLE };
+    keys_ = { BTN_LEFT, BTN_RIGHT, BTN_MIDDLE };
     relBits_ = { REL_X, REL_Y, REL_WHEEL };
     miscellaneous_ = { MSC_SCAN };
 }
