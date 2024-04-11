@@ -579,7 +579,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed
     ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceLongConfig_);
     handler.downToPrevDownDistanceConfig_ = handler.distanceLongConfig_;
     handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_ - 1);
-    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_); 
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
 }
 
 /**
