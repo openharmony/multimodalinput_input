@@ -93,7 +93,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_001, Tes
 
 /**
  * @tc.name: EventMonitorHandlerTest_InitSessionLostCallback_001
- * @tc.desc: Test InitSessionLostCallback
+ * @tc.desc: Verify the invalid and valid event type of InitSessionLostCallback
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -132,7 +132,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_001, T
 
 /**
  * @tc.name: EventMonitorHandlerTest_RemoveInputHandler_001
- * @tc.desc: Verify the RemoveInputHandler
+ * @tc.desc: Verify the invalid and valid event type of RemoveInputHandler
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -142,14 +142,14 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_001
     InputHandlerType handlerType = InputHandlerType::NONE; 
     HandleEventType eventType = 1;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
-    eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
     handlerType = InputHandlerType::MONITOR;
-    eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
 }
 
 /**
  * @tc.name: EventMonitorHandlerTest_SendToClient_001
- * @tc.desc: Verify the SendToClient
+ * @tc.desc: Verify the keyEvent and pointerEvent of SendToClient
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -160,14 +160,14 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_001, Test
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    sessionHandler.SendToClient(keyEvent);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent));
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    sessionHandler.SendToClient(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(pointerEvent));
 }
 
 /**
  * @tc.name: EventMonitorHandlerTest_AddMonitor_001
- * @tc.desc: Verify the AddMonitor
+ * @tc.desc: Verify the invalid and valid event type of AddMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -194,7 +194,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddMonitor_001, TestSi
 
 /**
  * @tc.name: EventMonitorHandlerTest_RemoveMonitor_001
- * @tc.desc: Verify the RemoveMonitor
+ * @tc.desc: Verify the invalid and valid event type of RemoveMonitor
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -205,14 +205,14 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_001, Tes
     HandleEventType eventType = 0;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
-    monitorCollection.RemoveMonitor(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
     monitorCollection.monitors_.insert(sessionHandler);
-    monitorCollection.RemoveMonitor(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
     SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
     eventType = 1;
     sessionHandler = { handlerType, eventType, session2 };
     monitorCollection.monitors_.insert(sessionHandler);
-    monitorCollection.RemoveMonitor(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
 }
 } // namespace MMI
 } // namespace OHOS
