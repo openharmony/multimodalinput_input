@@ -52,7 +52,8 @@ public:
  */
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventDispatchHandler_001, TestSize.Level1)
 {
-    ASSERT_NO_FATAL_FAILURE(InputHandler->GetEventDispatchHandler());
+    auto ret = InputHandler->GetEventDispatchHandler();
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
