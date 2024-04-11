@@ -317,6 +317,7 @@ ohos_unittest("ut-mmi-service-out") {
     "dfx/test/dfx_hisysevent_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
+    "event_handler/test/anr_manager_test.cpp",
     "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
