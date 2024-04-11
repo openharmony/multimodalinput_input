@@ -119,25 +119,365 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputNativeTest_Authorize_001
- * @tc.desc: Verify the Authorize
+ * @tc.name: InputNativeTest_InjectKeyEvent_001
+ * @tc.desc: Verify the InjectKeyEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputNativeTest, InputNativeTest_Authorize_001, TestSize.Level1)
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_001, TestSize.Level1)
 {
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
     OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_DOWN);
-    OH_Input_SetKeyEventKeyCode(keyEvent, KeyEvent::UNKNOWN_FUNCTION_KEY);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_UNKNOWN);
+    OH_Input_SetKeyEventActionTime(keyEvent, -1);
     int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
-    ASSERT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
     OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_UP);
-    OH_Input_SetKeyEventKeyCode(keyEvent, KeyEvent::UNKNOWN_FUNCTION_KEY);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_UNKNOWN);
+    OH_Input_SetKeyEventActionTime(keyEvent, -1);
     retResult = OH_Input_InjectKeyEvent(keyEvent);
-    ASSERT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
     InputManager::GetInstance()->Authorize(true);
+    OH_Input_CancelInjection();
     OH_Input_DestroyKeyEvent(&keyEvent);
-    ASSERT_EQ(keyEvent, nullptr);
+    EXPECT_EQ(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_KeyEventAction_001
+ * @tc.desc: Verify the set and get of keyEvent action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_KeyEventAction_001, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_DOWN);
+    int32_t action = OH_Input_GetKeyEventAction(keyEvent);
+    EXPECT_EQ(action, KEY_ACTION_DOWN);
+    OH_Input_DestroyKeyEvent(&keyEvent);
+    EXPECT_EQ(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_KeyEventKeyCode_001
+ * @tc.desc: Verify the set and get of keyEvent code
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_KeyEventKeyCode_001, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_A);
+    int32_t keyCode = OH_Input_GetKeyEventKeyCode(keyEvent);
+    EXPECT_EQ(keyCode, KEYCODE_A);
+    OH_Input_DestroyKeyEvent(&keyEvent);
+    EXPECT_EQ(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_KeyEventActionTime_001
+ * @tc.desc: Verify the set and get of keyEvent time
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_KeyEventActionTime_001, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventActionTime(keyEvent, 200);
+    int64_t actionTime = OH_Input_GetKeyEventActionTime(keyEvent);
+    EXPECT_EQ(actionTime, 200);
+    OH_Input_DestroyKeyEvent(&keyEvent);
+    EXPECT_EQ(keyEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectMouseEvent_001
+ * @tc.desc: Verify the InjectMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_MOVE);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
+    OH_Input_SetMouseEventButton(mouseEvent, -2);
+    OH_Input_SetMouseEventActionTime(mouseEvent, -1);
+    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectMouseEvent_002
+ * @tc.desc: Verify the InjectMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_002, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
+    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
+    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
+    OH_Input_SetMouseEventButton(mouseEvent, -2);
+    OH_Input_SetMouseEventActionTime(mouseEvent, -1);
+    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_END);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
+    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
+    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
+    OH_Input_SetMouseEventButton(mouseEvent, -2);
+    OH_Input_SetMouseEventActionTime(mouseEvent, -1);
+    retResult = OH_Input_InjectMouseEvent(mouseEvent);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventAction_001
+ * @tc.desc: Verify the set and get of mouseEvent action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventAction_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_BUTTON_DOWN);
+    int32_t action = OH_Input_GetMouseEventAction(mouseEvent);
+    EXPECT_EQ(action, MOUSE_ACTION_BUTTON_DOWN);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventDisplayX_001
+ * @tc.desc: Verify the set and get of mouseEvent displayX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventDisplayX_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 100);
+    int32_t displayX = OH_Input_GetMouseEventDisplayX(mouseEvent);
+    EXPECT_EQ(displayX, 100);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventDisplayY_001
+ * @tc.desc: Verify the set and get of mouseEvent displayY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventDisplayY_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 100);
+    int32_t displayY = OH_Input_GetMouseEventDisplayY(mouseEvent);
+    EXPECT_EQ(displayY, 100);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventButton_001
+ * @tc.desc: Verify the set and get of mouseEvent button
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventButton_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_LEFT);
+    int32_t button = OH_Input_GetMouseEventButton(mouseEvent);
+    EXPECT_EQ(button, MOUSE_BUTTON_LEFT);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventAxisType_001
+ * @tc.desc: Verify the set and get of mouseEvent axisType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventAxisType_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
+    int32_t axisType = OH_Input_GetMouseEventAxisType(mouseEvent);
+    EXPECT_EQ(axisType, MOUSE_BUTTON_LEFT);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventAxisValue_001
+ * @tc.desc: Verify the set and get of mouseEvent axisValue
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventAxisValue_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventAxisValue(mouseEvent, 15.0);
+    float axisValue = OH_Input_GetMouseEventAxisValue(mouseEvent);
+    EXPECT_EQ(axisValue, 15.0);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_MouseEventActionTime_001
+ * @tc.desc: Verify the set and get of mouseEvent actionTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_MouseEventActionTime_001, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventActionTime(mouseEvent, 200);
+    int64_t actionTime = OH_Input_GetMouseEventActionTime(mouseEvent);
+    EXPECT_EQ(actionTime, 200);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+    EXPECT_EQ(mouseEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectTouchEvent_001
+ * @tc.desc: Verify the InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_DOWN);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 671);
+    OH_Input_SetTouchEventDisplayY(touchEvent, -10);
+    OH_Input_SetTouchEventActionTime(touchEvent, -1);
+    int32_t retResult = OH_Input_InjectTouchEvent(touchEvent);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_UP);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 671);
+    OH_Input_SetTouchEventDisplayY(touchEvent, -10);
+    OH_Input_SetTouchEventActionTime(touchEvent, -1);
+    retResult = OH_Input_InjectTouchEvent(touchEvent);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_TouchEventAction_001
+ * @tc.desc: Verify the set and get of touchEvent action
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_TouchEventAction_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_DOWN);
+    int32_t action = OH_Input_GetTouchEventAction(touchEvent);
+    EXPECT_EQ(action, TOUCH_ACTION_DOWN);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_TouchEventFingerId_001
+ * @tc.desc: Verify the set and get of touchEvent id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_TouchEventFingerId_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    int32_t id = OH_Input_GetTouchEventFingerId(touchEvent);
+    EXPECT_EQ(id, 0);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_TouchEventDisplayX_001
+ * @tc.desc: Verify the set and get of touchEvent displayX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_TouchEventDisplayX_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 100);
+    int32_t displayX = OH_Input_GetTouchEventDisplayX(touchEvent);
+    EXPECT_EQ(displayX, 100);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_TouchEventDisplayY_001
+ * @tc.desc: Verify the set and get of touchEvent displayY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_TouchEventDisplayY_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventDisplayY(touchEvent, 100);
+    int32_t displayY = OH_Input_GetTouchEventDisplayY(touchEvent);
+    EXPECT_EQ(displayY, 100);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
+}
+
+/**
+ * @tc.name: InputNativeTest_TouchEventActionTime_001
+ * @tc.desc: Verify the set and get of touchEvent actionTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_TouchEventActionTime_001, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventActionTime(touchEvent, 200);
+    int64_t actionTime = OH_Input_GetTouchEventActionTime(touchEvent);
+    EXPECT_EQ(actionTime, 200);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+    EXPECT_EQ(touchEvent, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
