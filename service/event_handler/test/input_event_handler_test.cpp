@@ -66,7 +66,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventDispatchHandler_00
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetFilterHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetFilterHandler());
+    auto result = inputHandler->GetFilterHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -78,7 +79,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetFilterHandler_001, Test
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetMonitorHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetMonitorHandler());
+    auto result = inputHandler->GetMonitorHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -90,7 +92,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetMonitorHandler_001, Tes
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetKeyCommandHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetKeyCommandHandler());
+    auto result = inputHandler->GetKeyCommandHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -102,7 +105,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetKeyCommandHandler_001, 
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetSwitchSubscriberHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetSwitchSubscriberHandler());
+    auto result = inputHandler->GetSwitchSubscriberHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -114,7 +118,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetSwitchSubscriberHandler
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetSubscriberHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetSubscriberHandler());
+    auto result = inputHandler->GetSubscriberHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -126,7 +131,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetSubscriberHandler_001, 
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetInterceptorHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetInterceptorHandler());
+    auto result = inputHandler->GetInterceptorHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -138,7 +144,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetInterceptorHandler_001,
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventNormalizeHandler_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetEventNormalizeHandler());
+    auto result = inputHandler->GetEventNormalizeHandler();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -150,7 +157,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventNormalizeHandler_0
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetUDSServer_001, TestSize.Level1)
 {
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->GetUDSServer());
+    auto result = inputHandler->GetUDSServer();
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -163,7 +171,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_BuildInputHandlerChain_001
 {
     UDSServer udsServer;
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->Init(udsServer));
+    auto result = inputHandler->Init(udsServer);
+    ASSERT_EQ(result, nullptr);
 }
 
 /**
@@ -177,7 +186,8 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_001, TestSize.Leve
     void* mockEvent = nullptr;
     int64_t mockFrameTime = 123456789;
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->OnEvent(mockEvent, mockFrameTime));
+    auto result = inputHandler->OnEvent(mockEvent, mockFrameTime);
+    ASSERT_EQ(result, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
