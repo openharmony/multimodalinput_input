@@ -60,7 +60,7 @@ HWTEST_F(TabletToolTranformProcessorTest, OnEvent_AxisEvent, TestSize.Level1)
     int32_t deviceID = 1;
     TabletToolTransformProcessor processor(deviceID);
     libinput_event* event = nullptr;
-    enum libinput_event_type type = libinput_event_get_type(event);
+    auto type = libinput_event_get_type(event);
     type = LIBINPUT_EVENT_TABLET_TOOL_AXIS;
     auto result = processor.OnEvent(event);
     ASSERT_EQ(result, nullptr);
@@ -77,7 +77,7 @@ HWTEST_F(TabletToolTranformProcessorTest, OnEvent_ProximityEvent, TestSize.Level
     int32_t deviceID = 1;
     TabletToolTransformProcessor processor(deviceID);
     libinput_event* event = nullptr;
-    enum libinput_event_type type = libinput_event_get_type(event);
+    auto type = libinput_event_get_type(event);
     type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
     auto result = processor.OnEvent(event);
     ASSERT_EQ(result, nullptr);
@@ -94,7 +94,7 @@ HWTEST_F(TabletToolTranformProcessorTest, OnEvent_TipEvent, TestSize.Level1)
     int32_t deviceID = 1;
     TabletToolTransformProcessor processor(deviceID);
     libinput_event* event = nullptr;
-    enum libinput_event_type type = libinput_event_get_type(event);
+    auto type = libinput_event_get_type(event);
     type = LIBINPUT_EVENT_TABLET_TOOL_TIP;
     auto result = processor.OnEvent(event);
     ASSERT_EQ(result, nullptr);
