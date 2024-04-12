@@ -978,8 +978,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     }
 #else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
-    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
