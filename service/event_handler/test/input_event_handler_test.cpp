@@ -52,7 +52,7 @@ public:
  */
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventDispatchHandler_001, TestSize.Level1)
 {
-    auto result = InputEventHandler.GetEventDispatchHandler();
+    auto result = InputEventHandler::GetEventDispatchHandler();
     ASSERT_EQ(result, nullptr);
 }
 
