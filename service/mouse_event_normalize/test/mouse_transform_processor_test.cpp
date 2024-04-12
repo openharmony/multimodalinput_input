@@ -429,5 +429,190 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadRig
     ASSERT_TRUE(processor.GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
 }
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetPointerEvent_001
+ * @tc.desc: Get pointer event verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEvent_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    auto ret = processor.GetPointerEvent();
+    ASSERT_EQ(ret, nullptr);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleMotionInner_001
+ * @tc.desc: Handle motion inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionInner_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    struct libinput_event* event = nullptr;
+    auto ret = processor.HandleMotionInner(data, event);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_CalculateOffset_001
+ * @tc.desc: Calculate offset verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CalculateOffset_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    Direction direction = DIRECTION90;
+    Offset offset;
+    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_CalculateOffset_002
+ * @tc.desc: Calculate offset verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CalculateOffset_002, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    Direction direction = DIRECTION180;
+    Offset offset;
+    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_CalculateOffset_003
+ * @tc.desc: Calculate offset verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CalculateOffset_003, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    Direction direction = DIRECTION270;
+    Offset offset;
+    ASSERT_NO_FATAL_FAILURE(processor.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonInner_001
+ * @tc.desc: Handle button inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonInner_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    struct libinput_event* event = nullptr;
+    auto ret = processor.HandleButtonInner(data, event);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonValueInner_001
+ * @tc.desc: Handle button value inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonValueInner_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    uint32_t button = -1;
+    int32_t type = 0;
+    auto ret = processor.HandleButtonValueInner(data, button, type);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleButtonValueInner_002
+ * @tc.desc: Handle button value inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonValueInner_002, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    uint32_t button = 272;
+    int32_t type = 1;
+    auto ret = processor.HandleButtonValueInner(data, button, type);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleTouchPadAxisState_001
+ * @tc.desc: Handle touch pad axis state verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchPadAxisState_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    libinput_pointer_axis_source source = LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
+    int32_t direction = 0;
+    bool tpScrollSwitch = false;
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchPadAxisState(source, direction, tpScrollSwitch));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisInner_001
+ * @tc.desc: Handle axis inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInner_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    auto ret = processor.HandleAxisInner(data);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_001
+ * @tc.desc: Handle axis begin end inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event* event = nullptr;
+    auto ret = processor.HandleAxisBeginEndInner(event);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisPostInner_001
+ * @tc.desc: Handle axis post inner verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisPostInner_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    PointerEvent::PointerItem pointerItem;
+    ASSERT_NO_FATAL_FAILURE(processor.HandleAxisPostInner(pointerItem));
+}
 }
 }
