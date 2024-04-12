@@ -52,7 +52,8 @@ public:
  */
 HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_GetEventDispatchHandler_001, TestSize.Level1)
 {
-    auto result = InputEventHandler::GetEventDispatchHandler();
+    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
+    auto result = inputHandler->GetEventDispatchHandler();
     ASSERT_EQ(result, nullptr);
 }
 
