@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,10 +83,10 @@ PointerDrawingManager::PointerDrawingManager()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
-    useMagicCursor_.name = "isMagicCursor";
+    hasMagicCursor_.name = "isMagicCursor";
     TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
-        MMI_HILOGD("timer after");
-        CreatePointerSwiftObserver(useMagicCursor_);
+        MMI_HILOGD("Timer callback");
+        CreatePointerSwiftObserver(hasMagicCursor_);
     });
 
     MAGIC_CURSOR->InitStyle();
@@ -134,7 +134,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     Rosen::RSTransaction::FlushImplicitTransaction();
     UpdatePointerVisible();
     mouseIconUpdate_ = false;
-    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+    MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         displayId, physicalX, physicalY);
     return;
 }
@@ -160,7 +160,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (UseMagicCursor()) {
+    if (HasMagicCursor()) {
         MMI_HILOGI("magicCursor DrawPointer enter CreatePointerWindow");
         MAGIC_CURSOR->CreatePointerWindow(displayId, physicalX, physicalY, direction, surfaceNode_);
     } else {
@@ -210,30 +210,29 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
             return;
         }
         item.isShow = statusValue;
-        MMI_HILOGE("key: %{public}s, statusValue: %{public}d", key.c_str(), statusValue);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(
         MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
 }
 
-bool PointerDrawingManager::UseMagicCursor()
+bool PointerDrawingManager::HasMagicCursor()
 {
-    return useMagicCursor_.isShow;
+    return hasMagicCursor_.isShow;
 }
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (UseMagicCursor()) {
-        MMI_HILOGE("magiccursor enter MAGIC_CURSOR->Initlayer");
+    if (HasMagicCursor()) {
+        MMI_HILOGD("magiccursor enter MAGIC_CURSOR->Initlayer");
         return MAGIC_CURSOR->InitLayer(mouseStyle);
     } else {
-        MMI_HILOGE("magiccursor not enter MAGIC_CURSOR->Initlayer");
+        MMI_HILOGD("magiccursor not enter MAGIC_CURSOR->Initlayer");
         return DrawCursor(mouseStyle);
     }
 #else
@@ -868,10 +867,10 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     std::string name = "pointerColor";
     int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, color);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer color successfully, color:%{public}d", color);
+        MMI_HILOGE("Set pointer color failed, color:%{public}d", color);
         return ret;
     }
-    MMI_HILOGE("Set pointer color successfully, color:%{public}d", color);
+    MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (UseMgaicCursor()) {
         ret = MAGIC_CURSOR->SetPointerColor(color);
@@ -921,7 +920,7 @@ int32_t PointerDrawingManager::GetIndependentPixels()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (UseMagicCursor()) {
+    if (HasMagicCursor()) {
         return MAGIC_INDEPENDENT_PIXELS;
     } else {
         return DEVICE_INDEPENDENT_PIXELS;
@@ -966,7 +965,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
         physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (UseMagicCursor()) {
+    if (HasMagicCursor()) {
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
     } else {
         CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
@@ -1221,11 +1220,11 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
 std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (UseMagicCursor()) {
-        MMI_HILOGE("magiccurosr get magic mouse map");
+    if (HasMagicCursor()) {
+        MMI_HILOGD("Magiccurosr get magic mouse map");
         return MAGIC_CURSOR->magicMouseIcons_;
     } else {
-        MMI_HILOGE("magiccurosr get mouse icon, UseMagicCursor is false");
+        MMI_HILOGD("Magiccurosr get mouse icon, HasMagicCursor is false");
         return mouseIcons_;
     }
 #else
