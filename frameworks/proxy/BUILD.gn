@@ -34,7 +34,6 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/common/include",
