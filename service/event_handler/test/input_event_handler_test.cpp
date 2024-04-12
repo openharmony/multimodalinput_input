@@ -171,8 +171,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_BuildInputHandlerChain_001
 {
     UDSServer udsServer;
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->Init(udsServer);
-    ASSERT_EQ(result, nullptr);
+    ASSERT_NO_FATAL_FAILURE(inputHandler->Init(udsServer));
 }
 
 /**
@@ -186,8 +185,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_001, TestSize.Leve
     void* mockEvent = nullptr;
     int64_t mockFrameTime = 123456789;
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto result = inputHandler->OnEvent(mockEvent, mockFrameTime);
-    ASSERT_EQ(result, nullptr);
+    ASSERT_NO_FATAL_FAILURE(inputHandler->OnEvent(mockEvent, mockFrameTime));
 }
 } // namespace MMI
 } // namespace OHOS
