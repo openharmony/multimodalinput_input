@@ -202,14 +202,20 @@ void PointerDrawingManager::UpdateMouseStyle()
 void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
         bool statusValue = false;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
+        bool tmp = item.isShow;
         item.isShow = statusValue;
+        if (item.isShow != tmp) {
+            PointerStyle pointerStyle = this->lastMouseStyle_;
+            this->lastMouseStyle_.id = -1;
+            this->DrawPointerStyle(pointerStyle);
+        }
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(
         MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
@@ -872,7 +878,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     }
     MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (UseMgaicCursor()) {
+    if (HasMgaicCursor()) {
         ret = MAGIC_CURSOR->SetPointerColor(color);
     } else {
         ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
