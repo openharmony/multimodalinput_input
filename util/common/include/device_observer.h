@@ -20,7 +20,7 @@ namespace OHOS {
 namespace MMI {
 class IDeviceObserver {
 public:
-    virtual void UpdatePointerDevice(bool hasPointerDevice, bool isVisible) = 0;
+    virtual void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) = 0;
 };
 
 class IDeviceObject {
