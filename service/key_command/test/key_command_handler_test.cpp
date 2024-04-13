@@ -15,14 +15,18 @@
 
 #include <gtest/gtest.h>
 
+#define private public
+#include "key_command_handler.h"
+#undef private
 #include "event_log_helper.h"
 #include "input_handler_type.h"
-#include "key_command_handler.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_preferences_manager.h"
 #include "system_info.h"
 #include "util.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace MMI {
@@ -507,5 +511,89 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_003, TestSize.
     ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
+
+/**
+ * @tc.name: KeyCommandHandlerTest_UpdateSettingsXml_001
+ * @tc.desc: Update settings xml verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UpdateSettingsXml_001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    ASSERT_EQ(handler.UpdateSettingsXml("", 100), COMMON_PARAMETER_ERROR);
+    ASSERT_EQ(handler.UpdateSettingsXml("businessId", 100), COMMON_PARAMETER_ERROR);
+    handler.businessIds_ = {"businessId1", "businessId2"};
+    ASSERT_EQ(handler.UpdateSettingsXml("businessId3", 100), COMMON_PARAMETER_ERROR);
+    handler.businessIds_ = {"businessId"};
+    ASSERT_EQ(handler.UpdateSettingsXml("businessId", 1000), COMMON_PARAMETER_ERROR);
+    auto result = PreferencesMgr->SetShortKeyDuration("businessId", 100);
+    ASSERT_EQ(handler.UpdateSettingsXml("businessId", 100), result);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed_001
+ * @tc.desc: Adjust timeInterval configIf need verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed_001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
+    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
+    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_SLOW);
+    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_SLOW);
+    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
+    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+    handler.AdjustTimeIntervalConfigIfNeed(DOUBLE_CLICK_INTERVAL_TIME_SLOW);
+    ASSERT_EQ(handler.downToPrevUpTimeConfig_, DOUBLE_CLICK_INTERVAL_TIME_SLOW);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AdjustDistanceConfigIfNeed_001
+ * @tc.desc: Adjust distance configIf need verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed_001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.downToPrevDownDistanceConfig_ = handler.distanceDefaultConfig_;
+    handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_);
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
+    handler.AdjustDistanceConfigIfNeed(handler.distanceLongConfig_);
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
+    handler.downToPrevDownDistanceConfig_ = handler.distanceLongConfig_;
+    handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_);
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
+    handler.AdjustDistanceConfigIfNeed(handler.distanceLongConfig_);
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceLongConfig_);
+    handler.downToPrevDownDistanceConfig_ = handler.distanceDefaultConfig_;
+    handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_ - 1);
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceLongConfig_);
+    handler.downToPrevDownDistanceConfig_ = handler.distanceLongConfig_;
+    handler.AdjustDistanceConfigIfNeed(handler.distanceDefaultConfig_ - 1);
+    ASSERT_EQ(handler.downToPrevDownDistanceConfig_, handler.distanceDefaultConfig_);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_001
+ * @tc.desc: Start two finger gesture verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.abilityStartDelay = 1000;
+    handler.StartTwoFingerGesture();
+    ASSERT_NE(-1, handler.twoFingerGesture_.timerId);
+}
 } // namespace MMI
 } // namespace OHOS

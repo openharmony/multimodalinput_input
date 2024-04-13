@@ -193,6 +193,13 @@ struct WindowInfo {
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
 
     /**
+     * Only handwriting window
+     *
+     * @since 12
+     */
+    static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
+
+    /**
      * Globally unique identifier of the window
      *
      * @since 9
@@ -285,6 +292,14 @@ struct WindowInfo {
      * @since 9
      */
     std::vector<float> transform;
+
+    /**
+     * pixelMap Indicates the special-shaped window. Its actual type must be OHOS::Media::PixelMap*,
+     * which is used to determine whether an event is dispatched to the current window.
+     *
+     * @since 12
+     */
+    void* pixelMap { nullptr };
 };
 
 /**

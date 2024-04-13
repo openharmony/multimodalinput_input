@@ -1072,6 +1072,7 @@ public:
          * @return void
          * @since 9
          */
+
         void SetRawDx(int32_t rawDx);
         /**
          * @brief Obtains the raw Y coordinate.
@@ -1088,7 +1089,7 @@ public:
          */
         void SetRawDy(int32_t rawDy);
     private:
-        int32_t pointerId_ {};
+        int32_t pointerId_ { -1 };
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
@@ -1202,6 +1203,20 @@ public:
      * @since 9
      */
     void RemovePointerItem(int32_t pointerId);
+
+    /**
+     * @brief All of the pointer items is be removed.
+     * @return void
+     * @since 9
+     */
+    void RemoveAllPointerItems();
+
+    /**
+     * @brief Return all the pointerItems.
+     * @return Returns pointers_.
+     * @since 9
+     */
+    std::list<PointerItem> GetAllPointerItems() const;
 
     /**
      * @brief Updates a pointer item based on the pointer ID.
@@ -1473,14 +1488,14 @@ public:
      * @return distance X.
      * @since 12
      */
-    double GetFingerprintDistanceX();
+    double GetFingerprintDistanceX() const;
 
     /**
      * @brief Get the fingerprint distance Y.
      * @return distance Y.
      * @since 12
      */
-    double GetFingerprintDistanceY();
+    double GetFingerprintDistanceY() const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 protected:

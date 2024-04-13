@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef INPUT_MANAGER_UTIL_H
 #define INPUT_MANAGER_UTIL_H
 
@@ -52,6 +52,12 @@ public:
     static std::shared_ptr<PointerEvent> SetupMouseEvent002();
     static std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
     static std::shared_ptr<PointerEvent> SetupTouchScreenEvent002();
+    static void SetPointerItem(PointerEvent::PointerItem &item, int32_t pointerId);
+    static void PrintPointerEventId(std::shared_ptr<PointerEvent> pointerEvent);
+    static std::shared_ptr<PointerEvent> SetupSimulateEvent001();
+    static std::shared_ptr<PointerEvent> SetupSimulateEvent002();
+    static std::shared_ptr<PointerEvent> SetupSimulateEvent003();
+    static std::shared_ptr<PointerEvent> SetupSimulateEvent004();
     static std::shared_ptr<KeyEvent> SetupKeyEvent001();
     static std::shared_ptr<KeyEvent> SetupKeyEvent002();
     static std::shared_ptr<KeyEvent> SetupKeyEvent003();

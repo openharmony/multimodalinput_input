@@ -235,5 +235,46 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidDistanceTest_00
     float distance = 10;
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidDistance(pointerEvent, distance));
 }
+
+/**
+ * @tc.name: DfxHisysEventTest_OnDeviceConnectTest_002
+ * @tc.desc: On device connect verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnDeviceConnectTest_002, TestSize.Level1)
+{
+    OHOS::HiviewDFX::HiSysEvent::EventType type = OHOS::HiviewDFX::HiSysEvent::EventType::FAULT;
+    int32_t id = 2;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
+    id = INT32_MAX;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
+    type = OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
+    id = 3;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
+    id = INT32_MAX;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnDeviceConnect(id, type));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnClientDisconnectTest_002
+ * @tc.desc: On client disconnect verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnClientDisconnectTest_002, TestSize.Level1)
+{
+    DfxHisysevent dfxHisysevent;
+    SessionPtr secPtr = std::shared_ptr<OHOS::MMI::UDSSession>();
+    secPtr->GetPid();
+    secPtr->GetUid();
+    secPtr->GetModuleType();
+    secPtr->GetProgramName();
+    ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1,
+OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR));
+    ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT));
+    secPtr = nullptr;
+    ASSERT_NO_FATAL_FAILURE(dfxHisysevent.OnClientDisconnect(secPtr, 1, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT));
+}
 } // namespace MMI
 } // namespace OHOS

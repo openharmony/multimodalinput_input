@@ -35,7 +35,9 @@
 #include "touch_event_normalize.h"
 #include "event_resample.h"
 #include "touchpad_transform_processor.h"
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 namespace OHOS {
 namespace MMI {

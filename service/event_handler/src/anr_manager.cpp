@@ -51,7 +51,10 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
     CALL_DEBUG_ENTER;
     MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
     SessionPtr sess = udsServer_->GetSessionByPid(pid);
-    CHKPR(sess, RET_ERR);
+    if (sess == nullptr) {
+        MMI_HILOGD("sess is nullptr");
+        return RET_ERR;
+    }
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
     for (int32_t item : timerIds) {
         if (item != -1) {
@@ -76,6 +79,22 @@ void ANRManager::RemoveTimers(SessionPtr sess)
     }
     std::vector<int32_t> MonitorTimerIds = sess->GetTimerIds(ANR_MONITOR);
     for (int32_t item : MonitorTimerIds) {
+        if (item != -1) {
+            TimerMgr->RemoveTimer(item);
+            anrTimerCount_--;
+        }
+    }
+}
+
+void ANRManager::RemoveTimersByType(SessionPtr sess, int32_t type)
+{
+    CHKPV(sess);
+    if (type != ANR_DISPATCH && type != ANR_MONITOR) {
+        MMI_HILOGE("remove times failed, your input parm is %{public}d, which is not legal", type);
+        return;
+    }
+    std::vector<int32_t> timerIds = sess->GetTimerIds(ANR_MONITOR);
+    for (int32_t item : timerIds) {
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
             anrTimerCount_--;

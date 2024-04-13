@@ -49,10 +49,12 @@ constexpr int32_t FOUR_FINGERS = 4;
 constexpr int32_t GESTURE_BEGIN = 1;
 constexpr int32_t GESTURE_UPDATE = 2;
 constexpr int32_t GESTURE_END = 3;
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 constexpr int32_t FINGERPRINT_DOWN = 0;
 constexpr int32_t FINGERPRINT_UP = 1;
 constexpr int32_t FINGERPRINT_SLIDE = 2;
 constexpr int32_t FINGERPRINT_CLICK = 3;
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
     TOUCH = 0,
@@ -126,6 +128,18 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_Z, PointerEvent::JOYSTICK_BUTTON_Z },
     { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
 };
+
+void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
+{
+    if (*monitorInfo != nullptr) {
+        delete *monitorInfo;
+        *monitorInfo = nullptr;
+    }
+    if (*work != nullptr) {
+        delete *work;
+        *work = nullptr;
+    }
+}
 } // namespace
 
 int32_t InputMonitor::Start()
@@ -296,9 +310,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std:
         return;
     }
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
-        auto& jsMonitor { JsInputMonMgr.GetMonitor(jsId, jsFingers) };
-        CHKPV(jsMonitor);
-        jsMonitor->OnPointerEvent(pointerEvent);
+        JsInputMonMgr.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
@@ -319,9 +331,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
         return;
     }
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
-        auto& jsMonitor { JsInputMonMgr.GetMonitor(jsId, jsFingers) };
-        CHKPV(jsMonitor);
-        jsMonitor->OnPointerEvent(pointerEvent);
+        JsInputMonMgr.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
@@ -657,6 +667,7 @@ int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
 {
     MMI_HILOGD("GetFingerprintAction enter, action is %{public}d", action);
@@ -679,6 +690,7 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         }
     }
 }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
 {
@@ -1158,29 +1170,31 @@ int32_t JsInputMonitor::TransformJoystickPointerEvent(const std::shared_ptr<Poin
     return RET_OK;
 }
 
-int32_t JsInputMonitor::TransfromFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetFingerprintAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action value failed");
+        MMI_HILOGW("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
-        MMI_HILOGE("Set name property failed");
+        MMI_HILOGW("Set name property failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "distanceX", pointerEvent->GetFingerprintDistanceX()) != napi_ok) {
-        MMI_HILOGE("Set distanceX property failed");
+        MMI_HILOGW("Set distanceX property failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "distanceY", pointerEvent->GetFingerprintDistanceY()) != napi_ok) {
-        MMI_HILOGE("Set distanceY property failed");
+        MMI_HILOGW("Set distanceY property failed");
         return RET_ERR;
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 int32_t JsInputMonitor::Start()
 {
@@ -1283,7 +1297,12 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             }
             return;
         }
-        uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
+        if (ret != 0) {
+            MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
+            CleanData(&monitorInfo, &work);
+        }
     }
 }
 
@@ -1387,6 +1406,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             case TypeName::THREE_FINGERS_TAP: {
                 if (!IsThreeFingersTap(pointerEvent)) {
                     MMI_HILOGE("the event is not threeFingersTapEvent");
+                    napi_close_handle_scope(jsEnv_, scope);
                 }
                 ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                 break;
@@ -1400,14 +1420,16 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 ret = TransformJoystickPointerEvent(pointerEvent, napiPointer);
                 break;
             }
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
             case TypeName::FINGERPRINT: {
                 if (!IsFingerprint(pointerEvent)) {
-                    MMI_HILOGE("the event is not fingerprintEvent");
+                    MMI_HILOGW("the event is not fingerprintEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                 }
-                ret = TransfromFingerprintEvent(pointerEvent, napiPointer);
+                ret = TransformFingerprintEvent(pointerEvent, napiPointer);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
             default: {
                 MMI_HILOGE("This event is invalid");
                 break;
