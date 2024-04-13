@@ -161,6 +161,13 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+    return OnInjectPointerEventExt(pointerEvent);
+}
+
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     auto source = pointerEvent->GetSourceType();

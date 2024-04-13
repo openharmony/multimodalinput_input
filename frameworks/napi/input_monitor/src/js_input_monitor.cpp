@@ -117,6 +117,18 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_Z, PointerEvent::JOYSTICK_BUTTON_Z },
     { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
 };
+
+void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
+{
+    if (*monitorInfo != nullptr) {
+        delete *monitorInfo;
+        *monitorInfo = nullptr;
+    }
+    if (*work != nullptr) {
+        delete *work;
+        *work = nullptr;
+    }
+}
 } // namespace
 
 int32_t InputMonitor::Start()
@@ -1228,14 +1240,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
         if (ret != 0) {
             MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
-            if (monitorInfo != nullptr) {
-                delete monitorInfo;
-                monitorInfo = nullptr;
-            }
-            if (work != nullptr) {
-                delete work;
-                work = nullptr;
-            }
+            CleanData(&monitorInfo, &work);
         }
     }
 }
