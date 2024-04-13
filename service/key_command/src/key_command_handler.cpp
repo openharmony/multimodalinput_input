@@ -549,7 +549,7 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
     }
 
     GetKeyVal(jsonData, "statusConfig", sequence.statusConfig);
-    
+
     cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
     if (!cJSON_IsObject(ability)) {
         MMI_HILOGE("ability is not object");
@@ -1241,15 +1241,15 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
 
 void KeyCommandHandler::Print()
 {
-    MMI_HILOGD("shortcutKey count:%{public}zu", shortcutKeys_.size());
+    MMI_HILOGI("shortcutKey count:%{public}zu", shortcutKeys_.size());
     int32_t row = 0;
     for (const auto &item : shortcutKeys_) {
-        MMI_HILOGD("row:%{public}d", row++);
+        MMI_HILOGI("row:%{public}d", row++);
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
-            MMI_HILOGD("preKey:%{public}d", prekey);
+            MMI_HILOGI("preKey:%{public}d", prekey);
         }
-        MMI_HILOGD("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
+        MMI_HILOGI("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
                    " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
                    shortcutKey.keyDownDuration, shortcutKey.triggerType,
                    shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
@@ -1258,15 +1258,15 @@ void KeyCommandHandler::Print()
 
 void KeyCommandHandler::PrintSeq()
 {
-    MMI_HILOGD("sequences count:%{public}zu", sequences_.size());
+    MMI_HILOGI("sequences count:%{public}zu", sequences_.size());
     int32_t row = 0;
     for (const auto &item : sequences_) {
-        MMI_HILOGD("row:%{public}d", row++);
+        MMI_HILOGI("row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
-        MMI_HILOGD("bundleName:%{public}s, abilityName:%{public}s",
+        MMI_HILOGI("bundleName:%{public}s, abilityName:%{public}s",
                    item.ability.bundleName.c_str(), item.ability.abilityName.c_str());
     }
 }
@@ -1685,7 +1685,7 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
     CHKPF(keyEvent);
     if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
         && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGD("Handle consumed key event, cancel opration");
+        MMI_HILOGI("Handle consumed key event, cancel opration");
         ResetCurrentLaunchAbilityKey();
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
@@ -1702,10 +1702,10 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     for (size_t i = keys_.size(); i > 0; --i) {
         if (keys_[i-1].keyCode == sequenceKey.keyCode) {
             if (keys_[i-1].keyAction == sequenceKey.keyAction) {
-                MMI_HILOGD("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
+                MMI_HILOGI("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
                 return true;
             }
-            MMI_HILOGD("Is not repeat key");
+            MMI_HILOGI("Is not repeat key");
             return false;
         }
     }
@@ -1803,38 +1803,38 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     }
 
     if (keysSize > sequenceKeysSize) {
-        MMI_HILOGD("The save sequence not matching ability sequence");
+        MMI_HILOGI("The save sequence not matching ability sequence");
         return false;
     }
 
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
-            MMI_HILOGD("The keyCode or keyAction not matching");
+            MMI_HILOGI("The keyCode or keyAction not matching");
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
         if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay >= delay)) {
-            MMI_HILOGD("Delay is not matching");
+            MMI_HILOGI("Delay is not matching");
             return false;
         }
     }
 
     if (keysSize == sequenceKeysSize) {
         if (sequence.abilityStartDelay == 0) {
-            MMI_HILOGD("Start launch ability immediately");
+            MMI_HILOGI("Start launch ability immediately");
             LaunchAbility(sequence);
             isLaunchAbility = true;
             return true;
         }
         sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
-            MMI_HILOGD("Timer callback");
+            MMI_HILOGI("Timer callback");
             LaunchAbility(sequence);
         });
         if (sequence.timerId < 0) {
             MMI_HILOGE("Add Timer failed");
             return false;
         }
-        MMI_HILOGD("Add timer success");
+        MMI_HILOGI("Add timer success");
         isLaunchAbility = true;
     }
     return true;
@@ -1884,12 +1884,12 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
-        MMI_HILOGD("Start launch ability immediately");
+        MMI_HILOGI("Start launch ability immediately");
         LaunchAbility(shortcutKey);
         return true;
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
-        MMI_HILOGD("Timer callback");
+        MMI_HILOGI("Timer callback");
         currentLaunchAbilityKey_ = shortcutKey;
         LaunchAbility(shortcutKey);
     });
@@ -1897,10 +1897,10 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
         MMI_HILOGE("Add Timer failed");
         return false;
     }
-    MMI_HILOGD("Add timer success");
+    MMI_HILOGI("Add timer success");
     lastMatchedKey_ = shortcutKey;
     if (InputHandler->GetSubscriberHandler()->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
-        MMI_HILOGD("current shortcutKey %{public}d is subSubcribed", shortcutKey.finalKey);
+        MMI_HILOGI("current shortcutKey %{public}d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
     return true;
@@ -1917,7 +1917,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (shortcutKey.keyDownDuration == 0) {
-        MMI_HILOGD("Start launch ability immediately");
+        MMI_HILOGI("Start launch ability immediately");
         LaunchAbility(shortcutKey);
         return true;
     }
@@ -1928,13 +1928,13 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     }
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
-    MMI_HILOGD("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
+    MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
     if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
-        MMI_HILOGD("Skip, upTime - downTime >= duration");
+        MMI_HILOGI("Skip, upTime - downTime >= duration");
         return false;
     }
-    MMI_HILOGD("Start launch ability immediately");
+    MMI_HILOGI("Start launch ability immediately");
     LaunchAbility(shortcutKey);
     return true;
 }
@@ -1948,7 +1948,7 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGD("timerId:%{public}d", timerId);
+    MMI_HILOGI("timerId:%{public}d", timerId);
     return false;
 }
 
@@ -1972,7 +1972,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     }
     DfxHisysevent::CalcComboStartTimes(delay);
     DfxHisysevent::ReportComboStartTimes();
-    MMI_HILOGD("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGI("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
@@ -1989,7 +1989,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     int32_t syncState = ACTIVE_EVENT;
     NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
     NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
-    MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 
 void KeyCommandHandler::LaunchAbility(const Ability &ability)
@@ -2007,7 +2007,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         want.SetParam(item.first, item.second);
     }
 
-    MMI_HILOGD("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGI("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
     if (ability.abilityType == EXTENSION_ABILITY) {
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
         if (err != ERR_OK) {
@@ -2020,7 +2020,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         }
     }
 
-    MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
@@ -2041,7 +2041,7 @@ void ShortcutKey::Print() const
     for (const auto &prekey: preKeys) {
         MMI_HILOGI("Eventkey matched, preKey:%{public}d", prekey);
     }
-    MMI_HILOGD("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
+    MMI_HILOGI("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
 }
 
@@ -2054,7 +2054,7 @@ void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
             TimerMgr->RemoveTimer(item);
         }
         specialTimers_.erase(keyCode);
-        MMI_HILOGD("Remove timer success");
+        MMI_HILOGI("Remove timer success");
     }
 }
 
