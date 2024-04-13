@@ -332,6 +332,7 @@ ohos_unittest("ut-mmi-service-out") {
     "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
+    "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
 
@@ -350,6 +351,7 @@ ohos_unittest("ut-mmi-service-out") {
   ]
 
   external_deps = [
+    "ability_runtime:dataobs_manager",
     "c_utils:utils",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
