@@ -136,7 +136,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(), session->GetPid());
+        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
+            static_cast<uint32_t>(session->GetPid()));
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
