@@ -1158,7 +1158,7 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
-    MMI_HILOGI("visible:%{public}s", visible ? "true" : "false");
+    MMI_HILOGI("pid:%{public}d,visible:%{public}s", pid, visible ? "true" : "false");
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
