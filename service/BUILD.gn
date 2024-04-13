@@ -291,6 +291,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
+    "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/dfx/include",
@@ -314,6 +315,7 @@ ohos_unittest("ut-mmi-service-out") {
 
   sources = [
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
+    "connect_manager/test/multimodal_input_connect_stub_test.cpp",
     "dfx/test/dfx_hisysevent_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
@@ -339,6 +341,11 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   deps = [
