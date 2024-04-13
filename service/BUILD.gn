@@ -327,6 +327,7 @@ ohos_unittest("ut-mmi-service-out") {
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
     "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
     "subscriber/test/key_subscriber_handler_test.cpp",
+    "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
     "touch_event_normalize/test/touch_event_normalize_test.cpp",
     "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
     "window_manager/test/input_display_bind_helper_test.cpp",
