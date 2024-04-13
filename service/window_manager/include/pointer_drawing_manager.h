@@ -81,7 +81,7 @@ public:
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
     std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
-    bool UseMagicCursor();
+    bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -142,7 +142,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
-    isMagicCursor useMagicCursor_;
+    isMagicCursor hasMagicCursor_;
 };
 } // namespace MMI
 } // namespace OHOS
