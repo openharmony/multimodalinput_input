@@ -20,6 +20,7 @@
 #include "mouse_transform_processor.h"
 #include "window_info.h"
 #include "mouse_device_state.h"
+#include "app_debug_info.h"
 
 namespace OHOS {
 namespace MMI {
