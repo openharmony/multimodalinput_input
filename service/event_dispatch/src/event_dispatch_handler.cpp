@@ -111,7 +111,6 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
         MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
-        DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
