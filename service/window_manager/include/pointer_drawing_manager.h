@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,10 +32,16 @@
 #include "device_observer.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
+#include "setting_observer.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
+struct isMagicCursor {
+    std::string name;
+    bool isShow { false };
+};
+
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
@@ -75,9 +81,10 @@ public:
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
     std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
-    bool UseMgaicCursor();
+    bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
 private:
+    IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
@@ -103,6 +110,8 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void CreatePointerSwiftObserver(isMagicCursor& item);
+    int32_t GetIndependentPixels();
 
 private:
     struct PidInfo {
@@ -133,6 +142,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
+    isMagicCursor hasMagicCursor_;
 };
 } // namespace MMI
 } // namespace OHOS
