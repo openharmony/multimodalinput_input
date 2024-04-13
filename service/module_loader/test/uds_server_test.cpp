@@ -124,8 +124,17 @@ HWTEST_F(UDSServerTest, GetSession_003, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, UdsStop_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
-    UDS_server.UdsStop();
+    UDSServer udsServer;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t serverFd = 1;
+    int32_t toReturnClientFd = 1;
+    int32_t tokenType = 1;
+    
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.UdsStop();
 }
 
 /**
@@ -136,11 +145,20 @@ HWTEST_F(UDSServerTest, UdsStop_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, GetClientPid_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t fd = 1;
-    int32_t pid = 0;
-    pid = UDS_server.GetClientPid(fd);
-    EXPECT_EQ(pid, INVALID_PID);
+    int32_t pid1 = 0;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t serverFd = 1;
+    int32_t toReturnClientFd = 1;
+    int32_t tokenType = 1;
+        
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    pid1 = udsServer.GetClientPid(fd);
+    EXPECT_EQ(pid1, INVALID_PID);
 }
 
 /**
@@ -151,7 +169,7 @@ HWTEST_F(UDSServerTest, GetClientPid_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, AddSocketPairInfo_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     const std::string programName = "program";
     const int32_t moduleType = 1;
     const int32_t uid = 2;
@@ -160,7 +178,8 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_001, TestSize.Level1)
     int32_t toReturnClientFd = 1;
     int32_t tokenType = 1;
     int32_t ret = 0;
-    ret = UDS_server.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    
+    ret = udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -172,12 +191,18 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, SetFdProperty_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t ret = RET_ERR;
     int32_t tokenType = TokenType::TOKEN_NATIVE;
     int32_t serverFd = 1;
-    int32_t toReturnClientFd = 2;
-    ret = UDS_server.SetFdProperty(tokenType, serverFd, toReturnClientFd);
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -189,12 +214,18 @@ HWTEST_F(UDSServerTest, SetFdProperty_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, SetFdProperty_002, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t ret = RET_ERR;
     int32_t tokenType = TokenType::TOKEN_SHELL;
     int32_t serverFd = 1;
-    int32_t toReturnClientFd = 2;
-    ret = UDS_server.SetFdProperty(tokenType, serverFd, toReturnClientFd);
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -206,10 +237,19 @@ HWTEST_F(UDSServerTest, SetFdProperty_002, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, Dump_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t fd = 1;
     const std::vector<std::string> args = {"help"};
-    UDS_server.Dump(fd, args);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.Dump(fd, args);
 }
 
 /**
@@ -220,9 +260,18 @@ HWTEST_F(UDSServerTest, Dump_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, OnConnected_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     SessionPtr sess;
-    UDS_server.OnConnected(sess);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.OnConnected(sess);
 }
 
 /**
@@ -233,9 +282,18 @@ HWTEST_F(UDSServerTest, OnConnected_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, SetRecvFun_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     MsgServerFunCallback fun{ nullptr };
-    UDS_server.SetRecvFun(fun);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.SetRecvFun(fun);
 }
 
 /**
@@ -246,10 +304,19 @@ HWTEST_F(UDSServerTest, SetRecvFun_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, ReleaseSession_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t fd = 1;
     epoll_event ev;
-    UDS_server.ReleaseSession(fd, ev);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.ReleaseSession(fd, ev);
 }
 
 /**
@@ -260,11 +327,20 @@ HWTEST_F(UDSServerTest, ReleaseSession_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, OnEpollRecv_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t size = 100;
     epoll_event ev;
-    int32_t fd = epoll_create(size);
-    UDS_server.OnEpollRecv(fd, ev);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    int32_t fd = epoll_create(size);    
+    udsServer.OnEpollRecv(fd, ev);
 }
 
 /**
@@ -275,10 +351,19 @@ HWTEST_F(UDSServerTest, OnEpollRecv_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, OnEpollRecv_002, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     epoll_event ev;
-    int32_t fd = -1;
-    UDS_server.OnEpollRecv(fd, ev);
+    int32_t fd = -1;  
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.OnEpollRecv(fd, ev);
 }
 
 /**
@@ -289,10 +374,19 @@ HWTEST_F(UDSServerTest, OnEpollRecv_002, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, AddEpollEvent_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     std::shared_ptr<mmi_epoll_event> epollEvent=std::make_shared<mmi_epoll_event>();
-    int32_t fd = 1;
-    UDS_server.AddEpollEvent(fd, epollEvent);
+    int32_t fd = 1;  
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.AddEpollEvent(fd, epollEvent);
 }
 
 /**
@@ -303,9 +397,18 @@ HWTEST_F(UDSServerTest, AddEpollEvent_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, DumpSession_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     const std::string title = "test_title";
-    UDS_server.DumpSession(title);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.DumpSession(title);
 }
 
 /**
@@ -316,15 +419,19 @@ HWTEST_F(UDSServerTest, DumpSession_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, AddSession_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     SessionPtr sess = nullptr;
-    const std::string programName = "test";
-    const int32_t moduleType = 1;
+    int32_t tokenType = TokenType::TOKEN_SHELL;
     int32_t serverFd = 1;
-    const int32_t uid = 3;
-    const int32_t pid = 5;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
-    UDS_server.AddSession(sess);
+    udsServer.AddSession(sess);
 }
 
 /**
@@ -335,9 +442,18 @@ HWTEST_F(UDSServerTest, AddSession_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, DelSession_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t fd = -1;
-    UDS_server.DelSession(fd);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.DelSession(fd);
 }
 
 /**
@@ -348,9 +464,18 @@ HWTEST_F(UDSServerTest, DelSession_001, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, DelSession_002, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     int32_t fd = 1;
-    UDS_server.DelSession(fd);
+    int32_t tokenType = TokenType::TOKEN_SHELL;
+    int32_t serverFd = 1;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    udsServer.DelSession(fd);
 }
 
 /**
@@ -361,15 +486,19 @@ HWTEST_F(UDSServerTest, DelSession_002, TestSize.Level1)
  */
 HWTEST_F(UDSServerTest, NotifySessionDeleted_001, TestSize.Level1)
 {
-    UDSServer UDS_server;
+    UDSServer udsServer;
     SessionPtr sess = nullptr;
-    const std::string programName = "test";
-    const int32_t moduleType = 1;
+    int32_t tokenType = TokenType::TOKEN_SHELL;
     int32_t serverFd = 1;
-    const int32_t uid = 3;
-    const int32_t pid = 5;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t toReturnClientFd = 1;
+     
+    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
-    UDS_server.NotifySessionDeleted(sess);
+    udsServer.NotifySessionDeleted(sess);
 }
 } // namespace MMI
 } // namespace OHOS
