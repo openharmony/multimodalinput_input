@@ -17,7 +17,6 @@
 #include <libinput.h>
 
 #include "multimodal_input_connect_stub.h"
-#include "mmi_service.h"
 
 namespace OHOS {
 namespace MMI {
