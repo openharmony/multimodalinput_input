@@ -303,7 +303,7 @@ void EventResample::UpdateTouchState(MotionEvent &event)
             if (idx < 0) {
                 TouchState newState;
                 touchStates_.push_back(newState);
-                idx = touchStates_.size() - 1;
+                idx = static_cast<ssize_t>(touchStates_.size() - 1);
             }
             TouchState& touchState = touchStates_.at(idx);
             touchState.Initialize(deviceId, source);
