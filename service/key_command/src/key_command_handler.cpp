@@ -48,6 +48,7 @@ constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
+constexpr int32_t KNUCKLE_KNOCKS = 1;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
@@ -984,6 +985,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     if (size == SINGLE_KNUCKLE_SIZE) {
         SingleKnuckleGestureProcesser(touchEvent);
         isDoubleClick_ = false;
+        knuckleCount_++;
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         DoubleKnuckleGestureProcesser(touchEvent);
         isDoubleClick_ = true;
@@ -1043,17 +1045,21 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
     if (isTimeIntervalReady && isDistanceReady) {
         MMI_HILOGI("knuckle gesture start launch ability");
+        knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
         LaunchAbility(knuckleGesture.ability, 0);
         knuckleGesture.state = true;
         ReportKnuckleScreenCapture(touchEvent);
     } else {
-        MMI_HILOGW("time ready:%{public}d, distance ready:%{public}d", isTimeIntervalReady, isDistanceReady);
-        if (!isTimeIntervalReady) {
-            DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
-        }
-        if (!isDistanceReady) {
-            DfxHisysevent::ReportFailIfInvalidDistance(touchEvent, downToPrevDownDistance);
+        if (knuckleCount_ > KNUCKLE_KNOCKS) {
+            knuckleCount_ = 0;
+            MMI_HILOGW("time ready:%{public}d, distance ready:%{public}d", isTimeIntervalReady, isDistanceReady);
+            if (!isTimeIntervalReady) {
+                DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
+            }
+            if (!isDistanceReady) {
+                DfxHisysevent::ReportFailIfInvalidDistance(touchEvent, downToPrevDownDistance);
+            }
         }
     }
     AdjustTimeIntervalConfigIfNeed(intervalTime);
