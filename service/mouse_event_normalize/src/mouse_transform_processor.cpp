@@ -87,9 +87,11 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         libinput_event_pointer_get_dy_unaccelerated(data)};
     auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_EMULATOR
     if (displayInfo->displayDirection == DIRECTION0) {
         CalculateOffset(displayInfo->direction, offset);
     }
+#endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {

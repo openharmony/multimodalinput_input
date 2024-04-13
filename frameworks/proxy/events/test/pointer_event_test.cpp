@@ -715,6 +715,51 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetShortAxis_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: PointerEventTest_GetPointerCount_001
+ * @tc.desc: Get pointer count
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetPointerCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerCount = pointerEvent->GetPointerCount();
+    ASSERT_EQ(pointerCount, 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetExtraData_001
+ * @tc.desc: Set extra data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const uint32_t length = 5;
+    std::shared_ptr<const uint8_t[]> data;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetExtraData(data, length);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetExtraData_001
+ * @tc.desc: Get extra data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    std::shared_ptr<const uint8_t[]> retrievedData;
+    uint32_t retrievedLength;
+    inputEvent->GetExtraData(retrievedData, retrievedLength);
+}
+
+/**
  * @tc.name: PointerEventTest_SetRawDx_001
  * @tc.desc: Sets the raw X coordinate.
  * @tc.type: FUNC

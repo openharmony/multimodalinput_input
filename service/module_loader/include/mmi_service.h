@@ -92,12 +92,12 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     int32_t SubscribeSwitchEvent(int32_t subscribeId) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
@@ -130,13 +130,15 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
+    int32_t Authorize(bool isAuthorize) override;
+    int32_t CancelInjection() override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
-    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent);
-    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 protected:
@@ -178,12 +180,12 @@ protected:
         int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
-    int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+    int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
@@ -200,8 +202,11 @@ protected:
     void AddAppDebugListener();
     void RemoveAppDebugListener();
     int32_t UpdateCombineKeyState(bool enable);
+    int32_t OnAuthorize(bool isAuthorize);
+    int32_t OnCancelInjection();
 
 private:
+    int32_t CheckPidPermission(int32_t pid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     bool isCesStart_ { false };

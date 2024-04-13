@@ -116,7 +116,7 @@ std::string WatchdogTask::GetSelfProcName()
     fin.close();
 
     std::string ret = std::string(readStr);
-    ret.erase(std::remove_if(ret.begin(), ret.end(), [](unsigned char c) {
+    auto comparisonFun = [](unsigned char c) {
         if (c >= '0' && c <= '9') {
             return false;
         }
@@ -129,7 +129,9 @@ std::string WatchdogTask::GetSelfProcName()
         if (c == '.' || c == '-' || c == '_') {
             return false;
         }
-        return true;}), ret.end());
+        return true;
+    };
+    ret.erase(std::remove_if(ret.begin(), ret.end(), comparisonFun), ret.end());
     return ret;
 }
 

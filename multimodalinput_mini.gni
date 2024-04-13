@@ -39,6 +39,7 @@ declare_args() {
   input_ext_feature_anco = false
   input_ext_feature_fingersense = false
   input_feature_fingerprint = false
+  input_ext_feature_magiccursor = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -103,6 +104,7 @@ declare_args() {
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
+    "message_handle/src/authorization_dialog.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
@@ -206,6 +208,7 @@ declare_args() {
     "src/virtual_knob_mouse.cpp",
     "src/virtual_knob_sys_ctrl.cpp",
     "src/virtual_mouse.cpp",
+    "src/virtual_pc_touchpad.cpp",
     "src/virtual_pen.cpp",
     "src/virtual_pen_keyboard.cpp",
     "src/virtual_pen_mouse.cpp",
@@ -321,4 +324,12 @@ if (input_ext_feature_anco) {
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]
+}
+
+if (input_ext_feature_magiccursor) {
+  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
+  g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
+  libmmi_service_sources +=
+      [ "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp" ]
 }

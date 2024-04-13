@@ -85,12 +85,12 @@ public:
         uint32_t deviceTags);
     int32_t MarkEventConsumed(int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t SubscribeSwitchEvent(int32_t subscribeId);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
@@ -119,6 +119,8 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+    int32_t Authorize(bool isAuthorize);
+    int32_t CancelInjection();
 
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);

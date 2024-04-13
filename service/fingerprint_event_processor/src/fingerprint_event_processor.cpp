@@ -21,9 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "FingerprintEventProcessor"};
 }
@@ -57,7 +55,8 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
     return true;
 }
 
-int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event* event) {
+int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event* event)
+{
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
@@ -85,6 +84,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
         return ERR_OK;
     }
     auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     switch (key) {
         case FINGERPRINT_CODE_DOWN: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN);
@@ -99,7 +99,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
             break;
         }
         default:
-            MMI_HILOGE("wrong key event : %{public}d", key);
+            MMI_HILOGW("unknown key event : %{public}d", key);
             return UNKNOWN_EVENT;
     }
     int64_t time = GetSysClockTime();
@@ -119,6 +119,7 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     double ux = libinput_event_pointer_get_dx_unaccelerated(rawPointerEvent);
     double uy = libinput_event_pointer_get_dy_unaccelerated(rawPointerEvent);
     auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE);

@@ -89,12 +89,12 @@ public:
         int32_t priority, uint32_t deviceTags) = 0;
     virtual int32_t MarkEventConsumed(int32_t eventId) = 0;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) = 0;
-    virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) = 0;
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t SubscribeSwitchEvent(int32_t subscribeId) = 0;
     virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
-    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
+    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) = 0;
@@ -127,6 +127,8 @@ public:
     virtual int32_t SetShieldStatus(int32_t shieldMode, bool isShield) = 0;
     virtual int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) = 0;
     virtual int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) = 0;
+    virtual int32_t Authorize(bool isAuthorize) = 0;
+    virtual int32_t CancelInjection() = 0;
 };
 } // namespace MMI
 } // namespace OHOS

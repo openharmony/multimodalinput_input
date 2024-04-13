@@ -363,7 +363,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_)
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-      , fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_)
+, fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_)
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
       {}
 
@@ -479,6 +479,11 @@ void PointerEvent::RemovePointerItem(int32_t pointerId)
     }
 }
 
+void PointerEvent::RemoveAllPointerItems()
+{
+    pointers_.clear();
+}
+
 void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 {
     if (pointers_.size() >= MAX_N_POINTER_ITEMS) {
@@ -546,6 +551,11 @@ std::vector<int32_t> PointerEvent::GetPointerIds() const
         pointerIdList.push_back(item.GetPointerId());
     }
     return pointerIdList;
+}
+
+std::list<PointerEvent::PointerItem> PointerEvent::GetAllPointerItems() const
+{
+    return pointers_;
 }
 
 int32_t PointerEvent::GetSourceType() const

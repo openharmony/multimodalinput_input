@@ -42,18 +42,20 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
-    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t SubscribeSwitchEvent(int32_t subscribeId);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t Authorize(bool isAuthorize);
+    int32_t CancelInjection();
 
 private:
     MMIClientPtr client_ { nullptr };
