@@ -878,7 +878,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     }
     MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMgaicCursor()) {
+    if (HasMagicCursor()) {
         ret = MAGIC_CURSOR->SetPointerColor(color);
     } else {
         ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
