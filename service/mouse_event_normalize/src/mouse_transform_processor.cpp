@@ -93,7 +93,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
-        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+        ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
     } else {
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
