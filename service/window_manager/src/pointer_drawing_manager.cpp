@@ -73,6 +73,7 @@ constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
+constexpr int32_t MAX_WINDOWID = 500;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -1251,9 +1252,26 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
     return RET_OK;
 }
 
+bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (windowId < -1 || windowId > MAX_WINDOWID) {
+        return false;
+    }
+    if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
+        pointerStyle.id > MOUSE_ICON::RUNNING_RIGHT) {
+        return false;
+    }
+    return true;
+}
+
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if (!CheckPointerStyleParam(windowId, pointerStyle)) {
+        MMI_HILOGE("PointerStyle param is invalid");
+        return RET_ERR;
+    }
     if (windowId == GLOBAL_WINDOW_ID) {
         int32_t ret = SetPointerStylePreference(pointerStyle);
         if (ret != RET_OK) {
