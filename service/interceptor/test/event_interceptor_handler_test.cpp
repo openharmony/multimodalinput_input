@@ -46,7 +46,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_001, TestSize
 {
     EventInterceptorHandler handler;
     std::shared_ptr<KeyEvent>event = KeyEvent::Create();
-    handler.HandleKeyEvent(event);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
 }
 
 /**
@@ -59,7 +59,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_002, TestSize
 {
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
-    handler.HandlePointerEvent(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
 }
 
 /**
@@ -72,7 +72,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_003, TestSize
 {
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
-    handler.HandleTouchEvent(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchEvent(pointerEvent));
 }
 
 /**
@@ -110,7 +110,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_006, TestSize.Level1)
 {
     EventInterceptorHandler handler;
-    handler.InitSessionLostCallback();
+    ASSERT_NO_FATAL_FAILURE(handler.InitSessionLostCallback());
 }
 
 /**
