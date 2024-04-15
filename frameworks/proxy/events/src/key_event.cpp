@@ -781,6 +781,7 @@ const int32_t KeyEvent::KEYCODE_WLAN = 2844;
 const int32_t KeyEvent::KEYCODE_UWB = 2845;
 const int32_t KeyEvent::KEYCODE_WWAN_WIMAX = 2846;
 const int32_t KeyEvent::KEYCODE_RFKILL = 2847;
+const int32_t KeyEvent::KEYCODE_STYLUS_SCREEN = 2849;
 const int32_t KeyEvent::KEYCODE_CHANNEL = 3001;
 const int32_t KeyEvent::KEYCODE_BTN_0 = 3100;
 const int32_t KeyEvent::KEYCODE_BTN_1 = 3101;
