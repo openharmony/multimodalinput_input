@@ -610,7 +610,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SkipFinalKey, TestSize.Lev
     KeyCommandHandler handler;
     int32_t keyCode = 1024;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    CHKPV(keyEvent);
+    ASSERT_NE(keyEvent, nullptr);
     ASSERT_FALSE(handler.SkipFinalKey(keyCode, keyEvent));
 }
 
@@ -639,7 +639,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetKeyDownDurationFromXml,
 {
     CALL_DEBUG_ENTER;
     KeyCommandHandler handler;
-    std::string businessId = "aaa";
+    std::string businessId = "power";
     int32_t ret = handler.GetKeyDownDurationFromXml(businessId);
     ASSERT_EQ(ret, ERROR_DELAY_VALUE);
 }
@@ -656,7 +656,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_001, TestSize.
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    CHKPV(keyEvent);
+    ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 0;
     ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
@@ -673,7 +673,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_002, TestSize.
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    CHKPV(keyEvent);
+    ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 1;
     ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
@@ -691,7 +691,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_003, TestSize.
     ShortcutKey shortcutKey;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     KeyEvent::KeyItem item;
-    CHKPV(keyEvent);
+    ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 1;
     item.SetKeyCode(KeyEvent::KEYCODE_H);
     keyEvent->AddKeyItem(item);
@@ -713,7 +713,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_004, TestSize.
     ShortcutKey shortcutKey;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     KeyEvent::KeyItem item;
-    CHKPV(keyEvent);
+    ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 10;
     item.SetKeyCode(KeyEvent::KEYCODE_H);
     keyEvent->AddKeyItem(item);
