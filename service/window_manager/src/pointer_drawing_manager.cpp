@@ -1028,14 +1028,19 @@ void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
     pid_ = info.windowPid;
 }
 
-void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible,
+    bool isHotPlug)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
-        SetPointerVisible(getpid(), isPointerVisible && IsPointerVisible());
+        bool pointerVisible = isPointerVisible;
+        if (!isHotPlug) {
+            pointerVisible = (pointerVisible && IsPointerVisible());
+        }
+        SetPointerVisible(getpid(), pointerVisible);
     } else {
         DeletePointerVisible(getpid());
     }

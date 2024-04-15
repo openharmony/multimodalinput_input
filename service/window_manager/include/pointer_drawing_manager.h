@@ -58,7 +58,7 @@ public:
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
-    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) override;
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
