@@ -437,7 +437,8 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
 
     pointerEvent_->SetFingerCount(fingerCount);
     pointerEvent_->SetDeviceId(deviceId_);
-    pointerEvent_->SetTargetDisplayId(0);
+    auto mouseInfo = WinMgr->GetMouseInfo();
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(defaultPointerId);
     pointerEvent_->SetPointerAction(action);
