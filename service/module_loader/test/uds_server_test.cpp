@@ -500,5 +500,261 @@ HWTEST_F(UDSServerTest, NotifySessionDeleted_001, TestSize.Level1)
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     udsServer.NotifySessionDeleted(sess);
 }
+
+/**
+ * @tc.name: GetClientPid_002
+ * @tc.desc: Test the function GetClientPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, GetClientPid_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 1;
+    auto ret = udsServer.GetClientPid(fd);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: AddSocketPairInfo_002
+ * @tc.desc: Test the function AddSocketPairInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    const std::string programName = "program";
+    const int32_t moduleType = 1;
+    const int32_t uid = 2;
+    const int32_t pid = 10;
+    int32_t serverFd = -1;
+    int32_t toReturnClientFd = -1;
+    int32_t tokenType = 1;
+    auto ret = udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: SetFdProperty_003
+ * @tc.desc: Test the function SetFdProperty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetFdProperty_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t tokenType = TokenType::TOKEN_NATIVE;
+    int32_t serverFd = -1;
+    int32_t toReturnClientFd = -1;
+    auto ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: Dump_002
+ * @tc.desc: Test the function Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, Dump_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 1;
+    const std::vector<std::string> args = {"help"};
+    ASSERT_NO_FATAL_FAILURE(udsServer.Dump(fd, args));
+}
+
+/**
+ * @tc.name: OnConnected_002
+ * @tc.desc: Test the function OnConnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnConnected_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    SessionPtr sess = nullptr;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnConnected(sess));
+}
+
+/**
+ * @tc.name: OnDisconnected_001
+ * @tc.desc: Test the function OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnDisconnected_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    SessionPtr sess = nullptr;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnDisconnected(sess));
+}
+
+/**
+ * @tc.name: AddEpoll_001
+ * @tc.desc: Test the function AddEpoll
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddEpoll_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    EpollEventType type = EPOLL_EVENT_BEGIN;
+    int32_t fd = 1;
+    auto ret = udsServer.AddEpoll(type, fd);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: SetRecvFun_002
+ * @tc.desc: Test the function SetRecvFun
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, SetRecvFun_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    MsgServerFunCallback fun{ nullptr };
+    ASSERT_NO_FATAL_FAILURE(udsServer.SetRecvFun(fun));
+}
+
+/**
+ * @tc.name: ReleaseSession_002
+ * @tc.desc: Test the function ReleaseSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, ReleaseSession_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 1;
+    epoll_event ev;
+    ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
+}
+
+/**
+ * @tc.name: OnPacket_001
+ * @tc.desc: Test the function OnPacket
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnPacket_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    MmiMessageId msgId = MmiMessageId::INVALID;
+    NetPacket pkt(msgId);
+    int32_t fd = 1;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnPacket(fd, pkt));
+}
+
+/**
+ * @tc.name: OnEpollRecv_003
+ * @tc.desc: Test the function OnEpollRecv
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnEpollRecv_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = -1;
+    epoll_event ev;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnEpollRecv(fd, ev));
+}
+
+/**
+ * @tc.name: OnEpollEvent_001
+ * @tc.desc: Test the function OnEpollEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, OnEpollEvent_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    epoll_event ev;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnEpollEvent(ev));
+}
+
+/**
+ * @tc.name: AddEpollEvent_002
+ * @tc.desc: Test the function AddEpollEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddEpollEvent_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 1;
+    std::shared_ptr<mmi_epoll_event> epollEvent=std::make_shared<mmi_epoll_event>();
+    ASSERT_NO_FATAL_FAILURE(udsServer.AddEpollEvent(fd, epollEvent));
+}
+
+/**
+ * @tc.name: RemoveEpollEvent_001
+ * @tc.desc: Test the function RemoveEpollEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, RemoveEpollEvent_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 1;
+    ASSERT_NO_FATAL_FAILURE(udsServer.RemoveEpollEvent(fd));
+}
+
+/**
+ * @tc.name: DumpSession_002
+ * @tc.desc: Test the function DumpSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, DumpSession_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    const std::string title = "test_title";
+    ASSERT_NO_FATAL_FAILURE(udsServer.DumpSession(title));
+}
+
+/**
+ * @tc.name: AddSession_002
+ * @tc.desc: Test the function AddSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, AddSession_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    SessionPtr sess = nullptr;
+    bool ret = udsServer.AddSession(sess);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DelSession_003
+ * @tc.desc: Test the function DelSession
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, DelSession_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = -1;
+    ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fd));
+    int32_t fds = 1;
+    ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fds));
+}
+
+/**
+ * @tc.name: NotifySessionDeleted_002
+ * @tc.desc: Test the function NotifySessionDeleted
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, NotifySessionDeleted_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    SessionPtr ses = nullptr;
+    ASSERT_NO_FATAL_FAILURE(udsServer.NotifySessionDeleted(ses));
+}
 } // namespace MMI
 } // namespace OHOS
