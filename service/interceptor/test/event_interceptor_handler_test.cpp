@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <fstream>
 
+#include <gtest/gtest.h>
 #include "mmi_log.h"
 #include "uds_server.h"
 
