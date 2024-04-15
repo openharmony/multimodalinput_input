@@ -129,7 +129,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_007, TestSize
 
 /**
  * @tc.name: EventInterceptorHandler_Test_008
- * @tc.desc: Test the function HandleEvent
+ * @tc.desc: Test the function CheckInputDeviceSource
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -148,10 +148,8 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize
     EXPECT_TRUE(ret);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    deviceTags = 2;
     ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 }
-
 } // namespace MMI
 } // namespace OHOS
