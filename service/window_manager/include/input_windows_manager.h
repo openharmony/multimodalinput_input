@@ -18,19 +18,20 @@
 
 #include <vector>
 
-#include "extra_data.h"
 #include "libinput.h"
 #include "nocopyable.h"
+#include "pixel_map.h"
 #include "singleton.h"
 
-#include "window_info.h"
-#include "window_manager.h"
+#include "extra_data.h"
 #include "input_display_bind_helper.h"
-#include "input_event_data_transformation.h"
 #include "input_event.h"
-#include "pixel_map.h"
+#include "input_event_data_transformation.h"
+#include "knuckle_drawing_manager.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "window_info.h"
+#include "window_manager.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -260,6 +261,7 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

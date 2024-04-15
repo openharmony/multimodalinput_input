@@ -84,6 +84,7 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
     "${graphics_path}/2d_graphics/include",
+    "${graphics_path}/render_service_client/core",
   ]
 
   if (input_ext_feature_anco) {
@@ -349,6 +350,7 @@ ohos_unittest("ut-mmi-service-out") {
 
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
