@@ -79,9 +79,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdatePointerDevice_
 {
     PointerDrawingManager pointerDrawingManager;
     EXPECT_EQ(pointerDrawingManager.pidInfos_.size(), 0);
-    pointerDrawingManager.UpdatePointerDevice(true, true);
+    pointerDrawingManager.UpdatePointerDevice(true, true, true);
     EXPECT_EQ(pointerDrawingManager.pidInfos_.size(), 1);
-    pointerDrawingManager.UpdatePointerDevice(false, true);
+    pointerDrawingManager.UpdatePointerDevice(false, true, true);
     EXPECT_EQ(pointerDrawingManager.pidInfos_.size(), 0);
 }
 
