@@ -110,6 +110,8 @@ private:
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetTargetDisplayId(),
             event->GetTargetWindowId(), isSimulate.c_str());
+        MMI_HILOGI("DisplayXPos:%{public}f, DisplayYPos:%{public}f, WindowXPos:%{public}f, WindowYPos::%{public}f",
+            GetDisplayXPos(), GetDisplayYPos(), GetWindowXPos(), GetWindowYPos());
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
