@@ -1031,6 +1031,8 @@ void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
+        hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
         SetPointerVisible(getpid(), isPointerVisible && IsPointerVisible());
