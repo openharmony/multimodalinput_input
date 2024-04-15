@@ -323,6 +323,7 @@ ohos_unittest("ut-mmi-service-out") {
     "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
+    "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
