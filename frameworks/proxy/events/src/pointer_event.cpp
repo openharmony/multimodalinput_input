@@ -479,6 +479,14 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
         MMI_HILOGE("Exceed maximum allowed number of pointer items");
         return;
     }
+    int32_t pointerId = pointerItem.GetPointerId();
+    for (auto &item : pointers_) {
+        if (item.GetPointerId() == pointerId) {
+            item = pointerItem;
+            MMI_HILOGI("Pointer:%{public}d is already exists", pointerId);
+            return;
+        }
+    }
     pointers_.push_back(pointerItem);
 }
 
@@ -490,7 +498,7 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
-    MMI_HILOGI("Pointer id is not found");
+    MMI_HILOGI("Pointer:%{public}d is not found", pointerId);
     AddPointerItem(pointerItem);
 }
 
