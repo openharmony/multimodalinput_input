@@ -81,8 +81,7 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
         startPos += GetObject<int32_t>(data + startPos, size - startPos, temp);
         pointerChangeAreasInfos.push_back(temp);
     }
-    windowInfo.pointerHotAreas = pointerChangeAreasInfos;
-
+    windowInfo.pointerChangeAreas = pointerChangeAreasInfos;
     std::vector<float> transformInfos;
     for (size_t j = 0; j < WindowInfo::WINDOW_TRANSFORM_SIZE; ++j) {
         float temp = 0;
