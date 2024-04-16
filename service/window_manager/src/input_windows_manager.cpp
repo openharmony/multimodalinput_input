@@ -1880,6 +1880,15 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
+{
+    if ((flag & WindowInfo::FLAG_BIT_HANDWRITING) == WindowInfo::FLAG_BIT_HANDWRITING
+        && toolType == PointerEvent::TOOL_TYPE_FINGER) {
+        return true;
+    }
+    return false;
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -1925,6 +1934,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (checkWindow) {
             MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
+        if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             continue;
         }
 
