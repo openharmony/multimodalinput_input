@@ -110,8 +110,6 @@ private:
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetTargetDisplayId(),
             event->GetTargetWindowId(), isSimulate.c_str());
-        MMI_HILOGI("DisplayXPos:%{public}f, DisplayYPos:%{public}f, WindowXPos:%{public}f, WindowYPos::%{public}f",
-            GetDisplayXPos(), GetDisplayYPos(), GetWindowXPos(), GetWindowYPos());
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
@@ -119,10 +117,12 @@ private:
                 return;
             }
             MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
-                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,"
-                "ShortAxis:%{public}d,WindowId:%{public}d",
-                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId());
+                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,"
+                "WindowId:%{public}d,DisplayXPos:%{public}f,DisplayYPos:%{public}f,WindowXPos:%{public}f,"
+                "WindowYPos::%{public}f",
+                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),item.GetDisplayY(),
+                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
