@@ -37,8 +37,10 @@ constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
+constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
+const std::string EXTENSION_ABILITY = "extensionAbility";
 } // namespace
 class KeyCommandHandlerTest : public testing::Test {
 public:
@@ -594,6 +596,188 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_001,
     handler.twoFingerGesture_.abilityStartDelay = 1000;
     handler.StartTwoFingerGesture();
     ASSERT_NE(-1, handler.twoFingerGesture_.timerId);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SkipFinalKey
+ * @tc.desc: Skip Final Key
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SkipFinalKey, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    int32_t keyCode = 1024;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_FALSE(handler.SkipFinalKey(keyCode, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown
+ * @tc.desc: Handle Key Down
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.keyDownDuration = 0;
+    ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_GetKeyDownDurationFromXml
+ * @tc.desc: GetKeyDownDurationFromXml
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetKeyDownDurationFromXml, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    std::string businessId = "power";
+    int32_t ret = handler.GetKeyDownDurationFromXml(businessId);
+    ASSERT_EQ(ret, ERROR_DELAY_VALUE);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyUp_001
+ * @tc.desc: HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    shortcutKey.keyDownDuration = 0;
+    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyUp_002
+ * @tc.desc: HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    shortcutKey.keyDownDuration = 1;
+    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyUp_003
+ * @tc.desc: HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    ASSERT_NE(keyEvent, nullptr);
+    shortcutKey.keyDownDuration = 1;
+    item.SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->SetActionTime(10000);
+    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyUp_004
+ * @tc.desc: HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    ASSERT_NE(keyEvent, nullptr);
+    shortcutKey.keyDownDuration = 10;
+    item.SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
+    keyEvent->SetActionTime(100);
+    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyCancel
+ * @tc.desc: HandleKeyCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyCancel, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.timerId = -1;
+    ASSERT_FALSE(handler.HandleKeyCancel(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchAbility_001
+ * @tc.desc: LaunchAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAbility_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    Ability ability;
+    ability.abilityType = EXTENSION_ABILITY;
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(ability));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchAbility_002
+ * @tc.desc: LaunchAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAbility_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_LaunchAbility_003
+ * @tc.desc: LaunchAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAbility_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(sequence));
 }
 } // namespace MMI
 } // namespace OHOS
