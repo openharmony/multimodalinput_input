@@ -221,6 +221,8 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
+    "src/virtual_fingerprint_key.cpp",
+    "src/virtual_fingerprint_mouse.cpp",
   ]
 
   libmmi_util_sources = [
