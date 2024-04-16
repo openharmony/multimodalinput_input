@@ -325,6 +325,7 @@ ohos_unittest("ut-mmi-service-out") {
     "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
+    "module_loader/test/mmi_service_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
@@ -360,10 +361,12 @@ ohos_unittest("ut-mmi-service-out") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
