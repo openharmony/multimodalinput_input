@@ -1797,8 +1797,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-    windowX = static_cast<int32_t>(windowXY.first);
-    windowY = static_cast<int32_t>(windowXY.second);
+    windowX = static_cast<int32_t>(windowX);
+    windowY = static_cast<int32_t>(windowY);
     pointerItem.SetWindowX(windowX);
     pointerItem.SetWindowY(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
