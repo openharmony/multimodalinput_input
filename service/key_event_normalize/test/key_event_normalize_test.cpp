@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#include <cstdio>
 #include <gtest/gtest.h>
-
 #include "libinput.h"
+
 #include "define_multimodal.h"
 #include "key_event_normalize.h"
 
