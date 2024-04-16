@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <gtest/gtest.h>
 #include "libinput.h"
 
