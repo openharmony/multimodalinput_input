@@ -524,10 +524,10 @@ HWTEST_F(UDSServerTest, GetClientPid_002, TestSize.Level1)
 HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
 {
     UDSServer udsServer;
-    const std::string programName = "program";
-    const int32_t moduleType = 1;
-    const int32_t uid = 2;
-    const int32_t pid = 10;
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t uid = 2;
+    int32_t pid = 10;
     int32_t serverFd = -1;
     int32_t toReturnClientFd = -1;
     int32_t tokenType = 1;
@@ -561,7 +561,7 @@ HWTEST_F(UDSServerTest, Dump_002, TestSize.Level1)
 {
     UDSServer udsServer;
     int32_t fd = 1;
-    const std::vector<std::string> args = {"help"};
+    std::vector<std::string> args = {"help"};
     ASSERT_NO_FATAL_FAILURE(udsServer.Dump(fd, args));
 }
 
@@ -588,6 +588,7 @@ HWTEST_F(UDSServerTest, OnDisconnected_001, TestSize.Level1)
 {
     UDSServer udsServer;
     SessionPtr sess = nullptr;
+    ASSERT_NO_FATAL_FAILURE(udsServer.OnConnected(sess));
     ASSERT_NO_FATAL_FAILURE(udsServer.OnDisconnected(sess));
 }
 
@@ -711,7 +712,7 @@ HWTEST_F(UDSServerTest, RemoveEpollEvent_001, TestSize.Level1)
 HWTEST_F(UDSServerTest, DumpSession_002, TestSize.Level1)
 {
     UDSServer udsServer;
-    const std::string title = "test_title";
+    std::string title = "test_title";
     ASSERT_NO_FATAL_FAILURE(udsServer.DumpSession(title));
 }
 
