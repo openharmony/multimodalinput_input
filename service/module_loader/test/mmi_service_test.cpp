@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,8 +45,8 @@ HWTEST_F(MMIServerTest, AddEpollAndDelEpoll_001, TestSize.Level1)
 {
     MMIService mmiService;
     int32_t fd = -1;
-    int32_t ret = RET_ERR;
-    ret = mmiService.AddEpoll(EPOLL_EVENT_INPUT, fd);
+
+    int32_t ret = mmiService.AddEpoll(EPOLL_EVENT_INPUT, fd);
     EXPECT_EQ(ret, RET_ERR);
     ret = mmiService.DelEpoll(EPOLL_EVENT_INPUT, fd);
     EXPECT_EQ(ret, RET_ERR);
@@ -95,8 +95,8 @@ HWTEST_F(MMIServerTest, InitLibinputService_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnStartAndOnStop_001, TestSize.Level1)
 {
     MMIService mmiService;
-    mmiService.OnStart();
-    mmiService.OnStop();
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnStart());
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnStop());
 }
 
 /**
@@ -108,8 +108,8 @@ HWTEST_F(MMIServerTest, OnStartAndOnStop_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, AddAppDebugListener_001, TestSize.Level1)
 {
     MMIService mmiService;
-    mmiService.AddAppDebugListener();
-    mmiService.RemoveAppDebugListener();
+    ASSERT_NO_FATAL_FAILURE(mmiService.AddAppDebugListener());
+    ASSERT_NO_FATAL_FAILURE(mmiService.RemoveAppDebugListener());
 }
 
 /**
@@ -126,7 +126,8 @@ HWTEST_F(MMIServerTest, AllocSocketFd_001, TestSize.Level1)
     int32_t toReturnClientFd = 1;
     int32_t tokenType = 1;
 
-    mmiService.AllocSocketFd(programName, moduleType, toReturnClientFd, tokenType);
+    int32_t ret = mmiService.AllocSocketFd(programName, moduleType, toReturnClientFd, tokenType);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -141,12 +142,11 @@ HWTEST_F(MMIServerTest, AddInputEventFilter_001, TestSize.Level1)
     int32_t filterId = 1;
     int32_t priority = 1;
     uint32_t deviceTags = 1;
-    int32_t ret = RET_ERR;
     int32_t returnCode0 = 65142804;
     int32_t returnCode = 65142786;
     sptr<IEventFilter> filter;
 
-    ret = mmiService.AddInputEventFilter(filter, filterId, priority, deviceTags);
+    int32_t ret = mmiService.AddInputEventFilter(filter, filterId, priority, deviceTags);
     EXPECT_EQ(ret, returnCode);
 
     ret = mmiService.RemoveInputEventFilter(filterId);
@@ -163,8 +163,8 @@ HWTEST_F(MMIServerTest, OnConnected_001, TestSize.Level1)
 {
     MMIService mmiService;
     SessionPtr session;
-    mmiService.OnConnected(session);
-    mmiService.OnDisconnected(session);
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnConnected(session));
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnDisconnected(session));
 }
 
 /**
@@ -178,12 +178,11 @@ HWTEST_F(MMIServerTest, SetCustomCursor_001, TestSize.Level1)
     MMIService mmiService;
     int32_t pid = 1;
     int32_t windowId = 1;
-    int32_t focusX = 200; 
+    int32_t focusX = 200;
     int32_t focusY = 500;
-    int32_t ret = RET_ERR;
     void* pixelMap = nullptr;
 
-    ret = mmiService.SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
+    int32_t ret = mmiService.SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -199,9 +198,8 @@ HWTEST_F(MMIServerTest, SetMouseIcon_001, TestSize.Level1)
     int32_t pid = 1;
     int32_t windowId = 1;
     void* pixelMap = nullptr;
-    int32_t ret = RET_ERR;
-
-    ret = mmiService.SetMouseIcon(pid, windowId, pixelMap);
+ 
+    int32_t ret = mmiService.SetMouseIcon(pid, windowId, pixelMap);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -218,9 +216,8 @@ HWTEST_F(MMIServerTest, SetMouseHotSpot_001, TestSize.Level1)
     int32_t windowId = 1;
     int32_t hotSpotX = 100;
     int32_t hotSpotY = 200;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    int32_t ret = mmiService.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -237,9 +234,8 @@ HWTEST_F(MMIServerTest, SetNapStatus_001, TestSize.Level1)
     int32_t uid = 2;
     std::string bundleName = "bundleName";
     int32_t napStatus = 1;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.SetNapStatus(pid, uid, bundleName, napStatus);
+    int32_t ret = mmiService.SetNapStatus(pid, uid, bundleName, napStatus);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -253,9 +249,8 @@ HWTEST_F(MMIServerTest, ReadMouseScrollRows_001, TestSize.Level1)
 {
     MMIService mmiService;
     int32_t rows = 1;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.ReadMouseScrollRows(rows);
+    int32_t ret = mmiService.ReadMouseScrollRows(rows);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -269,10 +264,9 @@ HWTEST_F(MMIServerTest, SetMousePrimaryButton_001, TestSize.Level1)
 {
     MMIService mmiService;
     int32_t primaryButton = 1;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142804;
 
-    ret = mmiService.SetMousePrimaryButton(primaryButton);
+    int32_t ret = mmiService.SetMousePrimaryButton(primaryButton);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -286,9 +280,8 @@ HWTEST_F(MMIServerTest, ReadMousePrimaryButton_001, TestSize.Level1)
 {
     MMIService mmiService;
     int32_t primaryButton = 1;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.ReadMousePrimaryButton(primaryButton);
+    int32_t ret = mmiService.ReadMousePrimaryButton(primaryButton);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -302,9 +295,8 @@ HWTEST_F(MMIServerTest, GetMousePrimaryButton_001, TestSize.Level1)
 {
     MMIService mmiService;
     int32_t primaryButton = 1;
-    int32_t ret = RET_ERR;
-
-    ret = mmiService.GetMousePrimaryButton(primaryButton);
+ 
+    int32_t ret = mmiService.GetMousePrimaryButton(primaryButton);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -318,9 +310,8 @@ HWTEST_F(MMIServerTest, CheckPointerVisible_001, TestSize.Level1)
 {
     MMIService mmiService;
     bool visible = true;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.CheckPointerVisible(visible);
+    int32_t ret = mmiService.CheckPointerVisible(visible);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -335,9 +326,8 @@ HWTEST_F(MMIServerTest, MarkProcessed_001, TestSize.Level1)
     MMIService mmiService;
     int32_t eventType = 1;
     int32_t eventId = 1;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.MarkProcessed(eventType, eventId);
+    int32_t ret = mmiService.MarkProcessed(eventType, eventId);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -351,9 +341,8 @@ HWTEST_F(MMIServerTest, ReadPointerColor_001, TestSize.Level1)
 {
     MMIService mmiService;
     int32_t color = 1;
-    int32_t ret = RET_ERR;
-
-    ret = mmiService.ReadPointerColor(color);
+ 
+    int32_t ret = mmiService.ReadPointerColor(color);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -366,9 +355,8 @@ HWTEST_F(MMIServerTest, ReadPointerColor_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, NotifyNapOnline_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
 
-    ret = mmiService.NotifyNapOnline();
+    int32_t ret = mmiService.NotifyNapOnline();
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -381,9 +369,8 @@ HWTEST_F(MMIServerTest, NotifyNapOnline_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, RemoveInputEventObserver_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
-
-    ret = mmiService.RemoveInputEventObserver();
+ 
+    int32_t ret = mmiService.RemoveInputEventObserver();
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -396,11 +383,10 @@ HWTEST_F(MMIServerTest, RemoveInputEventObserver_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, ClearWindowPointerStyle_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t pid = 1;
     int32_t windowId = 2;
 
-    ret = mmiService.ClearWindowPointerStyle(pid,windowId);
+    int32_t ret = mmiService.ClearWindowPointerStyle(pid, windowId);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -413,10 +399,9 @@ HWTEST_F(MMIServerTest, ClearWindowPointerStyle_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, ReadHoverScrollState_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     bool state = true;
 
-    ret = mmiService.ReadHoverScrollState(state);
+    int32_t ret = mmiService.ReadHoverScrollState(state);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -429,13 +414,12 @@ HWTEST_F(MMIServerTest, ReadHoverScrollState_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnSupportKeys_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t deviceId = 1;
     std::vector<int32_t> keys = {1};
     std::vector<bool> keystroke = {true, true};
     std::vector<bool> keystroke1 = {true, true, true, true, true, true};
 
-    ret = mmiService.OnSupportKeys(deviceId, keys, keystroke);
+    int32_t ret = mmiService.OnSupportKeys(deviceId, keys, keystroke);
     EXPECT_EQ(ret, RET_OK);
 
     ret = mmiService.OnSupportKeys(deviceId, keys, keystroke1);
@@ -451,13 +435,12 @@ HWTEST_F(MMIServerTest, OnSupportKeys_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SupportKeys_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t deviceId = 1;
     int32_t returnCode = 65142804;
     std::vector<int32_t> keys = {1};
     std::vector<bool> keystroke = {true, true};
 
-    ret = mmiService.SupportKeys(deviceId, keys, keystroke);
+    int32_t ret = mmiService.SupportKeys(deviceId, keys, keystroke);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -470,10 +453,9 @@ HWTEST_F(MMIServerTest, SupportKeys_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnGetDeviceIds_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     std::vector<int32_t> ids= {1};
 
-    ret = mmiService.OnGetDeviceIds(ids);
+    int32_t ret = mmiService.OnGetDeviceIds(ids);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -486,10 +468,9 @@ HWTEST_F(MMIServerTest, OnGetDeviceIds_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetDeviceIds_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     std::vector<int32_t> ids= {1};
 
-    ret = mmiService.GetDeviceIds(ids);
+    int32_t ret = mmiService.GetDeviceIds(ids);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -502,11 +483,10 @@ HWTEST_F(MMIServerTest, GetDeviceIds_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnGetDevice_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t deviceId = 1;
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
 
-    ret = mmiService.OnGetDevice(deviceId, inputDevice);
+    int32_t ret = mmiService.OnGetDevice(deviceId, inputDevice);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -519,12 +499,11 @@ HWTEST_F(MMIServerTest, OnGetDevice_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetDevice_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142804;
     int32_t deviceId = 1;
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
 
-    ret = mmiService.GetDevice(deviceId, inputDevice);
+    int32_t ret = mmiService.GetDevice(deviceId, inputDevice);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -537,10 +516,9 @@ HWTEST_F(MMIServerTest, GetDevice_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnRegisterDevListener_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t pid = 1;
 
-    ret = mmiService.OnRegisterDevListener(pid);
+    int32_t ret = mmiService.OnRegisterDevListener(pid);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -553,10 +531,9 @@ HWTEST_F(MMIServerTest, OnRegisterDevListener_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, RegisterDevListener_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t pid = 1;
 
-    ret = mmiService.RegisterDevListener();
+    int32_t ret = mmiService.RegisterDevListener();
     EXPECT_EQ(ret, RET_ERR);
 
     ret = mmiService.UnregisterDevListener();
@@ -575,11 +552,10 @@ HWTEST_F(MMIServerTest, RegisterDevListener_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnGetKeyboardType_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
 
-    ret = mmiService.OnGetKeyboardType(deviceId, keyboardType);
+    int32_t ret = mmiService.OnGetKeyboardType(deviceId, keyboardType);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -592,12 +568,11 @@ HWTEST_F(MMIServerTest, OnGetKeyboardType_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetKeyboardType_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142804;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
 
-    ret = mmiService.GetKeyboardType(deviceId, keyboardType);
+    int32_t ret = mmiService.GetKeyboardType(deviceId, keyboardType);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -610,11 +585,10 @@ HWTEST_F(MMIServerTest, GetKeyboardType_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetKeyboardRepeatDelay_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142804;
     int32_t delay = 1;
 
-    ret = mmiService.GetKeyboardRepeatDelay(delay);
+    int32_t ret = mmiService.GetKeyboardRepeatDelay(delay);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -627,11 +601,10 @@ HWTEST_F(MMIServerTest, GetKeyboardRepeatDelay_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetKeyboardRepeatRate_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142804;
     int32_t rate = 1;
 
-    ret = mmiService.GetKeyboardRepeatRate(rate);
+    int32_t ret = mmiService.GetKeyboardRepeatRate(rate);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -644,7 +617,6 @@ HWTEST_F(MMIServerTest, GetKeyboardRepeatRate_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, CheckAddInput_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142786;
     int32_t pid = 1;
     InputHandlerType handlerType = InputHandlerType::MONITOR;
@@ -652,7 +624,7 @@ HWTEST_F(MMIServerTest, CheckAddInput_001, TestSize.Level1)
     int32_t priority = 1;
     uint32_t deviceTags = 1;
 
-    ret = mmiService.CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
+    int32_t ret = mmiService.CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -665,13 +637,12 @@ HWTEST_F(MMIServerTest, CheckAddInput_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, AddInputHandler_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
     HandleEventType eventType = 10;
     int32_t priority = 1;
     uint32_t deviceTags = 1;
 
-    ret = mmiService.AddInputHandler(handlerType, eventType, priority, deviceTags);
+    int32_t ret = mmiService.AddInputHandler(handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -684,7 +655,6 @@ HWTEST_F(MMIServerTest, AddInputHandler_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, CheckRemoveInput_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142786;
     int32_t pid = 1;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -692,7 +662,7 @@ HWTEST_F(MMIServerTest, CheckRemoveInput_001, TestSize.Level1)
     int32_t priority = 1;
     uint32_t deviceTags = 1;
 
-    ret = mmiService.CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
+    int32_t ret = mmiService.CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -705,13 +675,12 @@ HWTEST_F(MMIServerTest, CheckRemoveInput_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, RemoveInputHandler_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
     HandleEventType eventType = 1;
     int32_t priority = 1;
     uint32_t deviceTags = 1;
 
-    ret = mmiService.RemoveInputHandler(handlerType, eventType, priority, deviceTags);
+    int32_t ret = mmiService.RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -724,12 +693,11 @@ HWTEST_F(MMIServerTest, RemoveInputHandler_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, CheckMarkConsumed_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142786;
     int32_t pid = 1;
     int32_t eventId = 1;
 
-    ret = mmiService.CheckMarkConsumed(pid, eventId);
+    int32_t ret = mmiService.CheckMarkConsumed(pid, eventId);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -742,11 +710,10 @@ HWTEST_F(MMIServerTest, CheckMarkConsumed_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, MoveMouseEvent_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t offsetX = 100;
     int32_t offsetY = 200;
 
-    ret = mmiService.MoveMouseEvent(offsetX, offsetY);
+    int32_t ret = mmiService.MoveMouseEvent(offsetX, offsetY);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -759,13 +726,12 @@ HWTEST_F(MMIServerTest, MoveMouseEvent_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, CheckInjectKeyEvent_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142786;
     const std::shared_ptr<KeyEvent> Event{ nullptr };
     int32_t pid = 1;
     bool isNativeInject = false;
 
-    ret = mmiService.CheckInjectKeyEvent(Event, pid, isNativeInject);
+    int32_t ret = mmiService.CheckInjectKeyEvent(Event, pid, isNativeInject);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -800,11 +766,10 @@ HWTEST_F(MMIServerTest, OnAddSystemAbility_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SubscribeKeyEvent_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t subscribeId = 1;
     const std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
 
-    ret = mmiService.SubscribeKeyEvent(subscribeId, option);
+    int32_t ret = mmiService.SubscribeKeyEvent(subscribeId, option);
     EXPECT_EQ(ret, RET_ERR);
 
     ret = mmiService.UnsubscribeKeyEvent(subscribeId);
@@ -820,10 +785,9 @@ HWTEST_F(MMIServerTest, SubscribeKeyEvent_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetDisplayBindInfo_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     DisplayBindInfos infos;
 
-    ret = mmiService.GetDisplayBindInfo(infos);
+    int32_t ret = mmiService.GetDisplayBindInfo(infos);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -836,12 +800,11 @@ HWTEST_F(MMIServerTest, GetDisplayBindInfo_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetDisplayBind_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t deviceId = 1;
     int32_t displayId = 2;
     std::string msg = "test";
 
-    ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
+    int32_t ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -854,12 +817,11 @@ HWTEST_F(MMIServerTest, SetDisplayBind_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetFunctionKeyState_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t funcKey = 1;
     bool enable = true;
     bool state = false;
 
-    ret = mmiService.SetFunctionKeyState(funcKey, enable);
+    int32_t ret = mmiService.SetFunctionKeyState(funcKey, enable);
     EXPECT_EQ(ret, RET_ERR);
 
     ret = mmiService.GetFunctionKeyState(funcKey, state);
@@ -906,9 +868,8 @@ HWTEST_F(MMIServerTest, OnThread_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, InitSignalHandler_001, TestSize.Level1)
 {
     MMIService mmiService;
-    bool ret = RET_ERR;
 
-    ret = mmiService.InitSignalHandler();
+    bool ret = mmiService.InitSignalHandler();
     EXPECT_EQ(ret, false);
 }
 
@@ -934,11 +895,10 @@ HWTEST_F(MMIServerTest, AddReloadDeviceTimer_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, Dump_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t fd = -1;
     const std::vector<std::u16string> args;
 
-    ret = mmiService.Dump(fd, args);
+    int32_t ret = mmiService.Dump(fd, args);
     EXPECT_EQ(ret, DUMP_PARAM_ERR);
 
     fd = 1;
@@ -955,11 +915,10 @@ HWTEST_F(MMIServerTest, Dump_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetMouseCaptureMode_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t windowId = 1;
     bool isCaptureMode = false;
 
-    ret = mmiService.SetMouseCaptureMode(windowId, isCaptureMode);
+    int32_t ret = mmiService.SetMouseCaptureMode(windowId, isCaptureMode);
     EXPECT_EQ(ret, RET_ERR);
 
     isCaptureMode = true;
@@ -976,11 +935,10 @@ HWTEST_F(MMIServerTest, SetMouseCaptureMode_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, OnGetWindowPid_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t windowId = 1;
     int32_t windowPid = 1;
 
-    ret = mmiService.OnGetWindowPid(windowId, windowPid);
+    int32_t ret = mmiService.OnGetWindowPid(windowId, windowPid);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -993,10 +951,9 @@ HWTEST_F(MMIServerTest, OnGetWindowPid_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, GetWindowPid_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t windowId = 1;
 
-    ret = mmiService.GetWindowPid(windowId);
+    int32_t ret = mmiService.GetWindowPid(windowId);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1009,10 +966,9 @@ HWTEST_F(MMIServerTest, GetWindowPid_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, UpdateCombineKeyState_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     bool enable = false;
 
-    ret = mmiService.UpdateCombineKeyState(enable);
+    int32_t ret = mmiService.UpdateCombineKeyState(enable);
     EXPECT_EQ(ret, RET_OK);
 
     enable = true;
@@ -1029,10 +985,9 @@ HWTEST_F(MMIServerTest, UpdateCombineKeyState_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, CheckPidPermission_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t pid = 10;
 
-    ret = mmiService.CheckPidPermission(pid);
+    int32_t ret = mmiService.CheckPidPermission(pid);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -1045,12 +1000,11 @@ HWTEST_F(MMIServerTest, CheckPidPermission_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, UpdateSettingsXml_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 401;
     const std::string businessId = "testid";
     int32_t delay = 3;
 
-    ret = mmiService.UpdateSettingsXml(businessId, delay);
+    int32_t ret = mmiService.UpdateSettingsXml(businessId, delay);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -1063,12 +1017,11 @@ HWTEST_F(MMIServerTest, UpdateSettingsXml_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetShieldStatus_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t ret = RET_ERR;
     int32_t returnCode = 65142804;
     int32_t shieldMode = 1;
     bool isShield = 0;
 
-    ret = mmiService.SetShieldStatus(shieldMode, isShield);
+    int32_t ret = mmiService.SetShieldStatus(shieldMode, isShield);
     EXPECT_EQ(ret, returnCode);
 
     ret = mmiService.GetShieldStatus(shieldMode, isShield);
