@@ -84,6 +84,9 @@ const char* InputEvent::EventTypeToString(int32_t eventType)
         case InputEvent::EVENT_TYPE_AXIS: {
             return "axis";
         }
+        case InputEvent::EVENT_TYPE_FINGERPRINT: {
+            return "fingerprint";
+        }
         default: {
             MMI_HILOGW("Unknown EVENT_TYPE");
             return "unknown";

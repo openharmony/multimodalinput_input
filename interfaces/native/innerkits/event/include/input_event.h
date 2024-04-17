@@ -70,6 +70,13 @@ public:
     static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
     /**
+     * The actual type of the current input event is FingerprintEvent or its derived class.
+     *
+     * @since 12
+     */
+    static constexpr int32_t EVENT_TYPE_FINGERPRINT = 0X00040000;
+
+    /**
      * The multimodal input service sends input events to the interceptor and listener. This is the default value.
      *
      * @since 9
@@ -338,7 +345,7 @@ public:
      * @since 9
      */
     void SetProcessedCallback(std::function<void(int32_t, int64_t)> callback);
-    
+
     /**
      * @brief Sets the extra data of an input event.
      * @param data the extra data.
