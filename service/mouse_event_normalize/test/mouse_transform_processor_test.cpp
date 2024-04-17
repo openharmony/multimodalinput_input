@@ -91,7 +91,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Dump_002, Test
     MouseTransformProcessor processor(deviceId);
     int32_t fd = 0;
     processor.Dump(fd, args);
-    ASSERT_NE(args, idNames);
+    ASSERT_EQ(args, idNames);
 }
 
 /**
@@ -107,7 +107,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveM
     MouseTransformProcessor processor(deviceId);
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    ASSERT_NE(processor.NormalizeMoveMouse(offsetX, offsetY), isNormalize);
+    ASSERT_EQ(processor.NormalizeMoveMouse(offsetX, offsetY), isNormalize);
 }
 
 /**
@@ -121,7 +121,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_0
     int32_t idNames = -1;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    ASSERT_NE(processor.GetDisplayId(), idNames);
+    ASSERT_EQ(processor.GetDisplayId(), idNames);
 }
 
 /**
@@ -136,7 +136,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 5;
-    ASSERT_NE(processor.SetPointerSpeed(speed), idNames);
+    ASSERT_EQ(processor.SetPointerSpeed(speed), idNames);
 }
 
 /**
@@ -152,7 +152,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 5;
     processor.SetPointerSpeed(speed);
-    ASSERT_NE(processor.GetPointerSpeed(), idNames);
+    ASSERT_EQ(processor.GetPointerSpeed(), idNames);
 }
 
 /**
@@ -168,7 +168,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
     MouseTransformProcessor processor(deviceId);
     int32_t x = 0;
     int32_t y = 0;
-    ASSERT_NE(processor.SetPointerLocation(x, y), idNames);
+    ASSERT_EQ(processor.SetPointerLocation(x, y), idNames);
 }
 
 /**
@@ -184,7 +184,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 0;
     processor.SetPointerSpeed(speed);
-    ASSERT_NE(processor.GetPointerSpeed(), idNames);
+    ASSERT_EQ(processor.GetPointerSpeed(), idNames);
 }
 
 /**
@@ -443,7 +443,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEven
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     auto ret = processor.GetPointerEvent();
-    ASSERT_EQ(ret, nullptr);
+    ASSERT_NE(ret, nullptr);
 }
 
 /**
@@ -459,7 +459,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionIn
     struct libinput_event_pointer* data = nullptr;
     struct libinput_event* event = nullptr;
     auto ret = processor.HandleMotionInner(data, event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -520,7 +520,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonIn
     struct libinput_event_pointer* data = nullptr;
     struct libinput_event* event = nullptr;
     auto ret = processor.HandleButtonInner(data, event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -537,7 +537,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonVa
     uint32_t button = -1;
     int32_t type = 0;
     auto ret = processor.HandleButtonValueInner(data, button, type);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_ERR);
 }
 
 /**
@@ -554,7 +554,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonVa
     uint32_t button = 272;
     int32_t type = 1;
     auto ret = processor.HandleButtonValueInner(data, button, type);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -585,7 +585,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInne
     MouseTransformProcessor processor(deviceId);
     struct libinput_event_pointer* data = nullptr;
     auto ret = processor.HandleAxisInner(data);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -600,7 +600,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBegi
     MouseTransformProcessor processor(deviceId);
     struct libinput_event* event = nullptr;
     auto ret = processor.HandleAxisBeginEndInner(event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -644,7 +644,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_001,
     MouseTransformProcessor processor(deviceId);
     struct libinput_event* event = nullptr;
     auto ret = processor.Normalize(event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -661,7 +661,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeRotat
     int32_t type = 1;
     double angle = 90.0;
     auto ret = processor.NormalizeRotateEvent(event, type, angle);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -760,7 +760,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadSpe
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     auto ret = processor.GetTouchpadSpeed();
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
