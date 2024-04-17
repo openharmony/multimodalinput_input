@@ -727,7 +727,7 @@ HWTEST_F(UDSServerTest, AddSession_002, TestSize.Level1)
     UDSServer udsServer;
     SessionPtr sess = nullptr;
     bool ret = udsServer.AddSession(sess);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
