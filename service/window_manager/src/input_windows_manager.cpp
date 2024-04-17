@@ -2461,10 +2461,6 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
 
-    cursorPos_.displayId = displayId;
-    cursorPos_.cursorPos.x = x;
-    cursorPos_.cursorPos.y = y;
-
     if (displayInfo->displayDirection == DIRECTION0 && isRealData) {
         PhysicalCoordinate coord {
             .x = integerX,
