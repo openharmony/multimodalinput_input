@@ -739,6 +739,7 @@ public:
          * @since 9
          */
         int32_t GetDisplayX() const;
+        double GetDisplayXPos() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
@@ -747,6 +748,7 @@ public:
          * @since 9
          */
         void SetDisplayX(int32_t displayX);
+        void SetDisplayXPos(double displayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
@@ -756,6 +758,7 @@ public:
          * @since 9
          */
         int32_t GetDisplayY() const;
+        double GetDisplayYPos() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
@@ -764,6 +767,7 @@ public:
          * @since 9
          */
         void SetDisplayY(int32_t displayY);
+        void SetDisplayYPos(double displayY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
@@ -771,6 +775,7 @@ public:
          * @since 9
          */
         int32_t GetWindowX() const;
+        double GetWindowXPos() const;
 
         /**
          * @brief Sets the x coordinate of the active window.
@@ -779,6 +784,7 @@ public:
          * @since 9
          */
         void SetWindowX(int32_t x);
+        void SetWindowXPos(double x);
 
         /**
          * @brief Obtains the y coordinate of the active window.
@@ -786,6 +792,7 @@ public:
          * @since 9
          */
         int32_t GetWindowY() const;
+        double GetWindowYPos() const;
 
         /**
          * @brief Sets the y coordinate of the active window.
@@ -794,6 +801,7 @@ public:
          * @since 9
          */
         void SetWindowY(int32_t y);
+        void SetWindowYPos(double y);
 
         /**
          * @brief Obtains the width of the pressed area.
@@ -1095,6 +1103,10 @@ public:
         int32_t displayY_ {};
         int32_t windowX_ {};
         int32_t windowY_ {};
+        double displayXPos_ {};
+        double displayYPos_ {};
+        double windowXPos_ {};
+        double windowYPos_ {};
         int32_t width_ {};
         int32_t height_ {};
         double  tiltX_ {};
