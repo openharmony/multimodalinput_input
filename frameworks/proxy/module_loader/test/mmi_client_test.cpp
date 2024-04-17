@@ -63,9 +63,9 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
 {
-    MMIClient client;
-    EXPECT_FALSE(client.Start());
-    client.Stop();
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    EXPECT_FALSE(client->Start());
+    client->Stop();
 }
 
 /**
@@ -76,10 +76,10 @@ HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.Level1)
 {
-    MMIClient client;
-    client.Start();
-    EXPECT_TRUE(client.GetCurrentConnectedStatus());
-    client.Stop();
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->Start();
+    EXPECT_TRUE(client->GetCurrentConnectedStatus());
+    client->Stop();
 }
 
 /**
@@ -90,10 +90,10 @@ HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.L
  */
 HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
 {
-    MMIClient client;
-    client.Start();
-    EXPECT_TRUE(client.Reconnect());
-    client.Stop();
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->Start();
+    EXPECT_TRUE(client->Reconnect());
+    client->Stop();
 }
 
 /**
@@ -104,11 +104,11 @@ HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
 {
-    MMIClient client;
-    client.Start();
-    client.OnDisconnect();
-    ASSERT_NO_FATAL_FAILURE(client.OnDisconnect());
-    client.Stop();
+    std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
+    client->Start();
+    client->OnDisconnect();
+    ASSERT_NO_FATAL_FAILURE(client->OnDisconnect());
+    client->Stop();
 }
 }
 } // namespace MMI
