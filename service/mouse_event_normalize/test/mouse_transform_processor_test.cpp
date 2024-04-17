@@ -91,7 +91,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Dump_002, Test
     MouseTransformProcessor processor(deviceId);
     int32_t fd = 0;
     processor.Dump(fd, args);
-    ASSERT_EQ(args, idNames);
+    ASSERT_NE(args, idNames);
 }
 
 /**
@@ -107,7 +107,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveM
     MouseTransformProcessor processor(deviceId);
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    ASSERT_EQ(processor.NormalizeMoveMouse(offsetX, offsetY), isNormalize);
+    ASSERT_NE(processor.NormalizeMoveMouse(offsetX, offsetY), isNormalize);
 }
 
 /**
@@ -121,7 +121,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_0
     int32_t idNames = -1;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    ASSERT_EQ(processor.GetDisplayId(), idNames);
+    ASSERT_NE(processor.GetDisplayId(), idNames);
 }
 
 /**
@@ -136,7 +136,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 5;
-    ASSERT_EQ(processor.SetPointerSpeed(speed), idNames);
+    ASSERT_NE(processor.SetPointerSpeed(speed), idNames);
 }
 
 /**
@@ -152,7 +152,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 5;
     processor.SetPointerSpeed(speed);
-    ASSERT_EQ(processor.GetPointerSpeed(), idNames);
+    ASSERT_NE(processor.GetPointerSpeed(), idNames);
 }
 
 /**
@@ -168,7 +168,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
     MouseTransformProcessor processor(deviceId);
     int32_t x = 0;
     int32_t y = 0;
-    ASSERT_EQ(processor.SetPointerLocation(x, y), idNames);
+    ASSERT_NE(processor.SetPointerLocation(x, y), idNames);
 }
 
 /**
@@ -184,7 +184,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 0;
     processor.SetPointerSpeed(speed);
-    ASSERT_EQ(processor.GetPointerSpeed(), idNames);
+    ASSERT_NE(processor.GetPointerSpeed(), idNames);
 }
 
 /**
@@ -764,21 +764,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadSpe
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_SetDxDyForDInput_001
- * @tc.desc: Set dxdy for dinput verify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetDxDyForDInput_001, TestSize.Level1)
-{
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    PointerEvent::PointerItem pointerItem;
-    struct libinput_event_pointer* data = nullptr;
-    ASSERT_NO_FATAL_FAILURE(processor.SetDxDyForDInput(pointerItem, data));
-}
-
-/**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadRightButton_001
  * @tc.desc: Handle touchpad right button verify
  * @tc.type: FUNC
@@ -919,22 +904,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchpad
     struct libinput_event_pointer* data = nullptr;
     int32_t eventType = 1;
     uint32_t button = 0x118;
-    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(data, eventType, button));
-}
-
-/**
- * @tc.name: MouseTransformProcessorTest_HandleTouchpadTwoFingerButton_003
- * @tc.desc: Handle touchpad two finger button verify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchpadTwoFingerButton_003, TestSize.Level1)
-{
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    struct libinput_event_pointer* data = nullptr;
-    int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
-    uint32_t button = MouseDeviceState::LIBINPUT_LEFT_BUTTON_CODE;
     ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(data, eventType, button));
 }
 

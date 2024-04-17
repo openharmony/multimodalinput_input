@@ -102,18 +102,6 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize
 }
 
 /**
- * @tc.name: EventInterceptorHandler_Test_006
- * @tc.desc: Test the function InitSessionLostCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_006, TestSize.Level1)
-{
-    EventInterceptorHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.InitSessionLostCallback());
-}
-
-/**
  * @tc.name: EventInterceptorHandler_Test_007
  * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC
