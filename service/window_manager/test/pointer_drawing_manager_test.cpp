@@ -342,7 +342,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerStyle_001,
 {
     PointerDrawingManager pointerDrawingManager;
     PointerStyle pointerStyle;
-    pointerStyle.id = 11;
+    pointerStyle.id = 0;
     pointerDrawingManager.SetPointerStyle(1, -1, pointerStyle);
     PointerStyle pointerStyleTmp;
     pointerDrawingManager.GetPointerStyle(1, -1, pointerStyleTmp);

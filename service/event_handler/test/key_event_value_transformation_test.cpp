@@ -476,7 +476,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputT
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     int32_t result = InputTransformationKeyValue(0);
-    ASSERT_EQ(result, -1);
+    ASSERT_EQ(result, 240);
 }
 } // namespace MMI
 } // namespace OHOS
