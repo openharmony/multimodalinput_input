@@ -112,6 +112,46 @@ void PointerEvent::PointerItem::SetWindowY(int32_t y)
     windowY_ = y;
 }
 
+double PointerEvent::PointerItem::GetDisplayXPos() const
+{
+    return displayXPos_;
+}
+
+void PointerEvent::PointerItem::SetDisplayXPos(double x)
+{
+    displayXPos_ = x;
+}
+
+double PointerEvent::PointerItem::GetDisplayYPos() const
+{
+    return displayYPos_;
+}
+
+void PointerEvent::PointerItem::SetDisplayYPos(double y)
+{
+    displayYPos_ = y;
+}
+
+double PointerEvent::PointerItem::GetWindowXPos() const
+{
+    return windowXPos_;
+}
+
+void PointerEvent::PointerItem::SetWindowXPos(double x)
+{
+    windowXPos_ = x;
+}
+
+double PointerEvent::PointerItem::GetWindowYPos() const
+{
+    return windowYPos_;
+}
+
+void PointerEvent::PointerItem::SetWindowYPos(double y)
+{
+    windowYPos_ = y;
+}
+
 int32_t PointerEvent::PointerItem::GetWidth() const
 {
     return width_;
@@ -319,7 +359,11 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
-        out.WriteInt32(targetWindowId_)
+        out.WriteInt32(targetWindowId_) &&
+        out.WriteDouble(displayXPos_) &&
+        out.WriteDouble(displayYPos_) &&
+        out.WriteDouble(windowXPos_) &&
+        out.WriteDouble(windowYPos_)
     );
 }
 
@@ -350,7 +394,11 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
-        in.ReadInt32(targetWindowId_)
+        in.ReadInt32(targetWindowId_) &&
+        in.ReadDouble(displayXPos_) &&
+        in.ReadDouble(displayYPos_) &&
+        in.ReadDouble(windowXPos_) &&
+        in.ReadDouble(windowYPos_)
     );
 }
 

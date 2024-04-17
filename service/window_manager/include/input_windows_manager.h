@@ -86,7 +86,7 @@ public:
     bool IsWindowVisible(int32_t pid);
     void ClearExtraData();
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
-    std::pair<int32_t, int32_t> TransformWindowXY(const WindowInfo &window, int32_t logicX, int32_t logicY) const;
+    std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -113,14 +113,14 @@ public:
 #endif //OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
+    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
-    void RotateScreen(const DisplayInfo& info, LogicalCoordinate& coord) const;
     void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
+    void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, LogicalCoordinate& coord) const;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
