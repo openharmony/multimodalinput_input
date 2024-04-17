@@ -188,7 +188,7 @@ private:
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
     void InitMouseDownInfo();
-    void SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
+    bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -211,7 +211,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
-    void InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
+    bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
     template <class T>
     void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -259,6 +259,7 @@ private:
     ExtraData extraData_;
     bool haveSetObserver_ { false };
     bool dragFlag_ { false };
+    bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
