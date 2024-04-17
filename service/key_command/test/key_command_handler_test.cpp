@@ -926,5 +926,36 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetKnuckleDoubleTapDistanc
     float distance = -1.0f;
     ASSERT_NO_FATAL_FAILURE(handler.SetKnuckleDoubleTapDistance(distance));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsKeyMatch
+ * @tc.desc: IsKeyMatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsKeyMatch, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyEvent::KeyItem item;
+    ASSERT_NE(keyEvent, nullptr);
+    shortcutKey.finalKey = 2019;
+    shortcutKey.preKeys.insert(2072);
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    item.SetKeyCode(KeyEvent::KEYCODE_C);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_C);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    ASSERT_FALSE(handler.IsKeyMatch(shortcutKey, keyEvent));
+
+    shortcutKey.preKeys.insert(2047);
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    keyEvent->AddKeyItem(item);
+    item.SetKeyCode(KeyEvent::KEYCODE_E);
+    keyEvent->AddKeyItem(item);
+    ASSERT_FALSE(handler.IsKeyMatch(shortcutKey, keyEvent));
+}
 } // namespace MMI
 } // namespace OHOS
