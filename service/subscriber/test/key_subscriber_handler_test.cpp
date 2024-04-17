@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,12 +17,11 @@
 #include <fstream>
 #include <list>
 
+#include"key_option.h"
 #include "key_subscriber_handler.h"
 #include "switch_subscriber_handler.h"
 #include "mmi_log.h"
 #include "uds_server.h"
-
-#include"key_option.h"
 
 namespace OHOS {
 namespace MMI {
