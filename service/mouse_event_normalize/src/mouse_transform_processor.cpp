@@ -94,6 +94,9 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
+    accelerated_.dx = cursorPos.cursorPos.x;
+    accelerated_.dy = cursorPos.cursorPos.y;
+
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
@@ -105,6 +108,8 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
+    accelerated_.dx = cursorPos.cursorPos.x - accelerated_.dx;
+    accelerated_.dy = cursorPos.cursorPos.y - accelerated_.dy;
 #ifdef OHOS_BUILD_EMULATOR
     cursorPos.cursorPos.x = offset.dx;
     cursorPos.cursorPos.y = offset.dy;
@@ -416,7 +421,9 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     }
     pointerItem.SetDeviceId(deviceId_);
-    SetDxDyForDInput(pointerItem, data);
+    pointerItem.SetRawDx(static_cast<int32_t>(accelerated_.dx));
+    pointerItem.SetRawDy(static_cast<int32_t>(accelerated_.dy));
+
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -642,18 +649,6 @@ int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
     }
 
     return speed;
-}
-
-void MouseTransformProcessor::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
-    struct libinput_event_pointer* data)
-{
-    double dx = libinput_event_pointer_get_dx(data);
-    double dy = libinput_event_pointer_get_dy(data);
-    int32_t rawDx = static_cast<int32_t>(dx);
-    int32_t rawDy = static_cast<int32_t>(dy);
-    pointerItem.SetRawDx(rawDx);
-    pointerItem.SetRawDy(rawDy);
-    MMI_HILOGD("MouseTransformProcessor SetDxDyForDInput, dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
 int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
