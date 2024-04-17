@@ -577,13 +577,15 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
-        int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-        MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
-            info.windowPid, info.windowId, pointerStyle.id);
-        CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
+        if (!isDragBorder_) {
+            int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+            MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
+                info.windowPid, info.windowId, pointerStyle.id);
+            CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
+        }
         WindowInfo window = *windowInfo;
         if (!dragFlag_) {
-            SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
+            isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
@@ -593,6 +595,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         }
         if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
             dragFlag_ = false;
+            isDragBorder_ = false;
         }
         IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
     }
@@ -1323,7 +1326,7 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
     return false;
 }
 
-void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects,
+bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects,
     PointerStyle &pointerStyle) const
 {
     CALL_DEBUG_ENTER;
@@ -1334,11 +1337,11 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
             MMI_HILOGE("The addition of displayMaxX overflows");
-            return;
+            return findFlag;
         }
         if (!AddInt32(item.y, item.height, displayMaxY)) {
             MMI_HILOGE("The addition of displayMaxY overflows");
-            return;
+            return findFlag;
         }
         if (((x > item.x) && (x <= displayMaxX)) &&
             (y > item.y) && (y <= displayMaxY)) {
@@ -1349,7 +1352,7 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
     }
     if (!findFlag) {
         MMI_HILOGD("pointer not match any area");
-        return;
+        return findFlag;
     }
     switch (pointerStyle.id) {
         case PointerHotArea::TOP:
@@ -1377,7 +1380,7 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             break;
     }
     MMI_HILOGD("pointerStyle after switch ID is :%{public}d", pointerStyle.id);
-    return;
+    return findFlag;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -1504,16 +1507,18 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
     return std::nullopt;
 }
 
-void InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
+bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
     int32_t logicalX, int32_t logicalY)
 {
     CALL_DEBUG_ENTER;
     int32_t windowId = windowInfo.id;
+    bool findFlag = false;
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
         MMI_HILOGD("windowHotAreas size is:%{public}zu, windowId is :%{public}d", windowHotAreas.size(), windowId);
-        InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
+        findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
     }
+    return findFlag;
 }
 
 void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo)
@@ -1756,14 +1761,17 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
-    GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+    if (!isDragBorder_) {
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+        dragPointerStyle_ = pointerStyle;
+    }
     if (!touchWindow) {
         MMI_HILOGE("TouchWindow is nullptr");
         return RET_ERR;
     }
     WindowInfo window = *touchWindow;
     if (!dragFlag_) {
-        SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
+        isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
         dragPointerStyle_ = pointerStyle;
         MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{public}d,"
             "logicalY is :%{public}d", pointerStyle.id, window.id, logicalX, logicalY);
@@ -1774,6 +1782,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         dragFlag_ = false;
+        isDragBorder_ = false;
     }
     Direction direction = DIRECTION0;
     int32_t physicalX = pointerItem.GetDisplayX();
@@ -2410,7 +2419,7 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
     if (direction == DIRECTION90) {
         MMI_HILOGD("direction is DIRECTION90");
         cursorPos.y = static_cast<double>(info.width) - x;
-        cursorPos.y = y;
+        cursorPos.x = y;
         MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
         return;
     }
