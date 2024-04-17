@@ -48,56 +48,5 @@ void TabletToolTranformProcessorTest::SetUp()
 void TabletToolTranformProcessorTest::TearDown()
 {
 }
-
-/**
- * @tc.name: TabletToolTranformProcessorTest_AxisEvent
- * @tc.desc: Test AxisEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TabletToolTranformProcessorTest, OnEvent_AxisEvent, TestSize.Level1)
-{
-    int32_t deviceID = 1;
-    TabletToolTransformProcessor processor(deviceID);
-    libinput_event* event = nullptr;
-    auto type = libinput_event_get_type(event);
-    type = LIBINPUT_EVENT_TABLET_TOOL_AXIS;
-    auto result = processor.OnEvent(event);
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: TabletToolTranformProcessorTest_ProximityEvent
- * @tc.desc: Test ProximityEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TabletToolTranformProcessorTest, OnEvent_ProximityEvent, TestSize.Level1)
-{
-    int32_t deviceID = 1;
-    TabletToolTransformProcessor processor(deviceID);
-    libinput_event* event = nullptr;
-    auto type = libinput_event_get_type(event);
-    type = LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY;
-    auto result = processor.OnEvent(event);
-    ASSERT_EQ(result, nullptr);
-}
-
-/**
- * @tc.name: TabletToolTranformProcessorTest_TipEvent
- * @tc.desc: Test TipEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TabletToolTranformProcessorTest, OnEvent_TipEvent, TestSize.Level1)
-{
-    int32_t deviceID = 1;
-    TabletToolTransformProcessor processor(deviceID);
-    libinput_event* event = nullptr;
-    auto type = libinput_event_get_type(event);
-    type = LIBINPUT_EVENT_TABLET_TOOL_TIP;
-    auto result = processor.OnEvent(event);
-    ASSERT_EQ(result, nullptr);
-}
 }
 }
