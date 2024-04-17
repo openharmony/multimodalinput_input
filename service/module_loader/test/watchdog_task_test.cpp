@@ -127,7 +127,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetSelfProcName_001, TestSize.Level1
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_SendEvent_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string message = "This is a test message"; 
+    std::string message = "This is a test message";
     std::string event = "TestEvent";
     ASSERT_NO_FATAL_FAILURE(watchdogtask.SendEvent(message, event));
 }
