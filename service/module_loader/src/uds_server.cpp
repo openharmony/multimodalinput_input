@@ -135,7 +135,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     OnConnected(sess);
     return RET_OK;
-    
+
     CLOSE_SOCK:
     close(serverFd);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
@@ -146,8 +146,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 
 int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    static constexpr size_t bufferSize = 1024 * 1024;
-    static constexpr size_t nativeBufferSize = 2048 * 1024;
+    static constexpr size_t bufferSize = 64 * 1024;
+    static constexpr size_t nativeBufferSize = 128 * 1024;
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
         MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
         return RET_ERR;
@@ -287,7 +287,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 void UDSServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
-    auto fd = *static_cast<int32_t*>(ev.data.ptr);
+    auto fd = ev.data.fd;
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;

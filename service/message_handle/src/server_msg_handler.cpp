@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,7 +96,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
@@ -155,12 +155,19 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+    return OnInjectPointerEventExt(pointerEvent);
+}
+
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     auto source = pointerEvent->GetSourceType();
@@ -184,12 +191,15 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
-                (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
+            } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+                (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
-            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
@@ -521,17 +531,20 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 
 void ServerMsgHandler::LaunchAbility()
 {
+    CALL_DEBUG_ENTER;
     OHOS::MMI::AuthorizationDialog authorizationDialog;
     authorizationDialog.ConnectSystemUi();
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
+    CALL_DEBUG_ENTER;
     if (isAuthorize) {
         auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
         if (InjectionType_ == InjectionType::KEYEVENT) {
             OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
         }
@@ -544,15 +557,18 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
         return ERR_OK;
     }
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()
 {
+    CALL_DEBUG_ENTER;
     auto iter = authorizationCollection_.find(CurrentPID_);
     if (iter != authorizationCollection_.end()) {
         authorizationCollection_.erase(iter);
+        MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
         CurrentPID_ = -1;
         InjectionType_ = InjectionType::UNKNOWN;
         keyEvent_ = nullptr;
