@@ -91,11 +91,66 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
+void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
+        PointerEvent::PointerItem pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(point);
+    std::vector<int32_t> windowIds;
+    WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    int32_t count = 0;
+    for (auto windowId : windowIds) {
+        int32_t pointerId = point->GetPointerId();
+        auto windowInfo = WinMgr->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
+        if (!windowInfo) {
+            MMI_HILOGE("WindowInfo id nullptr");
+        }
+        auto fd = WinMgr->GetClientFd(point, windowInfo->id);
+        auto pointerEvent = std::make_shared<PointerEvent>(*point);
+        pointerEvent->SetTargetWindowId(windowId);
+        pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
+        int32_t windowX = pointItem.GetDisplayX() - windowInfo->area.x;
+        int32_t windowY = pointItem.GetDisplayY() - windowInfo->area.y;
+        if (!windowInfo->transform.empty()) {
+            auto windowXY = WinMgr->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(), pointItem.GetDisplayY());
+            windowX = windowXY.first;
+            windowY = windowXY.second
+        }
+        pointItem.SetDisplayX(windowX);
+        pointItem.SetDisplayY(windowY);
+        pointItem.SetTargetWindowId(windowId);
+        pointerEvent->UpdatePointerItem(pointerId ,pointerItem);
+        pointerEvent->SetDispatchTimes(count);
+        count++;
+        DispatchPointerEventInner(pointerEvent, fd);
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
+    int32_t pointerId = point->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!point->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    pointerItem.SetOriginPointerId(pointerItem.GetPointerId());
+    point->UpdatePointerItem(pointerId, pointerItem);
+    std::vector<int32_t> windowIds;
+    WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    if (!windowIds.empty()) {
+        HandleMultiWindowPointerEvent(point, pointerItem);
+        return;
+    }
     auto fd = WinMgr->GetClientFd(point);
+    DispatchPointerEventInner(point, pointerItem);
+}
+
+void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
+{
+    CALL_DEBUG_ENTER;
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
