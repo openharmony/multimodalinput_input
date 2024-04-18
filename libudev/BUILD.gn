@@ -46,7 +46,10 @@ output_path = "multimodalinput/mmi_unit_out"
 
 group("test") {
   testonly = true
-  deps = [ ":libudev-test" ]
+  deps = [
+    ":e2e-libudev-test",
+    ":libudev-test",
+  ]
 }
 
 ohos_unittest("libudev-test") {

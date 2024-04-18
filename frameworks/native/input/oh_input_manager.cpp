@@ -98,11 +98,13 @@ struct Input_KeyState* OH_Input_CreateKeyState()
     return keyState;
 }
 
-void OH_Input_DestroyKeyState(struct Input_KeyState* keyState)
+void OH_Input_DestroyKeyState(struct Input_KeyState** keyState)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(keyState);
-    delete keyState;
-    keyState = nullptr;
+    CHKPV(*keyState);
+    delete *keyState;
+    *keyState = nullptr;
 }
 
 void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
@@ -115,7 +117,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
     keyState->keyCode = keyCode;
 }
 
-int32_t OH_Input_GetKeyCode(struct Input_KeyState* keyState)
+int32_t OH_Input_GetKeyCode(const struct Input_KeyState* keyState)
 {
     CHKPR(keyState, KEYCODE_UNKNOWN);
     return keyState->keyCode;
@@ -127,7 +129,7 @@ void OH_Input_SetKeyPressed(struct Input_KeyState* keyState, int32_t keyAction)
     keyState->keyState = keyAction;
 }
 
-int32_t OH_Input_GetKeyPressed(struct Input_KeyState* keyState)
+int32_t OH_Input_GetKeyPressed(const struct Input_KeyState* keyState)
 {
     CHKPR(keyState, KEY_DEFAULT);
     return keyState->keyState;
@@ -139,7 +141,7 @@ void OH_Input_SetKeySwitch(struct Input_KeyState* keyState, int32_t keySwitch)
     keyState->keySwitch = keySwitch;
 }
 
-int32_t OH_Input_GetKeySwitch(struct Input_KeyState* keyState)
+int32_t OH_Input_GetKeySwitch(const struct Input_KeyState* keyState)
 {
     CHKPR(keyState, KEY_DEFAULT);
     return keyState->keySwitch;
@@ -272,6 +274,7 @@ static int32_t HandleMouseButton(const struct Input_MouseEvent* mouseEvent)
         }
         case MOUSE_BUTTON_LEFT: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_LEFT;
+            break;
         }
         case MOUSE_BUTTON_MIDDLE: {
             button = OHOS::MMI::PointerEvent::MOUSE_BUTTON_MIDDLE;
@@ -501,6 +504,19 @@ int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEve
     return mouseEvent->actionTime;
 }
 
+static void HandleTouchActionDown(OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
+{
+    auto pointIds = g_touchEvent->GetPointerIds();
+    if (pointIds.empty()) {
+        g_touchEvent->SetActionStartTime(time);
+        g_touchEvent->SetTargetDisplayId(0);
+    }
+    g_touchEvent->SetActionTime(time);
+    g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    item.SetDownTime(time);
+    item.SetPressed(true);
+}
+
 static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_DEBUG_ENTER;
@@ -520,15 +536,7 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
             break;
         }
         case TOUCH_ACTION_DOWN: {
-            auto pointIds = g_touchEvent->GetPointerIds();
-            if (pointIds.empty()) {
-                g_touchEvent->SetActionStartTime(time);
-                g_touchEvent->SetTargetDisplayId(0);
-            }
-            g_touchEvent->SetActionTime(time);
-            g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
-            item.SetDownTime(time);
-            item.SetPressed(true);
+            HandleTouchActionDown(item, time);
             break;
         }
         case TOUCH_ACTION_MOVE: {

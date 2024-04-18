@@ -218,8 +218,8 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
                 return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
             }
             auto windowXY = WinMgr->TransformWindowXY(window, logicX, logicY);
-            auto windowX = windowXY.first;
-            auto windowY = windowXY.second;
+            auto windowX = static_cast<int32_t>(windowXY.first);
+            auto windowY = static_cast<int32_t>(windowXY.second);
             return {windowX, windowY};
         }
     }
@@ -303,7 +303,7 @@ void EventResample::UpdateTouchState(MotionEvent &event)
             if (idx < 0) {
                 TouchState newState;
                 touchStates_.push_back(newState);
-                idx = touchStates_.size() - 1;
+                idx = static_cast<ssize_t>(touchStates_.size() - 1);
             }
             TouchState& touchState = touchStates_.at(idx);
             touchState.Initialize(deviceId, source);

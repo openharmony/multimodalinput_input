@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,7 +96,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
@@ -155,12 +155,19 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
-            return RET_OK;
+            return COMMON_PERMISSION_CHECK_ERROR;
         }
         if (iter->second == AuthorizationStatus::UNAUTHORIZED) {
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+    return OnInjectPointerEventExt(pointerEvent);
+}
+
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     auto source = pointerEvent->GetSourceType();
@@ -184,12 +191,15 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
-                (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
+            } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+                (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
-            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
@@ -265,9 +275,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
+        size_t size = 0;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
-            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform >> size;
+        if (size != 0) {
+            CreatPixelMap(size, pkt, info);
+        }
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -281,9 +295,9 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
@@ -517,17 +531,20 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 
 void ServerMsgHandler::LaunchAbility()
 {
+    CALL_DEBUG_ENTER;
     OHOS::MMI::AuthorizationDialog authorizationDialog;
     authorizationDialog.ConnectSystemUi();
 }
 
 int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 {
+    CALL_DEBUG_ENTER;
     if (isAuthorize) {
         auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::AUTHORIZED));
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
         if (InjectionType_ == InjectionType::KEYEVENT) {
             OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
         }
@@ -540,21 +557,52 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
         return ERR_OK;
     }
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()
 {
+    CALL_DEBUG_ENTER;
     auto iter = authorizationCollection_.find(CurrentPID_);
     if (iter != authorizationCollection_.end()) {
         authorizationCollection_.erase(iter);
+        MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
         CurrentPID_ = -1;
         InjectionType_ = InjectionType::UNKNOWN;
         keyEvent_ = nullptr;
         pointerEvent_ = nullptr;
     }
     return ERR_OK;
+}
+
+void ServerMsgHandler::CreatPixelMap(size_t size, NetPacket &pkt, WindowInfo &info)
+{
+    CALL_DEBUG_ENTER;
+    int32_t width = 0;
+    int32_t height = 0;
+    pkt >> width >> height;
+    int32_t length = width * height;
+    std::vector<char> buf (size);
+    pkt.Read(buf.data(), size);
+    MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d", size, width, height);
+
+    OHOS::Media::InitializationOptions ops;
+    ops.size.width = width;
+    ops.size.height = height;
+    ops.pixelFormat = OHOS::Media::PixelFormat::BGRA_8888;
+    ops.alphaType = OHOS::Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    ops.scaleMode = OHOS::Media::ScaleMode::FIT_TARGET_SIZE;
+    const uint32_t* datas = reinterpret_cast<const uint32_t*>(buf.data());
+    std::unique_ptr<Media::PixelMap> pixelMapPtr = Media::PixelMap::Create(datas, length, ops);
+    CHKPV(pixelMapPtr);
+    if (pixelMapPtr->GetCapacity() == 0) {
+        MMI_HILOGE("The pixelMap is empty");
+        return;
+    }
+    auto iter = transparentWins_.insert_or_assign(info.id, std::move(pixelMapPtr));
+    info.pixelMap = iter.first->second.get();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace MMI {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "setting_DataShare" };
-SettingDataShare* SettingDataShare::instance_;
+std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
 std::mutex SettingDataShare::mutex_;
 sptr<IRemoteObject> SettingDataShare::remoteObj_;
 namespace {
@@ -41,21 +41,14 @@ constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdat
 constexpr int32_t LONG_CAST_NUM = 10;
 } // namespace
 
-SettingDataShare::~SettingDataShare()
-{
-    if (instance_ != nullptr) {
-        delete instance_;
-    }
-    instance_ = nullptr;
-    remoteObj_ = nullptr;
-}
+SettingDataShare::~SettingDataShare() {}
 
 SettingDataShare& SettingDataShare::GetInstance(int32_t systemAbilityId)
 {
     if (instance_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
-            instance_ = new SettingDataShare();
+            instance_ = std::make_shared<SettingDataShare>();
             Initialize(systemAbilityId);
         }
     }

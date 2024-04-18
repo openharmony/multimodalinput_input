@@ -161,7 +161,11 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         sptr<JsUtil::ReportData> reportData = new (std::nothrow) JsUtil::ReportData;
-        CHKPV(reportData);
+        if (reportData == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
+            return;
+        }
         reportData->deviceId = deviceId;
         reportData->ref = item->ref;
         reportData->IncStrongRef(nullptr);
@@ -194,7 +198,11 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         sptr<JsUtil::ReportData> reportData = new (std::nothrow) JsUtil::ReportData;
-        CHKPV(reportData);
+        if (reportData == nullptr) {
+            MMI_HILOGE("Memory allocation failed");
+            JsUtil::DeletePtr<uv_work_t *>(work);
+            return;
+        }
         reportData->deviceId = deviceId;
         reportData->ref = item->ref;
         reportData->IncStrongRef(nullptr);
