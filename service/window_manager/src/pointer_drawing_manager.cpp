@@ -1212,8 +1212,9 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         return RET_ERR;
     }
     if (pointerStyle.id != style.id) {
-        auto it = GetMouseIconPath().find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
-        if (it == GetMouseIconPath().end()) {
+        auto iconPath = GetMouseIconPath();
+        auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (it == iconPath.end()) {
             MMI_HILOGE("Cannot find the default style");
             return RET_ERR;
         }
@@ -1221,7 +1222,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].iconPath;
+            newIconPath = iconPath[MOUSE_ICON(pointerStyle.id)].iconPath;
         }
         MMI_HILOGD("default path has changed from %{public}s to %{public}s",
             it->second.iconPath.c_str(), newIconPath.c_str());
@@ -1284,8 +1285,9 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_ERR;
         }
     }
-    auto it = GetMouseIconPath().find(MOUSE_ICON(pointerStyle.id));
-    if (it == GetMouseIconPath().end()) {
+    auto iconPath = GetMouseIconPath();
+    auto it = iconPath.find(MOUSE_ICON(pointerStyle.id));
+    if (it == iconPath.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
     }
@@ -1311,7 +1313,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         return RET_OK;
     }
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
+        iconPath[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
         PointerStyle style;
         if (WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) != RET_OK) {
             MMI_HILOGE("Get global pointer style failed!");
