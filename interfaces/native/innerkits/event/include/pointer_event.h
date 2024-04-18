@@ -680,6 +680,21 @@ public:
         void SetPointerId(int32_t pointerId);
 
         /**
+         * @brief Obtains the origin ID of the pointer in this event.
+         * @return Returns the pointer ID.
+         * @since 12
+         */
+        int32_t GetOriginPointerId() const;
+
+        /**
+         * @brief Sets the origin ID of the pointer in this event.
+         * @param pointerId Indicates the pointer ID to set.
+         * @return void
+         * @since 12
+         */
+        void SetOriginPointerId(int32_t originPointerId);
+
+        /**
          * @brief Obtains the time when the pointer is pressed.
          * @return Returns the time.
          * @since 9
@@ -1092,6 +1107,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t originPointerId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
     };
@@ -1446,6 +1462,20 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    /**
+     * @brief
+     * @return The number of times the input event is dispatched.
+     * @since 9
+     */
+    int32_t GetDispatchTimes() const;
+
+    /**
+     * @brief The number of times the same input event was distributed to multiple different windows.
+     * @return void
+     * @since 9
+     */
+    void SetDispatchTimes(int32_t dispatchTimes);
+
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -1477,6 +1507,7 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+    int32_t dispatchTimes { 0 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

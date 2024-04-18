@@ -202,7 +202,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         return RET_ERR;
     }
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetFingerCount() << event->GetZOrder() << event->GetAxes();
+        << event->GetFingerCount() << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
 
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
@@ -264,6 +264,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetFingerCount(tField);
     pkt >> tField;
     event->SetZOrder(tField);
+    pkt >> tField;
+    event->SetDispatchTimes(tField);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;

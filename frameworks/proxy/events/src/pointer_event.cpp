@@ -282,6 +282,16 @@ void PointerEvent::PointerItem::SetRawDx(int32_t rawDx)
     rawDx_ = rawDx;
 }
 
+int32_t PointerEvent::PointerItem::GetOriginPointerId() const
+{
+    return originPointerId_;
+}
+
+void PointerEvent::PointerItem::SetOriginPointerId(int32_t originPointerId)
+{
+    originPointerId_ = originPointerId;
+}
+
 int32_t PointerEvent::PointerItem::GetRawDy() const
 {
     return rawDy_;
@@ -319,7 +329,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
-        out.WriteInt32(targetWindowId_)
+        out.WriteInt32(targetWindowId_) &&
+        out.WriteInt32(originPointerId_)
     );
 }
 
@@ -350,7 +361,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
-        in.ReadInt32(targetWindowId_)
+        in.ReadInt32(targetWindowId_) &&
+        in.ReadInt32(originPointerId_)
     );
 }
 
@@ -361,7 +373,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
       zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
-      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_) {}
+      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_), dispatchTimes_(other.dispatchTimes_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -383,6 +395,7 @@ void PointerEvent::Reset()
     buttonId_ = -1;
     fingerCount_ = 0;
     zOrder_ = -1.0f;
+    dispatchTimes_ = 0;
     axes_ = 0U;
     axisValues_.fill(0.0);
     pressedKeys_.clear();
@@ -1016,6 +1029,16 @@ void PointerEvent::ClearBuffer()
 std::vector<uint8_t> PointerEvent::GetBuffer() const
 {
     return buffer_;
+}
+
+int32_t PointerEvent::GetDispatchTimes() const
+{
+    return dispatchTimes_;
+}
+
+void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
+{
+    dispatchTimes_ = dispatchTimes;
 }
 } // namespace MMI
 } // namespace OHOS
