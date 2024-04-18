@@ -1469,7 +1469,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
-        if (targetWindowId < 0) {
+        if (targetWindowId <= 1) {
             ClearTargetWindowIds();
         }
         bool isHotArea = false;
@@ -1975,7 +1975,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
-    if (targetWindowId < 0) {
+    if (targetWindowId <= 1) {
         ClearTargetWindowIds();
     }
     bool isHotArea = false;
