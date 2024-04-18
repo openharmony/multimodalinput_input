@@ -156,7 +156,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_002, TestSize.L
 {
     DelegateTasks delegateTasks;
     std::vector<DelegateTasks::TaskPtr> tasks;
-    for(int32_t i = 0; i < 15; i++){
+    for (int32_t i = 0; i < 15; i++) {
         delegateTasks.PopPendingTaskList(tasks);
     }
     ASSERT_NO_FATAL_FAILURE(delegateTasks.PopPendingTaskList(tasks));
@@ -171,7 +171,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_002, TestSize.L
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_001, TestSize.Level1)
 {
     DelegateTasks delegateTasks;
-    for(int32_t i = 0; i < 1001; i++){
+    for (int32_t i = 0; i < 1001; i++) {
         delegateTasks.PostTask(nullptr, nullptr);
     }
     auto task = delegateTasks.PostTask(nullptr, nullptr);
