@@ -87,7 +87,7 @@ config("libmmi_server_config") {
   ]
 
   if (input_feature_fingerprint) {
-    include_dirs += ["fingerprint_event_processor/include"]
+    include_dirs += [ "fingerprint_event_processor/include" ]
   }
 
   if (input_ext_feature_anco) {
@@ -184,7 +184,8 @@ ohos_shared_library("libmmi-server") {
     }
   }
   if (input_feature_fingerprint) {
-    sources += ["fingerprint_event_processor/src/fingerprint_event_processor.cpp"]
+    sources +=
+        [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
   }
   if (input_feature_joystick) {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
@@ -312,6 +313,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/unittest/common/include",
@@ -337,6 +339,7 @@ ohos_unittest("ut-mmi-service-out") {
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
     "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
+    "nap_process/test/nap_process_test.cpp",
     "subscriber/test/key_subscriber_handler_test.cpp",
     "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
     "touch_event_normalize/test/touch_event_normalize_test.cpp",
