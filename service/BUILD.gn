@@ -87,7 +87,7 @@ config("libmmi_server_config") {
   ]
 
   if (input_feature_fingerprint) {
-    include_dirs += ["fingerprint_event_processor/include"]
+    include_dirs += [ "fingerprint_event_processor/include" ]
   }
 
   if (input_ext_feature_anco) {
@@ -184,7 +184,8 @@ ohos_shared_library("libmmi-server") {
     }
   }
   if (input_feature_fingerprint) {
-    sources += ["fingerprint_event_processor/src/fingerprint_event_processor.cpp"]
+    sources +=
+        [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
   }
   if (input_feature_joystick) {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
