@@ -2551,6 +2551,12 @@ void InputWindowsManager::ClearExtraData()
     extraData_.pointerId = -1;
 }
 
+ExtraData InputWindowsManager::GetExtraData() const
+{
+    CALL_DEBUG_ENTER;
+    return extraData_;
+}
+
 bool InputWindowsManager::IsWindowVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
