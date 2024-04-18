@@ -23,7 +23,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-//constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NapProcessTest" };
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t NAP_EVENT = 0;
 constexpr int32_t SUBSCRIBED = 1;
