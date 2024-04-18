@@ -21,7 +21,7 @@
 #include "uds_server.h"
 
 #include "input_device_manager.h"
-1111
+
 namespace OHOS {
 namespace MMI {
 namespace {
