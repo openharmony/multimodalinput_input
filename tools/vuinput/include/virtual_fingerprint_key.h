@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_OBSERVER_H
-#define DEVICE_OBSERVER_H
+#ifndef VIRTUAL_FINGERPRINT_KEY_H
+#define VIRTUAL_FINGERPRINT_KEY_H
+
+#include "virtual_device.h"
 
 namespace OHOS {
 namespace MMI {
-class IDeviceObserver {
+class VirtualFingerprintKey : public VirtualDevice {
 public:
-    virtual void UpdatePointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) = 0;
-};
-
-class IDeviceObject {
-public:
-    virtual void Attach(std::shared_ptr<IDeviceObserver> observer) = 0;
-    virtual void Detach(std::shared_ptr<IDeviceObserver> observer) = 0;
-    virtual void NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug) = 0;
+    VirtualFingerprintKey();
+    DISALLOW_COPY_AND_MOVE(VirtualFingerprintKey);
+    ~VirtualFingerprintKey() = default;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // VIRTUAL_FINGERPRINT_KEY_H

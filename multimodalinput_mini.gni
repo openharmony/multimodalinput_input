@@ -38,6 +38,7 @@ declare_args() {
   input_feature_coverage = false
   input_ext_feature_anco = false
   input_ext_feature_fingersense = false
+  input_feature_fingerprint = false
   input_ext_feature_magiccursor = false
 
   if (defined(global_parts_info) &&
@@ -221,6 +222,8 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
+    "src/virtual_fingerprint_key.cpp",
+    "src/virtual_fingerprint_mouse.cpp",
   ]
 
   libmmi_util_sources = [
@@ -292,6 +295,10 @@ if (input_feature_joystick) {
 
 if (input_feature_short_key) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
+}
+
+if (input_feature_fingerprint) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 }
 
 if (!defined(global_parts_info) ||

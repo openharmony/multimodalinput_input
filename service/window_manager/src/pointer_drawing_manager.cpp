@@ -73,6 +73,7 @@ constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
+constexpr int32_t MAX_WINDOWID = 500;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -1028,12 +1029,19 @@ void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
     pid_ = info.windowPid;
 }
 
-void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible,
+    bool isHotPlug)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("hasPointerDevice:%{public}s, isPointerVisible:%{public}s",
+        hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
-        SetPointerVisible(getpid(), isPointerVisible && IsPointerVisible());
+        bool pointerVisible = isPointerVisible;
+        if (!isHotPlug) {
+            pointerVisible = (pointerVisible && IsPointerVisible());
+        }
+        SetPointerVisible(getpid(), pointerVisible);
     } else {
         DeletePointerVisible(getpid());
     }
@@ -1158,7 +1166,7 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
-    MMI_HILOGI("visible:%{public}s", visible ? "true" : "false");
+    MMI_HILOGI("pid:%{public}d,visible:%{public}s", pid, visible ? "true" : "false");
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -1249,9 +1257,26 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
     return RET_OK;
 }
 
+bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (windowId < -1 || windowId > MAX_WINDOWID) {
+        return false;
+    }
+    if ((pointerStyle.id < MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) ||
+        pointerStyle.id > MOUSE_ICON::RUNNING_RIGHT) {
+        return false;
+    }
+    return true;
+}
+
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if (!CheckPointerStyleParam(windowId, pointerStyle)) {
+        MMI_HILOGE("PointerStyle param is invalid");
+        return RET_ERR;
+    }
     if (windowId == GLOBAL_WINDOW_ID) {
         int32_t ret = SetPointerStylePreference(pointerStyle);
         if (ret != RET_OK) {
@@ -1264,13 +1289,12 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
     }
-    int32_t ret = UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
-    if (ret != RET_OK) {
+    if (UpdateDefaultPointerStyle(pid, windowId, pointerStyle) != RET_OK) {
         MMI_HILOGE("Update default pointer iconPath failed!");
-        return ret;
+        return RET_ERR;
     }
 
-    ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return ret;
@@ -1289,8 +1313,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
         PointerStyle style;
-        int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
-        if (ret != RET_OK) {
+        if (WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) != RET_OK) {
             MMI_HILOGE("Get global pointer style failed!");
             return RET_ERR;
         }
