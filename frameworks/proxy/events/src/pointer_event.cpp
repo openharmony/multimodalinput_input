@@ -369,7 +369,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
-        out.WriteInt32(targetWindowId_)
+        out.WriteInt32(targetWindowId_) &&
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
         out.WriteDouble(windowXPos_) &&
@@ -405,7 +405,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
-        in.ReadInt32(targetWindowId_)
+        in.ReadInt32(targetWindowId_) &&
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
         in.ReadDouble(windowXPos_) &&
