@@ -1167,6 +1167,10 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     MMI_HILOGI("pid:%{public}d,visible:%{public}s", pid, visible ? "true" : "false");
+    if (WinMgr->GetExtraData().appended && visible) {
+        MMI_HILOGE("current is drag state, can not set pointer visible");
+        return RET_ERR;
+    }
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
