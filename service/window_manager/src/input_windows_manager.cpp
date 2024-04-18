@@ -1741,7 +1741,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            MMI_HILOGD("turn the mouseDisplay from false to true");
+            MMI_HILOGD("Turn the mouseDisplay from false to true");
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
         }
         pointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
@@ -1766,7 +1766,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         dragPointerStyle_ = pointerStyle;
     }
     if (!touchWindow) {
-        MMI_HILOGE("TouchWindow is nullptr");
+        MMI_HILOGE("TouchWindow is nullopt");
         return RET_ERR;
     }
     WindowInfo window = *touchWindow;
