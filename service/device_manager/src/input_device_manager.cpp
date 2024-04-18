@@ -347,17 +347,18 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     CALL_DEBUG_ENTER;
     std::regex pattern("^event(\\d+)$");
     std::smatch mr;
-    std::string sysName = std::string(libinput_device_get_sysname(inputDevice));
-    if (sysName.empty()) {
-        MMI_HILOGE("The return value of the libinput_device_get_sysname is empty");
+    const char *sysName = libinput_device_get_sysname(inputDevice);
+    if (sysName == nullptr) {
+        MMI_HILOGE("The return value of the libinput_device_get_sysname is null");
         return -1;
     }
-    if (std::regex_match(sysName, mr, pattern)) {
+    std::string strName(sysNmae);
+    if (std::regex_match(strName, mr, pattern)) {
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
             return std::stoi(mr[EXPECTED_SUBMATCH].str());
         }
     }
-    MMI_HILOGE("Parsing sysname failed: \'%{public}s\'", sysName.c_str());
+    MMI_HILOGE("Parsing strName failed: \'%{public}s\'", strName.c_str());
     return -1;
 }
 
