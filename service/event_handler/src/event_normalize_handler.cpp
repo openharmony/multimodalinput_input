@@ -35,6 +35,9 @@
 #include "touch_event_normalize.h"
 #include "event_resample.h"
 #include "touchpad_transform_processor.h"
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+#include "fingerprint_event_processor.h"
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 namespace OHOS {
 namespace MMI {
@@ -257,6 +260,11 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
 
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+        return FingerprintEventHdr->HandleFingerprintEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
         return ERROR_UNSUPPORT;
@@ -312,6 +320,11 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+        return FingerprintEventHdr->HandleFingerprintEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
         return ERROR_UNSUPPORT;
@@ -421,7 +434,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         MMI_HILOGD("touchpad rotate switch is false");
         return RET_ERR;
     }
-    
+
     auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
 
     if (nextHandler_ == nullptr) {

@@ -161,6 +161,13 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+    return OnInjectPointerEventExt(pointerEvent);
+}
+
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     auto source = pointerEvent->GetSourceType();
@@ -185,10 +192,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
-            } else if (((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
-                (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
+            } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+                (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
