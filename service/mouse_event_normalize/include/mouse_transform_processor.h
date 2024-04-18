@@ -43,6 +43,11 @@ struct AccelerateCurve {
     std::vector<double> diffNums;
 };
 class MouseTransformProcessor final : public std::enable_shared_from_this<MouseTransformProcessor> {
+    struct Movement {
+        double dx;
+        double dy;
+    };
+
 public:
     enum class RightClickType {
         TP_RIGHT_BUTTON = 1,
@@ -85,7 +90,6 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
     void DumpInner();
-    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
     int32_t GetTouchpadSpeed(void);
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
@@ -122,6 +126,7 @@ private:
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
+    Movement accelerated_ {};
 };
 } // namespace MMI
 } // namespace OHOS

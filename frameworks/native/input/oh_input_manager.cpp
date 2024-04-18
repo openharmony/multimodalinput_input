@@ -504,6 +504,19 @@ int64_t OH_Input_GetMouseEventActionTime(const struct Input_MouseEvent* mouseEve
     return mouseEvent->actionTime;
 }
 
+static void HandleTouchActionDown(OHOS::MMI::PointerEvent::PointerItem &item, int64_t time)
+{
+    auto pointIds = g_touchEvent->GetPointerIds();
+    if (pointIds.empty()) {
+        g_touchEvent->SetActionStartTime(time);
+        g_touchEvent->SetTargetDisplayId(0);
+    }
+    g_touchEvent->SetActionTime(time);
+    g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
+    item.SetDownTime(time);
+    item.SetPressed(true);
+}
+
 static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS::MMI::PointerEvent::PointerItem &item)
 {
     CALL_DEBUG_ENTER;
@@ -523,15 +536,7 @@ static int32_t HandleTouchAction(const struct Input_TouchEvent* touchEvent, OHOS
             break;
         }
         case TOUCH_ACTION_DOWN: {
-            auto pointIds = g_touchEvent->GetPointerIds();
-            if (pointIds.empty()) {
-                g_touchEvent->SetActionStartTime(time);
-                g_touchEvent->SetTargetDisplayId(0);
-            }
-            g_touchEvent->SetActionTime(time);
-            g_touchEvent->SetPointerAction(OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN);
-            item.SetDownTime(time);
-            item.SetPressed(true);
+            HandleTouchActionDown(item, time);
             break;
         }
         case TOUCH_ACTION_MOVE: {

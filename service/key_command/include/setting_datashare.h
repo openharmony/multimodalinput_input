@@ -25,6 +25,7 @@ namespace OHOS {
 namespace MMI {
 class SettingDataShare : public NoCopyable {
 public:
+    ~SettingDataShare() override;
     static SettingDataShare& GetInstance(int32_t systemAbilityId);
     ErrCode GetStringValue(const std::string& key, std::string& value);
     ErrCode GetIntValue(const std::string& key, int32_t& value);
@@ -40,11 +41,8 @@ public:
     ErrCode RegisterObserver(const sptr<SettingObserver>& observer);
     ErrCode UnregisterObserver(const sptr<SettingObserver>& observer);
 
-protected:
-    ~SettingDataShare() override;
-
 private:
-    static SettingDataShare* instance_;
+    static std::shared_ptr<SettingDataShare> instance_;
     static std::mutex mutex_;
     static sptr<IRemoteObject> remoteObj_;
 
