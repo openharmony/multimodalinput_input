@@ -32,6 +32,7 @@
 #include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
+#include <transaction/rs_interfaces.h>
 
 namespace OHOS {
 namespace MMI {
@@ -126,6 +127,16 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
 }
 
+void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid)
+{
+    if (isTouchEnable_) {
+        MMI_HILOGD("touch interface to RS Enable");
+        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction);
+    } else {
+        MMI_HILOGD("touch interface to RS NOT Enable");
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -155,7 +166,6 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
         MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
-        DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
@@ -177,6 +187,13 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN
+        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
+        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
+        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
+            static_cast<uint32_t>(session->GetPid()));
+    }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());

@@ -73,7 +73,7 @@ int32_t MultimodalEventHandler::UnsubscribeKeyEvent(int32_t subscribeId)
     return MultimodalInputConnMgr->UnsubscribeKeyEvent(subscribeId);
 }
 
-int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
+int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -82,7 +82,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
         MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
     }
-    int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
+    int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent, isNativeInject);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -133,11 +133,11 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     EventLogHelper::PrintEventData(pointerEvent);
-    int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
+    int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent, isNativeInject);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -158,5 +158,25 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+int32_t MultimodalEventHandler::Authorize(bool isAuthorize)
+{
+    int32_t ret = MultimodalInputConnMgr->Authorize(isAuthorize);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalEventHandler::CancelInjection()
+{
+    int32_t ret = MultimodalInputConnMgr->CancelInjection();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
