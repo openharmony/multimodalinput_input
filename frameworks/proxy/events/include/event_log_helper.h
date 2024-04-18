@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef EVENT_LOG_HELPER_H
 #define EVENT_LOG_HELPER_H
 
@@ -117,10 +117,12 @@ private:
                 return;
             }
             MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
-                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,"
-                "ShortAxis:%{public}d,WindowId:%{public}d",
+                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,"
+                "WindowId:%{public}d,DisplayXPos:%{public}f,DisplayYPos:%{public}f,WindowXPos:%{public}f,"
+                "WindowYPos::%{public}f",
                 pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId());
+                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -131,6 +133,13 @@ private:
             }
             MMI_HILOGI("%{public}s]", tmpStr.c_str());
         }
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+        MMI_HILOGI("fingerprint event, id:%{public}d, actionTime:%{public}" PRId64 ", EventType:%{public}s,"
+            "fingerAction:%{public}d, distanceX:%{public}f, distanceY:%{public}f",
+            event->GetId(), event->GetActionTime(), InputEvent::EventTypeToString(event->GetEventType()),
+            event->GetPointerAction(), event->GetFingerprintDistanceX(), event->GetFingerprintDistanceY()
+        );
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     }
 
     static void Print(const std::shared_ptr<PointerEvent> event)

@@ -449,5 +449,34 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_IN);
 }
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_001
+ * @tc.desc: Transfer key value
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_001, TestSize.Level1)
+{
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t nonExistingKeyValue = 999;
+    KeyEventValueTransformation result = TransferKeyValue(nonExistingKeyValue);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_InputTransformationKeyValue_001
+ * @tc.desc: Input transformationKey value
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputTransformationKeyValue_001,
+     TestSize.Level1)
+{
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t result = InputTransformationKeyValue(0);
+    ASSERT_EQ(result, 240);
+}
 } // namespace MMI
 } // namespace OHOS

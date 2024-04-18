@@ -45,6 +45,12 @@ enum HosKeyEventEnum {
     HOS_UNKNOWN_KEY_BASE = 10000,
     HOS_KEY_UNKNOWN = -1,
     /**
+     * Keycode constant: Fn key
+     *
+     * @since 1
+     */
+    HOS_KEY_FN = 0,
+    /**
      * Keycode constant: Home key
      * <p>This key is processed by the framework and will never be sent to the application.
      *
