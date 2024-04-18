@@ -20,9 +20,7 @@
 #include "mmi_log.h"
 #include "uds_server.h"
 
-#define private public
 #include "input_device_manager.h"
-#undef private
 
 namespace OHOS {
 namespace MMI {
