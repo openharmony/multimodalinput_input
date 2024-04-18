@@ -34,7 +34,6 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/common/include",
@@ -117,6 +116,7 @@ ohos_shared_library("libmmi-client") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
   ]
@@ -306,6 +306,7 @@ ohos_unittest("PointerEventTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
     "window_manager:libwm",
     "window_manager:libwsutils",
