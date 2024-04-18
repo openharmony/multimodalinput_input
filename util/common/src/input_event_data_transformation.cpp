@@ -151,7 +151,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
-        << event->GetAgentWindowId() << event->GetFlag();
+        << event->GetAgentWindowId() << event->GetFlag() << event->IsMarkEnabled();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Serialize packet is failed");
         return RET_ERR;
@@ -186,11 +186,14 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetAgentWindowId(tField);
     uint32_t tFlag = InputEvent::EVENT_FLAG_NONE;
     pkt >> tFlag;
+    event->AddFlag(tFlag);
+    bool markEnabled = true;
+    pkt >> markEnabled;
+    event->SetMarkEnabled(markEnabled);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Deserialize packet is failed");
         return RET_ERR;
     }
-    event->AddFlag(tFlag);
     return RET_OK;
 }
 
