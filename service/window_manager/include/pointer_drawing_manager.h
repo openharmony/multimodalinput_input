@@ -80,7 +80,7 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
-    std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
+    IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
 private:
@@ -113,6 +113,8 @@ private:
     void CreatePointerSwiftObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
+    std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
+    void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
 
 private:
     struct PidInfo {

@@ -674,9 +674,9 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
         return;
     }
     lastPointerStyle_.id = pointerStyle.id;
-    std::map<MOUSE_ICON, IconStyle> mouseIcons = IPointerDrawingManager::GetInstance()->GetMouseIconPath();
+    IconStyle iconStyle = IPointerDrawingManager::GetInstance()->GetIconStyle(MOUSE_ICON(pointerStyle.id));
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != defaultIconPath)) {
+        iconStyle.iconPath != defaultIconPath)) {
         PointerStyle style;
         int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         if (ret != RET_OK) {
