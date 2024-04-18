@@ -102,6 +102,16 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     }
 }
 
+bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
+{
+    if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        enableMark_ = !enableMark_;
+        MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
+        return enableMark_;
+    }
+    return true;
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -124,6 +134,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
+    pointerEvent->SetMarkEnabled(AcquireEnableMark(pointerEvent));
     pointerEvent->SetSensorInputTime(point->GetSensorInputTime());
     FilterInvalidPointerItem(pointerEvent, fd);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
@@ -147,7 +158,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
         MMI_HILOGD("session pid : %{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
     }
