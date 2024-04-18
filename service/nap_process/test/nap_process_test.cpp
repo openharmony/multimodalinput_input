@@ -162,7 +162,7 @@ HWTEST_F(NapProcessTest, NapProcessTest_RemoveMmiSubscribedEventData_001, TestSi
     ASSERT_EQ(ret, RET_OK);
     process.AddMmiSubscribedEventData(napData, syncState);
     ret = process.RemoveMmiSubscribedEventData(napData);
-    ASSERT_EQ(ret, RET_OK);   
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
