@@ -93,7 +93,7 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
 }
 
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
-        PointerEvent::PointerItem pointerItem)
+    PointerEvent::PointerItem pointerItem)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
@@ -120,7 +120,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         pointItem.SetDisplayX(windowX);
         pointItem.SetDisplayY(windowY);
         pointItem.SetTargetWindowId(windowId);
-        pointerEvent->UpdatePointerItem(pointerId ,pointerItem);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count);
         count++;
         DispatchPointerEventInner(pointerEvent, fd);
