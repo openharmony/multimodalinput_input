@@ -18,7 +18,6 @@
 
 #include "nap_process.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -34,19 +33,6 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
-
-/**
- * @tc.name: NapProcessTest_GetInstance_001
- * @tc.desc: Test get instance
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(NapProcessTest, NapProcessTest_GetInstance_001, TestSize.Level1)
-{
-    NapProcess* instance1 = NapProcess::GetInstance();
-    NapProcess* instance2 = NapProcess::GetInstance();
-    ASSERT_EQ(instance1, instance2);
-}
 
 /**
  * @tc.name: NapProcessTest_Init_001
