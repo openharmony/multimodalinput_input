@@ -20,7 +20,9 @@
 #include "mmi_log.h"
 #include "uds_server.h"
 
+#define private public
 #include "input_device_manager.h"
+#undef private
 
 namespace OHOS {
 namespace MMI {
@@ -46,7 +48,6 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_001, TestSize.Level1)
     std::shared_ptr<InputDevice> inputDeviceManager{nullptr};
     int32_t id = 1;
     bool checked = true;
-
     inputDeviceManager = inputDevice.GetInputDevice(id, checked);
     EXPECT_EQ(inputDeviceManager, nullptr);
 }
@@ -60,7 +61,6 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
-
     ASSERT_NO_FATAL_FAILURE(inputDevice.GetInputDeviceIds());
 }
 
@@ -74,10 +74,9 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
-    std::vector<int32_t> keyCodes = {12};
-    std::vector<bool> keystroke = {true};
+    std::vector<int32_t> keyCodes{12};
+    std::vector<bool> keystroke{true};
     int32_t returnCode = 401;
-
     int32_t ret = inputDevice.SupportKeys(deviceId, keyCodes, keystroke);
     EXPECT_EQ(ret, returnCode);
 }
@@ -93,9 +92,8 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceConfig_Test_001, TestSize.Level1)
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
-
     bool ret = inputDevice.GetDeviceConfig(deviceId, keyboardType);
-    EXPECT_EQ(ret, false);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -110,7 +108,6 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_001, TestSize.Level1)
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
     int32_t returnCode = 401;
-
     int32_t ret = inputDevice.GetDeviceSupportKey(deviceId, keyboardType);
     EXPECT_EQ(ret, returnCode);
 }
@@ -127,7 +124,6 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_001, TestSize.Level1)
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
     int32_t returnCode = 401;
-
     int32_t ret = inputDevice.GetKeyboardType(deviceId, keyboardType);
     EXPECT_EQ(ret, returnCode);
 }
@@ -141,9 +137,8 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, HasTouchDevice_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
-
     bool ret = inputDevice.HasTouchDevice();
-    EXPECT_EQ(ret, false);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -155,8 +150,7 @@ HWTEST_F(InputDeviceManagerTest, HasTouchDevice_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, ParseDeviceId_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
-    const std::string sysName = "test";
-
+    std::string sysName = "test";
     int32_t ret = inputDevice.ParseDeviceId(sysName);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -170,7 +164,6 @@ HWTEST_F(InputDeviceManagerTest, ParseDeviceId_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, ScanPointerDevice_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
-
     ASSERT_NO_FATAL_FAILURE(inputDevice.ScanPointerDevice());
 }
 
@@ -183,8 +176,7 @@ HWTEST_F(InputDeviceManagerTest, ScanPointerDevice_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, GetKeyboardDevice_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
-    struct libinput_device *inputDev = nullptr;
-
+    struct libinput_device *inputDev = inputDevice.GetKeyboardDevice();
     inputDev = inputDevice.GetKeyboardDevice();
     EXPECT_EQ(inputDev, nullptr);
 }
@@ -199,8 +191,7 @@ HWTEST_F(InputDeviceManagerTest, Dump_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
     int32_t fd = 1;
-    const std::vector<std::string> args = {"test"};
-
+    std::vector<std::string> args{"test"};
     ASSERT_NO_FATAL_FAILURE(inputDevice.Dump(fd, args));
 }
 
@@ -214,8 +205,7 @@ HWTEST_F(InputDeviceManagerTest, DumpDeviceList_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
     int32_t fd = 1;
-    const std::vector<std::string> args = {"test"};
-
+    std::vector<std::string> args{"test"};
     ASSERT_NO_FATAL_FAILURE(inputDevice.DumpDeviceList(fd, args));
 }
 
@@ -229,7 +219,6 @@ HWTEST_F(InputDeviceManagerTest, GetVendorConfig_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
-
     ASSERT_NO_FATAL_FAILURE(inputDevice.GetVendorConfig(deviceId));
 }
 
@@ -243,10 +232,8 @@ HWTEST_F(InputDeviceManagerTest, OnEnableInputDevice_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
     bool enable = true;
-
     int32_t ret = inputDevice.OnEnableInputDevice(enable);
     EXPECT_EQ(ret, RET_OK);
-
     enable = false;
     ret = inputDevice.OnEnableInputDevice(enable);
     EXPECT_EQ(ret, RET_OK);
@@ -261,7 +248,6 @@ HWTEST_F(InputDeviceManagerTest, OnEnableInputDevice_Test_001, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_001, TestSize.Level1)
 {
     InputDeviceManager inputDevice;
-
     ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
 }
 } // namespace MMI
