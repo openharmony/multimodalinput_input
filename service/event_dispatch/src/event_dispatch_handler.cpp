@@ -110,16 +110,16 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         auto pointerEvent = std::make_shared<PointerEvent>(*point);
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
-        int32_t windowX = pointItem.GetDisplayX() - windowInfo->area.x;
-        int32_t windowY = pointItem.GetDisplayY() - windowInfo->area.y;
+        int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
+        int32_t windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
         if (!windowInfo->transform.empty()) {
-            auto windowXY = WinMgr->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(), pointItem.GetDisplayY());
+            auto windowXY = WinMgr->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
             windowX = windowXY.first;
-            windowY = windowXY.second
+            windowY = windowXY.second;
         }
-        pointItem.SetDisplayX(windowX);
-        pointItem.SetDisplayY(windowY);
-        pointItem.SetTargetWindowId(windowId);
+        pointerItem.SetDisplayX(windowX);
+        pointerItem.SetDisplayY(windowY);
+        pointerItem.SetTargetWindowId(windowId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
         DispatchPointerEventInner(pointerEvent, fd);
