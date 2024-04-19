@@ -155,7 +155,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         return;
     }
     auto fd = WinMgr->GetClientFd(point);
-    DispatchPointerEventInner(point, pointerItem);
+    DispatchPointerEventInner(point, fd);
 }
 
 void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
