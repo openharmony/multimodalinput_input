@@ -186,7 +186,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_001, TestSize.Level1)
     int64_t time = 123456789;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
     bool result = ANRMgr->TriggerANR(type, time, sess);
-    ASSERT_EQ(result, false);
+    EXPECT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS
