@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-#include <cstdio>
+#include
+
 #include <gtest/gtest.h>
 
 #include "watchdog_task.h"
@@ -28,8 +29,6 @@ class WatchdogTaskTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    void SetUp() {}
-    void TearDoen() {}
 };
 
 /**
@@ -41,7 +40,7 @@ public:
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetFirstLine_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string path = "";
+    std::string path;
     auto ret = watchdogtask.GetFirstLine(path);
     EXPECT_EQ(ret, path);
 }
@@ -55,7 +54,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetFirstLine_001, TestSize.Level1)
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetProcessNameFromProcCmdline_001, TestSize.Level1)
 {
     WatchdogTask watchdogtask;
-    std::string expectedDescription = "";
+    std::string expectedDescription;
     int32_t pid = -1;
     auto ret = watchdogtask.GetProcessNameFromProcCmdline(pid);
     EXPECT_EQ(ret, expectedDescription);
