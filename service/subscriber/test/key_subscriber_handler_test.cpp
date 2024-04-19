@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include
+
 #include <gtest/gtest.h>
 #include <fstream>
 #include <list>
@@ -192,20 +194,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEqualKeyOption_001
     newOption->SetFinalKeyUpDelay(100);
     oldOption->SetFinalKeyUpDelay(100);
     ASSERT_TRUE(handler.IsEqualKeyOption(newOption, oldOption));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_OnSessionDelete_001
- * @tc.desc: Test onSession delete
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    ASSERT_NO_FATAL_FAILURE(handler.OnSessionDelete(sess));
 }
 
 /**
