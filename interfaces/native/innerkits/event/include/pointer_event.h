@@ -1571,7 +1571,7 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
-    int32_t dispatchTimes { 0 };
+    int32_t dispatchTimes_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
