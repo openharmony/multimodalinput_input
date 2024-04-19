@@ -113,7 +113,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
         int32_t windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
         if (!windowInfo->transform.empty()) {
-            auto windowXY = WinMgr->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+            auto windowXY = WinMgr->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(),
+                pointerItem.GetDisplayY());
             windowX = windowXY.first;
             windowY = windowXY.second;
         }
