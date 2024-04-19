@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include
-
 #include <gtest/gtest.h>
 
 #include "display_event_monitor.h"
