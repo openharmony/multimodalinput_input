@@ -53,6 +53,8 @@ private:
     bool IsExisting(napi_env env);
     void RemoveEnv(std::map<napi_env, napi_ref>::iterator it);
     void RemoveAllEnv();
+    bool IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
+        const std::string &typeName, int32_t fingers);
 
 private:
     std::list<std::shared_ptr<JsInputMonitor>> monitors_;

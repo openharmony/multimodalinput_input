@@ -1329,7 +1329,6 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
 bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects,
     PointerStyle &pointerStyle) const
 {
-    CALL_DEBUG_ENTER;
     int32_t areaNum = 0;
     bool findFlag = false;
     for (const auto &item : rects) {
@@ -1343,8 +1342,7 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             MMI_HILOGE("The addition of displayMaxY overflows");
             return findFlag;
         }
-        if (((x > item.x) && (x <= displayMaxX)) &&
-            (y > item.y) && (y <= displayMaxY)) {
+        if (((x > item.x) && (x <= displayMaxX)) && (y > item.y) && (y <= displayMaxY)) {
             findFlag = true;
             pointerStyle.id = areaNum;
         }
