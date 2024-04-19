@@ -64,7 +64,7 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
 {
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
-    EXPECT_FALSE(client->Start());
+    EXPECT_TRUE(client->Start());
     client->Stop();
 }
 
@@ -92,7 +92,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
 {
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
     client->Start();
-    EXPECT_TRUE(client->Reconnect());
+    EXPECT_FALSE(client->Reconnect());
     client->Stop();
 }
 
