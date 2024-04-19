@@ -151,10 +151,10 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
+    AdjustMouseFocus(direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(pointerStyle.id)).alignmentWay),
         physicalX, physicalY);
     MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
-        ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+        ICON_TYPE(GetIconStyle(MOUSE_ICON(pointerStyle.id)).alignmentWay));
 
     if (surfaceNode_ != nullptr) {
         DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
@@ -969,7 +969,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     if (displayInfo_.displayDirection == DIRECTION0) {
         direction = displayInfo_.direction;
     }
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
+    AdjustMouseFocus(direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
         physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -1216,9 +1216,8 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         return RET_ERR;
     }
     if (pointerStyle.id != style.id) {
-        auto iconPath = GetMouseIconPath();
-        auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
-        if (it == iconPath.end()) {
+        IconStyle iconStyle = GetIconStyle(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (iconStyle.iconPath.empty()) {
             MMI_HILOGE("Cannot find the default style");
             return RET_ERR;
         }
@@ -1226,17 +1225,17 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = iconPath[MOUSE_ICON(pointerStyle.id)].iconPath;
+            newIconPath = GetIconStyle(MOUSE_ICON(pointerStyle.id)).iconPath;
         }
         MMI_HILOGD("default path has changed from %{public}s to %{public}s",
-            it->second.iconPath.c_str(), newIconPath.c_str());
-        it->second.iconPath = newIconPath;
+            iconStyle.iconPath.c_str(), newIconPath.c_str());
+        UpdateIconPath(MOUSE_ICON(MOUSE_ICON::DEFAULT), newIconPath);
     }
     lastMouseStyle_ = style;
     return RET_OK;
 }
 
-std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
+std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIcons()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -1249,6 +1248,28 @@ std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
 #else
     return mouseIcons_;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+IconStyle PointerDrawingManager::GetIconStyle(const MOUSE_ICON mouseStyle)
+{
+    std::map<MOUSE_ICON, IconStyle> mouseIcons = GetMouseIcons();
+    auto iter = mouseIcons.find(mouseStyle);
+    if (iter == mouseIcons.end()) {
+        MMI_HILOGE("Cannot find the mouseStyle:%{public}d", static_cast<int32_t>(mouseStyle));
+        return IconStyle();
+    }
+    return iter->second;
+}
+
+void PointerDrawingManager::UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath)
+{
+    std::map<MOUSE_ICON, IconStyle> mouseIcons = GetMouseIcons();
+    auto iter = mouseIcons.find(mouseStyle);
+    if (iter == mouseIcons.end()) {
+        MMI_HILOGE("Cannot find the mouseStyle:%{public}d", static_cast<int32_t>(mouseStyle));
+        return;
+    }
+    iter->second.iconPath = iconPath;
 }
 
 int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerStyle)
@@ -1289,7 +1310,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_ERR;
         }
     }
-    auto iconPath = GetMouseIconPath();
+    auto iconPath = GetMouseIcons();
     auto it = iconPath.find(MOUSE_ICON(pointerStyle.id));
     if (it == iconPath.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
