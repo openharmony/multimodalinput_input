@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -87,7 +87,7 @@ config("libmmi_server_config") {
   ]
 
   if (input_feature_fingerprint) {
-    include_dirs += ["fingerprint_event_processor/include"]
+    include_dirs += [ "fingerprint_event_processor/include" ]
   }
 
   if (input_ext_feature_anco) {
@@ -184,7 +184,8 @@ ohos_shared_library("libmmi-server") {
     }
   }
   if (input_feature_fingerprint) {
-    sources += ["fingerprint_event_processor/src/fingerprint_event_processor.cpp"]
+    sources +=
+        [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
   }
   if (input_feature_joystick) {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
@@ -331,7 +332,6 @@ ohos_unittest("ut-mmi-service-out") {
     "event_handler/test/key_event_value_transformation_test.cpp",
     "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
-    "module_loader/test/mmi_service_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
@@ -367,13 +367,11 @@ ohos_unittest("ut-mmi-service-out") {
   ]
 
   external_deps = [
-    "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
