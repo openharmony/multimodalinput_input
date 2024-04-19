@@ -503,21 +503,21 @@ HWTEST_F(UDSServerTest, NotifySessionDeleted_001, TestSize.Level1)
 
 /**
  * @tc.name: GetClientPid_002
- * @tc.desc: Test the function GetClientPid
+ * @tc.desc: Test the scenario of obtaining the client process ID
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(UDSServerTest, GetClientPid_002, TestSize.Level1)
 {
     UDSServer udsServer;
-    int32_t fd = 1;
+    int32_t fd = 123;
     auto ret = udsServer.GetClientPid(fd);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
  * @tc.name: AddSocketPairInfo_002
- * @tc.desc: Test the function AddSocketPairInfo
+ * @tc.desc: Test the scenario of adding socket pair information
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -528,16 +528,22 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
     int32_t moduleType = 1;
     int32_t uid = 2;
     int32_t pid = 10;
-    int32_t serverFd = -1;
-    int32_t toReturnClientFd = -1;
+    int32_t serverFd = 123;
+    int32_t toReturnClientFd = 456;
     int32_t tokenType = 1;
     auto ret = udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+    if (serverFd != -1) {
+        close(serverFd);
+    }
+    if (toReturnClientFd != -1) {
+        close(toReturnClientFd);
+    }
     EXPECT_EQ(ret, RET_OK);
 }
 
 /**
  * @tc.name: SetFdProperty_003
- * @tc.desc: Test the function SetFdProperty
+ * @tc.desc: Test the scenario of setting file descriptor properties
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -545,15 +551,15 @@ HWTEST_F(UDSServerTest, SetFdProperty_003, TestSize.Level1)
 {
     UDSServer udsServer;
     int32_t tokenType = TokenType::TOKEN_NATIVE;
-    int32_t serverFd = -1;
-    int32_t toReturnClientFd = -1;
+    int32_t serverFd = 123;
+    int32_t toReturnClientFd = 456;
     auto ret = udsServer.SetFdProperty(tokenType, serverFd, toReturnClientFd);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
  * @tc.name: Dump_002
- * @tc.desc: Test the function Dump
+ * @tc.desc: Test the Dump functionality of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -567,7 +573,7 @@ HWTEST_F(UDSServerTest, Dump_002, TestSize.Level1)
 
 /**
  * @tc.name: OnConnected_002
- * @tc.desc: Test the function OnConnected
+ * @tc.desc: Test the OnConnected function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -580,7 +586,7 @@ HWTEST_F(UDSServerTest, OnConnected_002, TestSize.Level1)
 
 /**
  * @tc.name: OnDisconnected_001
- * @tc.desc: Test the function OnDisconnected
+ * @tc.desc: Test the OnDisconnected function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -594,7 +600,7 @@ HWTEST_F(UDSServerTest, OnDisconnected_001, TestSize.Level1)
 
 /**
  * @tc.name: AddEpoll_001
- * @tc.desc: Test the function AddEpoll
+ * @tc.desc: Test the AddEpoll function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -609,7 +615,7 @@ HWTEST_F(UDSServerTest, AddEpoll_001, TestSize.Level1)
 
 /**
  * @tc.name: SetRecvFun_002
- * @tc.desc: Test the function SetRecvFun
+ * @tc.desc: Test the SetRecvFun function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -622,7 +628,7 @@ HWTEST_F(UDSServerTest, SetRecvFun_002, TestSize.Level1)
 
 /**
  * @tc.name: ReleaseSession_002
- * @tc.desc: Test the function ReleaseSession
+ * @tc.desc: Test the ReleaseSession function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -636,7 +642,7 @@ HWTEST_F(UDSServerTest, ReleaseSession_002, TestSize.Level1)
 
 /**
  * @tc.name: OnPacket_001
- * @tc.desc: Test the function OnPacket
+ * @tc.desc: Test the OnPacket function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -651,7 +657,7 @@ HWTEST_F(UDSServerTest, OnPacket_001, TestSize.Level1)
 
 /**
  * @tc.name: OnEpollRecv_003
- * @tc.desc: Test the function OnEpollRecv
+ * @tc.desc: Test the OnEpollRecv function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -665,7 +671,7 @@ HWTEST_F(UDSServerTest, OnEpollRecv_003, TestSize.Level1)
 
 /**
  * @tc.name: OnEpollEvent_001
- * @tc.desc: Test the function OnEpollEvent
+ * @tc.desc: Test the OnEpollEvent function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -678,7 +684,7 @@ HWTEST_F(UDSServerTest, OnEpollEvent_001, TestSize.Level1)
 
 /**
  * @tc.name: AddEpollEvent_002
- * @tc.desc: Test the function AddEpollEvent
+ * @tc.desc: Test the AddEpollEvent function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -692,7 +698,7 @@ HWTEST_F(UDSServerTest, AddEpollEvent_002, TestSize.Level1)
 
 /**
  * @tc.name: RemoveEpollEvent_001
- * @tc.desc: Test the function RemoveEpollEvent
+ * @tc.desc: Test the RemoveEpollEvent function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -705,7 +711,7 @@ HWTEST_F(UDSServerTest, RemoveEpollEvent_001, TestSize.Level1)
 
 /**
  * @tc.name: DumpSession_002
- * @tc.desc: Test the function DumpSession
+ * @tc.desc: The DumpSession function of UDSServer properly outputs session information
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -718,7 +724,7 @@ HWTEST_F(UDSServerTest, DumpSession_002, TestSize.Level1)
 
 /**
  * @tc.name: AddSession_002
- * @tc.desc: Test the function AddSession
+ * @tc.desc: The AddSession function of UDSServer properly adds a session
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -732,7 +738,7 @@ HWTEST_F(UDSServerTest, AddSession_002, TestSize.Level1)
 
 /**
  * @tc.name: DelSession_003
- * @tc.desc: Test the function DelSession
+ * @tc.desc: The DelSession function of UDSServer properly deletes a session
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -747,7 +753,7 @@ HWTEST_F(UDSServerTest, DelSession_003, TestSize.Level1)
 
 /**
  * @tc.name: NotifySessionDeleted_002
- * @tc.desc: Test the function NotifySessionDeleted
+ * @tc.desc: Test the NotifySessionDeleted function of UDSServer
  * @tc.type: FUNC
  * @tc.require:
  */
