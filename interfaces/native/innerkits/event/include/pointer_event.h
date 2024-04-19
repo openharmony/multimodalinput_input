@@ -700,15 +700,15 @@ public:
         void SetPointerId(int32_t pointerId);
 
         /**
-         * @brief Obtains the origin ID of the pointer in this event.
-         * @return Returns the pointer ID.
+         * @brief Obtains the origin id of the pointer in this event.
+         * @return Returns the pointer id.
          * @since 12
          */
         int32_t GetOriginPointerId() const;
 
         /**
-         * @brief Sets the origin ID of the pointer in this event.
-         * @param pointerId Indicates the pointer ID to set.
+         * @brief Sets the origin id of the pointer in this event.
+         * @param pointerId Indicates the pointer id to set.
          * @return void
          * @since 12
          */
@@ -1495,16 +1495,16 @@ public:
     bool ReadFromParcel(Parcel &in);
 
     /**
-     * @brief
-     * @return The number of times the input event is dispatched.
-     * @since 9
+     * @brief The number of times the input event is dispatched.
+     * @return Return the event dispatch times.
+     * @since 12
      */
     int32_t GetDispatchTimes() const;
 
     /**
      * @brief The number of times the same input event was distributed to multiple different windows.
      * @return void
-     * @since 9
+     * @since 12
      */
     void SetDispatchTimes(int32_t dispatchTimes);
 
