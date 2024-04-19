@@ -352,7 +352,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
         MMI_HILOGE("The return value of the libinput_device_get_sysname is null");
         return -1;
     }
-    std::string strName(sysNmae);
+    std::string strName(sysName);
     if (std::regex_match(strName, mr, pattern)) {
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
             return std::stoi(mr[EXPECTED_SUBMATCH].str());
