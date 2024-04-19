@@ -250,7 +250,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
     if (windowInfo == nullptr) {
-        MMI_HILOGE("WindowInfo is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         return INVALID_FD;
     } else {
         MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
@@ -2744,12 +2744,8 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
             return true;
         case WindowInputType::TRANSMIT_EXCEPT_MOVE: {
             auto pointerAction = pointerEvent->GetPointerAction();
-            if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-                pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE) {
-                return true;
-            } else {
-                return false;
-            }
+            return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+                pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
         }
         case WindowInputType::ANTI_MISTAKE_TOUCH:
             return true;
@@ -2767,7 +2763,7 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t w
             return std::make_optional(item);
         }
     }
-    return std::nullptr;
+    return std::nullopt;
 }
 
 void InputWindowsManager::GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds)
