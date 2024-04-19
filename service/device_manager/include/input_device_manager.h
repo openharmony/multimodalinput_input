@@ -80,7 +80,7 @@ public:
     int32_t OnEnableInputDevice(bool enable);
 
 private:
-    int32_t ParseDeviceId(const std::string &sysName);
+    int32_t ParseDeviceId(struct libinput_device *inputDevice);
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
