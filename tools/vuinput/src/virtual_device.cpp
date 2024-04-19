@@ -250,8 +250,8 @@ static void StartFingerprint()
     fingerprintMouse.SetUp();
 }
 
-using virtualFun = void (*)();
-std::map<std::string, virtualFun> mapFun = {
+using VirtualFun = void (*)();
+std::map<std::string, VirtualFun> mapFun = {
     {"mouse", &StartMouse},
     {"keyboard", &StartKeyboard},
     {"joystick", &StartJoystick},
