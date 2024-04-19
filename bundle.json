@@ -73,7 +73,8 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
-        "graphic_2d_ext"
+        "graphic_2d_ext",
+	"audio_framework"
       ],
       "third_party": [
         "cJSON",
