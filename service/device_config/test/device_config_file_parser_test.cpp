@@ -35,7 +35,7 @@ public:
     virtual uint32_t libinput_device_get_id_vendor() const { return 123; }
     virtual uint32_t libinput_device_get_id_product() const { return 456; }
     virtual uint32_t libinput_device_get_id_version() const { return 789; }
-    virtual const char* libinput_device_get_name() const { return "MockDevice"; }
+    virtual const char* LibinputDeviceGetName() const { return "MockDevice"; }
 };
 
 /**
@@ -48,7 +48,7 @@ HWTEST_F(DeviceConfigFileParserTest, DeviceConfigFileParserTest_CombDeviceFileNa
 {
     class MockLibinputDeviceNullName : public MockLibinputDevice {
     public:
-        const char* libinput_device_get_name() const override { return nullptr; }
+        const char* LibinputDeviceGetName() const override { return nullptr; }
     };
 
     MockLibinputDeviceNullName mockDevice;
@@ -104,8 +104,5 @@ HWTEST_F(DeviceConfigFileParserTest, DeviceConfigFileParserTest_GetVendorConfig_
     VendorConfig vendorconfig = configManager.GetVendorConfig(device);
     EXPECT_EQ(vendorconfig.pointerSpeed, -1);
 }
-
-
-
 } // namespace MMI
 } // namespace OHOS
