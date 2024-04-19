@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-#include <cstdio>
+#include
+
 #include <gtest/gtest.h>
 
 #include "display_event_monitor.h"
@@ -28,8 +29,6 @@ class DisplayEventMonitorTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    void SetUp() {}
-    void TearDoen() {}
 };
 } // namespace MMI
 } // namespace OHOS
