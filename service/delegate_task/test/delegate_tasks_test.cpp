@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-#include <cstdio>
+#include
+
 #include <gtest/gtest.h>
 
 #include "delegate_tasks.h"
@@ -29,8 +30,6 @@ class DelegateTasksTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    void SetUp() {}
-    void TearDoen() {}
 };
 
 /**
@@ -43,29 +42,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_Init_001, TestSize.Level1)
 {
     DelegateTasks delegateTasks;
     ASSERT_NO_FATAL_FAILURE(delegateTasks.Init());
-}
-
-/**
- * @tc.name: DelegateTasksTest_ProcessTasks_001
- * @tc.desc: Test the function ProcessTasks
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_ProcessTasks_001, TestSize.Level1)
-{
-    DelegateTasks delegateTasks;
     ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
-}
-
-/**
- * @tc.name: DelegateTasksTest_PostSyncTask_001
- * @tc.desc: Test the function PostSyncTask
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_001, TestSize.Level1)
-{
-    DelegateTasks delegateTasks;
     EXPECT_EQ(delegateTasks.PostSyncTask(nullptr), ERROR_NULL_POINTER);
 }
 
