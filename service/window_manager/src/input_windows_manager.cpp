@@ -241,9 +241,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     CHKPR(udsServer_, INVALID_FD);
     CHKPR(pointerEvent, INVALID_FD);
     const WindowInfo* windowInfo = nullptr;
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetWindowIds());
-    for (const auto &item : windowsInfo) {
-        if (item.id == windowsInfo) {
+    std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetWindowIds());
+    for (const auto &item : windowInfos) {
+        if (item.id == windowId) {
             MMI_HILOGD("Find windowInfo by window id %{public}d", item.id);
             windowInfo = &item;
             break;
@@ -2757,8 +2757,8 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
 std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId)
 {
     CALL_DEBUG_ENTER;
-    std::vector<int32_t> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
-    for (const auto &item : windowsInfo) {
+    std::vector<int32_t> windowInfos = GetWindowGroupInfoByDisplayId(displayId);
+    for (const auto &item : windowInfos) {
         if (windowId == item.id) {
             return std::make_optional(item);
         }
