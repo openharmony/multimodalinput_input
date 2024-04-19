@@ -40,8 +40,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleTouchEvent_001, TestSize.Lev
 {
     EventDispatchHandler eventdispatchhandler;
     int32_t eventType = 3;
-    PointerEvent* pointerEvent = new PointerEvent(eventType);
-    std::shared_ptr<PointerEvent> sharedPointerEvent(pointerEvent);
+    std::shared_ptr<PointerEvent> sharedPointerEvent = std::make_shared<PointerEvent>(eventType);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleTouchEvent(sharedPointerEvent));
 }
 
@@ -56,8 +55,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_001, Test
     EventDispatchHandler eventdispatchhandler;
     int32_t fd = 1;
     int32_t eventType = 3;
-    PointerEvent* pointerEvent = new PointerEvent(eventType);
-    std::shared_ptr<PointerEvent> sharedPointerEvent(pointerEvent);
+    std::shared_ptr<PointerEvent> sharedPointerEvent = std::make_shared<PointerEvent>(eventType);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(sharedPointerEvent, fd));
 }
 
