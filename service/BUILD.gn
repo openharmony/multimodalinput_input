@@ -324,6 +324,7 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
+    "device_manager/test/input_device_manager_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
     "event_handler/test/anr_manager_test.cpp",
