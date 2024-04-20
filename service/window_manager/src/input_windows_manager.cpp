@@ -1956,8 +1956,15 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
-    double physicalX = pointerItem.GetDisplayXPos();
-    double physicalY = pointerItem.GetDisplayYPos();
+    double physicalX = 0;
+    double physicalY = 0;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        physicalX = pointerItem.GetDisplayX();
+        physicalY = pointerItem.GetDisplayY();
+    } else {
+        physicalX = pointerItem.GetDisplayXPos();
+        physicalY = pointerItem.GetDisplayYPos();
+    }
     AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
     int32_t logicalX1 = 0;
     int32_t logicalY1 = 0;
