@@ -143,5 +143,50 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
     int32_t ret = ANRMgr->SetANRNoticedPid(pid);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: AnrManagerTest_AddTimer_001
+ * @tc.desc: Add timer function normal
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
+{
+    int32_t type = 1;
+    int32_t id = 1001;
+    int64_t currentTime = 123456789;
+    SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
+}
+
+/**
+ * @tc.name: AnrManagerTest_AddTimer_002
+ * @tc.desc: Add timer function abnormal
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_002, TestSize.Level1)
+{
+    int32_t type = -1;
+    int32_t id = -2;
+    int64_t currentTime = 123456789;
+    SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
+    ASSERT_NO_FATAL_FAILURE(ANRMgr->AddTimer(type, id, currentTime, sess));
+}
+
+/**
+ * @tc.name: AnrManagerTest_TriggerANR_001
+ * @tc.desc: Trigger function normal
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_001, TestSize.Level1)
+{
+    int32_t type = 1;
+    int64_t time = 123456789;
+    SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
+    bool result = ANRMgr->TriggerANR(type, time, sess);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS
