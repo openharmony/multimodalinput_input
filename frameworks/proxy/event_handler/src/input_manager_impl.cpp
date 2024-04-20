@@ -558,7 +558,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
             if (pixelMapPtr != nullptr) {
                 const uint8_t* dataPtr = pixelMapPtr->GetPixels();
                 const char* chars = reinterpret_cast<const char*>(dataPtr);
-                size  = static_cast<size_t>(pixelMapPtr->GetByteCount());
+                size = static_cast<size_t>(pixelMapPtr->GetByteCount());
                 MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d",
                     size, pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
                 pkt << size << pixelMapPtr->GetWidth() << pixelMapPtr->GetHeight();

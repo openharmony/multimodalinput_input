@@ -693,7 +693,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     GetPointerStyleByArea(area, pid, windowId, pointerStyle);
     UpdateWindowPointerVisible(pid);
     if (lastPointerStyle_.id == pointerStyle.id) {
-        MMI_HILOGE("Tha lastPointerStyle is  totally equal with this, no need to change it");
+        MMI_HILOGE("Tha lastPointerStyle is totally equal with this, no need to change it");
         return;
     }
     lastPointerStyle_.id = pointerStyle.id;
@@ -2809,7 +2809,7 @@ void InputWindowsManager::ClearTargetWindowIds()
 int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    int32_t checkingPid  = GetWindowPid(windowId);
+    int32_t checkingPid = GetWindowPid(windowId);
     if (checkingPid != pid) {
         MMI_HILOGE("check windowId failed, windowId is %{public}d, pid is %{public}d", windowId, pid);
         return RET_ERR;

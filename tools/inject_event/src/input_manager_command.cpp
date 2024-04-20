@@ -283,9 +283,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         << std::endl;
                                     return RET_ERR;
                                 }
-                                std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
-                                std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
-                                std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
+                                std::cout << "start coordinate: (" << px1 << ", " << py1 << ")" << std::endl;
+                                std::cout << "  end coordinate: (" << px2 << ", " << py2 << ")" << std::endl;
+                                std::cout << "     total times: "  << totalTimeMs << " ms"      << std::endl;
                                 std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -384,7 +384,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 's': {
                             if (!StrToInt(optarg, scrollValue)) {
-                                std::cout << "invalid  scroll button command" << std::endl;
+                                std::cout << "invalid scroll button command" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "scroll wheel " << scrollValue << std::endl;
