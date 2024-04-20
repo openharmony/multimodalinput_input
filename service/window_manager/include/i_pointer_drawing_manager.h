@@ -105,7 +105,7 @@ public:
     {
         return {};
     }
-    virtual std::map<MOUSE_ICON, IconStyle> GetMouseIconPath()
+    virtual IconStyle GetIconStyle(const MOUSE_ICON mouseStyle)
     {
         return {};
     }

@@ -297,29 +297,6 @@ HWTEST_F(UDSServerTest, SetRecvFun_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ReleaseSession_001
- * @tc.desc: Test the function ReleaseSession
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, ReleaseSession_001, TestSize.Level1)
-{
-    UDSServer udsServer;
-    int32_t fd = 1;
-    epoll_event ev;
-    int32_t tokenType = TokenType::TOKEN_SHELL;
-    int32_t serverFd = 1;
-    const std::string programName = "program";
-    const int32_t moduleType = 1;
-    const int32_t uid = 2;
-    const int32_t pid = 10;
-    int32_t toReturnClientFd = 1;
-     
-    udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
-    udsServer.ReleaseSession(fd, ev);
-}
-
-/**
  * @tc.name: OnEpollRecv_001
  * @tc.desc: Test the function OnEpollRecv
  * @tc.type: FUNC

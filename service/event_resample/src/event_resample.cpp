@@ -218,8 +218,8 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
                 return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
             }
             auto windowXY = WinMgr->TransformWindowXY(window, logicX, logicY);
-            auto windowX = windowXY.first;
-            auto windowY = windowXY.second;
+            auto windowX = static_cast<int32_t>(windowXY.first);
+            auto windowY = static_cast<int32_t>(windowXY.second);
             return {windowX, windowY};
         }
     }
