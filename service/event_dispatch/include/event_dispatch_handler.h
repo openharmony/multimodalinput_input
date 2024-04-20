@@ -56,6 +56,10 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
+    void DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd);
+    void HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
+        PointerEvent::PointerItem pointerItem);
+
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
     bool isTouchEnable_ = true;
