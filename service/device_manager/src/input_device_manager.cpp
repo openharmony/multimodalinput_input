@@ -342,17 +342,23 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     }
 }
 
-int32_t InputDeviceManager::ParseDeviceId(const std::string &sysName)
+int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
     std::regex pattern("^event(\\d+)$");
     std::smatch mr;
-
-    if (std::regex_match(sysName, mr, pattern)) {
+    const char *sysName = libinput_device_get_sysname(inputDevice);
+    if (sysName == nullptr) {
+        MMI_HILOGE("The return value of the libinput_device_get_sysname is null");
+        return -1;
+    }
+    std::string strName(sysName);
+    if (std::regex_match(strName, mr, pattern)) {
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
             return std::stoi(mr[EXPECTED_SUBMATCH].str());
         }
     }
+    MMI_HILOGE("Parsing strName failed: \'%{public}s\'", strName.c_str());
     return -1;
 }
 
@@ -372,11 +378,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             hasPointer = true;
         }
     }
-    const char *sysName = libinput_device_get_sysname(inputDevice);
-    CHKPV(sysName);
-    int32_t deviceId = ParseDeviceId(std::string(sysName));
+    int32_t deviceId = ParseDeviceId(inputDevice);
     if (deviceId < 0) {
-        MMI_HILOGE("Parsing sysname failed: \'%{public}s\'", sysName);
         return;
     }
     struct InputDeviceInfo info;
@@ -395,7 +398,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-        NotifyPointerDevice(true, true);
+        NotifyPointerDevice(true, true, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
         MMI_HILOGI("Set para input.pointer.device true");
     }
@@ -474,7 +477,7 @@ void InputDeviceManager::ScanPointerDevice()
         }
     }
     if (!hasPointerDevice) {
-        NotifyPointerDevice(false, false);
+        NotifyPointerDevice(false, false, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
         MMI_HILOGI("Set para input.pointer.device false");
     }
@@ -485,6 +488,10 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    std::string name = libinput_device_get_name(device);
+    if (name == "hw_fingerprint_mouse") {
+        return false;
+    }
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
         EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
 }
@@ -515,11 +522,11 @@ void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
     observers_.remove(observer);
 }
 
-void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisible)
+void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug)
 {
     MMI_HILOGI("observers_ size:%{public}zu", observers_.size());
     for (auto observer = observers_.begin(); observer != observers_.end(); observer++) {
-        (*observer)->UpdatePointerDevice(hasPointerDevice, isVisible);
+        (*observer)->UpdatePointerDevice(hasPointerDevice, isVisible, isHotPlug);
     }
 }
 
@@ -663,7 +670,7 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
     }
     for (const auto &item : inputDevice_) {
         if (item.second.isPointerDevice && item.second.enable) {
-            NotifyPointerDevice(true, true);
+            NotifyPointerDevice(true, true, false);
             break;
         }
     }

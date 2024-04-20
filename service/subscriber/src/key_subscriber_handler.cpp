@@ -195,20 +195,34 @@ int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
     return RET_OK;
 }
 
+bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    MMI_HILOGD("Is Funciton Key In");
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_WLAN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_CONFIG) {
+        return true;
+    }
+    return false;
+}
+
 bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (enableCombineKey_) {
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
-        auto items = keyEvent->GetKeyItems();
-        return items.size() != 1 ? enableCombineKey_ : true;
-    }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+    if (IsFunctionKey(keyEvent)) {
         auto items = keyEvent->GetKeyItems();
         return items.size() != 1 ? enableCombineKey_ : true;
     }
@@ -269,19 +283,19 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
                 return false;
             }
             MMI_HILOGI("Set mute success!");
+            hasHandleRingMute_ = true;
+            return true;
         } else {
             if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
                 MMI_HILOGE("Set mute success keycode power miss!");
                 return false;
             }
-            MMI_HILOGI("Set mute success keycode power success!");
+            return true;
         }
     }
-    if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_ACTIVE || DEVICE_MONITOR->GetCallState() ==
-        StateType::CALL_STATUS_DISCONNECTED
-        || DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_DISCONNECTING) {
-        int32_t initVol = AudioStandard::AudioSystemManager::GetInstance()->GetVolume(
-            AudioStandard::AudioVolumeType::STREAM_RING);
+    if (hasHandleRingMute_ && (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_ACTIVE
+        || DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_DISCONNECTED
+        || DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_DISCONNECTING)) {
         ret = AudioStandard::AudioSystemManager::GetInstance()->SetMute(
             AudioStandard::AudioVolumeType::STREAM_RING, false);
         if (ret != 0) {
@@ -290,7 +304,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         }
         MMI_HILOGI("Mute reply success.");
     }
-    return true;
+    return false;
 }
 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)

@@ -118,6 +118,44 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
     return true;
 }
 
+
+bool PermissionHelper::CheckInfraredEmmit()
+{
+    std::string infraredEmmitPermissionCode = "ohos.permission.INFRARED_EMITTER";
+    return CheckHapPermission(infraredEmmitPermissionCode);
+}
+
+bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    return CheckHapPermission(tokenId, permissionCode);
+}
+
+bool PermissionHelper::CheckHapPermission(uint32_t tokenId, const std::string permissionCode)
+{
+    CALL_DEBUG_ENTER;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
+        (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGI("Token type is shell");
+        return true;
+    } else {
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
+        return false;
+    }
+    std::string context = "For CheckPerm. PermiCode" + permissionCode + ";appId:" + std::to_string(tokenId);
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
+    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+        MMI_HILOGE("Check Permi: %{public}s fail for appId:%{public}d, and ret:%{public}d",
+                   permissionCode.c_str(), tokenId, ret);
+        return false;
+    }
+    MMI_HILOGD("Check permission( %{public}s) permission success", permissionCode.c_str());
+    return true;
+}
+
 bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
 {
     static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
