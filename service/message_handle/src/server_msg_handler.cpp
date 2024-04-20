@@ -284,7 +284,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         if (byteCount != 0) {
             MMI_HILOGD("byteCount:%{public}d", byteCount);
             SetWindowInfo(info.id, info);
-         }
+        }
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -604,6 +604,6 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void* pixelMap)
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
     return RET_OK;
- }
+}
 } // namespace MMI
 } // namespace OHOS
