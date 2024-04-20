@@ -225,6 +225,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
+        DECLARE_NAPI_FUNCTION("hasIrEmitter", HasIrEmitter),
         DECLARE_NAPI_FUNCTION("getInfraredFrequencies", GetInfraredFrequencies),
         DECLARE_NAPI_FUNCTION("transmitInfrared", TransmitInfrared)
     };
