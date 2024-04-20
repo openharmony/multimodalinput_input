@@ -159,7 +159,7 @@ private:
             "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
             "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
-            "BufferCount:%{public}zu,Buffer:%{public}s",
+            "BufferCount:%{public}zu,Buffer:%{public}s,MarkEnabled:%{public}d",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetSensorInputTime(),
             event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(),
@@ -172,7 +172,7 @@ private:
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE), event->GetPointerId(), pointerIds.size(),
-            event->GetId(), buffer.size(), str.c_str());
+            event->GetId(), buffer.size(), str.c_str(), event->IsMarkEnabled());
 
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;

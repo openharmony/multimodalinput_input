@@ -777,7 +777,7 @@ public:
     */
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
-    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime, bool enable = true);
 
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 
