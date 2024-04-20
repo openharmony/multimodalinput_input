@@ -165,7 +165,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetDisplayX(static_cast<int32_t>(tCoord.x));
     item.SetDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetDisplayXPos(tCoord.x);
-    item.SetDisplayYPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
@@ -216,7 +216,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     item.SetDisplayX(static_cast<int32_t>(tCoord.x));
     item.SetDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetDisplayXPos(tCoord.x);
-    item.SetDisplayYPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
