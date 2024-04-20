@@ -1976,5 +1976,40 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    if (infoId < 0 || pixelMap == nullptr) {
+        MMI_HILOGE("Invalid infoId or pixelMap");
+        return RET_ERR;
+    }
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    if (pixelMapPtr->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty");
+        return RET_ERR;
+    }
+    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
+
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, infoId, ERR_INVALID_VALUE);
+    pixelMapPtr->Marshalling(data);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send request, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -2106,5 +2106,18 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     MMI_HILOGI("MMIService::OnTransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;
 }
+
+int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::SetPixelMapData, &sMsgHandler_,
+        infoId, pixelMap));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
