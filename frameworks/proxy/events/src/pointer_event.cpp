@@ -682,12 +682,12 @@ void PointerEvent::SetFingerCount(int32_t fingerCount)
     fingerCount_ = fingerCount;
 }
 
-float  PointerEvent::GetZOrder() const
+float PointerEvent::GetZOrder() const
 {
     return zOrder_;
 }
 
-void  PointerEvent::SetZOrder(float zOrder)
+void PointerEvent::SetZOrder(float zOrder)
 {
     zOrder_ = zOrder;
 }

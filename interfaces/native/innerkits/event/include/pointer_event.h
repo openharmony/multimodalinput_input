@@ -62,7 +62,7 @@ public:
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
-     * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger leaves the touchscreen or touchpad.
      *
      * @since 9
      */
