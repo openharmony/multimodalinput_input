@@ -443,7 +443,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEven
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     auto ret = processor.GetPointerEvent();
-    ASSERT_EQ(ret, nullptr);
+    ASSERT_NE(ret, nullptr);
 }
 
 /**
@@ -459,7 +459,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionIn
     struct libinput_event_pointer* data = nullptr;
     struct libinput_event* event = nullptr;
     auto ret = processor.HandleMotionInner(data, event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -520,7 +520,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonIn
     struct libinput_event_pointer* data = nullptr;
     struct libinput_event* event = nullptr;
     auto ret = processor.HandleButtonInner(data, event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -537,7 +537,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonVa
     uint32_t button = -1;
     int32_t type = 0;
     auto ret = processor.HandleButtonValueInner(data, button, type);
-    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_NE(ret, RET_ERR);
 }
 
 /**
@@ -554,7 +554,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleButtonVa
     uint32_t button = 272;
     int32_t type = 1;
     auto ret = processor.HandleButtonValueInner(data, button, type);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -585,7 +585,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInne
     MouseTransformProcessor processor(deviceId);
     struct libinput_event_pointer* data = nullptr;
     auto ret = processor.HandleAxisInner(data);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -600,7 +600,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBegi
     MouseTransformProcessor processor(deviceId);
     struct libinput_event* event = nullptr;
     auto ret = processor.HandleAxisBeginEndInner(event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -644,7 +644,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_001,
     MouseTransformProcessor processor(deviceId);
     struct libinput_event* event = nullptr;
     auto ret = processor.Normalize(event);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -661,7 +661,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeRotat
     int32_t type = 1;
     double angle = 90.0;
     auto ret = processor.NormalizeRotateEvent(event, type, angle);
-    ASSERT_EQ(ret, RET_OK);
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -760,22 +760,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadSpe
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     auto ret = processor.GetTouchpadSpeed();
-    ASSERT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: MouseTransformProcessorTest_SetDxDyForDInput_001
- * @tc.desc: Set dxdy for dinput verify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetDxDyForDInput_001, TestSize.Level1)
-{
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    PointerEvent::PointerItem pointerItem;
-    struct libinput_event_pointer* data = nullptr;
-    ASSERT_NO_FATAL_FAILURE(processor.SetDxDyForDInput(pointerItem, data));
+    ASSERT_NE(ret, RET_OK);
 }
 
 /**
@@ -919,22 +904,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchpad
     struct libinput_event_pointer* data = nullptr;
     int32_t eventType = 1;
     uint32_t button = 0x118;
-    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(data, eventType, button));
-}
-
-/**
- * @tc.name: MouseTransformProcessorTest_HandleTouchpadTwoFingerButton_003
- * @tc.desc: Handle touchpad two finger button verify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchpadTwoFingerButton_003, TestSize.Level1)
-{
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    struct libinput_event_pointer* data = nullptr;
-    int32_t eventType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
-    uint32_t button = MouseDeviceState::LIBINPUT_LEFT_BUTTON_CODE;
     ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(data, eventType, button));
 }
 

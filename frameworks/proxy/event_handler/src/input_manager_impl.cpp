@@ -513,7 +513,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform;
+            << item.transform << item.windowInputType;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -551,7 +551,8 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         size_t size = 0 ;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
-            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform;
+            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
+            << item.windowInputType;
         if (item.pixelMap != nullptr) {
             OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
             if (pixelMapPtr != nullptr) {

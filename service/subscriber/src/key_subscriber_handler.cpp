@@ -205,7 +205,7 @@ bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEven
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_WLAN
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_CONFIG) {
