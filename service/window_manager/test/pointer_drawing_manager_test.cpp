@@ -27,7 +27,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t MOUSEICONS_COUNT = 47;
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -51,8 +50,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_Init_001, TestSize.L
 {
     bool isSucess = IPointerDrawingManager::GetInstance()->Init();
     EXPECT_EQ(isSucess, true);
-    auto mouseIcons = IPointerDrawingManager::GetInstance()->GetMouseIconPath();
-    EXPECT_EQ(mouseIcons.size(), MOUSEICONS_COUNT);
+    IconStyle iconStyle = IPointerDrawingManager::GetInstance()->GetIconStyle(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+    EXPECT_EQ(iconStyle.alignmentWay, 7);
 }
 
 /**
