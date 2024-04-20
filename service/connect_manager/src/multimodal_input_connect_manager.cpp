@@ -712,5 +712,11 @@ int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vec
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 }
+
+int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
+}
 } // namespace MMI
 } // namespace OHOS
