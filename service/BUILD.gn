@@ -300,6 +300,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/dfx/include",
@@ -324,6 +325,7 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
+    "device_config/test/device_config_file_parser_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
     "event_handler/test/anr_manager_test.cpp",
