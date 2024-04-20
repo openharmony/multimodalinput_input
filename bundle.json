@@ -10,14 +10,15 @@
     "name": "input",
     "subsystem": "multimodalinput",
     "syscap": [
-      "SystemCapability.MultimodalInput.Input.InputConsumer",
-      "SystemCapability.MultimodalInput.Input.InputDevice",
-      "SystemCapability.MultimodalInput.Input.Core",
-      "SystemCapability.MultimodalInput.Input.InputSimulator",
-      "SystemCapability.MultimodalInput.Input.InputMonitor",
+      "SystemCapability.MultimodalInput.Input.InfraredEmitter",
+      "SystemCapability.MultimodalInput.Input.Cooperator",
       "SystemCapability.MultimodalInput.Input.Pointer",
       "SystemCapability.MultimodalInput.Input.ShortKey",
-      "SystemCapability.MultimodalInput.Input.InfraredEmitter"
+      "SystemCapability.MultimodalInput.Input.InputMonitor",
+      "SystemCapability.MultimodalInput.Input.InputSimulator",
+      "SystemCapability.MultimodalInput.Input.Core",
+      "SystemCapability.MultimodalInput.Input.InputDevice",
+      "SystemCapability.MultimodalInput.Input.InputConsumer"
     ],
     "features": [
       "input_feature_product",
@@ -73,7 +74,9 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
-        "graphic_2d_ext"
+        "graphic_2d_ext",
+        "drivers_interface_tros_extra",
+        "hdf_core"
       ],
       "third_party": [
         "cJSON",
