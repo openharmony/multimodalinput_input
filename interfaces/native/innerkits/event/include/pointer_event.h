@@ -62,7 +62,7 @@ public:
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
-     * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger leaves the touchscreen or touchpad.
      *
      * @since 9
      */
@@ -163,6 +163,19 @@ public:
     static constexpr int32_t POINTER_ACTION_HOVER_ENTER = 26;
 
     static constexpr int32_t POINTER_ACTION_HOVER_EXIT = 27;
+
+    /**
+     * Indicates that the fingerprint action.
+     *
+     * @since 12
+     */
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_DOWN = 28;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_UP = 29;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_SLIDE = 30;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 31;
 
     enum AxisType {
         /**
@@ -310,6 +323,13 @@ public:
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_JOYSTICK = 4;
+
+    /**
+     * Indicates that the input source generates a fingerprint event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_FINGERPRINT = 5;
 
     /**
      * Indicates an invalid button ID.
@@ -680,6 +700,21 @@ public:
         void SetPointerId(int32_t pointerId);
 
         /**
+         * @brief Obtains the origin id of the pointer in this event.
+         * @return Returns the pointer id.
+         * @since 12
+         */
+        int32_t GetOriginPointerId() const;
+
+        /**
+         * @brief Sets the origin id of the pointer in this event.
+         * @param pointerId Indicates the pointer id to set.
+         * @return void
+         * @since 12
+         */
+        void SetOriginPointerId(int32_t originPointerId);
+
+        /**
          * @brief Obtains the time when the pointer is pressed.
          * @return Returns the time.
          * @since 9
@@ -719,6 +754,7 @@ public:
          * @since 9
          */
         int32_t GetDisplayX() const;
+        double GetDisplayXPos() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
@@ -727,6 +763,7 @@ public:
          * @since 9
          */
         void SetDisplayX(int32_t displayX);
+        void SetDisplayXPos(double displayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
@@ -736,6 +773,7 @@ public:
          * @since 9
          */
         int32_t GetDisplayY() const;
+        double GetDisplayYPos() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
@@ -744,6 +782,7 @@ public:
          * @since 9
          */
         void SetDisplayY(int32_t displayY);
+        void SetDisplayYPos(double displayY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
@@ -751,6 +790,7 @@ public:
          * @since 9
          */
         int32_t GetWindowX() const;
+        double GetWindowXPos() const;
 
         /**
          * @brief Sets the x coordinate of the active window.
@@ -759,6 +799,7 @@ public:
          * @since 9
          */
         void SetWindowX(int32_t x);
+        void SetWindowXPos(double x);
 
         /**
          * @brief Obtains the y coordinate of the active window.
@@ -766,6 +807,7 @@ public:
          * @since 9
          */
         int32_t GetWindowY() const;
+        double GetWindowYPos() const;
 
         /**
          * @brief Sets the y coordinate of the active window.
@@ -774,6 +816,7 @@ public:
          * @since 9
          */
         void SetWindowY(int32_t y);
+        void SetWindowYPos(double y);
 
         /**
          * @brief Obtains the width of the pressed area.
@@ -1075,6 +1118,10 @@ public:
         int32_t displayY_ {};
         int32_t windowX_ {};
         int32_t windowY_ {};
+        double displayXPos_ {};
+        double displayYPos_ {};
+        double windowXPos_ {};
+        double windowYPos_ {};
         int32_t width_ {};
         int32_t height_ {};
         double  tiltX_ {};
@@ -1092,6 +1139,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t originPointerId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
     };
@@ -1446,6 +1494,52 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    /**
+     * @brief The number of times the input event is dispatched.
+     * @return Return the event dispatch times.
+     * @since 12
+     */
+    int32_t GetDispatchTimes() const;
+
+    /**
+     * @brief The number of times the same input event was distributed to multiple different windows.
+     * @return void
+     * @since 12
+     */
+    void SetDispatchTimes(int32_t dispatchTimes);
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    /**
+     * @brief Set the fingerprint distance X.
+     * @param X Indicates the distance X.
+     * @return void.
+     * @since 12
+     */
+    void SetFingerprintDistanceX(double x);
+
+    /**
+     * @brief Set the fingerprint distance Y.
+     * @param Y Indicates the distance Y.
+     * @return void.
+     * @since 12
+     */
+    void SetFingerprintDistanceY(double y);
+
+    /**
+     * @brief Get the fingerprint distance X.
+     * @return distance X.
+     * @since 12
+     */
+    double GetFingerprintDistanceX() const;
+
+    /**
+     * @brief Get the fingerprint distance Y.
+     * @return distance Y.
+     * @since 12
+     */
+    double GetFingerprintDistanceY() const;
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -1477,9 +1571,14 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+    int32_t dispatchTimes_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    double fingerprintDistanceX_ { 0.0 };
+    double fingerprintDistanceY_ { 0.0 };
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
