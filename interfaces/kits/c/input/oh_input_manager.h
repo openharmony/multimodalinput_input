@@ -425,7 +425,7 @@ int32_t OH_Input_GetMouseEventAction(const struct Input_MouseEvent* mouseEvent);
  * @brief Sets the X coordinate for a mouse event.
  *
  * @param mouseEvent Mouse event object.
- * @param displayX  X coordinate on the display.
+ * @param displayX X coordinate on the display.
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */

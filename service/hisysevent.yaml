@@ -75,7 +75,7 @@ FINGERSENSE_KNOCK_EVENT_INFO:
   __BASE: {type: STATISTIC, level: MINOR, desc: report fingersense knuckle knock event info}
   DKF_D_I: {type: INT32, desc: fs dk fail time interval}
   DKF_T_I: {type: INT32, desc: fs Double knuckle double knock fail time interval}
-  DKS_D_I: {type: INT32, desc: fs Single knuckle double knock  succ distance interval}
+  DKS_D_I: {type: INT32, desc: fs Single knuckle double knock succ distance interval}
   DKS_T_I: {type: INT32, desc: fs Double knuckle double knock succ time interval}
   DK_F_T: {type: INT32, desc: Double knuckle double knock fail times}
   DK_S_T: {type: INT32, desc: Double knuckle double knock succ times}
