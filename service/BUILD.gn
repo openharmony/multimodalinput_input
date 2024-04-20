@@ -91,7 +91,10 @@ config("libmmi_server_config") {
   }
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_service_path}/infrared_emitter/include",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -231,6 +234,13 @@ ohos_shared_library("libmmi-server") {
 
   if (resource_schedule_service_enabled) {
     external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+
+  if (input_ext_feature_anco) {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
   }
 
   external_deps += [
