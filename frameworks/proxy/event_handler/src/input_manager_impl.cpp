@@ -553,19 +553,17 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
             << item.windowInputType;
-        if (item.pixelMap != nullptr) {
-            OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
-            if (pixelMapPtr != nullptr) {
-                byteCount = pixelMapPtr->GetByteCount();
-                int32_t ret = SetPixelMapData(item.id, item.pixelMap);
-                if (ret != RET_OK) {
-                    byteCount = 0;
-                    MMI_HILOGE("Failed to set pixel map");
-                }
-            }
-        } else {
+
+        if (item.pixelMap == nullptr) {
             pkt << byteCount;
             continue;
+        }
+        OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
+        byteCount = pixelMapPtr->GetByteCount();
+        int32_t ret = SetPixelMapData(item.id, item.pixelMap);
+        if (ret != RET_OK) {
+            byteCount = 0;
+            MMI_HILOGE("Failed to set pixel map");
         }
         pkt << byteCount;
     }
