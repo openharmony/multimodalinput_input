@@ -73,7 +73,9 @@
         "relational_store",
         "faultloggerd",
         "ffrt",
-        "graphic_2d_ext"
+        "graphic_2d_ext",
+        "drivers_interface_tros_extra",
+        "hdf_core"
       ],
       "third_party": [
         "cJSON",
