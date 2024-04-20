@@ -108,6 +108,9 @@ group("input_jsapi_group") {
     if (input_feature_short_key) {
       deps += [ "frameworks/napi/short_key:shortkey" ]
     }
+    if (input_feature_infrared_emitter) {
+      deps += [ "frameworks/napi/infrared_emitter:infraredemitter" ]
+    }
   }
 }
 
@@ -144,6 +147,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
+    "service:ApplicationStateObserverTest",
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
     "service:TransformPointTest",

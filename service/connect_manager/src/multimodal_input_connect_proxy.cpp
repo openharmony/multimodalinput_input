@@ -23,6 +23,7 @@
 #include "string_ex.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "input_scene_board_judgement.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1888,6 +1889,89 @@ int32_t MultimodalInputConnectProxy::CancelInjection()
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::HasIrEmitter(bool &hasIrEmitter)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN),
+        data, reply, option);
+    READBOOL(reply, hasIrEmitter, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::HasIrEmitter Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::GetInfraredFrequencies Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    int64_t number;
+    READINT64(reply, number, IPC_PROXY_DEAD_OBJECT_ERR);
+    int64_t min = 0;
+    int64_t max = 0;
+    for (int32_t i = 0; i < number; i++) {
+        READINT64(reply, max);
+        READINT64(reply, min);
+        InfraredFrequency item;
+        item.max_ = max;
+        item.min_ = min;
+        requencys.push_back(item);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT64(data, number, ERR_INVALID_VALUE);
+    WRITEINT32(data, static_cast<int64_t>(pattern.size()), ERR_INVALID_VALUE);
+    for (const auto &item : pattern) {
+        WRITEINT64(data, item);
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::TransmitInfrared Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
