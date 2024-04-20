@@ -235,6 +235,29 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     return displayId;
 }
 
+int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(udsServer_, INVALID_FD);
+    CHKPR(pointerEvent, INVALID_FD);
+    const WindowInfo* windowInfo = nullptr;
+    std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    for (const auto &item : windowInfos) {
+        if (item.id == windowId) {
+            MMI_HILOGD("Find windowInfo by window id %{public}d", item.id);
+            windowInfo = &item;
+            break;
+        }
+    }
+    if (windowInfo == nullptr) {
+        MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        return INVALID_FD;
+    } else {
+        MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
+        return udsServer_->GetClientFd(windowInfo->pid);
+    }
+}
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -1446,6 +1469,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        if (targetWindowId <= 1) {
+            ClearTargetWindowIds();
+        }
+        bool isHotArea = false;
         for (const auto &item : windowsInfo) {
             if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
                 MMI_HILOGE("It's an abnormal window and pointer find the next window");
@@ -1470,7 +1497,18 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOGD("Find out the dispatch window of this pointer event when the targetWindowId "
                     "hasn't been set up yet, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
-                break;
+                bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
+                if (isSpecialWindow) {
+                    AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                    isHotArea = true;
+                    continue;
+                } else if (isHotArea) {
+                    AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                    break;
+                } else {
+                    break;
+                }
+
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
                 MMI_HILOGD("Find out the dispatch window of this pointer event when the targetWindowId "
@@ -1937,6 +1975,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     MMI_HILOGI("targetWindowId:%{public}d", targetWindowId);
+    if (targetWindowId <= 1) {
+        ClearTargetWindowIds();
+    }
+    bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
         if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
@@ -1976,7 +2018,17 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         } else if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
             item.defaultHotAreas, item)) {
             touchWindow = &item;
-            break;
+            bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
+            if (isSpecialWindow) {
+                AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                isHotArea = true;
+                continue;
+            } else if (isHotArea) {
+                AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                break;
+            } else {
+                break;
+            }
         }
     }
     if (touchWindow == nullptr) {
@@ -2685,6 +2737,66 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
         return false;
     }
     return true;
+}
+
+bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    switch (window.windowInputType)
+    {
+        case WindowInputType::NORMAL:
+            return false;
+        case WindowInputType::TRANSMIT_ALL:
+            return true;
+        case WindowInputType::TRANSMIT_EXCEPT_MOVE: {
+            auto pointerAction = pointerEvent->GetPointerAction();
+            return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+                pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
+        }
+        case WindowInputType::ANTI_MISTAKE_TOUCH:
+            return true;
+        default:
+            return true;
+    }
+}
+
+std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(displayId);
+    for (const auto &item : windowInfos) {
+        if (windowId == item.id) {
+            return std::make_optional(item);
+        }
+    }
+    return std::nullopt;
+}
+
+void InputWindowsManager::GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds)
+{
+    CALL_DEBUG_ENTER;
+    if (targetWindowIds_.find(pointerItemId) == targetWindowIds_.end()) {
+        MMI_HILOGD("Get target windowId fail, pointerItem pointerId:%{public}d", pointerItemId);
+    }
+    windowIds = targetWindowIds_[pointerItemId];
+}
+
+void InputWindowsManager::AddTargetWindowIds(int32_t pointerItemId, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    if (targetWindowIds_.find(pointerItemId) != targetWindowIds_.end()) {
+        targetWindowIds_[pointerItemId].push_back(windowId);
+    } else {
+        std::vector<int32_t> windowIds;
+        windowIds.push_back(windowId);
+        targetWindowIds_.emplace(pointerItemId, windowIds);
+    }
+}
+
+void InputWindowsManager::ClearTargetWindowIds()
+{
+    CALL_DEBUG_ENTER;
+    targetWindowIds_.clear();
 }
 
 int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)

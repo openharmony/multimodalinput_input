@@ -700,6 +700,21 @@ public:
         void SetPointerId(int32_t pointerId);
 
         /**
+         * @brief Obtains the origin id of the pointer in this event.
+         * @return Returns the pointer id.
+         * @since 12
+         */
+        int32_t GetOriginPointerId() const;
+
+        /**
+         * @brief Sets the origin id of the pointer in this event.
+         * @param pointerId Indicates the pointer id to set.
+         * @return void
+         * @since 12
+         */
+        void SetOriginPointerId(int32_t originPointerId);
+
+        /**
          * @brief Obtains the time when the pointer is pressed.
          * @return Returns the time.
          * @since 9
@@ -1124,6 +1139,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t originPointerId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
     };
@@ -1478,6 +1494,20 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    /**
+     * @brief The number of times the input event is dispatched.
+     * @return Return the event dispatch times.
+     * @since 12
+     */
+    int32_t GetDispatchTimes() const;
+
+    /**
+     * @brief The number of times the same input event was distributed to multiple different windows.
+     * @return void
+     * @since 12
+     */
+    void SetDispatchTimes(int32_t dispatchTimes);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1541,6 +1571,7 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+    int32_t dispatchTimes_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
