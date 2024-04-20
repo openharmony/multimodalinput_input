@@ -16,13 +16,11 @@
 #ifndef KNUCKLE_DRAWING_MANAGER_H
 #define KNUCKLE_DRAWING_MANAGER_H
 
-#include "draw/canvas.h"
 #include "nocopyable.h"
 #include "singleton.h"
 #include "transaction/rs_transaction.h"
 #include "ui/rs_canvas_drawing_node.h"
 #include "ui/rs_surface_node.h"
-
 #include "pointer_event.h"
 #include "window_info.h"
 
@@ -56,7 +54,6 @@ private:
     Rosen::Drawing::Path path;
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
-    float width_ { 0 };
     bool isActionUp_ { false };
 };
 } // namespace MMI

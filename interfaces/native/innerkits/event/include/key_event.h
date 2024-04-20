@@ -3063,6 +3063,19 @@ public:
      */
     static const int32_t INTENTION_CAMERA;
 
+    /**
+     * Outbound Notification Center
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_CALL_NOTIFICATION_CENTER;
+
+     /**
+     * Outbound Control Center
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_CALL_CONTROL_CENTER;
 public:
     class KeyItem {
     public:

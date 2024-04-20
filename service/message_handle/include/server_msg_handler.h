@@ -82,6 +82,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
+    int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

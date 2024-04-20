@@ -201,8 +201,12 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetFingerCount() << event->GetZOrder() << event->GetAxes();
+        << event->GetFingerCount() << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
 
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
@@ -264,6 +268,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetFingerCount(tField);
     pkt >> tField;
     event->SetZOrder(tField);
+    pkt >> tField;
+    event->SetDispatchTimes(tField);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
@@ -297,6 +303,15 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         MMI_HILOGE("Deserialize input event failed");
         return RET_ERR;
     }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    double distanceX {0.0};
+    double distanceY {0.0};
+    pkt >> distanceX;
+    pkt >> distanceY;
+    event->SetFingerprintDistanceX(distanceX);
+    event->SetFingerprintDistanceY(distanceY);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
     if (DeserializePressedButtons(event, pkt) != RET_OK) {
         MMI_HILOGE("Deserialize pressed buttons failed");

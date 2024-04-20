@@ -34,15 +34,16 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDrawingManager" };
 constexpr int32_t DENSITY_BASELINE = 80;
+constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
+constexpr int32_t MAX_POINTER_NUM = 5;
+constexpr int32_t MID_POINT = 2;
 constexpr int32_t POINT_INDEX0 = 0;
 constexpr int32_t POINT_INDEX1 = 1;
 constexpr int32_t POINT_INDEX2 = 2;
 constexpr int32_t POINT_INDEX3 = 3;
 constexpr int32_t POINT_INDEX4 = 4;
-constexpr int32_t MAX_POINTER_NUM = 5;
-constexpr int32_t MID_POINT = 2;
-constexpr int32_t DEFAULT_VALUE = -1;
+constexpr int32_t PEN_WIDTH = 20;
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -112,7 +113,6 @@ void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
         return;
     }
     displayInfo_ = displayInfo;
-    width_ = displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS / DENSITY_BASELINE;
 }
 
 void KnuckleDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> touchEvent)
@@ -227,7 +227,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
             MMI_HILOGE("Size of pointerInfos_:%{public}u", pointerInfos_.size());
             return RET_ERR;
         }
-        pen_.SetWidth(width_);
+        pen_.SetWidth(PEN_WIDTH);
         path.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
         path.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,

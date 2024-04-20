@@ -209,6 +209,7 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
         return;
     }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
+    CHKPV(enhanceCfg_);
     if (memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen)) {
         MMI_HILOGE("cfg memcpy failed!");
         return;
@@ -512,7 +513,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform;
+            << item.transform << item.windowInputType;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -550,13 +551,14 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         size_t size = 0 ;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
-            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform;
+            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
+            << item.windowInputType;
         if (item.pixelMap != nullptr) {
             OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
             if (pixelMapPtr != nullptr) {
                 const uint8_t* dataPtr = pixelMapPtr->GetPixels();
                 const char* chars = reinterpret_cast<const char*>(dataPtr);
-                size  = static_cast<size_t>(pixelMapPtr->GetByteCount());
+                size = static_cast<size_t>(pixelMapPtr->GetByteCount());
                 MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d",
                     size, pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
                 pkt << size << pixelMapPtr->GetWidth() << pixelMapPtr->GetHeight();
@@ -2022,6 +2024,24 @@ int32_t InputManagerImpl::CancelInjection()
         return RET_ERR;
     }
     return RET_OK;
+}
+
+int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
+{
+    CALL_INFO_TRACE;
+    return MultimodalInputConnMgr->HasIrEmitter(hasIrEmitter);
+}
+
+int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    CALL_INFO_TRACE;
+    return MultimodalInputConnMgr->GetInfraredFrequencies(requencys);
+}
+
+int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    CALL_INFO_TRACE;
+    return MultimodalInputConnMgr->TransmitInfrared(number, pattern);
 }
 } // namespace MMI
 } // namespace OHOS

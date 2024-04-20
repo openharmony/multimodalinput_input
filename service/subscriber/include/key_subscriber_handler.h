@@ -81,6 +81,7 @@ private:
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes);
     bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
     bool IsEnableCombineKeySwipe(const std::shared_ptr<KeyEvent> key);
     bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
