@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <fstream>
 #include <list>
 
-#include"key_option.h"
+#include <gtest/gtest.h>
+
+#include "key_option.h"
 #include "key_subscriber_handler.h"
-#include "switch_subscriber_handler.h"
 #include "mmi_log.h"
+#include "switch_subscriber_handler.h"
 #include "uds_server.h"
 
 namespace OHOS {
