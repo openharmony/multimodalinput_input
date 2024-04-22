@@ -94,6 +94,10 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_UP);
             break;
         }
+        case FINGERPRINT_CODE_RETOUCH: {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH);
+            break;
+        }
         case FINGERPRINT_CODE_CLICK: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK);
             break;
