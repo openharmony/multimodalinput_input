@@ -340,6 +340,7 @@ ohos_unittest("ut-mmi-service-out") {
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
     "delegate_task/test/delegate_tasks_test.cpp",
     "device_config/test/device_config_file_parser_test.cpp",
+    "device_manager/test/input_device_manager_test.cpp",
     "display_state_manager/test/display_event_monitor_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
