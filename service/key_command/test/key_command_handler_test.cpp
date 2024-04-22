@@ -15,9 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#define private public
 #include "key_command_handler.h"
-#undef private
 #include "event_log_helper.h"
 #include "input_handler_type.h"
 #include "input_event_handler.h"
