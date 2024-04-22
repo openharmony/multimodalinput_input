@@ -213,6 +213,7 @@ declare_args() {
     "src/virtual_knob_mouse.cpp",
     "src/virtual_knob_sys_ctrl.cpp",
     "src/virtual_mouse.cpp",
+    "src/virtual_pc_switch.cpp",
     "src/virtual_pc_touchpad.cpp",
     "src/virtual_pen.cpp",
     "src/virtual_pen_keyboard.cpp",
