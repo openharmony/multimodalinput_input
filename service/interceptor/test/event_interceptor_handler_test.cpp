@@ -14,11 +14,12 @@
  */
 
 #include <fstream>
+
 #include <gtest/gtest.h>
 
+#include "event_interceptor_handler.h"
 #include "mmi_log.h"
 #include "uds_server.h"
-#include "event_interceptor_handler.h"
 
 namespace OHOS {
 namespace MMI {
