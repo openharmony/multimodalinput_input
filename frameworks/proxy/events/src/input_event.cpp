@@ -38,7 +38,7 @@ InputEvent::InputEvent(const InputEvent& other)
       action_(other.action_), actionStartTime_(other.actionStartTime_),
       deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
       targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
-      bitwise_(other.bitwise_), processedCallback_(other.processedCallback_) {}
+      bitwise_(other.bitwise_), markEnabled_(other.markEnabled_), processedCallback_(other.processedCallback_) {}
 
 InputEvent::~InputEvent() {}
 
@@ -60,6 +60,7 @@ void InputEvent::Reset()
     targetWindowId_ = -1;
     agentWindowId_ = -1;
     bitwise_ = EVENT_FLAG_NONE;
+    markEnabled_ = true;
 }
 
 std::shared_ptr<InputEvent> InputEvent::Create()
@@ -214,6 +215,18 @@ void InputEvent::ClearFlag()
     bitwise_ = EVENT_FLAG_NONE;
 }
 
+bool InputEvent::IsMarkEnabled() const
+{
+    return markEnabled_;
+}
+
+
+void InputEvent::SetMarkEnabled(bool markEnabled)
+{
+    markEnabled_ = markEnabled;
+}
+
+
 void InputEvent::SetProcessedCallback(std::function<void(int32_t, int64_t)> callback)
 {
     processedCallback_ = callback;
@@ -222,6 +235,10 @@ void InputEvent::SetProcessedCallback(std::function<void(int32_t, int64_t)> call
 void InputEvent::MarkProcessed()
 {
     if (!processedCallback_) {
+        return;
+    }
+    if (!markEnabled_) {
+        MMI_HILOGI("Skip MarkProcessed eventId:%{public}d, eventType:%{public}d", id_, eventType_);
         return;
     }
     auto func = processedCallback_;
@@ -260,6 +277,7 @@ bool InputEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, targetWindowId_);
     WRITEINT32(out, agentWindowId_);
     WRITEUINT32(out, bitwise_);
+    WRITEBOOL(out, markEnabled_);
     if (extraData_ && extraDataLength_ != 0) {
         WRITEUINT32(out, extraDataLength_);
         WRITEBUFFER(out, (void *)extraData_.get(), extraDataLength_);
@@ -282,6 +300,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, targetWindowId_);
     READINT32(in, agentWindowId_);
     READUINT32(in, bitwise_);
+    READBOOL(in, markEnabled_);
     READUINT32(in, extraDataLength_);
 
     if (extraDataLength_ == 0) {

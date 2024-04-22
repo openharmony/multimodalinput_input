@@ -508,9 +508,12 @@ void InputManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> wa
     InputMgrImpl.RemoveServiceWatcher(watcher);
 }
 
-int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime)
+int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime, bool enable)
 {
-    return InputMgrImpl.MarkProcessed(eventId, actionTime);
+    if (enable) {
+        return InputMgrImpl.MarkProcessed(eventId, actionTime);
+    }
+    return RET_OK;
 }
 
 int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
@@ -521,6 +524,21 @@ int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 void InputManager::Authorize(bool isAuthorize)
 {
     InputMgrImpl.Authorize(isAuthorize);
+}
+
+int32_t InputManager::HasIrEmitter(bool &hasIrEmitter)
+{
+    return InputMgrImpl.HasIrEmitter(hasIrEmitter);
+}
+
+int32_t InputManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    return InputMgrImpl.GetInfraredFrequencies(requencys);
+}
+
+int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    return InputMgrImpl.TransmitInfrared(number, pattern);
 }
 } // namespace MMI
 } // namespace OHOS

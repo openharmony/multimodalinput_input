@@ -26,6 +26,7 @@
 #include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
 #include "multimodalinput_ipc_interface_code.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -121,9 +122,12 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
     int32_t Authorize(bool isAuthorize);
     int32_t CancelInjection();
-
+    int32_t HasIrEmitter(bool &hasIrEmitter);
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
 
 private:
     MultimodalInputConnectManager() = default;

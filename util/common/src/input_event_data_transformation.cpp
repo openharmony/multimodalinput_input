@@ -151,7 +151,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
-        << event->GetAgentWindowId() << event->GetFlag();
+        << event->GetAgentWindowId() << event->GetFlag() << event->IsMarkEnabled();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Serialize packet is failed");
         return RET_ERR;
@@ -186,11 +186,14 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetAgentWindowId(tField);
     uint32_t tFlag = InputEvent::EVENT_FLAG_NONE;
     pkt >> tFlag;
+    event->AddFlag(tFlag);
+    bool markEnabled = true;
+    pkt >> markEnabled;
+    event->SetMarkEnabled(markEnabled);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Deserialize packet is failed");
         return RET_ERR;
     }
-    event->AddFlag(tFlag);
     return RET_OK;
 }
 
@@ -206,7 +209,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetFingerCount() << event->GetZOrder() << event->GetAxes();
+        << event->GetFingerCount() << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
 
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
@@ -268,6 +271,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetFingerCount(tField);
     pkt >> tField;
     event->SetZOrder(tField);
+    pkt >> tField;
+    event->SetDispatchTimes(tField);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
