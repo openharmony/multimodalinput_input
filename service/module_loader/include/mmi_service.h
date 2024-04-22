@@ -32,6 +32,7 @@
 #include "server_msg_handler.h"
 #include "uds_server.h"
 #include "nap_process.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -133,6 +134,13 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    int32_t HasIrEmitter(bool &hasIrEmitter) override;
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
+    int32_t OnHasIrEmitter(bool &hasIrEmitter);
+    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

@@ -513,7 +513,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform;
+            << item.transform << item.windowInputType;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -548,27 +548,24 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        size_t size = 0 ;
+        int32_t byteCount = 0;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
-            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform;
-        if (item.pixelMap != nullptr) {
-            OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
-            if (pixelMapPtr != nullptr) {
-                const uint8_t* dataPtr = pixelMapPtr->GetPixels();
-                const char* chars = reinterpret_cast<const char*>(dataPtr);
-                size  = static_cast<size_t>(pixelMapPtr->GetByteCount());
-                MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d",
-                    size, pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-                pkt << size << pixelMapPtr->GetWidth() << pixelMapPtr->GetHeight();
-                pkt.Write(chars, size);
-            } else {
-                MMI_HILOGD("The pixelMapPtr is null");
-                pkt << size;
-            }
-        } else {
-            pkt << size;
+            << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
+            << item.windowInputType;
+
+        if (item.pixelMap == nullptr) {
+            pkt << byteCount;
+            continue;
         }
+        OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
+        byteCount = pixelMapPtr->GetByteCount();
+        int32_t ret = SetPixelMapData(item.id, item.pixelMap);
+        if (ret != RET_OK) {
+            byteCount = 0;
+            MMI_HILOGE("Failed to set pixel map");
+        }
+        pkt << byteCount;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -2023,6 +2020,38 @@ int32_t InputManagerImpl::CancelInjection()
         return RET_ERR;
     }
     return RET_OK;
+}
+
+int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
+{
+    CALL_INFO_TRACE;
+    return MultimodalInputConnMgr->HasIrEmitter(hasIrEmitter);
+}
+
+int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    CALL_INFO_TRACE;
+    return MultimodalInputConnMgr->GetInfraredFrequencies(requencys);
+}
+
+int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    CALL_INFO_TRACE;
+    return MultimodalInputConnMgr->TransmitInfrared(number, pattern);
+}
+
+int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    if (infoId < 0 || pixelMap == nullptr) {
+        MMI_HILOGE("Invalid infoId or pixelMap");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetPixelMapData(infoId, pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pixel map, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -67,6 +67,8 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
+    bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
@@ -85,8 +87,9 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData);
     bool IsWindowVisible(int32_t pid);
     void ClearExtraData();
+    ExtraData GetExtraData() const;
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
-    std::pair<int32_t, int32_t> TransformWindowXY(const WindowInfo &window, int32_t logicX, int32_t logicY) const;
+    std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -113,14 +116,14 @@ public:
 #endif //OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
+    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, double& physicalX, double& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
-    void RotateScreen(const DisplayInfo& info, LogicalCoordinate& coord) const;
     void ReverseRotateScreen(const DisplayInfo& info, const double x, const double y, Coordinate2D& cursorPos) const;
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
+    void RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, LogicalCoordinate& coord) const;
+        int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -144,6 +147,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER
+    std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId);
+    void GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds);
+    void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
+    void ClearTargetWindowIds();
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
 
 private:
@@ -263,6 +270,7 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

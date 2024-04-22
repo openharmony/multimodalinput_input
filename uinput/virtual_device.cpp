@@ -93,6 +93,11 @@ bool VirtualDevice::SetUp()
         }
     }
 
+    return SetUpExt();
+}
+
+bool VirtualDevice::SetUpExt()
+{
     errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
     if (ret != EOK) {
         MMI_HILOGE("Failed to copy deviceName");

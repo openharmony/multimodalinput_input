@@ -162,6 +162,12 @@ struct Rect {
     int32_t height;
 };
 
+enum class WindowInputType : uint8_t {
+    NORMAL = 0,
+    TRANSMIT_ALL = 1,
+    TRANSMIT_EXCEPT_MOVE = 2,
+    ANTI_MISTAKE_TOUCH = 3
+};
 
 struct WindowInfo {
     /**
@@ -300,6 +306,8 @@ struct WindowInfo {
      * @since 12
      */
     void* pixelMap { nullptr };
+
+    WindowInputType windowInputType { WindowInputType::NORMAL };
 };
 
 /**
