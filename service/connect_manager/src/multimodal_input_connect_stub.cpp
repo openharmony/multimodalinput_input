@@ -731,7 +731,7 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = MarkProcessed(eventType, eventId);
     if (ret != RET_OK) {
-        MMI_HILOGE("MarkProcessed failed, ret:%{public}d", ret);
+        MMI_HILOGD("MarkProcessed failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

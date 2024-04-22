@@ -670,7 +670,7 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
     if (ret != RET_OK) {
-        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
+        MMI_HILOGD("Mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -793,7 +793,7 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 
 int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
@@ -959,7 +959,7 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 
 int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this, deviceId, std::ref(keyboardType)));
     if (ret != RET_OK) {
