@@ -14,6 +14,7 @@
  */
 
 #include <cstdio>
+
 #include <gtest/gtest.h>
 #include "libinput.h"
 
