@@ -94,6 +94,8 @@ config("libmmi_server_config") {
     include_dirs += [
       "${mmi_ext_path}/anco_uds_manager/include",
       "${mmi_service_path}/infrared_emitter/include",
+      "${g2d_path}/interfaces/inner_api/surface",
+      "${g2d_path}/rosen/modules/render_service_base/src",
     ]
   }
 
