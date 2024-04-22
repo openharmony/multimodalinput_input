@@ -611,7 +611,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     CHKPV(subscriber);
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER || state == UNOBSERVED) {
-        MMI_HILOGW("nap client status:%{public}d", state);
+        MMI_HILOGD("nap client status:%{public}d", state);
         return;
     }
 

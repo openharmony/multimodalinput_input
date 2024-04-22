@@ -639,10 +639,10 @@ void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo
         if (times > LOOP_COND) {
             return;
         }
-        MMI_HILOGI("WindowInfo[%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}f]",
+        MMI_HILOGD("WindowInfo[%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}f]",
             item.id, item.pid, item.area.x, item.area.y, item.area.width, item.area.height, item.zOrder);
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGI("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
         times++;
@@ -651,7 +651,7 @@ void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo
 
 void InputManagerImpl::PrintDisplayInfo()
 {
-    MMI_HILOGI("windowsInfos,num:%{public}zu,focusWindowId:%{public}d", displayGroupInfo_.windowsInfo.size(),
+    MMI_HILOGD("windowsInfos,num:%{public}zu,focusWindowId:%{public}d", displayGroupInfo_.windowsInfo.size(),
         displayGroupInfo_.focusWindowId);
     PrintForemostThreeWindowInfo(displayGroupInfo_.windowsInfo);
     if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
@@ -1413,7 +1413,7 @@ int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &ke
 
 int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
