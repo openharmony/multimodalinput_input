@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "proto.h"
 #include "uds_server.h"
+#include "proto.h"
 #include "udp_wrap.h"
 
 namespace OHOS {
