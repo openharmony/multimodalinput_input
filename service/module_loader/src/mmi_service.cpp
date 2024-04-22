@@ -56,9 +56,6 @@
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
-#ifdef OHOS_BUILD_ENABLE_ANCO
-#include "infrared_emitter_controller.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
@@ -250,13 +247,6 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGI("InitInfraredEmitter Init");
-    InfraredEmitterController::GetInstance()->InitInfraredEmitter();
-#else
-    MMI_HILOGI("InfraredEmitter not supported");
-#endif
-
     MMI_HILOGI("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -2079,16 +2069,14 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
-    #ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitterController::GetInstance()->GetFrequencies(requencys);
-    #endif
+    MMI_HILOGI("start get infrared frequency");
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
     for (int32_t i = 0; i < size; i++) {
         context = context + "requencys[" + std::to_string(i) + "]. max="
                 + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) +";";
     }
-    MMI_HILOGD("MMIService::OnGetInfraredFrequencies data from hdf is. %{public}s ", context.c_str());
+    MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
     return RET_OK;
 }
 
@@ -2099,11 +2087,8 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
-    #ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
-    #endif
 
-    MMI_HILOGI("MMIService::OnTransmitInfrared para. %{public}s", context.c_str());
+    MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;
 }
 
