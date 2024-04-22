@@ -513,6 +513,7 @@ int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime, bool en
     if (enable) {
         return InputMgrImpl.MarkProcessed(eventId, actionTime);
     }
+    MMI_HILOGD("Skip MarkProcessed eventId:%{public}d", eventId);
     return RET_OK;
 }
 

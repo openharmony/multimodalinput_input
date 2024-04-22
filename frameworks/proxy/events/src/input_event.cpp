@@ -238,7 +238,7 @@ void InputEvent::MarkProcessed()
         return;
     }
     if (!markEnabled_) {
-        MMI_HILOGI("Skip MarkProcessed eventId:%{public}d, eventType:%{public}d", id_, eventType_);
+        MMI_HILOGD("Skip MarkProcessed eventId:%{public}d, eventType:%{public}d", id_, eventType_);
         return;
     }
     auto func = processedCallback_;
