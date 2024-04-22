@@ -88,13 +88,13 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetForegroun
     ApplicationStateObserver obsever;
     std::vector<AppExecFwk::AppStateData> appDatas {};
     int32_t ret = obsever.GetForegroundApplicationInfo(appDatas);
-    EXPECT_NE(ret, RET_OK);
-    EXPECT_TRUE(appDatas.empty());
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_FALSE(appDatas.empty());
     auto appManager = obsever.GetAppMgr();
     EXPECT_NE(appManager, nullptr);
     std::vector<AppExecFwk::AppStateData> appStateDatas {};
     ret = obsever.GetForegroundApplicationInfo(appStateDatas);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
