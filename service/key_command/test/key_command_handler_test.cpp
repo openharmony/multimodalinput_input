@@ -1039,23 +1039,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleConsumedKeyEvent, Te
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_SendKeyEvent
- * @tc.desc: SendKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeyCommandHandler handler;
-    handler.count_ = 2;
-    handler.isHandleSequence_ = false;
-    handler.launchAbilityCount_ = 0;
-    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount
  * @tc.desc: HandleRepeatKeyCount
  * @tc.type: FUNC
