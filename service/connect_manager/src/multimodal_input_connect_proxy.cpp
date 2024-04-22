@@ -561,7 +561,7 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED),
         data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGD("Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
