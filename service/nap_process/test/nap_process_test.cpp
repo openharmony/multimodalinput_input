@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <fstream>
+
+#include <gtest/gtest.h>
 
 #include "nap_process.h"
 
