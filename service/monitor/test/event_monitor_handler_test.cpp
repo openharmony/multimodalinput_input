@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <fstream>
+
+#include <gtest/gtest.h>
 
 #include "event_monitor_handler.h"
 #include "input_event_handler.h"
