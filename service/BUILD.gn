@@ -348,6 +348,7 @@ ohos_unittest("ut-mmi-service-out") {
     "event_handler/test/key_event_value_transformation_test.cpp",
     "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
+    "key_event_normalize/test/key_event_normalize_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
