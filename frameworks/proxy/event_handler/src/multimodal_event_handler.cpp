@@ -64,7 +64,8 @@ int32_t MultimodalEventHandler::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     CALL_DEBUG_ENTER;
-    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(),
+        subscribeInfo.GetKeyOption());
 }
 
 int32_t MultimodalEventHandler::UnsubscribeKeyEvent(int32_t subscribeId)
