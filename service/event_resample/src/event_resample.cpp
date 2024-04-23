@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -303,7 +303,7 @@ void EventResample::UpdateTouchState(MotionEvent &event)
             if (idx < 0) {
                 TouchState newState;
                 touchStates_.push_back(newState);
-                idx = static_cast<ssize_t>(touchStates_.size() - 1);
+                idx = static_cast<ssize_t>(touchStates_.size()) - 1;
             }
             TouchState& touchState = touchStates_.at(idx);
             touchState.Initialize(deviceId, source);
