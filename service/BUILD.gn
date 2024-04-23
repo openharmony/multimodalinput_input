@@ -101,6 +101,8 @@ config("libmmi_server_config") {
     include_dirs += [
       "${mmi_ext_path}/magic_cursor/include",
       "${g2d_ext_path}/sdf/include",
+      "${g2d_path}/interfaces/inner_api/surface",
+      "${g2d_path}/rosen/modules/render_service_base/src",
     ]
   }
 
@@ -329,12 +331,14 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
     "//third_party/node/src",
+    "${graphics_path}/2d_graphics/include",
   ]
 
   sources = [
@@ -342,6 +346,7 @@ ohos_unittest("ut-mmi-service-out") {
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
     "delegate_task/test/delegate_tasks_test.cpp",
     "device_config/test/device_config_file_parser_test.cpp",
+    "device_manager/test/input_device_manager_test.cpp",
     "display_state_manager/test/display_event_monitor_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
@@ -351,18 +356,22 @@ ohos_unittest("ut-mmi-service-out") {
     "event_handler/test/key_event_value_transformation_test.cpp",
     "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
+    "key_command/test/setting_datashare_test.cpp",
+    "key_event_normalize/test/key_event_normalize_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "module_loader/test/watchdog_task_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
     "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
+    "nap_process/test/nap_process_test.cpp",
     "subscriber/test/key_subscriber_handler_test.cpp",
     "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
     "touch_event_normalize/test/touch_event_normalize_test.cpp",
     "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
+    "window_manager/test/knuckle_drawing_manager_test.cpp",
     "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
@@ -389,6 +398,7 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -400,7 +410,10 @@ ohos_unittest("ut-mmi-service-out") {
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
-  include_dirs = [ "${mmi_path}/service/event_resample/include" ]
+  include_dirs = [
+    "${mmi_path}/service/event_resample/include",
+    "${graphics_path}/2d_graphics/include",
+  ]
 
   sources = [
     "event_resample/src/event_resample.cpp",
@@ -421,6 +434,8 @@ ohos_unittest("event_resample_test") {
   external_deps = [
     "c_utils:utils",
     "config_policy:configpolicy_util",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
@@ -433,6 +448,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
   include_dirs = [
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_command/test",
+    "${graphics_path}/2d_graphics/include",
   ]
 
   configs = [ ":libmmi_server_config" ]
@@ -458,6 +474,8 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
@@ -526,7 +544,10 @@ ohos_unittest("EventFilterDeathRecipientTest") {
 ohos_unittest("EventFilterHandlerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/filter/include" ]
+  include_dirs = [
+    "${mmi_path}/service/filter/include",
+    "${graphics_path}/2d_graphics/include",
+  ]
 
   configs = [ ":libmmi_server_config" ]
 
@@ -550,6 +571,8 @@ ohos_unittest("EventFilterHandlerTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",

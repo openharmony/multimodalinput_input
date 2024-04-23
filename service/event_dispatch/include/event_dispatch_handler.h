@@ -63,9 +63,11 @@ private:
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
     bool isTouchEnable_ = true;
+    bool enableMark_ { true };
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void FilterInvalidPointerItem(const std::shared_ptr<PointerEvent> pointEvent, int32_t fd);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    bool AcquireEnableMark(std::shared_ptr<PointerEvent> event);
 };
 } // namespace MMI
 } // namespace OHOS

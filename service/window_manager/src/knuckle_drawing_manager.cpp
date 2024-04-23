@@ -43,16 +43,20 @@ constexpr int32_t POINT_INDEX1 = 1;
 constexpr int32_t POINT_INDEX2 = 2;
 constexpr int32_t POINT_INDEX3 = 3;
 constexpr int32_t POINT_INDEX4 = 4;
-constexpr int32_t PEN_WIDTH = 20;
+constexpr int32_t PAINT_STROKE_WIDTH = 10;
+constexpr int32_t PAINT_PATH_RADIUS = 10;
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
 {
-    pen_.SetColor(Rosen::Drawing::Color::COLOR_CYAN);
-    pen_.SetAntiAlias(true);
-    float outerCircleTransparency = 0.1f;
-    pen_.SetAlphaF(outerCircleTransparency);
-    pen_.SetJoinStyle(Rosen::Drawing::Pen::JoinStyle::ROUND_JOIN);
+    paint_.SetColor(Rosen::Drawing::Color::COLOR_CYAN);
+    paint_.SetAntiAlias(true);
+    float outerCircleTransparency = 1.0f;
+    paint_.SetAlphaF(outerCircleTransparency);
+    paint_.SetStyle(Rosen::Drawing::Paint::PaintStyle::PAINT_STROKE);
+    paint_.SetJoinStyle(Rosen::Drawing::Pen::JoinStyle::ROUND_JOIN);
+    paint_.SetCapStyle(Rosen::Drawing::Pen::CapStyle::ROUND_CAP);
+    paint_.SetPathEffect(Rosen::Drawing::PathEffect::CreateCornerPathEffect(PAINT_PATH_RADIUS));
 }
 
 KnuckleDrawingManager::~KnuckleDrawingManager() {}
@@ -227,14 +231,14 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
             MMI_HILOGE("Size of pointerInfos_:%{public}u", pointerInfos_.size());
             return RET_ERR;
         }
-        pen_.SetWidth(PEN_WIDTH);
+        paint_.SetWidth(PAINT_STROKE_WIDTH);
         path.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
         path.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,
             pointerInfos_[POINT_INDEX3].x, pointerInfos_[POINT_INDEX3].y);
-        canvas->AttachPen(pen_);
+        canvas->AttachPaint(paint_);
         canvas->DrawPath(path);
-        canvas->DetachPen();
+        canvas->DetachPaint();
         pointerInfos_.erase(pointerInfos_.begin(), pointerInfos_.begin() + POINT_INDEX3);
     } else {
         MMI_HILOGD("isActionUp_ == true");

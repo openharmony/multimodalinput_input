@@ -15,9 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#define private public
 #include "key_command_handler.h"
-#undef private
 #include "event_log_helper.h"
 #include "input_handler_type.h"
 #include "input_event_handler.h"
@@ -1038,23 +1036,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleConsumedKeyEvent, Te
     keyEvent->SetKeyCode(2017);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     ASSERT_TRUE(handler.HandleConsumedKeyEvent(keyEvent));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_SendKeyEvent
- * @tc.desc: SendKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeyCommandHandler handler;
-    handler.count_ = 2;
-    handler.isHandleSequence_ = false;
-    handler.launchAbilityCount_ = 0;
-    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_VOLUME_UP;
-    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
 }
 
 /**
