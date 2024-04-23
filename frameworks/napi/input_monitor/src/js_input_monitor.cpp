@@ -53,7 +53,8 @@ constexpr int32_t GESTURE_END = 3;
 constexpr int32_t FINGERPRINT_DOWN = 0;
 constexpr int32_t FINGERPRINT_UP = 1;
 constexpr int32_t FINGERPRINT_SLIDE = 2;
-constexpr int32_t FINGERPRINT_CLICK = 3;
+constexpr int32_t FINGERPRINT_RETOUCH = 3;
+constexpr int32_t FINGERPRINT_CLICK = 4;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -680,6 +681,9 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         }
         case PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE: {
             return FINGERPRINT_SLIDE;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH: {
+            return FINGERPRINT_RETOUCH;
         }
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK: {
             return FINGERPRINT_CLICK;

@@ -47,7 +47,8 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
         struct libinput_event_keyboard* keyBoard = libinput_event_get_keyboard_event(event);
         CHKPR(keyBoard, false);
         auto key = libinput_event_keyboard_get_key(keyBoard);
-        if (key != FINGERPRINT_CODE_DOWN && key != FINGERPRINT_CODE_UP && key != FINGERPRINT_CODE_CLICK) {
+        if (key != FINGERPRINT_CODE_DOWN && key != FINGERPRINT_CODE_UP
+            && key != FINGERPRINT_CODE_CLICK && key != FINGERPRINT_CODE_RETOUCH) {
             MMI_HILOGD("not FingerprintEvent event");
             return false;
         }
@@ -92,6 +93,10 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
         }
         case FINGERPRINT_CODE_UP: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_UP);
+            break;
+        }
+        case FINGERPRINT_CODE_RETOUCH: {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH);
             break;
         }
         case FINGERPRINT_CODE_CLICK: {
