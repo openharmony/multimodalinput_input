@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -65,6 +65,11 @@ constexpr int64_t MAX_TAKTTIME_MS = 15000;
 constexpr int32_t DEFAULT_DELAY = 200;
 constexpr int32_t KNUCKLE_PARAM_SIZE = 9;
 constexpr int32_t DEFAULT_POINTER_ID_FIRST = 11000;
+constexpr int32_t TOTAL_TIME_MS = 1000;
+constexpr int32_t BUTTON_PARAM_SIZE = 8;
+constexpr int32_t KEY_PARAM_SIZE = 5;
+constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
+constexpr int32_t INTERVAL_TIME_MS = 100;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -498,7 +503,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                             }
-                            if (argc == 8) {
+                            if (argc == BUTTON_PARAM_SIZE) {
                                 if (!StrToInt(argv[optind + 3], clickIntervalTimeMs)) {
                                     std::cout << "invalid interval between hits" << std::endl;
                                     return RET_ERR;
@@ -855,7 +860,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
-                                totalTimeMs = 1000;
+                                totalTimeMs = TOTAL_TIME_MS;
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
@@ -1000,14 +1005,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 'c': {
                             int32_t intervalTimeMs = 0;
-                            if (argc == 5) {
+                            if (argc == KEY_PARAM_SIZE) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1)) {
                                     std::cout << "input coordinate error" << std::endl;
                                     return RET_ERR;
                                 }
-                                intervalTimeMs = 100;
-                            } else if (argc == 6) {
+                                intervalTimeMs = INTERVAL_TIME_MS;
+                            } else if (argc == KEY_TIME_PARAM_SIZE) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1) ||
                                     !StrToInt(argv[optind + 1], intervalTimeMs)) {
@@ -1078,7 +1083,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return RET_ERR;
                             }
-                            totalTimeMs = 1000;
+                            totalTimeMs = TOTAL_TIME_MS;
                             int32_t pressTimems = 500;
                             if (argc == moveArgcSeven) {
                                 if ((!StrToInt(optarg, px1)) ||
