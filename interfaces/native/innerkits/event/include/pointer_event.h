@@ -1574,14 +1574,14 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
-    int32_t dispatchTimes_ { 0 };
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    std::vector<uint8_t> enhanceData_;
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     double fingerprintDistanceX_ { 0.0 };
     double fingerprintDistanceY_ { 0.0 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    int32_t dispatchTimes_ { 0 };
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    std::vector<uint8_t> enhanceData_;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
