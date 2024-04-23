@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -204,9 +204,8 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
+    SerializeFingerprint(event, pkt);
 
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
         << event->GetFingerCount() << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
@@ -253,6 +252,13 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         return RET_ERR;
     }
     return RET_OK;
+}
+
+void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<InputEvent> event, NetPacket &pkt)
+{
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 }
 
 int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
