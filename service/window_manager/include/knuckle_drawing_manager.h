@@ -16,6 +16,7 @@
 #ifndef KNUCKLE_DRAWING_MANAGER_H
 #define KNUCKLE_DRAWING_MANAGER_H
 
+#include "draw/canvas.h"
 #include "nocopyable.h"
 #include "singleton.h"
 #include "transaction/rs_transaction.h"
@@ -50,7 +51,7 @@ private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
     std::vector<PointerInfo> pointerInfos_;
-    Rosen::Drawing::Pen pen_;
+    Rosen::Drawing::Paint paint_;
     Rosen::Drawing::Path path;
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };

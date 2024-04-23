@@ -364,6 +364,22 @@ public:
      */
     void GetExtraData(std::shared_ptr<const uint8_t[]> &data, uint32_t &length) const;
 
+    /**
+     * @brief Checks whether the "Processed feedback" of this event is enabled or not.
+     * @return Returns <b>true</b> if we need a "Processed feedback" for this event;
+     * returns <b>false</b> otherwise.
+     * @since 12
+     */
+    bool IsMarkEnabled() const;
+
+    /**
+     * @brief Sets the markEnabled_ field of an input event.
+     * @param markEnabled Indicates whether we need a "Processed feedback" or not for this event.
+     * @return void
+     * @since 12
+     */
+    void SetMarkEnabled(bool markEnabled);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -401,6 +417,7 @@ private:
     int32_t targetWindowId_;
     int32_t agentWindowId_;
     uint32_t bitwise_;
+    bool markEnabled_ { true };
     std::function<void(int32_t, int64_t)> processedCallback_;
     std::shared_ptr<const uint8_t[]> extraData_;
     uint32_t extraDataLength_ { 0 };

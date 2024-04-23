@@ -35,7 +35,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
         MMI_HILOGE("Devices is empty");
         return RET_ERR;
     }
-    DeviceList deviceList;
+    std::map<std::string, std::vector<std::string>> deviceList;
     AnalyseDevices(devices, deviceList);
     if (deviceList.empty()) {
         MMI_HILOGE("Device list is empty");
@@ -104,7 +104,8 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
     return deviceStrs;
 }
 
-void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs, DeviceList &deviceList) const
+void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs,
+    std::map<std::string, std::vector<std::string>> &deviceList) const
 {
     std::string name;
     for (const auto &item : deviceStrs) {

@@ -175,7 +175,9 @@ public:
 
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_SLIDE = 30;
 
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 31;
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_RETOUCH = 31;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 32;
 
     enum AxisType {
         /**
