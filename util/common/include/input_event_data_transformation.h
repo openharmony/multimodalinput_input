@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ public:
     static int32_t UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<KeyEvent> event);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 private:
+    static void SerializeFingerprint(const std::shared_ptr<InputEvent> event, NetPacket &pkt);
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
