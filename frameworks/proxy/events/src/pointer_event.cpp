@@ -497,6 +497,7 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN, "fingerprint-down" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_UP, "fingerprint-up" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH, "fingerprint-retouch" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK, "fingerprint-click" },
 };
 
@@ -886,12 +887,12 @@ void PointerEvent::SetFingerprintDistanceY(double y)
     fingerprintDistanceY_ = y;
 }
 
-double PointerEvent::GetFingerprintDistanceX()
+double PointerEvent::GetFingerprintDistanceX() const
 {
     return fingerprintDistanceX_;
 }
 
-double PointerEvent::GetFingerprintDistanceY()
+double PointerEvent::GetFingerprintDistanceY() const
 {
     return fingerprintDistanceY_;
 }

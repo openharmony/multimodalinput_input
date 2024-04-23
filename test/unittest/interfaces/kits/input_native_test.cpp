@@ -480,45 +480,5 @@ HWTEST_F(InputNativeTest, InputNativeTest_TouchEventActionTime_001, TestSize.Lev
     OH_Input_DestroyTouchEvent(&touchEvent);
     EXPECT_EQ(touchEvent, nullptr);
 }
-
-/**
- * @tc.name: InputNativeTest_IR_001
- * @tc.desc: Verify the IR GetFrequencies
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputNativeTest, InputNativeTest_IR_001, TestSize.Level1)
-{
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitter::GetInstance()->InitInfraredEmitter();
-    std::vector<InfraredFrequency> frequencyInfo;
-    bool bRet = InfraredEmitter::GetInstance()->GetFrequencies(frequencyInfo);
-    ASSERT_EQ(bRet, true);
-    bool bSizeBiggerZero = frequencyInfo.size();
-    ASSERT_EQ(bSizeBiggerZero, true);
-#else
-    ASSERT_EQ("no support", "no support");
-#endif // OHOS_BUILD_ENABLE_ANCO
-}
-
-/**
- * @tc.name: InputNativeTest_IR_002
- * @tc.desc: Verify the set and get of touchEvent actionTime
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputNativeTest, InputNativeTest_IR_002, TestSize.Level1)
-{
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    InfraredEmitter::GetInstance()->InitInfraredEmitter();
-    int64_t carrierFreq = 3800;
-    std::vector<int64_t> pattern = {0x01, 0x02, 0x03};
-    std::vector<InfraredFrequency> frequencyInfo;
-    bool bRet = InfraredEmitter::GetInstance()->Transmit(carrierFreq, pattern);
-    ASSERT_EQ(bRet, true);
-#else
-    ASSERT_EQ("no support", "no support");
-#endif // OHOS_BUILD_ENABLE_ANCO
-}
 } // namespace MMI
 } // namespace OHOS

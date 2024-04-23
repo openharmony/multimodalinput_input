@@ -15,13 +15,12 @@
 
 #include <cstdio>
 #include <fstream>
+
 #include <gtest/gtest.h>
 
+#include "pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
-#define private public
-#include "pointer_drawing_manager.h"
-#undef private
 
 namespace OHOS {
 namespace MMI {

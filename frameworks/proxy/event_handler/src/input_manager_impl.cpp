@@ -424,8 +424,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask,
-            this, inputConsumer, keyEvent))) {
+        if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
+            this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
+            AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOGE("Post task failed");
             return;
         }
@@ -471,8 +472,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         MMI_HILOGI("InputTracking id:%{public}d Pointer Event", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask,
-            this, inputConsumer, pointerEvent))) {
+        if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
+            this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
+            AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOGE("Post task failed");
             return;
         }
@@ -548,28 +550,24 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        size_t size = 0 ;
+        int32_t byteCount = 0;
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
             << item.windowInputType;
-        if (item.pixelMap != nullptr) {
-            OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
-            if (pixelMapPtr != nullptr) {
-                const uint8_t* dataPtr = pixelMapPtr->GetPixels();
-                const char* chars = reinterpret_cast<const char*>(dataPtr);
-                size = static_cast<size_t>(pixelMapPtr->GetByteCount());
-                MMI_HILOGD("size:%{public}zu, width:%{public}d, height:%{public}d",
-                    size, pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-                pkt << size << pixelMapPtr->GetWidth() << pixelMapPtr->GetHeight();
-                pkt.Write(chars, size);
-            } else {
-                MMI_HILOGD("The pixelMapPtr is null");
-                pkt << size;
-            }
-        } else {
-            pkt << size;
+
+        if (item.pixelMap == nullptr) {
+            pkt << byteCount;
+            continue;
         }
+        OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
+        byteCount = pixelMapPtr->GetByteCount();
+        int32_t ret = SetPixelMapData(item.id, item.pixelMap);
+        if (ret != RET_OK) {
+            byteCount = 0;
+            MMI_HILOGE("Failed to set pixel map");
+        }
+        pkt << byteCount;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -643,10 +641,10 @@ void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo
         if (times > LOOP_COND) {
             return;
         }
-        MMI_HILOGI("WindowInfo[%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}f]",
+        MMI_HILOGD("WindowInfo[%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}d,%{public}f]",
             item.id, item.pid, item.area.x, item.area.y, item.area.width, item.area.height, item.zOrder);
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGI("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
         times++;
@@ -655,7 +653,7 @@ void InputManagerImpl::PrintForemostThreeWindowInfo(const std::vector<WindowInfo
 
 void InputManagerImpl::PrintDisplayInfo()
 {
-    MMI_HILOGI("windowsInfos,num:%{public}zu,focusWindowId:%{public}d", displayGroupInfo_.windowsInfo.size(),
+    MMI_HILOGD("windowsInfos,num:%{public}zu,focusWindowId:%{public}d", displayGroupInfo_.windowsInfo.size(),
         displayGroupInfo_.focusWindowId);
     PrintForemostThreeWindowInfo(displayGroupInfo_.windowsInfo);
     if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
@@ -1417,7 +1415,7 @@ int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &ke
 
 int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -2042,6 +2040,20 @@ int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>&
 {
     CALL_INFO_TRACE;
     return MultimodalInputConnMgr->TransmitInfrared(number, pattern);
+}
+
+int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    if (infoId < 0 || pixelMap == nullptr) {
+        MMI_HILOGE("Invalid infoId or pixelMap");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetPixelMapData(infoId, pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pixel map, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

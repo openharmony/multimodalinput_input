@@ -90,8 +90,8 @@ declare_args() {
     "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
-    "device_state_manager/src/device_event_monitor.cpp",
     "device_manager/src/input_device_manager.cpp",
+    "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "display_state_manager/src/display_event_monitor.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
@@ -214,6 +214,7 @@ declare_args() {
     "src/virtual_knob_mouse.cpp",
     "src/virtual_knob_sys_ctrl.cpp",
     "src/virtual_mouse.cpp",
+    "src/virtual_pc_switch.cpp",
     "src/virtual_pc_touchpad.cpp",
     "src/virtual_pen.cpp",
     "src/virtual_pen_keyboard.cpp",
@@ -330,14 +331,16 @@ if (input_ext_feature_anco) {
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
-    "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp",
   ]
 }
 
 if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
+  g2d_path = "//foundation/graphic/graphic_2d"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
-  libmmi_service_sources +=
-      [ "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp" ]
+  libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/sdf_parser.cpp",
+  ]
 }

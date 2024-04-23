@@ -1352,7 +1352,6 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
 bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects,
     PointerStyle &pointerStyle) const
 {
-    CALL_DEBUG_ENTER;
     int32_t areaNum = 0;
     bool findFlag = false;
     for (const auto &item : rects) {
@@ -1366,8 +1365,7 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             MMI_HILOGE("The addition of displayMaxY overflows");
             return findFlag;
         }
-        if (((x > item.x) && (x <= displayMaxX)) &&
-            (y > item.y) && (y <= displayMaxY)) {
+        if (((x > item.x) && (x <= displayMaxX)) && (y > item.y) && (y <= displayMaxY)) {
             findFlag = true;
             pointerStyle.id = areaNum;
         }
@@ -1474,7 +1472,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         }
         bool isHotArea = false;
         for (const auto &item : windowsInfo) {
-            if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+            if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
                 MMI_HILOGE("It's an abnormal window and pointer find the next window");
                 continue;
             }
@@ -1988,7 +1986,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
-        if (IsTransparentWin(item.pixelMap, logicalX, logicalY)) {
+        if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
             MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
             continue;
         }
@@ -2821,19 +2819,21 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 {
     CALL_DEBUG_ENTER;
     if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelmap is nullptr");
+        MMI_HILOGD("The pixelmap is nullptr");
         return false;
     }
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
     CHKPF(pixelMapPtr);
     uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
     if (result != RET_OK) {
         MMI_HILOGE("Failed to read pixelmap");
         return false;
     }
+    MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     return dst == RET_OK;
 }
 } // namespace MMI

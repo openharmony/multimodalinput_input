@@ -116,7 +116,7 @@ private:
     bool enableCombineKey_ { true };
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
-    bool hasHandleRingMute_ { false };
+    bool needSkipPowerKeyUp_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
