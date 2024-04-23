@@ -424,8 +424,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask,
-            this, inputConsumer, keyEvent))) {
+        if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
+            this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
+            AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOGE("Post task failed");
             return;
         }
@@ -471,8 +472,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         MMI_HILOGI("InputTracking id:%{public}d Pointer Event", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
-        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask,
-            this, inputConsumer, pointerEvent))) {
+        if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
+            this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
+            AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOGE("Post task failed");
             return;
         }
