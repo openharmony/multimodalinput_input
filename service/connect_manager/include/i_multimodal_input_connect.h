@@ -133,6 +133,7 @@ public:
     virtual int32_t HasIrEmitter(bool &hasIrEmitter) = 0;
     virtual int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) = 0;
     virtual int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) = 0;
+    virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

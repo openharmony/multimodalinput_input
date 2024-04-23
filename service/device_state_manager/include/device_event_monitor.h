@@ -23,16 +23,12 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "define_multimodal.h"
-#include "fingersense_manager.h"
-#include "fingersense_wrapper.h"
-#include "key_event_normalize.h"
 #include "mmi_log.h"
 #include "want.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
-
 enum StateType {
     CALL_STATUS_ACTIVE = 0,
     CALL_STATUS_HOLDING = 1,
@@ -51,15 +47,14 @@ class DeviceEventMonitor final {
         DISALLOW_COPY_AND_MOVE(DeviceEventMonitor);
 
         void InitCommonEventSubscriber();
-        bool IsCommonEventSubscriberInit();
         void SetCallState(const EventFwk::CommonEventData &eventData, int32_t callState);
         int32_t GetCallState();
-        void UpdateShieldStatusOnScreenOn();
-        void UpdateShieldStatusOnScreenOff();
+        void SetHasHandleRingMute(bool hasHandleRingMute);
     private:
-        int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
         int32_t callState_ { -1 };
+        bool hasHandleRingMute_ { false };
+        std::mutex stateMutex_;
 };
 #define DEVICE_MONITOR ::OHOS::DelayedSingleton<DeviceEventMonitor>::GetInstance()
 } // namespace MMI

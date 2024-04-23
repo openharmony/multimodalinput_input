@@ -508,9 +508,13 @@ void InputManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> wa
     InputMgrImpl.RemoveServiceWatcher(watcher);
 }
 
-int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime)
+int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime, bool enable)
 {
-    return InputMgrImpl.MarkProcessed(eventId, actionTime);
+    if (enable) {
+        return InputMgrImpl.MarkProcessed(eventId, actionTime);
+    }
+    MMI_HILOGD("Skip MarkProcessed eventId:%{public}d", eventId);
+    return RET_OK;
 }
 
 int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)

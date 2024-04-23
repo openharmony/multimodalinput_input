@@ -269,40 +269,31 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_DOWN &&
         keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_UP &&
         keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-        MMI_HILOGE("There is no need to set mute.");
+        MMI_HILOGE("There is no need to set mute");
         return false;
     }
-    uint32_t ret = -1;
+    int32_t ret = -1;
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
         if (!AudioStandard::AudioSystemManager::GetInstance()->IsStreamMute(
             AudioStandard::AudioVolumeType::STREAM_RING)) {
             ret = AudioStandard::AudioSystemManager::GetInstance()->SetMute(
                 AudioStandard::AudioVolumeType::STREAM_RING, true);
-            if (ret != 0) {
+            if (ret != ERR_OK) {
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
                 return false;
             }
-            MMI_HILOGI("Set mute success!");
-            hasHandleRingMute_ = true;
-            return true;
-        } else {
+            MMI_HILOGI("Set mute success");
+            DEVICE_MONITOR->SetHasHandleRingMute(true);
             if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
-                MMI_HILOGE("Set mute success keycode power miss!");
-                return false;
+                needSkipPowerKeyUp_ = true;
             }
             return true;
+        } else {
+            if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+                MMI_HILOGD("Set mute success, block volumeKey");
+                return true;
+            }
         }
-    }
-    if (hasHandleRingMute_ && (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_ACTIVE
-        || DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_DISCONNECTED
-        || DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_DISCONNECTING)) {
-        ret = AudioStandard::AudioSystemManager::GetInstance()->SetMute(
-            AudioStandard::AudioVolumeType::STREAM_RING, false);
-        if (ret != 0) {
-            MMI_HILOGE("Mute reply fail, ret:%{public}d", ret);
-            return false;
-        }
-        MMI_HILOGI("Mute reply success.");
     }
     return false;
 }
@@ -327,6 +318,12 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
         KeyEvent::ActionToString(keyAction));
+    if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
+        && keyAction == KeyEvent::KEY_ACTION_UP) {
+        MMI_HILOGD("Skip power key up");
+        needSkipPowerKeyUp_ = false;
+        return true;
+    }
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_HILOGD("Pressed KeyCode:%{public}d", keyCode);
     }
@@ -663,7 +660,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     CHKPV(subscriber);
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER || state == UNOBSERVED) {
-        MMI_HILOGW("nap client status:%{public}d", state);
+        MMI_HILOGD("nap client status:%{public}d", state);
         return;
     }
 
