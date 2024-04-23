@@ -16,14 +16,16 @@
 #ifndef INFRARED_EMMITTER_CONTROLLER_H
 #define INFRARED_EMMITTER_CONTROLLER_H
 
-#include "infrared_frequency_info.h"
-
 #include "nocopyable.h"
 #include "v1_0/consumer_ir.h"
 #include "v1_0/types.h"
 
 namespace OHOS {
 namespace MMI {
+struct InfraredFrequencyInfo {
+    int64_t max_ { 0 };
+    int64_t min_ { 0 };
+};
 class InfraredEmitterController {
 public:
     /**
@@ -35,7 +37,7 @@ public:
     virtual ~InfraredEmitterController() = default;
     void InitInfraredEmitter();
     bool Transmit(int64_t carrierFreq, std::vector<int64_t> pattern);
-    bool GetFrequencies(std::vector<InfraredFrequency> &frequencyInfo);
+    bool GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo);
 
 private:
      InfraredEmitterController() =default;
