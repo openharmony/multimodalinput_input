@@ -1410,7 +1410,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             case TypeName::THREE_FINGERS_TAP: {
                 if (!IsThreeFingersTap(pointerEvent)) {
                     MMI_HILOGE("the event is not threeFingersTapEvent");
-                    napi_close_handle_scope(jsEnv_, scope);
                 }
                 ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                 break;
