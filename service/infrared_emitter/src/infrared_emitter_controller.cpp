@@ -31,10 +31,14 @@ InfraredEmitterController *InfraredEmitterController::GetInstance()
 void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
+    if (irInterface_ != nullptr) {
+        MMI_HILOGE("infrared emitter has inited");
+        return;
+    }
     MMI_HILOGI("infrared emitter call ConsumerIr::Get()");
     irInterface_ = ConsumerIr::Get();
     if (irInterface_ == nullptr) {
-        MMI_HILOGE("infrared emitter init");
+        MMI_HILOGE("infrared emitter init error");
         return;
     }
     MMI_HILOGI("infrared emitter init ok");
@@ -43,11 +47,11 @@ void InfraredEmitterController::InitInfraredEmitter()
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
+    InitInfraredEmitter();
     if (!irInterface_) {
         MMI_HILOGE("infrared emitter not init");
         return false;
     }
-
     int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
     std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
@@ -57,7 +61,6 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
         tempPattern.push_back(per);
     }
     MMI_HILOGI("irInterface_->Transmit params:%{public}s", context.c_str());
-
     bool outRet = false;
     int32_t ret = irInterface_->Transmit(tempCarrierFreq, tempPattern, outRet);
     MMI_HILOGI("irInterface_->Transmit ret:%{public}d", ret);
@@ -72,9 +75,10 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
     return true;
 }
 
-bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequency> &frequencyInfo)
+bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo)
 {
     CALL_DEBUG_ENTER;
+    InitInfraredEmitter();
     if (!irInterface_) {
         MMI_HILOGE("infrared emitter not init");
         return false;
@@ -94,13 +98,14 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequency> &f
     }
     std::string context = "size:" + std::to_string(outRange.size()) + ";";
     for (size_t i = 0; i < outRange.size(); i++) {
-        InfraredFrequency item;
+        InfraredFrequencyInfo item;
         context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
          ": per.min:" + std::to_string(outRange[i].min) + ";;";
         item.max_ = outRange[i].max;
         item.min_ = outRange[i].min;
-        frequencyInfo.pushback(item);
+        frequencyInfo.push_back(item);
     }
+    MMI_HILOGI("data from hdf: %{public}s", context.c_str());
     return true;
 }
 } // namespace MMI

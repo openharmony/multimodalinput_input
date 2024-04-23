@@ -330,7 +330,6 @@ if (input_ext_feature_anco) {
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
-    "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp",
   ]
 }
 
