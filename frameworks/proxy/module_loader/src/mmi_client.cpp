@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -274,12 +274,13 @@ void MMIClient::OnConnected()
 int32_t MMIClient::Socket()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret =
+        MULTIMODAL_INPUT_CONNECT_MGR->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return IMultimodalInputConnect::INVALID_SOCKET_FD;
     }
-    fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
+    fd_ = MULTIMODAL_INPUT_CONNECT_MGR->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {

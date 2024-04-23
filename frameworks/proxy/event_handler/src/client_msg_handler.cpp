@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,7 @@ void ClientMsgHandler::Init()
 void ClientMsgHandler::InitProcessedCallback()
 {
     CALL_DEBUG_ENTER;
-    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP) {
         MMI_HILOGD("Current session is hap");
         dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1,
@@ -258,7 +258,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDevImpl.OnDevListener(deviceId, type);
+    INPUT_DEVICE_IMPL.OnDevListener(deviceId, type);
     return RET_OK;
 }
 
