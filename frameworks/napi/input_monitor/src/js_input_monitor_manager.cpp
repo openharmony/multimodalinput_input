@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -213,8 +213,8 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
                                 int32_t *id = static_cast<int32_t *>(data);
                                 delete id;
                                 id = nullptr;
-                                JsInputMonMgr.RemoveMonitor(env);
-                                JsInputMonMgr.RemoveEnv(env);
+                                JS_INPUT_MONITOR_MGR.RemoveMonitor(env);
+                                JS_INPUT_MONITOR_MGR.RemoveEnv(env);
                                 MMI_HILOGD("napi_wrap leave");
                                 }, nullptr, nullptr);
     if (status != napi_ok) {
