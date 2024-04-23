@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,8 +50,8 @@ bool MMISceneBoardJudgement::IsResampleEnabled()
 std::ifstream& MMISceneBoardJudgement::SafeGetLine(std::ifstream& configFile, std::string& line)
 {
     std::getline(configFile, line);
-    if (line.size() && line[line.size() - 1] == '\r') {
-        line = line.substr(0, line.size() - 1);
+    if (!line.empty() && (line.back() == '\r')) {
+        line.pop_back();
     }
     return configFile;
 }
