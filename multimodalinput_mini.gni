@@ -38,7 +38,9 @@ declare_args() {
   input_feature_coverage = false
   input_ext_feature_anco = false
   input_ext_feature_fingersense = false
+  input_feature_fingerprint = false
   input_ext_feature_magiccursor = false
+  input_feature_infrared_emitter = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -116,6 +118,8 @@ declare_args() {
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
+
+  infraredemitter_sources = [ "src/js_register_module.cpp" ]
 
   inputdevice_sources = [
     "src/js_event_target.cpp",
@@ -197,6 +201,8 @@ declare_args() {
   libmmi_virtual_device_sources = [
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
+    "src/virtual_fingerprint_key.cpp",
+    "src/virtual_fingerprint_mouse.cpp",
     "src/virtual_gamepad.cpp",
     "src/virtual_joystick.cpp",
     "src/virtual_keyboard.cpp",
@@ -208,6 +214,7 @@ declare_args() {
     "src/virtual_knob_mouse.cpp",
     "src/virtual_knob_sys_ctrl.cpp",
     "src/virtual_mouse.cpp",
+    "src/virtual_pc_switch.cpp",
     "src/virtual_pc_touchpad.cpp",
     "src/virtual_pen.cpp",
     "src/virtual_pen_keyboard.cpp",
@@ -222,8 +229,6 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
-    "src/virtual_fingerprint_key.cpp",
-    "src/virtual_fingerprint_mouse.cpp",
   ]
 
   libmmi_util_sources = [
@@ -258,6 +263,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
+print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
 
 input_default_defines = []
 
@@ -295,6 +301,10 @@ if (input_feature_joystick) {
 
 if (input_feature_short_key) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
+}
+
+if (input_feature_fingerprint) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 }
 
 if (!defined(global_parts_info) ||

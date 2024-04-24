@@ -694,5 +694,29 @@ int32_t MultimodalInputConnectManager::CancelInjection()
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->CancelInjection();
 }
+
+int32_t MultimodalInputConnectManager::HasIrEmitter(bool &hasIrEmitter)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->HasIrEmitter(hasIrEmitter);
+}
+
+int32_t MultimodalInputConnectManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetInfraredFrequencies(requencys);
+}
+
+int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->TransmitInfrared(number, pattern);
+}
+
+int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
+}
 } // namespace MMI
 } // namespace OHOS

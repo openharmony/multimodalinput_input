@@ -16,13 +16,10 @@
 #include <fstream>
 
 #include <gtest/gtest.h>
+
+#include "event_interceptor_handler.h"
 #include "mmi_log.h"
 #include "uds_server.h"
-
-#define private public
-#include "event_interceptor_handler.h"
-#undef private
-
 
 namespace OHOS {
 namespace MMI {
@@ -99,18 +96,6 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
     EXPECT_FALSE(handler.OnHandleEvent(pointerEvent));
-}
-
-/**
- * @tc.name: EventInterceptorHandler_Test_006
- * @tc.desc: Test the function InitSessionLostCallback
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_006, TestSize.Level1)
-{
-    EventInterceptorHandler handler;
-    ASSERT_NO_FATAL_FAILURE(handler.InitSessionLostCallback());
 }
 
 /**

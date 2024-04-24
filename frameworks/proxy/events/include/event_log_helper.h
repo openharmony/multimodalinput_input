@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef EVENT_LOG_HELPER_H
 #define EVENT_LOG_HELPER_H
 
@@ -106,10 +106,10 @@ private:
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         MMI_HILOGI("InputTracking id:%{public}d, EventType:%{public}s, ActionTime:%{public}" PRId64
             ", PointerAction:%{public}s, SourceType:%{public}s, DisplayId:%{public}d"
-            ", WindowId:%{public}d, IsSimulate:%{public}s",
+            ", WindowId:%{public}d, DispatchTimes:%{public}d, IsSimulate:%{public}s",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetTargetDisplayId(),
-            event->GetTargetWindowId(), isSimulate.c_str());
+            event->GetTargetWindowId(), event->GetDispatchTimes(), isSimulate.c_str());
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
@@ -117,10 +117,13 @@ private:
                 return;
             }
             MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
-                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,"
-                "ShortAxis:%{public}d,WindowId:%{public}d",
+                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,"
+                "WindowId:%{public}d,DisplayXPos:%{public}f,DisplayYPos:%{public}f,WindowXPos:%{public}f,"
+                "WindowYPos::%{public}f, OriginPointerId:%{public}d",
                 pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId());
+                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
+                item.GetOriginPointerId());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -131,6 +134,13 @@ private:
             }
             MMI_HILOGI("%{public}s]", tmpStr.c_str());
         }
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+        MMI_HILOGI("fingerprint event, id:%{public}d, actionTime:%{public}" PRId64 ", EventType:%{public}s,"
+            "fingerAction:%{public}d, distanceX:%{public}f, distanceY:%{public}f",
+            event->GetId(), event->GetActionTime(), InputEvent::EventTypeToString(event->GetEventType()),
+            event->GetPointerAction(), event->GetFingerprintDistanceX(), event->GetFingerprintDistanceY()
+        );
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     }
 
     static void Print(const std::shared_ptr<PointerEvent> event)
@@ -149,7 +159,7 @@ private:
             "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
             "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
-            "BufferCount:%{public}zu,Buffer:%{public}s",
+            "BufferCount:%{public}zu,Buffer:%{public}s,MarkEnabled:%{public}d",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetSensorInputTime(),
             event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(),
@@ -162,7 +172,7 @@ private:
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE), event->GetPointerId(), pointerIds.size(),
-            event->GetId(), buffer.size(), str.c_str());
+            event->GetId(), buffer.size(), str.c_str(), event->IsMarkEnabled());
 
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;

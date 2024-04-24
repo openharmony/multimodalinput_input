@@ -42,10 +42,10 @@ bool AddMonitorFuzzTeset(const uint8_t* data, size_t /* size */)
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 
-    auto PointerEventFun = [](std::shared_ptr<PointerEvent> event) {
+    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
         MMI_HILOGD("Add monitor success");
     };
-    monitorId = InputManager::GetInstance()->AddMonitor(PointerEventFun);
+    monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 
     auto consumer = std::make_shared<InputEventConsumerTest>();
