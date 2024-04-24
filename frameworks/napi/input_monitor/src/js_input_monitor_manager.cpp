@@ -91,13 +91,11 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
                 monitors_.erase(it++);
                 continue;
             }
-            if (IsFindJsInputMonitor(*it, typeName, fingers)) {
-                if ((*it)->IsMatch(jsEnv, callback) == RET_OK) {
-                    monitor = *it;
-                    monitors_.erase(it++);
-                    MMI_HILOGD("Found monitor");
-                    break;
-                }
+            if (IsFindJsInputMonitor(*it, jsEnv, typeName, callback, fingers)) {
+                monitor = *it;
+                monitors_.erase(it++);
+                MMI_HILOGD("Found monitor");
+                break;
             }
             ++it;
         }
@@ -118,12 +116,10 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
                 monitors_.erase(it++);
                 continue;
             }
-            if (IsFindJsInputMonitor(*it, typeName, fingers)) {
-                if ((*it)->IsMatch(jsEnv) == RET_OK) {
-                    monitors.push_back(*it);
-                    monitors_.erase(it++);
-                    continue;
-                }
+            if (IsFindJsInputMonitor(*it, jsEnv, typeName, fingers)) {
+                monitors.push_back(*it);
+                monitors_.erase(it++);
+                continue;
             }
             ++it;
         }
@@ -341,9 +337,25 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
 }
 
 bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
-    const std::string &typeName, int32_t fingers)
+    napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers)
 {
-    return ((monitor->GetTypeName() == typeName) && (monitor->GetFingers() == fingers));
+    if ((monitor->GetTypeName() == typeName) && (monitor->GetFingers() == fingers)) {
+        if (monitor->IsMatch(jsEnv, callback) == RET_OK) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool JsInputMonitorManager::IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
+    napi_env jsEnv, const std::string &typeName, const int32_t fingers)
+{
+    if ((monitor->GetTypeName() == typeName) && (monitor->GetFingers() == fingers)) {
+        if (monitor->IsMatch(jsEnv) == RET_OK) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS
