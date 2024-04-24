@@ -336,10 +336,7 @@ if (input_ext_feature_anco) {
 if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
-  g2d_path = "//foundation/graphic/graphic_2d"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
-  libmmi_service_sources += [
-    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
-    "${mmi_ext_path}/magic_cursor/src/sdf_parser.cpp",
-  ]
+  libmmi_service_sources +=
+      [ "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp" ]
 }
