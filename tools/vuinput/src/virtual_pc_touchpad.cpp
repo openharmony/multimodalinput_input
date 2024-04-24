@@ -53,7 +53,7 @@ VirtualPcTouchpad::VirtualPcTouchpad() : VirtualDevice("Virtual PcTouchPad", BUS
     eventTypes_ = { EV_KEY, EV_ABS, EV_MSC };
     keys_ = { BTN_LEFT, BTN_TOOL_FINGER, BTN_TOOL_QUINTTAP, BTN_TOUCH, BTN_TOOL_DOUBLETAP, BTN_TOOL_TRIPLETAP,
         BTN_TOOL_QUADTAP };
-    abs_ = { ABS_X, ABS_Y, ABS_MT_SLOT, ABS_MT_POSITION_X, ABS_MT_POSITION_Y, ABS_MT_TOOL_TYPE, ABS_MT_TRACKING_ID, };
+    abs_ = { ABS_X, ABS_Y, ABS_MT_SLOT, ABS_MT_POSITION_X, ABS_MT_POSITION_Y, ABS_MT_TOOL_TYPE, ABS_MT_TRACKING_ID };
     miscellaneous_ = { MSC_SCAN };
     properties_ = { INPUT_PROP_POINTER, INPUT_PROP_BUTTONPAD };
     for (const auto &item : absInfos) {

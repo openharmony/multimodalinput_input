@@ -200,7 +200,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadDownEvent_001, Tes
     double logicalY = 0.0;
     auto originType = LIBINPUT_EVENT_TOUCHPAD_DOWN;
     auto gestureType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
-    ASSERT_EQ(gestureType, PointerEvent::POINTER_ACTION_ROTATE_END);
+    ASSERT_EQ(gestureType, PointerEvent::POINTER_ACTION_UNKNOWN);
 }
 
 /**

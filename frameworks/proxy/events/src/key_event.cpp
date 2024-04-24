@@ -942,7 +942,11 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       keyCode_(other.keyCode_),
       keys_(other.keys_),
       keyAction_(other.keyAction_),
-      keyIntention_(other.keyIntention_) {}
+      keyIntention_(other.keyIntention_),
+      numLock_(other.numLock_),
+      capsLock_(other.capsLock_),
+      scrollLock_(other.scrollLock_),
+      repeat_(other.repeat_) {}
 
 KeyEvent::~KeyEvent() {}
 

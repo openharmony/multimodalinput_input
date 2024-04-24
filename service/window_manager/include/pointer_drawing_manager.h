@@ -46,10 +46,6 @@ class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    int32_t IMAGE_WIDTH = 64;
-    int32_t IMAGE_HEIGHT = 64;
-
-public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     ~PointerDrawingManager() override = default;
@@ -80,7 +76,7 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
-    std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
+    IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
 private:
@@ -112,7 +108,10 @@ private:
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreatePointerSwiftObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
+    int32_t SwitchPointerStyle();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
+    std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
+    void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
 
 private:
     struct PidInfo {
@@ -130,6 +129,8 @@ private:
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
     int32_t imageHeight_ { 0 };
+    int32_t canvasWidth_ = 64;
+    int32_t canvasHeight_ = 64;
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };

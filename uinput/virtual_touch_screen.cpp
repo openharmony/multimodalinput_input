@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,15 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_PRESSURE = 100;
+constexpr int32_t ABS_MT_MIN_ORIENTATION = -90;
+constexpr int32_t ABS_MT_MAX_ORIENTATION = 90;
+constexpr int32_t ABS_MT_BLOB_MAX_ID = 10;
+constexpr int32_t ABS_MT_TRACKING_MAX_ID = 9;
+constexpr int32_t ABS_MT_MAX_PRESSURE = 100;
+} // namespace
+
 const std::vector<uint32_t> &VirtualTouchScreen::GetEventTypes() const
 {
     static const std::vector<uint32_t> evtTypes {EV_ABS, EV_KEY, EV_SYN};
@@ -65,15 +74,15 @@ VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     dev_.absmax[ABS_Y] = maxY;
 
     dev_.absmin[ABS_PRESSURE] = 0;
-    dev_.absmax[ABS_PRESSURE] = 100;
+    dev_.absmax[ABS_PRESSURE] = ABS_MAX_PRESSURE;
 
     dev_.absmin[ABS_MT_TOUCH_MAJOR] = 0;
     dev_.absmax[ABS_MT_TOUCH_MAJOR] = 1;
     dev_.absmin[ABS_MT_TOUCH_MINOR] = 0;
     dev_.absmax[ABS_MT_TOUCH_MINOR] = 1;
 
-    dev_.absmin[ABS_MT_ORIENTATION] = -90;
-    dev_.absmax[ABS_MT_ORIENTATION] = 90;
+    dev_.absmin[ABS_MT_ORIENTATION] = ABS_MT_MIN_ORIENTATION;
+    dev_.absmax[ABS_MT_ORIENTATION] = ABS_MT_MAX_ORIENTATION;
 
     dev_.absmin[ABS_MT_POSITION_X] = 0;
     dev_.absmax[ABS_MT_POSITION_X] = maxX;
@@ -81,11 +90,11 @@ VirtualTouchScreen::VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY)
     dev_.absmax[ABS_MT_POSITION_Y] = maxY;
 
     dev_.absmin[ABS_MT_BLOB_ID] = 0;
-    dev_.absmax[ABS_MT_BLOB_ID] = 10;
+    dev_.absmax[ABS_MT_BLOB_ID] = ABS_MT_BLOB_MAX_ID;
     dev_.absmin[ABS_MT_TRACKING_ID] = 0;
-    dev_.absmax[ABS_MT_TRACKING_ID] = 9;
+    dev_.absmax[ABS_MT_TRACKING_ID] = ABS_MT_TRACKING_MAX_ID;
     dev_.absmin[ABS_MT_PRESSURE] = 0;
-    dev_.absmax[ABS_MT_PRESSURE] = 100;
+    dev_.absmax[ABS_MT_PRESSURE] = ABS_MT_MAX_PRESSURE;
 }
 } // namespace MMI
 } // namespace OHOS

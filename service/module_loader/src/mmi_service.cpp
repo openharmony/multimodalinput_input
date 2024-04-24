@@ -247,7 +247,7 @@ int32_t MMIService::Init()
     NapProcess::GetInstance()->Init(*this);
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
-    MMI_HILOGD("PointerDrawingManager Init");
+    MMI_HILOGI("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
@@ -660,7 +660,7 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
     if (ret != RET_OK) {
-        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
+        MMI_HILOGD("Mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -783,7 +783,7 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 
 int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
@@ -949,7 +949,7 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 
 int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this, deviceId, std::ref(keyboardType)));
     if (ret != RET_OK) {
@@ -2025,6 +2025,84 @@ int32_t MMIService::CancelInjection()
 int32_t MMIService::OnCancelInjection()
 {
     return sMsgHandler_.OnCancelInjection();
+}
+
+int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnHasIrEmitter, this, std::ref(hasIrEmitter)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetInfraredFrequencies,
+                                                        this, std::ref(requencys)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnTransmitInfrared, this, number, pattern));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnTransmitInfrared failed, returnCode:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
+{
+    hasIrEmitter = false;
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    MMI_HILOGI("start get infrared frequency");
+    std::string context = "";
+    int32_t size = static_cast<int32_t>(requencys.size());
+    for (int32_t i = 0; i < size; i++) {
+        context = context + "requencys[" + std::to_string(i) + "]. max="
+                + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) +";";
+    }
+    MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
+    return RET_OK;
+}
+
+int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t>& pattern)
+{
+    std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
+    int32_t size = static_cast<int32_t>(pattern.size());
+    for (int32_t i = 0; i < size; i++) {
+        context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
+    }
+
+    MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());
+    return RET_OK;
+}
+
+int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::SetPixelMapData, &sMsgHandler_,
+        infoId, pixelMap));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
