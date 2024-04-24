@@ -135,7 +135,7 @@ static void ThrowError(napi_env env, int32_t code, std::string operateType)
     }
     MMI_HILOGE("Operate %{public}s requst error. returnCode:%{public}d", operateType.c_str(), code);
     if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "Infrared", "ohos.permission.INFRARED_EMITTER");
+        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "Infrared", "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER");
     } else if (COMMON_USE_SYSAPI_ERROR == errorCode) {
         THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "Infrared", "Non system applications use system API");
     } else {

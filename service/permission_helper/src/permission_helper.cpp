@@ -121,7 +121,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
 
 bool PermissionHelper::CheckInfraredEmmit()
 {
-    std::string infraredEmmitPermissionCode = "ohos.permission.INFRARED_EMITTER";
+    std::string infraredEmmitPermissionCode = "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
     return CheckHapPermission(infraredEmmitPermissionCode);
 }
 
