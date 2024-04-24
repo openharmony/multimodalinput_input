@@ -320,6 +320,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/uinput",
