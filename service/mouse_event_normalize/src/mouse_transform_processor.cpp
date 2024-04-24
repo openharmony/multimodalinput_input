@@ -43,8 +43,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseTransformProcessor" };
 constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 11;
-constexpr int32_t DEFAULT_SPEED = 5;
+constexpr int32_t MAX_SPEED = 10;
+constexpr int32_t DEFAULT_SPEED = 7;
 constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
