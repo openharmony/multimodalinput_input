@@ -66,7 +66,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutIntValue, TestSize.Level1
 }
 
 /**
- * @tc.name: SettingDatashareTest_PutIntValue
+ * @tc.name: SettingDatashareTest_PutLongValue
  * @tc.desc: Test PutLongValue
  * @tc.type: FUNC
  * @tc.require:
@@ -82,7 +82,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutLongValue, TestSize.Level
 }
 
 /**
- * @tc.name: SettingDatashareTest_PutIntValue
+ * @tc.name: SettingDatashareTest_PutBoolValue
  * @tc.desc: Test PutBoolValue
  * @tc.type: FUNC
  * @tc.require:
@@ -98,7 +98,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutBoolValue, TestSize.Level
 }
 
 /**
- * @tc.name: SettingDatashareTest_PutIntValue
+ * @tc.name: SettingDatashareTest_IsValidKey
  * @tc.desc: Test IsValidKey
  * @tc.type: FUNC
  * @tc.require:
