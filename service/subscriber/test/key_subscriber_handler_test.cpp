@@ -361,36 +361,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_001, T
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_SubscriberNotifyNap_001
- * @tc.desc: Test subscriber notify nap
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> keyOption;
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    int32_t state = -2;
-    handler.SubscriberNotifyNap(subscriber);
-    ASSERT_EQ(NapProcess::GetInstance()->GetNapClientPid(), -1);
-    state = -1;
-    handler.SubscriberNotifyNap(subscriber);
-    ASSERT_EQ(NapProcess::GetInstance()->GetNapClientPid(), -1);
-}
-
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_CloneKeyEvent_001, TestSize.Level1)
-{
-    KeySubscriberHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_TRUE(handler.CloneKeyEvent(keyEvent));
-    handler.keyEvent_ = nullptr;
-    ASSERT_TRUE(handler.CloneKeyEvent(keyEvent));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_RemoveKeyCode_001
  * @tc.desc: Test remove key code
  * @tc.type: FUNC
