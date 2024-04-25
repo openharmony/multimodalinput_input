@@ -394,12 +394,12 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
     pointerEvent_->SetAgentWindowId(-1);
 }
 
-void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
+bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(data);
-    CHKPV(pointerEvent_);
+    CHKPF(data);
+    CHKPF(pointerEvent_);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
@@ -434,6 +434,7 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+    return true;
 }
 
 int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
@@ -476,8 +477,14 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     PointerEvent::PointerItem pointerItem;
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         HandleAxisPostInner(pointerItem);
-    } else {
-        HandlePostInner(data, pointerItem);
+    } else if (!HandlePostInner(data, pointerItem)) {
+        if (data == nullptr) {
+            MMI_HILOGE("The data is nullptr");
+        }
+        if (pointerEvent_ == nullptr) {
+            MMI_HILOGE("The pointerEvent_ is nullptr");
+        }
+        return RET_ERR;
     }
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
@@ -494,7 +501,15 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->ClearAxisValue();
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
-    HandlePostInner(data, pointerItem);
+    if (!HandlePostInner(data, pointerItem)) {
+        if (data == nullptr) {
+            MMI_HILOGE("The data is nullptr");
+        }
+        if (pointerEvent_ == nullptr) {
+            MMI_HILOGE("The pointerEvent_ is nullptr");
+        }
+        return ERROR_NULL_POINTER;
+    }
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return RET_OK;
