@@ -458,18 +458,12 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t size = 0;
     int32_t windowId = 0;
     int32_t winPid = -1;
-    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("Reading size of the tlv count %{public}d", size);
-    if (size > MAX_BUFFER_SIZE || size <= 0) {
-        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", size);
+    OHOS::Media::PixelMap *pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
         return RET_ERR;
-    }
-    std::vector<uint8_t> buff(size, 0);
-    for (int i = 0; i < size; i++) {
-        READUINT8(data, buff[i], IPC_PROXY_DEAD_OBJECT_ERR);
     }
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -478,11 +472,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
         return RET_ERR;
     }
-    OHOS::Media::PixelMap* pixelMap = OHOS::Media::PixelMap::DecodeTlv(buff);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
-        return RET_ERR;
-    }
+
     int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
