@@ -37,6 +37,7 @@ constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 } // namespace
