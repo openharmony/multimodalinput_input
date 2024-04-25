@@ -42,7 +42,7 @@ public:
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_GetIntValue, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     int32_t value = 123;
@@ -57,7 +57,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_GetIntValue, TestSize.Level1
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutIntValue, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     int32_t value = 123;
@@ -73,7 +73,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutIntValue, TestSize.Level1
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutLongValue, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     int64_t value = 123;
@@ -89,7 +89,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutLongValue, TestSize.Level
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutBoolValue, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     bool value = true;
@@ -105,7 +105,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutBoolValue, TestSize.Level
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_IsValidKey, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     ASSERT_FALSE(settingDataShare.IsValidKey(key));
@@ -119,7 +119,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_IsValidKey, TestSize.Level1)
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_ExecRegisterCb, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     sptr<SettingObserver> observer = nullptr;
@@ -134,7 +134,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_ExecRegisterCb, TestSize.Lev
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     sptr<SettingObserver> observer = nullptr;
@@ -149,7 +149,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_RegisterObserver, TestSize.L
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     sptr<SettingObserver> observer = nullptr;
@@ -167,7 +167,7 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_UnregisterObserver, TestSize
  */
 HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutStringValue, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     SettingDataShare settingDataShare;
     std::string key = "settingDateShare";
     std::string value = "valueObj";
