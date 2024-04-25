@@ -261,6 +261,154 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupFourFingerTapEvent()
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_OnHandleTouchEvent
+ * @tc.desc: Test OnHandleTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleTouchEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.isParseConfig_ = false;
+    handler.isTimeConfig_ = false;
+    handler.isDistanceConfig_ = false;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PENCIL);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_NO_FATAL_FAILURE(handler.OnHandleTouchEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.OnHandleTouchEvent(touchEvent));
+
+    touchEvent->RemovePointerItem(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_NO_FATAL_FAILURE(handler.OnHandleTouchEvent(touchEvent));
+
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.OnHandleTouchEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandlePointerActionMoveEvent
+ * @tc.desc: Test HandlePointerActionMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerActionMoveEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.timerId = -1;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerActionMoveEvent(touchEvent));
+
+    touchEvent->SetPointerId(2);
+    handler.twoFingerGesture_.timerId = 1;
+    handler.twoFingerGesture_.touches->id = 1;
+    handler.twoFingerGesture_.touches->x = 25;
+    handler.twoFingerGesture_.touches->y = 25;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerActionMoveEvent(touchEvent));
+
+    touchEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(5);
+    item.SetDisplayY(5);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerActionMoveEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleFingerGestureDownEvent
+ * @tc.desc: Test HandleFingerGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleFingerGestureDownEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.twoFingerGesture_.active = true;
+    item.SetPointerId(1);
+    item.SetDisplayX(10);
+    item.SetDisplayY(10);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleFingerGestureDownEvent(touchEvent));
+
+    item.SetPointerId(2);
+    item.SetDisplayX(15);
+    item.SetDisplayY(15);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleFingerGestureDownEvent(touchEvent));
+
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.timerId = 150;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleFingerGestureUpEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureDownEvent
+ * @tc.desc: Test HandleKnuckleGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.twoFingerGesture_.active = true;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_PALM);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    item.SetPointerId(2);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    touchEvent->AddPointerItem(item);
+    item.SetPointerId(3);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(2);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
+
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureUpEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleGestureProcessor
+ * @tc.desc: Test KnuckleGestureProcessor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureProcessor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KnuckleGesture knuckleGesture;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    knuckleGesture.lastPointerDownEvent = touchEvent;
+    knuckleGesture.lastPointerUpTime = 10;
+    touchEvent->SetActionTime(5);
+    handler.knuckleCount_ = 2;
+    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureProcessor(touchEvent, knuckleGesture));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleMultiTapTest__001
  * @tc.desc: Test three fingers tap event launch ability
  * @tc.type: FUNC
