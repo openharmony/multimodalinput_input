@@ -26,12 +26,11 @@
 #include "proto.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventInterceptorHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventInterceptorHandler" };
-} // namespace
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {

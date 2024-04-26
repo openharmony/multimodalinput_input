@@ -48,10 +48,12 @@
 #include "res_type.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputWindowsManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr int32_t CURSOR_CIRCLE_STYLE = 41;

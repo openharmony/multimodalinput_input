@@ -30,10 +30,12 @@
 #include "dfx_hisysevent.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchPadTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchPadTransformProcessor" };
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
