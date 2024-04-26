@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,6 +57,7 @@ const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
+constexpr int32_t TIME_CONVERSION_UNIT = 1000;
 } // namespace
 
 int64_t GetSysClockTime()
@@ -66,7 +67,7 @@ int64_t GetSysClockTime()
         MMI_HILOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
-    return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+    return (ts.tv_sec * TIME_CONVERSION_UNIT * TIME_CONVERSION_UNIT) + (ts.tv_nsec / TIME_CONVERSION_UNIT);
 }
 
 int64_t GetMillisTime()
@@ -462,7 +463,7 @@ static int32_t ReadConfigFile(const std::string &realPath, DeviceConfig &devConf
             continue;
         }
         pos = tmp.find('=');
-        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
+        if ((pos == std::string::npos) || (tmp.back() == '=')) {
             MMI_HILOGE("Find config item error");
             cfgFile.close();
             return RET_ERR;

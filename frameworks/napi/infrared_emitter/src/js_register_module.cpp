@@ -27,7 +27,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInfraredRegister" };
 const uint32_t NUMBER_PARAMETERS = 2;
-const uint32_t NUMBER_DEFAULT = 0;
+const int32_t  MAX_NUMBER_ARRAY_ELEMENT = 50;
 }
 
 bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)
@@ -86,6 +86,10 @@ bool ParsePatternArray(const napi_env& env, const napi_value& value, std::vector
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "element of pattern", "Int64");
             return false;
         }
+        if (res <= 0) {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "value for element of pattern", "must be positive");
+            return false;
+        }
         result.emplace_back(res);
     }
     return true;
@@ -95,7 +99,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
                                   std::vector<int64_t> & vecPattern)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = NUMBER_DEFAULT;
+    size_t argc = NUMBER_PARAMETERS;
     napi_value argv[NUMBER_PARAMETERS];
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != NUMBER_PARAMETERS) {
@@ -108,8 +112,16 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
         return false;
     }
     CHKRF(napi_get_value_int64(env, argv[0], &infraredFrequency), "get number64 value error");
+    if (infraredFrequency <= 0) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "value of infraredFrequency", "must be greater than 0");
+        return false;
+    }
     if (!ParsePatternArray(env, argv[1], vecPattern)) {
         MMI_HILOGE("ParsePatternArray parse pattern array fail.");
+        return false;
+    }
+    if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of pattern", "must be less than or equal  50");
         return false;
     }
     return true;
@@ -123,7 +135,7 @@ static void ThrowError(napi_env env, int32_t code, std::string operateType)
     }
     MMI_HILOGE("Operate %{public}s requst error. returnCode:%{public}d", operateType.c_str(), code);
     if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "Infrared", "ohos.permission.INFRARED_EMITTER");
+        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "Infrared", "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER");
     } else if (COMMON_USE_SYSAPI_ERROR == errorCode) {
         THROWERR_API9(env, COMMON_USE_SYSAPI_ERROR, "Infrared", "Non system applications use system API");
     } else {
@@ -248,6 +260,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&infraredModule);
 }
-
 }
 }

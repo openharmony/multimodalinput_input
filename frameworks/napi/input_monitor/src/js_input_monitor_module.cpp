@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,11 +72,11 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
         return nullptr;
     }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
         MMI_HILOGE("AddEnv failed");
         return nullptr;
     }
-    JsInputMonMgr.AddMonitor(env, typeName, argv[1]);
+    JS_INPUT_MONITOR_MGR.AddMonitor(env, typeName, argv[1]);
     return nullptr;
 }
 
@@ -90,7 +90,7 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
         return;
     }
-    hotRectAreaList = JsInputMonMgr.GetHotRectAreaList(env, napiRect, rectArrayLength);
+    hotRectAreaList = JS_INPUT_MONITOR_MGR.GetHotRectAreaList(env, napiRect, rectArrayLength);
     if (hotRectAreaList.size() != rectArrayLength) {
         MMI_HILOGE("Hot Rect Area Parameter error");
         return;
@@ -102,11 +102,11 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
         return;
     }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
         MMI_HILOGE("AddEnv failed");
         return;
     }
-    JsInputMonMgr.AddMonitor(env, "mouse", hotRectAreaList, rectArrayLength, napiCallback);
+    JS_INPUT_MONITOR_MGR.AddMonitor(env, "mouse", hotRectAreaList, rectArrayLength, napiCallback);
     return;
 }
 
@@ -150,11 +150,11 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
             return nullptr;
         }
-        if (!JsInputMonMgr.AddEnv(env, info)) {
+        if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
             MMI_HILOGE("AddEnv failed");
             return nullptr;
         }
-        JsInputMonMgr.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
+        JS_INPUT_MONITOR_MGR.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     }
     return nullptr;
 }
@@ -198,7 +198,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < TWO_PARAMETERS) {
-        JsInputMonMgr.RemoveMonitor(env, typeName);
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
     }
@@ -210,12 +210,12 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    if (!JsInputMonMgr.AddEnv(env, info)) {
-        JsInputMonMgr.RemoveMonitor(env, typeName);
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName);
         return nullptr;
     }
 
-    JsInputMonMgr.RemoveMonitor(env, typeName, argv[1]);
+    JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, argv[1]);
     return nullptr;
 }
 
@@ -253,7 +253,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < THREE_PARAMETERS) {
-        JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, fingers);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
     }
@@ -263,12 +263,12 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
         return nullptr;
     }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
-        JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, fingers);
         return nullptr;
     }
 
-    JsInputMonMgr.RemoveMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
+    JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     return nullptr;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@ constexpr int32_t STANDARD_KEY_REPEAT_RATE = 50;
 constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
 constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
 constexpr int32_t ARGC_NUM = 2;
+constexpr size_t INPUT_PARAMETER = 2;
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -252,7 +253,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1 || argc > 2) {
+    if (argc < 1 || argc > INPUT_PARAMETER) {
         THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
     }
@@ -328,7 +329,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
         return nullptr;
     }
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
-    if (argc == 2) {
+    if (argc == INPUT_PARAMETER) {
         return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCodes);
     }
     if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
