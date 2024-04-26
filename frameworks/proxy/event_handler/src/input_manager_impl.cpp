@@ -31,10 +31,12 @@
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerImpl"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
 constexpr size_t MAX_FILTER_NUM = 4;
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
