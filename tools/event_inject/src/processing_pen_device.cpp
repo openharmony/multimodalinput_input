@@ -15,10 +15,12 @@
 
 #include "processing_pen_device.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ProcessingPenDevice"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPenDevice" };
 constexpr int32_t EV_ABS_Z_DEFAULT_VALUE { 450 };
 constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE { 2114 };
 } // namespace

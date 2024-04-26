@@ -21,12 +21,11 @@
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventDataTransformation"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
-} // namespace
-
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
