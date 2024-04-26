@@ -126,10 +126,10 @@ private:
 } // namespace MMI
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER OHOS::MMI::InnerFunctionDebugTracer __innerFuncTracer_Debug___ \
+#define CALL_DEBUG_ENTER OHOS::MMI::InnerFunctionTracer __innerFuncTracer_Debug___ \
     { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__ }
-#define CALL_INFO_TRACE OHOS::MMI::InnerFunctionInfoTracer ___innerFuncTracer_Info___ \
+#define CALL_INFO_TRACE OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
     { LOG_INFO, MMI_LOG_TAG, __FUNCTION__ }
-#define CALL_TEST_DEBUG OHOS::MMI::InnerFunctionInfoTracer ___innerFuncTracer_Info___ \
+#define CALL_TEST_DEBUG OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
     { LOG_DEBUG, MMI_LOG_TAG, test_info_ == nullptr ? "TestBody" : test_info_->name() }
 #endif // MMI_LOG_H
