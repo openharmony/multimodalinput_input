@@ -24,11 +24,12 @@
 #include "mmi_log.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventLogHelper"
+
 namespace OHOS {
 namespace MMI {
 class EventLogHelper final {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventLogHelper" };
-
 public:
     template <class T> static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum);
     template <class T> static void PrintEventData(std::shared_ptr<T> event);

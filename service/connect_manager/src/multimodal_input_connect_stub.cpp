@@ -29,10 +29,12 @@
 #include "time_cost_chk.h"
 #include "nap_process.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectStub"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 const int32_t TUPLE_PID = 0;

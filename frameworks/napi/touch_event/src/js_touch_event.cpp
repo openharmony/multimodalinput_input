@@ -19,12 +19,11 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsMouseEvent"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseEvent" };
-} // namespace
-
 napi_value JsTouchEvent::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_DEBUG_ENTER;

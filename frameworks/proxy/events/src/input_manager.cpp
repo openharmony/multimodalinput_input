@@ -20,12 +20,11 @@
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
-} // namespace
-
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
