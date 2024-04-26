@@ -42,6 +42,11 @@ public:
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
 
+    std::string GetInputDeviceById(int32_t id);
+    std::string GetInputNodeNameByCfg(int32_t id);
+    std::string GetContent(const std::string &fileName);
+    std::string GetInputNode(const std::string &inputNodeName);
+
 private:
     const std::string fileName_;
     std::shared_ptr<BindInfos> infos_;
