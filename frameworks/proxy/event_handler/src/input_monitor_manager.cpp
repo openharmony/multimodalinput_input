@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,7 +45,7 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGW("Failed to find the monitorId");
         return;
     }
-    int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(eventId);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkEventConsumed(eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }

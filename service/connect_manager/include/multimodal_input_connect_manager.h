@@ -147,5 +147,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define MultimodalInputConnMgr MultimodalInputConnectManager::GetInstance()
+#define MULTIMODAL_INPUT_CONNECT_MGR MultimodalInputConnectManager::GetInstance()
 #endif // MULTIMODAL_INPUT_CONNECT_MANAGER_H

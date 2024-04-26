@@ -71,6 +71,11 @@ ohos_unittest("ut-event-injection-out") {
 
   configs = [ "${mmi_path}:coverage_flags" ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   include_dirs = [
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",

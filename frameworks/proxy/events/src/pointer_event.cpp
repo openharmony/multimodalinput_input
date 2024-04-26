@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -421,10 +421,11 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
       zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
-      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_), dispatchTimes_(other.dispatchTimes_)
+      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-, fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_)
+      fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+      dispatchTimes_(other.dispatchTimes_)
       {}
 
 PointerEvent::~PointerEvent() {}
@@ -851,16 +852,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READINT32(in, buttonId_);
     READINT32(in, fingerCount_);
     READFLOAT(in, zOrder_);
-    uint32_t axes;
-    READUINT32(in, axes);
 
-    for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
-        const AxisType axis { static_cast<AxisType>(i) };
-        if (HasAxis(axes, axis)) {
-            double val;
-            READDOUBLE(in, val);
-            SetAxisValue(axis, val);
-        }
+    if (!ReadAxisFromParcel(in)) {
+        return false;
     }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -873,6 +867,22 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READDOUBLE(in, fingerprintDistanceX_);
     READDOUBLE(in, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    return true;
+}
+
+bool PointerEvent::ReadAxisFromParcel(Parcel &in)
+{
+    uint32_t axes;
+    READUINT32(in, axes);
+
+    for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
+        const AxisType axis { static_cast<AxisType>(i) };
+        if (HasAxis(axes, axis)) {
+            double val;
+            READDOUBLE(in, val);
+            SetAxisValue(axis, val);
+        }
+    }
     return true;
 }
 
