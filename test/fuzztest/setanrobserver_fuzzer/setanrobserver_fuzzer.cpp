@@ -19,12 +19,11 @@
 #include "i_anr_observer.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SetAnrObserverFuzzTest"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SetAnrObserverFuzzTest" };
-} // namespace
-
 class IAnrObserverTest : public IAnrObserver {
 public:
     IAnrObserverTest() : IAnrObserver() {}

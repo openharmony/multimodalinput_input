@@ -20,10 +20,12 @@
 #include "cJSON.h"
 #include "define_multimodal.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GetDeviceNode"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
