@@ -54,10 +54,7 @@ group("test") {
 
 ohos_unittest("libudev-test") {
   module_out_path = output_path
-  include_dirs = [
-    "${mmi_path}/test/unittest/standalone/include",
-    "//third_party/libevdev",
-  ]
+  include_dirs = [ "//third_party/libevdev" ]
 
   configs = [
     ":mmi_libudev_config",
@@ -70,6 +67,7 @@ ohos_unittest("libudev-test") {
   ]
 
   deps = [
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/libevdev",
   ]
