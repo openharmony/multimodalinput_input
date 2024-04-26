@@ -303,7 +303,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayId_001, Test
 {
     int32_t expectedDisplayId = 1;
     std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
-    EXPECT_NE(inputEvent, nullptr); 
+    EXPECT_NE(inputEvent, nullptr);
     inputEvent->SetTargetDisplayId(expectedDisplayId);
     int32_t ret = WinMgr->GetDisplayId(inputEvent);
     EXPECT_EQ(ret, expectedDisplayId);
