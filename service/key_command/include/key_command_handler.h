@@ -261,6 +261,7 @@ private:
     int32_t maxCount_ { 0 };
     int32_t count_ { 0 };
     int32_t repeatTimerId_ { -1 };
+    int32_t knuckleCount_ { 0 };
     int64_t downActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };

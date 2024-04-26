@@ -1345,6 +1345,57 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Leve
 }
 
 /**
+ * @tc.name: InputManagerTest_IsPointerVisible_001
+ * @tc.desc: Test flag `InputEvent::EVENT_FLAG_HIDE_POINTER` on controlling pointer visibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ONE);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_HIDE_POINTER);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_FALSE(InputManager::GetInstance()->IsPointerVisible());
+}
+
+/**
+ * @tc.name: InputManagerTest_IsPointerVisible_002
+ * @tc.desc: Test flag `InputEvent::EVENT_FLAG_HIDE_POINTER` on controlling pointer visibility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_IsPointerVisible_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible());
+}
+
+/**
  * @tc.name: InputManagerTest_SetTouchpadScrollSwitch_001
  * @tc.desc: Set touchpad scroll switch
  * @tc.type: FUNC
@@ -1755,6 +1806,7 @@ static bool SimulateInputEventInjectKeyTest(int32_t keyAction, int32_t keyCode, 
         return false;
     }
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    keyEvent->SetKeyCode(keyCode);
 
     KeyEvent::KeyItem item;
     keyEvent->SetKeyAction(keyAction);
@@ -1939,8 +1991,10 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_009, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
-    itemFirst.SetPressed(true);
+    itemFirst.SetPressed(false);
     itemFirst.SetDownTime(1000);
     keyEvent->AddKeyItem(itemFirst);
 
@@ -1974,6 +2028,8 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_010, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(1000);
@@ -2009,6 +2065,8 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_011, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     itemFirst.SetPressed(false);
     itemFirst.SetDownTime(500);
@@ -2044,15 +2102,17 @@ HWTEST_F(InputManagerTest, InputManager_InjectKeyEvent_012, TestSize.Level1)
 
     KeyEvent::KeyItem itemFirst;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+
     itemFirst.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     itemFirst.SetPressed(false);
-    itemFirst.SetDownTime(1000);
+    itemFirst.SetDownTime(500);
     keyEvent->AddKeyItem(itemFirst);
 
     KeyEvent::KeyItem itemSecond;
     itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
-    itemSecond.SetPressed(false);
-    itemSecond.SetDownTime(1000);
+    itemSecond.SetPressed(true);
+    itemSecond.SetDownTime(500);
     keyEvent->AddKeyItem(itemSecond);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));

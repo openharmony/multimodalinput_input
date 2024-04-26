@@ -58,7 +58,7 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
-    void NotifyPointerDevice(bool hasPointerDevice, bool isVisible);
+    void NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug);
     void AddDevListener(SessionPtr sess);
     void RemoveDevListener(SessionPtr sess);
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -80,7 +80,7 @@ public:
     int32_t OnEnableInputDevice(bool enable);
 
 private:
-    int32_t ParseDeviceId(const std::string &sysName);
+    int32_t ParseDeviceId(struct libinput_device *inputDevice);
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
