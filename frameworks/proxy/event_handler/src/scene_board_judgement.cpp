@@ -17,12 +17,11 @@
 #include "parameters.h"
 #include "input_scene_board_judgement.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMISceneBoardJudgement"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISceneBoardJudgement" };
-} // namespace
-
 bool MMISceneBoardJudgement::IsSceneBoardEnabled()
 {
     static bool isSceneBoardEnabled = false;

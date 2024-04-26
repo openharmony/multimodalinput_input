@@ -17,10 +17,12 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultiModalInputPreferencesManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultiModalInputPreferencesManager" };
 constexpr int32_t KEYBOARD_REPEATRATE = 50;
 constexpr int32_t KEYBOARD_REPEATDELAY = 500;
 constexpr int32_t MOUSE_SCROLL_ROWS = 3;

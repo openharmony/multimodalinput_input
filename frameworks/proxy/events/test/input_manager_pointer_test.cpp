@@ -18,10 +18,12 @@
 #include "input_manager_util.h"
 #include "pixel_map.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerPointerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerPointerTest"};
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t SIZE_TYPE_CASE = 3;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 222;

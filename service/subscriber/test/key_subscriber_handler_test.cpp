@@ -24,11 +24,13 @@
 #include "switch_subscriber_handler.h"
 #include "uds_server.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyCommandHandlerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandlerTest" };
 } // namespace
 
 class KeySubscriberHandlerTest : public testing::Test {

@@ -27,9 +27,11 @@
 #include "result_set.h"
 #include "uri.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "setting_DataShare"
+
 namespace OHOS {
 namespace MMI {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "setting_DataShare" };
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
 std::mutex SettingDataShare::mutex_;
 sptr<IRemoteObject> SettingDataShare::remoteObj_;
