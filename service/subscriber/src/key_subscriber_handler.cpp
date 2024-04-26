@@ -205,7 +205,7 @@ bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEven
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_WLAN
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_CONFIG) {
@@ -611,7 +611,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     CHKPV(subscriber);
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER || state == UNOBSERVED) {
-        MMI_HILOGW("nap client status:%{public}d", state);
+        MMI_HILOGD("nap client status:%{public}d", state);
         return;
     }
 

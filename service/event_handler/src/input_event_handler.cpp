@@ -109,7 +109,7 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event* event)
         if (TimerMgr->IsExist(timerId_)) {
             TimerMgr->ResetTimer(timerId_);
         } else {
-            static constexpr int32_t timeout = 500;
+            static constexpr int32_t timeout = 30;
             std::weak_ptr<InputEventHandler> weakPtr = shared_from_this();
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;

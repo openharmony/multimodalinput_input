@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -85,6 +85,10 @@ config("libmmi_server_config") {
     "${preferences_path}/frameworks/native/include",
     "${graphics_path}/2d_graphics/include",
   ]
+
+  if (input_feature_fingerprint) {
+    include_dirs += [ "fingerprint_event_processor/include" ]
+  }
 
   if (input_ext_feature_anco) {
     include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
@@ -178,6 +182,10 @@ ohos_shared_library("libmmi-server") {
         "touch_event_normalize/src/touch_transform_processor.cpp",
       ]
     }
+  }
+  if (input_feature_fingerprint) {
+    sources +=
+        [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
   }
   if (input_feature_joystick) {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
@@ -292,6 +300,9 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/service/include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/display_state_manager/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/dfx/include",
@@ -305,7 +316,9 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/uinput",
@@ -316,19 +329,28 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "connect_manager/test/multimodal_input_connect_stub_test.cpp",
-    "dfx/test/dfx_hisysevent_test.cpp",
+    "delegate_task/test/delegate_tasks_test.cpp",
+    "device_config/test/device_config_file_parser_test.cpp",
+    "device_manager/test/input_device_manager_test.cpp",
+    "display_state_manager/test/display_event_monitor_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "event_dump/test/event_dump_test.cpp",
     "event_handler/test/anr_manager_test.cpp",
     "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
+    "interceptor/test/event_interceptor_handler_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
+    "key_command/test/setting_datashare_test.cpp",
+    "key_event_normalize/test/key_event_normalize_test.cpp",
+    "module_loader/test/mmi_service_test.cpp",
     "module_loader/test/uds_server_test.cpp",
+    "module_loader/test/watchdog_task_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
     "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
     "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
+    "nap_process/test/nap_process_test.cpp",
     "subscriber/test/key_subscriber_handler_test.cpp",
     "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
     "touch_event_normalize/test/touch_event_normalize_test.cpp",
@@ -359,11 +381,14 @@ ohos_unittest("ut-mmi-service-out") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -536,7 +561,11 @@ ohos_unittest("ApplicationStateObserverTest") {
 
   configs = [ ":libmmi_server_config" ]
 
-  cflags = [ "-DUNIT_TEST" ]
+  cflags = [
+    "-DUNIT_TEST",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",

@@ -44,6 +44,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "switch_event.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -192,6 +193,12 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
     void Authorize(bool isAuthorize);
     int32_t CancelInjection();
+
+    int32_t HasIrEmitter(bool &hasIrEmitter);
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);

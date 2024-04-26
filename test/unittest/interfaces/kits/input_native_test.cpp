@@ -19,7 +19,9 @@
 #include "key_event.h"
 #include "oh_input_manager.h"
 #include "oh_key_code.h"
-
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    #include "infrared_emitter_controller.h"
+#endif
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -30,7 +32,6 @@ class InputNativeTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-
     void SetUp() {}
     void TearDown() {}
 };

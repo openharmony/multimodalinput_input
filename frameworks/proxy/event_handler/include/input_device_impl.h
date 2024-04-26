@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,5 +68,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputDevImpl OHOS::MMI::InputDeviceImpl::GetInstance()
+#define INPUT_DEVICE_IMPL OHOS::MMI::InputDeviceImpl::GetInstance()
 #endif // OHOS_INPUT_DEVICE_EVENT_H

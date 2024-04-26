@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,7 +151,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
-        << event->GetAgentWindowId() << event->GetFlag();
+        << event->GetAgentWindowId() << event->GetFlag() << event->IsMarkEnabled();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Serialize packet is failed");
         return RET_ERR;
@@ -186,11 +186,14 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetAgentWindowId(tField);
     uint32_t tFlag = InputEvent::EVENT_FLAG_NONE;
     pkt >> tFlag;
+    event->AddFlag(tFlag);
+    bool markEnabled = true;
+    pkt >> markEnabled;
+    event->SetMarkEnabled(markEnabled);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Deserialize packet is failed");
         return RET_ERR;
     }
-    event->AddFlag(tFlag);
     return RET_OK;
 }
 
@@ -201,8 +204,11 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
+
+    SerializeFingerprint(event, pkt);
+
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetFingerCount() << event->GetZOrder() << event->GetAxes();
+        << event->GetFingerCount() << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
 
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
@@ -248,6 +254,13 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
+void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<InputEvent> event, NetPacket &pkt)
+{
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+}
+
 int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -264,6 +277,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetFingerCount(tField);
     pkt >> tField;
     event->SetZOrder(tField);
+    pkt >> tField;
+    event->SetDispatchTimes(tField);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
@@ -297,6 +312,15 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         MMI_HILOGE("Deserialize input event failed");
         return RET_ERR;
     }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    double distanceX {0.0};
+    double distanceY {0.0};
+    pkt >> distanceX;
+    pkt >> distanceY;
+    event->SetFingerprintDistanceX(distanceX);
+    event->SetFingerprintDistanceY(distanceY);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
     if (DeserializePressedButtons(event, pkt) != RET_OK) {
         MMI_HILOGE("Deserialize pressed buttons failed");

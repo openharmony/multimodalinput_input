@@ -94,6 +94,8 @@ public:
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
@@ -102,7 +104,7 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    void CreatPixelMap(size_t size, NetPacket &pkt, WindowInfo &info);
+    void SetWindowInfo(int32_t infoId, WindowInfo &info);
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
