@@ -124,7 +124,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, Tes
     ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_UP);
     EXPECT_TRUE(ret);
     ret = manager.IsValidAction(100);
-    EXPECT_FALSE(ret);  
+    EXPECT_FALSE(ret);
 }
 
 /**
