@@ -1046,6 +1046,13 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         DeletePointerVisible(getpid());
     }
     DrawManager();
+    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
+        MMI_HILOGD("Pointer window destroy start");
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGD("Pointer window destroy success");
+    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -1075,13 +1082,6 @@ void PointerDrawingManager::DrawManager()
         WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
-    }
-    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
-        MMI_HILOGD("Pointer window destroy start");
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Pointer window destroy success");
     }
 }
 
