@@ -43,7 +43,7 @@ public:
     static int32_t UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<KeyEvent> event);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 private:
-    static void SerializeFingerprint(const std::shared_ptr<InputEvent> event, NetPacket &pkt);
+    static void SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
