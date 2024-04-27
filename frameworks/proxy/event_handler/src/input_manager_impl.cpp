@@ -1254,14 +1254,20 @@ void InputManagerImpl::OnConnected()
 template<typename T>
 bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
+    CALL_INFO_TRACE;
     CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
-            lastPointerEvent_->SetPointerAction(pointerActionEvent);
             PointerEvent::PointerItem item;
+            int32_t pointerId = lastPointerEvent_->GetPointerId();
+            if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
+                MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerId);
+                return false;
+            }
             item.SetPressed(false);
-            lastPointerEvent_->UpdatePointerItem(lastPointerEvent_->GetPointerId(), item);
+            lastPointerEvent_->UpdatePointerItem(pointerId, item);
+            lastPointerEvent_->SetPointerAction(pointerActionEvent);
             OnPointerEvent(lastPointerEvent_);
             return true;
         }
