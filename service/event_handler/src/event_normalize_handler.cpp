@@ -293,7 +293,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     EventLogHelper::PrintEventData(keyEvent);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
     CHKPR(device, RET_ERR);
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
