@@ -803,8 +803,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    WRITEINT32(out, fingerprintDistanceX_);
-    WRITEINT32(out, fingerprintDistanceY_);
+    WRITEDOUBLE(out, fingerprintDistanceX_);
+    WRITEDOUBLE(out, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     return true;
 }
