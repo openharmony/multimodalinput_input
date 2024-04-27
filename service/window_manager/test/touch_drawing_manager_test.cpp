@@ -101,5 +101,93 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, 
     pointerEvent->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->TouchDrawHandler(pointerEvent));
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidAction_001
+ * @tc.desc: Test is valid action
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, TestSize.Level1)
+{
+    TouchDrawingManager manager;
+    bool ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_TRUE(ret);
+    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
+    EXPECT_TRUE(ret);
+    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_TRUE(ret);
+    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    EXPECT_TRUE(ret);
+    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_TRUE(ret);
+    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_TRUE(ret);
+    ret = manager.IsValidAction(100);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo_001
+ * @tc.desc: Test update display info
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t DENSITY_BASELINE = 160;
+    int32_t INDEPENDENT_INNER_PIXELS = 20;
+    int32_t INDEPENDENT_OUTER_PIXELS = 21;
+    int32_t INDEPENDENT_WIDTH_PIXELS = 2;
+    int32_t CALCULATE_MIDDLE = 2;
+    TouchDrawingManager manager;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 160;
+    manager.UpdateDisplayInfo(displayInfo);
+    EXPECT_EQ(manager.bubble_.innerCircleRadius,
+    displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE);
+    EXPECT_EQ(manager.bubble_.outerCircleRadius,
+    displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE);
+    EXPECT_EQ(manager.bubble_.outerCircleWidth,
+    static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE);
+    EXPECT_NO_FATAL_FAILURE(manager.UpdateDisplayInfo(displayInfo));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_StartTouchDraw_001
+ * @tc.desc: Test start touch draw
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_StartTouchDraw_001, TestSize.Level1)
+{
+    TouchDrawingManager manager;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(manager.StartTouchDraw(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawGraphic_001
+ * @tc.desc: Test draw graphic
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawGraphic_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager manager;
+    EXPECT_EQ(manager.DrawGraphic(nullptr), RET_ERR);
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    manager.canvasNode_ = nullptr;
+    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
+    pointerEvent->SetPointerId(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    manager.displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
