@@ -150,6 +150,7 @@ group("mmi_tests") {
     "service:ApplicationStateObserverTest",
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
+    "service:TimerManagerTest",
     "service:TransformPointTest",
     "service:TwoFingerLongTouchTest",
     "service:event_resample_test",
