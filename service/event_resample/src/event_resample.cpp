@@ -187,7 +187,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
             item.SetDisplayY(logicY);
-            
+
             auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
             item.SetWindowX(windowXY.first);
             item.SetWindowY(windowXY.second);
@@ -513,7 +513,8 @@ void EventResample::PrintfDeviceName()
         MMI_HILOGW("The device is not found");
         return;
     }
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
 }
 
 } // namespace MMI
