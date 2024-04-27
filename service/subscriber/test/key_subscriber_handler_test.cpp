@@ -565,7 +565,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearSubscriberTimer
     auto subscriber2 = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(2, sess, keyOption);
     subscribers.push_back(subscriber1);
     subscribers.push_back(subscriber2);
-    ASSERT_NO_FATAL_FAILURE(handler.ClearSubscriberTimer(subscribers)); 
+    ASSERT_NO_FATAL_FAILURE(handler.ClearSubscriberTimer(subscribers));
 }
 } // namespace MMI
 } // namespace OHOS
