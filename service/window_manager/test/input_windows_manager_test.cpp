@@ -233,5 +233,239 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_01
     WinMgr->SetHoverScrollState(true);
     ASSERT_TRUE(WinMgr->GetHoverScrollState());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_InitMouseDownInfo_001
+ * @tc.desc: Test initializing mouse down information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InitMouseDownInfo_001, TestSize.Level1)
+{
+    WinMgr->InitMouseDownInfo();
+    EXPECT_EQ(WinMgr->mouseDownInfo_.id, -1);
+    EXPECT_EQ(WinMgr->mouseDownInfo_.pid, -1);
+    EXPECT_TRUE(WinMgr->mouseDownInfo_.defaultHotAreas.empty());
+    EXPECT_TRUE(WinMgr->mouseDownInfo_.pointerHotAreas.empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InitMouseDownInfo_002
+ * @tc.desc: Test initializing mouse down information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InitMouseDownInfo_002, TestSize.Level1)
+{
+    WinMgr->mouseDownInfo_.id = 1;
+    WinMgr->mouseDownInfo_.pid = 123;
+    WinMgr->mouseDownInfo_.defaultHotAreas.push_back({0, 0, 100, 100});
+    WinMgr->InitMouseDownInfo();
+    EXPECT_EQ(WinMgr->mouseDownInfo_.id, -1);
+    EXPECT_EQ(WinMgr->mouseDownInfo_.pid, -1);
+    EXPECT_TRUE(WinMgr->mouseDownInfo_.defaultHotAreas.empty());
+    EXPECT_TRUE(WinMgr->mouseDownInfo_.pointerHotAreas.empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_001
+ * @tc.desc: Test getting window group information by display ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_001, TestSize.Level1)
+{
+    int32_t displayId = -1;
+    const std::vector<WindowInfo>& windowGroupInfo = WinMgr->GetWindowGroupInfoByDisplayId(displayId);
+    EXPECT_EQ(windowGroupInfo.size(), 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_002
+ * @tc.desc: Test getting window group information by display ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDisplayId_002, TestSize.Level1)
+{
+    int32_t displayId = 1;
+    const std::vector<WindowInfo>& windowGroupInfo = WinMgr->GetWindowGroupInfoByDisplayId(displayId);
+    EXPECT_FALSE(windowGroupInfo.empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetDisplayId_001
+ * @tc.desc: Test getting the display ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayId_001, TestSize.Level1)
+{
+    int32_t expectedDisplayId = 1;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->SetTargetDisplayId(expectedDisplayId);
+    int32_t ret = WinMgr->GetDisplayId(inputEvent);
+    EXPECT_EQ(ret, expectedDisplayId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPidAndUpdateTarget_001
+ * @tc.desc: Test getting PID and updating the target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    EXPECT_NE(keyEvent, nullptr);
+    int32_t targetDisplayId = 0;
+    keyEvent->SetTargetDisplayId(targetDisplayId);
+    int32_t ret = WinMgr->GetPidAndUpdateTarget(keyEvent);
+    EXPECT_EQ(ret, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowPid_001
+ * @tc.desc: Test getting the process ID of a window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_001, TestSize.Level1)
+{
+    int32_t windowId = 100;
+    std::vector<WindowInfo> windowsInfo;
+    int32_t ret = WinMgr->GetWindowPid(windowId,  windowsInfo);
+    EXPECT_EQ(ret, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckFocusWindowChange_001
+ * @tc.desc: Test checking focus window changes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFocusWindowChange_001, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 123;
+    ASSERT_NO_FATAL_FAILURE(WinMgr->CheckFocusWindowChange(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckFocusWindowChange_002
+ * @tc.desc: Test checking focus window changes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFocusWindowChange_002, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    DisplayGroupInfo displayGroupInfo_;
+    displayGroupInfo.focusWindowId = 123;
+    displayGroupInfo_.focusWindowId = 456;
+    ASSERT_NO_FATAL_FAILURE(WinMgr->CheckFocusWindowChange(displayGroupInfo));
+    ASSERT_NO_FATAL_FAILURE(WinMgr->CheckFocusWindowChange(displayGroupInfo_));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckZorderWindowChange_001
+ * @tc.desc: Test checking Z-order window changes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckZorderWindowChange_001, TestSize.Level1)
+{
+    std::vector<WindowInfo> oldWindowsInfo = {{1}};
+    std::vector<WindowInfo> newWindowsInfo = {{2}};
+    ASSERT_NO_FATAL_FAILURE(WinMgr->CheckZorderWindowChange(oldWindowsInfo, newWindowsInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayIdAndName_001
+ * @tc.desc: Test updating display ID and name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName_001, TestSize.Level1)
+{
+    ASSERT_NO_FATAL_FAILURE(WinMgr->UpdateDisplayIdAndName());
+    assert(WinMgr->GetDisplayIdNames().size() == 2);
+    assert(WinMgr->IsDisplayAdd(1, "A"));
+    assert(WinMgr->IsDisplayAdd(2, "B"));
+    ASSERT_NO_FATAL_FAILURE(WinMgr->UpdateDisplayIdAndName());
+    assert(WinMgr->GetDisplayIdNames().size() == 2);
+    assert(WinMgr->IsDisplayAdd(1, "A"));
+    assert(WinMgr->IsDisplayAdd(3, "C"));
+    assert(!WinMgr->IsDisplayAdd(2, "B"));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetDisplayBindInfo_001
+ * @tc.desc: Test getting display binding information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayBindInfo_001, TestSize.Level1)
+{
+    int32_t deviceId = 1;
+    int32_t displayId = 2;
+    DisplayBindInfos infos;
+    std::string msg;
+    int32_t ret = WinMgr->SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_EQ(ret, -1);
+    ret = WinMgr->GetDisplayBindInfo(infos);
+    EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateCaptureMode_001
+ * @tc.desc: Test updating capture mode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode_001, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 123;
+    WinMgr->UpdateCaptureMode(displayGroupInfo);
+    EXPECT_FALSE(WinMgr->captureModeInfo_.isCaptureMode);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfoByIncrementalInfo_001
+ * @tc.desc: Test updating display information by incremental info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfoByIncrementalInfo_001, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    WindowInfo window;
+    WinMgr->UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo);
+    EXPECT_EQ(displayGroupInfo.windowsInfo.size(), 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindowsInfoPerDisplay_001
+ * @tc.desc: Test updating window information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDisplay_001, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 2;
+    WinMgr->UpdateWindowsInfoPerDisplay(displayGroupInfo);
+    WindowInfo window1{1};
+    WindowInfo window2{2};
+    displayGroupInfo.windowsInfo.push_back(window1);
+    displayGroupInfo.windowsInfo.push_back(window2);
+    WinMgr->UpdateDisplayInfo(displayGroupInfo);
+    ASSERT_EQ(displayGroupInfo.windowsInfo.size(), 2);
+    ASSERT_EQ(displayGroupInfo.windowsInfo[0].zOrder, 0);
+    ASSERT_EQ(displayGroupInfo.windowsInfo[1].zOrder, 0);
+}
 } // namespace MMI
 } // namespace OHOS

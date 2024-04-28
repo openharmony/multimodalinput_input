@@ -134,13 +134,6 @@ private:
             }
             MMI_HILOGI("%{public}s]", tmpStr.c_str());
         }
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-        MMI_HILOGI("fingerprint event, id:%{public}d, actionTime:%{public}" PRId64 ", EventType:%{public}s,"
-            "fingerAction:%{public}d, distanceX:%{public}f, distanceY:%{public}f",
-            event->GetId(), event->GetActionTime(), InputEvent::EventTypeToString(event->GetEventType()),
-            event->GetPointerAction(), event->GetFingerprintDistanceX(), event->GetFingerprintDistanceY()
-        );
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     }
 
     static void Print(const std::shared_ptr<PointerEvent> event)

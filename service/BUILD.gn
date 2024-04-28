@@ -318,7 +318,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/nap_process/include",
     "${mmi_path}/service/mouse_event_normalize/include",
-    "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/uinput",
@@ -594,6 +593,38 @@ ohos_unittest("ApplicationStateObserverTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("TimerManagerTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/service/timer_manager/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "timer_manager/test/timer_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "hilog:libhilog",
   ]
 }
 

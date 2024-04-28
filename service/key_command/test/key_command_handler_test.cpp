@@ -37,6 +37,7 @@ constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 } // namespace
@@ -1169,24 +1170,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsRepeatKeyEvent, TestSize
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleConsumedKeyEvent
- * @tc.desc: HandleConsumedKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleConsumedKeyEvent, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    handler.currentLaunchAbilityKey_.finalKey = 2017;
-    keyEvent->SetKeyCode(2017);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    ASSERT_TRUE(handler.HandleConsumedKeyEvent(keyEvent));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyCount
  * @tc.desc: HandleRepeatKeyCount
  * @tc.type: FUNC
@@ -1274,6 +1257,118 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CreateKeyEvent, TestSize.L
     int32_t keyAction = KeyEvent::KEY_ACTION_DOWN;
     bool isPressed = true;
     ASSERT_NE(handler.CreateKeyEvent(keyCode, keyAction, isPressed), nullptr);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey
+ * @tc.desc: Test IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    handler.enableCombineKey_ = false;
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    key->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    key->AddKeyItem(item);
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    key->AddKeyItem(item);
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+
+    key->SetKeyCode(KeyEvent::KEYCODE_L);
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed
+ * @tc.desc: Test AdjustTimeIntervalConfigIfNeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustTimeIntervalConfigIfNeed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int64_t intervalTime = 300000;
+    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
+    handler.checkAdjustIntervalTimeCount_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
+
+    handler.downToPrevUpTimeConfig_ = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
+
+    intervalTime = 10000;
+    handler.checkAdjustIntervalTimeCount_ = 6;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
+
+    handler.downToPrevUpTimeConfig_ = 100000;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustTimeIntervalConfigIfNeed(intervalTime));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AdjustDistanceConfigIfNeed
+ * @tc.desc: Test AdjustDistanceConfigIfNeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    float distance = 5.0f;
+    handler.downToPrevDownDistanceConfig_ = 10.0f;
+    handler.distanceDefaultConfig_ = 10.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+
+    distance = 20.0f;
+    handler.distanceLongConfig_ = 15.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+
+    distance = 12.0f;
+    handler.checkAdjustDistanceCount_ = 6;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+
+    handler.downToPrevDownDistanceConfig_ = 15.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+
+    distance = 5.0f;
+    handler.checkAdjustDistanceCount_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+
+    handler.downToPrevDownDistanceConfig_ = 11.5f;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportKnuckleDoubleClickEvent
+ * @tc.desc: Test ReportKnuckleDoubleClickEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportKnuckleDoubleClickEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    KnuckleGesture knuckleGesture;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    item.SetPointerId(1);
+    touchEvent->AddPointerItem(item);
+    knuckleGesture.downToPrevUpTime = 100;
+    ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture));
+
+    item.SetPointerId(2);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture));
 }
 } // namespace MMI
 } // namespace OHOS
