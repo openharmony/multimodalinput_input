@@ -613,6 +613,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
+        JudgMouseIsDownOrUp(dragFlag);
         if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
             dragFlag_ = true;
             MMI_HILOGD("Is in drag scene");
@@ -1224,6 +1225,11 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         return RET_OK;
     }
     iter->second = pointerStyle;
+    if (pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        SetMouseFlag(true);
+    } else {
+        SetMouseFlag(false);
+    }
     return RET_OK;
 }
 
@@ -1899,6 +1905,18 @@ bool InputWindowsManager::GetMouseFlag()
     return mouseFlag_;
 }
 
+void InputWindowsManager::JudgMouseIsDownOrUp(bool dragState)
+{
+    if (!dragState && (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP ||
+        pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN)) {
+        SetMouseFlag(true);
+        return;
+    }
+    if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        SetMouseFlag(true);
+    }
+}
+
 int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
     if (windowId < 0) {
@@ -2384,6 +2402,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
+    pointerActionFlag_ = pointerEvent->GetPointerAction();
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
