@@ -26,12 +26,11 @@
 #include "multimodal_input_connect_manager.h"
 #include "switch_event_input_subscribe_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalEventHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalEventHandler" };
-} // namespace
-
 void OnConnected(const IfMMIClient& client)
 {
     CALL_DEBUG_ENTER;

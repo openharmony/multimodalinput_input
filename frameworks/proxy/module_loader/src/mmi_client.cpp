@@ -29,10 +29,12 @@
 #include "multimodal_input_connect_manager.h"
 #include "xcollie/watchdog.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIClient"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 const std::string THREAD_NAME = "OS_mmi_EventHdr";
 } // namespace
 

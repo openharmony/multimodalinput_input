@@ -18,12 +18,11 @@
 #include "multimodal_input_connect_manager.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputMonitorManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputMonitorManager" };
-} // namespace
-
 InputMonitorManager::InputMonitorManager() {}
 InputMonitorManager::~InputMonitorManager() {}
 

@@ -23,10 +23,12 @@
 #include "bytrace_adapter.h"
 #include "multimodal_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventInputSubscribeManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventInputSubscribeManager" };
 constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
 constexpr size_t PRE_KEYS_NUM = 4;
 } // namespace

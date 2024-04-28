@@ -27,12 +27,11 @@
 #include "net_packet.h"
 #include "proto.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputHandlerManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
-} // namespace
-
 InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =

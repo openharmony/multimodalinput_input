@@ -25,12 +25,11 @@
 #include "util_ex.h"
 #include "dfx_hisysevent.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SwitchSubscriberHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SwitchSubscriberHandler" };
-} // namespace
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void SwitchSubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
