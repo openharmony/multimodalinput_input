@@ -128,6 +128,7 @@ public:
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+    int32_t SetCurrentUser(int32_t userId);
 
 private:
     MultimodalInputConnectManager() = default;
