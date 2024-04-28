@@ -168,6 +168,9 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 140);
     EXPECT_EQ(physicalY, 50);
+}
+
+/**
  * @tc.name: TouchDrawingManagerTest_IsValidAction_001
  * @tc.desc: Test is valid action
  * @tc.type: Function
