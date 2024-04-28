@@ -15,10 +15,12 @@
 
 #include "get_device_node.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GetDeviceNode"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 const std::string DEVICES_INFO_PATH = "/proc/bus/input/devices";
 constexpr int32_t READ_CMD_BUFF_SIZE { 1024 };
 } // namespace

@@ -21,12 +21,14 @@
 #include "event_resample.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventResampleTest"
+
 namespace OHOS {
 namespace MMI {
 
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventResampleTest" };
 constexpr int64_t START_TIME = 10000;
 constexpr int64_t TIME_DELTA = 2500;
 constexpr uint32_t INITIAL_COORDS = 10;

@@ -19,13 +19,12 @@
 #include "input_event_handler.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "FingerprintEventProcessor"
+
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "FingerprintEventProcessor"};
-}
-
 FingerprintEventProcessor::FingerprintEventProcessor()
 {}
 
