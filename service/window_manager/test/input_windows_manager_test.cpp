@@ -573,5 +573,53 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_0
     WinMgr->CoordinateCorrection(width, height, integerX, integerY);
     EXPECT_EQ(integerY, 199);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_001
+ * @tc.desc: Test HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    WindowInfo window;
+    window.windowInputType = WindowInputType::NORMAL;
+    ASSERT_FALSE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_002
+ * @tc.desc: Test HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    WindowInfo window;
+    window.windowInputType = WindowInputType::TRANSMIT_ALL;
+    ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_003
+ * @tc.desc: Test HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    WindowInfo window;
+    window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
+    ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
