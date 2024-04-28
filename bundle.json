@@ -33,7 +33,8 @@
       "input_feature_pointer_drawing",
       "input_feature_switch",
       "input_feature_touchscreen",
-      "input_feature_short_key"
+      "input_feature_short_key",
+      "input_feature_fingerprint"
     ],
     "adapted_system_type": [
       "standard"

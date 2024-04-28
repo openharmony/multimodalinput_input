@@ -254,7 +254,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<InputEvent> event, NetPacket &pkt)
+void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();
