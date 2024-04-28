@@ -141,6 +141,7 @@ public:
     int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
+    int32_t SetCurrentUser(int32_t userId) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

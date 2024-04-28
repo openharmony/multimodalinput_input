@@ -488,7 +488,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
-    pkt << displayGroupInfo_.width << displayGroupInfo_.height << displayGroupInfo_.focusWindowId;
+    pkt << displayGroupInfo_.width << displayGroupInfo_.height
+        << displayGroupInfo_.focusWindowId << displayGroupInfo_.currentUserId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write logical data failed");
         return RET_ERR;
@@ -2058,6 +2059,20 @@ int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPixelMapData(infoId, pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pixel map, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    if (userId < 0) {
+        MMI_HILOGE("Invalid userId");
+        return RET_ERR;
+    }
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCurrentUser(userId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
     }
     return ret;
 }
