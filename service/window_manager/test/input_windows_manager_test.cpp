@@ -18,9 +18,13 @@
 #include <gtest/gtest.h>
 
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
-#include "uds_server.h"
+#include "proto.h"
 #include "scene_board_judgement.h"
+#include "struct_multimodal.h"
+#include "uds_server.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -466,6 +470,332 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDi
     ASSERT_EQ(displayGroupInfo.windowsInfo.size(), 2);
     ASSERT_EQ(displayGroupInfo.windowsInfo[0].zOrder, 0);
     ASSERT_EQ(displayGroupInfo.windowsInfo[1].zOrder, 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FindPhysicalDisplayInfo_001
+ * @tc.desc: Test finding physical display information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplayInfo_001, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    assert(WinMgr->FindPhysicalDisplayInfo("test") == nullptr);
+    DisplayInfo info1;
+    info1.id = 123;
+    manager.displayGroupInfo_.displaysInfo.push_back(info1);
+    assert(WinMgr->FindPhysicalDisplayInfo("test") != nullptr);
+    DisplayInfo info2;
+    info2.id = 456;
+    manager.displayGroupInfo_.displaysInfo.push_back(info2);
+    assert(WinMgr->FindPhysicalDisplayInfo("test") != nullptr);
+    assert(WinMgr->FindPhysicalDisplayInfo("not_matching") != nullptr);
+    assert(WinMgr->FindPhysicalDisplayInfo("nonexistent") == nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_001
+ * @tc.desc: Test rotating the screen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_001, TestSize.Level1)
+{
+    DisplayInfo info;
+    LogicalCoordinate coord;
+    info.direction = DIRECTION0;
+    coord.x = 10;
+    coord.y = 20;
+    WinMgr->RotateScreen(info, coord);
+    EXPECT_EQ(coord.x, 10);
+    EXPECT_EQ(coord.y, 20);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_002
+ * @tc.desc: Test rotating the screen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, TestSize.Level1)
+{
+    DisplayInfo info;
+    LogicalCoordinate coord;
+    info.direction = DIRECTION90;
+    info.width = 800;
+    info.height = 600;
+    coord.x = 10;
+    coord.y = 20;
+    WinMgr->RotateScreen(info, coord);
+    EXPECT_EQ(coord.x, 580);
+    EXPECT_EQ(coord.y, 10);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_003
+ * @tc.desc: Test rotating the screen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_003, TestSize.Level1)
+{
+    DisplayInfo info;
+    LogicalCoordinate coord;
+    info.direction = DIRECTION180;
+    info.width = 800;
+    info.height = 600;
+    coord.x = 10;
+    coord.y = 20;
+    WinMgr->RotateScreen(info, coord);
+    EXPECT_EQ(coord.x, 790);
+    EXPECT_EQ(coord.y, 580);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_004
+ * @tc.desc: Test rotating the screen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_004, TestSize.Level1)
+{
+    DisplayInfo info;
+    LogicalCoordinate coord;
+    info.direction = DIRECTION270;
+    info.width = 800;
+    info.height = 600;
+    coord.x = 10;
+    coord.y = 20;
+    WinMgr->RotateScreen(info, coord);
+    EXPECT_EQ(coord.x, 20);
+    EXPECT_EQ(coord.y, 790);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_001
+ * @tc.desc: Test whether layer refresh is needed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_001, TestSize.Level1)
+{
+    EXPECT_FALSE(WinMgr->IsNeedRefreshLayer(1));
+    WinMgr->GetWindowInfo(0, 0)->id = 2;
+    EXPECT_FALSE(WinMgr->IsNeedRefreshLayer(GLOBAL_WINDOW_ID));
+    WinMgr->GetWindowInfo(0, 0)->id = 3;
+    EXPECT_FALSE(WinMgr->IsNeedRefreshLayer(1));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnSessionLost_001
+ * @tc.desc: Test handling when session is lost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, TestSize.Level1)
+{
+    SessionPtr session = std::shared_ptr<UDSSession>();
+    WinMgr->OnSessionLost(session);
+    DisplayGroupInfo actualInfo = WinMgr->GetDisplayGroupInfo();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePoinerStyle_001
+ * @tc.desc: Test updating pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001, TestSize.Level1)
+{
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    PointerStyle pointerStyle;
+    int32_t ret = WinMgr->UpdatePoinerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, 401);
+    pid = -1;
+    windowId = -2;
+    ret = WinMgr->UpdatePoinerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, 401);
+    pid = 1;
+    windowId = -2;
+    ret = WinMgr->UpdatePoinerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, 401);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateSceneBoardPointerStyle_001
+ * @tc.desc: Test updating scene board pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointerStyle_001, TestSize.Level1)
+{
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 3;
+    int32_t ret = WinMgr->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, RET_OK);
+    pid = -1;
+    windowId = -2;
+    ret = WinMgr->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001
+ * @tc.desc: Test setting global default pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001, TestSize.Level1)
+{
+    WinMgr->SetGlobalDefaultPointerStyle();
+    for (auto &iter : WinMgr->pointerStyle_) {
+        for (auto &item : iter.second) {
+            EXPECT_NE(item.second.id, WinMgr->globalStyle_.id);
+        }
+    }
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
+ * @tc.desc: Test setting pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle_001, TestSize.Level1)
+{
+    int32_t pid = 1;
+    int32_t windowId = GLOBAL_WINDOW_ID;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 1;
+    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(WinMgr->globalStyle_.id, pointerStyle.id);
+    pid = 1;
+    windowId = 2;
+    ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, WinMgr->UpdatePoinerStyle(pid, windowId, pointerStyle));
+    pid = 1;
+    windowId = 2;
+    ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret, WinMgr->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ClearWindowPointerStyle_001
+ * @tc.desc: Test clearing window pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
+{
+    int32_t pid = 123;
+    int32_t windowId = 678;
+    int32_t ret = WinMgr->ClearWindowPointerStyle(pid, windowId);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPointerStyle_001
+ * @tc.desc: Test getting pointer style
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle_001, TestSize.Level1)
+{
+    PointerStyle style;
+    int32_t ret = WinMgr->GetPointerStyle(1, GLOBAL_WINDOW_ID, style);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(style.id, 1);
+    ret = WinMgr->GetPointerStyle(3, 1, style);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(style.id, 1);
+    ret = WinMgr->GetPointerStyle(1, 1, style);
+    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(style.id, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInHotArea_001
+ * @tc.desc: Test whether input is in the hot area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea_001, TestSize.Level1)
+{
+    WinMgr->InitPointerStyle();
+    int32_t x = 10;
+    int32_t y = 20;
+    std::vector<Rect> rects = {{0, 0, 30, 40}};
+    WindowInfo window;
+    bool ret = WinMgr->IsInHotArea(x, y, rects, window);
+    EXPECT_TRUE(ret);
+    x = -10;
+    y = 20;
+    ret = WinMgr->IsInHotArea(x, y, rects, window);
+    EXPECT_FALSE(ret);
+    x = 10;
+    y = -10;
+    ret = WinMgr->IsInHotArea(x, y, rects, window);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea_001
+ * @tc.desc: Test which hot area the input is in
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea_001, TestSize.Level1)
+{
+    int32_t x = 50;
+    int32_t y = 50;
+    std::vector<Rect> rects = {{0, 0, 100, 100}, {100, 100, 200, 200}};
+    PointerStyle pointerStyle;
+    WinMgr->InWhichHotArea(x, y, rects, pointerStyle);
+    ASSERT_EQ(pointerStyle.id, 6);
+    x = 250;
+    y = 250;
+    WinMgr->InWhichHotArea(x, y, rects, pointerStyle);
+    ASSERT_EQ(pointerStyle.id, 6);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayCoordinate_001
+ * @tc.desc: Test adjusting display coordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinate_001, TestSize.Level1)
+{
+    DisplayInfo displayInfo;
+    displayInfo.width = 10;
+    displayInfo.height = 20;
+    displayInfo.direction = DIRECTION90;
+    int32_t physicalX = -5;
+    int32_t physicalY = 15;
+    WinMgr->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 0);
+    EXPECT_EQ(physicalY, 9);
+    displayInfo.width = 10;
+    displayInfo.height = 20;
+    displayInfo.direction = DIRECTION270;
+    physicalX = 15;
+    physicalY = 25;
+    WinMgr->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 15);
+    EXPECT_EQ(physicalY, 9);
+    displayInfo.width = 10;
+    displayInfo.height = 20;
+    displayInfo.direction = DIRECTION270;
+    physicalX = -5;
+    physicalY = -15;
+    WinMgr->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 0);
+    EXPECT_EQ(physicalY, 0);
 }
 } // namespace MMI
 } // namespace OHOS
