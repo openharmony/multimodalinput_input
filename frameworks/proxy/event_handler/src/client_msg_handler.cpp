@@ -39,12 +39,11 @@
 #include "time_cost_chk.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ClientMsgHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler" };
-} // namespace
-
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {

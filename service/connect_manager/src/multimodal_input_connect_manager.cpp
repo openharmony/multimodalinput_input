@@ -26,11 +26,13 @@
 #include "multimodal_input_connect_define.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" };
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()

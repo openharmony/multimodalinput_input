@@ -25,10 +25,12 @@
 #include "input_scene_board_judgement.h"
 #include "infrared_frequency_info.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectProxy"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;

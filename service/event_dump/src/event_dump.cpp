@@ -37,10 +37,12 @@
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventDump"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
 constexpr size_t MAX_COMMAND_COUNT { 32 };
 } // namespace
 

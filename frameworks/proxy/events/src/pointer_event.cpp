@@ -19,11 +19,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerEvent"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };

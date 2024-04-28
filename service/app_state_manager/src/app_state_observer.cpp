@@ -15,10 +15,12 @@
 
 #include "app_state_observer.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AppStateObserver"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AppStateObserver" };
 std::mutex mutex_;
 } // namespace
 AppObserverManager::AppObserverManager() {}
