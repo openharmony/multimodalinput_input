@@ -338,9 +338,9 @@ private:
             MMI_HILOGE("The realpath return nullptr");
             return;
         }
-        std::ifstream f(filename, std::ios_base::in);
+        std::ifstream f(realPath, std::ios_base::in);
         if (!f.is_open()) {
-            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", filename.c_str(), std::strerror(errno));
+            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", realPath, std::strerror(errno));
             return;
         }
         ueventLoaded = true;
