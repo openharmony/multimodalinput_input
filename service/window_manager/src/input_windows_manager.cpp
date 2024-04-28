@@ -613,7 +613,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
-        JudgMouseIsDownOrUp(dragFlag);
+        JudgMouseIsDownOrUp(dragFlag_);
         if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
             dragFlag_ = true;
             MMI_HILOGD("Is in drag scene");
