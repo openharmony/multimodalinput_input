@@ -26,10 +26,12 @@
 #include "securec.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsInputMonitor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
 constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL = 0;
 constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL = 1;
 constexpr int32_t AXIS_TYPE_PINCH = 2;

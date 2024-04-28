@@ -17,10 +17,12 @@
 
 #include "input_windows_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DfxHisysevent"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DfxHisysevent" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr uint32_t REPORT_DISPATCH_TIMES = 100;
 constexpr uint32_t REPORT_COMBO_START_TIMES = 100;

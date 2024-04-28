@@ -20,6 +20,9 @@
 #include "hos_key_event.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyUnicodeTransformation"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -28,7 +31,6 @@ struct KeyUnicode {
     uint32_t transitioned { 0 };
 };
 
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyUnicodeTransformation" };
 constexpr uint32_t DEFAULT_UNICODE = 0x0000;
 
 const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {

@@ -24,11 +24,12 @@
 #include "mmi_log.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventLogHelper"
+
 namespace OHOS {
 namespace MMI {
 class EventLogHelper final {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventLogHelper" };
-
 public:
     template <class T> static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum);
     template <class T> static void PrintEventData(std::shared_ptr<T> event);
@@ -64,7 +65,7 @@ private:
 
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
-        if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) &&
+        if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG) &&
             event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
             return;
         }
@@ -201,7 +202,7 @@ template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event,
 {
     CHKPV(event);
     PrintInfoLog(event);
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         static int64_t nowTimeUSec = 0;
         static int32_t dropped = 0;
         if (event->GetAction() == EVENT_TYPE_POINTER) {
@@ -223,7 +224,7 @@ template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
     CHKPV(event);
     PrintInfoLog(event);
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) ||
+    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG) ||
         (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
         EventLogHelper::Print(event);
     }

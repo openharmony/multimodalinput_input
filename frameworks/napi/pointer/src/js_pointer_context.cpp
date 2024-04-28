@@ -17,10 +17,12 @@
 #include "pixel_map.h"
 #include "pixel_map_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsPointerContext"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsPointerContext" };
 constexpr int32_t STANDARD_SPEED = 5;
 constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t MIN_SPEED = 1;

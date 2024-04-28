@@ -15,10 +15,11 @@
 
 #include "mmi_service.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MmiServiceDemo"
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServiceDemo" };
 constexpr int32_t sleepTime = 10 * 60;
 } // namespace
 } // namespace MMI
