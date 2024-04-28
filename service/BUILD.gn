@@ -98,6 +98,8 @@ config("libmmi_server_config") {
     include_dirs += [
       "${mmi_ext_path}/magic_cursor/include",
       "${g2d_ext_path}/sdf/include",
+      "${g2d_path}/interfaces/inner_api/surface",
+      "${g2d_path}/rosen/modules/render_service_base/src",
     ]
   }
 
