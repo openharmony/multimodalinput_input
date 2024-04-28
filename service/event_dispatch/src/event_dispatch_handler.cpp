@@ -157,8 +157,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    pointerItem.SetOriginPointerId(pointerItem.GetPointerId());
-    point->UpdatePointerItem(pointerId, pointerItem);
+
     std::vector<int32_t> windowIds;
     WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     if (!windowIds.empty()) {
