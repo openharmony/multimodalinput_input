@@ -79,7 +79,7 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
     JsPointerContext *jsContext = new (std::nothrow) JsPointerContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("jsvm ends");
+        MMI_HILOGI("Jsvm ends");
         JsPointerContext *context = static_cast<JsPointerContext*>(data);
         delete context;
     }, nullptr, nullptr);
