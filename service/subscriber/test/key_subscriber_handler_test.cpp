@@ -567,5 +567,22 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearSubscriberTimer
     subscribers.push_back(subscriber2);
     ASSERT_NO_FATAL_FAILURE(handler.ClearSubscriberTimer(subscribers));
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnTimer_001
+ * @tc.desc: Test OnTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer_001, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    std::shared_ptr<KeyOption> keyOption;
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    subscriber->keyEvent_.reset();
+    handler.OnTimer(subscriber);
+    ASSERT_EQ(subscriber->keyEvent_, nullptr);
+}
 } // namespace MMI
 } // namespace OHOS
