@@ -2177,7 +2177,7 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int64_t userId = 0;
+    int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetCurrentUser(userId);
     if (ret != RET_OK) {
