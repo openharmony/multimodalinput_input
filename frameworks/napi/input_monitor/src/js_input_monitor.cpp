@@ -1428,6 +1428,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 if (!IsFingerprint(pointerEvent)) {
                     MMI_HILOGW("the event is not fingerprintEvent");
                     napi_close_handle_scope(jsEnv_, scope);
+                    continue;
                 }
                 ret = TransformFingerprintEvent(pointerEvent, napiPointer);
                 break;
