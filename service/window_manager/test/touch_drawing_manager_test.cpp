@@ -103,6 +103,74 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, 
 }
 
 /**
+ * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_001
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_001, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION0, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 50);
+    EXPECT_EQ(physicalY, 60);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_002
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_002, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION90, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 60);
+    EXPECT_EQ(physicalY, 50);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_003
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_003, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION180, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 50);
+    EXPECT_EQ(physicalY, 140);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_004
+ * @tc.desc: Test GetOriginalTouchScreenCoordinates
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_004, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t physicalX = 50;
+    int32_t physicalY = 60;
+    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
+    EXPECT_EQ(physicalX, 140);
+    EXPECT_EQ(physicalY, 50);
+}
+
+/**
  * @tc.name: TouchDrawingManagerTest_IsValidAction_001
  * @tc.desc: Test is valid action
  * @tc.type: Function
