@@ -53,6 +53,7 @@ private:
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GestureIdentify(libinput_event* event);
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t timerId_ { -1 };
