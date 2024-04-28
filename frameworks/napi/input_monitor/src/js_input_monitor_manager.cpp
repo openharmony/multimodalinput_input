@@ -51,7 +51,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
         rectTotal, callback, nextId_++, fingers);
     int32_t ret = monitor->Start();
     if (ret < 0) {
-        MMI_HILOGE("js monitor startup failed");
+        MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
         return;
     }
@@ -72,7 +72,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, fingers);
     int32_t ret = monitor->Start();
     if (ret < 0) {
-        MMI_HILOGE("js monitor startup failed");
+        MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
         return;
     }

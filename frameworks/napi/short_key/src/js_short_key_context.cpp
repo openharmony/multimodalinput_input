@@ -70,7 +70,7 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
     JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("jsvm ends");
+        MMI_HILOGI("Jsvm ends");
         JsShortKeyContext *context = static_cast<JsShortKeyContext*>(data);
         delete context;
     }, nullptr, nullptr);
