@@ -2104,5 +2104,16 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
     }
     return RET_OK;
 }
+
+int32_t MMIService::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WinMgr, userId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

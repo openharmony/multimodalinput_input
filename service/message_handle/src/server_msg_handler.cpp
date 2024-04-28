@@ -266,7 +266,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
+    pkt >> displayGroupInfo.width >> displayGroupInfo.height >>
+        displayGroupInfo.focusWindowId >> displayGroupInfo.currentUserId;
     uint32_t num = 0;
     pkt >> num;
     if (pkt.ChkRWError()) {

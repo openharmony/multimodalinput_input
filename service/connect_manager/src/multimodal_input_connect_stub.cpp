@@ -309,6 +309,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             return StubSetPixelMapData(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
+            return StubSetCurrentUser(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2169,6 +2172,20 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userId = 0;
+    READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetCurrentUser(userId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, ret);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
