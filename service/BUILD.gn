@@ -278,121 +278,6 @@ ohos_shared_library("libmmi-server") {
 import("//build/test.gni")
 module_output_path = "multimodalinput/mmi_unit_out"
 
-ohos_unittest("ut-mmi-service-out") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/service/include",
-    "${mmi_path}/service/connect_manager/include",
-    "${mmi_path}/service/delegate_task/include",
-    "${mmi_path}/service/device_config/include",
-    "${mmi_path}/service/display_state_manager/include",
-    "${mmi_path}/service/device_manager/include",
-    "${mmi_path}/service/device_scalability/include",
-    "${mmi_path}/service/dfx/include",
-    "${mmi_path}/service/event_dump/include",
-    "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/key_event_normalize/include",
-    "${mmi_path}/service/key_command/include",
-    "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/event_dump/include",
-    "${mmi_path}/service/libinput_adapter/include",
-    "${mmi_path}/service/message_handle/include",
-    "${mmi_path}/service/module_loader/include",
-    "${mmi_path}/service/monitor/include",
-    "${mmi_path}/service/nap_process/include",
-    "${mmi_path}/service/mouse_event_normalize/include",
-    "${mmi_path}/service/window_manager/include",
-    "${mmi_path}/test/unittest/common/include",
-    "${mmi_path}/uinput",
-    "$root_out_dir/diff_libinput_mmi/export_include",
-    "//third_party/node/src",
-  ]
-
-  sources = [
-    "${mmi_path}/test/unittest/common/src/system_info.cpp",
-    "connect_manager/test/multimodal_input_connect_stub_test.cpp",
-    "delegate_task/test/delegate_tasks_test.cpp",
-    "device_config/test/device_config_file_parser_test.cpp",
-    "device_manager/test/input_device_manager_test.cpp",
-    "display_state_manager/test/display_event_monitor_test.cpp",
-    "event_dispatch/test/event_dispatch_test.cpp",
-    "event_dump/test/event_dump_test.cpp",
-    "event_handler/test/anr_manager_test.cpp",
-    "event_handler/test/gesture_handler_test.cpp",
-    "event_handler/test/input_event_handler_test.cpp",
-    "event_handler/test/key_event_value_transformation_test.cpp",
-    "interceptor/test/event_interceptor_handler_test.cpp",
-    "key_command/test/key_command_handler_test.cpp",
-    "key_command/test/setting_datashare_test.cpp",
-    "key_event_normalize/test/key_event_normalize_test.cpp",
-    "module_loader/test/mmi_service_test.cpp",
-    "module_loader/test/uds_server_test.cpp",
-    "module_loader/test/watchdog_task_test.cpp",
-    "monitor/test/event_monitor_handler_test.cpp",
-    "mouse_event_normalize/test/mouse_device_state_test.cpp",
-    "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
-    "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
-    "nap_process/test/nap_process_test.cpp",
-    "subscriber/test/key_subscriber_handler_test.cpp",
-    "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
-    "touch_event_normalize/test/touch_event_normalize_test.cpp",
-    "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
-    "window_manager/test/input_display_bind_helper_test.cpp",
-    "window_manager/test/input_windows_manager_test.cpp",
-    "window_manager/test/pointer_drawing_manager_test.cpp",
-    "window_manager/test/touch_drawing_manager_test.cpp",
-  ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "c_utils:utils",
-    "data_share:datashare_consumer",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libwm",
-    "window_manager:libwsutils",
-  ]
-}
-
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
   include_dirs = [ "${mmi_path}/service/event_resample/include" ]
@@ -625,6 +510,480 @@ ohos_unittest("TimerManagerTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hilog:libhilog",
+  ]
+}
+
+ohos_unittest("WindowManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "window_manager/test/input_display_bind_helper_test.cpp",
+    "window_manager/test/input_windows_manager_test.cpp",
+    "window_manager/test/pointer_drawing_manager_test.cpp",
+    "window_manager/test/touch_drawing_manager_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:dataobs_manager",
+    "c_utils:utils",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
+ohos_unittest("TouchEventNormalizeTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
+    "touch_event_normalize/test/touch_event_normalize_test.cpp",
+    "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+  ]
+}
+
+ohos_unittest("SubscriberTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
+
+ohos_unittest("NapProcessTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "nap_process/test/nap_process_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [ "c_utils:utils" ]
+}
+
+ohos_unittest("MouseEventNormalizeTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "mouse_event_normalize/test/mouse_device_state_test.cpp",
+    "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
+    "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+}
+
+ohos_unittest("MonitorTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "monitor/test/event_monitor_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "image_framework:image_native",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("ModuleLoaderTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/util/common/include",
+    "//third_party/node/src",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "module_loader/test/mmi_service_test.cpp",
+    "module_loader/test/uds_server_test.cpp",
+    "module_loader/test/watchdog_task_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "image_framework:image_native",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("KeyEventNormalizeTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_event_normalize/test/key_event_normalize_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "image_framework:image_native",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("KeyCommandTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "key_command/test/key_command_handler_test.cpp",
+    "key_command/test/setting_datashare_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("InterceptorTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "interceptor/test/event_interceptor_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+}
+
+ohos_unittest("EventHandlerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
+
+ohos_unittest("EventDumpTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "event_handler/test/anr_manager_test.cpp",
+    "event_handler/test/gesture_handler_test.cpp",
+    "event_handler/test/input_event_handler_test.cpp",
+    "event_handler/test/key_event_value_transformation_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "image_framework:image_native",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("EventDispatchTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "event_dispatch/test/event_dispatch_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [ "c_utils:utils" ]
+}
+
+ohos_unittest("DisplayStateManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "display_state_manager/test/display_event_monitor_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "image_framework:image_native",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("DeviceManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "device_manager/test/input_device_manager_test.cpp" ]
+
+  deps = [ "${mmi_path}/service:libmmi-server" ]
+
+  external_deps = [ "hilog:libhilog" ]
+}
+
+ohos_unittest("DeviceConfigTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "device_config/test/device_config_file_parser_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "//third_party/googletest:gmock_main",
+  ]
+}
+
+ohos_unittest("DelegateTaskTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
+
+  deps = [ "${mmi_path}/service:libmmi-server" ]
+}
+
+ohos_unittest("ConnectManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "connect_manager/test/multimodal_input_connect_stub_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
   ]
 }
 
