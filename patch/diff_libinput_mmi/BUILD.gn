@@ -94,6 +94,8 @@ ohos_shared_library("libinput-third-mmi") {
     "//third_party/libevdev:libevdev",
   ]
 
+  external_deps = [ "hilog:libhilog" ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }

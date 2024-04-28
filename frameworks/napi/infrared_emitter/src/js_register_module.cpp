@@ -22,10 +22,12 @@
 #include "util_napi_error.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsInfraredRegister"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInfraredRegister" };
 const uint32_t NUMBER_PARAMETERS = 2;
 const int32_t  MAX_NUMBER_ARRAY_ELEMENT = 50;
 }

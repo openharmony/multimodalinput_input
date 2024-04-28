@@ -55,7 +55,7 @@ group("test") {
 ohos_unittest("libudev-test") {
   module_out_path = output_path
   include_dirs = [
-    "${mmi_path}/test/unittest/standalone/include",
+    "${mmi_path}/util/common/include",
     "//third_party/libevdev",
   ]
 
@@ -68,6 +68,8 @@ ohos_unittest("libudev-test") {
     "src/udev_device.cpp",
     "test/custom_udev_test.cpp",
   ]
+
+  external_deps = [ "hilog:libhilog" ]
 
   deps = [
     "//third_party/googletest:gmock_main",

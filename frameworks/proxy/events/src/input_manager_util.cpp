@@ -20,10 +20,12 @@
 #include "key_event.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerUtil"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerUtil"};
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t DEFAULT_POINTER_ID = 0;

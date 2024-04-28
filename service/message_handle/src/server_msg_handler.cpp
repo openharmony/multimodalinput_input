@@ -39,10 +39,12 @@
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ServerMsgHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

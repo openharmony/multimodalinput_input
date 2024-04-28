@@ -27,12 +27,11 @@
 #include "util.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UDSServer"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSServer" };
-} // namespace
-
 UDSServer::~UDSServer()
 {
     CALL_DEBUG_ENTER;

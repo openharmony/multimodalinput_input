@@ -30,11 +30,11 @@
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MouseEventNormalize"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventNormalize" };
-} // namespace
 MouseEventNormalize::MouseEventNormalize() {}
 MouseEventNormalize::~MouseEventNormalize() {}
 

@@ -27,10 +27,12 @@
 #include "proto.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InjectionEventDispatch"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
 constexpr uint32_t SEND_EVENT_ARGV_COUNTS { 5 };
 constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX { 1 };
 constexpr uint32_t SEND_EVENT_TYPE_INDEX { 2 };

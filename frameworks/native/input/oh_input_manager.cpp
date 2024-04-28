@@ -21,9 +21,8 @@
 #include "mmi_log.h"
 #include "oh_key_code.h"
 
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "OHInputManager" };
-} // namespace
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "OHInputManager"
 
 struct Input_KeyState {
     int32_t keyCode;

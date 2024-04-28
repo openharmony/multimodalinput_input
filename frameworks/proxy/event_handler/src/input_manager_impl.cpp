@@ -31,10 +31,12 @@
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerImpl"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
 constexpr size_t MAX_FILTER_NUM = 4;
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
@@ -596,7 +598,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 
 void InputManagerImpl::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
-    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
     for (const auto &item : windowsInfo) {
@@ -657,7 +659,7 @@ void InputManagerImpl::PrintDisplayInfo()
     MMI_HILOGD("windowsInfos,num:%{public}zu,focusWindowId:%{public}d", displayGroupInfo_.windowsInfo.size(),
         displayGroupInfo_.focusWindowId);
     PrintForemostThreeWindowInfo(displayGroupInfo_.windowsInfo);
-    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
@@ -676,7 +678,7 @@ void InputManagerImpl::PrintDisplayInfo()
 
 void InputManagerImpl::PrintWindowGroupInfo()
 {
-    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",

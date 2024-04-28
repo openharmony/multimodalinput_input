@@ -20,11 +20,11 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsIntentionCode"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsIntentionCode" };
-} // namespace
 
 napi_value JsIntentionCode::GetNapiInt32(napi_env env, int32_t code)
 {
