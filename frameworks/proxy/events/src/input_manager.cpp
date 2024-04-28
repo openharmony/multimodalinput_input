@@ -541,5 +541,10 @@ int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pat
 {
     return InputMgrImpl.TransmitInfrared(number, pattern);
 }
+
+int32_t InputManager::SetCurrentUser(int32_t userId)
+{
+    return InputMgrImpl.SetCurrentUser(userId);
+}
 } // namespace MMI
 } // namespace OHOS

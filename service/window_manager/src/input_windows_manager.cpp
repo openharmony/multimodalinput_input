@@ -518,8 +518,10 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
-        displayGroupInfo_ = displayGroupInfoTmp_;
-        UpdateWindowsInfoPerDisplay(displayGroupInfo);
+        if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
+            displayGroupInfo_ = displayGroupInfoTmp_;
+            UpdateWindowsInfoPerDisplay(displayGroupInfo);
+        }
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
@@ -2848,6 +2850,13 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
     MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
         dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     return dst == RET_OK;
+}
+
+int32_t InputWindowsManager::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    currentUserId_ = userId;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
