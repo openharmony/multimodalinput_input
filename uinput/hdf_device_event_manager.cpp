@@ -20,13 +20,12 @@
 #include "hdf_device_event_dispatch.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "HdfDeviceEventManager"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager" };
-} // namespace
-
 HdfDeviceEventManager::HdfDeviceEventManager() {}
 
 HdfDeviceEventManager::~HdfDeviceEventManager() {}

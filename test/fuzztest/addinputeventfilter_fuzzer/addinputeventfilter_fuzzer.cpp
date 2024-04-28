@@ -19,12 +19,11 @@
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AddInputEventFilterFuzzTest"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddInputEventFilterFuzzTest" };
-} // namespace
-
 void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
 {
     struct TestFilter : public IInputEventFilter {

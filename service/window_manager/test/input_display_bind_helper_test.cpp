@@ -22,11 +22,13 @@
 #include "input_display_bind_helper.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputDisplayBindHelperTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDisplayBindHelperTest" };
 const std::string INPUT_NODE_PATH = "/data/input0_test";
 const std::string INPUT_DEVICE_NAME_FILE = "/data/input0_test/name";
 const std::string INPUT_DEVICE_NAME_CONFIG = "/data/input_device_name.cfg";
