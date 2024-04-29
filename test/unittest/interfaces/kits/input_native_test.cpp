@@ -21,7 +21,7 @@
 #include "oh_key_code.h"
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
-#else
+#endif
 namespace OHOS {
 namespace MMI {
 namespace {

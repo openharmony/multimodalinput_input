@@ -2077,7 +2077,7 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& req
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
-    for(auto &item : infos) {
+    for (auto &item : infos) {
         InfraredFrequency info;
         info.min_ = item.min_;
         info.max_ = item.max_;
