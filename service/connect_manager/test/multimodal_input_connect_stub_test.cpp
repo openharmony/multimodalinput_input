@@ -422,7 +422,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubNoti
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubRemoveInputEventObserver_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
@@ -452,7 +452,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubClearWindowPointerStyle_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
