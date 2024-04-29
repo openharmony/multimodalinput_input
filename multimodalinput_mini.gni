@@ -326,11 +326,20 @@ if (input_ext_feature_anco) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
       [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
+
+  if (input_feature_product != "pc") {
+    input_default_defines += [ "OHOS_BUILD_ENABLE_INFRARED_EMITTER" ]
+  }
+
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
   ]
+
+  if (input_feature_product != "pc") {
+    libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
+  }
 }
 
 if (input_ext_feature_magiccursor) {
@@ -338,6 +347,8 @@ if (input_ext_feature_magiccursor) {
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
   g2d_path = "//foundation/graphic/graphic_2d"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
-  libmmi_service_sources +=
-      [ "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp" ]
+  libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
+  ]
 }

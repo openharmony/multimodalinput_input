@@ -41,7 +41,7 @@ const int32_t TUPLE_PID = 0;
 const int32_t TUPLE_UID = 1;
 const int32_t TUPLE_NAME = 2;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
-constexpr size_t MAX_N_TRANSMIT_INFRARED_PATTERN { 50 };
+constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 50 };
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -2133,7 +2133,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     int32_t patternLen = 0;
     std::vector<int64_t> pattern;
     READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (patternLen > static_cast<int32_t>(MAX_N_TRANSMIT_INFRARED_PATTERN) || patternLen <= 0) {
+    if (patternLen > MAX_N_TRANSMIT_INFRARED_PATTERN || patternLen <= 0) {
         MMI_HILOGE("transmit infrared pattern len is invalid");
         return false;
     }

@@ -18,11 +18,11 @@
 
 #include "draw/canvas.h"
 #include "nocopyable.h"
+#include "pointer_event.h"
 #include "singleton.h"
 #include "transaction/rs_transaction.h"
 #include "ui/rs_canvas_drawing_node.h"
 #include "ui/rs_surface_node.h"
-#include "pointer_event.h"
 #include "window_info.h"
 
 namespace OHOS {
@@ -52,8 +52,8 @@ private:
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
     std::vector<PointerInfo> pointerInfos_;
     Rosen::Drawing::Paint paint_;
-    Rosen::Drawing::Path path;
-    DisplayInfo displayInfo_ {};
+    Rosen::Drawing::Path path_;
+    DisplayInfo displayInfo_;
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
 };
