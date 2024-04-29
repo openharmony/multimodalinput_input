@@ -467,5 +467,162 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowsInfoPerDi
     ASSERT_EQ(displayGroupInfo.windowsInfo[0].zOrder, 0);
     ASSERT_EQ(displayGroupInfo.windowsInfo[1].zOrder, 0);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsTransparentWin
+ * @tc.desc: Test IsTransparentWin
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin, TestSize.Level1)
+{
+    void* pixelMap = nullptr;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    bool result = WinMgr->IsTransparentWin(pixelMap, logicalX, logicalY);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckWindowIdPermissionByPid
+ * @tc.desc: Test CheckWindowIdPermissionByPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissionByPid, TestSize.Level1)
+{
+    int32_t windowId = 12345;
+    int32_t pid = 6789;
+    int32_t result = WinMgr->CheckWindowIdPermissionByPid(windowId, pid);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsWindowVisible
+ * @tc.desc: Test IsWindowVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible, TestSize.Level1)
+{
+    int32_t pid = -1;
+    bool result = WinMgr->IsWindowVisible(pid);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CoordinateCorrection_001
+ * @tc.desc: Test CoordinateCorrection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_001, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t integerX = -1;
+    int32_t integerY = 1;
+    WinMgr->CoordinateCorrection(width, height, integerX, integerY);
+    EXPECT_EQ(integerX, 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CoordinateCorrection_002
+ * @tc.desc: Test CoordinateCorrection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_002, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t integerX = 150;
+    int32_t integerY = 100;
+    WinMgr->CoordinateCorrection(width, height, integerX, integerY);
+    EXPECT_EQ(integerX, 99);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CoordinateCorrection_003
+ * @tc.desc: Test CoordinateCorrection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_003, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t integerX = 1;
+    int32_t integerY = -1;
+    WinMgr->CoordinateCorrection(width, height, integerX, integerY);
+    EXPECT_EQ(integerY, 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CoordinateCorrection_004
+ * @tc.desc: Test CoordinateCorrection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CoordinateCorrection_004, TestSize.Level1)
+{
+    int32_t width = 100;
+    int32_t height = 200;
+    int32_t integerX = 100;
+    int32_t integerY = 250;
+    WinMgr->CoordinateCorrection(width, height, integerX, integerY);
+    EXPECT_EQ(integerY, 199);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_001
+ * @tc.desc: Test HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo window;
+    window.windowInputType = WindowInputType::NORMAL;
+    ASSERT_FALSE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_002
+ * @tc.desc: Test HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_002, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo window;
+    window.windowInputType = WindowInputType::TRANSMIT_ALL;
+    ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_003
+ * @tc.desc: Test HandleWindowInputType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_003, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo window;
+    window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
+    ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
