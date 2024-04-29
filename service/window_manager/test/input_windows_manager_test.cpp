@@ -1090,6 +1090,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
     WinMgr->AdjustDisplayCoordinate(displayInfo, physicalX, physicalY);
     EXPECT_EQ(physicalX, 0);
     EXPECT_EQ(physicalY, 0);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsTransparentWin
  * @tc.desc: Test IsTransparentWin
  * @tc.type: FUNC
