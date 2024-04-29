@@ -56,7 +56,7 @@
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER 
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
 #endif
 #undef MMI_LOG_TAG
@@ -2075,7 +2075,7 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& req
 {
     MMI_HILOGI("start get infrared frequency");
 
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER 
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
     for(auto &item : infos) {
@@ -2102,7 +2102,7 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER 
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
 #endif
     MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());

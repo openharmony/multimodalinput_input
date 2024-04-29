@@ -489,7 +489,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_TouchEventActionTime_001, TestSize.Lev
  */
 HWTEST_F(InputNativeTest, InputNativeTest_IR_001, TestSize.Level1)
 {
-
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     InfraredEmitter::GetInstance()->InitInfraredEmitter();
     std::vector<InfraredFrequencyInfo> frequencyInfo;
@@ -500,7 +499,6 @@ HWTEST_F(InputNativeTest, InputNativeTest_IR_001, TestSize.Level1)
 #else
     ASSERT_EQ("no support", "no support");
 #endif //OHOS_BUILD_ENABLE_INFRARED_EMITTER
-   
 }
 
 /**
