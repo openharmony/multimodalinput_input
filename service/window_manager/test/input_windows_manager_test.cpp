@@ -585,6 +585,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     UDSServer udsServer;
     WinMgr->Init(udsServer);
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::NORMAL;
     ASSERT_FALSE(WinMgr->HandleWindowInputType(window, pointerEvent));
@@ -601,6 +602,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     UDSServer udsServer;
     WinMgr->Init(udsServer);
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::TRANSMIT_ALL;
     ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
@@ -617,6 +619,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     UDSServer udsServer;
     WinMgr->Init(udsServer);
     auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
     ASSERT_TRUE(WinMgr->HandleWindowInputType(window, pointerEvent));
