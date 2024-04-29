@@ -41,10 +41,12 @@
 #include "util.h"
 #include "timer_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerDrawingManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t BASELINE_DENSITY = 160;
@@ -1089,6 +1091,13 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         DeletePointerVisible(getpid());
     }
     DrawManager();
+    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
+        MMI_HILOGD("Pointer window destroy start");
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGD("Pointer window destroy success");
+    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -1118,13 +1127,6 @@ void PointerDrawingManager::DrawManager()
         WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
-    }
-    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
-        MMI_HILOGD("Pointer window destroy start");
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Pointer window destroy success");
     }
 }
 

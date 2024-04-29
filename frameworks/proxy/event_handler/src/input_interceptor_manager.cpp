@@ -18,12 +18,11 @@
 #include "input_handler_manager.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputInterceptorManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
-} // namespace
-
 InputInterceptorManager::InputInterceptorManager() {}
 InputInterceptorManager::~InputInterceptorManager() {}
 

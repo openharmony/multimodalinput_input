@@ -25,10 +25,12 @@
 #include "proto.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsInputMonitorModule"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
 const std::set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
     "fingerprint"
@@ -59,13 +61,6 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
-#ifndef OHOS_BUILD_ENABLE_FINGERPRINT
-    if (std::string{typeName} == "fingerprint") {
-        MMI_HILOGE("dont support fingerprint in this device");
-        THROWERR_CUSTOM(env, COMMON_CAPABILITY_NOT_SUPPORTED, "EventType is invalid");
-        return nullptr;
-    }
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");

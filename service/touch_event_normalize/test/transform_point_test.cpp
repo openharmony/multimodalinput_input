@@ -20,11 +20,13 @@
 #include "mmi_log.h"
 #include "virtual_pen.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TransformPointTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TransformPointTest" };
 constexpr int32_t WAIT_TIME_FOR_INPUT { 1000 };
 constexpr int32_t WAIT_TIME_FOR_EVENTS { 10 };
 constexpr size_t DEFAULT_BUF_SIZE { 4096 };

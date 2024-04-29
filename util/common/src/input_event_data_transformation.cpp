@@ -21,12 +21,11 @@
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventDataTransformation"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
-} // namespace
-
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
@@ -254,7 +253,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<InputEvent> event, NetPacket &pkt)
+void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();

@@ -842,6 +842,8 @@ public:
      */
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
+    int32_t SetCurrentUser(int32_t userId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

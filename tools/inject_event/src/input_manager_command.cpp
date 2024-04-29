@@ -39,6 +39,9 @@
 #include "pointer_event.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerCommand"
+
 class InputManagerCommand {
 public:
     int32_t ParseCommand(int32_t argc, char *argv[]);
@@ -50,7 +53,6 @@ private:
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand" };
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 7;
 constexpr int32_t JOYSTICK_BUTTON_ID = 25;

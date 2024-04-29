@@ -24,7 +24,7 @@ group("test") {
 ohos_unittest("mmi-libadapter-hotplug-test") {
   module_out_path = output_path
   include_dirs = [
-    "${mmi_path}/test/unittest/standalone/include",
+    "${mmi_path}/util/common/include",
     "../include",
   ]
 
@@ -35,5 +35,8 @@ ohos_unittest("mmi-libadapter-hotplug-test") {
 
   deps = [ "//third_party/googletest:gmock_main" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 }

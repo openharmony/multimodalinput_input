@@ -23,10 +23,12 @@
 #include "multimodal_input_connect_manager.h"
 #include "ffrt.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ANRHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRHandler" };
 constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME = 3500000;
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME = 50000;
 constexpr int32_t INVALID_OR_PROCESSED_ID = -1;

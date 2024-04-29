@@ -155,6 +155,7 @@ public:
     void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
     void ClearTargetWindowIds();
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
+    int32_t SetCurrentUser(int32_t userId);
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
@@ -276,6 +277,7 @@ private:
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
+    int32_t currentUserId_ { -1 };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

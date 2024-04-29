@@ -19,10 +19,12 @@
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsInputDeviceContext"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
 constexpr uint32_t MIN_N_SIZE = 1;
 constexpr uint32_t MAX_N_SIZE = 5;
 constexpr int32_t STANDARD_KEY_REPEAT_DELAY = 500;

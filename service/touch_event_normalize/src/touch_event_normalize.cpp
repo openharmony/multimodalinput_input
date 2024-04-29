@@ -21,12 +21,11 @@
 #include "touch_transform_processor.h"
 #include "touchpad_transform_processor.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchEventNormalize"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL{ LOG_CORE, MMI_LOG_DOMAIN, "TouchEventNormalize" };
-} // namespace
-
 TouchEventNormalize::TouchEventNormalize() {}
 TouchEventNormalize::~TouchEventNormalize() {}
 

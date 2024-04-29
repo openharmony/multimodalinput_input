@@ -48,10 +48,12 @@
 #include "res_type.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputWindowsManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
@@ -518,8 +520,10 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
-        displayGroupInfo_ = displayGroupInfoTmp_;
-        UpdateWindowsInfoPerDisplay(displayGroupInfo);
+        if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
+            displayGroupInfo_ = displayGroupInfoTmp_;
+            UpdateWindowsInfoPerDisplay(displayGroupInfo);
+        }
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
@@ -937,7 +941,7 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
@@ -947,7 +951,7 @@ void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGrou
 
 void InputWindowsManager::PrintDisplayInfo()
 {
-    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
         return;
     }
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
@@ -2855,6 +2859,13 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
     MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
         dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     return dst == RET_OK;
+}
+
+int32_t InputWindowsManager::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    currentUserId_ = userId;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

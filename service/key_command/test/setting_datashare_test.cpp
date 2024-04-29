@@ -19,11 +19,13 @@
 #include "event_log_helper.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SettingDatashareTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SettingDatashareTest" };
 } // namespace
 
 class SettingDatashareTest : public testing::Test {

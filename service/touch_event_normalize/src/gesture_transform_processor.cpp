@@ -18,12 +18,11 @@
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GestureTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "GestureTransformProcessor" };
-} // namespace
-
 GestureTransformProcessor::GestureTransformProcessor(int32_t deviceId)
     : deviceId_(deviceId) {}
 

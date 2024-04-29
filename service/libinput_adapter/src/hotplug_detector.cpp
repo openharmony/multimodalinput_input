@@ -25,10 +25,12 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "HotplugDetector"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HotplugDetector"};
 constexpr auto MAX_EVENT_BUF_SIZE = 512;
 constexpr auto INPUT_DEVICES_PATH = "/dev/input/";
 
