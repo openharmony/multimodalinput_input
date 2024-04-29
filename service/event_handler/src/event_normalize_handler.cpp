@@ -351,6 +351,10 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     HandlePalmEvent(event, pointerEvent);
+    if (SetOriginPointerId(pointerEvent) != RET_OK) {
+        MMI_HILOGE("Failed to set origin pointerId");
+        return RET_ERR;
+    }
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
@@ -516,9 +520,12 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
 
     if (pointerEvent != nullptr) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+        if (SetOriginPointerId(pointerEvent) != RET_OK) {
+            MMI_HILOGE("Failed to set origin pointerId");
+            return RET_ERR;
+        }
         nextHandler_->HandleTouchEvent(pointerEvent);
     }
-
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }
@@ -618,6 +625,23 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     });
     return timerId_;
+}
+
+int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return RET_ERR;
+    }
+    pointerItem.SetOriginPointerId(pointerItem.GetPointerId());
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    MMI_HILOGD("pointerId:%{public}d, originPointerId:%{public}d",
+        pointerId, pointerItem.GetPointerId());
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
