@@ -2074,7 +2074,6 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     MMI_HILOGI("start get infrared frequency");
-
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
