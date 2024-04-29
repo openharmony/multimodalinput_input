@@ -68,6 +68,7 @@ public:
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
     bool GetMouseFlag();
+    void JudgMouseIsDownOrUp(bool dragState);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
@@ -275,6 +276,7 @@ private:
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
+    int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
 };
 
