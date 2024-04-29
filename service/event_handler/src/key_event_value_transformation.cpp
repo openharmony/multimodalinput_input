@@ -20,10 +20,12 @@
 #include "hos_key_event.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventValueTransformation"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformation" };
 constexpr int32_t INVALID_KEY_CODE = -1;
 } // namespace
 

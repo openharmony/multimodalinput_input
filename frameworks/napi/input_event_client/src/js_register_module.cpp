@@ -23,10 +23,12 @@
 #include "util_napi.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JSRegisterModule"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE = 1;
 constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT = 2;
 

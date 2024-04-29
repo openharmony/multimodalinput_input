@@ -21,12 +21,11 @@
 #include "mmi_log.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventResample"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "EventResample" };
-} // namespace
-
 EventResample::EventResample(){};
 EventResample::~EventResample(){};
 
@@ -187,7 +186,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
             item.SetDisplayY(logicY);
-            
+
             auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
             item.SetWindowX(windowXY.first);
             item.SetWindowY(windowXY.second);
@@ -513,7 +512,8 @@ void EventResample::PrintfDeviceName()
         MMI_HILOGW("The device is not found");
         return;
     }
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
 }
 
 } // namespace MMI

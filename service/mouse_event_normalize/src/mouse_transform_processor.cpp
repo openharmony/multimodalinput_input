@@ -38,12 +38,14 @@
 #include "util.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MouseTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseTransformProcessor" };
 constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 10;
+constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t DEFAULT_SPEED = 7;
 constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
 constexpr int32_t DEFAULT_ROWS = 3;
@@ -160,7 +162,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     TransTouchpadRightButton(data, type, button);
 
-    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_MIDDLE_BUTTON_CODE && 
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_MIDDLE_BUTTON_CODE &&
         type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
     }
@@ -595,7 +597,8 @@ void MouseTransformProcessor::DumpInner()
     EventLogHelper::PrintEventData(pointerEvent_);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
 }
 
 void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &args)

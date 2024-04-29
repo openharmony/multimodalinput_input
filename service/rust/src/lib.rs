@@ -99,6 +99,11 @@ impl AccelerateCurves {
                         slopes: vec![1.28, 5.1, 9.52],
                         diff_nums: vec![0.0, -30.56, -172.00],
                     },
+                    CurveItem {
+                        speeds: vec![8, 32, 128],
+                        slopes: vec![1.34, 5.55, 10.36],
+                        diff_nums: vec![0.0, -33.68, -187.6],
+                    },
                 ],
             });
         });

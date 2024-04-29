@@ -20,11 +20,13 @@
 #include "define_multimodal.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "FingersenseWrapper"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 const std::string FINGERSENSE_WRAPPER_PATH = "libfingersense_wrapper.z.so";
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "FingersenseWrapper" };
 } // namespace
 
 FingersenseWrapper::FingersenseWrapper() {}

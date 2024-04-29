@@ -26,11 +26,13 @@
 #include "multimodal_input_connect_define.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<MultimodalInputConnectManager> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectManager" };
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::GetInstance()
@@ -717,6 +719,12 @@ int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pix
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
+}
+
+int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetCurrentUser(userId);
 }
 } // namespace MMI
 } // namespace OHOS

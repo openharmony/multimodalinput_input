@@ -32,9 +32,11 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MmiLibudev"
+
 using namespace std::literals;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiLibudev" };
 constexpr int UTIL_PATH_SIZE = 1024;
 constexpr int UTIL_LINE_SIZE = 16384;
 
@@ -338,9 +340,9 @@ private:
             MMI_HILOGE("The realpath return nullptr");
             return;
         }
-        std::ifstream f(filename, std::ios_base::in);
+        std::ifstream f(realPath, std::ios_base::in);
         if (!f.is_open()) {
-            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", filename.c_str(), std::strerror(errno));
+            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", realPath, std::strerror(errno));
             return;
         }
         ueventLoaded = true;

@@ -28,10 +28,12 @@
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "StreamBuffer"
+
 namespace OHOS {
 namespace MMI {
 class StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer" };
 public:
     StreamBuffer() = default;
     DISALLOW_MOVE(StreamBuffer);
