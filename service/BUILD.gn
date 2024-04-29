@@ -987,6 +987,14 @@ ohos_unittest("ConnectManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
   ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
+  ]
 }
 
 group("mmi-service-tests") {
