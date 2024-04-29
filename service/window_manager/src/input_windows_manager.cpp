@@ -2157,7 +2157,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
     }
     bool gestureInject = false;
-    if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) && MMI_GNE(pointerEvent->GetZorder(), 0.0f)) {
+    if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) && MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
         gestureInject = true;
     }
     if (IsNeedDrawPointer(pointerItem)) {
