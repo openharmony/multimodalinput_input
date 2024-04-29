@@ -1840,7 +1840,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR    
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR 
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
