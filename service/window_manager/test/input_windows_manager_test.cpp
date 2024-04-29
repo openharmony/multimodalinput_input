@@ -705,7 +705,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintWindowInfo_001, T
     windowInfo2.pointerChangeAreas = {40, 50, 60};
     windowInfo2.transform = {4.0f, 5.0f, 6.0f};
     std::vector<WindowInfo> windowsInfo = {windowInfo1, windowInfo2};
-    ASSERT_NO_FATAL_FAILURE(WinMgr->PrintWindowInfo(windowsInfo)); 
+    ASSERT_NO_FATAL_FAILURE(WinMgr->PrintWindowInfo(windowsInfo));
 }
 
 /**
