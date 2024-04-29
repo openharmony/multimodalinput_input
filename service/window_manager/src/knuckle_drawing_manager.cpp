@@ -23,7 +23,7 @@
 #include "pipeline/rs_recording_canvas.h"
 #else
 #include "ui/rs_canvas_drawing_node.h"
-#endif
+#endif // USE_ROSEN_DRAWING
 
 #include "define_multimodal.h"
 #include "mmi_log.h"
@@ -86,7 +86,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
         touchEvent->GetPointerIds().size() != 1) {
         if (canvasNode_ != nullptr) {
-            path.Reset();
+            path_.Reset();
             pointerInfos_.clear();
             canvasNode_->ResetSurface();
             Rosen::RSTransaction::FlushImplicitTransaction();
@@ -104,7 +104,7 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
         (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty()))) {
         return true;
     }
-    MMI_HILOGE("action is not down or move or up");
+    MMI_HILOGE("action is not down or move or up, action:%{public}d", action);
     return false;
 }
 
@@ -120,14 +120,14 @@ void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 
 void KnuckleDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> touchEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     int32_t ret = DrawGraphic(touchEvent);
     if (ret != RET_OK) {
-        MMI_HILOGE("Draw graphic failed");
+        MMI_HILOGE("Draw graphic failed, ret:%{public}d", ret);
         return;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-    MMI_HILOGD("Draw graphic success");
 }
 
 void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
@@ -231,21 +231,21 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
             return RET_ERR;
         }
         paint_.SetWidth(PAINT_STROKE_WIDTH);
-        path.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
-        path.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
+        path_.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
+        path_.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,
             pointerInfos_[POINT_INDEX3].x, pointerInfos_[POINT_INDEX3].y);
         canvas->AttachPaint(paint_);
-        canvas->DrawPath(path);
+        canvas->DrawPath(path_);
         canvas->DetachPaint();
         pointerInfos_.erase(pointerInfos_.begin(), pointerInfos_.begin() + POINT_INDEX3);
     } else {
-        MMI_HILOGD("isActionUp_ == true");
+        MMI_HILOGD("isActionUp_ is true");
         isActionUp_ = false;
         pointerInfos_.clear();
         canvasNode_->ResetSurface();
     }
-    path.Reset();
+    path_.Reset();
     canvasNode_->FinishRecording();
     return RET_OK;
 }

@@ -1017,8 +1017,13 @@ ohos_unittest("ConnectManagerTest") {
   ]
 
   external_deps = [
+    "ability_runtime:app_manager",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
   ]
 }
 

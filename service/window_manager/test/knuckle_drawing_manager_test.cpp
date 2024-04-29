@@ -15,6 +15,7 @@
 
 #include <cstdio>
 #include <fstream>
+
 #include <gtest/gtest.h>
 
 #include "mmi_log.h"
@@ -42,13 +43,13 @@ public:
         info.height = 1;
         int32_t displayDpi = 240;
         info.dpi = displayDpi;
-        info.name = "xx";
+        info.name = "display";
         info.uniq = "xx";
         if (knuckleDrawMgr == nullptr) {
             knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
         }
         knuckleDrawMgr->UpdateDisplayInfo(info);
-    } // void SetUp(void)
+    }
 private:
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
 };
@@ -77,7 +78,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    (knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
