@@ -17,10 +17,12 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TabletToolTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolTransformProcessor" };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 

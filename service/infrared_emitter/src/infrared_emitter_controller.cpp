@@ -16,11 +16,11 @@
 #include "infrared_emitter_controller.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InfraredEmitterController"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InfraredEmitterController" };
-} // namespace
 using namespace OHOS::HDI::Consumerir::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
 InfraredEmitterController *InfraredEmitterController::GetInstance()

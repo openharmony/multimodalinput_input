@@ -17,10 +17,12 @@
 #include "config_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyOption"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyOption" };
 constexpr int32_t PRE_KEYS_MAX_SIZE = 4;
 }
 std::set<int32_t> KeyOption::GetPreKeys() const

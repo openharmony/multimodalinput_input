@@ -24,10 +24,12 @@
 #include "util_napi.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JSRegisterModule"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
 constexpr size_t INPUT_PARAMETER_MIDDLE = 2;

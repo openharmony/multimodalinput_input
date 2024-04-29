@@ -26,10 +26,12 @@
 #include "timer_manager.h"
 #include "window_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ANRManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
 const std::string FOUNDATION = "foundation";
 constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
 constexpr int32_t TIME_CONVERT_RATIO = 1000;

@@ -23,12 +23,11 @@
 #include "napi_constants.h"
 #include "net_packet.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputDeviceImpl"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl" };
-} // namespace
-
 InputDeviceImpl& InputDeviceImpl::GetInstance()
 {
     static InputDeviceImpl instance;

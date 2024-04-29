@@ -26,10 +26,12 @@
 #include "uds_socket.h"
 #include "proto.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UDSSession"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 const std::string FOUNDATION = "foundation";
 } // namespace
 

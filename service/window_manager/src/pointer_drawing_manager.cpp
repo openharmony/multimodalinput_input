@@ -41,10 +41,12 @@
 #include "util.h"
 #include "timer_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerDrawingManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t BASELINE_DENSITY = 160;
@@ -153,6 +155,10 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     currentDirection_ = direction;
     AdjustMouseFocus(direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(pointerStyle.id)).alignmentWay),
         physicalX, physicalY);
+    if (WinMgr->GetMouseFlag()) {
+        WinMgr->SetMouseFlag(false);
+        return;
+    }
     MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
         ICON_TYPE(GetIconStyle(MOUSE_ICON(pointerStyle.id)).alignmentWay));
 
@@ -1428,10 +1434,6 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
 void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (WinMgr->GetMouseFlag()) {
-        WinMgr->SetMouseFlag(false);
-        return;
-    }
     if (hasDisplay_ && hasPointerDevice_) {
         if (surfaceNode_ != nullptr) {
             surfaceNode_->AttachToDisplay(screenId_);

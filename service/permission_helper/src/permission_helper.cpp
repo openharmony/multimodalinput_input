@@ -21,12 +21,11 @@
 
 #include "tokenid_kit.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PermissionHelper"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PermissionHelper" };
-} // namespace
-
 PermissionHelper::PermissionHelper() {}
 PermissionHelper::~PermissionHelper() {}
 
