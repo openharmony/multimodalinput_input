@@ -27,10 +27,12 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeySubscriberHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNOBSERVED = -1;

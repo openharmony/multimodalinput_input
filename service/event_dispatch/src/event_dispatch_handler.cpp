@@ -34,12 +34,12 @@
 #include "util.h"
 #include <transaction/rs_interfaces.h>
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventDispatchHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatchHandler" };
-#endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
 } // namespace
 
@@ -157,8 +157,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    pointerItem.SetOriginPointerId(pointerItem.GetPointerId());
-    point->UpdatePointerItem(pointerId, pointerItem);
+
     std::vector<int32_t> windowIds;
     WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     if (!windowIds.empty()) {

@@ -27,10 +27,12 @@
 #include "parameters.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputDisplayBindHelper"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDisplayBindHelper" };
 const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
 const std::string INPUT_DEVICE_NAME_CONFIG = "/sys_prod/etc/input/input_device_name.cfg";
 const std::string DIRECTORY = "/sys/devices/virtual/input";

@@ -57,10 +57,12 @@
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIService"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
@@ -2100,6 +2102,17 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
         infoId, pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WinMgr, userId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
