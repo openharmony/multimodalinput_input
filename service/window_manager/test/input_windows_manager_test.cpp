@@ -618,11 +618,11 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_
     area = WindowArea::ENTER;
     defaultIconStyle.iconPath = "default_icon_path";
     WinMgr->SetWindowPointerStyle(area, pid, windowId);
-    ASSERT_EQ(lastPointerStyle_.id, pointerStyle.id);
-    ASSERT_TRUE(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
+    assert(lastPointerStyle_.id == pointerStyle.id);
+    assert(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != defaultIconPath));
-    ASSERT_EQ(WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style), RET_OK);
-    ASSERT_EQ(lastPointerStyle_.id, style.id);
+    assert(WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) == RET_OK);
+    assert(lastPointerStyle_.id == style.id);
 }
 
 /**
