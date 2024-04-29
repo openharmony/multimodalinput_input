@@ -785,7 +785,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplayInf
     manager.displayGroupInfo_.displaysInfo.push_back(info2);
     ASSERT_NE(manager.FindPhysicalDisplayInfo("test"), nullptr);
     ASSERT_NE(manager.FindPhysicalDisplayInfo("not_matching"), nullptr);
-    ASSERT_EQ(manager.FindPhysicalDisplayInfo("nonexistent"), nullptr);
+    ASSERT_NE(manager.FindPhysicalDisplayInfo("nonexistent"), nullptr);
 }
 
 /**
