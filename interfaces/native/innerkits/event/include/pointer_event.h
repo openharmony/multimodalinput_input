@@ -1141,7 +1141,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
-        int32_t originPointerId_ { -1 };
+        int32_t originPointerId_ { 0 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
     };
