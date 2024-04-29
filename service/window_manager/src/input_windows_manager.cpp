@@ -580,9 +580,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
     if (InputDevMgr->HasPointerDevice()) {
         MouseLocation mouseLocation = GetMouseInfo();
         int32_t displayId = MouseEventHdr->GetDisplayId();
-        if (displayId < 0) {
-            displayId = displayGroupInfo_.displaysInfo[0].id;
-        }
+        displayId = displayId < 0 ? displayGroupInfo_.displaysInfo[0].id : displayId;
         auto displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
         int32_t logicX = mouseLocation.physicalX + displayInfo->x;
@@ -610,10 +608,9 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
                 info.windowPid, info.windowId, pointerStyle.id);
             CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
         }
-        WindowInfo window = *windowInfo;
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
-            isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
+            isDragBorder_ = SelectPointerChangeArea(*windowInfo, pointerStyle, logicX, logicY);
             dragPointerStyle_ = pointerStyle;
             MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
         }
@@ -1229,7 +1226,11 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         return RET_OK;
     }
     iter->second = pointerStyle;
-    pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN ? SetMouseFlag(true) :SetMouseFlag(false);
+    if (pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        SetMouseFlag(true);
+    } else {
+        SetMouseFlag(false);
+    }
     return RET_OK;
 }
 
