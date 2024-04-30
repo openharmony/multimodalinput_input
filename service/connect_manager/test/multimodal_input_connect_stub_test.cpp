@@ -490,5 +490,323 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSupp
     int32_t ret = stub->StubSupportKeys(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
+/**
+ * @tc.name: StubGetDevice_001
+ * @tc.desc: Test the function StubGetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetDevice_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    int32_t ret = stub->StubGetDevice(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubRegisterInputDeviceMonitor_001
+ * @tc.desc: Test the function StubRegisterInputDeviceMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubRegisterInputDeviceMonitor_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubRegisterInputDeviceMonitor(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: StubGetKeyboardType_001
+ * @tc.desc: Test the function StubGetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyboardType_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    int32_t ret = stub->StubGetKeyboardType(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubAddInputHandler_001
+ * @tc.desc: Test the function StubAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubAddInputHandler(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubRemoveInputHandler_001
+ * @tc.desc: Test the function StubRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubRemoveInputHandler(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubMarkEventConsumed_001
+ * @tc.desc: Test the function StubMarkEventConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubMarkEventConsumed_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubMarkEventConsumed(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSubscribeKeyEvent_001
+ * @tc.desc: Test the function StubSubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSubscribeKeyEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubUnsubscribeKeyEvent_001
+ * @tc.desc: Test the function StubUnsubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeKeyEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubUnsubscribeKeyEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSubscribeSwitchEvent_001
+ * @tc.desc: Test the function StubSubscribeSwitchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeSwitchEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSubscribeSwitchEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubUnsubscribeSwitchEvent_001
+ * @tc.desc: Test the function StubUnsubscribeSwitchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeSwitchEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubUnsubscribeSwitchEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubMoveMouseEvent_001
+ * @tc.desc: Test the function StubMoveMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubMoveMouseEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubMoveMouseEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubInjectKeyEvent_001
+ * @tc.desc: Test the function StubInjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubInjectKeyEvent(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetAnrListener_001
+ * @tc.desc: Test the function StubSetAnrListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetAnrListener_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSetAnrListener(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubGetDisplayBindInfo_001
+ * @tc.desc: Test the function StubGetDisplayBindInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetDisplayBindInfo_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubGetDisplayBindInfo(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubGetAllMmiSubscribedEvents_001
+ * @tc.desc: Test the function StubGetAllMmiSubscribedEvents
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetAllMmiSubscribedEvents_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubGetAllMmiSubscribedEvents(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetDisplayBind_001
+ * @tc.desc: Test the function StubSetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetDisplayBind_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSetDisplayBind(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubGetFunctionKeyState_001
+ * @tc.desc: Test the function StubGetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetFunctionKeyState_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubGetFunctionKeyState(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetFunctionKeyState_001
+ * @tc.desc: Test the function StubSetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetFunctionKeyState_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSetFunctionKeyState(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetPointerLocation_001
+ * @tc.desc: Test the function StubSetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSetPointerLocation(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetMouseCaptureMode_001
+ * @tc.desc: Test the function StubSetMouseCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 201;
+    int32_t ret = stub->StubSetMouseCaptureMode(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
 } // namespace MMI
 } // namespace OHOS
