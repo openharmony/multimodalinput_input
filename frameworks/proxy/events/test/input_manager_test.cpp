@@ -63,6 +63,9 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+public:
+    int64_t frequency_Max { 0 };
+    int64_t frequency_Min { 0 };
 
 private:
     int32_t keyboardRepeatRate_ { 50 };
@@ -2933,5 +2936,97 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadTapSwitch_001, TestSize.L
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
 }
+
+
+/**
+ * @tc.name: InputManagerTest_SetTouchpadRotateSwitch_001
+ * @tc.desc: Set touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadRotateSwitch_001
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = true;
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
+}
+
+/**
+ * @tc.name: InputManagerTest_HasIrEmitterTest
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitterTest, TestSize.Level1)
+{
+    bool hasEmmited = false;
+    InputManager::GetInstance()->HasIrEmitter(hasEmmited);
+    EXPECT_EQ(hasEmmited, false);
+}
+
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
+/**
+ * @tc.name: InputManagerTest_GetInfraredFrequenciesTest
+ * @tc.desc: Event dump CheckCount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequenciesTest, TestSize.Level1)
+{
+    std::vector<InfraredFrequency> requencys;
+    InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    bool testResult = true;
+    int32_t size = requencys.size();
+    ASSERT_GE(size, 1);
+    frequency_Max = requencys[0].max_;
+    frequency_Min = requencys[0].min_;
+    for (int32_t i = 0; i < size; i++) {
+        InfraredFrequency fre = requencys[i];
+        if (fre.max_ < fre.min_) {
+            testResult = false;
+            break;
+        }
+    }
+    EXPECT_EQ(testResult, true);
+}
+
+/**
+ * @tc.name: InputManagerTest_TransmitInfraredTest
+ * @tc.desc: Event dump CheckCount
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest, TestSize.Level1)
+{
+    std::vector<int64_t> requencys;
+    int64_t dist = (frequency_Max - frequency_Min) / 10;
+    bool testResult = true;
+
+    for (int i = 0; i < 10; i++) {
+        requencys.push_back(dist * i + frequency_Min);
+    }
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency_Min, requencys);
+    if (0 != ret) {
+        testResult = false;
+    }
+    EXPECT_EQ(testResult, true);
+}
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 } // namespace MMI
 } // namespace OHOS
