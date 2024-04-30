@@ -2156,7 +2156,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
             pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
     }
-
+    bool gestureInject = false;
+    if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) && MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
+        gestureInject = true;
+    }
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
@@ -2179,7 +2182,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
                 MMI_HILOGD("PointerAction is to leave the window");
                 DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+                if (!gestureInject) {
+                    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+                }
             }
         }
     }
