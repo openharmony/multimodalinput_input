@@ -40,7 +40,6 @@
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
 #include "multimodal_input_preferences_manager.h"
-#include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -75,7 +74,7 @@ constexpr int32_t TWOFOLD = 2;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-const std::string showCursorSwitchName = "settings.input.show_touch_hint";
+
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -2332,15 +2331,6 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
 void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    if (!haveSetObserver_) {
-        showCursor_.SwitchName = showCursorSwitchName;
-        CreateStatusConfigObserver(showCursor_);
-        haveSetObserver_ = true;
-    }
-    if (!showCursor_.isShow) {
-        MMI_HILOGD("The touchCursor does not need to be displayed.");
-        return;
-    }
     CHKPV(pointerEvent);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
@@ -2353,29 +2343,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     TouchDrawingMgr->TouchDrawHandler(pointerEvent);
 }
 
-template <class T>
-void InputWindowsManager::CreateStatusConfigObserver(T& item)
-{
-    CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
-        bool statusValue = false;
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .GetBoolValue(key, statusValue);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get value from setting date fail");
-            return;
-        }
-        item.isShow = statusValue;
-        MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), statusValue);
-    };
-    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-        .CreateObserver(item.SwitchName, updateFunc);
-    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
-    if (ret != ERR_OK) {
-        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
-        statusObserver = nullptr;
-    }
-}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

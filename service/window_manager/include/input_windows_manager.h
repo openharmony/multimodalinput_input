@@ -51,11 +51,6 @@ struct CursorPosition {
     Coordinate2D cursorPos {};
 };
 
-struct DevMode {
-    std::string SwitchName;
-    bool isShow { false };
-};
-
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
@@ -221,8 +216,6 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
     bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
-    template <class T>
-    void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -270,7 +263,6 @@ private:
     bool dragFlag_ { false };
     bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
-    DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
