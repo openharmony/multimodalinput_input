@@ -63,9 +63,6 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
-public:
-    int64_t frequency_Max { 0 };
-    int64_t frequency_Min { 0 };
 
 private:
     int32_t keyboardRepeatRate_ { 50 };
@@ -2994,11 +2991,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequenciesTest_001, Test
     EXPECT_GE(size, 0);
     for (int32_t i = 0; i < size; i++) {
         InfraredFrequency fre = requencys[i];
-        MMI_HILOGI("GetInfraredFrequencies i:%{public}d, max_:%{public}lld, min_:%{public}lld", 
-        i, fre.max_, fre.min_);
+        MMI_HILOGI("GetInfraredFrequencies i:%{public}d, max_:%{public}lld, min_:%{public}lld",
+            i, fre.max_, fre.min_);
     }
     ASSERT_TRUE(ret == RET_OK);
-    
 }
 
 /**
