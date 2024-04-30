@@ -64,7 +64,7 @@ public:
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
     virtual int32_t SetHoverScrollState(bool state) = 0;
     virtual int32_t GetHoverScrollState(bool &state) = 0;
-    virtual int32_t SetPointerVisible(bool visible) = 0;
+    virtual int32_t SetPointerVisible(bool visible, int32_t priority) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerColor(int32_t color) = 0;

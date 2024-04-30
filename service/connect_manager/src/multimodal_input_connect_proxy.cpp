@@ -490,7 +490,7 @@ int32_t MultimodalInputConnectProxy::GetHoverScrollState(bool &state)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
+int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -500,6 +500,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     }
 
     WRITEBOOL(data, visible, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;

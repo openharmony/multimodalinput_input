@@ -1090,7 +1090,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         if (!isHotPlug) {
             pointerVisible = (pointerVisible && IsPointerVisible());
         }
-        SetPointerVisible(getpid(), pointerVisible);
+        SetPointerVisible(getpid(), pointerVisible, 0);
     } else {
         DeletePointerVisible(getpid());
     }
@@ -1213,10 +1213,10 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
     return true;
 }
 
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
 {
-    MMI_HILOGI("pid:%{public}d,visible:%{public}s", pid, visible ? "true" : "false");
-    if (WinMgr->GetExtraData().appended && visible) {
+    MMI_HILOGI("pid:%{public}d,visible:%{public}s,priority:%{public}d", pid, visible ? "true" : "false", priority);
+    if (WinMgr->GetExtraData().appended && visible && priority == 0) {
         MMI_HILOGE("current is drag state, can not set pointer visible");
         return RET_ERR;
     }
