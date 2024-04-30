@@ -291,6 +291,11 @@ ohos_unittest("event_resample_test") {
 
   configs = [ ":libmmi_server_config" ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",

@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "setting_datashare.h"
+#include "setting_observer.h"
 #include "event_log_helper.h"
 #include "mmi_log.h"
 
@@ -34,6 +35,12 @@ public:
     static void TearDownTestCase(void) {}
     void SetUp(void) {}
     void TearDown(void) {}
+};
+
+class SettingObserverTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 };
 
 /**
@@ -175,6 +182,22 @@ HWTEST_F(SettingDatashareTest, SettingDatashareTest_PutStringValue, TestSize.Lev
     std::string value = "valueObj";
     bool needNotify = true;
     ASSERT_NE(settingDataShare.PutStringValue(key, value, needNotify), RET_ERR);
+}
+
+/**
+ * @tc.name: SettingObserverTest_OnChange
+ * @tc.desc: Test OnChange
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SettingObserverTest, SettingObserverTest_OnChange, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SettingObserver observer;
+    std::string key = "SettingObserver";
+    observer.SetKey(key);
+    observer.update_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(observer.OnChange());
 }
 } // namespace MMI
 } // namespace OHOS
