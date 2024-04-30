@@ -577,8 +577,14 @@ ohos_unittest("TouchEventNormalizeTest") {
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+  ]
+
+  external_deps = [
+    "graphic_2d:librender_service_client",
+    "window_manager:libwm",
   ]
 }
 
