@@ -927,7 +927,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_VerifyTo
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetTouchpadScrollSwitch_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollSwitch_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
@@ -942,7 +942,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetTouchpadScrollSwitch_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollSwitch_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
@@ -957,7 +957,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetTouchpadScrollDirection_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollDirection_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
@@ -972,7 +972,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetTouchpadScrollDirection_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollDirection_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
@@ -1017,7 +1017,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetTouchpadPointerSpeed_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadPointerSpeed_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
@@ -1032,7 +1032,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetT
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetTouchpadPointerSpeed_001, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadPointerSpeed_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
