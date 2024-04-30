@@ -27,9 +27,10 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t UID_ROOT { 0 };
 static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-int32_t moduleType_ = 3;
-static inline int32_t pid_ = 0;
-int32_t writeFd_ = -1;
+int32_t g_moduleType = 3;
+int32_t g_pid = 0;
+int32_t g_writeFd = -1;
+constexpr size_t MAX_EVENTIDS_SIZE = 1001;
 } // namespace
 
 class EventMonitorHandlerTest : public testing::Test {
@@ -121,7 +122,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_001, T
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     int32_t ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
     EXPECT_EQ(ret, RET_ERR);
     eventType = 1;
@@ -140,7 +141,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_001
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 1;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
     handlerType = InputHandlerType::MONITOR;
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.RemoveInputHandler(handlerType, eventType, session));
@@ -156,7 +157,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_001, Test
 {
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent));
@@ -175,16 +176,16 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddMonitor_001, TestSi
     EventMonitorHandler::MonitorCollection monitorCollection;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
     for (int i = 0; i < MAX_N_INPUT_MONITORS - 1; i++) {
-        SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+        SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
         EventMonitorHandler::SessionHandler sessionHandler = { handlerType, eventType, session };
         monitorCollection.monitors_.insert(sessionHandler);
     }
     int32_t ret = monitorCollection.AddMonitor(sessionHandler);
     EXPECT_EQ(ret, RET_OK);
-    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler2 { handlerType, eventType, session2 };
     monitorCollection.monitors_.insert(sessionHandler2);
     ret = monitorCollection.AddMonitor(sessionHandler2);
@@ -202,16 +203,111 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_001, Tes
     EventMonitorHandler::MonitorCollection monitorCollection;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
     monitorCollection.monitors_.insert(sessionHandler);
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
-    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    SessionPtr session2 = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     eventType = 1;
     sessionHandler = { handlerType, eventType, session2 };
     monitorCollection.monitors_.insert(sessionHandler);
     ASSERT_NO_FATAL_FAILURE(monitorCollection.RemoveMonitor(sessionHandler));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_MarkConsumed
+ * @tc.desc: Test MarkConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed, TestSize.Level1)
+{
+    EventMonitorHandler eventMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    int32_t eventId = 100;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.MarkConsumed(eventId, session));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_Dump
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump, TestSize.Level1)
+{
+    EventMonitorHandler eventMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.Dump(fd, args));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_OnSessionLost
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnSessionLost, TestSize.Level1)
+{
+    EventMonitorHandler eventMonitorHandler;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnSessionLost(session));
+
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnSessionLost(session));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HasMonitor
+ * @tc.desc: Test HasMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HasMonitor, TestSize.Level1)
+{
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+    monitorCollection.monitors_.insert(monitor);
+    ASSERT_TRUE(monitorCollection.HasMonitor(session));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_UpdateConsumptionState
+ * @tc.desc: Test UpdateConsumptionState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_UpdateConsumptionState, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    EventMonitorHandler::MonitorCollection monitorCollection;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetDeviceId(deviceId);
+    EventMonitorHandler::MonitorCollection::ConsumptionState state;
+    for (int32_t i = 0; i <= MAX_EVENTIDS_SIZE; ++i) {
+        state.eventIds_.insert(i);
+    }
+    monitorCollection.states_.insert(std::make_pair(deviceId, state));
+    PointerEvent::PointerItem item;
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.UpdateConsumptionState(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ASSERT_NO_FATAL_FAILURE(monitorCollection.UpdateConsumptionState(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
