@@ -361,6 +361,31 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleFingerGestureDownEve
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_HandleFingerGestureDownEvent_001
+ * @tc.desc: Test HandleFingerGestureDownEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleFingerGestureDownEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.twoFingerGesture_.active = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleFingerGestureDownEvent(touchEvent));
+
+    item.SetPointerId(1);
+    touchEvent->AddPointerItem(item);
+    item.SetPointerId(2);
+    touchEvent->AddPointerItem(item);
+    item.SetPointerId(3);
+    touchEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleFingerGestureDownEvent(touchEvent));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureDownEvent
  * @tc.desc: Test HandleKnuckleGestureDownEvent
  * @tc.type: FUNC
@@ -388,6 +413,25 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureDownEv
     touchEvent->SetPointerId(2);
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureDownEvent(touchEvent));
 
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureUpEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureUpEvent
+ * @tc.desc: Test HandleKnuckleGestureUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureUpEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    item.SetPointerId(1);
+    touchEvent->AddPointerItem(item);
+    handler.isDoubleClick_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureUpEvent(touchEvent));
 }
 
@@ -1346,6 +1390,28 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed
     ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
 
     handler.downToPrevDownDistanceConfig_ = 11.5f;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AdjustDistanceConfigIfNeed_002
+ * @tc.desc: Test AdjustDistanceConfigIfNeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    float distance = 15.0f;
+    handler.downToPrevDownDistanceConfig_ = 10.0f;
+    handler.distanceLongConfig_ = 10.0f;
+    handler.distanceDefaultConfig_ = 5.0f;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+    handler.distanceDefaultConfig_ = 20.0f;
+    handler.checkAdjustDistanceCount_ = 6;
+    ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
+    handler.downToPrevDownDistanceConfig_ = 30.0f;
     ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
 }
 
