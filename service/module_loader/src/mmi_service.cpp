@@ -622,12 +622,12 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerVisible(bool visible)
+int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), visible, priority));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer visible failed,return %{public}d", ret);
         return ret;
