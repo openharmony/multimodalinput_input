@@ -2989,7 +2989,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitterTest, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequenciesTest_001, TestSize.Level1)
 {
     std::vector<InfraredFrequency> requencys;
-    InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
     int32_t size = requencys.size();
     EXPECT_GE(size, 0);
     for (int32_t i = 0; i < size; i++) {
@@ -2997,7 +2997,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequenciesTest_001, Test
         MMI_HILOGI("GetInfraredFrequencies i:%{public}d, max_:%{public}lld, min_:%{public}lld", 
         i, fre.max_, fre.min_);
     }
-    EXPECT_EQ(true, true);
+    ASSERT_TRUE(ret == RET_OK);
     
 }
 
@@ -3011,8 +3011,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest_001, TestSize.L
 {
     std::vector<int64_t> requencys = {9000, 4500, 5800};
     int64_t frequency = 3800;
-    InputManager::GetInstance()->TransmitInfrared(frequency, requencys);
-    EXPECT_EQ(true, true);
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency, requencys);
+    ASSERT_TRUE(ret == RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
