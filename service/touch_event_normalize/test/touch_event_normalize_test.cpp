@@ -17,17 +17,19 @@
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
+#include "joystick_transform_processor.h"
+#include "touch_transform_processor.h"
 #include "touch_event_normalize.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-}
+constexpr int32_t LIBINPUT_HOMEPAGE_BUTTON_CODE = 172;
+constexpr int32_t LIBINPUT_BUTTON_NONE = -1;
+} // namespace
 class TouchEventNormalizeTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
 
@@ -37,13 +39,17 @@ private:
     bool preRotateSwitch_ { true };
 };
 
-void TouchEventNormalizeTest::SetUpTestCase(void)
-{
-}
+class JoystickTransformProcessorTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
 
-void TouchEventNormalizeTest::TearDownTestCase(void)
-{
-}
+class TouchTransformProcessorTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
 
 void TouchEventNormalizeTest::SetUp()
 {
@@ -57,6 +63,61 @@ void TouchEventNormalizeTest::TearDown()
     TouchEventHdr->SetTouchpadPinchSwitch(prePinchSwitch_);
     TouchEventHdr->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     TouchEventHdr->SetTouchpadRotateSwitch(preRotateSwitch_);
+}
+
+/**
+ * @tc.name: JoystickTransformProcessorTest_LibinputButtonToPointer
+ * @tc.desc: Test LibinputButtonToPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(JoystickTransformProcessorTest, JoystickTransformProcessorTest_LibinputButtonToPointer, TestSize.Level1)
+{
+    int32_t deviceId = 123;
+    JoystickTransformProcessor joystickTransformProcessor(deviceId);
+    uint32_t button = LIBINPUT_HOMEPAGE_BUTTON_CODE;
+    ASSERT_EQ(joystickTransformProcessor.LibinputButtonToPointer(button), PointerEvent::JOYSTICK_BUTTON_HOMEPAGE);
+
+    button = LIBINPUT_BUTTON_NONE;
+    ASSERT_EQ(joystickTransformProcessor.LibinputButtonToPointer(button), PointerEvent::BUTTON_NONE);
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_UpdatePointerItemProperties
+ * @tc.desc: Test UpdatePointerItemProperties
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_UpdatePointerItemProperties, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TouchTransformProcessor touchTransformProcessor(deviceId);
+    PointerEvent::PointerItem item;
+    EventTouch touchInfo;
+    touchInfo.point.x = 125;
+    touchInfo.point.y = 300;
+    touchInfo.toolRect.point.x = 300;
+    touchInfo.toolRect.point.y = 600;
+    touchInfo.toolRect.width = 720;
+    touchInfo.toolRect.height = 1000;
+    ASSERT_NO_FATAL_FAILURE(touchTransformProcessor.UpdatePointerItemProperties(item, touchInfo));
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_MakeTransformProcessor
+ * @tc.desc: Test Gets the TransformProcessor pointer based on the device type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor, TestSize.Level1)
+{
+    int32_t deviceId = 123456;
+    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH), nullptr);
+    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TABLET_TOOL), nullptr);
+    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH_PAD), nullptr);
+    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::GESTURE), nullptr);
+    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::JOYSTICK), nullptr);
+    ASSERT_EQ(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::KNUCKLE), nullptr);
 }
 
 /**
@@ -139,5 +200,5 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitc
     ASSERT_TRUE(TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
