@@ -1463,7 +1463,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateLeftRightArea_00
     std::vector<int32_t> pointerChangeAreas = {10, 20, 30, 40, 50, 60, 70, 80};
     std::vector<Rect> windowHotAreas;
     WinMgr->UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
-    int32_t ret1 = windowHotAreas.size_t();
+    int32_t ret1 = windowHotAreas.size();
     EXPECT_EQ(ret1, 2);
     int32_t ret2 = windowHotAreas[0].x;
     EXPECT_EQ(ret2, -20);
@@ -1495,7 +1495,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateLeftRightArea_00
     std::vector<int32_t> pointerChangeAreas = {10, 0, 30, 40, 50, 60, 70, 80};
     std::vector<Rect> windowHotAreas;
     WinMgr->UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
-    int32_t ret1 = windowHotAreas.size_t();
+    int32_t ret1 = windowHotAreas.size();
     EXPECT_EQ(ret1, 2);
     int32_t ret2 = windowHotAreas[0].x;
     EXPECT_EQ(ret2, -20);
