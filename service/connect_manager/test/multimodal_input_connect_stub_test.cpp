@@ -820,10 +820,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetW
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubGetWindowPid(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubGetWindowPid(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -839,10 +839,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAppe
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubAppendExtraData(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubAppendExtraData(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -858,10 +858,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubEnableCombineKey(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubEnableCombineKey(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -877,10 +877,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubEnableInputDevice(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubEnableInputDevice(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -896,10 +896,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubSetKeyDownDuration(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubSetKeyDownDuration(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -913,10 +913,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_VerifyTouchPadSetting_001, TestSize.Level1)
 {
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->VerifyTouchPadSetting();
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->VerifyTouchPadSetting();
     EXPECT_NE(ret, RET_OK);
 }
@@ -1052,10 +1052,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubSetKeyboardRepeatDelay(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubSetKeyboardRepeatDelay(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -1071,10 +1071,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubSetKeyboardRepeatRate(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubSetKeyboardRepeatRate(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -1090,10 +1090,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetK
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubGetKeyboardRepeatDelay(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubGetKeyboardRepeatDelay(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
@@ -1109,10 +1109,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetK
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubGetKeyboardRepeatRate(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
-    state_ = ServiceRunningState::STATE_RUNNING;
+    state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubGetKeyboardRepeatRate(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
