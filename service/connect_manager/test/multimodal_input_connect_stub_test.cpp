@@ -498,7 +498,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSupp
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetDevice_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 201;
@@ -514,7 +514,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetDevice_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubRegisterInputDeviceMonitor_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubRegisterInputDeviceMonitor(data, reply);
@@ -529,7 +529,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRegisterInputDeviceMonitor_001, Tes
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyboardType_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 201;
@@ -545,7 +545,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyboardType_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -561,7 +561,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -577,7 +577,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Le
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubMarkEventConsumed_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -593,7 +593,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubMarkEventConsumed_001, TestSize.Lev
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -609,7 +609,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeKeyEvent_001, TestSize.Lev
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeKeyEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -625,7 +625,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeKeyEvent_001, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeSwitchEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -641,7 +641,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSubscribeSwitchEvent_001, TestSize.
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeSwitchEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -657,7 +657,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubUnsubscribeSwitchEvent_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubMoveMouseEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -673,7 +673,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubMoveMouseEvent_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -689,7 +689,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetAnrListener_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -705,7 +705,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetAnrListener_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetDisplayBindInfo_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -721,7 +721,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetDisplayBindInfo_001, TestSize.Le
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetAllMmiSubscribedEvents_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -737,7 +737,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetAllMmiSubscribedEvents_001, Test
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetDisplayBind_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -753,7 +753,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetDisplayBind_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetFunctionKeyState_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -769,7 +769,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetFunctionKeyState_001, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetFunctionKeyState_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -785,7 +785,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetFunctionKeyState_001, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -801,7 +801,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_001, TestSize.Le
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 201;
