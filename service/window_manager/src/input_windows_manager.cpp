@@ -998,6 +998,11 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
     return nullptr;
 }
 
+const DisplayInfo *InputWindowsManager::GetDefaultDisplayInfo() const
+{
+    return FindPhysicalDisplayInfo("default0");
+}
+
 void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordinate& coord) const
 {
     const Direction direction = info.direction;

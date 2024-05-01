@@ -94,6 +94,7 @@ struct TwoFingerGesture {
         int32_t id { 0 };
         int32_t x { 0 };
         int32_t y { 0 };
+        int64_t downTime { 0 };
     } touches[MAX_TOUCH_NUM];
 };
 
@@ -216,6 +217,7 @@ private:
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
+    bool CheckTwoFingerGestureAction() const;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -229,6 +231,7 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
