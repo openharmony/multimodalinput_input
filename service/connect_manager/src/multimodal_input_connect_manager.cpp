@@ -229,10 +229,10 @@ int32_t MultimodalInputConnectManager::GetHoverScrollState(bool &state)
     return multimodalInputConnectService_->GetHoverScrollState(state);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
+int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible, int32_t priority)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetPointerVisible(visible);
+    return multimodalInputConnectService_->SetPointerVisible(visible, priority);
 }
 
 int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
