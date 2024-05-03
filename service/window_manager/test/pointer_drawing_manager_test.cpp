@@ -330,11 +330,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     for (int32_t i = 1; i < 102; i++) {
-        pointerDrawingManager->SetPointerVisible(i, false);
+        pointerDrawingManager->SetPointerVisible(i, false, 0);
     }
     bool visible = pointerDrawingManager->GetPointerVisible(1);
     EXPECT_EQ(visible, true);
-    pointerDrawingManager->SetPointerVisible(11, true);
+    pointerDrawingManager->SetPointerVisible(11, true, 0);
     visible = pointerDrawingManager->GetPointerVisible(11);
     EXPECT_EQ(visible, true);
 }
