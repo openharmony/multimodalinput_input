@@ -65,7 +65,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
     int32_t GetHoverScrollState(bool &state) override;
-    int32_t SetPointerVisible(bool visible) override;
+    int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerColor(int32_t color) override;

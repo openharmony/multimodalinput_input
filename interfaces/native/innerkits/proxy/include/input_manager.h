@@ -437,7 +437,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority = 0);
 
     /**
      * @brief Checks whether the pointer icon is visible.

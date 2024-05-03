@@ -691,7 +691,9 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
     CALL_DEBUG_ENTER;
     bool visible = false;
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetPointerVisible(visible);
+    int32_t priority = 0;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerVisible(visible, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerVisible failed ret:%{public}d", ret);
         return ret;

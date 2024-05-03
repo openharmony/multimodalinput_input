@@ -268,9 +268,9 @@ int32_t InputManager::GetHoverScrollState(bool &state)
     return InputMgrImpl.GetHoverScrollState(state);
 }
 
-int32_t InputManager::SetPointerVisible(bool visible)
+int32_t InputManager::SetPointerVisible(bool visible, int32_t priority)
 {
-    return InputMgrImpl.SetPointerVisible(visible);
+    return InputMgrImpl.SetPointerVisible(visible, priority);
 }
 
 bool InputManager::IsPointerVisible()

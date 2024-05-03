@@ -140,7 +140,7 @@ public:
     int32_t SetHoverScrollState(bool state);
     int32_t GetHoverScrollState(bool &state);
 
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority);
     bool IsPointerVisible();
     int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);

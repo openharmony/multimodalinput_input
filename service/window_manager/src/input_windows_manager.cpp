@@ -721,7 +721,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
 void InputWindowsManager::UpdateWindowPointerVisible(int32_t pid)
 {
     bool visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible);
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible, 0);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
