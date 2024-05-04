@@ -722,7 +722,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_UpdateSettingsXml_001, Tes
     ASSERT_EQ(handler.UpdateSettingsXml("businessId3", 100), COMMON_PARAMETER_ERROR);
     handler.businessIds_ = {"businessId"};
     ASSERT_EQ(handler.UpdateSettingsXml("businessId", 1000), 0);
-    auto result = PreferencesMgr->SetShortKeyDuration("businessId", 100);
+    auto result = PREFERENCES_MGR->SetShortKeyDuration("businessId", 100);
     ASSERT_EQ(handler.UpdateSettingsXml("businessId", 100), result);
 }
 

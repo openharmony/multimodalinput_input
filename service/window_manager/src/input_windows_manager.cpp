@@ -1728,14 +1728,14 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
     std::string name = "isEnableHoverScroll";
-    return PreferencesMgr->SetBoolValue(name, mouseFileName, state);
+    return PREFERENCES_MGR->SetBoolValue(name, mouseFileName, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
     std::string name = "isEnableHoverScroll";
-    bool state = PreferencesMgr->GetBoolValue(name, true);
+    bool state = PREFERENCES_MGR->GetBoolValue(name, true);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
@@ -1843,7 +1843,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t physicalY = pointerItem.GetDisplayY();
     if (physicalDisplayInfo->displayDirection == DIRECTION0) {
         direction = physicalDisplayInfo->direction;
-        TouchDrawingMgr->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
+        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -2181,15 +2181,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId,
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
-    } else {
-        if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            if ((!checkExtraData) && (!(extraData_.appended &&
-                extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
-                MMI_HILOGD("PointerAction is to leave the window");
-                DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-                if (!gestureInject) {
-                    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
-                }
+    } else if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        if ((!checkExtraData) && (!(extraData_.appended &&
+            extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
+            MMI_HILOGD("PointerAction is to leave the window");
+            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+            if (!gestureInject) {
+                IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
             }
         }
     }
@@ -2391,8 +2389,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
         MMI_HILOGD("The touchCursor does not need to be displayed.");
         return;
     }
-    TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
-    TouchDrawingMgr->TouchDrawHandler(pointerEvent);
+    TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
+    TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
 }
 
 template <class T>

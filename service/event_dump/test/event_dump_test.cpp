@@ -34,14 +34,14 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDumpTest" };
 using namespace testing::ext;
-const char *testFileName = "/data/log.log";
+constexpr const char *TEST_FILE_NAME = "/data/log.log";
 } // namespace
 
 class EventDumpTest : public testing::Test {
 public:
 void SetUp() override
 {
-    fd_ = open(testFileName, O_WRONLY);
+    fd_ = open(TEST_FILE_NAME, O_WRONLY);
 }
 
 void TearDown() override
