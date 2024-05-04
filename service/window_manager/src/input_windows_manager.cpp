@@ -2379,8 +2379,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     knuckleDrawMgr->UpdateDisplayInfo(*physicDisplayInfo);
     knuckleDrawMgr->KnuckleDrawHandler(pointerEvent);
 
-    TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
-    TouchDrawingMgr->TouchDrawHandler(pointerEvent);
+    TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
+    TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
