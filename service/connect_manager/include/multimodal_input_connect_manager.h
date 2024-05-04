@@ -67,8 +67,8 @@ public:
     int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t GetDeviceIds(std::vector<int32_t> &ids);

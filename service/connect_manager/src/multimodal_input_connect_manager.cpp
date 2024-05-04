@@ -271,10 +271,10 @@ int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
     return multimodalInputConnectService_->GetPointerSpeed(speed);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
-    return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
+    return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
@@ -283,10 +283,10 @@ int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int3
     return multimodalInputConnectService_->ClearWindowPointerStyle(pid, windowId);
 }
 
-int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
+int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
-    return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle);
+    return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()
