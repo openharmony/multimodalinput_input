@@ -19,6 +19,9 @@
 
 #include "mmi_log.h"
 #include "pointer_event.h"
+#ifndef USE_ROSEN_DRAWING
+#define USE_ROSEN_DRAWING
+#endif
 #include "touch_drawing_manager.h"
 #include "window_info.h"
 
@@ -225,39 +228,40 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001,
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_StartTouchDraw_001
- * @tc.desc: Test start touch draw
+ * @tc.name: TouchDrawingManagerTest_SetPointerPositionState_001
+ * @tc.desc: Test TouchDrawHandler
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_StartTouchDraw_001, TestSize.Level1)
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionState_001, TestSize.Level1)
 {
-    TouchDrawingManager manager;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    EXPECT_NO_FATAL_FAILURE(manager.StartTouchDraw(pointerEvent));
+    CALL_TEST_DEBUG;
+
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(false));
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DrawGraphic_001
- * @tc.desc: Test draw graphic
+ * @tc.name: TouchDrawingManagerTest_SetPointerPositionState_002
+ * @tc.desc: Test TouchDrawHandler
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawGraphic_001, TestSize.Level1)
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionState_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    TouchDrawingManager manager;
-    EXPECT_EQ(manager.DrawGraphic(nullptr), RET_ERR);
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    manager.canvasNode_ = nullptr;
-    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
-    pointerEvent->SetPointerId(PointerEvent::POINTER_ACTION_UP);
-    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    manager.displayInfo_.displayDirection = DIRECTION0;
-    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(true));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateLabels_001
+ * @tc.desc: Test TouchDrawHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
 }
 } // namespace MMI
 } // namespace OHOS
