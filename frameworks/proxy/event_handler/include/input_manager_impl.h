@@ -142,8 +142,8 @@ public:
 
     int32_t SetPointerVisible(bool visible, int32_t priority);
     bool IsPointerVisible();
-    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
 
     int32_t SetPointerColor(int32_t color);
     int32_t GetPointerColor(int32_t &color);

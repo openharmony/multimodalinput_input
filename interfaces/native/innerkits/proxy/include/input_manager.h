@@ -104,7 +104,7 @@ public:
      * @since 10
      */
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
-    
+
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
@@ -453,7 +453,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
 
     /**
      * @brief Obtains the mouse pointer style.
@@ -462,7 +462,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
 
     /**
      * @brief Sets pointer color.

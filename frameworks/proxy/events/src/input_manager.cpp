@@ -313,14 +313,14 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl.SetAnrObserver(observer);
 }
 
-int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
-    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle);
+    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
-int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
+int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
-    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle);
+    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 bool InputManager::GetFunctionKeyState(int32_t funcKey)
