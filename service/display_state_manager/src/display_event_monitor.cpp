@@ -44,6 +44,7 @@ public:
         }
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
+            STYLUS_HANDLER->IsLaunchAbility();
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGD("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();

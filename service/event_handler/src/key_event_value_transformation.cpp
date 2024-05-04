@@ -410,6 +410,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {247, {"KEY_RFKILL", 247, 2847, HOS_KEY_RFKILL}},
     {248, {"KEY_MUTE", 248, 23, HOS_KEY_MUTE}},
     {196, {"KEY_F26", 196, 2848, HOS_KEY_F26}},
+    {197, {"KEY_F27", 197, 2849, HOS_KEY_F27}},
 
     {363, {"KEY_CHANNEL", 363, 3001, HOS_KEY_CHANNEL}},
     {256, {"KEY_BTN_0", 256, 3100, HOS_KEY_BTN_0}},
