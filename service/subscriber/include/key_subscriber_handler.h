@@ -70,6 +70,7 @@ private:
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
+    bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);
     bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber> &subscriber);
@@ -115,6 +116,7 @@ private:
     bool enableCombineKey_ { true };
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
+    bool needSkipPowerKeyUp_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
