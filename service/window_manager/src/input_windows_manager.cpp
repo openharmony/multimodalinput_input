@@ -1290,7 +1290,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         return UpdatePoinerStyle(pid, windowId, pointerStyle);
     }
-    if (!isUiExtension && uiExtensionPointerStyle_.count(pid) != 0 ) {
+    if (!isUiExtension && uiExtensionPointerStyle_.count(pid) != 0) {
         MMI_HILOGI("clear the uiextension mouse style for pid %{public}d", pid);
         uiExtensionPointerStyle_.erase(pid);
     }
