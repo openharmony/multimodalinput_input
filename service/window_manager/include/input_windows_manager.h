@@ -109,7 +109,8 @@ public:
     int32_t SetHoverScrollState(bool state);
     bool GetHoverScrollState() const;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) const;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false) const;
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
@@ -250,7 +251,7 @@ private:
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
-    std::map<int32_t std::map<int32_t, PointerStyle>> uiExtensionPointerStyle_;
+    std::map<int32_t, std::map<int32_t, PointerStyle>> uiExtensionPointerStyle_;
     WindowInfo mouseDownInfo_;
     PointerStyle globalStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
