@@ -510,7 +510,12 @@ std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
 {
     CALL_DEBUG_ENTER;
     std::string content;
-    std::ifstream file(fileName);
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("The realpath return nullptr");
+        return content;
+    }
+    std::ifstream file(realPath);
     if (file.is_open()) {
         std::string line;
         while (getline(file, line)) {
