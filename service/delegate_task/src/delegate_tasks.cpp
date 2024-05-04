@@ -22,12 +22,11 @@
 #include "error_multimodal.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DelegateTasks"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DelegateTasks" };
-} // namespace
-
 void DelegateTasks::Task::ProcessTask()
 {
     CALL_DEBUG_ENTER;

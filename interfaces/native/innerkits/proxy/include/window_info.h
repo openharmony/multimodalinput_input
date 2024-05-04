@@ -418,6 +418,8 @@ struct DisplayGroupInfo {
      */
     int32_t focusWindowId;
 
+    int32_t currentUserId { -1 };
+
     /**
      * List of window information of the logical display arranged in Z order, with the top window at the top
      *

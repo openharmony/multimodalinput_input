@@ -22,12 +22,11 @@
 #include "stream_buffer.h"
 #include "uds_socket.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIFdListener"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIFdListener" };
-}
-
 using namespace AppExecFwk;
 MMIFdListener::MMIFdListener(MMIClientPtr client) : mmiClient_(client)
 {

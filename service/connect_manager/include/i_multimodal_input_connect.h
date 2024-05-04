@@ -64,7 +64,7 @@ public:
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
     virtual int32_t SetHoverScrollState(bool state) = 0;
     virtual int32_t GetHoverScrollState(bool &state) = 0;
-    virtual int32_t SetPointerVisible(bool visible) = 0;
+    virtual int32_t SetPointerVisible(bool visible, int32_t priority) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerColor(int32_t color) = 0;
@@ -134,6 +134,7 @@ public:
     virtual int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) = 0;
     virtual int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
+    virtual int32_t SetCurrentUser(int32_t userId) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

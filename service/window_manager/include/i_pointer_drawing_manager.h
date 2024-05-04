@@ -42,7 +42,7 @@ public:
         return true;
     }
     virtual void DeletePointerVisible(int32_t pid) {}
-    virtual int32_t SetPointerVisible(int32_t pid, bool visible)
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority)
     {
         return 0;
     }

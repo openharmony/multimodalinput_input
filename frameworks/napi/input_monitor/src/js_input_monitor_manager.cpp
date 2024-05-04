@@ -21,11 +21,12 @@
 #include "napi_constants.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsInputMonitorManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
-
 const std::string REFERENCE_UNREF = "napi_reference_unref";
 constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
 } // namespace
@@ -51,7 +52,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
         rectTotal, callback, nextId_++, fingers);
     int32_t ret = monitor->Start();
     if (ret < 0) {
-        MMI_HILOGE("js monitor startup failed");
+        MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
         return;
     }
@@ -72,7 +73,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, fingers);
     int32_t ret = monitor->Start();
     if (ret < 0) {
-        MMI_HILOGE("js monitor startup failed");
+        MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
         return;
     }

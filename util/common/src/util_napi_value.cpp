@@ -19,12 +19,11 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UtilNapiValue"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapiValue" };
-} // namespace
-
 napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, bool value)
 {
     napi_value napiValue{};

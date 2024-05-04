@@ -140,7 +140,7 @@ public:
     int32_t SetHoverScrollState(bool state);
     int32_t GetHoverScrollState(bool &state);
 
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority);
     bool IsPointerVisible();
     int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
@@ -198,6 +198,7 @@ public:
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+    int32_t SetCurrentUser(int32_t userId);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

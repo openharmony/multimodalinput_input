@@ -25,10 +25,12 @@
 #include "input_scene_board_judgement.h"
 #include "infrared_frequency_info.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectProxy"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
@@ -488,7 +490,7 @@ int32_t MultimodalInputConnectProxy::GetHoverScrollState(bool &state)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
+int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -498,6 +500,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     }
 
     WRITEBOOL(data, visible, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -2002,6 +2005,29 @@ int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixel
         MMI_HILOGE("Failed to send request, ret:%{public}d", ret);
     }
     return ret;
+}
+
+
+int32_t MultimodalInputConnectProxy::SetCurrentUser(int32_t userId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, userId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
