@@ -54,6 +54,7 @@
 #include "key_command_handler.h"
 #include "touch_event_normalize.h"
 #include "display_event_monitor.h"
+#include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
@@ -312,7 +313,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-    PreferencesMgr->InitPreferences();
+    PREFERENCES_MGR->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -1237,6 +1238,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
         MMI_HILOGI("Init app state observer start");
         APP_OBSERVER_MGR->InitAppStateObserver();
+    }
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
+        DEVICE_MONITOR->InitCommonEventSubscriber();
+        MMI_HILOGD("Common event service started");
     }
 }
 

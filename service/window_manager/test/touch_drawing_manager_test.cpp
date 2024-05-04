@@ -51,7 +51,7 @@ public:
         info.name = "xx";
         info.uniq = "xx";
         info.direction = DIRECTION0;
-        TouchDrawingMgr->UpdateDisplayInfo(info);
+        TOUCH_DRAWING_MGR->UpdateDisplayInfo(info);
     } // void SetUp(void)
 };
 
@@ -78,7 +78,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_001, 
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->TouchDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent));
 }
 
 /**
@@ -104,7 +104,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, 
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->TouchDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent));
 }
 
 /**
@@ -119,7 +119,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     int32_t height = 200;
     int32_t physicalX = 50;
     int32_t physicalY = 60;
-    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION0, width, height, physicalX, physicalY);
+    TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION0, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 50);
     EXPECT_EQ(physicalY, 60);
 }
@@ -136,7 +136,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     int32_t height = 200;
     int32_t physicalX = 50;
     int32_t physicalY = 60;
-    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION90, width, height, physicalX, physicalY);
+    TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION90, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 60);
     EXPECT_EQ(physicalY, 50);
 }
@@ -153,7 +153,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     int32_t height = 200;
     int32_t physicalX = 50;
     int32_t physicalY = 60;
-    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION180, width, height, physicalX, physicalY);
+    TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION180, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 50);
     EXPECT_EQ(physicalY, 140);
 }
@@ -170,7 +170,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
     int32_t height = 200;
     int32_t physicalX = 50;
     int32_t physicalY = 60;
-    TouchDrawingMgr->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
+    TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(DIRECTION270, width, height, physicalX, physicalY);
     EXPECT_EQ(physicalX, 140);
     EXPECT_EQ(physicalY, 50);
 }
