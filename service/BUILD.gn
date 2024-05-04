@@ -611,6 +611,11 @@ ohos_unittest("TouchEventNormalizeTest") {
 ohos_unittest("SubscriberTest") {
   module_out_path = module_output_path
 
+  include_dirs = [
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_service_path}/device_state_manager/include",
+  ]
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
@@ -624,12 +629,16 @@ ohos_unittest("SubscriberTest") {
   sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
 
   deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
   ]
 }
@@ -837,32 +846,6 @@ ohos_unittest("InterceptorTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-  ]
-}
-
-ohos_unittest("EventHandlerTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
   ]
 }
 
