@@ -76,7 +76,8 @@
         "faultloggerd",
         "ffrt",
         "graphic_2d_ext",
-        "drivers_interface_rtos_extra",
+        "audio_framework",
+        "drivers_interface_tros_extra",
         "hdf_core"
       ],
       "third_party": [

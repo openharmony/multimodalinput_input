@@ -91,6 +91,7 @@ declare_args() {
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
+    "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "display_state_manager/src/display_event_monitor.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
@@ -346,6 +347,7 @@ if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
   g2d_path = "//foundation/graphic/graphic_2d"
+  surface_path = "//foundation/graphic/graphic_surface"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
   libmmi_service_sources += [
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
