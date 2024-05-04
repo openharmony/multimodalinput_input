@@ -1026,5 +1026,114 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
     buffer = pointerEvent->GetBuffer();
     ASSERT_EQ(buffer.size(), 0);
 }
+
+/**
+ * @tc.name: PointerEventTest_SetOriginPointerId_001
+ * @tc.desc: Sets the origin id of the pointer in this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t originPointerId = 11;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetOriginPointerId(originPointerId));
+    ASSERT_EQ(item.GetOriginPointerId(), originPointerId);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetDisplayXPos_001
+ * @tc.desc: Sets the x coordinate relative to the upper left corner of the screen.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayXPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double displayX = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetDisplayXPos(displayX));
+    ASSERT_EQ(item.GetDisplayXPos(), displayX);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetDisplayYPos_001
+ * @tc.desc: Sets the y coordinate relative to the upper left corner of the screen.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayYPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double displayY = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetDisplayYPos(displayY));
+    ASSERT_EQ(item.GetDisplayYPos(), displayY);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetWindowXPos_001
+ * @tc.desc: Sets the x coordinate of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowXPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double x = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetWindowXPos(x));
+    ASSERT_EQ(item.GetWindowXPos(), x);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetWindowYPos_001
+ * @tc.desc: Sets the y coordinate of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double y = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetWindowYPos(y));
+    ASSERT_EQ(item.GetWindowYPos(), y);
+}
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+/**
+ * @tc.name: PointerEventTest_SetFingerprintDistanceX_001
+ * @tc.desc: Set the fingerprint distance X.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    double x = 10.0;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetFingerprintDistanceX(x));
+    ASSERT_EQ(pointerEvent->GetFingerprintDistanceX(), x);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetFingerprintDistanceY_001
+ * @tc.desc: Set the fingerprint distance Y.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    double y = 10.0;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetFingerprintDistanceY(y));
+    ASSERT_EQ(pointerEvent->GetFingerprintDistanceY(), y);
+}
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 } // namespace MMI
 } // namespace OHOS

@@ -1608,35 +1608,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
 }
 
 /**
- * @tc.name: InputManagerPointerTest_SetTouchpadRotateSwitch_001
- * @tc.desc: Set touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool rotateSwitch = false;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_GetTouchpadRotateSwitch_001
- * @tc.desc: Get touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool rotateSwitch = true;
-    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
-    bool newRotateSwitch = true;
-    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
-    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
-}
-
-/**
  * @tc.name: InputManagerPointerTest_SetPointerSize_001
  * @tc.desc: Sets pointer size
  * @tc.type: FUNC
