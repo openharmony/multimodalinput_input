@@ -237,7 +237,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionStat
 {
     CALL_TEST_DEBUG;
 
-    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->SetPointerPositionState(false));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(false));
 }
 
 /**
@@ -249,7 +249,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionStat
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionState_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->SetPointerPositionState(true));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(true));
 }
 
 /**
@@ -262,7 +262,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_001, Test
 {
     CALL_TEST_DEBUG;
 
-    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->UpdateLabels(false));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels(false));
 }
 
 /**
@@ -274,7 +274,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_001, Test
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->UpdateLabels(true));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels(true));
 }
 } // namespace MMI
 } // namespace OHOS
