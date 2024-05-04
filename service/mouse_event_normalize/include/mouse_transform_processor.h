@@ -34,6 +34,8 @@ extern "C" {
         double dy;
     };
     int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
+    int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
+        int32_t speed);
 }
 
 namespace MMI {
