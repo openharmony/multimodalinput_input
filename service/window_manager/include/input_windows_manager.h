@@ -108,8 +108,9 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetHoverScrollState(bool state);
     bool GetHoverScrollState() const;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) const;
+    void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
     PointerStyle GetLastPointerStyle() const;
@@ -191,7 +192,8 @@ private:
     void OnSessionLost(SessionPtr session);
     void InitPointerStyle();
     int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
+    int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false);
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
@@ -239,12 +241,16 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    bool isUiExtension_ { false };
+    int32_t uiExtensionPid_ { -1 };
+    int32_t uiExtensionWindowId_ { -1 };
     int32_t firstBtnDownWindowId_ { -1 };
     int32_t lastLogicX_ { -1 };
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
+    std::map<int32_t std::map<int32_t, PointerStyle>> uiExtensionPointerStyle_;
     WindowInfo mouseDownInfo_;
     PointerStyle globalStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
