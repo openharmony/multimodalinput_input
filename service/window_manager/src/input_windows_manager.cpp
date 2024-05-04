@@ -1205,11 +1205,24 @@ int32_t InputWindowsManager::UpdatePoinerStyle(int32_t pid, int32_t windowId, Po
     return COMMON_PARAMETER_ERROR;
 }
 
-int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+    bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     auto scenePid = pid;
     auto sceneWinId = windowId;
+    if (isUiExtension) {
+        auto iter = uiExtensionPointerStyle_.find(scenePid);
+        if (iter == uiExtensionPointerStyle_.end() || iter->second.find(sceneWinId) == iter->second.end()) {
+            uiExtensionPointerStyle_[scenePid] = {};
+            MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on uiExtensionPointerStyle_",
+                scenePid, sceneWinId);
+        }
+        uiExtensionPointerStyle_[scenePid][sceneWinId] = pointerStyle;
+        MMI_HILOGI("set uiextension pointer success. pid:%{public}d, windowid:%{public}d, pointerid:%{public}d",
+                scenePid, sceneWinId, pointerStyle.id);
+        return RET_OK;
+    }
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         pointerStyle_[scenePid] = {};
@@ -1242,6 +1255,14 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     return RET_OK;
 }
 
+void InputWindowsManager::SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId)
+{
+    MMI_HILOGI("SetUiExtensionInfo. pid:%{public}d, windowid:%{public}d", uiExtensionPid, uiExtensionWindoId);
+    isUiExtension_ = isUiExtension;
+    uiExtensionPid_ = uiExtensionPid;
+    uiExtensionWindowId_ = uiExtensionWindoId;
+}
+
 void InputWindowsManager::SetGlobalDefaultPointerStyle()
 {
     for (auto &iter : pointerStyle_) {
@@ -1255,7 +1276,8 @@ void InputWindowsManager::SetGlobalDefaultPointerStyle()
     }
 }
 
-int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+    bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
@@ -1268,7 +1290,12 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         return UpdatePoinerStyle(pid, windowId, pointerStyle);
     }
-    return UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
+    if (!isUiExtension && uiExtensionPointerStyle_.count(pid) != 0) {
+        MMI_HILOGI("clear the uiextension mouse style for pid %{public}d", pid);
+        uiExtensionPointerStyle_.erase(pid);
+    }
+    SetUiExtensionInfo(isUiExtension, pid, windowId);
+    return UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle, isUiExtension);
 }
 
 int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
@@ -1289,9 +1316,26 @@ int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t window
     return RET_OK;
 }
 
-int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const
+int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+    bool isUiExtension) const
 {
     CALL_DEBUG_ENTER;
+    if (isUiExtension) {
+        auto it = uiExtensionPointerStyle_.find(pid);
+        if (it == uiExtensionPointerStyle_.end()) {
+            MMI_HILOGE("The uiextension pointer style map is not include pid:%{public}d", pid);
+            pointerStyle.id = globalStyle_.id;
+            return RET_OK;
+        }
+        auto iter = it->second.find(windowId);
+        if (iter == it->second.end()) {
+            pointerStyle.id = globalStyle_.id;
+            return RET_OK;
+        }
+        MMI_HILOGI("window type:%{public}d, get pointer style:%{public}d success", windowId, iter->second.id);
+        pointerStyle = iter->second;
+        return RET_OK;
+    }
     if (windowId == GLOBAL_WINDOW_ID) {
         MMI_HILOGD("Getting global pointer style");
         pointerStyle.id = globalStyle_.id;
@@ -1813,7 +1857,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
-    if (!isDragBorder_) {
+    GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+    if (isUiExtension_) {
+        MMI_HILOGD("updatemouse target in uiextension");
+        GetPointerStyle(uiExtensionPid_, uiExtensionWindowId_, pointerStyle, isUiExtension_);
+        dragPointerStyle_ = pointerStyle;
+    } else {
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+    }
+    if (!isDragBorder_ && !isUiExtension_) {
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         dragPointerStyle_ = pointerStyle;
     }
@@ -1897,7 +1949,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     MMI_HILOGD("pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
-               touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
+               isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
+               touchWindow->id, touchWindow->agentWindowId,
                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");

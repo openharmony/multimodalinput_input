@@ -1252,14 +1252,15 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
     }
 }
 
-int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+    bool isUiExtension)
 {
     if (windowId != GLOBAL_WINDOW_ID) {
         MMI_HILOGD("No need to change the default icon style");
         return RET_OK;
     }
     PointerStyle style;
-    int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
+    int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Get global pointer style failed!");
         return RET_ERR;
@@ -1345,7 +1346,8 @@ bool PointerDrawingManager::CheckPointerStyleParam(int32_t windowId, PointerStyl
     return true;
 }
 
-int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+    bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     if (!CheckPointerStyleParam(windowId, pointerStyle)) {
@@ -1370,7 +1372,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         return RET_ERR;
     }
 
-    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return ret;
@@ -1400,7 +1402,8 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle)
+int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+    bool isUiExtension)
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
@@ -1416,7 +1419,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_OK;
         }
     }
-    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
+    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;

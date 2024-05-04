@@ -842,7 +842,9 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     READINT32(data, pointerStyle.size, RET_ERR);
     READINT32(data, pointerStyle.color, RET_ERR);
     READINT32(data, pointerStyle.id, RET_ERR);
-    int32_t ret = SetPointerStyle(windowId, pointerStyle);
+    bool isUiExtension;
+    READBOOL(data, isUiExtension, RET_ERR);
+    int32_t ret = SetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
         return ret;
@@ -871,8 +873,10 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
+    bool isUiExtension;
+    READBOOL(data, isUiExtension, RET_ERR);
     PointerStyle pointerStyle;
-    int32_t ret = GetPointerStyle(windowId, pointerStyle);
+    int32_t ret = GetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPointerStyle failed ret:%{public}d", ret);
         return ret;

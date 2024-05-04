@@ -61,9 +61,11 @@ public:
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
     bool GetPointerVisible(int32_t pid) override;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
@@ -92,7 +94,7 @@ private:
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void UpdatePointerVisible();
-    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style);
+    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
     void CheckMouseIconPath();
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
