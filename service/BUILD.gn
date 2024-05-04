@@ -140,7 +140,10 @@ ohos_shared_library("libmmi-server") {
     cfi_cross_dso = true
     debug = false
   }
-  sources += [ "window_manager/src/touch_drawing_manager.cpp" ]
+  sources += [
+    "window_manager/src/knuckle_drawing_manager.cpp",
+    "window_manager/src/touch_drawing_manager.cpp",
+  ]
 
   if (input_feature_keyboard) {
     sources += [
@@ -283,7 +286,10 @@ module_output_path = "multimodalinput/mmi_unit_out"
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
-  include_dirs = [ "${mmi_path}/service/event_resample/include" ]
+  include_dirs = [
+    "${mmi_path}/service/event_resample/include",
+    "${graphics_path}/2d_graphics/include",
+  ]
 
   sources = [
     "event_resample/src/event_resample.cpp",
@@ -309,6 +315,8 @@ ohos_unittest("event_resample_test") {
   external_deps = [
     "c_utils:utils",
     "config_policy:configpolicy_util",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
@@ -321,6 +329,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
   include_dirs = [
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_command/test",
+    "${graphics_path}/2d_graphics/include",
   ]
 
   configs = [ ":libmmi_server_config" ]
@@ -346,6 +355,8 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
@@ -414,7 +425,10 @@ ohos_unittest("EventFilterDeathRecipientTest") {
 ohos_unittest("EventFilterHandlerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/filter/include" ]
+  include_dirs = [
+    "${mmi_path}/service/filter/include",
+    "${graphics_path}/2d_graphics/include",
+  ]
 
   configs = [ ":libmmi_server_config" ]
 
@@ -438,6 +452,8 @@ ohos_unittest("EventFilterHandlerTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
@@ -687,6 +703,8 @@ ohos_unittest("MonitorTest") {
 
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -725,6 +743,8 @@ ohos_unittest("ModuleLoaderTest") {
   external_deps = [
     "ability_runtime:app_manager",
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
@@ -752,6 +772,8 @@ ohos_unittest("KeyEventNormalizeTest") {
   ]
 
   external_deps = [
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -786,6 +808,8 @@ ohos_unittest("KeyCommandTest") {
   external_deps = [
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
@@ -867,6 +891,8 @@ ohos_unittest("EventDumpTest") {
 
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -916,6 +942,8 @@ ohos_unittest("DisplayStateManagerTest") {
   ]
 
   external_deps = [
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -1002,6 +1030,8 @@ ohos_unittest("ConnectManagerTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
     "image_framework:image_native",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
