@@ -2367,13 +2367,29 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (knuckleDrawMgr == nullptr) {
+        knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
+    }
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
-        MMI_HILOGE("This display is nonexistent");
+        MMI_HILOGE("This display is not exist");
         return;
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
+    
+    knuckleDrawMgr->UpdateDisplayInfo(*physicDisplayInfo);
+    knuckleDrawMgr->KnuckleDrawHandler(pointerEvent);
+
+    if (!haveSetObserver_) {
+        showCursor_.SwitchName = showCursorSwitchName;
+        CreateStatusConfigObserver(showCursor_);
+        haveSetObserver_ = true;
+    }
+    if (!showCursor_.isShow) {
+        MMI_HILOGD("The touchCursor does not need to be displayed.");
+        return;
+    }
     TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
     TouchDrawingMgr->TouchDrawHandler(pointerEvent);
 }

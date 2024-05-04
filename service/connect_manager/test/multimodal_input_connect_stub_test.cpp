@@ -1116,5 +1116,302 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetK
     ret = stub->StubGetKeyboardRepeatRate(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetTouchpadPinchSwitch_001
+ * @tc.desc: Test the function StubSetTouchpadPinchSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetTouchpadPinchSwitch(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetTouchpadPinchSwitch_001
+ * @tc.desc: Test the function StubGetTouchpadPinchSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadPinchSwitch(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetTouchpadSwipeSwitch_001
+ * @tc.desc: Test the function StubSetTouchpadSwipeSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetTouchpadSwipeSwitch(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetTouchpadSwipeSwitch_001
+ * @tc.desc: Test the function StubGetTouchpadSwipeSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadSwipeSwitch(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetTouchpadRightClickType_001
+ * @tc.desc: Test the function StubSetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadRightClickType_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetTouchpadRightClickType(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetTouchpadRightClickType_001
+ * @tc.desc: Test the function StubGetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadRightClickType_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadRightClickType(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetTouchpadRotateSwitch_001
+ * @tc.desc: Test the function StubSetTouchpadRotateSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetTouchpadRotateSwitch(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetTouchpadRotateSwitch_001
+ * @tc.desc: Test the function StubGetTouchpadRotateSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetTouchpadRotateSwitch(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetShieldStatus_001
+ * @tc.desc: Test the function StubSetShieldStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetShieldStatus_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetShieldStatus(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetShieldStatus_001
+ * @tc.desc: Test the function StubSetShieldStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetShieldStatus_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetShieldStatus(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetShieldStatus(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetShieldStatus_001
+ * @tc.desc: Test the function StubGetShieldStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetShieldStatus_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubGetShieldStatus(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubGetShieldStatus(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetKeyState_001
+ * @tc.desc: Test the function StubGetKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetKeyState(data, reply);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAuthorize_001
+ * @tc.desc: Test the function StubAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAuthorize_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubAuthorize(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubCancelInjection_001
+ * @tc.desc: Test the function StubCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubCancelInjection_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubCancelInjection(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubHasIrEmitter_001
+ * @tc.desc: Test the function StubHasIrEmitter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubHasIrEmitter_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubHasIrEmitter(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetInfraredFrequencies_001
+ * @tc.desc: Test the function StubGetInfraredFrequencies
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetInfraredFrequencies_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubGetInfraredFrequencies(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubTransmitInfrared_001
+ * @tc.desc: Test the function StubTransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubTransmitInfrared(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetPixelMapData_001
+ * @tc.desc: Test the function StubSetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPixelMapData_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetPixelMapData(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetPixelMapData(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetCurrentUser_001
+ * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetCurrentUser(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
