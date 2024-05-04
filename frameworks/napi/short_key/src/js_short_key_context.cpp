@@ -15,12 +15,14 @@
 
 #include "js_short_key_context.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsShortKeyContext"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsShortKeyContext" };
 constexpr const char *SHORT_KEY_CLASS = "multimodalinput_short_key_class";
 constexpr const char *SHORT_KEY_INSTANCE = "multimodalinput_short_key";
 } // namespace
@@ -70,7 +72,7 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
     JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("jsvm ends");
+        MMI_HILOGI("Jsvm ends");
         JsShortKeyContext *context = static_cast<JsShortKeyContext*>(data);
         delete context;
     }, nullptr, nullptr);

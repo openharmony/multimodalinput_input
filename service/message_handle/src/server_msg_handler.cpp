@@ -39,10 +39,12 @@
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ServerMsgHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -194,11 +196,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0);
             }
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
@@ -266,7 +268,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
+    pkt >> displayGroupInfo.width >> displayGroupInfo.height >>
+        displayGroupInfo.focusWindowId >> displayGroupInfo.currentUserId;
     uint32_t num = 0;
     pkt >> num;
     if (pkt.ChkRWError()) {

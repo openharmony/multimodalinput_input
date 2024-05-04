@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,12 +27,11 @@
 #include "net_packet.h"
 #include "proto.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputHandlerManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
-} // namespace
-
 InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
@@ -148,7 +147,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priority, deviceTags);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->AddInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -186,7 +185,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
-    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -306,7 +305,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         MMI_HILOGE("All task post failed");
         return;
     }
-    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
     if (tokenType != TokenType::TOKEN_HAP) {
         return;
     }

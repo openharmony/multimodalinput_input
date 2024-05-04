@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-}
+} // namespace
 class TouchPadTransformProcessorTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -153,5 +153,46 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     ASSERT_TRUE(processor.GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_SetTouchPadMultiTapData
+ * @tc.desc: Test SetTouchPadMultiTapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchPadMultiTapData, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TouchPadTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    ASSERT_EQ(processor.SetTouchPadMultiTapData(), RET_OK);
 }
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_ProcessTouchPadPinchDataEvent
+ * @tc.desc: Test ProcessTouchPadPinchDataEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_ProcessTouchPadPinchDataEvent, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t fingerCount = 2;
+    int32_t action = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    double scale = 8.5;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(processor.pointerEvent_, nullptr);
+    processor.pointerEvent_->SetFingerCount(2);
+    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale));
+
+    fingerCount = 1;
+    processor.pointerEvent_->SetFingerCount(1);
+    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale));
+
+    fingerCount = 3;
+    ASSERT_NO_FATAL_FAILURE(processor.ProcessTouchPadPinchDataEvent(fingerCount, action, scale));
 }
+} // namespace MMI
+} // namespace OHOS

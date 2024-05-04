@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,10 +37,12 @@
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventDump"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
 constexpr size_t MAX_COMMAND_COUNT { 32 };
 } // namespace
 
@@ -63,7 +65,7 @@ void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, siz
             ++count;
             continue;
         }
-        if (str.find("-") == 0) {
+        if (str.find("-") == 0 && str.size() >= 1) {
             count += str.size() - 1;
             continue;
         }

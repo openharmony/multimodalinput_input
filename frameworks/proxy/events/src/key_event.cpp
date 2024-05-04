@@ -17,11 +17,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEvent"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent" };
 const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
     {KeyEvent::KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
@@ -781,6 +783,7 @@ const int32_t KeyEvent::KEYCODE_WLAN = 2844;
 const int32_t KeyEvent::KEYCODE_UWB = 2845;
 const int32_t KeyEvent::KEYCODE_WWAN_WIMAX = 2846;
 const int32_t KeyEvent::KEYCODE_RFKILL = 2847;
+const int32_t KeyEvent::KEYCODE_STYLUS_SCREEN = 2849;
 const int32_t KeyEvent::KEYCODE_CHANNEL = 3001;
 const int32_t KeyEvent::KEYCODE_BTN_0 = 3100;
 const int32_t KeyEvent::KEYCODE_BTN_1 = 3101;
@@ -942,7 +945,11 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       keyCode_(other.keyCode_),
       keys_(other.keys_),
       keyAction_(other.keyAction_),
-      keyIntention_(other.keyIntention_) {}
+      keyIntention_(other.keyIntention_),
+      numLock_(other.numLock_),
+      capsLock_(other.capsLock_),
+      scrollLock_(other.scrollLock_),
+      repeat_(other.repeat_) {}
 
 KeyEvent::~KeyEvent() {}
 

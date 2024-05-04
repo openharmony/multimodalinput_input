@@ -19,12 +19,11 @@
 #include "input_device_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventFilterHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterHandler" };
-} // namespace
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {

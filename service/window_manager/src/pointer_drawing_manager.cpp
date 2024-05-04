@@ -41,10 +41,12 @@
 #include "util.h"
 #include "timer_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerDrawingManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t BASELINE_DENSITY = 160;
@@ -153,6 +155,10 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     currentDirection_ = direction;
     AdjustMouseFocus(direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(pointerStyle.id)).alignmentWay),
         physicalX, physicalY);
+    if (WinMgr->GetMouseFlag()) {
+        WinMgr->SetMouseFlag(false);
+        return;
+    }
     MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
         ICON_TYPE(GetIconStyle(MOUSE_ICON(pointerStyle.id)).alignmentWay));
 
@@ -200,6 +206,46 @@ void PointerDrawingManager::UpdateMouseStyle()
     }
 }
 
+int32_t PointerDrawingManager::SwitchPointerStyle()
+{
+    CALL_DEBUG_ENTER;
+    int32_t size = GetPointerSize();
+    if (size < MIN_POINTER_SIZE) {
+        size = MIN_POINTER_SIZE;
+    } else if (size > MAX_POINTER_SIZE) {
+        size = MAX_POINTER_SIZE;
+    }
+    imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
+    imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
+    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    Direction direction = DIRECTION0;
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        direction = displayInfo_.direction;
+    }
+    int32_t physicalX = lastPhysicalX_;
+    int32_t physicalY = lastPhysicalY_;
+    AdjustMouseFocus(
+        direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor()) {
+        MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
+    } else {
+        CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Init layer failed");
+        return RET_ERR;
+    }
+    UpdatePointerVisible();
+    return RET_OK;
+}
+
 void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
@@ -213,9 +259,12 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
         bool tmp = item.isShow;
         item.isShow = statusValue;
         if (item.isShow != tmp) {
-            PointerStyle pointerStyle = this->lastMouseStyle_;
-            this->lastMouseStyle_.id = -1;
-            this->DrawPointerStyle(pointerStyle);
+            MMI_HILOGD("switch pointer style");
+            if (surfaceNode_ != nullptr) {
+                surfaceNode_->DetachToDisplay(screenId_);
+                Rosen::RSTransaction::FlushImplicitTransaction();
+                this->SwitchPointerStyle();
+            }
         }
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(
@@ -310,7 +359,7 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
     }
-    float ratio = imageWidth_ * 1.0 / IMAGE_WIDTH;
+    float ratio = imageWidth_ * 1.0 / canvasWidth_;
     surfaceNode_->SetPivot({LOADING_CENTER_RATIO * ratio, LOADING_CENTER_RATIO * ratio});
     protocol.SetDuration(ANIMATION_DURATION);
     protocol.SetRepeatCount(DEFAULT_VALUE);
@@ -338,7 +387,7 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
         return;
     }
     canvasNode_->SetVisible(true);
-    float ratio = imageWidth_ * 1.0 / IMAGE_WIDTH;
+    float ratio = imageWidth_ * 1.0 / canvasWidth_;
     canvasNode_->SetPivot({RUNNING_X_RATIO * ratio, RUNNING_Y_RATIO * ratio});
     std::shared_ptr<OHOS::Media::PixelMap> pixelmap =
         DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_RIGHT].iconPath);
@@ -601,7 +650,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CHKPV(surfaceNode_);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    surfaceNode_->SetBounds(physicalX, physicalY, IMAGE_WIDTH, IMAGE_HEIGHT);
+    surfaceNode_->SetBounds(physicalX, physicalY, canvasWidth_, canvasHeight_);
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -615,8 +664,8 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     lastDirection_ = direction;
 
     canvasNode_ = Rosen::RSCanvasNode::Create();
-    canvasNode_->SetBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
-    canvasNode_->SetFrame(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+    canvasNode_->SetBounds(0, 0, canvasWidth_, canvasHeight_);
+    canvasNode_->SetFrame(0, 0, canvasWidth_, canvasHeight_);
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -645,8 +694,8 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
     sptr<OHOS::SurfaceBuffer> buffer;
     int32_t releaseFence = -1;
     OHOS::BufferRequestConfig config = {
-        .width = IMAGE_WIDTH,
-        .height = IMAGE_HEIGHT,
+        .width = canvasWidth_,
+        .height = canvasHeight_,
         .strideAlignment = 0x8,
         .format = GRAPHIC_PIXEL_FMT_RGBA_8888,
         .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA,
@@ -916,8 +965,8 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
     int32_t size = GetPointerSize();
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetDisplayInfo(displayInfo);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -958,8 +1007,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     }
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1041,11 +1090,18 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         if (!isHotPlug) {
             pointerVisible = (pointerVisible && IsPointerVisible());
         }
-        SetPointerVisible(getpid(), pointerVisible);
+        SetPointerVisible(getpid(), pointerVisible, 0);
     } else {
         DeletePointerVisible(getpid());
     }
     DrawManager();
+    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
+        MMI_HILOGD("Pointer window destroy start");
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGD("Pointer window destroy success");
+    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -1075,13 +1131,6 @@ void PointerDrawingManager::DrawManager()
         WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
-    }
-    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
-        MMI_HILOGD("Pointer window destroy start");
-        surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ = nullptr;
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Pointer window destroy success");
     }
 }
 
@@ -1164,10 +1213,10 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
     return true;
 }
 
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
 {
-    MMI_HILOGI("pid:%{public}d,visible:%{public}s", pid, visible ? "true" : "false");
-    if (WinMgr->GetExtraData().appended && visible) {
+    MMI_HILOGI("pid:%{public}d,visible:%{public}s,priority:%{public}d", pid, visible ? "true" : "false", priority);
+    if (WinMgr->GetExtraData().appended && visible && priority == 0) {
         MMI_HILOGE("current is drag state, can not set pointer visible");
         return RET_ERR;
     }

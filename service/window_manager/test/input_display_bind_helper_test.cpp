@@ -15,22 +15,34 @@
 
 #include "gtest/gtest.h"
 
+#include <filesystem>
 #include <fstream>
+#include <iostream>
 
 #include "input_display_bind_helper.h"
 #include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputDisplayBindHelperTest"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDisplayBindHelperTest" };
+const std::string INPUT_NODE_PATH = "/data/input0_test";
+const std::string INPUT_DEVICE_NAME_FILE = "/data/input0_test/name";
+const std::string INPUT_DEVICE_NAME_CONFIG = "/data/input_device_name.cfg";
+const std::string DISPLAY_MAPPING = "0<=>wrapper";
+const std::string INPUT_NODE_NAME = "wrapper";
 } // namespace
+namespace fs = std::filesystem;
 class InputDisplayBindHelperTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     static bool WriteConfigFile(const std::string &content);
+    static bool InitInputNode();
+    static bool InitConfigFile();
     static inline const std::string bindCfgFile_ = "input_display_bind_helper.cfg";
     static std::string GetCfgFileName()
     {
@@ -48,6 +60,53 @@ bool InputDisplayBindHelperTest::WriteConfigFile(const std::string &content)
     }
     ofs << content;
     ofs.close();
+    return true;
+}
+
+bool InputDisplayBindHelperTest::InitInputNode()
+{
+    if (fs::exists(INPUT_NODE_PATH) && fs::is_directory(INPUT_NODE_PATH)) {
+        if (fs::remove_all(INPUT_NODE_PATH) == 0) {
+            MMI_HILOGI("Clear success, path:%{public}s", INPUT_NODE_PATH.c_str());
+        } else {
+            MMI_HILOGE("Clear fail, path:%{public}s", INPUT_NODE_PATH.c_str());
+        }
+    }
+    if (fs::create_directory(INPUT_NODE_PATH)) {
+        MMI_HILOGI("Create success, path:%{public}s", INPUT_NODE_PATH.c_str());
+    } else {
+        MMI_HILOGE("Create fail, path:%{public}s", INPUT_NODE_PATH.c_str());
+        return false;
+    }
+    std::ofstream file(INPUT_DEVICE_NAME_FILE);
+    if (!file.is_open()) {
+        MMI_HILOGE("Write fail, path:%{public}s", INPUT_DEVICE_NAME_FILE.c_str());
+        return false;
+    }
+    file << INPUT_NODE_NAME;
+    file.close();
+    MMI_HILOGI("Write success, path:%{public}s", INPUT_DEVICE_NAME_FILE.c_str());
+    return true;
+}
+
+bool InputDisplayBindHelperTest::InitConfigFile()
+{
+    if (fs::exists(INPUT_DEVICE_NAME_CONFIG)) {
+        if (std::remove(INPUT_DEVICE_NAME_CONFIG.c_str()) == 0) {
+            MMI_HILOGI("Clear success, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+        } else {
+            MMI_HILOGE("Clear fail, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+            return false;
+        }
+    }
+    std::ofstream file(INPUT_DEVICE_NAME_CONFIG);
+    if (!file.is_open()) {
+        MMI_HILOGE("Write fail, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+        return false;
+    }
+    file << DISPLAY_MAPPING;
+    file.close();
+    MMI_HILOGI("Write success, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
     return true;
 }
 
@@ -251,6 +310,35 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     idNames.insert(std::make_pair(2, "hp 223"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_008
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_008, TestSize.Level1)
+{
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    if (!(InputDisplayBindHelperTest::InitInputNode())) {
+        return;
+    }
+    if (!(InputDisplayBindHelperTest::InitConfigFile())) {
+        return;
+    }
+    // 读取输入节点名称
+    std::string content = idh.GetContent(INPUT_DEVICE_NAME_FILE);
+    ASSERT_EQ(content, INPUT_NODE_NAME);
+    // 根据输入节点名称获取输入节点
+    std::string inputNode = idh.GetInputNode(INPUT_NODE_NAME);
+    ASSERT_EQ(inputNode, "");
+    // 根据id获取输入节点名称
+    std::string inputNodeName = idh.GetInputNodeNameByCfg(1000);
+    ASSERT_EQ(inputNodeName, "");
+    // 根据id获取输入设备
+    std::string inputDevice = idh.GetInputDeviceById(1000);
+    ASSERT_EQ(inputDevice, "");
 }
 } // namespace MMI
 } // namespace OHOS

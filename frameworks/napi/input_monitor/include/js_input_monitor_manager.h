@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,9 @@ private:
     void RemoveEnv(std::map<napi_env, napi_ref>::iterator it);
     void RemoveAllEnv();
     bool IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
-        const std::string &typeName, int32_t fingers);
+        napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers);
+    bool IsFindJsInputMonitor(const std::shared_ptr<JsInputMonitor> monitor,
+        napi_env jsEnv, const std::string &typeName, const int32_t fingers);
 
 private:
     std::list<std::shared_ptr<JsInputMonitor>> monitors_;
@@ -63,7 +65,7 @@ private:
     std::mutex mutex_;
 };
 
-#define JsInputMonMgr JsInputMonitorManager::GetInstance()
+#define JS_INPUT_MONITOR_MGR JsInputMonitorManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_INPUT_MONITOR_MANAGER_H

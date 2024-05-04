@@ -29,17 +29,19 @@
 #include "time_cost_chk.h"
 #include "nap_process.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectStub"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 const int32_t TUPLE_PID = 0;
 const int32_t TUPLE_UID = 1;
 const int32_t TUPLE_NAME = 2;
-const int32_t MAX_BUFFER_SIZE = 1000000;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
+constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 50 };
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -309,6 +311,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             return StubSetPixelMapData(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
+            return StubSetCurrentUser(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -458,18 +463,12 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t size = 0;
     int32_t windowId = 0;
     int32_t winPid = -1;
-    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("Reading size of the tlv count %{public}d", size);
-    if (size > MAX_BUFFER_SIZE || size <= 0) {
-        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", size);
+    OHOS::Media::PixelMap *pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
         return RET_ERR;
-    }
-    std::vector<uint8_t> buff(size, 0);
-    for (int i = 0; i < size; i++) {
-        READUINT8(data, buff[i], IPC_PROXY_DEAD_OBJECT_ERR);
     }
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -478,11 +477,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
         return RET_ERR;
     }
-    OHOS::Media::PixelMap* pixelMap = OHOS::Media::PixelMap::DecodeTlv(buff);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
-        return RET_ERR;
-    }
+
     int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
@@ -696,7 +691,9 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
     CALL_DEBUG_ENTER;
     bool visible = false;
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetPointerVisible(visible);
+    int32_t priority = 0;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerVisible(visible, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerVisible failed ret:%{public}d", ret);
         return ret;
@@ -2135,10 +2132,14 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     }
     int64_t number = 0;
     READINT64(data, number, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t pattern_len = 0;
+    int32_t patternLen = 0;
     std::vector<int64_t> pattern;
-    READINT32(data, pattern_len, IPC_PROXY_DEAD_OBJECT_ERR);
-    for (int32_t i = 0; i < pattern_len; i++) {
+    READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (patternLen > MAX_N_TRANSMIT_INFRARED_PATTERN || patternLen <= 0) {
+        MMI_HILOGE("transmit infrared pattern len is invalid");
+        return false;
+    }
+    for (int32_t i = 0; i < patternLen; i++) {
         int64_t value = 0;
         READINT64(data, value);
         pattern.push_back(value);
@@ -2175,6 +2176,20 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userId = 0;
+    READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetCurrentUser(userId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, ret);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

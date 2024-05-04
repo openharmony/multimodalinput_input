@@ -15,14 +15,11 @@
 
 #include "display_event_monitor.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DisplayEventMonitor"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DisplayEventMonitor" };
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-} // namespace
-
 DisplayEventMonitor::DisplayEventMonitor() {}
 DisplayEventMonitor::~DisplayEventMonitor() {}
 
@@ -47,6 +44,7 @@ public:
         }
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
+            STYLUS_HANDLER->IsLaunchAbility();
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGD("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();

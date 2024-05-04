@@ -18,19 +18,20 @@
 
 #include <vector>
 
-#include "extra_data.h"
 #include "libinput.h"
 #include "nocopyable.h"
+#include "pixel_map.h"
 #include "singleton.h"
 
-#include "window_info.h"
-#include "window_manager.h"
+#include "extra_data.h"
 #include "input_display_bind_helper.h"
-#include "input_event_data_transformation.h"
 #include "input_event.h"
-#include "pixel_map.h"
+#include "input_event_data_transformation.h"
+#include "knuckle_drawing_manager.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "window_info.h"
+#include "window_manager.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -66,6 +67,9 @@ class InputWindowsManager final {
 public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
+    void SetMouseFlag(bool state);
+    bool GetMouseFlag();
+    void JudgMouseIsDownOrUp(bool dragState);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
     bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
@@ -124,6 +128,7 @@ public:
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, PhysicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
+    const DisplayInfo *GetDefaultDisplayInfo() const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -152,6 +157,7 @@ public:
     void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
     void ClearTargetWindowIds();
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
+    int32_t SetCurrentUser(int32_t userId);
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
@@ -270,7 +276,11 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
+    bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
+    int32_t pointerActionFlag_ { -1 };
+    int32_t currentUserId_ { -1 };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

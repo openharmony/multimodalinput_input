@@ -25,10 +25,12 @@
 #include "timer_manager.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyAutoRepeat"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyAutoRepeat" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t OPEN_AUTO_REPEAT = 1;
 constexpr int32_t DEFAULT_KEY_REPEAT_DELAY = 500;

@@ -19,10 +19,12 @@
 #include "key_map_manager.h"
 #include "key_unicode_transformation.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventNormalize"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventNormalize" };
 constexpr uint32_t KEYSTATUS = 0;
 } // namespace
 

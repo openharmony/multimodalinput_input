@@ -59,7 +59,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);
     int32_t GetHoverScrollState(bool &state);
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);
     int32_t SetPointerColor(int32_t color);
@@ -128,6 +128,7 @@ public:
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+    int32_t SetCurrentUser(int32_t userId);
 
 private:
     MultimodalInputConnectManager() = default;
@@ -147,5 +148,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define MultimodalInputConnMgr MultimodalInputConnectManager::GetInstance()
+#define MULTIMODAL_INPUT_CONNECT_MGR MultimodalInputConnectManager::GetInstance()
 #endif // MULTIMODAL_INPUT_CONNECT_MANAGER_H

@@ -20,10 +20,12 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SupportKeysFuzzTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SupportKeysFuzzTest" };
 constexpr int32_t FUZZ_FST_DATA = 0;
 constexpr int32_t MAX_SUPPORT_KEY = 5;
 } // namespace

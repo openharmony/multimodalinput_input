@@ -16,11 +16,11 @@
 #include "ability_manager_client.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AbilityManagerClientStub"
+
 namespace OHOS {
 namespace AAFwk {
-
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI::MMI_LOG_DOMAIN, "AbilityManagerClientStub" };
-
 std::shared_ptr<AbilityManagerClient> AbilityManagerClient::instance_ = nullptr;
 
 Want &Want::SetElementName(const std::string &deviceId, const std::string &bundleName,
