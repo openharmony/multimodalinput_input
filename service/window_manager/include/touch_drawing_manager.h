@@ -16,21 +16,24 @@
 #ifndef TOUCH_DRAWING_MANAGER_H
 #define TOUCH_DRAWING_MANAGER_H
 
+#include "draw/canvas.h"
 #include "nocopyable.h"
 #include "singleton.h"
-#include "window_info.h"
-#include "pointer_event.h"
-#include <ui/rs_canvas_node.h>
-#include <ui/rs_surface_node.h>
-#include <transaction/rs_transaction.h>
-#include "draw/canvas.h"
+#include "transaction/rs_transaction.h"
+#include "ui/rs_canvas_node.h"
+#include "ui/rs_surface_node.h"
 #include "utils/rect.h"
+
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
 #else
 #include "recording/recording_canvas.h"
 #include "ui/rs_canvas_drawing_node.h"
-#endif
+#endif // USE_ROSEN_DRAWING
+
+#include "pointer_event.h"
+#include "window_info.h"
+
 namespace OHOS {
 namespace MMI {
 
