@@ -261,20 +261,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionStat
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels(false));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdateLabels_002
- * @tc.desc: Test TouchDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels(true));
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
 }
 } // namespace MMI
 } // namespace OHOS
