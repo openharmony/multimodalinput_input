@@ -153,6 +153,7 @@ ohos_shared_library("libmmi-server") {
         "key_command/src/key_command_handler.cpp",
         "key_command/src/setting_datashare.cpp",
         "key_command/src/setting_observer.cpp",
+        "key_command/src/stylus_key_handler.cpp",
       ]
     }
   }
