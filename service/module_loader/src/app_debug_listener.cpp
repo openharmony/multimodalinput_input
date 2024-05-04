@@ -16,12 +16,11 @@
 #include "app_debug_listener.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AppDebugListener"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "AppDebugListener"};
-} // namespace
-
 AppDebugListener *AppDebugListener::instance_ = new (std::nothrow) AppDebugListener();
 AppDebugListener *AppDebugListener::GetInstance()
 {

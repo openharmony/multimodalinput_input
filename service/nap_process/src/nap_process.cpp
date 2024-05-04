@@ -18,10 +18,12 @@
 #include "nap_process.h"
 #include "input_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "NapProcess"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NapProcess" };
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t NAP_EVENT = 0;
 constexpr int32_t SUBSCRIBED = 1;

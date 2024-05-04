@@ -27,11 +27,10 @@
 #include "util.h"
 #include "klog.h"
 
-namespace OHOS {
-namespace MMI {
-inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
-} // namespace MMI
-} // namespace OHOS
+#ifdef MMI_LOG_DOMAIN
+#undef MMI_LOG_DOMAIN
+#endif
+#define MMI_LOG_DOMAIN 0XD002800
 
 #ifndef MMI_FUNC_FMT
 #define MMI_FUNC_FMT "in %{public}s, "
@@ -50,21 +49,21 @@ inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #endif
 
 #define MMI_HILOGD(fmt, ...) do { \
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) { \
-        ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGW(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGE(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGF(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \
@@ -102,41 +101,35 @@ inline constexpr int32_t FINAL_FINGER { 1 };
 
 class InnerFunctionTracer {
 public:
-    using HilogFunc = std::function<int(const char *)>;
-
-public:
-    InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
-        : logfn_ { logfn }, tag_ { tag }, level_ { level }
+    InnerFunctionTracer(LogLevel level, const char* tag, const char* logfn)
+        : level_ { level }, tag_ { tag }, logfn_ { logfn }
     {
-        if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
+        if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                logfn_("in %{public}s, enter");
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, "in %{public}s, enter", logfn_);
             }
         }
     }
     ~InnerFunctionTracer()
     {
-        if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
+        if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                logfn_("in %{public}s, leave");
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, "in %{public}s, leave", logfn_);
             }
         }
     }
 private:
-    HilogFunc logfn_ { nullptr };
-    const char* tag_ { nullptr };
     LogLevel level_ { LOG_LEVEL_MIN };
+    const char* tag_ { nullptr };
+    const char* logfn_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER        ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Debug___    \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
-
-#define CALL_INFO_TRACE         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
-
-#define CALL_TEST_DEBUG         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
-    (test_info_ == nullptr ? "TestBody" : test_info_->name())), LABEL.tag, LOG_DEBUG }
+#define CALL_DEBUG_ENTER ::OHOS::MMI::InnerFunctionTracer __innerFuncTracer_Debug___ \
+    { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__ }
+#define CALL_INFO_TRACE ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
+    { LOG_INFO, MMI_LOG_TAG, __FUNCTION__ }
+#define CALL_TEST_DEBUG ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
+    { LOG_DEBUG, MMI_LOG_TAG, test_info_ == nullptr ? "TestBody" : test_info_->name() }
 #endif // MMI_LOG_H

@@ -38,13 +38,15 @@
 #include "util.h"
 #include "multimodal_input_preferences_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MouseTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseTransformProcessor" };
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
-constexpr int32_t DEFAULT_SPEED = 5;
+constexpr int32_t DEFAULT_SPEED = 7;
 constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
@@ -160,7 +162,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     TransTouchpadRightButton(data, type, button);
 
-    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_MIDDLE_BUTTON_CODE && 
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_MIDDLE_BUTTON_CODE &&
         type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
     }
@@ -394,12 +396,12 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
     pointerEvent_->SetAgentWindowId(-1);
 }
 
-void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
+bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(data);
-    CHKPV(pointerEvent_);
+    CHKPF(data);
+    CHKPF(pointerEvent_);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     pointerItem.SetDisplayX(mouseInfo.physicalX);
@@ -434,6 +436,7 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+    return true;
 }
 
 int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
@@ -476,8 +479,14 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     PointerEvent::PointerItem pointerItem;
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         HandleAxisPostInner(pointerItem);
-    } else {
-        HandlePostInner(data, pointerItem);
+    } else if (!HandlePostInner(data, pointerItem)) {
+        if (data == nullptr) {
+            MMI_HILOGE("The data is nullptr");
+        }
+        if (pointerEvent_ == nullptr) {
+            MMI_HILOGE("The pointerEvent_ is nullptr");
+        }
+        return RET_ERR;
     }
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
@@ -494,7 +503,15 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->ClearAxisValue();
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
-    HandlePostInner(data, pointerItem);
+    if (!HandlePostInner(data, pointerItem)) {
+        if (data == nullptr) {
+            MMI_HILOGE("The data is nullptr");
+        }
+        if (pointerEvent_ == nullptr) {
+            MMI_HILOGE("The pointerEvent_ is nullptr");
+        }
+        return ERROR_NULL_POINTER;
+    }
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return RET_OK;
@@ -580,7 +597,8 @@ void MouseTransformProcessor::DumpInner()
     EventLogHelper::PrintEventData(pointerEvent_);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
 }
 
 void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &args)

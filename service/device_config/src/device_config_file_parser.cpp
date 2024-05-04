@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,10 +23,12 @@
 #include "libinput.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DeviceConfigManagement"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceConfigManagement" };
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
 } // namespace
 
@@ -94,7 +96,7 @@ std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const s
             continue;
         }
         pos = tmp.find('=');
-        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
+        if ((pos == std::string::npos) || (tmp.back() == '=')) {
             continue;
         }
         std::string key = tmp.substr(0, pos);

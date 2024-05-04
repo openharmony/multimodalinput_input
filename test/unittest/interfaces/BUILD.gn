@@ -22,17 +22,25 @@ ohos_unittest("InputNativeTest") {
   defines = []
   include_dirs = [ "${mmi_path}/interfaces/kits/c/input" ]
   if (input_ext_feature_anco) {
-    defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
+    if (input_feature_product != "pc") {
+      defines += [ "OHOS_BUILD_ENABLE_INFRARED_EMITTER" ]
+    }
   }
   if (input_ext_feature_anco) {
     include_dirs += [
       "${mmi_path}/service/infrared_emitter/include",
       "${mmi_path}/interfaces/native/innerkits/event/include",
     ]
+    if (input_feature_product != "pc") {
+      include_dirs += [ "${mmi_path}/service/infrared_emitter/include" ]
+    }
   }
 
   sources =
       [ "${mmi_path}/test/unittest/interfaces/kits/input_native_test.cpp" ]
+  if (input_ext_feature_anco && input_feature_product != "pc") {
+    sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
+  }
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -47,7 +55,7 @@ ohos_unittest("InputNativeTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_ext_feature_anco) {
+  if (input_ext_feature_anco && input_feature_product != "pc") {
     external_deps += [
       "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
       "hdf_core:libhdi",

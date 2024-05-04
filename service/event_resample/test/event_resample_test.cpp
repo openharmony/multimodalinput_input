@@ -21,12 +21,14 @@
 #include "event_resample.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventResampleTest"
+
 namespace OHOS {
 namespace MMI {
 
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventResampleTest" };
 constexpr int64_t START_TIME = 10000;
 constexpr int64_t TIME_DELTA = 2500;
 constexpr uint32_t INITIAL_COORDS = 10;
@@ -567,6 +569,56 @@ HWTEST_F(EventResampleTest, EventResampleTest_006, TestSize.Level1)
     CALL_TEST_DEBUG;
     TestData testData = {.framesNum = 5, .fingerNum = 1, .evtNum = 3};
     EXPECT_TRUE(DoTest(testData, 6));
+}
+
+/**
+ * @tc.name: EventResampleTest_OnEventConsume
+ * @tc.desc: Test OnEventConsume
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_OnEventConsume, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int64_t frameTime = 0;
+    ErrCode status = ERR_OK;
+    EventResampleHdr->frameTime_ = 0;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    ASSERT_NE(EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status), nullptr);
+}
+
+/**
+ * @tc.name: EventResampleTest_InitializeInputEvent
+ * @tc.desc: Test InitializeInputEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_InitializeInputEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int64_t frameTime = 0;
+    EventResampleHdr->frameTime_ = 0;
+    ASSERT_EQ(EventResampleHdr->InitializeInputEvent(pointerEvent, frameTime), ERR_OK);
+}
+
+/**
+ * @tc.name: EventResampleTest_TransformSampleWindowXY
+ * @tc.desc: Test TransformSampleWindowXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    PointerEvent::PointerItem item;
+    int32_t logicX = 100;
+    int32_t logicY = 100;
+    std::pair<int32_t, int32_t> pair { logicX, logicY };
+    ASSERT_EQ(EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY), pair);
 }
 } // namespace MMI
 } // namespace OHOS

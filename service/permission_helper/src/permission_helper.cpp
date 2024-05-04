@@ -21,12 +21,11 @@
 
 #include "tokenid_kit.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PermissionHelper"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PermissionHelper" };
-} // namespace
-
 PermissionHelper::PermissionHelper() {}
 PermissionHelper::~PermissionHelper() {}
 
@@ -121,7 +120,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
 
 bool PermissionHelper::CheckInfraredEmmit()
 {
-    std::string infraredEmmitPermissionCode = "ohos.permission.INFRARED_EMITTER";
+    std::string infraredEmmitPermissionCode = "ohos.permission.MANAGE_INPUT_INFRARED_EMITTER";
     return CheckHapPermission(infraredEmmitPermissionCode);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,25 +16,30 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
-#include "nap_process.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
+#include "file_ex.h"
+#include "setting_datashare.h"
+#include "system_ability_definition.h"
+
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
-#include "file_ex.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
+#include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
-#include "setting_datashare.h"
-#include "system_ability_definition.h"
+#include "stylus_key_handler.h"
 #include "timer_manager.h"
 #include "util_ex.h"
-#include "nap_process.h"
-#include "multimodal_input_preferences_manager.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyCommandHandler"
 
 namespace OHOS {
 namespace MMI {
@@ -46,7 +51,13 @@ constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
-constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
+constexpr int32_t TOUCH_MAX_THRESHOLD = 20;
+constexpr int32_t TWO_FINGERS_DISTANCE_LIMIT = 16;
+constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
+constexpr int32_t TOUCH_LIFT_LIMIT = 24;
+constexpr int32_t TOUCH_RIGHT_LIMIT = 24;
+constexpr int32_t TOUCH_TOP_LIMIT = 80;
+constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t KNUCKLE_KNOCKS = 1;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
@@ -61,8 +72,6 @@ constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 const std::string EXTENSION_ABILITY = "extensionAbility";
-
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
@@ -815,6 +824,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    STYLUS_HANDLER->SetLastEventState(false);
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -905,7 +917,8 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     touchEvent->GetPointerItem(id, item);
     auto dx = std::abs(pos->x - item.GetDisplayX());
     auto dy = std::abs(pos->y - item.GetDisplayY());
-    if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
+    auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
+    if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
         StopTwoFingerGesture();
     }
 }
@@ -955,6 +968,7 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
         twoFingerGesture_.touches[num - 1].id = id;
         twoFingerGesture_.touches[num - 1].x = item.GetDisplayX();
         twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
+        twoFingerGesture_.touches[num - 1].downTime = item.GetDownTime();
     }
 }
 
@@ -1160,8 +1174,16 @@ void KeyCommandHandler::StartTwoFingerGesture()
 {
     CALL_DEBUG_ENTER;
     twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
-        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
         twoFingerGesture_.timerId = -1;
+        if (!CheckTwoFingerGestureAction()) {
+            return;
+        }
+        twoFingerGesture_.ability.params.emplace("displayX1", std::to_string(twoFingerGesture_.touches[0].x));
+        twoFingerGesture_.ability.params.emplace("displayY1", std::to_string(twoFingerGesture_.touches[0].y));
+        twoFingerGesture_.ability.params.emplace("displayX2", std::to_string(twoFingerGesture_.touches[1].x));
+        twoFingerGesture_.ability.params.emplace("displayY2", std::to_string(twoFingerGesture_.touches[1].y));
+        MMI_HILOGI("Start launch ability immediately");
+        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
     });
 }
 
@@ -1173,6 +1195,61 @@ void KeyCommandHandler::StopTwoFingerGesture()
         twoFingerGesture_.timerId = -1;
     }
 }
+
+bool KeyCommandHandler::CheckTwoFingerGestureAction() const
+{
+    if (!twoFingerGesture_.active) {
+        return false;
+    }
+
+    auto firstFinger = twoFingerGesture_.touches[0];
+    auto secondFinger = twoFingerGesture_.touches[1];
+
+    auto pressTimeInterval = fabs(firstFinger.downTime - secondFinger.downTime);
+    if (pressTimeInterval > TWO_FINGERS_TIME_LIMIT) {
+        return false;
+    }
+
+    auto devX = firstFinger.x - secondFinger.x;
+    auto devY = firstFinger.y - secondFinger.y;
+    auto distance = sqrt(pow(devX, 2) + pow(devY, 2));
+    if (distance < ConvertVPToPX(TWO_FINGERS_DISTANCE_LIMIT)) {
+        MMI_HILOGI("two fingers distance:%{public}f too small", distance);
+        return false;
+    }
+
+    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    CHKPR(displayInfo, false);
+    auto leftLimit = ConvertVPToPX(TOUCH_LIFT_LIMIT);
+    auto rightLimit = displayInfo->width - ConvertVPToPX(TOUCH_RIGHT_LIMIT);
+    auto topLimit = ConvertVPToPX(TOUCH_TOP_LIMIT);
+    auto bottomLimit = displayInfo->height - ConvertVPToPX(TOUCH_BOTTOM_LIMIT);
+    if (firstFinger.x <= leftLimit || firstFinger.x >= rightLimit ||
+        firstFinger.y <= topLimit || firstFinger.y >= bottomLimit ||
+        secondFinger.x <= leftLimit || secondFinger.x >= rightLimit ||
+        secondFinger.y <= topLimit || secondFinger.y >= bottomLimit) {
+        MMI_HILOGI("any finger out of region");
+        return false;
+    }
+
+    return true;
+}
+
+int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
+{
+    if (vp <= 0) {
+        return 0;
+    }
+    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    CHKPR(displayInfo, 0);
+    int32_t dpi = displayInfo->dpi;
+    if (dpi <= 0) {
+        return 0;
+    }
+    const int32_t base = 160;
+    return vp * (dpi / base);
+}
+
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::ParseConfig()
@@ -1366,9 +1443,8 @@ std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int
     return keyEvent;
 }
 
-bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
-    CALL_DEBUG_ENTER;
     CHKPF(key);
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
@@ -1394,6 +1470,23 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
     }
+
+    return true;
+}
+
+bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(key);
+    if (!PreHandleEvent(key)) {
+        return false;
+    }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    if (STYLUS_HANDLER->HandleStylusKey(keyEvent)) {
+        return true;
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
@@ -1474,6 +1567,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    STYLUS_HANDLER->SetLastEventState(false);
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");

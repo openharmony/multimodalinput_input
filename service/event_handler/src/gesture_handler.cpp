@@ -17,10 +17,12 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GestureHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GestureHandler" };
 constexpr int32_t FIRST_FINGER = 0;
 constexpr int32_t SECOND_FINGER = 1;
 constexpr int32_t TWO_FINGERS = 2;

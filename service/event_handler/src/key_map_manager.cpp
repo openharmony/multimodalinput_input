@@ -22,12 +22,11 @@
 #include "mmi_log.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyMapManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyMapManager" };
-} // namespace
-
 KeyMapManager::KeyMapManager() {}
 KeyMapManager::~KeyMapManager() {}
 
