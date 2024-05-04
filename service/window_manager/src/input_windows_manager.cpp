@@ -1213,7 +1213,7 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     auto sceneWinId = windowId;
     if (isUiExtension) {
         auto iter = uiExtensionPointerStyle_.find(scenePid);
-        if (iter = uiExtensionPointerStyle_.end() || iter->second.find(sceneWinId) == iter->second.end()) {
+        if (iter == uiExtensionPointerStyle_.end() || iter->second.find(sceneWinId) == iter->second.end()) {
             uiExtensionPointerStyle_[scenePid] = {};
             MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on uiExtensionPointerStyle_",
                 scenePid, sceneWinId);
@@ -1857,13 +1857,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
-    GetPointerStyle(touchWindod->pid, touchWindo->id, pointerStyle);
+    GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
     if (isUiExtension_) {
         MMI_HILOGD("updatemouse target in uiextension");
         GetPointerStyle(uiExtensionPid_, uiExtensionWindowId_, pointerStyle, isUiExtension_);
         dragPointerStyle_ = pointerStyle;
     } else {
-        GetPointerStyle(touchWindo->pid, touchWindo->id, pointerStyle);
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
     }
     if (!isDragBorder_ && !isUiExtension_) {
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
