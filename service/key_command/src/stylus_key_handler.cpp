@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Stylu
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace
 const std::string STYLUS_ABILITY_NAME = "HiNotePcMainAbility";
-const std::string STYLUS_BUNDLE_NAME = "com.huawei.hmos.hinote";
+const std::string STYLUS_BUNDLE_NAME = "com.hmos.hinote";
 
 StylusKeyHandler::StylusKeyHandler() {}
 StylusKeyHandler::~StylusKeyHandler() {}
