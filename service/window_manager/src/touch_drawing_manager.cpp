@@ -223,7 +223,7 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TouchDrawingMgr->UpdateLabels();
+        TOUCH_DRAWING_MGR->UpdateLabels();
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
