@@ -43,7 +43,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr size_t MAX_COMMAND_COUNT { 32 };
+constexpr int32_t MAX_COMMAND_COUNT { 32 };
 } // namespace
 
 EventDump::EventDump() {}
@@ -57,7 +57,7 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, size_t &count)
+void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, int32_t &count)
 {
     CALL_DEBUG_ENTER;
     for (const auto &str : args) {
@@ -65,8 +65,8 @@ void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, siz
             ++count;
             continue;
         }
-        if (str.find("-") == 0 && str.size() >= 1) {
-            count += str.size() - 1;
+        if (str.find("-") == 0) {
+            count += static_cast<int32_t>(str.size()) - 1;
             continue;
         }
     }
@@ -75,7 +75,7 @@ void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, siz
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    size_t count = 0;
+    int32_t count = 0;
     CheckCount(fd, args, count);
     if (count > MAX_COMMAND_COUNT) {
         MMI_HILOGE("cmd param number not more than 32");

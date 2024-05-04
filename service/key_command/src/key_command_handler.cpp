@@ -2011,7 +2011,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
 {
     CALL_DEBUG_ENTER;
-    return PreferencesMgr->GetShortKeyDuration(businessId);
+    return PREFERENCES_MGR->GetShortKeyDuration(businessId);
 }
 
 bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
@@ -2208,7 +2208,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         MMI_HILOGE("delay is not in valid range.");
         return COMMON_PARAMETER_ERROR;
     }
-    return PreferencesMgr->SetShortKeyDuration(businessId, delay);
+    return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
 
 KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()

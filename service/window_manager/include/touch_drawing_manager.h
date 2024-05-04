@@ -59,7 +59,7 @@ private:
     Rosen::Drawing::Brush brush_;
     Rosen::Drawing::Pen pen_;
 };
-#define TouchDrawingMgr ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
+#define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_DRAWING_MANAGER_H

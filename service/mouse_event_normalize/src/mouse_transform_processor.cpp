@@ -208,7 +208,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     }
 
     std::string name = "primaryButton";
-    int32_t primaryButton = PreferencesMgr->GetIntValue(name, 0);
+    int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     if (type == LIBINPUT_EVENT_POINTER_BUTTON && primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
@@ -233,7 +233,7 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
         rows = MAX_ROWS;
     }
     std::string name = "rows";
-    int32_t ret = PreferencesMgr->SetIntValue(name, mouseFileName, rows);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, rows);
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
     return ret;
 }
@@ -242,7 +242,7 @@ int32_t MouseTransformProcessor::GetMouseScrollRows()
 {
     CALL_DEBUG_ENTER;
     std::string name = "rows";
-    int32_t rows = PreferencesMgr->GetIntValue(name, DEFAULT_ROWS);
+    int32_t rows = PREFERENCES_MGR->GetIntValue(name, DEFAULT_ROWS);
     MMI_HILOGD("Get mouse scroll rows successfully, rows:%{public}d", rows);
     return rows;
 }
@@ -621,7 +621,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     std::string name = "primaryButton";
-    PreferencesMgr->SetIntValue(name, mouseFileName, primaryButton);
+    PREFERENCES_MGR->SetIntValue(name, mouseFileName, primaryButton);
     return RET_OK;
 }
 
@@ -629,7 +629,7 @@ int32_t MouseTransformProcessor::GetMousePrimaryButton()
 {
     CALL_DEBUG_ENTER;
     std::string name = "primaryButton";
-    int32_t primaryButton = PreferencesMgr->GetIntValue(name, 0);
+    int32_t primaryButton = PREFERENCES_MGR->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     return primaryButton;
 }
@@ -644,7 +644,7 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
     }
     globalPointerSpeed_ = speed;
     std::string name = "speed";
-    int32_t ret = PreferencesMgr->SetIntValue(name, mouseFileName, speed);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, speed);
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
     return ret;
 }
@@ -653,7 +653,7 @@ int32_t MouseTransformProcessor::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
     std::string name = "speed";
-    int32_t speed = PreferencesMgr->GetIntValue(name, DEFAULT_SPEED);
+    int32_t speed = PREFERENCES_MGR->GetIntValue(name, DEFAULT_SPEED);
     MMI_HILOGD("Get pointer speed successfully, speed:%{public}d", speed);
     return speed;
 }
@@ -940,24 +940,24 @@ int32_t MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PreferencesMgr->SetBoolValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetBoolValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    value = PreferencesMgr->GetBoolValue(key, true);
+    value = PREFERENCES_MGR->GetBoolValue(key, true);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PreferencesMgr->SetIntValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetIntValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)
 {
     int32_t defaultValue = value;
-    value = PreferencesMgr->GetIntValue(key, defaultValue);
+    value = PREFERENCES_MGR->GetIntValue(key, defaultValue);
     return RET_OK;
 }
 } // namespace MMI
