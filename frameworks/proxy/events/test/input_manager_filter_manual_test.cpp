@@ -40,13 +40,15 @@
 #include "proto.h"
 #include "token_setproc.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerFilterManualTest"
+
 namespace OHOS {
 namespace MMI {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerFilterManualTest" };
 static const int SIG_KILL = 9;
 static constexpr int32_t DEFAULT_API_VERSION = 8;
 

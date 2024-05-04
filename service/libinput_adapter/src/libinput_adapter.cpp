@@ -27,10 +27,12 @@
 #include "input_windows_manager.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "LibinputAdapter"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
 constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 constexpr int32_t MAX_RETRY_COUNT { 5 };
 

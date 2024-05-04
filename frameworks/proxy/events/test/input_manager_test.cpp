@@ -22,10 +22,12 @@
 #include "system_info.h"
 #include "input_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
 constexpr int32_t TUPLE_PID = 0;
 constexpr int32_t TUPLE_UID = 1;
 constexpr int32_t TUPLE_NAME = 2;
@@ -2930,6 +2932,83 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadTapSwitch_001, TestSize.L
     InputManager::GetInstance()->Authorize(true);
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
+}
+
+
+/**
+ * @tc.name: InputManagerTest_SetTouchpadRotateSwitch_001
+ * @tc.desc: Set touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadRotateSwitch_001
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool rotateSwitch = true;
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
+}
+
+/**
+ * @tc.name: InputManagerTest_HasIrEmitterTest
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitterTest, TestSize.Level1)
+{
+    bool hasEmmited = false;
+    InputManager::GetInstance()->HasIrEmitter(hasEmmited);
+    EXPECT_EQ(hasEmmited, false);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetInfraredFrequenciesTest_001
+ * @tc.desc: get infrared frequencies
+ * @tc.type: FUNC
+ * @tc.require
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequenciesTest_001, TestSize.Level1)
+{
+    std::vector<InfraredFrequency> requencys;
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    int32_t size = requencys.size();
+    EXPECT_GE(size, 0);
+    for (int32_t i = 0; i < size; i++) {
+        InfraredFrequency fre = requencys[i];
+        MMI_HILOGI("GetInfraredFrequencies i:%{public}d, max_:%{public}lld, min_:%{public}lld",
+            i, fre.max_, fre.min_);
+    }
+    ASSERT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TransmitInfraredTest_001
+ * @tc.desc: set transmit infrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest_001, TestSize.Level1)
+{
+    std::vector<int64_t> requencys = {9000, 4500, 5800};
+    int64_t frequency = 3800;
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency, requencys);
+    ASSERT_TRUE(ret == RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

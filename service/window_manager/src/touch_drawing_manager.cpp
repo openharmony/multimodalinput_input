@@ -19,6 +19,9 @@
 #include "text/font_mgr.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchDrawingManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -89,7 +92,7 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
     if (crosshairCanvasNode_ == nullptr) {
         crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
         InitCanvasNode(crosshairCanvasNode_);
-    }  
+    }
     if (labelsCanvasNode_ == nullptr) {
         labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
         InitCanvasNode(labelsCanvasNode_);
@@ -402,7 +405,6 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         canvas->AttachPen(pointPen_);
         canvas->DrawPoint(lastCenterPt);
         canvas->DetachPen();
-        
     }
     if (!isDownAction_ && !find) {
         int32_t futureX = x + xVelocity_ * MULTIPLE_FACTOR;
@@ -450,7 +452,8 @@ void TouchDrawingManager::DrawLabels()
     rect.top_ = RECT_TOP;
     rect.bottom_ = RECT_TOP + RECT_HEIGHT;
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
-    auto canvas = static_cast<RosenCanvas *>(labelsCanvasNode_->BeginRecording(displayInfo_.width, displayInfo_.height));
+    auto canvas = static_cast<RosenCanvas *>
+        (labelsCanvasNode_->BeginRecording(displayInfo_.width, displayInfo_.height));
     CHKPV(canvas);
     DrawRectItem(canvas, viewP, rect, color);
     if (isDownAction_ || !lastPointerItem_.empty()) {
@@ -496,7 +499,7 @@ void TouchDrawingManager::UpdatePointerPosition()
     int32_t pointerId = pointerEvent_->GetPointerId();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
         if (lastPointerItem_.empty()) {
-            ClearLabels();    
+            ClearLabels();
         }
         maxPointerCount_ = ++currentPointerCount_;
     } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {

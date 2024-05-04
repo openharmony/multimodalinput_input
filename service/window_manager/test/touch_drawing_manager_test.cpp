@@ -19,6 +19,9 @@
 
 #include "mmi_log.h"
 #include "pointer_event.h"
+#ifndef USE_ROSEN_DRAWING
+#define USE_ROSEN_DRAWING
+#endif
 #include "touch_drawing_manager.h"
 #include "window_info.h"
 
@@ -29,7 +32,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchDrawingManagerTest" };
 } // namespace
 class TouchDrawingManagerTest : public testing::Test {
 public:
@@ -223,42 +225,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001,
     EXPECT_EQ(manager.bubble_.outerCircleWidth,
     static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE);
     EXPECT_NO_FATAL_FAILURE(manager.UpdateDisplayInfo(displayInfo));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_StartTouchDraw_001
- * @tc.desc: Test start touch draw
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_StartTouchDraw_001, TestSize.Level1)
-{
-    TouchDrawingManager manager;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    EXPECT_NO_FATAL_FAILURE(manager.StartTouchDraw(pointerEvent));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_DrawGraphic_001
- * @tc.desc: Test draw graphic
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawGraphic_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager manager;
-    EXPECT_EQ(manager.DrawGraphic(nullptr), RET_ERR);
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    manager.canvasNode_ = nullptr;
-    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
-    pointerEvent->SetPointerId(PointerEvent::POINTER_ACTION_UP);
-    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    manager.displayInfo_.displayDirection = DIRECTION0;
-    EXPECT_EQ(manager.DrawGraphic(pointerEvent), RET_ERR);
 }
 
 /**

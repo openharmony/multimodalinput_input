@@ -41,7 +41,7 @@ void PrintHelp(const std::string &title = {})
 
 void QueryDisplayBindInfo()
 {
-    printf("query\n");
+    printf("Query\n");
     OHOS::MMI::DisplayBindInfos infos;
     auto ret = OHOS::MMI::InputManager::GetInstance()->GetDisplayBindInfo(infos);
     if (ret != 0) {

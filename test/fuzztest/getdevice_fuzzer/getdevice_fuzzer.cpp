@@ -18,12 +18,11 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GetDeviceFuzzTest"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceFuzzTest" };
-} // namespace
-
 void GetDeviceFuzzTest(const uint8_t* data, size_t /* size */)
 {
     int32_t deviceId = *(reinterpret_cast<const int32_t*>(data));

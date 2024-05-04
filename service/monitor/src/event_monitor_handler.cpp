@@ -27,10 +27,12 @@
 #include "proto.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventMonitorHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 constexpr size_t MAX_EVENTIDS_SIZE = 1000;
 #endif // OHOS_BUILD_ENABLE_TOUCH
