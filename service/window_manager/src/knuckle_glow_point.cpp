@@ -40,7 +40,7 @@ double KnuckleGlowPoint::DEFAULT_LIFESPAN = -1;
 KnuckleGlowPoint::KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap bitMap)
 {
     CALL_DEBUG_ENTER;
-    mTraceShadow_ = bitMap;
+    traceShadow_ = bitMap;
 }
 
 KnuckleGlowPoint::~KnuckleGlowPoint() {};
@@ -59,61 +59,61 @@ void KnuckleGlowPoint::Update()
     if (IsEnded()) {
         return;
     }
-    long currentTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    long timeInterval = currentTime - mLastUpdateTimeMillis_;
+    int64_t currentTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    int64_t timeInterval = currentTime - lastUpdateTimeMillis_;
     if (timeInterval < 0) {
         timeInterval = 0;
     }
 
-    mLastUpdateTimeMillis_ = currentTime;
-    mLifespan_ -= timeInterval;
-    mTraceSize_ = (float)((mLifespan_ / BASIC_LIFESPAN) * BASIC_SIZE);
+    lastUpdateTimeMillis_ = currentTime;
+    lifespan_ -= timeInterval;
+    traceSize_ = static_cast<float>((lifespan_ / BASIC_LIFESPAN) * BASIC_SIZE);
     UpdateMatrix();
-    mGlowPaint_.SetAlpha((int) (TRACE_COLOR * (mLifespan_ / BASIC_LIFESPAN)));
-    mGlowPaint_.SetColor(Rosen::Drawing::Color::ColorQuadSetARGB(ARGB_A, ARGB_RGB, ARGB_RGB, ARGB_RGB));
-    mGlowPaint_.SetAntiAlias(true);
-    mGlowPaint_.SetWidth(PAINT_WIDTH);
+    glowPaint_.SetAlpha(static_cast<int32_t>(TRACE_COLOR * (lifespan_ / BASIC_LIFESPAN)));
+    glowPaint_.SetColor(Rosen::Drawing::Color::ColorQuadSetARGB(ARGB_A, ARGB_RGB, ARGB_RGB, ARGB_RGB));
+    glowPaint_.SetAntiAlias(true);
+    glowPaint_.SetWidth(PAINT_WIDTH);
 }
 
 void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
-    if (IsEnded() || mPointX_ <= 0 || mPointY_ <= 0) {
+    if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
         return;
     }
     Rosen::Drawing::Paint paint;
-    canvas->AttachPaint(mGlowPaint_);
-    canvas->SetMatrix(mTraceMatrix_);
+    canvas->AttachPaint(glowPaint_);
+    canvas->SetMatrix(traceMatrix_);
     OHOS::Rosen::Drawing::Brush brush;
     canvas->AttachBrush(brush);
-    canvas->DrawBitmap(mTraceShadow_, mPointX_, mPointY_);
+    canvas->DrawBitmap(traceShadow_, pointX_, pointY_);
     canvas->DetachBrush();
     canvas->DetachPaint();
 }
 
-void KnuckleGlowPoint::Reset(double pointx, double pointy, float lifespanoffset)
+void KnuckleGlowPoint::Reset(double pointX, double pointY, float lifespanOffset)
 {
     CALL_DEBUG_ENTER;
-    mPointX_ = pointx;
-    mPointY_ = pointy;
-    mLifespan_ = BASIC_LIFESPAN - lifespanoffset;
-    mTraceSize_ = BASIC_SIZE;
-    mLastUpdateTimeMillis_ = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    pointX_ = pointX;
+    pointY_ = pointY;
+    lifespan_ = BASIC_LIFESPAN - lifespanOffset;
+    traceSize_ = BASIC_SIZE;
+    lastUpdateTimeMillis_ = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
 }
 
 bool KnuckleGlowPoint::IsEnded()
 {
     CALL_DEBUG_ENTER;
-    return mLifespan_ < 0;
+    return lifespan_ < 0;
 }
 
 void KnuckleGlowPoint::UpdateMatrix()
 {
     CALL_DEBUG_ENTER;
-    mTraceMatrix_.Reset();
-    float proportion = mTraceSize_ / (float) mTraceShadow_.GetWidth();
-    mTraceMatrix_.PostScale(proportion, proportion, mPointX_, mPointY_);
+    traceMatrix_.Reset();
+    float proportion = traceSize_ / traceShadow_.GetWidth();
+    traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
