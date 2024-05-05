@@ -22,6 +22,9 @@
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KnuckleDivergentPoint"
+
 namespace OHOS {
 namespace MMI {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDivergentPoint" };

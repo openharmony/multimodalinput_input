@@ -19,6 +19,9 @@
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KnuckleGlowTraceSystem"
+
 namespace OHOS {
 namespace MMI {
 namespace {
