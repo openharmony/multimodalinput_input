@@ -3010,5 +3010,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest_001, TestSize.L
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency, requencys);
     ASSERT_TRUE(ret == RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_SetCurrentUser_001
+ * @tc.desc: set current user id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
+{
+    int32_t userId = 10;
+    int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
+    EXPECT_TRUE(ret == RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
