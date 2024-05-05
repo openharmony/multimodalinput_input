@@ -25,6 +25,9 @@ namespace MMI {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleGlowPoint" };
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
+constexpr int32_t PAINT_WIDTH = 20;
+constexpr int32_t ARGB_A = 0;
+constexpr int32_t ARGB_RGB = 255;
 
 int KnuckleGlowPoint::TRACE_COLOR = 255;
 float KnuckleGlowPoint::BASIC_SIZE = 100.0f;
@@ -65,9 +68,9 @@ void KnuckleGlowPoint::Update()
     mTraceSize_ = (float)((mLifespan_ / BASIC_LIFESPAN) * BASIC_SIZE);
     UpdateMatrix();
     mGlowPaint_.SetAlpha((int) (TRACE_COLOR * (mLifespan_ / BASIC_LIFESPAN)));
-    mGlowPaint_.SetColor(Rosen::Drawing::Color::ColorQuadSetARGB(0, 255, 255, 255));
+    mGlowPaint_.SetColor(Rosen::Drawing::Color::ColorQuadSetARGB(ARGB_A, ARGB_RGB, ARGB_RGB, ARGB_RGB));
     mGlowPaint_.SetAntiAlias(true);
-    mGlowPaint_.SetWidth(20);
+    mGlowPaint_.SetWidth(PAINT_WIDTH);
 }
 
 void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
