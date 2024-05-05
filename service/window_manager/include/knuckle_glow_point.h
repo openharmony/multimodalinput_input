@@ -28,13 +28,12 @@
 namespace OHOS {
 namespace MMI {
 class KnuckleGlowPoint {
-
 public:
     KnuckleGlowPoint(OHOS::Rosen::Drawing::Bitmap bitMap);
     ~KnuckleGlowPoint();
     void Update();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
-    void Reset(double pointx, double pointy, float lifespanoffset);
+    void Reset(double pointX, double pointY, float lifespanOffset);
     bool IsEnded();
 
 private:
@@ -47,15 +46,15 @@ private:
     static double BASIC_LIFESPAN;
     static double DEFAULT_LIFESPAN;
 
-    double mLifespan_ = DEFAULT_LIFESPAN;
-    double mPointX_;
-    double mPointY_;
-    long mLastUpdateTimeMillis_;
-    float mTraceSize_;
+    double lifespan_ = DEFAULT_LIFESPAN;
+    double pointX_;
+    double pointY_;
+    int64_t lastUpdateTimeMillis_;
+    float traceSize_;
 
-    Rosen::Drawing::Matrix mTraceMatrix_;
-    Rosen::Drawing::Bitmap mTraceShadow_;
-    Rosen::Drawing::Paint mGlowPaint_;
+    Rosen::Drawing::Matrix traceMatrix_;
+    Rosen::Drawing::Bitmap traceShadow_;
+    Rosen::Drawing::Paint glowPaint_;
 };
 } // namespace MMI
 } // namespace OHOS

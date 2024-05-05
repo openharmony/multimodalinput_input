@@ -26,25 +26,25 @@
 #include "pipeline/rs_recording_canvas.h"
 #else
 #include "recording/recording_canvas.h"
-#endif
+#endif // USE_ROSEN_DRAWING
 
 namespace OHOS {
 namespace MMI {
 class KnuckleGlowTraceSystem {
 public:
-    KnuckleGlowTraceSystem(int pointSize, Rosen::Drawing::Bitmap bitmap, int maxDivergenceNum);
+    KnuckleGlowTraceSystem(int32_t pointSize, Rosen::Drawing::Bitmap bitmap, int32_t maxDivergenceNum);
     ~KnuckleGlowTraceSystem();
     void Clear();
     void Update();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
     void ResetDivergentPoints(double pointx, double pointY);
-    void AddGlowPoints(Rosen::Drawing::Path path, long timeInteval);
+    void AddGlowPoints(Rosen::Drawing::Path path, int64_t timeInteval);
 
 private:
     float BASIC_DISTANCE_BETWEEN_POINTS = 5.0f;
-    std::vector<std::shared_ptr<KnuckleGlowPoint>> mGlowPoints_;
-    std::vector<std::shared_ptr<KnuckleDivergentPoint>> mDivergentPoints_;
-    int32_t mMaxDivergenceNum_ { 0 };
+    std::vector<std::shared_ptr<KnuckleGlowPoint>> glowPoints_;
+    std::vector<std::shared_ptr<KnuckleDivergentPoint>> divergentPoints_;
+    int32_t maxDivergenceNum_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -19,6 +19,8 @@
 #include <iostream>
 #include <random>
 
+#include "include/core/SkColorFilter.h"
+
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
@@ -41,10 +43,9 @@ int KnuckleDivergentPoint::DEFAULT_SIZE_OFFSET = 20;
 int KnuckleDivergentPoint::DEFAULT_SPEED = 8;
 int KnuckleDivergentPoint::DEFAULT_SPEED_OFFSET = 8;
 
-KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap)
+KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap) : mTraceShadow_(bitMap)
 {
     CALL_DEBUG_ENTER;
-    mTraceShadow_ = bitMap;
 }
 
 KnuckleDivergentPoint::~KnuckleDivergentPoint() {};
@@ -101,5 +102,5 @@ bool KnuckleDivergentPoint::IsEnded()
     CALL_DEBUG_ENTER;
     return mLifespan_ < 0;
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS

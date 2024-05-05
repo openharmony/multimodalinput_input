@@ -66,14 +66,14 @@ private:
     uint64_t screenId_ { 0 };
     Rosen::Drawing::Brush brush_;
     Rosen::Drawing::Pen pen_;
-    std::vector<Rosen::Drawing::Point> mTraceControlpoints_;
+    std::vector<Rosen::Drawing::Point> traceControlPoints_;
 
-    int mPointCounter = 0;
-    bool mIsDrawing_ = false;
-    std::shared_ptr<KnuckleGlowTraceSystem> mGlowTraceSystem_;
-    Rosen::Drawing::Path mPointerPath_;
-    SkPaint mPointerPathPaint_;
-    int64_t mLastUpdateTimeMillis_;
+    int32_t pointCounter_ { 0 };
+    bool isDrawing_ { false };
+    std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_;
+    Rosen::Drawing::Path pointerPath_;
+    SkPaint pointerPathPaint_;
+    int64_t lastUpdateTimeMillis_;
 
     static float PAINT_STROKE_WIDTH;
     static float PAINT_PATH_RADIUS;
@@ -83,8 +83,8 @@ private:
     static int MAX_DIVERGENCE_NUM;
     static int MAX_UPDATE_TIME_MILLIS;
 
-    std::shared_ptr<OHOS::Media::PixelMap> mpixelMap_;
-    bool isStop { false };
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+    bool isStop_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
