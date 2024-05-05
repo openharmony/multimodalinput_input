@@ -37,7 +37,7 @@ declare_args() {
   input_feature_short_key = true
   input_feature_coverage = false
   input_ext_feature_anco = false
-  input_ext_feature_fingersense = false
+  input_ext_feature_fingersense = true
   input_feature_fingerprint = false
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
