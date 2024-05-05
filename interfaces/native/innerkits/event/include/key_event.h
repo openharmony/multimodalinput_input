@@ -3234,6 +3234,8 @@ public:
      */
     static std::shared_ptr<KeyEvent> Create();
 
+    virtual void Reset() override;
+
     /**
      * @brief Obtains the key code of this key event.
      * @return Returns the key code.
