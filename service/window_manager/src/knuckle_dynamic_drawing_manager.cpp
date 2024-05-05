@@ -34,6 +34,9 @@
 #include <fstream>
 #include "pixel_map.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KnuckleDynamicDrawingManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
