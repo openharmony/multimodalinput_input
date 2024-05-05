@@ -280,6 +280,7 @@ private:
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
+	std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
