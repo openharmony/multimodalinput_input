@@ -25,6 +25,7 @@
 
 // Ability manager stub header
 #include "ability_manager_client.h"
+#include "display_event_monitor.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TwoFingerLongTouchTest"

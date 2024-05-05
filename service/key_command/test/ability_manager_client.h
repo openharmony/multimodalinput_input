@@ -78,5 +78,36 @@ private:
 };
 
 } // namespace AAFwk
+
+namespace EventFwk {
+class CommonEventSupport {
+public:
+    /**
+     * Indicates the action of a common event that the device screen is off and the device is sleeping.
+     * This common event can only be published by the system.
+     */
+    static const std::string COMMON_EVENT_SCREEN_OFF;
+    /**
+     * Indicates the action of a common event that the device screen is on and the device is interactive.
+     * This common event can only be published by the system.
+     */
+    static const std::string COMMON_EVENT_SCREEN_ON;
+
+	/**
+     * Indicates the action of a common event that the screen lock.
+     * This is a protected common event that can only be sent by system.
+     */
+    static const std::string COMMON_EVENT_SCREEN_LOCKED;
+
+    /**
+     * Indicates the action of a common event that the screen unlock.
+     * This is a protected common event that can only be sent by system.
+     */
+    static const std::string COMMON_EVENT_SCREEN_UNLOCKED;
+public:
+    CommonEventSupport();
+    virtual ~CommonEventSupport();
+};
+}  // namespace EventFwk
 } // namespace OHOS
 #endif // ABILITY_MANAGER_CLIENT_STUB_H

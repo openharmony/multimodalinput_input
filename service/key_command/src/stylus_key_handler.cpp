@@ -16,8 +16,12 @@
 #include "stylus_key_handler.h"
 
 #include "ability_manager_client.h"
+#include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "StylusKeyHandler"
 
 namespace OHOS {
 namespace MMI {
@@ -35,7 +39,6 @@ StylusKeyHandler::~StylusKeyHandler() {}
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 bool StylusKeyHandler::HandleStylusKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
         stylusKey_.lastEventIsStylus = false;
@@ -62,7 +65,6 @@ void StylusKeyHandler::IsLaunchAbility()
 
 void StylusKeyHandler::LaunchAbility(const Ability &ability)
 {
-    CALL_DEBUG_ENTER;
     AAFwk::Want want;
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
     want.SetAction(ability.action);
