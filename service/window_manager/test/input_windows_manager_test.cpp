@@ -1641,5 +1641,264 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001,
     EXPECT_FALSE(ret);
     EXPECT_EQ(result, RET_ERR);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_JudgMouseIsDownOrUp_001
+ * @tc.desc: This test verifies the functionality of judging whether the mouse button is down or up
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgMouseIsDownOrUp_001, TestSize.Level1)
+{
+    WinMgr->JudgMouseIsDownOrUp(false);
+    EXPECT_FALSE(WinMgr->GetMouseFlag());
+    WinMgr->JudgMouseIsDownOrUp(true);
+    EXPECT_FALSE(WinMgr->GetMouseFlag());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseCaptureMode_001
+ * @tc.desc: This test verifies the functionality of setting the mouse capture mode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetMouseCaptureMode_001, TestSize.Level1)
+{
+    int32_t windowId = -1;
+    bool isCaptureMode = true;
+    int32_t result = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    EXPECT_EQ(result, RET_ERR);
+    windowId = 1;
+    isCaptureMode = false;
+    result = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    EXPECT_EQ(result, RET_OK);
+    windowId = 1;
+    isCaptureMode = true;
+    result = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    EXPECT_EQ(result, RET_OK);
+    EXPECT_TRUE(WinMgr->GetMouseIsCaptureMode());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedDrawPointer_001
+ * @tc.desc: This test verifies the functionality of determining whether to draw the pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedDrawPointer_001, TestSize.Level1)
+{
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerItem.SetDeviceId(1);
+    bool result = WinMgr->IsNeedDrawPointer(pointerItem);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SkipAnnotationWindow_001
+ * @tc.desc: This test verifies the functionality of determining whether to draw the pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipAnnotationWindow_001, TestSize.Level1)
+{
+    uint32_t flag = WindowInfo::FLAG_BIT_HANDWRITING;
+    int32_t toolType = PointerEvent::TOOL_TYPE_FINGER;
+    bool result = WinMgr->SkipAnnotationWindow(flag, toolType);
+    EXPECT_TRUE(result);
+    flag = WindowInfo::FLAG_BIT_HANDWRITING;
+    toolType = PointerEvent::TOOL_TYPE_PEN;
+    result = WinMgr->SkipAnnotationWindow(flag, toolType);
+    EXPECT_FALSE(result);
+    flag = 0;
+    toolType = PointerEvent::TOOL_TYPE_FINGER;
+    result = WinMgr->SkipAnnotationWindow(flag, toolType);
+    EXPECT_FALSE(result);
+    flag = 0;
+    toolType = PointerEvent::TOOL_TYPE_PEN;
+    result = WinMgr->SkipAnnotationWindow(flag, toolType);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_001
+ * @tc.desc: This test verifies the functionality of updating the touch screen target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_001, TestSize.Level1)
+{
+    auto result = WinMgr->UpdateTouchScreenTarget(nullptr);
+    EXPECT_NE(result, RET_ERR);
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetTargetDisplayId(-1);
+    result = WinMgr->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(1);
+    result = WinMgr->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PullEnterLeaveEvent_001
+ * @tc.desc: This test verifies the functionality of pulling enter and leave events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PullEnterLeaveEvent_001, TestSize.Level1)
+{
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    auto pointerEvent = PointerEvent::Create();
+    WindowInfo touchWindow;
+    WinMgr->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow);
+    logicalX = -123;
+    logicalY = -456;
+    WinMgr->PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchTouch_001
+ * @tc.desc: This test verifies the functionality of touch event dispatching
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchTouch_001, TestSize.Level1)
+{
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
+    WinMgr->DispatchTouch(pointerAction);
+    pointerAction = PointerEvent::POINTER_ACTION_DOWN;
+    WinMgr->DispatchTouch(pointerAction);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchPadTarget_001
+ * @tc.desc: This test verifies the functionality of updating the touchpad target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchPadTarget_001, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    int32_t result = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    result = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    result = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    result = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    result = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetPointerAction(9999);
+    result = WinMgr->UpdateTouchPadTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_001
+ * @tc.desc: This test verifies the functionality of drawing touch graphics
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_001, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    WinMgr->DrawTouchGraphic(pointerEvent);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTargetPointer_001
+ * @tc.desc: This test verifies the functionality of updating the target pointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTargetPointer_001, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(1);
+    int32_t result = WinMgr->UpdateTargetPointer(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(1);
+    result = WinMgr->UpdateTargetPointer(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerAction(1);
+    result = WinMgr->UpdateTargetPointer(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->SetPointerAction(1);
+    result = WinMgr->UpdateTargetPointer(pointerEvent);
+    EXPECT_EQ(result, RET_OK);
+    pointerEvent->SetSourceType(999);
+    pointerEvent->SetPointerAction(1);
+    result = WinMgr->UpdateTargetPointer(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInsideDisplay_001
+ * @tc.desc: This test verifies the functionality of determining whether it is inside the display area
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInsideDisplay_001, TestSize.Level1)
+{
+    DisplayInfo displayInfo;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    int32_t physicalX = 500;
+    int32_t physicalY = 10;
+    bool result = WinMgr->IsInsideDisplay(displayInfo, physicalX, physicalY);
+    EXPECT_TRUE(result);
+    physicalX = -10;
+    physicalY = 500;
+    result = WinMgr->IsInsideDisplay(displayInfo, physicalX, physicalY);
+    EXPECT_FALSE(result);
+    physicalX = 500;
+    physicalY = -10;
+    result = WinMgr->IsInsideDisplay(displayInfo, physicalX, physicalY);
+    EXPECT_FALSE(result);
+    physicalX = -500;
+    physicalY = -10;
+    result = WinMgr->IsInsideDisplay(displayInfo, physicalX, physicalY);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FindPhysicalDisplay_001
+ * @tc.desc: This test verifies the functionality of finding physical displays
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_001, TestSize.Level1)
+{
+    DisplayInfo displayInfo = {10, 20};
+    int32_t physicalX, physicalY, displayId;
+    WinMgr->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(physicalX, RET_OK);
+    EXPECT_EQ(physicalY, RET_OK);
+    EXPECT_EQ(displayId, RET_OK);
+    displayInfo.x = INT32_MAX;
+    displayInfo.y = INT32_MAX;
+    WinMgr->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(physicalX, RET_OK);
+    EXPECT_EQ(physicalY, RET_OK);
+    EXPECT_EQ(displayId, RET_OK);
+    displayInfo.x = 50;
+    displayInfo.y = 60;
+    WinMgr->FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(physicalX, RET_OK);
+    EXPECT_EQ(physicalY, RET_OK);
+    EXPECT_EQ(displayId, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
