@@ -38,8 +38,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
-const std::string PentagramIconPath = IMAGE_POINTER_PENTAGRAM_PATH + "knuckle_sprite_360.png";
-// const std::string PentagramIconPath = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
+// const std::string PentagramIconPath = IMAGE_POINTER_PENTAGRAM_PATH + "knuckle_sprite_360.png";
+const std::string PentagramIconPath = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDynamicDrawingManager" };
 constexpr int32_t DENSITY_BASELINE = 160;
 constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
@@ -48,6 +48,7 @@ constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t MAX_POINTER_COLOR = 0x00ffff;
+constexpr int32_t TIME_DIMENSION = 1000;
 } // namespace
 
 float KnuckleDynamicDrawingManager::PAINT_STROKE_WIDTH = 10.0f;
@@ -119,7 +120,7 @@ Rosen::Drawing::AlphaType KnuckleDynamicDrawingManager::AlphaTypeToAlphaType(Med
 
 Rosen::Drawing::ColorType KnuckleDynamicDrawingManager::PixelFormatToColorType(Media::PixelFormat pixelFormat)
 {
-     switch (pixelFormat) {
+    switch (pixelFormat) {
         case Media::PixelFormat::RGB_565:
             return Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
         case Media::PixelFormat::RGBA_8888:
@@ -338,7 +339,7 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(const std::shared_ptr<Pointe
         // Add glowing particles onto the last path segment that was drawn
         long now = pointerEvent->GetActionTime();
         double len = mPointerPath_.GetLength(false);
-        mGlowTraceSystem_->AddGlowPoints(mPointerPath_, (now - mLastUpdateTimeMillis_) / 1000);
+        mGlowTraceSystem_->AddGlowPoints(mPointerPath_, (now - mLastUpdateTimeMillis_) / TIME_DIMENSION);
         mPointerPath_.Reset();
         mLastUpdateTimeMillis_ = now;
     }
