@@ -42,6 +42,7 @@ public:
             MMI_HILOGE("action is empty");
             return;
         }
+        DISPLAY_MONITOR->SetScreenStatus(action);
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
             STYLUS_HANDLER->IsLaunchAbility();
