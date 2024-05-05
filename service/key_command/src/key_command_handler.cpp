@@ -1435,7 +1435,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("Get value from setting date fail");
         return;
     }
-    MMI_HILOGE("Get value success key:%{public}s value:%{public}d", item.statusConfig.c_str(), configVlaue);
+    MMI_HILOGI("Get value success key:%{public}s value:%{public}d", item.statusConfig.c_str(), configVlaue);
     item.statusConfigValue = configVlaue;
 }
 
