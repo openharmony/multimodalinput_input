@@ -58,7 +58,6 @@ private:
     void InitPointerPathPaint();
     void UpdateTrackColors();
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
-    int32_t GetPointerSize();
     std::shared_ptr<Rosen::Drawing::Bitmap> PixelMapToBitmap(
     std::shared_ptr<Media::PixelMap>& pixelMap);
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
