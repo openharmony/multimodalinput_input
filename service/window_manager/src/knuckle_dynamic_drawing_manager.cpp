@@ -70,14 +70,6 @@ KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
 
 KnuckleDynamicDrawingManager::~KnuckleDynamicDrawingManager() {}
 
-int32_t KnuckleDynamicDrawingManager::GetPointerSize()
-{
-    CALL_DEBUG_ENTER;
-    std::string name = "pointerSize";
-    int32_t pointerSize = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_SIZE);
-    return pointerSize;
-}
-
 std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
 {
     CALL_DEBUG_ENTER;

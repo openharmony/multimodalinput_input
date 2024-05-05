@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDivergentPoint" };
 constexpr double PI = 3.14159265358979323846;
+constexpr double MOVE_SPEED = 10.0;
 Rosen::Drawing::Pen KnuckleDivergentPoint::sTracePaint;
 int32_t KnuckleDivergentPoint::BASIC_LIFESPAN = 15;
 double KnuckleDivergentPoint::BASIC_GRAVITY_Y = 0.5;
@@ -44,15 +45,6 @@ KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap
 {
     CALL_DEBUG_ENTER;
     mTraceShadow_ = bitMap;
-    srand((unsigned)time(nullptr));
-    float newSize = rand() % DEFAULT_SIZE + DEFAULT_SIZE_OFFSET;
-    float proportion = 0;
-    int width = bitMap.GetWidth();
-    if (width != 0) {
-        proportion = newSize / width;
-    }
-    mTraceMatrix_.PostTranslate(-width / DOUBLE, -(bitMap.GetHeight() / DOUBLE));
-    mTraceMatrix_.PostScale(proportion, proportion);
 }
 
 KnuckleDivergentPoint::~KnuckleDivergentPoint() {};
@@ -100,10 +92,8 @@ void KnuckleDivergentPoint::Reset(double pointX, double pointY)
     std::uniform_real_distribution<double> u(0.0, 1.0);
     double baseVelocity = u(e) * DOUBLE * PI;
 
-    srand((unsigned)time(nullptr));
-    double moveSpeed = rand() % DEFAULT_SPEED + DEFAULT_SPEED_OFFSET;
-    mMoveVelocityX_ = std::cos(baseVelocity) * moveSpeed;
-    mMoveVelocityY_ = std::sin(baseVelocity) * moveSpeed;
+    mMoveVelocityX_ = std::cos(baseVelocity) * MOVE_SPEED;
+    mMoveVelocityY_ = std::sin(baseVelocity) * MOVE_SPEED;
 }
 
 bool KnuckleDivergentPoint::IsEnded()
