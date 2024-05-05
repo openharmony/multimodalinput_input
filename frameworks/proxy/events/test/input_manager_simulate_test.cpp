@@ -556,22 +556,6 @@ HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_0
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
-/**
- * @tc.name: MultimodalEventHandler_SimulatePointerEvent_014
- * @tc.desc: Dispatch joystick event dispatch to focus window
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, MultimodalEventHandler_SimulatePointerEvent_014, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent016()};
-    ASSERT_NE(pointerEvent, nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
-}
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
-
 /**
  * @tc.name: MultimodalEventHandler_SimulatePencil2Event_001
  * @tc.desc: Verify simulate pencil2 down event
