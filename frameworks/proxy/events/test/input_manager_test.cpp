@@ -3012,15 +3012,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest_001, TestSize.L
 }
 
 /**
- * @tc.name: InputManagerTest_SetCurrenUser_001
- * @tc.desc: set curren user id
+ * @tc.name: InputManagerTest_SetCurrentUser_001
+ * @tc.desc: set current user id
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SetCurrenUser_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
 {
     int32_t userId = 10;
-    int32_t ret = InputManager::GetInstance()->SetCurrenUser(userId);
+    int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
     EXPECT_TRUE(ret == RET_OK);
 }
 } // namespace MMI
