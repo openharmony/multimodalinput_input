@@ -184,7 +184,6 @@ private:
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
     bool PreHandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
-    bool PreHandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);

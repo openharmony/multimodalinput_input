@@ -14,6 +14,7 @@
  */
 
 #include "display_event_monitor.h"
+#include "stylus_key_handler.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "DisplayEventMonitor"
