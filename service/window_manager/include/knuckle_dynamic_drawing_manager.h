@@ -32,11 +32,6 @@
 
 namespace OHOS {
 namespace MMI {
-struct KnuBubble {
-    int32_t innerCircleRadius { 0 };
-    int32_t outerCircleRadius { 0 };
-    float outerCircleWidth { 0 };
-};
 
 class KnuckleDynamicDrawingManager {
 public:
@@ -69,7 +64,6 @@ private:
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_;
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
-    KnuBubble bubble_;
     Rosen::Drawing::Brush brush_;
     Rosen::Drawing::Pen pen_;
     std::vector<Rosen::Drawing::Point> mTraceControlpoints_;
