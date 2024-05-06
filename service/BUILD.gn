@@ -143,7 +143,11 @@ ohos_shared_library("libmmi-server") {
     debug = false
   }
   sources += [
+    "window_manager/src/knuckle_divergent_point.cpp",
     "window_manager/src/knuckle_drawing_manager.cpp",
+    "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
+    "window_manager/src/knuckle_glow_point.cpp",
+    "window_manager/src/knuckle_glow_trace_system.cpp",
     "window_manager/src/touch_drawing_manager.cpp",
   ]
 
