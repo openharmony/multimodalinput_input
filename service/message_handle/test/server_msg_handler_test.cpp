@@ -127,5 +127,33 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
     int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
     EXPECT_EQ(result, RET_OK);
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_01
+ * @tc.desc: Test OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_01, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    bool isAuthorize = true;
+    int32_t result = servermsghandler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_02
+ * @tc.desc: Test OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_02, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    bool isAuthorize = false;
+    int32_t result = servermsghandler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(result, ERR_OK);
+}
 }
 }
