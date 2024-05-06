@@ -127,14 +127,10 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
 }
 
-void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid)
+void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
+    uint32_t pid, int32_t pointCnt)
 {
-    if (isTouchEnable_) {
-        MMI_HILOGD("touch interface to RS Enable");
-        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction);
-    } else {
-        MMI_HILOGD("touch interface to RS NOT Enable");
-    }
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -201,8 +197,9 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        int32_t pointerCnt = pointerEvent->GetPointerCount();
         NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
-            static_cast<uint32_t>(session->GetPid()));
+            static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
