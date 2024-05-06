@@ -71,7 +71,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSi
     int32_t action = 1;
     std::string name = "ExampleProgram";
     uint32_t processId = 12345;
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(action, name, processId));
+    int32_t touchCnt = 0;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(action, name, processId, touchCnt));
 }
 
 /**
