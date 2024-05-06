@@ -118,8 +118,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
             windowX = windowXY.first;
             windowY = windowXY.second;
         }
-        pointerItem.SetDisplayX(windowX);
-        pointerItem.SetDisplayY(windowY);
+        pointerItem.SetWindowX(windowX);
+        pointerItem.SetWindowY(windowY);
         pointerItem.SetTargetWindowId(windowId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
