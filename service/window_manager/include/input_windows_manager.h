@@ -211,6 +211,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
+    bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
@@ -218,11 +219,14 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
+    void SetAntiMisTake(bool state);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
     bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
+    template <class T>
+    void CreateAntiMisTakeObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -275,6 +279,11 @@ private:
     bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    struct AntiMisTake {
+        std::string switchName;
+        bool isOpen { false };
+    } antiMistake_;
+    bool isOpenAntiMisTakeObserver_ { false };
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
