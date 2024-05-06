@@ -40,6 +40,7 @@
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
 #include "multimodal_input_preferences_manager.h"
+#include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -80,6 +81,7 @@ const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/di
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
 
+const std::string navigationSwitchName = "settings.input.stylus_navigation_hint";
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -1069,6 +1071,11 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         libinput_event_touch_get_tool_height_transformed(touch, height));
 }
 
+void InputWindowsManager::SetAntiMisTake(bool state)
+{
+    antiMistake_.isOpen = state;
+}
+
 bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
@@ -2031,6 +2038,28 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
     return false;
 }
 
+bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
+{
+    CALL_DEBUG_ENTER;
+    if (windowType != WindowInputType::ANTI_MISTAKE_TOUCH || toolType != PointerEvent::TOOL_TYPE_PEN) {
+        return false;
+    }
+    if (!isOpenAntiMisTakeObserver_) {
+        antiMistake_.switchName = navigationSwitchName;
+        CreateAntiMisTakeObserver(antiMistake_);
+        isOpenAntiMisTakeObserver_ = true;
+        MMI_HILOGI("get anti mistake touch switch start");
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName,
+            antiMistake_.isOpen);
+        MMI_HILOGI("get anti mistake touch switch end");
+    }
+    if (antiMistake_.isOpen) {
+        MMI_HILOGD("anti mistake switch is open.");
+        return true;
+    }
+    return false;
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2093,6 +2122,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             continue;
         }
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
+            continue;
+        }
+        if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
             continue;
         }
 
@@ -2437,6 +2469,25 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 }
 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+template <class T>
+void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
+{
+    CALL_INFO_ENTER;
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+        if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
+            MMI_HILOGE("get settingdata failed, key: %{public}s", key.c_str());
+        }
+        MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isOpen);
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.switchName, updateFunc);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        statusObserver = nullptr;
+    }
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
