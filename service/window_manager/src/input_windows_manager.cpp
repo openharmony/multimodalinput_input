@@ -2080,6 +2080,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    bool isFirstSpecialWindow = false;
     for (auto &item : windowsInfo) {
         if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
             MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
@@ -2119,6 +2120,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             item.defaultHotAreas, item)) {
             touchWindow = &item;
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
+            if (!isFirstSpecialWindow) {
+                isFirstSpecialWindow = isSpecialWindow;
+                MMI_HILOGI("the first special window status:%{publc}d", isFirstSpecialWindow);
+            }
             if (isSpecialWindow) {
                 AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
                 isHotArea = true;
@@ -2151,8 +2156,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
-        if (isCompensatePointer) {
+        if (isCompensatePointer || isFirstSpecialWindow) {
             SimulatePointerExt(pointerEvent);
+            isFirstSpecialWindow = false;
         } else {
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                 std::unordered_map<std::string, std::string> mapPayload;
@@ -2431,7 +2437,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    
+
     knuckleDrawMgr->UpdateDisplayInfo(*physicDisplayInfo);
     knuckleDrawMgr->KnuckleDrawHandler(pointerEvent);
     knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
