@@ -29,7 +29,7 @@ declare_args() {
   input_feature_interceptor = true
   input_feature_monitor = true
   input_feature_keyboard = true
-  input_feature_switch = false
+  input_feature_switch = true
   input_feature_mouse = true
   input_feature_joystick = true
   input_feature_touchscreen = true
@@ -140,6 +140,7 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/evdev-debounce.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-fallback.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-joystick.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-privacy-switch.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-middle-button.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-buttons.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-edge-scroll.c",

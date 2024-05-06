@@ -604,6 +604,8 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
     CHKPR(swev, ERROR_NULL_POINTER);
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
+    MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d",
+        libinput_event_switch_get_switch(swev), state);
     auto swEvent = std::make_unique<SwitchEvent>(static_cast<int>(state));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
