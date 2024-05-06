@@ -121,7 +121,7 @@ private:
     bool isFirstDownAction_ { false };
     bool isDownAction_ { false };
     bool isFirstDraw_ { true };
-    std::shared_ptr<PointerEvent> pointerEvent_{ nullptr };
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     PointerEvent::PointerItem firstPointerItem_;
     RosenCanvas *trackerCanvas_;
