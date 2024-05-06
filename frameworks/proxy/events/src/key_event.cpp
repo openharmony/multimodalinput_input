@@ -960,6 +960,22 @@ std::shared_ptr<KeyEvent> KeyEvent::Create()
     return event;
 }
 
+void KeyEvent::Reset()
+{
+    InputEvent::Reset();
+    keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
+    keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
+    keyIntention_ = KeyEvent::INTENTION_UNKNOWN;
+    numLock_ = false;
+    capsLock_ = false;
+    scrollLock_ = false;
+    repeat_ = false;
+    keys_.clear();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    enhanceData_.clear();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+}
+
 int32_t KeyEvent::GetKeyCode() const
 {
     return keyCode_;
