@@ -42,6 +42,7 @@ constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 const std::string EXTENSION_ABILITY = "extensionAbility";
+const std::string EXTENSION_ABILITY_ABNORMAL = "extensionAbilityAbnormal";
 } // namespace
 class KeyCommandHandlerTest : public testing::Test {
 public:
@@ -928,6 +929,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyCancel, TestSize.
     ShortcutKey shortcutKey;
     shortcutKey.timerId = -1;
     ASSERT_FALSE(handler.HandleKeyCancel(shortcutKey));
+    shortcutKey.timerId = 10;
+    ASSERT_FALSE(handler.HandleKeyCancel(shortcutKey));
 }
 
 /**
@@ -942,6 +945,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_LaunchAbility_001, TestSiz
     KeyCommandHandler handler;
     Ability ability;
     ability.abilityType = EXTENSION_ABILITY;
+    ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(ability));
+    ability.abilityType = EXTENSION_ABILITY_ABNORMAL;
     ASSERT_NO_FATAL_FAILURE(handler.LaunchAbility(ability));
 }
 
@@ -1052,6 +1057,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_RemoveSubscribedTimer, Tes
     timerIds.push_back(100);
     handler.specialTimers_.insert(std::make_pair(keyCode, timerIds));
     ASSERT_NO_FATAL_FAILURE(handler.RemoveSubscribedTimer(keyCode));
+    keyCode = 17;
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveSubscribedTimer(keyCode));
 }
 
 /**
@@ -1076,6 +1083,26 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSpecialKeys, TestSiz
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_HandleSpecialKeys_001
+ * @tc.desc: Overrides the HandleSpecialKeys function exception branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSpecialKeys_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    int32_t powerKeyCode = 18;
+    int32_t keyCode = 2017;
+    int32_t keyAction = KeyEvent::KEY_ACTION_UP;
+    handler.specialKeys_.insert(std::make_pair(powerKeyCode, keyAction));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleSpecialKeys(keyCode, keyAction));
+
+    keyAction = KeyEvent::KEY_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleSpecialKeys(powerKeyCode, keyAction));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_InterruptTimers
  * @tc.desc: InterruptTimers
  * @tc.type: FUNC
@@ -1086,8 +1113,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_InterruptTimers, TestSize.
     CALL_DEBUG_ENTER;
     KeyCommandHandler handler;
     Sequence sequence;
-    std::vector<Sequence> filterSequences;
     sequence.timerId = 1;
+    handler.filterSequences_.push_back(sequence);
+    ASSERT_NO_FATAL_FAILURE(handler.InterruptTimers());
+
+    handler.filterSequences_.clear();
+    sequence.timerId = -1;
     handler.filterSequences_.push_back(sequence);
     ASSERT_NO_FATAL_FAILURE(handler.InterruptTimers());
 }
@@ -1118,6 +1149,22 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetKnuckleDoubleTapDistanc
     KeyCommandHandler handler;
     float distance = -1.0f;
     ASSERT_NO_FATAL_FAILURE(handler.SetKnuckleDoubleTapDistance(distance));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleMulFingersTap
+ * @tc.desc: Overrides the HandleMulFingersTap function exception branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMulFingersTap, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_QUADTAP);
+    ASSERT_FALSE(handler.HandleMulFingersTap(pointerEvent));
 }
 
 /**
@@ -1213,6 +1260,41 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsRepeatKeyEvent, TestSize
     handler.keys_.push_back(sequenceKey);
     sequenceKey.keyCode = 2020;
     ASSERT_FALSE(handler.IsRepeatKeyEvent(sequenceKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleSequences
+ * @tc.desc: HandleSequences
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.matchedSequence_.timerId = 10;
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+    handler.matchedSequence_.timerId = -1;
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetActionTime(10000);
+    SequenceKey sequenceKey;
+    Sequence sequence;
+    handler.sequences_.push_back(sequence);
+    sequenceKey.actionTime = 15000;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+
+    handler.keys_.clear();
+    keyEvent->SetActionTime(1500000);
+    sequenceKey.actionTime = 200000;
+    sequence.statusConfigValue = false;
+    handler.filterSequences_.push_back(sequence);
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
 }
 
 /**
