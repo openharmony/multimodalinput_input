@@ -939,5 +939,164 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, 
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_002
+ * @tc.desc: Test subscribe keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    std::string programName = "UDSSession";
+    int32_t moduleType = 1;
+    int32_t fd = 1;
+    int32_t uid = 100;
+    int32_t pid = 100;
+    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, fd, uid, pid);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::set<int32_t> preKeys;
+    preKeys.insert(1);
+    keyOption->SetPreKeys(preKeys);
+    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_OK);
+
+    preKeys.insert(2);
+    preKeys.insert(3);
+    preKeys.insert(4);
+    preKeys.insert(5);
+    preKeys.insert(6);
+    keyOption->SetPreKeys(preKeys);
+    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEqualKeyOption
+ * @tc.desc: Test Is Equal KeyOption
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEqualKeyOption, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyOption> newOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeyOption> oldOption = std::make_shared<KeyOption>();
+    std::set<int32_t> preKeys;
+    std::set<int32_t> pressedKeys;
+    preKeys.insert(1);
+    pressedKeys.insert(1);
+    newOption->SetPreKeys(preKeys);
+    oldOption->SetPreKeys(pressedKeys);
+    newOption->SetFinalKey(1);
+    oldOption->SetFinalKey(2);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+
+    oldOption->SetFinalKey(1);
+    newOption->SetFinalKeyDown(true);
+    oldOption->SetFinalKeyDown(false);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    oldOption->SetFinalKeyDown(true);
+
+    newOption->SetFinalKeyDownDuration(100);
+    oldOption->SetFinalKeyDownDuration(150);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    oldOption->SetFinalKeyDownDuration(100);
+
+    newOption->SetFinalKeyUpDelay(100);
+    oldOption->SetFinalKeyUpDelay(150);
+    ASSERT_FALSE(handler.IsEqualKeyOption(newOption, oldOption));
+    oldOption->SetFinalKeyUpDelay(100);
+    ASSERT_TRUE(handler.IsEqualKeyOption(newOption, oldOption));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEnableCombineKey_003
+ * @tc.desc: Test Is Enable CombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    handler.enableCombineKey_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->AddKeyItem(item);
+    ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
+
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    keyEvent->AddKeyItem(item);
+    ASSERT_FALSE(handler.IsEnableCombineKey(keyEvent));
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_DPAD_RIGHT);
+    ASSERT_FALSE(handler.IsEnableCombineKey(keyEvent));
+
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
+    ASSERT_FALSE(handler.IsEnableCombineKey(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEnableCombineKey_004
+ * @tc.desc: Test Is Enable CombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    handler.enableCombineKey_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
+    item.SetKeyCode(KeyEvent::KEYCODE_L);
+    ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEnableCombineKey_005
+ * @tc.desc: Test Is Enable CombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    handler.enableCombineKey_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
+    item.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEnableCombineKey_006
+ * @tc.desc: Test Is Enable CombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    handler.enableCombineKey_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
+    item.SetKeyCode(KeyEvent::KEYCODE_META_RIGHT);
+    ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
+}
 } // namespace MMI
 } // namespace OHOS
