@@ -44,7 +44,7 @@ public:
  */
 HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData, TestSize.Level1)
 {
-    ServerMsgHandler servermsghandler; 
+    ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
     void* pixelMap = nullptr;
     int32_t result = servermsghandler.SetPixelMapData(infoId, pixelMap);
