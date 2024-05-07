@@ -1571,6 +1571,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerEvent_001
     int32_t logicalX = 10;
     int32_t logicalY = 20;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo touchWindow;
     touchWindow.id = 2;
     WinMgr->UpdatePointerEvent(logicalX, logicalY, pointerEvent, touchWindow);
@@ -1590,6 +1591,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerEvent_002
     int32_t logicalX = 10;
     int32_t logicalY = 20;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo touchWindow;
     touchWindow.id = 0;
     WinMgr->UpdatePointerEvent(logicalX, logicalY, pointerEvent, touchWindow);
@@ -1634,6 +1636,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_00
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     int32_t result =WinMgr->UpdateMouseTarget(pointerEvent);
     WinMgr->SetMouseFlag(true);
     WinMgr->SetMouseFlag(false);
@@ -1899,6 +1902,275 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_00
     EXPECT_EQ(physicalX, RET_OK);
     EXPECT_EQ(physicalY, RET_OK);
     EXPECT_EQ(displayId, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWidthAndHeight_001
+ * @tc.desc: Test the method for retrieving width and height
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWidthAndHeight_001, TestSize.Level1)
+{
+    DisplayInfo displayInfo;
+    displayInfo.displayDirection = DIRECTION0;
+    displayInfo.direction = DIRECTION0;
+    int32_t width = 1920;
+    int32_t height = 1080;
+    WinMgr->GetWidthAndHeight(&displayInfo, width, height);
+    EXPECT_EQ(width, RET_OK);
+    EXPECT_EQ(height, RET_OK);
+    displayInfo.direction = DIRECTION90;
+    WinMgr->GetWidthAndHeight(&displayInfo, width, height);
+    EXPECT_EQ(width, RET_OK);
+    EXPECT_EQ(height, RET_OK);
+    displayInfo.displayDirection = DIRECTION180;
+    displayInfo.direction = DIRECTION0;
+    WinMgr->GetWidthAndHeight(&displayInfo, width, height);
+    EXPECT_EQ(width, RET_OK);
+    EXPECT_EQ(height, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ReverseRotateScreen_001
+ * @tc.desc: Test the method for reversing screen rotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReverseRotateScreen_001, TestSize.Level1)
+{
+    DisplayInfo info;
+    Coordinate2D cursorPos;
+    info.direction = DIRECTION0;
+    info.width = 1920;
+    info.height = 1080;
+    WinMgr->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
+    EXPECT_EQ(cursorPos.x, 100);
+    EXPECT_EQ(cursorPos.y, 200);
+    info.direction = DIRECTION90;
+    WinMgr->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);;
+    EXPECT_EQ(cursorPos.x, 200);
+    EXPECT_EQ(cursorPos.y, 1820);
+    info.direction = DIRECTION180;
+    WinMgr->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
+    EXPECT_EQ(cursorPos.x, 1820);
+    EXPECT_EQ(cursorPos.y, 880);
+    info.direction = DIRECTION270;
+    WinMgr->ReverseRotateScreen(info, 100.0, 200.0, cursorPos);
+    EXPECT_EQ(cursorPos.x, 880);
+    EXPECT_EQ(cursorPos.y, 100);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateAndAdjustMouseLocation_001
+ * @tc.desc: Test the method for updating and adjusting mouse location
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLocation_001, TestSize.Level1)
+{
+    int32_t displayId = 2;
+    double x = 100.5;
+    double y = 200.5;
+    bool isRealData = true;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y, isRealData);
+    auto ret = WinMgr->GetDisplayId(inputEvent);
+    EXPECT_NE(displayId, ret);
+    displayId = -1;
+    x = 100.5;
+    y = 200.5;
+    isRealData = true;
+    WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y, isRealData);
+    ret = WinMgr->GetDisplayId(inputEvent);
+    EXPECT_NE(displayId, ret);
+    displayId = 0;
+    x = -100.5;
+    y = -200.5;
+    isRealData = true;
+    WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y, isRealData);
+    ret = WinMgr->GetDisplayId(inputEvent);
+    EXPECT_NE(displayId, ret);
+    displayId = 0;
+    x = 100.5;
+    y = 200.5;
+    isRealData = false;
+    WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y, isRealData);
+    ret = WinMgr->GetDisplayId(inputEvent);
+    EXPECT_NE(displayId, ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetMouseInfo_001
+ * @tc.desc: Test the GetMouseInfo method
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_001, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    MouseLocation mouseLocation;
+    displayGroupInfo.displaysInfo.clear();
+    MouseLocation result = WinMgr->GetMouseInfo();
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 1920;
+    displayInfo.height = 1080;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    mouseLocation.displayId = 0;
+    result = WinMgr->GetMouseInfo();
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    mouseLocation.displayId = -1;
+    MouseLocation expectedResult;
+    expectedResult.displayId = 1;
+    expectedResult.physicalX = 960;
+    expectedResult.physicalY = 540;
+    result = WinMgr->GetMouseInfo();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_001
+ * @tc.desc: Test the functionality of getting the cursor position
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_001, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    manager.cursorPos_.displayId = -1;
+    manager.displayGroupInfo_.displaysInfo.push_back({0, 800, 600});
+    CursorPosition result = WinMgr->GetCursorPos();
+    EXPECT_EQ(result.displayId, 1);
+    EXPECT_EQ(result.cursorPos.x, 1);
+    EXPECT_EQ(result.cursorPos.y, 1);
+    manager.cursorPos_.displayId = 1;
+    manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
+    result = WinMgr->GetCursorPos();
+    EXPECT_EQ(result.displayId, 1);
+    EXPECT_EQ(result.cursorPos.x, 1);
+    EXPECT_EQ(result.cursorPos.y, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetCursorPos_001
+ * @tc.desc: Test the functionality of resetting cursor position
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_001, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    manager.displayGroupInfo_.displaysInfo.push_back({1, 800, 600});
+    CursorPosition result = WinMgr->ResetCursorPos();
+    EXPECT_EQ(result.displayId, 1);
+    EXPECT_EQ(result.cursorPos.x, 1);
+    EXPECT_EQ(result.cursorPos.y, 1);
+    manager.displayGroupInfo_.displaysInfo.clear();
+    result = WinMgr->ResetCursorPos();
+    EXPECT_EQ(result.displayId, 1);
+    EXPECT_EQ(result.cursorPos.x, 1);
+    EXPECT_EQ(result.cursorPos.y, 1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AppendExtraData_001
+ * @tc.desc: Test the functionality of appending extra data in the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AppendExtraData_001, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    ExtraData extraData;
+    extraData.appended = true;
+    extraData.buffer = std::vector<uint8_t>{1, 2, 3};
+    extraData.pointerId = 12345;
+    int32_t result = WinMgr->AppendExtraData(extraData);
+    ASSERT_EQ(result, RET_OK);
+    ASSERT_NE(manager.GetExtraData().appended, extraData.appended);
+    ASSERT_NE(manager.GetExtraData().buffer, extraData.buffer);
+    ASSERT_NE(manager.GetExtraData().pointerId, extraData.pointerId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ClearExtraData_001
+ * @tc.desc: Test the functionality of clearing extra data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearExtraData_001, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    manager.extraData_.appended = true;
+    manager.extraData_.buffer.push_back(1);
+    manager.extraData_.sourceType = 0;
+    manager.extraData_.pointerId = 1;
+    WinMgr->ClearExtraData();
+    EXPECT_TRUE(manager.extraData_.appended);
+    EXPECT_FALSE(manager.extraData_.buffer.empty());
+    EXPECT_NE(-1, manager.extraData_.sourceType);
+    EXPECT_NE(-1, manager.extraData_.pointerId);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetExtraData_001
+ * @tc.desc: Test the functionality of getting extra data in the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetExtraData_001, TestSize.Level1)
+{
+    ExtraData actualData = WinMgr->GetExtraData();
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsWindowVisible_001
+ * @tc.desc: Test the window visibility functionality of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible_001, TestSize.Level1)
+{
+    int32_t invalidPid = -1;
+    bool result = WinMgr->IsWindowVisible(invalidPid);
+    EXPECT_TRUE(result);
+    int32_t visiblePid = 0;
+    result = WinMgr->IsWindowVisible(visiblePid);
+    EXPECT_FALSE(result);
+    int32_t invisiblePid = 1;
+    result = WinMgr->IsWindowVisible(invisiblePid);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_001
+ * @tc.desc: Test the update function of pointer action in Input Windows Manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_001, TestSize.Level1)
+{
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    WinMgr->UpdatePointerAction(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_MOVE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    WinMgr->UpdatePointerAction(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_UP);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    WinMgr->UpdatePointerAction(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_UP);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    WinMgr->UpdatePointerAction(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_IN_WINDOW);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+    WinMgr->UpdatePointerAction(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+    pointerEvent->SetPointerAction(100);
+    WinMgr->UpdatePointerAction(pointerEvent);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), 100);
 }
 } // namespace MMI
 } // namespace OHOS
