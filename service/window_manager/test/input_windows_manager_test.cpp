@@ -1571,6 +1571,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerEvent_001
     int32_t logicalX = 10;
     int32_t logicalY = 20;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo touchWindow;
     touchWindow.id = 2;
     WinMgr->UpdatePointerEvent(logicalX, logicalY, pointerEvent, touchWindow);
@@ -1590,6 +1591,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerEvent_002
     int32_t logicalX = 10;
     int32_t logicalY = 20;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     WindowInfo touchWindow;
     touchWindow.id = 0;
     WinMgr->UpdatePointerEvent(logicalX, logicalY, pointerEvent, touchWindow);
@@ -1634,6 +1636,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_00
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     int32_t result =WinMgr->UpdateMouseTarget(pointerEvent);
     WinMgr->SetMouseFlag(true);
     WinMgr->SetMouseFlag(false);
@@ -1971,6 +1974,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
     double y = 200.5;
     bool isRealData = true;
     std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
     WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y, isRealData);
     auto ret = WinMgr->GetDisplayId(inputEvent);
     EXPECT_NE(displayId, ret);
@@ -2117,7 +2121,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearExtraData_001, Te
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetExtraData_001, TestSize.Level1)
 {
-    ExtraData expectedData;
     ExtraData actualData = WinMgr->GetExtraData();
 }
 
@@ -2149,6 +2152,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible_001, T
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_001, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     WinMgr->UpdatePointerAction(pointerEvent);
     EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_PULL_MOVE);
