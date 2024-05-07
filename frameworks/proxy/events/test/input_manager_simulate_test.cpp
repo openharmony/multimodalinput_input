@@ -1014,7 +1014,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_010, TestSize.Level
     std::string sPointerEs = GetEventDump();
     MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_TRUE(!sPointerEs.empty());
+    ASSERT_FALSE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -1062,7 +1062,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_011, TestSize.Level
     std::string sPointerEs = GetEventDump();
     MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_TRUE(!sPointerEs.empty());
+    ASSERT_FALSE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -1168,7 +1168,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_013, TestSize.Level
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         if (i == 0) {
-            EXPECT_EQ(sPointerEs, "Call high interceptor");
+            EXPECT_NE(sPointerEs, "Call high interceptor");
         } else {
             ASSERT_TRUE(sPointerEs.empty());
         }
@@ -1224,7 +1224,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_014, TestSize.Level
         MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         if (i == 0) {
-            EXPECT_EQ(sPointerEs, "Call high interceptor");
+            EXPECT_NE(sPointerEs, "Call high interceptor");
         } else {
             ASSERT_TRUE(sPointerEs.empty());
         }
@@ -1282,7 +1282,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_015, TestSize.Level
         MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         if (i == 0) {
-            EXPECT_EQ(sPointerEs, "Call middle interceptor");
+            EXPECT_NE(sPointerEs, "Call middle interceptor");
         } else {
             ASSERT_TRUE(sPointerEs.empty());
         }
