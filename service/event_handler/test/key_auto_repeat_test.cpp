@@ -253,7 +253,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
     int32_t testValue = 123;
     int32_t result = keyAutoRepeat.PutConfigDataToDatabase(testKey, testValue);
     ASSERT_EQ(result, 0);
-    ASSERT_TRUE(PreferencesMgr->GetIntValue(testKey, testValue));
+    ASSERT_TRUE(PREFERENCES_MGR->GetIntValue(testKey, testValue));
 }
 
 /**
@@ -267,7 +267,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetConfigDataFromDatabase_001, Tes
     KeyAutoRepeat keyAutoRepeat;
     std::string key = "test_key";
     int32_t value = 0;
-    PreferencesMgr->SetIntValue(key, KEYBOARD_FILE_NAME, 42);
+    PREFERENCES_MGR->SetIntValue(key, KEYBOARD_FILE_NAME, 42);
     int32_t ret = keyAutoRepeat.GetConfigDataFromDatabase(key, value);
     EXPECT_EQ(ret, RET_OK);
     EXPECT_EQ(value, 42);
