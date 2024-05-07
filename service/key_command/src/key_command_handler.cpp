@@ -90,9 +90,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     STYLUS_HANDLER->SetLastEventState(false);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -823,11 +821,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return false;
     }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (STYLUS_HANDLER->HandleStylusKey(key)) {
         return true;
     }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
@@ -906,9 +902,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     STYLUS_HANDLER->SetLastEventState(false);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
