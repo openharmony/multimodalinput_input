@@ -15,12 +15,13 @@
 
 #include <cstdio>
 #include <cinttypes>
-#include <gtest/gtest.h>
 
-#include "define_multimodal.h"
+#include <gtest/gtest.h>
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
+
+#include "define_multimodal.h"
 #include "server_msg_handler.h"
 
 namespace OHOS {
@@ -155,5 +156,5 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_02, TestSize.Lev
     int32_t result = servermsghandler.OnAuthorize(isAuthorize);
     EXPECT_EQ(result, ERR_OK);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
