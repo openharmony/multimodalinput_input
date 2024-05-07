@@ -932,12 +932,12 @@ ohos_unittest("ServerMsgHandlerTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
-    "security_component_manager:libsecurity_component_sdk",
+    "c_utils:utils",
     "c_utils:utils",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
-    "c_utils:utils",
+    "security_component_manager:libsecurity_component_sdk",
   ]
 }
 
