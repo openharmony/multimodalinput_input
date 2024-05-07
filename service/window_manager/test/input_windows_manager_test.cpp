@@ -2311,7 +2311,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddTargetWindowIds_002
     ASSERT_EQ(manager.targetWindowIds_[pointerItemId].size(), 1);
     ASSERT_EQ(manager.targetWindowIds_[pointerItemId][0], windowId1);
     ASSERT_NE(manager.targetWindowIds_[pointerItemId][1], windowId2);
-
 }
 
 /**
