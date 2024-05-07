@@ -2172,5 +2172,190 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_00
     WinMgr->UpdatePointerAction(pointerEvent);
     EXPECT_EQ(pointerEvent->GetPointerAction(), 100);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_Dump_001
+ * @tc.desc: Test the dump function of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_Dump_001, TestSize.Level1)
+{
+    int32_t fd = 1;
+    std::vector<std::string> args;
+    WinMgr->Dump(fd, args);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformWindowXY_001
+ * @tc.desc: Test the TransformWindowXY function of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformWindowXY_001, TestSize.Level1)
+{
+    WindowInfo window;
+    double logicX = 10.0;
+    double logicY = 20.0;
+    std::pair<double, double> result =WinMgr->TransformWindowXY(window, logicX, logicY);
+    double ret = result.first;
+    EXPECT_EQ(ret, logicX);
+    double ret1 = result.second;
+    EXPECT_EQ(ret1, logicY);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsValidZorderWindow_001
+ * @tc.desc: Test the validity of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsValidZorderWindow_001, TestSize.Level1)
+{
+    WindowInfo window;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    bool result = WinMgr->IsValidZorderWindow(window, pointerEvent);
+    EXPECT_TRUE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleWindowInputType_004
+ * @tc.desc: Test the functionality of handling window input types in the Input Windows Manage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_004, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo window;
+    window.windowInputType = WindowInputType::TRANSMIT_EXCEPT_MOVE;
+    ASSERT_FALSE(WinMgr->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowAndDisplayInfo_001
+ * @tc.desc: Test the function of getting window and display information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowAndDisplayInfo_001, TestSize.Level1)
+{
+    int32_t windowId = 1;
+    int32_t displayId = 1;
+    auto result = WinMgr->GetWindowAndDisplayInfo(windowId, displayId);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result->id, windowId);
+    windowId = -1;
+    displayId = 1;
+    result = WinMgr->GetWindowAndDisplayInfo(windowId, displayId);
+    ASSERT_FALSE(result.has_value());
+    windowId = 1;
+    displayId = -1;
+    result = WinMgr->GetWindowAndDisplayInfo(windowId, displayId);
+    ASSERT_TRUE(result.has_value());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetTargetWindowIds_001
+ * @tc.desc: Test the functionality of getting target window IDs
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetTargetWindowIds_001, TestSize.Level1)
+{
+    std::vector<int32_t> windowIds;
+    int32_t pointerItemId = 1;
+    WinMgr->GetTargetWindowIds(pointerItemId, windowIds);
+    ASSERT_TRUE(windowIds.empty());
+    pointerItemId = -1;
+    WinMgr->GetTargetWindowIds(pointerItemId, windowIds);
+    ASSERT_TRUE(windowIds.empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AddTargetWindowIds_001
+ * @tc.desc: Test the functionality of adding target window IDs
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddTargetWindowIds_001, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    int32_t pointerItemId = 1;
+    int32_t windowId = 100;
+    WinMgr->AddTargetWindowIds(pointerItemId, windowId);
+    ASSERT_FALSE(manager.targetWindowIds_.find(pointerItemId) != manager.targetWindowIds_.end());
+    ASSERT_EQ(manager.targetWindowIds_[pointerItemId].size(), 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AddTargetWindowIds_002
+ * @tc.desc: Test the functionality of adding target window IDs
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddTargetWindowIds_002, TestSize.Level1)
+{
+    InputWindowsManager manager;
+    int32_t pointerItemId = 2;
+    int32_t windowId1 = 200;
+    int32_t windowId2 = 201;
+    manager.targetWindowIds_[pointerItemId] = {windowId1};
+    WinMgr->AddTargetWindowIds(pointerItemId, windowId2);
+    ASSERT_TRUE(manager.targetWindowIds_.find(pointerItemId) != manager.targetWindowIds_.end());
+    ASSERT_EQ(manager.targetWindowIds_[pointerItemId].size(), 1);
+    ASSERT_EQ(manager.targetWindowIds_[pointerItemId][0], windowId1);
+    ASSERT_NE(manager.targetWindowIds_[pointerItemId][1], windowId2);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckWindowIdPermissionByPid_002
+ * @tc.desc: Test the functionality of checking window ID permission by process ID
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissionByPid_002, TestSize.Level1)
+{
+    int32_t windowId = -123;
+    int32_t pid = -456;
+    int32_t result = WinMgr->CheckWindowIdPermissionByPid(windowId, pid);
+    EXPECT_EQ(result, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsTransparentWin_001
+ * @tc.desc: Test the functionality of transparent windows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin_001, TestSize.Level1)
+{
+    void* pixelMap = nullptr;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    auto result = WinMgr->IsTransparentWin(pixelMap, logicalX, logicalY);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetCurrentUser_001
+ * @tc.desc: Test the functionality of setting the current user
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetCurrentUser_001, TestSize.Level1)
+{
+    int32_t userId = 123;
+    auto ret = WinMgr->SetCurrentUser(userId);
+    EXPECT_EQ(ret, RET_OK);
+    userId = -456;
+    ret = WinMgr->SetCurrentUser(userId);
+    EXPECT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
