@@ -2009,19 +2009,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_001, TestSize.Level1)
 {
-    DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_;
-    displayGroupInfo_.displaysInfo.clear();
+    DisplayGroupInfo displayGroupInfo;
+    MouseLocation mouseLocation;
+    displayGroupInfo.displaysInfo.clear();
     MouseLocation result = WinMgr->GetMouseInfo();
     DisplayInfo displayInfo;
     displayInfo.id = 1;
     displayInfo.width = 1920;
     displayInfo.height = 1080;
-    displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    mouseLocation_.displayId = 0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    mouseLocation.displayId = 0;
     result = WinMgr->GetMouseInfo();
-    displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    mouseLocation_.displayId = -1;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    mouseLocation.displayId = -1;
     MouseLocation expectedResult;
     expectedResult.displayId = 1;
     expectedResult.physicalX = 960;
