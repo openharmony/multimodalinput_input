@@ -2904,7 +2904,6 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 {
     CALL_DEBUG_ENTER;
     if (pixelMap == nullptr) {
-        MMI_HILOGD("The pixelmap is nullptr");
         return false;
     }
 

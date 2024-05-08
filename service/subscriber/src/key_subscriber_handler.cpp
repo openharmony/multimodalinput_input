@@ -104,7 +104,6 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
 
 int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
     return RemoveSubscriber(sess, subscribeId);
