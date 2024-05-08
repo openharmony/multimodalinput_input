@@ -1898,7 +1898,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             physicalDisplayInfo->height, physicalX, physicalY);
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
+    if (IPointerDrawingManager::GetInstance()->HasMagicCursor()) {
+        MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
+    }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
 
