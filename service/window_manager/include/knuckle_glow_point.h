@@ -47,10 +47,10 @@ private:
     static double DEFAULT_LIFESPAN;
 
     double lifespan_ = DEFAULT_LIFESPAN;
-    double pointX_;
-    double pointY_;
-    int64_t lastUpdateTimeMillis_;
-    float traceSize_;
+    double pointX_ { 0.0 };
+    double pointY_ { 0.0 };
+    int64_t lastUpdateTimeMillis_ { 0 };
+    float traceSize_ { 0.0 };
 
     Rosen::Drawing::Matrix traceMatrix_;
     Rosen::Drawing::Bitmap traceShadow_;
