@@ -943,6 +943,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
   ]
 }
 
