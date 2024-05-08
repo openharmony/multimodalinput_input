@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <cstdio>
 #include <cinttypes>
+#include <cstdio>
 
 #include <gtest/gtest.h>
 #include "input_event_handler.h"
