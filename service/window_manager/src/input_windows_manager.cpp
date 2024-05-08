@@ -2122,7 +2122,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
-                MMI_HILOGI("the first special window status:%{publc}d", isFirstSpecialWindow);
+                MMI_HILOGI("the first special window status:%{public}d", isFirstSpecialWindow);
             }
             if (isSpecialWindow) {
                 AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
