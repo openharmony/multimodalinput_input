@@ -53,7 +53,7 @@ private:
     std::vector<PointerInfo> pointerInfos_;
     Rosen::Drawing::Paint paint_;
     Rosen::Drawing::Path path_;
-    DisplayInfo displayInfo_;
+    DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
 };

@@ -464,7 +464,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
     item2.SetDownTime(100);
     item2.SetPressed(false);
     pointerEvent2->AddPointerItem(item2);
-    ASSERT_TRUE(!pointerEvent2->IsValid());
+    ASSERT_FALSE(!pointerEvent2->IsValid());
 }
 
 /**

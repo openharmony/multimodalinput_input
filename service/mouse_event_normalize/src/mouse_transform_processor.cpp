@@ -84,9 +84,10 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         MMI_HILOGE("No display");
         return RET_ERR;
     }
+    unaccelerated_.dx = libinput_event_pointer_get_dx_unaccelerated(data);
+    unaccelerated_.dy = libinput_event_pointer_get_dy_unaccelerated(data);
 
-    Offset offset = {libinput_event_pointer_get_dx_unaccelerated(data),
-        libinput_event_pointer_get_dy_unaccelerated(data)};
+    Offset offset { unaccelerated_.dx, unaccelerated_.dy };
     auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
@@ -96,13 +97,13 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
-    accelerated_.dx = cursorPos.cursorPos.x;
-    accelerated_.dy = cursorPos.cursorPos.y;
 
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
+        pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
     } else {
+        pointerEvent_->AddFlag(~InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
     }
@@ -110,8 +111,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
-    accelerated_.dx = cursorPos.cursorPos.x - accelerated_.dx;
-    accelerated_.dy = cursorPos.cursorPos.y - accelerated_.dy;
 #ifdef OHOS_BUILD_EMULATOR
     cursorPos.cursorPos.x = offset.dx;
     cursorPos.cursorPos.y = offset.dy;
@@ -423,8 +422,8 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     }
     pointerItem.SetDeviceId(deviceId_);
-    pointerItem.SetRawDx(static_cast<int32_t>(accelerated_.dx));
-    pointerItem.SetRawDy(static_cast<int32_t>(accelerated_.dy));
+    pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
+    pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
 
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
@@ -651,21 +650,20 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
 
 int32_t MouseTransformProcessor::GetPointerSpeed()
 {
-    CALL_DEBUG_ENTER;
     std::string name = "speed";
     int32_t speed = PREFERENCES_MGR->GetIntValue(name, DEFAULT_SPEED);
-    MMI_HILOGD("Get pointer speed successfully, speed:%{public}d", speed);
+    MMI_HILOGD("Pointer speed:%{public}d", speed);
     return speed;
 }
 
-int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
+int32_t MouseTransformProcessor::GetTouchpadSpeed()
 {
     int32_t speed = DEFAULT_TOUCHPAD_SPEED;
     if (GetTouchpadPointerSpeed(speed) != RET_OK) {
         // if failed to get touchpad from database, return DEFAULT_TOUCHPAD_SPEED
         return DEFAULT_TOUCHPAD_SPEED;
     }
-
+    MMI_HILOGD("(TouchPad) pointer speed:%{public}d", speed);
     return speed;
 }
 

@@ -92,7 +92,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
     void DumpInner();
-    int32_t GetTouchpadSpeed(void);
+
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
@@ -118,6 +118,7 @@ public:
     static int32_t GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    static int32_t GetTouchpadSpeed();
 
 private:
     static int32_t globalPointerSpeed_;
@@ -128,7 +129,7 @@ private:
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
-    Movement accelerated_ {};
+    Movement unaccelerated_ {};
 };
 } // namespace MMI
 } // namespace OHOS
