@@ -271,8 +271,6 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
-                    size, errno);
                 continue;
             }
             MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
