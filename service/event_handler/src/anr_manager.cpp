@@ -24,7 +24,6 @@
 #include "napi_constants.h"
 #include "proto.h"
 #include "timer_manager.h"
-#include "window_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ANRManager"
