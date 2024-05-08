@@ -609,7 +609,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    ASSERT_TRUE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -636,7 +636,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    ASSERT_TRUE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -663,7 +663,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
-    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    ASSERT_TRUE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -3009,6 +3009,19 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest_001, TestSize.L
     int64_t frequency = 3800;
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency, requencys);
     ASSERT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetCurrentUser_001
+ * @tc.desc: set current user id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
+{
+    int32_t userId = 10;
+    int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
+    EXPECT_TRUE(ret == RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

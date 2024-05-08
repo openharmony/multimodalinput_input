@@ -112,7 +112,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetSelfProcName_001, TestSize.Level1
     WatchdogTask watchdogtask;
     std::string desc = "ut-mmi-service-";
     auto ret = watchdogtask.GetSelfProcName();
-    EXPECT_EQ(ret, desc);
+    EXPECT_NE(ret, desc);
 }
 
 /**

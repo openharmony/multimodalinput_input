@@ -2080,6 +2080,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    bool isFirstSpecialWindow = false;
     for (auto &item : windowsInfo) {
         if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
             MMI_HILOGE("It's an abnormal window and touchscreen find the next window");
@@ -2119,6 +2120,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             item.defaultHotAreas, item)) {
             touchWindow = &item;
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
+            if (!isFirstSpecialWindow) {
+                isFirstSpecialWindow = isSpecialWindow;
+                MMI_HILOGI("the first special window status:%{public}d", isFirstSpecialWindow);
+            }
             if (isSpecialWindow) {
                 AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
                 isHotArea = true;
@@ -2151,8 +2156,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
-        if (isCompensatePointer) {
+        if (isCompensatePointer || isFirstSpecialWindow) {
             SimulatePointerExt(pointerEvent);
+            isFirstSpecialWindow = false;
         } else {
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                 std::unordered_map<std::string, std::string> mapPayload;
@@ -2421,6 +2427,9 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     if (knuckleDrawMgr == nullptr) {
         knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
     }
+    if (knuckleDynamicDrawingManager_ == nullptr) {
+        knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+    }
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
         MMI_HILOGE("This display is not exist");
@@ -2428,9 +2437,11 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    
+
     knuckleDrawMgr->UpdateDisplayInfo(*physicDisplayInfo);
     knuckleDrawMgr->KnuckleDrawHandler(pointerEvent);
+    knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
+    knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
 
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
@@ -2899,7 +2910,7 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     CHKPF(pixelMapPtr);
     uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
     if (result != RET_OK) {

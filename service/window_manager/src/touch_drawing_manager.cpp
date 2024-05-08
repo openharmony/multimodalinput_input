@@ -116,7 +116,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
-    itemRectW_ = displayInfo_.width / RECT_COUNT;
+    itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
 }
 
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
@@ -556,7 +556,7 @@ void TouchDrawingManager::UpdateVelocity()
             }
             int32_t physicalX = pointerItem.GetDisplayX();
             int32_t physicalY = pointerItem.GetDisplayY();
-            double diffTime = (actionTime - lastActionTime_) / 1000;
+            double diffTime = static_cast<double>(actionTime - lastActionTime_) / 1000;
             if (MMI_EQ(diffTime, 0.0)) {
                 xVelocity_ = 0.0;
                 yVelocity_ = 0.0;

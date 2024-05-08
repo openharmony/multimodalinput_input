@@ -761,6 +761,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
+        MMI_HILOGI("Config changed key:%{public}s value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -770,6 +771,15 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
         statusObserver = nullptr;
     }
+    bool configVlaue = true;
+    ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .GetBoolValue(item.statusConfig, configVlaue);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get value from setting date fail");
+        return;
+    }
+    MMI_HILOGI("Get value success key:%{public}s value:%{public}d", item.statusConfig.c_str(), configVlaue);
+    item.statusConfigValue = configVlaue;
 }
 
 std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed)
