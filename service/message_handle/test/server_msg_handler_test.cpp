@@ -277,7 +277,8 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitor
     HandleEventType eventType = 1;
     int32_t priority = 1;
     uint32_t deviceTags = 0x01;
-    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags), ERROR_NULL_POINTER);
+    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
 }
 
 /**
