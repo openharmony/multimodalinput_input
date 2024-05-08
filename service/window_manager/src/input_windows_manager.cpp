@@ -1566,11 +1566,13 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     break;
                 }
 
-            } else ((targetWindowId >= 0) && (targetWindowId == item.id)) {
+            } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
                 MMI_HILOGD("Find out the dispatch window of this pointer event when the targetWindowId "
                     "has been set up already, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
                 break;
+            } else {
+                MMI_HILOGW("Continue searching for the dispatch window of this pointer event");
             }
         }
     }
@@ -1591,8 +1593,10 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
             MMI_HILOGD("Skip the untouchable window to continue searching, "
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
-        } else (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
+        } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
             return std::make_optional(item);
+        } else {
+            MMI_HILOGD("Continue searching for the dispatch window");
         }
     }
     return std::nullopt;
