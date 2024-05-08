@@ -43,7 +43,7 @@ int KnuckleDivergentPoint::DEFAULT_SIZE_OFFSET = 20;
 int KnuckleDivergentPoint::DEFAULT_SPEED = 8;
 int KnuckleDivergentPoint::DEFAULT_SPEED_OFFSET = 8;
 
-KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap) : mTraceShadow_(bitMap)
+KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap) : traceShadow_(bitMap)
 {
     CALL_DEBUG_ENTER;
 }
@@ -56,51 +56,51 @@ void KnuckleDivergentPoint::Update()
     if (IsEnded()) {
         return;
     }
-    mLifespan_--;
-    mPointX_ += mMoveVelocityX_;
-    mPointY_ += mMoveVelocityY_;
-    mMoveVelocityY_ += BASIC_GRAVITY_Y;
+    lifespan_--;
+    pointX_ += moveVelocityX_;
+    pointY_ += moveVelocityY_;
+    moveVelocityY_ += BASIC_GRAVITY_Y;
 }
 
 void KnuckleDivergentPoint::Clear()
 {
     CALL_DEBUG_ENTER;
-    mLifespan_ = DEFAULT_LIFESPAN;
+    lifespan_ = DEFAULT_LIFESPAN;
 }
 
 void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
-    if (IsEnded() || mPointX_ <= 0 || mPointY_ <= 0) {
+    if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
         return;
     }
 
     OHOS::Rosen::Drawing::Brush brush;
     canvas->AttachBrush(brush);
-    canvas->DrawBitmap(mTraceShadow_, mPointX_, mPointY_);
+    canvas->DrawBitmap(traceShadow_, pointX_, pointY_);
     canvas->DetachBrush();
 }
 
 void KnuckleDivergentPoint::Reset(double pointX, double pointY)
 {
     CALL_DEBUG_ENTER;
-    mPointX_ = pointX;
-    mPointY_ = pointY;
-    mLifespan_ = BASIC_LIFESPAN;
+    pointX_ = pointX;
+    pointY_ = pointY;
+    lifespan_ = BASIC_LIFESPAN;
     std::random_device rd;
     std::default_random_engine e(rd());
     std::uniform_real_distribution<double> u(0.0, 1.0);
     double baseVelocity = u(e) * DOUBLE * PI;
 
-    mMoveVelocityX_ = std::cos(baseVelocity) * MOVE_SPEED;
-    mMoveVelocityY_ = std::sin(baseVelocity) * MOVE_SPEED;
+    moveVelocityX_ = std::cos(baseVelocity) * MOVE_SPEED;
+    moveVelocityY_ = std::sin(baseVelocity) * MOVE_SPEED;
 }
 
 bool KnuckleDivergentPoint::IsEnded()
 {
     CALL_DEBUG_ENTER;
-    return mLifespan_ < 0;
+    return lifespan_ < 0;
 }
 } // namespace MMI
 } // namespace OHOS
