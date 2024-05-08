@@ -123,7 +123,7 @@ private:
     bool isFirstDraw_ { true };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
-    PointerEvent::PointerItem currentPointerItem_;
+    PointerEvent::PointerItem firstPointerItem_;
     RosenCanvas *trackerCanvas_ { nullptr };
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
