@@ -47,10 +47,10 @@ private:
     static int DEFAULT_SPEED;
     static int DEFAULT_SPEED_OFFSET;
 
-    double mMoveVelocityX_;
-    double mMoveVelocityY_;
-    double mPointX_;
-    double mPointY_;
+    double mMoveVelocityX_ { 0.0 };
+    double mMoveVelocityY_ { 0.0 };
+    double mPointX_ { 0.0 };
+    double mPointY_ { 0.0 };
     int32_t mLifespan_ = DEFAULT_LIFESPAN;
     Rosen::Drawing::Matrix mTraceMatrix_;
     Rosen::Drawing::Bitmap mTraceShadow_;
