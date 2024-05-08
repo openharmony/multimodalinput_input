@@ -47,13 +47,13 @@ private:
     static int DEFAULT_SPEED;
     static int DEFAULT_SPEED_OFFSET;
 
-    double mMoveVelocityX_;
-    double mMoveVelocityY_;
-    double mPointX_;
-    double mPointY_;
-    int32_t mLifespan_ = DEFAULT_LIFESPAN;
-    Rosen::Drawing::Matrix mTraceMatrix_;
-    Rosen::Drawing::Bitmap mTraceShadow_;
+    double moveVelocityX_ { 0.0 };
+    double moveVelocityY_ { 0.0 };
+    double pointX_ { 0.0 };
+    double pointY_ { 0.0 };
+    int32_t lifespan_ = DEFAULT_LIFESPAN;
+    Rosen::Drawing::Matrix traceMatrix_;
+    Rosen::Drawing::Bitmap traceShadow_;
 };
 } // namespace MMI
 } // namespace OHOS
