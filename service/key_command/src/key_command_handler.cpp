@@ -812,6 +812,17 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
+    if (!isParseMaxCount_) {
+        ParseRepeatKeyMaxCount();
+        isParseMaxCount_ = true;
+        if (repeatKeys_.size() > 0) {
+            intervalTime_ = repeatKeys_[0].delay;
+        }
+    }
+    if (!isParseStatusConfig_) {
+        ParseStatusConfigObserver();
+        isParseStatusConfig_ = true;
+    }
     return true;
 }
 
