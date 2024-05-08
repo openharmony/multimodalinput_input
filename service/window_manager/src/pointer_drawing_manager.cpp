@@ -286,7 +286,6 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
         MAGIC_CURSOR->UpdateMagicCursorChangeState(statusValue);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-
     };
     std::string dynamicallyKey = "isVariable";
     sptr<SettingObserver> magicCursorChangeObserver = SettingDataShare::GetInstance(
