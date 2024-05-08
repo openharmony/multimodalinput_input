@@ -2707,7 +2707,7 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
         return true;
     }
     std::vector<sptr<Rosen::WindowVisibilityInfo>> infos;
-    Rosen::WindowManager::GetInstance().GetVisibilityWindowInfo(infos);
+    Rosen::WindowManagerLite::GetInstance().GetVisibilityWindowInfo(infos);
     for (const auto &it: infos) {
         if (pid == it->pid_ &&
             it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_TOTALLY_OCCUSION) {

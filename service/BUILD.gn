@@ -228,7 +228,7 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
-    external_deps += [ "window_manager:libwm" ]
+    external_deps += [ "window_manager:libwm_lite" ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -277,7 +277,7 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "window_manager:libwm",
+    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 
