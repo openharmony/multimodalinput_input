@@ -23,37 +23,30 @@
 #else
 #include "recording/recording_canvas.h"
 #endif
+
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t DEFAULT_LIFESPAN = -1;
+} // namespace
+
 class KnuckleDivergentPoint {
 public:
-    KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap);
+    KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitmap);
     ~KnuckleDivergentPoint();
     void Update();
     void Clear();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
     void Reset(double pointX, double pointY);
-    bool IsEnded();
+    bool IsEnded() const;
 
 private:
-    static Rosen::Drawing::Pen sTracePaint;
-    static int32_t BASIC_LIFESPAN;
-    static double BASIC_GRAVITY_Y;
-    static int32_t DEFAULT_LIFESPAN;
-    static float DOUBLE;
-    static int TRACE_COLOR;
-    static int DEFAULT_SIZE;
-    static int DEFAULT_SIZE_OFFSET;
-    static int DEFAULT_SPEED;
-    static int DEFAULT_SPEED_OFFSET;
-
-    double mMoveVelocityX_;
-    double mMoveVelocityY_;
-    double mPointX_;
-    double mPointY_;
-    int32_t mLifespan_ = DEFAULT_LIFESPAN;
-    Rosen::Drawing::Matrix mTraceMatrix_;
-    Rosen::Drawing::Bitmap mTraceShadow_;
+    double moveVelocityX_ { 0.f };
+    double moveVelocityY_ { 0.f };
+    double pointX_ { 0.f };
+    double pointY_ { 0.f };
+    int32_t lifespan_ { DEFAULT_LIFESPAN };
+    Rosen::Drawing::Bitmap traceShadow_;
 };
 } // namespace MMI
 } // namespace OHOS

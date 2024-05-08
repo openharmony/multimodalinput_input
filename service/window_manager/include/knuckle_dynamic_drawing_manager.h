@@ -20,19 +20,15 @@
 #include "ui/rs_surface_node.h"
 #include "transaction/rs_transaction.h"
 
-#include "knuckle_glow_trace_system.h"
+#include "draw/canvas.h"
 #include "include/core/SkPath.h"
 #include "include/core/SkPaint.h"
-#include "draw/canvas.h"
-#include "utils/point.h"
-#include "nocopyable.h"
+#include "knuckle_glow_trace_system.h"
 #include "pointer_event.h"
 #include "window_info.h"
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
-
 class KnuckleDynamicDrawingManager {
 public:
     KnuckleDynamicDrawingManager();
@@ -60,8 +56,8 @@ private:
     bool IsSingleKnuckle(const std::shared_ptr<PointerEvent> touchEvent);
 
 private:
-    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_;
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     Rosen::Drawing::Brush brush_;
@@ -73,15 +69,7 @@ private:
     std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_;
     Rosen::Drawing::Path pointerPath_;
     SkPaint pointerPathPaint_;
-    int64_t lastUpdateTimeMillis_;
-
-    static float PAINT_STROKE_WIDTH;
-    static float PAINT_PATH_RADIUS;
-    static float DOUBLE;
-    static int POINT_TOTAL_SIZE;
-    static int POINT_SYSTEM_SIZE;
-    static int MAX_DIVERGENCE_NUM;
-    static int MAX_UPDATE_TIME_MILLIS;
+    int64_t lastUpdateTimeMillis_ { 0 };
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
     bool isStop_ { false };
