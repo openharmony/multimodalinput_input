@@ -2910,7 +2910,7 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     CHKPF(pixelMapPtr);
     uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
     if (result != RET_OK) {
