@@ -355,10 +355,10 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
     int32_t pid;
     pkt >> pid;
     if (pkt.ChkRWError()) {
-        MMI_HILOG_ANR_DETECTE("Packet read data failed");
+        MMI_HILOG_ANRDETECTE("Packet read data failed");
         return RET_ERR;
     }
-    MMI_HILOG_ANR_DETECTI("Client pid:%{public}d", pid);
+    MMI_HILOG_ANRDETECTI("Client pid:%{public}d", pid);
     InputMgrImpl.OnAnr(pid);
     return RET_OK;
 }
