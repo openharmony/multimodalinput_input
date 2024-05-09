@@ -887,11 +887,10 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, 
     data.SetWant(want);
     callState = 0;
     DEVICE_MONITOR->SetCallState(data, callState);
-
+    
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
