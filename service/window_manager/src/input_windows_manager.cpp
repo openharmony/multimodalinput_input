@@ -98,6 +98,30 @@ enum PointerHotArea : int32_t {
 InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
 {
     MMI_HILOGI("Bind cfg file name:%{public}s", bindCfgFileName.c_str());
+    lastWindowInfo_.id = -1;
+    lastWindowInfo_.pid = -1;
+    lastWindowInfo_.uid = -1;
+    lastWindowInfo_.agentWindowId = -1;
+    lastWindowInfo_.area = { 0, 0, 0, 0 };
+    lastWindowInfo_.flags = -1;
+    mouseDownInfo_.id = -1;
+    mouseDownInfo_.pid = -1;
+    mouseDownInfo_.uid = -1;
+    mouseDownInfo_.agentWindowId = -1;
+    mouseDownInfo_.area = { 0, 0, 0, 0 };
+    mouseDownInfo_.flags = -1;
+    lastTouchWindowInfo_.id = -1;
+    lastTouchWindowInfo_.pid = -1;
+    lastTouchWindowInfo_.uid = -1;
+    lastTouchWindowInfo_.agentWindowId = -1;
+    lastTouchWindowInfo_.area = { 0, 0, 0, 0 };
+    lastTouchWindowInfo_.flags = -1;
+    displayGroupInfoTmp_.focusWindowId = -1;
+    displayGroupInfoTmp_.width = 0;
+    displayGroupInfoTmp_.height = 0;
+    displayGroupInfo_.focusWindowId = -1;
+    displayGroupInfo_.width = 0;
+    displayGroupInfo_.height = 0;
 }
 
 InputWindowsManager::~InputWindowsManager()
@@ -2778,7 +2802,7 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
         return true;
     }
     std::vector<sptr<Rosen::WindowVisibilityInfo>> infos;
-    Rosen::WindowManager::GetInstance().GetVisibilityWindowInfo(infos);
+    Rosen::WindowManagerLite::GetInstance().GetVisibilityWindowInfo(infos);
     for (const auto &it: infos) {
         if (pid == it->pid_ &&
             it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_TOTALLY_OCCUSION) {
@@ -2975,7 +2999,6 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 {
     CALL_DEBUG_ENTER;
     if (pixelMap == nullptr) {
-        MMI_HILOGD("The pixelmap is nullptr");
         return false;
     }
 
