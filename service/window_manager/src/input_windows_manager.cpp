@@ -102,7 +102,8 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
 
 InputWindowsManager::~InputWindowsManager()
 {
-    if (isFoldable_) {
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (isFoldable) {
         UnRegisterFoldStatusListener();
     }
 }
@@ -138,8 +139,8 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 void InputWindowsManager::RegisterFoldStatusListener()
 {
     CALL_INFO_TRACE;
-    isFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
-    if (!isFoldable_) {
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (!isFoldable) {
         MMI_HILOGD("The device is not foldable");
         return;
     }
@@ -2525,9 +2526,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
-    if (isFoldable_) {
-        lastPointerMoveEvent_ = pointerEvent;
-    }
+    lastPointerMoveEvent_ = pointerEvent;
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
