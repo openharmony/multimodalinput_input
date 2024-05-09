@@ -32,7 +32,7 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "window_info.h"
-#include "window_manager.h"
+#include "window_manager_lite.h"
 #include "uds_server.h"
 
 namespace OHOS {

@@ -285,7 +285,7 @@ int32_t InputManagerImpl::NotifyNapOnline()
 
 int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (eventFilterServices_.empty()) {
         MMI_HILOGE("Filters is empty, size:%{public}zu", eventFilterServices_.size());
@@ -1500,7 +1500,7 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 
 void InputManagerImpl::OnAnr(int32_t pid)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     {
         std::lock_guard<std::mutex> guard(mtx_);
