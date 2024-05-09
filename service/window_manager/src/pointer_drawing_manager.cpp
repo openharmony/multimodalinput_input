@@ -305,7 +305,7 @@ bool PointerDrawingManager::HasMagicCursor()
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor()) {
+    if (HasMagicCursor() && mouseStyle != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("magiccursor enter MAGIC_CURSOR->Initlayer");
         return MAGIC_CURSOR->InitLayer(mouseStyle);
     } else {
