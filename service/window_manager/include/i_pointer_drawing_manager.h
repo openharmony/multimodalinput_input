@@ -111,6 +111,10 @@ public:
     {
         return {};
     }
+    virtual std::map<MOUSE_ICON, IconStyle> GetMouseIconPath()
+    {
+        return {};
+    }
     virtual int32_t SwitchPointerStyle()
     {
         return 0;
