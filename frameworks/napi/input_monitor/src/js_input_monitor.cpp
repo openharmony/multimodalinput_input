@@ -1430,6 +1430,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
             default: {
+                MMI_HILOGE("This event is invalid");
                 break;
             }
         }
