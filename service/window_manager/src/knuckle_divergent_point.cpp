@@ -33,7 +33,8 @@ constexpr int32_t BASIC_LIFESPAN = 15;
 constexpr float DOUBLE = 2.0f;
 } // namespace
 
-KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitmap) : traceShadow_(bitmap)
+KnuckleDivergentPoint::KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap)
+    : traceShadow_(bitmap)
 {
     CALL_DEBUG_ENTER;
 }

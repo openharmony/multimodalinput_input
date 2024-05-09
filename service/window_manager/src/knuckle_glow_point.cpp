@@ -34,7 +34,7 @@ constexpr int32_t TRACE_COLOR = 255;
 constexpr float BASIC_SIZE = 100.0f;
 } // namespace
 
-KnuckleGlowPoint::KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap bitmap) : traceShadow_(bitmap) {}
+KnuckleGlowPoint::KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap) : traceShadow_(bitmap) {}
 
 KnuckleGlowPoint::~KnuckleGlowPoint() {}
 

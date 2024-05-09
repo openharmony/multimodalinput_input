@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef KNUCKLE_GIVERGENT_POINT_H
 #define KNUCKLE_GIVERGENT_POINT_H
 
@@ -22,7 +23,7 @@
 #include "pipeline/rs_recording_canvas.h"
 #else
 #include "recording/recording_canvas.h"
-#endif
+#endif // USE_ROSEN_DRAWING
 
 namespace OHOS {
 namespace MMI {
@@ -32,7 +33,7 @@ constexpr int32_t DEFAULT_LIFESPAN = -1;
 
 class KnuckleDivergentPoint {
 public:
-    KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitmap);
+    explicit KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap);
     ~KnuckleDivergentPoint();
     void Update();
     void Clear();

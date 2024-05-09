@@ -33,19 +33,19 @@ class KnuckleDynamicDrawingManager {
 public:
     KnuckleDynamicDrawingManager();
     ~KnuckleDynamicDrawingManager();
-    void KnuckleDynamicDrawHandler(const std::shared_ptr<PointerEvent> pointerEvent);
+    void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
 
 private:
-    void StartTouchDraw(const std::shared_ptr<PointerEvent> pointerEvent);
+    void StartTouchDraw(std::shared_ptr<PointerEvent> pointerEvent);
     void CreateTouchWindow(const int32_t displayId);
     void CreateCanvasNode();
-    int32_t DrawGraphic(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t DrawGraphic(std::shared_ptr<PointerEvent> pointerEvent);
 
-    bool CheckPointerAction(const std::shared_ptr<PointerEvent> pointerEvent);
-    void ProcessUpAndCancelEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-    void ProcessDownEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-    void ProcessMoveEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    bool CheckPointerAction(std::shared_ptr<PointerEvent> pointerEvent);
+    void ProcessUpAndCancelEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void ProcessDownEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void InitPointerPathPaint();
     void UpdateTrackColors();
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
@@ -53,7 +53,7 @@ private:
     std::shared_ptr<Media::PixelMap>& pixelMap);
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
     Rosen::Drawing::ColorType PixelFormatToColorType(Media::PixelFormat pixelFormat);
-    bool IsSingleKnuckle(const std::shared_ptr<PointerEvent> touchEvent);
+    bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };

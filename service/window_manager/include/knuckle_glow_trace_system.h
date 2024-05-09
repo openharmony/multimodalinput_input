@@ -33,7 +33,7 @@ namespace OHOS {
 namespace MMI {
 class KnuckleGlowTraceSystem {
 public:
-    KnuckleGlowTraceSystem(int32_t pointSize, Rosen::Drawing::Bitmap bitmap, int32_t maxDivergenceNum);
+    explicit KnuckleGlowTraceSystem(int32_t pointSize, const Rosen::Drawing::Bitmap &bitmap, int32_t maxDivergenceNum);
     ~KnuckleGlowTraceSystem();
     void Clear();
     void Update();

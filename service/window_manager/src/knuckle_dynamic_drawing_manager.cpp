@@ -170,7 +170,7 @@ void KnuckleDynamicDrawingManager::UpdateTrackColors()
     pointerPathPaint_.setColor(PATH_COLOR);
 }
 
-void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
@@ -184,7 +184,7 @@ void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(const std::shared_p
     }
 }
 
-bool KnuckleDynamicDrawingManager::IsSingleKnuckle(const std::shared_ptr<PointerEvent> touchEvent)
+bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(touchEvent);
@@ -207,7 +207,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(const std::shared_ptr<Pointer
     return true;
 }
 
-bool KnuckleDynamicDrawingManager::CheckPointerAction(const std::shared_ptr<PointerEvent> pointerEvent)
+bool KnuckleDynamicDrawingManager::CheckPointerAction(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     size_t size = pointerEvent->GetPointerIds().size();
@@ -239,7 +239,7 @@ bool KnuckleDynamicDrawingManager::CheckPointerAction(const std::shared_ptr<Poin
     return true;
 }
 
-void KnuckleDynamicDrawingManager::StartTouchDraw(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     int32_t ret = DrawGraphic(pointerEvent);
@@ -251,7 +251,7 @@ void KnuckleDynamicDrawingManager::StartTouchDraw(const std::shared_ptr<PointerE
     MMI_HILOGI("Draw graphic success");
 }
 
-void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     if (pointerPath_.IsValid()) {
@@ -269,7 +269,7 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(const std::shared_ptr
     isDrawing_ = false;
 }
 
-void KnuckleDynamicDrawingManager::ProcessDownEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
@@ -285,7 +285,7 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(const std::shared_ptr<Pointe
     isStop_ = false;
 }
 
-void KnuckleDynamicDrawingManager::ProcessMoveEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     pointCounter_++;
@@ -340,7 +340,7 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
     displayInfo_ = displayInfo;
 }
 
-int32_t KnuckleDynamicDrawingManager::DrawGraphic(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, RET_ERR);

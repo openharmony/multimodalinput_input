@@ -334,6 +334,14 @@ public:
     void ClearFlag();
 
     /**
+     * @brief Clears all flags of an input event.
+     * @param flag Indicates the flag of the input event.
+     * @return void
+     * @since 12
+     */
+    void ClearFlag(uint32_t flag);
+
+    /**
      * @brief Marks an input event as completed.
      * This method can only be called once.
      * @return void

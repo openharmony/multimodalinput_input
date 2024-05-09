@@ -37,6 +37,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+const std::string PROGRAM_NAME = "uds_session_test";
+constexpr int32_t MODULE_TYPE = 1;
+constexpr int32_t UDS_FD = 1;
+constexpr int32_t UDS_UID = 100;
+constexpr int32_t UDS_PID = 100;
 } // namespace
 
 class KeySubscriberHandlerTest : public testing::Test {
@@ -951,12 +956,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     CALL_DEBUG_ENTER;
     KeySubscriberHandler handler;
     int32_t subscribeId = 1;
-    std::string programName = "UDSSession";
-    int32_t moduleType = 1;
-    int32_t fd = 1;
-    int32_t uid = 100;
-    int32_t pid = 100;
-    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, fd, uid, pid);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     std::set<int32_t> preKeys;
     preKeys.insert(1);
@@ -1057,9 +1057,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_0
     KeySubscriberHandler handler;
     KeyEvent::KeyItem item;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     handler.enableCombineKey_ = false;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
     item.SetKeyCode(KeyEvent::KEYCODE_L);
+    keyEvent->AddKeyItem(item);
     ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
 }
 
@@ -1075,9 +1077,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_0
     KeySubscriberHandler handler;
     KeyEvent::KeyItem item;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     handler.enableCombineKey_ = false;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
     item.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    keyEvent->AddKeyItem(item);
     ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
 }
 
@@ -1093,10 +1097,442 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_0
     KeySubscriberHandler handler;
     KeyEvent::KeyItem item;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     handler.enableCombineKey_ = false;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
     item.SetKeyCode(KeyEvent::KEYCODE_META_RIGHT);
+    keyEvent->AddKeyItem(item);
     ASSERT_TRUE(handler.IsEnableCombineKey(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriber
+ * @tc.desc: Test Remove Subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriber, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 2;
+    int32_t id = 1;
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    subscriberList.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
+    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId), RET_ERR);
+    subscribeId = 1;
+    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId), RET_OK);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsFunctionKey
+ * @tc.desc: Test IsFunctionKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsFunctionKey, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_UP);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_MUTE);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_MUTE);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_SWITCHVIDEOMODE);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_WLAN);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_CONFIG);
+    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent
+ * @tc.desc: Test OnSubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.enableCombineKey_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->AddKeyItem(item);
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    keyEvent->AddKeyItem(item);
+    ASSERT_FALSE(handler.OnSubscribeKeyEvent(keyEvent));
+
+    handler.enableCombineKey_ = true;
+    handler.hasEventExecuting_ = true;
+    handler.keyEvent_ = KeyEvent::Create();
+    ASSERT_NE(handler.keyEvent_, nullptr);
+    handler.keyEvent_->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    handler.keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    handler.keyEvent_->AddKeyItem(item);
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    handler.keyEvent_->AddKeyItem(item);
+    ASSERT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
+
+    handler.hasEventExecuting_ = false;
+    handler.needSkipPowerKeyUp_ = true;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ASSERT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    ASSERT_FALSE(handler.OnSubscribeKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnSessionDelete
+ * @tc.desc: Test OnSessionDelete
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    int32_t id = 1;
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    subscriberList.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    ASSERT_NO_FATAL_FAILURE(handler.OnSessionDelete(sess));
+    ASSERT_NO_FATAL_FAILURE(handler.OnSessionDelete(session));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsPreKeysMatch
+ * @tc.desc: Test IsPreKeysMatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::set<int32_t> preKeys;
+    std::vector<int32_t> pressedKeys;
+    preKeys.insert(KeyEvent::KEYCODE_A);
+    pressedKeys.push_back(KeyEvent::KEYCODE_B);
+    ASSERT_FALSE(handler.IsPreKeysMatch(preKeys, pressedKeys));
+    preKeys.clear();
+    pressedKeys.clear();
+    preKeys.insert(KeyEvent::KEYCODE_C);
+    pressedKeys.push_back(KeyEvent::KEYCODE_C);
+    ASSERT_TRUE(handler.IsPreKeysMatch(preKeys, pressedKeys));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsMatchForegroundPid
+ * @tc.desc: Test Is Match Foreground Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchForegroundPid, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    int32_t id = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    std::set<int32_t> foregroundPids;
+    subscriberList.push_back(subscriber);
+    foregroundPids.insert(1);
+    ASSERT_FALSE(handler.IsMatchForegroundPid(subscriberList, foregroundPids));
+
+    foregroundPids.insert(100);
+    ASSERT_TRUE(handler.IsMatchForegroundPid(subscriberList, foregroundPids));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownSubscriber
+ * @tc.desc: Test Notify Key Down Subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownSubscriber, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t id = 1;
+    bool handled = false;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    subscriberList.push_back(subscriber);
+    keyOption->SetFinalKeyDownDuration(100);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownSubscriber(keyEvent, keyOption, subscriberList, handled));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownRightNow
+ * @tc.desc: Test Notify Key Down Right Now
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNow, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t id = 1;
+    bool handled = false;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    subscriberList.push_back(subscriber);
+    handler.isForegroundExits_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownRightNow(keyEvent, subscriberList, handled));
+
+    handler.isForegroundExits_ = false;
+    handler.foregroundPids_.insert(UDS_PID);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownRightNow(keyEvent, subscriberList, handled));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyDownDelay
+ * @tc.desc: Test Notify KeyDown Delay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t id = 1;
+    bool handled = false;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    subscriber->timerId_ = 1;
+    subscriberList.push_back(subscriber);
+    handler.isForegroundExits_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownDelay(keyEvent, subscriberList, handled));
+
+    handler.isForegroundExits_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    handler.foregroundPids_.insert(UDS_PID);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownDelay(keyEvent, subscriberList, handled));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifyKeyUpSubscriber
+ * @tc.desc: Test Notify KeyUp Subscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyUpSubscriber, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t id = 1;
+    bool handled = false;
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    subscriber->timerId_ = 1;
+    keyOption->SetFinalKeyUpDelay(1000);
+    subscriberList.push_back(subscriber);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyUpSubscriber(keyEvent, subscriberList, handled));
+    handler.isForegroundExits_ = true;
+    handler.foregroundPids_.insert(UDS_PID);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyUpSubscriber(keyEvent, subscriberList, handled));
+    handler.foregroundPids_.erase(UDS_PID);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyUpSubscriber(keyEvent, subscriberList, handled));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnTimer
+ * @tc.desc: Test OnTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    int32_t id = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    ASSERT_EQ(subscriber->keyEvent_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(handler.OnTimer(subscriber));
+    subscriber->keyEvent_ = KeyEvent::Create();
+    ASSERT_NE(subscriber->keyEvent_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(handler.OnTimer(subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsKeyEventSubscribed
+ * @tc.desc: Test IsKeyEventSubscribed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsKeyEventSubscribed, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    int32_t id = 1;
+    int32_t keyCode = KeyEvent::KEYCODE_ALT_LEFT;
+    int32_t trrigerType = KeyEvent::KEY_ACTION_DOWN;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyDown(false);
+    keyOption->SetFinalKey(KeyEvent::KEYCODE_CTRL_LEFT);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    subscriberList.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
+    ASSERT_FALSE(handler.IsKeyEventSubscribed(keyCode, trrigerType));
+
+    for (auto &iter : handler.subscriberMap_) {
+        iter.first->SetFinalKeyDown(true);
+    }
+    keyCode = KeyEvent::KEYCODE_CTRL_LEFT;
+    ASSERT_TRUE(handler.IsKeyEventSubscribed(keyCode, trrigerType));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveKeyCode
+ * @tc.desc: Test RemoveKeyCode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyCode, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    std::vector<int32_t> keyCodes { KeyEvent::KEYCODE_A, KeyEvent::KEYCODE_B };
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveKeyCode(keyCode, keyCodes));
+    keyCode = KeyEvent::KEYCODE_C;
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveKeyCode(keyCode, keyCodes));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsRepeatedKeyEvent
+ * @tc.desc: Test IsRepeatedKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsRepeatedKeyEvent, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
+    handler.keyEvent_ = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.hasEventExecuting_ = true;
+    handler.keyEvent_->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_B);
+    ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    handler.keyEvent_->AddKeyItem(item);
+    ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    keyEvent->AddKeyItem(item);
+    ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    handler.keyEvent_->AddKeyItem(item);
+    item.SetKeyCode(KeyEvent::KEYCODE_D);
+    keyEvent->AddKeyItem(item);
+    ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
+ * @tc.desc: Test RemoveSubscriberKeyUpTimer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    int32_t id = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
+    subscriber->timerId_ = -1;
+    subscriberList.push_back(subscriber);
+    subscriber->timerId_ = 1;
+    subscriber->keyOption_->SetFinalKey(KeyEvent::KEYCODE_A);
+    subscriberList.push_back(subscriber);
+    handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveSubscriberKeyUpTimer(keyCode));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber
+ * @tc.desc: Test IsNotifyPowerKeySubsciber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber, TestSize.Level1)
+{
+    KeySubscriberHandler handler;
+    int32_t keyCode = KeyEvent::KEYCODE_A;
+    std::vector<int32_t> keyCodes;
+    ASSERT_TRUE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
+    keyCode = KeyEvent::KEYCODE_POWER;
+    keyCodes.push_back(KeyEvent::KEYCODE_A);
+    ASSERT_TRUE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
+    keyCodes.insert(keyCodes.begin(), KeyEvent::KEYCODE_VOLUME_DOWN);
+    ASSERT_FALSE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
+    keyCodes.insert(keyCodes.begin(), KeyEvent::KEYCODE_VOLUME_UP);
+    ASSERT_FALSE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
 }
 } // namespace MMI
 } // namespace OHOS

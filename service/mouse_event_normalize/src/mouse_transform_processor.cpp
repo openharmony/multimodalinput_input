@@ -103,7 +103,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
     } else {
-        pointerEvent_->AddFlag(~InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
     }
