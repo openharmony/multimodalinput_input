@@ -51,7 +51,7 @@ constexpr float TEXT_SIZE = 40.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
-const std::string pointerPositionSwitchName = "settings.input.show_pointer_position_hint";
+const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
@@ -439,8 +439,8 @@ void TouchDrawingManager::DrawLabels()
     std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
     std::string viewX = "X: " + FormatNumber(currentPhysicalX_, ONE_PRECISION);
     std::string viewY = "Y: " + FormatNumber(currentPhysicalY_, ONE_PRECISION);
-    auto dx = currentPhysicalX_ - currentPointerItem_.GetDisplayX();
-    auto dy = currentPhysicalY_ - currentPointerItem_.GetDisplayY();
+    auto dx = currentPhysicalX_ - firstPointerItem_.GetDisplayX();
+    auto dy = currentPhysicalY_ - firstPointerItem_.GetDisplayY();
     std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
     std::string viewDy = "dY: " + FormatNumber(dy, ONE_PRECISION);
     std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
@@ -516,12 +516,15 @@ void TouchDrawingManager::UpdatePointerPosition()
             currentPointerId_ = lastPointerItem_.front().GetPointerId();
         }
     }
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
+    if (isFirstDownAction_) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
+            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+            return;
+        }
+        firstPointerItem_ = pointerItem;
+        isFirstDownAction_ = false;
     }
-    currentPointerItem_ = pointerItem;
     UpdateVelocity();
     UpdateDisplayCoord();
 }

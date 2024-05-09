@@ -73,7 +73,7 @@ private:
     std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_;
     Rosen::Drawing::Path pointerPath_;
     SkPaint pointerPathPaint_;
-    int64_t lastUpdateTimeMillis_;
+    int64_t lastUpdateTimeMillis_ { 0 };
 
     static float PAINT_STROKE_WIDTH;
     static float PAINT_PATH_RADIUS;
