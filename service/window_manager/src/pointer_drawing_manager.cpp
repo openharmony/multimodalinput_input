@@ -153,7 +153,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath(MOUSE_ICON(pointerStyle.id)).alignmentWay),
+    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
         physicalX, physicalY);
     if (WinMgr->GetMouseFlag()) {
         WinMgr->SetMouseFlag(false);
@@ -217,8 +217,8 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     }
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -226,7 +226,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
     AdjustMouseFocus(
-        direction, ICON_TYPE(GetMouseIconPath(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
+        direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
@@ -267,8 +267,8 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
             MMI_HILOGD("switch pointer style");
         }
     };
-    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(
-        MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
+    sptr<SettingObserver> statusObserver =
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
@@ -965,8 +965,8 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
     int32_t size = GetPointerSize();
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->SetDisplayInfo(displayInfo);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1007,8 +1007,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     }
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
-    canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-    canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1018,7 +1018,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     if (displayInfo_.displayDirection == DIRECTION0) {
         direction = displayInfo_.direction;
     }
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay),
+    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
         physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
@@ -1276,7 +1276,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
             newIconPath = DefaultIconPath;
         } else {
-            newIconPath = iconPath(MOUSE_ICON(pointerStyle.id)).iconPath;
+            newIconPath = iconPath[MOUSE_ICON(pointerStyle.id)].iconPath;
         }
         MMI_HILOGD("default path has changed from %{public}s to %{public}s",
             iconStyle.iconPath.c_str(), newIconPath.c_str());
@@ -1302,7 +1302,7 @@ std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIconPath()
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-IconStyle PointerDrawingManager::GetMouseIconStyle(const MOUSE_ICON mouseStyle)
+IconStyle PointerDrawingManager::GetIconStyle(const MOUSE_ICON mouseStyle)
 {
     std::map<MOUSE_ICON, IconStyle> mouseIcons = GetMouseIcons();
     auto iter = mouseIcons.find(mouseStyle);
