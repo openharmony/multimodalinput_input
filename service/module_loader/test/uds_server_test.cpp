@@ -23,7 +23,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-const std::string PROGRAM_NAME = "uds_session_test";
+const std::string PROGRAM_NAME = "uds_server_test";
 constexpr int32_t MODULE_TYPE = 1;
 constexpr int32_t UDS_FD = -1;
 constexpr int32_t UDS_UID = 100;
