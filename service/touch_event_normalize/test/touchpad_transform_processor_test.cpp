@@ -213,11 +213,11 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
 
 /**
  * @tc.name: TouchPadTransformProcessorTest_SetMULTI_FINGERTAP_HDRDefault_001
- * @tc.desc: Test the behavior of SetMULTI_FINGERTAP_HDRDefault method in TouchPadTransformProcessor class under default conditions
+ * @tc.desc: Test the behavior of SetMULTI_FINGERTAP_HDRDefault
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetMULTI_FINGERTAP_HDRDefault_001, TestSize.Level1)
+HWTEST_F(TouchPadTransformProcessorTest, SetMULTI_FINGERTAP_HDRDefault_001, TestSize.Level1)
 {
     MultiFingersTapHandler processor;
     bool isAlldefault = true;
@@ -228,7 +228,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetMULTI
 
 /**
  * @tc.name: TouchPadTransformProcessorTest_ClearPointerItems_001
- * @tc.desc: Clear Pointer Items Function Test, Verifying the ability to correctly clear pointer items under given conditions
+ * @tc.desc: Verifying the ability to correctly clear pointer items under given conditions
  * @tc.type: FUNC
  * @tc.require:
  */
