@@ -228,7 +228,7 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
-    external_deps += [ "window_manager:libwm" ]
+    external_deps += [ "window_manager:libwm_lite" ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -278,7 +278,7 @@ ohos_shared_library("libmmi-server") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "window_manager:libdm",
-    "window_manager:libwm",
+    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 
@@ -944,6 +944,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
   ]
 }
 

@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
-#include <cstdio>
 #include <cinttypes>
+#include <cstdio>
 
 #include <gtest/gtest.h>
+#include "input_event_handler.h"
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
@@ -28,7 +29,13 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-}
+constexpr int32_t UID_ROOT { 0 };
+static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
+int32_t g_moduleType = 3;
+int32_t g_pid = 0;
+int32_t g_writeFd = -1;
+} // namespace
+
 class ServerMsgHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
@@ -155,6 +162,290 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_02, TestSize.Lev
     bool isAuthorize = false;
     int32_t result = servermsghandler.OnAuthorize(isAuthorize);
     EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_01
+ * @tc.desc: Test FixTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_01, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
+    bool result = servermsghandler.FixTargetWindowId(pointerEvent, action);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_02
+ * @tc.desc: Test FixTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_02, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    bool result = servermsghandler.FixTargetWindowId(pointerEvent, action);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_03
+ * @tc.desc: Test FixTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_03, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto pointerIds = pointerEvent->GetPointerIds();
+    EXPECT_TRUE(pointerIds.empty());
+    bool result = servermsghandler.FixTargetWindowId(pointerEvent, action);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_Init
+ * @tc.desc: Test Init
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_Init, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    UDSServer udsServerFirst;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.Init(udsServerFirst));
+    UDSServer udsServerSecond;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.Init(udsServerSecond));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddInputHandlerWithNullSession
+ * @tc.desc: Test OnAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithNullSession, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddInputHandlerWithInterceptorHandler001
+ * @tc.desc: Test OnAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithInterceptorHandler001, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddInputHandlerWithMonitorHandler001
+ * @tc.desc: Test OnAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitorHandler001, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveInputHandlerWithNullSession
+ * @tc.desc: Test OnRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithNullSession, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveInputHandlerWithInterceptorHandler001
+ * @tc.desc: Test OnRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithInterceptorHandler001, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveInputHandlerWithMonitorHandler001
+ * @tc.desc: Test OnRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithMonitorHandler001, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags),
+        ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMarkConsumedWithNullSession
+ * @tc.desc: Test OnMarkConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithNullSession, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = nullptr;
+    int32_t eventId = 11;
+    EXPECT_EQ(servermsghandler.OnMarkConsumed(sess, eventId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMarkConsumedWithMonitorHandler001
+ * @tc.desc: Test OnMarkConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithMonitorHandler001, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    int32_t eventId = 11;
+    EXPECT_EQ(servermsghandler.OnMarkConsumed(sess, eventId), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddInputHandlerWithInterceptorHandler002
+ * @tc.desc: Test OnAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithInterceptorHandler002, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    InputHandler->BuildInputHandlerChain();
+    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddInputHandlerWithMonitorHandler002
+ * @tc.desc: Test OnAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandlerWithMonitorHandler002, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveInputHandlerWithInterceptorHandler002
+ * @tc.desc: Test OnRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithInterceptorHandler002, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveInputHandlerWithMonitorHandler002
+ * @tc.desc: Test OnRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandlerWithMonitorHandler002, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(servermsghandler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMarkConsumedWithMonitorHandler002
+ * @tc.desc: Test OnMarkConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMarkConsumedWithMonitorHandler002, TestSize.Level1)
+{
+    ServerMsgHandler servermsghandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    int32_t eventId = 11;
+    EXPECT_EQ(servermsghandler.OnMarkConsumed(sess, eventId), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

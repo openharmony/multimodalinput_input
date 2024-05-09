@@ -461,7 +461,6 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
     }
     auto iter = processedEvents_.find(eventId);
     if (iter == processedEvents_.end()) {
-        MMI_HILOGE("EventId not in processedEvents_");
         return;
     }
     int32_t count = iter->second;
