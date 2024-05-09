@@ -12,45 +12,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef KNUCKLE_GLOW_POINT_H
 #define KNUCKLE_GLOW_POINT_H
 
-#include "image/bitmap.h"
 #include "draw/canvas.h"
+#include "image/bitmap.h"
 #include "include/core/SkCanvas.h"
-#include "utils/matrix.h"
 #include "include/core/SkPaint.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
 #else
 #include "recording/recording_canvas.h"
-#endif
+#endif // USE_ROSEN_DRAWING
+#include "utils/matrix.h"
+
 namespace OHOS {
 namespace MMI {
 class KnuckleGlowPoint {
 public:
-    KnuckleGlowPoint(OHOS::Rosen::Drawing::Bitmap bitMap);
+    explicit KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap);
     ~KnuckleGlowPoint();
     void Update();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
     void Reset(double pointX, double pointY, float lifespanOffset);
-    bool IsEnded();
+    bool IsEnded() const;
 
 private:
     void UpdateMatrix();
-    int64_t GetNanoTime();
+    int64_t GetNanoTime() const;
 
-    static int TRACE_COLOR;
-    static float BASIC_SIZE;
-    static float DOUBLE;
-    static double BASIC_LIFESPAN;
-    static double DEFAULT_LIFESPAN;
-
-    double lifespan_ = DEFAULT_LIFESPAN;
-    double pointX_ { 0.0 };
-    double pointY_ { 0.0 };
-    int64_t lastUpdateTimeMillis_ { 0 };
-    float traceSize_ { 0.0 };
+    double lifespan_ { -1.f };
+    double pointX_ { 0.f };
+    double pointY_ { 0.f };
+    int64_t lastUpdateTimeMillis_  { 0 };
+    float traceSize_  { 0.f };
 
     Rosen::Drawing::Matrix traceMatrix_;
     Rosen::Drawing::Bitmap traceShadow_;
