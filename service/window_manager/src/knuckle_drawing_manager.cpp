@@ -25,7 +25,6 @@
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
 
-#include "define_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG

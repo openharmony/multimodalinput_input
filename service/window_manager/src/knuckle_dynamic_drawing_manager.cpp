@@ -20,9 +20,7 @@
 #include "image_type.h"
 #include "image_utils.h"
 
-#include "define_multimodal.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
 #else
@@ -31,9 +29,6 @@
 #endif // USE_ROSEN_DRAWING
 #include "render/rs_pixel_map_util.h"
 
-#include <fstream>
-#include "pixel_map.h"
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDynamicDrawingManager"
 
@@ -41,9 +36,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
-// const std::string PentagramIconPath = IMAGE_POINTER_PENTAGRAM_PATH + "knuckle_sprite_360.png";
 const std::string PentagramIconPath = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDynamicDrawingManager" };
 constexpr int32_t DENSITY_BASELINE = 160;
 constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
 constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
@@ -54,16 +47,14 @@ constexpr int32_t MAX_POINTER_COLOR = 0x00ffff;
 constexpr int32_t TIME_DIMENSION = 1000;
 constexpr int32_t PATH_COLOR = 0xFFCCCCCC;
 constexpr int32_t MIN_POINT_SIZE = 1;
-} // namespace
-
-float KnuckleDynamicDrawingManager::PAINT_STROKE_WIDTH = 10.0f;
-float KnuckleDynamicDrawingManager::PAINT_PATH_RADIUS = 10.0f;
-float KnuckleDynamicDrawingManager::DOUBLE = 2.0f;
-int KnuckleDynamicDrawingManager::POINT_TOTAL_SIZE = 5;
-int KnuckleDynamicDrawingManager::POINT_SYSTEM_SIZE = 500;
-int KnuckleDynamicDrawingManager::MAX_DIVERGENCE_NUM = 10;
-int KnuckleDynamicDrawingManager::MAX_UPDATE_TIME_MILLIS = 500;
+constexpr float PAINT_STROKE_WIDTH = 10.0f;
+constexpr float DOUBLE = 2.0f;
+constexpr int32_t POINT_TOTAL_SIZE = 5;
+constexpr int32_t POINT_SYSTEM_SIZE = 500;
+constexpr int32_t MAX_DIVERGENCE_NUM = 10;
 constexpr int32_t DEFAULT_POINTER_SIZE = 1;
+constexpr int32_t DESIRED_SIZE = 80;
+} // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
 {
@@ -83,10 +74,9 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
     ret = imageSource->GetSupportedFormats(formats);
     OHOS::Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {
-        .width = 80,
-        .height = 80
+        .width = DESIRED_SIZE,
+        .height = DESIRED_SIZE
     };
- 
     decodeOpts.SVGOpts.fillColor = {.isValidColor = false, .color = MAX_POINTER_COLOR};
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = false, .color = MAX_POINTER_COLOR};
 
@@ -180,7 +170,7 @@ void KnuckleDynamicDrawingManager::UpdateTrackColors()
     pointerPathPaint_.setColor(PATH_COLOR);
 }
 
-void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
@@ -194,7 +184,7 @@ void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(const std::shared_p
     }
 }
 
-bool KnuckleDynamicDrawingManager::IsSingleKnuckle(const std::shared_ptr<PointerEvent> touchEvent)
+bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(touchEvent);
@@ -217,7 +207,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(const std::shared_ptr<Pointer
     return true;
 }
 
-bool KnuckleDynamicDrawingManager::CheckPointerAction(const std::shared_ptr<PointerEvent> pointerEvent)
+bool KnuckleDynamicDrawingManager::CheckPointerAction(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     size_t size = pointerEvent->GetPointerIds().size();
@@ -249,7 +239,7 @@ bool KnuckleDynamicDrawingManager::CheckPointerAction(const std::shared_ptr<Poin
     return true;
 }
 
-void KnuckleDynamicDrawingManager::StartTouchDraw(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     int32_t ret = DrawGraphic(pointerEvent);
@@ -261,7 +251,7 @@ void KnuckleDynamicDrawingManager::StartTouchDraw(const std::shared_ptr<PointerE
     MMI_HILOGI("Draw graphic success");
 }
 
-void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     if (pointerPath_.IsValid()) {
@@ -279,7 +269,7 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(const std::shared_ptr
     isDrawing_ = false;
 }
 
-void KnuckleDynamicDrawingManager::ProcessDownEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
@@ -295,7 +285,7 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(const std::shared_ptr<Pointe
     isStop_ = false;
 }
 
-void KnuckleDynamicDrawingManager::ProcessMoveEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     pointCounter_++;
@@ -350,7 +340,7 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
     displayInfo_ = displayInfo;
 }
 
-int32_t KnuckleDynamicDrawingManager::DrawGraphic(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, RET_ERR);

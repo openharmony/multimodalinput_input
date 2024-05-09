@@ -16,36 +16,29 @@
 #include "knuckle_glow_point.h"
 
 #include "include/core/SkColorFilter.h"
-#include "define_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleGlowPoint"
+
 namespace OHOS {
 namespace MMI {
-
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleGlowPoint" };
+namespace {
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t PAINT_WIDTH = 20;
 constexpr int32_t ARGB_A = 0;
 constexpr int32_t ARGB_RGB = 255;
+constexpr double BASIC_LIFESPAN = 400.0f;
+constexpr int32_t TRACE_COLOR = 255;
+constexpr float BASIC_SIZE = 100.0f;
+} // namespace
 
-int KnuckleGlowPoint::TRACE_COLOR = 255;
-float KnuckleGlowPoint::BASIC_SIZE = 100.0f;
-float KnuckleGlowPoint::DOUBLE = 2.0f;
-double KnuckleGlowPoint::BASIC_LIFESPAN = 400;
-double KnuckleGlowPoint::DEFAULT_LIFESPAN = -1;
+KnuckleGlowPoint::KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap) : traceShadow_(bitmap) {}
 
-KnuckleGlowPoint::KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap bitMap)
-{
-    CALL_DEBUG_ENTER;
-    traceShadow_ = bitMap;
-}
+KnuckleGlowPoint::~KnuckleGlowPoint() {}
 
-KnuckleGlowPoint::~KnuckleGlowPoint() {};
-
-int64_t KnuckleGlowPoint::GetNanoTime()
+int64_t KnuckleGlowPoint::GetNanoTime() const
 {
     CALL_DEBUG_ENTER;
     struct timespec time = { 0 };
@@ -102,7 +95,7 @@ void KnuckleGlowPoint::Reset(double pointX, double pointY, float lifespanOffset)
     lastUpdateTimeMillis_ = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
 }
 
-bool KnuckleGlowPoint::IsEnded()
+bool KnuckleGlowPoint::IsEnded() const
 {
     CALL_DEBUG_ENTER;
     return lifespan_ < 0;
