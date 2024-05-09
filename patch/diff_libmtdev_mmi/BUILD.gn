@@ -41,7 +41,7 @@ ohos_source_set("patch_gen_libmtdev-third-mmi") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   sources = patch_gen_libmtdev_third_mmi_sources
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -58,7 +58,7 @@ ohos_source_set("patch_gen_libmtdev-third-mmi") {
 
 ohos_shared_library("libmtdev-third-mmi") {
   sources = []
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

@@ -17,7 +17,7 @@ import("../../multimodalinput_mini.gni")
 
 ohos_source_set("input-manager") {
   sources = [ "src/input_manager_command.cpp" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -46,7 +46,7 @@ ohos_executable("uinput") {
   sources = [ "src/main.cpp" ]
   configs = [ "${mmi_path}:coverage_flags" ]
   include_dirs = [ "include" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
