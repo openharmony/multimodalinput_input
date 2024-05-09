@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef KNUCKLE_GLOW_POINT_H
 #define KNUCKLE_GLOW_POINT_H
 
@@ -30,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 class KnuckleGlowPoint {
 public:
-    KnuckleGlowPoint(OHOS::Rosen::Drawing::Bitmap bitmap);
+    explicit KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap);
     ~KnuckleGlowPoint();
     void Update();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);

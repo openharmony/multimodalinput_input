@@ -217,6 +217,11 @@ void InputEvent::ClearFlag()
     bitwise_ = EVENT_FLAG_NONE;
 }
 
+void InputEvent::ClearFlag(uint32_t flag)
+{
+    bitwise_ &= (~flag);
+}
+
 bool InputEvent::IsMarkEnabled() const
 {
     return markEnabled_;

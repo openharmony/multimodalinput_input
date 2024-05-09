@@ -27,7 +27,7 @@ namespace {
 constexpr float BASIC_DISTANCE_BETWEEN_POINTS = 5.0f;
 } // namespace
 
-KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, OHOS::Rosen::Drawing::Bitmap bitmap,
+KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, const OHOS::Rosen::Drawing::Bitmap &bitmap,
     int32_t maxDivergenceNum) : maxDivergenceNum_(maxDivergenceNum)
 {
     CALL_DEBUG_ENTER;

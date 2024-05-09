@@ -1375,7 +1375,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::ROTATE: {
                 if (!IsRotate(pointerEvent)) {
-                    MMI_HILOGE("This event is not rotateEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1384,7 +1383,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::PINCH: {
                 if (!IsPinch(pointerEvent, fingers)) {
-                    MMI_HILOGE("This event is not pinchEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1393,7 +1391,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::THREE_FINGERS_SWIPE: {
                 if (!IsThreeFingersSwipe(pointerEvent)) {
-                    MMI_HILOGE("This event is not three fingers swipeEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1402,7 +1399,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::FOUR_FINGERS_SWIPE: {
                 if (!IsFourFingersSwipe(pointerEvent)) {
-                    MMI_HILOGE("This event is not four fingers swipeEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1411,14 +1407,12 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::THREE_FINGERS_TAP: {
                 if (!IsThreeFingersTap(pointerEvent)) {
-                    MMI_HILOGE("The event is not threeFingersTapEvent");
                 }
                 ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                 break;
             }
             case TypeName::JOYSTICK:{
                 if (!IsJoystick(pointerEvent)) {
-                    MMI_HILOGE("The event is not JoystickEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1428,7 +1422,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
             case TypeName::FINGERPRINT: {
                 if (!IsFingerprint(pointerEvent)) {
-                    MMI_HILOGW("The event is not fingerprintEvent");
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1437,7 +1430,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
             default: {
-                MMI_HILOGE("This event is invalid");
                 break;
             }
         }
