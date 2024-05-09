@@ -23,6 +23,7 @@
 #include "pixel_map.h"
 #include "singleton.h"
 
+#include "display_manager.h"
 #include "extra_data.h"
 #include "input_display_bind_helper.h"
 #include "input_event.h"
@@ -306,7 +307,6 @@ private:
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_;
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
-    bool isFoldable_ { false };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
