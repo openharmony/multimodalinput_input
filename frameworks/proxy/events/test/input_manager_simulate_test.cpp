@@ -1062,7 +1062,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_011, TestSize.Level
     std::string sPointerEs = GetEventDump();
     MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_FALSE(!sPointerEs.empty());
+    ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
