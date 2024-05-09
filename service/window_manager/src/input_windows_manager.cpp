@@ -41,8 +41,8 @@
 #include "scene_board_judgement.h"
 #include "multimodal_input_preferences_manager.h"
 #include "system_ability_definition.h"
-#include "touch_drawing_manager.h"
 #include "timer_manager.h"
+#include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "res_sched_client.h"
 #include "res_type.h"
