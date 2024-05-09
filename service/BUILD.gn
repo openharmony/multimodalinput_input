@@ -136,7 +136,7 @@ ohos_rust_unittest("rust_mmi_test") {
 
 ohos_shared_library("libmmi-server") {
   sources = libmmi_service_sources
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
