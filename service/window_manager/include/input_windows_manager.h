@@ -267,7 +267,6 @@ private:
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
-    std::shared_ptr<PointerEvent> lastPointerMoveEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
     std::map<int32_t, std::map<int32_t, PointerStyle>> uiExtensionPointerStyle_;
     WindowInfo mouseDownInfo_;
