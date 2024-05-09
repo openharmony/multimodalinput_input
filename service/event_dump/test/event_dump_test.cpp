@@ -34,14 +34,14 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDumpTest" };
 using namespace testing::ext;
-constexpr const char *TEST_FILE_NAME = "/data/log.log";
+const std::string TEST_FILE_NAME = "/data/log.log";
 } // namespace
 
 class EventDumpTest : public testing::Test {
 public:
 void SetUp() override
 {
-    fd_ = open(TEST_FILE_NAME, O_WRONLY);
+    fd_ = open(TEST_FILE_NAME.c_str(), O_WRONLY);
 }
 
 void TearDown() override
@@ -62,7 +62,7 @@ int32_t fd_;
 HWTEST_F(EventDumpTest, EventDumpTest001, TestSize.Level1)
 {
     std::vector<std::string> args;
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     EXPECT_EQ(count, 0);
 }
@@ -76,7 +76,7 @@ HWTEST_F(EventDumpTest, EventDumpTest001, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest002, TestSize.Level1)
 {
     std::vector<std::string> args = {"--help"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     EXPECT_EQ(count, 1);
@@ -91,7 +91,7 @@ HWTEST_F(EventDumpTest, EventDumpTest002, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest003, TestSize.Level1)
 {
     std::vector<std::string> args = {"-h"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     EXPECT_EQ(count, 1);
@@ -105,7 +105,7 @@ HWTEST_F(EventDumpTest, EventDumpTest003, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest004, TestSize.Level1) {
     std::vector<std::string> args = {"-abc"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     EXPECT_EQ(count, 3);
@@ -120,7 +120,7 @@ HWTEST_F(EventDumpTest, EventDumpTest004, TestSize.Level1) {
 HWTEST_F(EventDumpTest, EventDumpTest005, TestSize.Level1) {
 
     std::vector<std::string> args = {"-a", "--help", "foo", "-bc", "bar"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     MMIEventDump->DumpEventHelp(fd_, args);
@@ -136,7 +136,7 @@ HWTEST_F(EventDumpTest, EventDumpTest005, TestSize.Level1) {
 HWTEST_F(EventDumpTest, EventDumpTest006, TestSize.Level1)
 {
     std::vector<std::string> args = {"-d"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     ASSERT_NO_FATAL_FAILURE(InputDevMgr->Dump(fd_, args));
@@ -151,7 +151,7 @@ HWTEST_F(EventDumpTest, EventDumpTest006, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest007, TestSize.Level1)
 {
     std::vector<std::string> args = {"-l"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     ASSERT_NO_FATAL_FAILURE(InputDevMgr->DumpDeviceList(fd_, args));
@@ -166,7 +166,7 @@ HWTEST_F(EventDumpTest, EventDumpTest007, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest008, TestSize.Level1)
 {
     std::vector<std::string> args = {"-w"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     ASSERT_NO_FATAL_FAILURE(WinMgr->Dump(fd_, args));
@@ -181,7 +181,7 @@ HWTEST_F(EventDumpTest, EventDumpTest008, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest009, TestSize.Level1)
 {
     std::vector<std::string> args = {"-u"};
-    size_t count = 0;
+    int32_t count = 0;
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
     MMIEventDump->CheckCount(fd_, args, count);
@@ -198,7 +198,7 @@ HWTEST_F(EventDumpTest, EventDumpTest009, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest010, TestSize.Level1)
 {
     std::vector<std::string> args = {"-s"};
-    size_t count = 0;
+    int32_t count = 0;
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPV(subscriberHandler);
     MMIEventDump->CheckCount(fd_, args, count);
@@ -215,7 +215,7 @@ HWTEST_F(EventDumpTest, EventDumpTest010, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest011, TestSize.Level1)
 {
     std::vector<std::string> args = {"-o"};
-    size_t count = 0;
+    int32_t count = 0;
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPV(monitorHandler);
     MMIEventDump->CheckCount(fd_, args, count);
@@ -232,7 +232,7 @@ HWTEST_F(EventDumpTest, EventDumpTest011, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest012, TestSize.Level1)
 {
     std::vector<std::string> args = {"-i"};
-    size_t count = 0;
+    int32_t count = 0;
     auto interceptorHandler = InputHandler->GetInterceptorHandler();
     CHKPV(interceptorHandler);
     MMIEventDump->CheckCount(fd_, args, count);
@@ -249,7 +249,7 @@ HWTEST_F(EventDumpTest, EventDumpTest012, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest013, TestSize.Level1)
 {
     std::vector<std::string> args = {"-f"};
-    size_t count = 0;
+    int32_t count = 0;
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPV(filterHandler);
     MMIEventDump->CheckCount(fd_, args, count);
@@ -266,7 +266,7 @@ HWTEST_F(EventDumpTest, EventDumpTest013, TestSize.Level1)
 HWTEST_F(EventDumpTest, EventDumpTest014, TestSize.Level1)
 {
     std::vector<std::string> args = {"-m"};
-    size_t count = 0;
+    int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
     ASSERT_NO_FATAL_FAILURE(MouseEventHdr->Dump(fd_, args));
