@@ -1241,7 +1241,7 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         if (iter == uiExtensionPointerStyle_.end() || iter->second.find(sceneWinId) == iter->second.end()) {
             uiExtensionPointerStyle_[scenePid] = {};
             MMI_HILOG_CURSORE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on"
-                "uiExtensionPointerStyle_",scenePid, sceneWinId);
+                "uiExtensionPointerStyle_", scenePid, sceneWinId);
         }
         uiExtensionPointerStyle_[scenePid][sceneWinId] = pointerStyle;
         MMI_HILOG_CURSORI("set uiextension pointer success. pid:%{public}d, windowid:%{public}d, pointerid:%{public}d",
@@ -2241,7 +2241,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             "displayX:%{public}f,displayY:%{public}f,windowX:%{public}f,windowY:%{public}f,"
             "width:%{public}d,height:%{public}d,area.x:%{public}d,area.y:%{public}d,flags:%{public}d,"
             "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d,zOrder:%{public}f",
-            pointerEvent->DumpPointerAction(), touchWindow->pid,touchWindow->id, 
+            pointerEvent->DumpPointerAction(), touchWindow->pid,touchWindow->id,
             displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
             physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
             touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
