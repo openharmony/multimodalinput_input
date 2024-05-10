@@ -78,9 +78,11 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
+    std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
+    int32_t SwitchPointerStyle() override;
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
@@ -110,7 +112,6 @@ private:
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreatePointerSwiftObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
-    int32_t SwitchPointerStyle();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
