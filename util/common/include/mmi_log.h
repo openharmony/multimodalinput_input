@@ -30,10 +30,39 @@
 #ifdef MMI_LOG_DOMAIN
 #undef MMI_LOG_DOMAIN
 #endif
-#define MMI_LOG_DOMAIN 0XD002800
+#ifdef MMI_LOG_FRAMEWORK
+#undef MMI_LOG_FRAMEWORK
+#endif
+#define MMI_LOG_FRAMEWORK 0XD002800
+#ifdef MMI_LOG_SERVER
+#undef MMI_LOG_SERVER
+#endif
+#define MMI_LOG_SERVER 0XD002801
+#ifdef MMI_LOG_HANDLER
+#undef MMI_LOG_HANDLER
+#endif
+#define MMI_LOG_HANDLER 0XD002802
+#ifdef MMI_LOG_WINDOW
+#undef MMI_LOG_WINDOW
+#endif
+#define MMI_LOG_WINDOW 0XD002803
+#ifdef MMI_LOG_CURSOR
+#undef MMI_LOG_CURSOR
+#endif
+#define MMI_LOG_CURSOR 0XD002804
+#ifdef MMI_LOG_DISPATCH
+#undef MMI_LOG_DISPATCH
+#endif
+#define MMI_LOG_DISPATCH 0XD002805
+#ifdef MMI_LOG_ANRDETECT
+#undef MMI_LOG_ANRDETECT
+#endif
+#define MMI_LOG_ANRDETECT 0XD002806
+
+#define MMI_LOG_DOMAIN MMI_LOG_FRAMEWORK
 
 #ifndef MMI_FUNC_FMT
-#define MMI_FUNC_FMT "in %{public}s, "
+#define MMI_FUNC_FMT "[%{public}s:%{public}d] "
 #endif
 
 #ifndef MMI_FUNC_INFO
@@ -50,20 +79,163 @@
 
 #define MMI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_SERVERD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_SERVER, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_SERVER, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_SERVERI(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_SERVER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERW(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_SERVER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERE(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_SERVER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERF(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_SERVER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_HANDLERD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_HANDLER, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_HANDLER, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_HANDLERI(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_HANDLER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERW(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_HANDLER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERE(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_HANDLER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERF(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_HANDLER, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_WINDOWD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_WINDOW, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_WINDOW, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_WINDOWI(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_WINDOW, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWW(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_WINDOW, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWE(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_WINDOW, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWF(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_WINDOW, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_CURSORD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_CURSOR, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_CURSOR, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_CURSORI(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_CURSOR, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORW(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_CURSOR, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORE(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_CURSOR, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORF(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_CURSOR, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_DISPATCHD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_DISPATCHI(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_DISPATCHW(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_DISPATCHE(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_DISPATCHF(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_ANRDETECTD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
+        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
+            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_ANRDETECTI(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTW(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTE(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTF(fmt, ...) do { \
+    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
+        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \

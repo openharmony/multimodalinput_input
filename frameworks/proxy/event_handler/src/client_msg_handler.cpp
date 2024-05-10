@@ -117,23 +117,23 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     CHKPR(key, ERROR_NULL_POINTER);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
-        MMI_HILOGE("Read netPacket failed");
+        MMI_HILOG_DISPATCHE("Read netPacket failed");
         return RET_ERR;
     }
     int32_t fd = 0;
     pkt >> fd;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, key) != ERR_OK) {
-        MMI_HILOGE("Failed to deserialize enhance data key event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize enhance data key event.");
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read fd failed");
+        MMI_HILOG_DISPATCHE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOGD("Key event dispatcher of client, Fd:%{public}d", fd);
-    MMI_HILOGI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
+    MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
+    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
     EventLogHelper::PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
@@ -164,20 +164,20 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
-        MMI_HILOGE("Failed to deserialize pointer event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
-        MMI_HILOGE("Failed to deserialize enhance data pointer event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize enhance data pointer event.");
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    MMI_HILOGI("InputTracking id:%{public}d action:%{public}d PointerEvent ReceivedMsg",
+    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d action:%{public}d PointerEvent ReceivedMsg",
         pointerEvent->GetId(), pointerEvent->GetPointerAction());
     EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
-        MMI_HILOGI("Operation canceled.");
+        MMI_HILOG_DISPATCHI("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
@@ -270,13 +270,13 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     uint32_t deviceTags;
     pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read handler failed");
+        MMI_HILOG_DISPATCHE("Packet read handler failed");
         return RET_ERR;
     }
     auto keyEvent = KeyEvent::Create();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
-        MMI_HILOGE("Failed to deserialize key event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize key event.");
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
@@ -294,7 +294,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
             break;
         }
         default: {
-            MMI_HILOGW("Failed to intercept or monitor on the event");
+            MMI_HILOG_DISPATCHW("Failed to intercept or monitor on the event");
             break;
         }
     }
@@ -310,14 +310,14 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     uint32_t deviceTags;
     pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read Pointer data failed");
+        MMI_HILOG_DISPATCHE("Packet read Pointer data failed");
         return RET_ERR;
     }
-    MMI_HILOGD("Client handlerType:%{public}d", handlerType);
+    MMI_HILOG_DISPATCHD("Client handlerType:%{public}d", handlerType);
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
-        MMI_HILOGE("Failed to deserialize pointer event");
+        MMI_HILOG_DISPATCHW("Failed to deserialize pointer event");
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
@@ -335,7 +335,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
             break;
         }
         default: {
-            MMI_HILOGW("Failed to intercept or monitor on the event");
+            MMI_HILOG_DISPATCHW("Failed to intercept or monitor on the event");
             break;
         }
     }
@@ -355,10 +355,10 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
     int32_t pid;
     pkt >> pid;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
+        MMI_HILOG_ANRDETECTE("Packet read data failed");
         return RET_ERR;
     }
-    MMI_HILOGI("Client pid:%{public}d", pid);
+    MMI_HILOG_ANRDETECTI("Client pid:%{public}d", pid);
     InputMgrImpl.OnAnr(pid);
     return RET_OK;
 }
