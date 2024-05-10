@@ -25,6 +25,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t UID_ROOT { 0 };
+const std::string PROGRAM_NAME = "uds_sesion_test";
+int32_t g_moduleType = 3;
+int32_t g_pid = 0;
+int32_t g_writeFd = -1;
 } // namespace
 
 class EventInterceptorHandlerTest : public testing::Test {
@@ -135,6 +140,84 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_AddInputHandler_01
+ * @tc.desc: Test AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_01, TestSize.Level1)
+{
+    EventInterceptorHandler interceptorHandler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(interceptorHandler.AddInputHandler(handlerType, eventType, priority, deviceTags, sess), RET_ERR);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_AddInputHandler_02
+ * @tc.desc: Test AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_02, TestSize.Level1)
+{
+    EventInterceptorHandler interceptorHandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    EXPECT_EQ(interceptorHandler.AddInputHandler(handlerType, eventType, priority, deviceTags, sess), RET_OK);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInputHandler
+ * @tc.desc: Test RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInputHandler, TestSize.Level1)
+{
+    EventInterceptorHandler interceptorHandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.RemoveInputHandler(handlerType, eventType, priority, deviceTags, sess));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnSessionLost
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnSessionLost, TestSize.Level1)
+{
+    EventInterceptorHandler interceptorHandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.OnSessionLost(sess));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Dump
+ * @tc.desc: Test Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Dump, TestSize.Level1)
+{
+    EventInterceptorHandler interceptorHandler;
+    int32_t fd = 1;
+    std::vector<std::string> args = {"-i"};
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.Dump(fd, args));
 }
 } // namespace MMI
 } // namespace OHOS

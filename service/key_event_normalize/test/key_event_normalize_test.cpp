@@ -31,7 +31,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp() {}
-    void TearDoen() {}
+    void TearDown() {}
 };
 
 /**
