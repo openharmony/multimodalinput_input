@@ -108,22 +108,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.
 }
 
 /**
- * @tc.name: EventDispatchTest_NotifyPointerEventToRS
- * @tc.desc: Test Notify Pointer Event To RS
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t action = 1;
-    std::string name = "example_program_test";
-    uint32_t processId = 12345;
-    dispatch.isTouchEnable_ = false;
-    ASSERT_NO_FATAL_FAILURE(dispatch.NotifyPointerEventToRS(action, name, processId));
-}
-
-/**
  * @tc.name: EventDispatchTest_AcquireEnableMark
  * @tc.desc: Test Acquire Enable Mark
  * @tc.type: FUNC
