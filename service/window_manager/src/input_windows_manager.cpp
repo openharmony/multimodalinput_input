@@ -2576,6 +2576,11 @@ void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int3
             width = displayInfo->height;
         }
     } else {
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            height = displayInfo->width;
+            width = displayInfo->height;
+            return;
+        }
         width = displayInfo->width;
         height = displayInfo->height;
     }
