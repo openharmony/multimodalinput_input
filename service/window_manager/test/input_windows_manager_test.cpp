@@ -2357,5 +2357,77 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetCurrentUser_001, Te
     ret = WinMgr->SetCurrentUser(userId);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_01
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_01, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_MOVE;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_02
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_02, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_UP;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_03
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_03, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerAction_04
+ * @tc.desc: Test UpdatePointerAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_04, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = pointerEvent->GetPointerAction();
+    action = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
+    WinMgr->UpdatePointerAction(pointerEvent);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW));
+}
 } // namespace MMI
 } // namespace OHOS
