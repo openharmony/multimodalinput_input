@@ -15,6 +15,9 @@
 
 #include "setting_observer.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+
 namespace OHOS {
 namespace MMI {
 SettingObserver::SettingObserver() = default;

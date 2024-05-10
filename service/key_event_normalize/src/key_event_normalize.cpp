@@ -19,6 +19,8 @@
 #include "key_map_manager.h"
 #include "key_unicode_transformation.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyEventNormalize"
 
