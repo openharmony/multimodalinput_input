@@ -1240,12 +1240,12 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         auto iter = uiExtensionPointerStyle_.find(scenePid);
         if (iter == uiExtensionPointerStyle_.end() || iter->second.find(sceneWinId) == iter->second.end()) {
             uiExtensionPointerStyle_[scenePid] = {};
-            MMI_HILOG_CURSORE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on uiExtensionPointerStyle_",
-                scenePid, sceneWinId);
+            MMI_HILOG_CURSORE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on"
+                "uiExtensionPointerStyle_",scenePid, sceneWinId);
         }
         uiExtensionPointerStyle_[scenePid][sceneWinId] = pointerStyle;
         MMI_HILOG_CURSORI("set uiextension pointer success. pid:%{public}d, windowid:%{public}d, pointerid:%{public}d",
-                scenePid, sceneWinId, pointerStyle.id);
+            scenePid, sceneWinId, pointerStyle.id);
         return RET_OK;
     }
     auto sceneIter = pointerStyle_.find(scenePid);
@@ -1636,7 +1636,8 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
     bool findFlag = false;
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
-        MMI_HILOG_CURSORD("windowHotAreas size is:%{public}zu, windowId is :%{public}d", windowHotAreas.size(), windowId);
+        MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
+            windowHotAreas.size(), windowId);
         findFlag = InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
     }
     return findFlag;
@@ -2115,8 +2116,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
-            MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching, "
-                       "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
@@ -2166,8 +2167,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f, logicalY:%{public}f, pointerId:%{public}d",
-                logicalX, logicalY, pointerId);
+            MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
+                logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
             return RET_ERR;
         }
         touchWindow = &it->second.window;
@@ -2235,12 +2236,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
-        MMI_HILOG_DISPATCHI("pointerAction:%{public}s,pid:%{public}d,targetWindowId:%{public}d,foucsWindowId:%{public}d,"
-            "eventId:%{public}d,logicalX:%{public}f,logicalY:%{public}f,displayX:%{public}f,displayY:%{public}f,"
-            "windowX:%{public}f,windowY:%{public}f,width:%{public}d,height:%{public}d,area.x:%{public}d,"
-            "area.y:%{public}d,flags:%{public}d,displayId:%{public}d,TargetWindowId:%{public}d,"
-            "AgentWindowId:%{public}d,zOrder:%{public}f", pointerEvent->DumpPointerAction(), touchWindow->pid,
-            touchWindow->id, displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
+        MMI_HILOG_DISPATCHI("pointerAction:%{public}s,pid:%{public}d,targetWindowId:%{public}d,"
+            "foucsWindowId:%{public}d,eventId:%{public}d,logicalX:%{public}f,logicalY:%{public}f,"
+            "displayX:%{public}f,displayY:%{public}f,windowX:%{public}f,windowY:%{public}f,"
+            "width:%{public}d,height:%{public}d,area.x:%{public}d,area.y:%{public}d,flags:%{public}d,"
+            "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d,zOrder:%{public}f",
+            pointerEvent->DumpPointerAction(), touchWindow->pid,touchWindow->id, 
+            displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
             physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
             touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
             pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
@@ -2298,7 +2300,8 @@ void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY
 {
     CHKPV(pointerEvent);
     CHKPV(touchWindow);
-    MMI_HILOG_DISPATCHD("LastTouchWindowInfo:%{public}d, touchWindow:%{public}d", lastTouchWindowInfo_.id, touchWindow->id);
+    MMI_HILOG_DISPATCHD("LastTouchWindowInfo:%{public}d, touchWindow:%{public}d",
+        "lastTouchWindowInfo_.id", touchWindow->id);
     if (lastTouchWindowInfo_.id != touchWindow->id) {
         if (lastTouchWindowInfo_.id != -1) {
             DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
