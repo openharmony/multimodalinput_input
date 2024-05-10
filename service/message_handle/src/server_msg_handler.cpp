@@ -39,6 +39,8 @@
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ServerMsgHandler"
 
