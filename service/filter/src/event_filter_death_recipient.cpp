@@ -15,6 +15,9 @@
 
 #include "event_filter_death_recipient.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+
 namespace OHOS {
 namespace MMI {
 EventFilterDeathRecipient::EventFilterDeathRecipient(

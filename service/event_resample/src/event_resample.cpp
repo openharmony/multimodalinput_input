@@ -21,6 +21,8 @@
 #include "mmi_log.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventResample"
 
