@@ -356,6 +356,21 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal_001, TestSize.
 }
 
 /**
+ * @tc.name: TimerManagerTest_CalcNextDelayInternal
+ * @tc.desc: Test calculating the next delay internally within the TimerManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal, TestSize.Level1)
+{
+    TimerManager tMgr;
+    auto timer = std::make_unique<TimerManager::TimerItem>();
+    timer->nextCallTime = -1;
+    tMgr.InsertTimerInternal(timer);
+    EXPECT_EQ(tMgr.CalcNextDelayInternal(), 0);
+}
+
+/**
  * @tc.name: TimerManagerTest_ProcessTimersInternal_001
  * @tc.desc: Test processing timers internally within the TimerManager
  * @tc.type: FUNC
@@ -365,6 +380,21 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_001, TestSize.
 {
     TimerManager timermanager;
     ASSERT_NO_FATAL_FAILURE(timermanager.ProcessTimersInternal());
+}
+
+/**
+ * @tc.name: TimerManagerTest_ProcessTimersInternal
+ * @tc.desc: Test processing timers internally within the TimerManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal, TestSize.Level1)
+{
+    TimerManager tMgr;
+    auto timer = std::make_unique<TimerManager::TimerItem>();
+    timer->nextCallTime = 10000000000;
+    tMgr.InsertTimerInternal(timer);
+    ASSERT_NO_FATAL_FAILURE(tMgr.ProcessTimersInternal());
 }
 } // namespace MMI
 } // namespace OHOS
