@@ -29,6 +29,8 @@
 #include "time_cost_chk.h"
 #include "nap_process.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputConnectStub"
 
