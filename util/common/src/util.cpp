@@ -584,5 +584,73 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
     }
     return realPath;
 }
+
+thread_local std::vector<int64_t> traceids;
+thread_local std::unordered_map<int64_t, size_t> traceIdToIdx;
+thread_local std::string traceStr;
+
+void StartLogTraceId(int64_t newId)
+{
+    if (newId == -1) {
+        return;
+    }
+    auto iter = traceIdToIdx.find(newId);
+    if (iter != traceIdToIdx.end()) {
+        return;
+    }
+    traceids.push_back(newId);
+    traceIdToIdx.emplace(newId, traceids.size() - 1);
+    traceStr += "/" + std::to_string(newId);
+};
+
+void EndLogTraceId(int64_t id)
+{
+    auto iter = traceIdToIdx.find(id);
+    if (iter == traceIdToIdx.end()) {
+        return;
+    }
+    auto Idx = iter->second;
+    traceIdToIdx.erase(iter);
+    auto IdCount = traceids.size();
+    if (IdCount <= Idx) {
+        return;
+    }
+    if (IdCount == Idx + 1) {
+        traceids.pop_back();
+    } else {
+        auto item = traceids.begin();
+        item += Idx;
+        traceids.erase(item);
+    }
+    traceStr = "";
+    for (auto perId: traceids) {
+        traceStr += "/" + std::to_string(perId);
+    }
+}
+
+const char *FormatLogTrace()
+{
+    return traceStr.c_str();
+}
+
+
+void ResetLogTrace()
+{
+    traceids.clear();
+    traceIdToIdx.clear();
+    traceStr = "";
+}
+
+LogTracer::LogTracer(int64_t id)
+{
+    this->id = id;
+    StartLogTraceId(id);
+}
+
+LogTracer::~LogTracer()
+{
+    EndLogTraceId(this->id);
+}
+
 } // namespace MMI
 } // namespace OHOS
