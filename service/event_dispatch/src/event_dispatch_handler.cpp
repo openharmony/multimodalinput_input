@@ -182,7 +182,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
         MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
-            "application not response", point->GetId());
+            "application not response. PointerEvent(deviceid = %{public}d, action = %{public}s)",
+            point->GetId(), point->GetDeviceId(), point->DumpPointerAction());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
