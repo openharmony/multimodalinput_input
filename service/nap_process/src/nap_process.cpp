@@ -18,6 +18,8 @@
 #include "nap_process.h"
 #include "input_event_handler.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "NapProcess"
 
