@@ -25,6 +25,8 @@
 #include "input_scene_board_judgement.h"
 #include "infrared_frequency_info.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputConnectProxy"
 
