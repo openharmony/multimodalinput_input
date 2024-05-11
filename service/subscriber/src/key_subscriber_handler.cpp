@@ -29,6 +29,8 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeySubscriberHandler"
 
