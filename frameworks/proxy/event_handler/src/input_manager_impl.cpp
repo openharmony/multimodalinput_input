@@ -372,13 +372,18 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-int32_t InputManagerImpl::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
+    std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
-    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(callback);
+    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+        MMI_HILOGE("switch type error");
+        return RET_ERR;
+    }
+    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
 #else
     MMI_HILOGW("Switch device does not support");
     return ERROR_UNSUPPORT;
