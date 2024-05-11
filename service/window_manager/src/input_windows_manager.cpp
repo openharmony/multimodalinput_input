@@ -2287,7 +2287,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         touchItemDownInfos_[pointerId] = windowInfoEX;
         MMI_HILOG_DISPATCHI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        MMI_HILOG_DISPATCHD("Clear extra data");
+        MMI_HILOG_DISPATCHD("Clear extra data.");
         pointerEvent->ClearBuffer();
         lastTouchEvent_ = nullptr;
         lastTouchWindowInfo_.id = -1;
