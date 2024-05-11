@@ -21,6 +21,8 @@
 #include "touch_transform_processor.h"
 #include "touchpad_transform_processor.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchEventNormalize"
 

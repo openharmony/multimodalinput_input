@@ -62,6 +62,8 @@
 #endif
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 
 namespace OHOS {
 namespace MMI {

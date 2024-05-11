@@ -234,7 +234,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+                handlerId, keyEvent->GetKeyCode());
         }
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
@@ -246,7 +247,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+                handlerId, keyEvent->GetKeyCode());
             break;
         }
     }
@@ -362,7 +364,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         CHKPV(iter.second);
         auto consumer = iter.second;
         consumer->OnInputEvent(tempEvent);
-        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", iter.first, pointerEvent->GetPointerId());
+        MMI_HILOG_DISPATCHD("Pointer event id:%{public}d pointerId:%{public}d",
+            iter.first, pointerEvent->GetPointerId());
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
