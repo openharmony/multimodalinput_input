@@ -519,7 +519,15 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             pointerEvent = outputEvent;
         }
     }
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    if (KeyEventHdr != nullptr) {
+        const auto &keyEvent = KeyEventHdr->GetKeyEvent();
+        if (keyEvent != nullptr && pointerEvent != nullptr) {
+            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+            pointerEvent->SetPressedKeys(pressedKeys);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     if (pointerEvent != nullptr) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
         if (SetOriginPointerId(pointerEvent) != RET_OK) {
