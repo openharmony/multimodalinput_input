@@ -35,11 +35,23 @@ int32_t SwitchEventInputSubscribeManager::subscribeManagerId_ = 0;
 SwitchEventInputSubscribeManager::SwitchEventInputSubscribeManager() {}
 SwitchEventInputSubscribeManager::~SwitchEventInputSubscribeManager() {}
 
+SwitchEventInputSubscribeManager::SubscribeSwitchEventInfo::SubscribeSwitchEventInfo(
+    int32_t switchType,
+    std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+    : switchType_(switchType), callback_(callback)
+{
+}
+
 int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
+    int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
     CALL_INFO_TRACE;
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
+    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+        MMI_HILOGE("switch type error");
+        return RET_ERR;
+    }
 
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -52,9 +64,13 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     }
     int32_t subscribeId = SwitchEventInputSubscribeManager::subscribeManagerId_;
     ++SwitchEventInputSubscribeManager::subscribeManagerId_;
-    subscribeInfos_[subscribeId] = callback;
-    MMIEventHdl.SubscribeSwitchEvent(subscribeId);
-    MMI_HILOGI("subscribeId:%{public}d,", subscribeId);
+    subscribeInfos_.emplace(std::make_pair(subscribeId, SubscribeSwitchEventInfo(switchType, callback)));
+    if (MMIEventHdl.SubscribeSwitchEvent(subscribeId, switchType) != RET_OK) {
+        MMI_HILOGE("Subscribing switch event failed");
+        subscribeInfos_.erase(subscribeId);
+        return INVALID_SUBSCRIBE_ID;
+    }
+    MMI_HILOGI("subscribeId:%{public}d,switchType:%{public}d", subscribeId, switchType);
 
     return subscribeId;
 }
@@ -103,7 +119,8 @@ int32_t SwitchEventInputSubscribeManager::OnSubscribeSwitchEventCallback(std::sh
     std::lock_guard<std::mutex> guard(mtx_);
     auto it = subscribeInfos_.find(subscribeId);
     if (it != subscribeInfos_.end()) {
-        callback = it->second;
+        SubscribeSwitchEventInfo &subscribeInfo = it->second;
+        callback = subscribeInfo.GetCallback();
     }
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(event);
@@ -119,7 +136,8 @@ void SwitchEventInputSubscribeManager::OnConnected()
         return;
     }
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
-        if (MMIEventHdl.SubscribeSwitchEvent(it->first) != RET_OK) {
+        SubscribeSwitchEventInfo &subscribeInfo = it->second;
+        if (MMIEventHdl.SubscribeSwitchEvent(subscribeInfo.GetSwitchType(), it->first) != RET_OK) {
             MMI_HILOGE("Subscribe switch event failed");
         }
     }

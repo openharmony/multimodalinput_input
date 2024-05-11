@@ -27,15 +27,32 @@ public:
     static constexpr int32_t SWITCH_ON = 0;
     static constexpr int32_t SWITCH_OFF = 1;
 
+    enum SwitchType {
+        DEFAULT = 0,
+        LID,
+        TABLET,
+        PRIVACY
+    };
+
 public:
-    int GetSwitchValue() const
+    int32_t GetSwitchType() const
+    {
+        return switchType_;
+    }
+    
+    int32_t GetSwitchValue() const
     {
         return switchValue_;
     }
 
-    int GetSwitchMask() const
+    int32_t GetSwitchMask() const
     {
         return updateSwitchMask_;
+    }
+
+    void SetSwitchType(int32_t type)
+    {
+        switchType_ = type;
     }
 
     void SetSwitchValue(int32_t value)
@@ -51,10 +68,12 @@ public:
     explicit SwitchEvent(int32_t value)
         : InputEvent(value),
         switchValue_(value),
-        updateSwitchMask_(0) {}
+        updateSwitchMask_(0),
+        switchType_(SwitchType::DEFAULT) {}
 private:
         int32_t switchValue_ { 0 };
         int32_t updateSwitchMask_ { 0 };
+        int32_t switchType_ { SwitchType::DEFAULT };
 };
 } // namespace MMI
 } // namespace OHOS

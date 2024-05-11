@@ -81,7 +81,7 @@ public:
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
-    int32_t SubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
