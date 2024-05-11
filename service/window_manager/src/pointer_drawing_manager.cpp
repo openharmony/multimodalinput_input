@@ -309,6 +309,7 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
     }
+    CreateMagicCursorChangeObserver();
 }
 
 bool PointerDrawingManager::HasMagicCursor()
