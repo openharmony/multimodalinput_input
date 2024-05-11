@@ -43,7 +43,7 @@ ohos_shared_library("joystickevent") {
     ":joystickEvent_config",
   ]
 
-  deps = []
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
   external_deps = [
     "c_utils:utils",

@@ -94,6 +94,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    LogTracer lt(keyEvent->GetId());
     if (isNativeInject) {
         CurrentPID_ = pid;
         auto iter = authorizationCollection_.find(pid);
@@ -155,6 +156,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId());
     if (isNativeInject) {
         CurrentPID_ = pid;
         auto iter = authorizationCollection_.find(pid);
@@ -175,7 +177,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EndLogTraceId(pointerEvent->GetId());
     pointerEvent->UpdateId();
+    LogTracer lt(pointerEvent->GetId());
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH

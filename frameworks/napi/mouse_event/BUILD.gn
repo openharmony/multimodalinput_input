@@ -43,7 +43,10 @@ ohos_shared_library("mouseevent") {
     ":mouseEvent_config",
   ]
 
-  deps = []
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "c_utils:utils",

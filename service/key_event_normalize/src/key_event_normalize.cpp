@@ -48,6 +48,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
+    StartLogTraceId(keyEvent->GetId());
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 

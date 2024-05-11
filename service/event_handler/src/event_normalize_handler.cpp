@@ -284,6 +284,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
+    LogTracer lt(keyEvent->GetId());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
@@ -344,6 +345,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId());
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
@@ -390,6 +392,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
+    LogTracer lt(pointerEvent->GetId());
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
         nextHandler_->HandlePointerEvent(pointerEvent);
@@ -463,6 +466,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
     if (actionType == PointerEvent::POINTER_ACTION_ROTATE_END) {
@@ -484,6 +488,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId());
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
@@ -508,12 +513,14 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    int64_t id = -1;
     if (event != nullptr) {
         CHKPR(event, ERROR_NULL_POINTER);
         pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        id = pointerEvent->GetId();
     }
-
+    LogTracer lt(id);
     if (MMISceneBoardJudgement::IsSceneBoardEnabled() && MMISceneBoardJudgement::IsResampleEnabled()) {
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
@@ -524,6 +531,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
                        outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
             pointerEvent = outputEvent;
+            id = pointerEvent->GetId();
         }
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -535,6 +543,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    LogTracer lt1(id);
     if (pointerEvent != nullptr) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
         if (SetOriginPointerId(pointerEvent) != RET_OK) {
@@ -578,6 +587,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
