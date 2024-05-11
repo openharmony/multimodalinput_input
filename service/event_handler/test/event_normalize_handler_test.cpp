@@ -141,7 +141,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
     ASSERT_NO_FATAL_FAILURE(handler.HandleJoystickEvent(event));
     event->type = LIBINPUT_EVENT_SWITCH_TOGGLE;
     handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleSwitchInputEvent(event));  
+    ASSERT_NO_FATAL_FAILURE(handler.HandleSwitchInputEvent(event));
 }
 } // namespace MMI
 } // namespace OHOS
