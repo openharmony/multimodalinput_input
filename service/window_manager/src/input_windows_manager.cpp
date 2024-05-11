@@ -2168,7 +2168,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
             MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
-                logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
+                "logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
             return RET_ERR;
         }
         touchWindow = &it->second.window;
@@ -2239,9 +2239,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOG_DISPATCHI("pointerAction:%{public}s,pid:%{public}d,targetWindowId:%{public}d,"
             "foucsWindowId:%{public}d,eventId:%{public}d,logicalX:%{public}f,logicalY:%{public}f,"
             "displayX:%{public}f,displayY:%{public}f,windowX:%{public}f,windowY:%{public}f,"
-            "width:%{public}d,height:%{public}d,area.x:%{public}d,area.y:%{public}d,flags:%{public}d,"
-            "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d,zOrder:%{public}f",
-            pointerEvent->DumpPointerAction(), touchWindow->pid,touchWindow->id,
+            "width:%{public}d,height:%{public}d,area.x:%{public}d,area.y:%{public}d,"
+            "flags:%{public}d,displayId:%{public}d,TargetWindowId:%{public}d,"
+            "AgentWindowId:%{public}d,zOrder:%{public}f",
+            pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
             displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
             physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
             touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
@@ -2301,7 +2302,7 @@ void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY
     CHKPV(pointerEvent);
     CHKPV(touchWindow);
     MMI_HILOG_DISPATCHD("LastTouchWindowInfo:%{public}d, touchWindow:%{public}d",
-        "lastTouchWindowInfo_.id", touchWindow->id);
+        lastTouchWindowInfo_.id, touchWindow->id);
     if (lastTouchWindowInfo_.id != touchWindow->id) {
         if (lastTouchWindowInfo_.id != -1) {
             DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
