@@ -35,8 +35,6 @@ HdfDeviceEventDispatch::HdfDeviceEventDispatch(const uint32_t maxX, const uint32
     g_pTouchScreen->SetUp();
 }
 
-HdfDeviceEventDispatch::~HdfDeviceEventDispatch() {}
-
 int32_t HdfDeviceEventDispatch::EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex)
 {
     if (pkgs.empty()) {
