@@ -261,12 +261,19 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MAGIC_CURSOR->InitRenderThread([]() { IPointerDrawingManager::GetInstance()->SwitchPointerStyle(); });
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-            if (surfaceNode_ != nullptr) {
+            if (surfaceNode_ == nullptr) {
+                MMI_HILOGE("surfaceNode_ is nullptr, no need detach");
+                return;
+            }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+            int64_t nodeId = surfaceNode_->GetId();
+            if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 surfaceNode_->DetachToDisplay(screenId_);
                 Rosen::RSTransaction::FlushImplicitTransaction();
-                this->SwitchPointerStyle();
             }
-            MMI_HILOGD("switch pointer style");
+            MAGIC_CURSOR->DetachDisplayNode();
+            this->SwitchPointerStyle();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         }
     };
     sptr<SettingObserver> statusObserver =
