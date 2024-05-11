@@ -189,7 +189,9 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
     auto currentTime = GetSysClockTime();
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (ANRMgr->TriggerANR(ANR_MONITOR, currentTime, session_)) {
-            MMI_HILOGW("The pointer event does not report normally, application not response");
+            MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
+                "application not response. TouchEvent(deviceid:%{public}d, action:%{public}s)",
+                pointerEvent->GetId(), pointerEvent->GetDeviceId(), pointerEvent->DumpPointerAction());
             return;
         }
     }
