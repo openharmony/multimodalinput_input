@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "mmi_fd_listener.h"
 
 #include <cinttypes>
@@ -41,22 +41,32 @@ void MMIFdListener::OnReadable(int32_t fd)
     }
     CHKPV(mmiClient_);
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
+    size_t recvSize = 0;
+    while (true) {
         ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
+            recvSize += size;
             mmiClient_->OnRecvMsg(szBuf, size);
-        } else if (size < 0) {
-            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                continue;
-            }
-            MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
-            break;
-        } else {
-            MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
-                "errno:%{public}d", i, errno);
+        }
+
+        // size 0 means it the fd may be closed.
+        if (size == 0) {
+            MMI_HILOGE("received %{public}d, now received 0 from fd %{public}d, wait for next readable", recvSize, fd);
             break;
         }
-        if (size < MAX_PACKET_BUF_SIZE) {
+
+        // size < 0 means there is an error occurred, need to handle the error.
+        int32_t recvError = errno;
+        if (recvError == EAGAIN || recvError == EWOULDBLOCK) {
+            MMI_HILOGW("received %{public}d from fd %{public}d, wait for next readable", recvSize, fd);
+            break;
+        } else if (recvError == EINTR) {
+            MMI_HILOGW("received %{public}d, fd %{public}d is interrupted by signal, continue to recv", recvSize,
+                       fd);
+            continue;
+        } else {
+            MMI_HILOGE("received %{public}d, unexpected errno %{public}d on fd %{public}d, wait for next readable",
+                       recvSize, recvError, fd);
             break;
         }
     }
