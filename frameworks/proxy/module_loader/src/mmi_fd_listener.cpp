@@ -42,32 +42,44 @@ void MMIFdListener::OnReadable(int32_t fd)
     CHKPV(mmiClient_);
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
     size_t recvSize = 0;
-    while (true) {
-        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-        if (size > 0) {
-            recvSize += size;
-            mmiClient_->OnRecvMsg(szBuf, size);
-        }
+    bool shouldTry = true;
+    while (shouldTry) {
+        size_t oneRecvSize = 0;
+        while (oneRecvSize < MAX_PACKET_BUF_SIZE) {
+            ssize_t size = recv(fd, szBuf + oneRecvSize, MAX_PACKET_BUF_SIZE - oneRecvSize,
+                                MSG_DONTWAIT | MSG_NOSIGNAL);
+            if (size > 0) {
+                recvSize += size;
+                oneRecvSize += size;
+                continue;
+            }
 
-        // size 0 means it the fd may be closed.
-        if (size == 0) {
-            MMI_HILOGE("received %{public}d, now received 0 from fd %{public}d, wait for next readable", recvSize, fd);
-            break;
-        }
+            // size 0 means it the fd may be closed.
+            if (size == 0) {
+                shouldTry = false;
+                MMI_HILOGE("received %{public}zu, now received 0 from fd %{public}d, wait for next readable", recvSize,
+                           fd);
+                break;
+            }
 
-        // size < 0 means there is an error occurred, need to handle the error.
-        int32_t recvError = errno;
-        if (recvError == EAGAIN || recvError == EWOULDBLOCK) {
-            MMI_HILOGW("received %{public}d from fd %{public}d, wait for next readable", recvSize, fd);
-            break;
-        } else if (recvError == EINTR) {
-            MMI_HILOGW("received %{public}d, fd %{public}d is interrupted by signal, continue to recv", recvSize,
-                       fd);
-            continue;
-        } else {
-            MMI_HILOGE("received %{public}d, unexpected errno %{public}d on fd %{public}d, wait for next readable",
-                       recvSize, recvError, fd);
-            break;
+            // size < 0 means there is an error occurred, need to handle the error.
+            int32_t recvError = errno;
+            if (recvError == EAGAIN || recvError == EWOULDBLOCK) {
+                shouldTry = false;
+                break;
+            } else if (recvError == EINTR) {
+                MMI_HILOGW("received %{public}zu, fd %{public}d is interrupted by signal, continue to recv", recvSize,
+                           fd);
+                continue;
+            } else {
+                shouldTry = false;
+                MMI_HILOGE("received %{public}zu, unexpected errno %{public}d on fd %{public}d, wait for next readable",
+                           recvSize, recvError, fd);
+                break;
+            }
+        }
+        if (oneRecvSize > 0) {
+            mmiClient_->OnRecvMsg(szBuf, oneRecvSize);
         }
     }
 }
