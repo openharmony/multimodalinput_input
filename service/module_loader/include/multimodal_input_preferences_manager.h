@@ -78,7 +78,7 @@ private:
     const std::string pointerStyle = "pointerStyle";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t g_magicPointerColor { -1 };
-    int32_t g_magicPointerSize { 1 };
+    int32_t g_magicPointerSize { 3 };
     const std::string magicPointerColor = "magicPointerColor";
     const std::string magicPointerSize = "magicPointerSize";
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR

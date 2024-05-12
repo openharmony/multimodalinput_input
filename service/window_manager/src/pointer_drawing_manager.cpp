@@ -93,7 +93,7 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
-    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 2, [this]() {
+    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, CALCULATE_MIDDLE, [this]() {
         MMI_HILOGD("Timer callback");
         CreatePointerSwiftObserver(hasMagicCursor_);
     });
