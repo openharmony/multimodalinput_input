@@ -873,6 +873,7 @@ ohos_unittest("EventDumpTest") {
 
   sources = [
     "event_handler/test/anr_manager_test.cpp",
+    "event_handler/test/event_normalize_handler_test.cpp",
     "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_auto_repeat_test.cpp",
