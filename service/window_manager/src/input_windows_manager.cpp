@@ -2473,7 +2473,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 template <class T>
 void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
 {
-    CALL_INFO_ENTER;
+    CALL_INFO_TRACE;
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
             MMI_HILOGE("get settingdata failed, key: %{public}s", key.c_str());
