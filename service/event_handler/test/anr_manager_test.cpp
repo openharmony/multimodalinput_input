@@ -47,6 +47,7 @@ public:
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = 123;
@@ -63,6 +64,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_MarkProcessed_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr sess;
@@ -77,6 +79,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimers_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr session;
@@ -92,6 +95,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr session;
@@ -107,6 +111,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_002, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     SessionPtr session;
@@ -122,6 +127,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_RemoveTimersByType_003, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = 1234;
@@ -137,6 +143,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_003, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     UDSServer udsServer;
     ASSERT_NO_FATAL_FAILURE(ANRMgr->Init(udsServer));
     int32_t pid = -1;
@@ -152,6 +159,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_SetANRNoticedPid_002, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t type = 1;
     int32_t id = 1001;
     int64_t currentTime = 123456789;
@@ -167,6 +175,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_001, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t type = -1;
     int32_t id = -2;
     int64_t currentTime = 123456789;
@@ -182,6 +191,7 @@ HWTEST_F(AnrManagerTest, AnrManagerTest_AddTimer_002, TestSize.Level1)
  */
 HWTEST_F(AnrManagerTest, AnrManagerTest_TriggerANR_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t type = 1;
     int64_t time = 123456789;
     SessionPtr sess = std::shared_ptr<OHOS::MMI::UDSSession>();
