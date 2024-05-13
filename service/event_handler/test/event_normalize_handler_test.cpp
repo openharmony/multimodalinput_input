@@ -46,7 +46,8 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, T
     libinput_event* event = nullptr;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.ProcessNullEvent(event, frameTime));
-    event = new(std::nothrow)libinput_event;
+    event = new (std::nothrow) libinput_event;
+    ASSERT_NE(event, nullptr);
     event->type = LIBINPUT_EVENT_TOUCH_CANCEL;
     ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
     event->type = LIBINPUT_EVENT_TOUCH_FRAME;
@@ -99,7 +100,8 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_002, T
 {
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
-    libinput_event* event = new(std::nothrow)libinput_event;
+    libinput_event* event = new (std::nothrow) libinput_event;
+    ASSERT_NE(event, nullptr);
     event->type = LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN;
     handler.HandleEvent(event, frameTime);
     ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(event));
