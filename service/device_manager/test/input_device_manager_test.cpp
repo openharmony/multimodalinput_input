@@ -18,9 +18,9 @@
 #include <gtest/gtest.h>
 #include "libinput-private.h"
 
-#include "libinput-private.h"
 #include "mmi_log.h"
 #include "uds_server.h"
+
 
 namespace OHOS {
 namespace MMI {
