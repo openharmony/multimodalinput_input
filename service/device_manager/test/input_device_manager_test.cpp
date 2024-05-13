@@ -21,6 +21,8 @@
 #include "mmi_log.h"
 #include "uds_server.h"
 
+#include "input_device_manager.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
