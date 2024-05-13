@@ -38,7 +38,7 @@ public:
 
 /**
  * @tc.name: KnuckleDrawingManagerTest_AlphaTypeToAlphaType
- * @tc.desc: Test AlphaTypeToAlphaType
+ * @tc.desc: Test Overrides AlphaTypeToAlphaType function branches
  * @tc.type: Function
  * @tc.require:
  */
@@ -60,7 +60,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Alph
 
 /**
  * @tc.name: KnuckleDrawingManagerTest_PixelFormatToColorType
- * @tc.desc: Test PixelFormatToColorType
+ * @tc.desc: Test Overrides PixelFormatToColorType function branches
  * @tc.type: Function
  * @tc.require:
  */
@@ -92,6 +92,52 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Pixe
     ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = static_cast<Media::PixelFormat>(100);
     ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_KnuckleDynamicDrawHandler
+ * @tc.desc: Test Normal branch of covering KnuckleDynamicDrawHandler function
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest,
+    KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_Normal, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_KnuckleDynamicDrawHandler_001
+ * @tc.desc: Test Abnormal branch of covering KnuckleDynamicDrawHandler function
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest,
+    KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_Abnormal, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetTargetDisplayId(50);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
