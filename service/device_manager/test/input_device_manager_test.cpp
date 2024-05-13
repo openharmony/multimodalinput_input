@@ -38,10 +38,10 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-class MockUDSSession: public UDSSession {
+class MockUDSSession : public UDSSession {
 public:
     MOCK_METHOD1(SendMsg, int32_t(NetPacket &));
-    MockUDSSession() : UDSSession("mockProgram", 1, 2, 3, 4) {}
+    MockUDSSession() : UDSSession("str", 1, 2, 3, 4) {}
 };
 
 
