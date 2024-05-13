@@ -42,9 +42,9 @@ private:
     void UpdateMatrix();
     int64_t GetNanoTime() const;
 
-    double lifespan_ { -1.f };
-    double pointX_ { 0.f };
-    double pointY_ { 0.f };
+    double lifespan_ { -1.0 };
+    double pointX_ { 0.0 };
+    double pointY_ { 0.0 };
     int64_t lastUpdateTimeMillis_  { 0 };
     float traceSize_  { 0.f };
 
