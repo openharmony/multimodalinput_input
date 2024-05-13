@@ -65,8 +65,9 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     int32_t subscribeId = SwitchEventInputSubscribeManager::subscribeManagerId_;
     ++SwitchEventInputSubscribeManager::subscribeManagerId_;
     subscribeInfos_.emplace(std::make_pair(subscribeId, SubscribeSwitchEventInfo(switchType, callback)));
-    if (MMIEventHdl.SubscribeSwitchEvent(subscribeId, switchType) != RET_OK) {
-        MMI_HILOGE("Subscribing switch event failed");
+    int32_t ret = MMIEventHdl.SubscribeSwitchEvent(subscribeId, switchType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Subscribing switch event failed, ret:%{public}d", ret);
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }
@@ -137,8 +138,9 @@ void SwitchEventInputSubscribeManager::OnConnected()
     }
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         SubscribeSwitchEventInfo &subscribeInfo = it->second;
-        if (MMIEventHdl.SubscribeSwitchEvent(subscribeInfo.GetSwitchType(), it->first) != RET_OK) {
-            MMI_HILOGE("Subscribe switch event failed");
+        int32_t ret = MMIEventHdl.SubscribeSwitchEvent(subscribeInfo.GetSwitchType(), it->first);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Subscribe switch event failed, ret:%{public}d", ret);
         }
     }
 }
