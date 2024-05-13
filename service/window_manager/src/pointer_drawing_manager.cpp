@@ -186,7 +186,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         return;
     }
     UpdatePointerVisible();
-    MMI_HILOGI("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d", displayId, physicalX, physicalY);
+    MMI_HILOGI("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
+        displayId, physicalX, physicalY);
 }
 
 void PointerDrawingManager::UpdateMouseStyle()
