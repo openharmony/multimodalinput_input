@@ -41,7 +41,7 @@ public:
 class MockUDSSession: public UDSSession {
 public:
     MOCK_METHOD1(SendMsg, int32_t(NetPacket &));
-    MockUDSSession() : UDSSession("mockProgram", 1, 2, 3, 4){}
+    MockUDSSession() : UDSSession("mockProgram", 1, 2, 3, 4){ }
 };
 
 
@@ -271,7 +271,7 @@ HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_003, TestSize.Leve
     InputDeviceManager inputDevice;
     inputDevice.sessionLostCallbackInitialized_ = false;
     ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
-    EXPECT_FALSE(inputDevice.sessionLostCallbackInitialized_); 
+    EXPECT_FALSE(inputDevice.sessionLostCallbackInitialized_);
 }
 
 /**
