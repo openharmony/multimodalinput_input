@@ -21,7 +21,6 @@
 #include "mmi_log.h"
 #include "uds_server.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {
