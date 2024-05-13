@@ -109,7 +109,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
         return false;
     }
     if (!CheckType(env, argv[0], napi_number)) {
-        MMI_HILOGE("ParseTransmitInfraredJSParam infraredFrequency parameter[0] type is invalid.");
+        MMI_HILOGE("ParseTransmitInfraredJSParam infraredFrequency parameter[0] type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "infraredFrequency", "number");
         return false;
     }
@@ -119,7 +119,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
         return false;
     }
     if (!ParsePatternArray(env, argv[1], vecPattern)) {
-        MMI_HILOGE("ParsePatternArray parse pattern array fail.");
+        MMI_HILOGE("ParsePatternArray parse pattern array fail");
         return false;
     }
     if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
@@ -183,7 +183,7 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
             MMI_HILOGE("js_register.GetFreq reqErr. Permi Err or Not System APP. Positive retCode:%{public}d", ret);
             ThrowError(env, ret, "GetInfraredFrequencies");
         }
-        MMI_HILOGE("Parse GetInfraredFrequencies requst error. returnCode: %{public}d", ret);
+        MMI_HILOGE("Parse GetInfraredFrequencies requst error. returnCode:%{public}d", ret);
         return result;
     }
     size_t size = requencys.size();
