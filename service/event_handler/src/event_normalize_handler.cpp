@@ -429,7 +429,14 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     double logicalX = libinput_event_touchpad_get_x(touchpad);
     double logicalY = libinput_event_touchpad_get_y(touchpad);
     auto originType = libinput_event_get_type(event);
-    auto actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, RET_ERR);
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    auto mouseEvent = MouseEventHdr->GetPointerEvent(deviceId);
+    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    if (mouseEvent == nullptr || mouseEvent->GetPressedButtons().empty()) {
+        actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    }
     if (actionType == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGD("Gesture identify failed");
         return RET_ERR;
