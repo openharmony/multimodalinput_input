@@ -236,7 +236,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001,
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionState_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(false));
 }
 
