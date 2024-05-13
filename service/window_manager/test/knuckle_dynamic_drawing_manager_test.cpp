@@ -137,6 +137,11 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_IsSi
     item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     pointerEvent->SetPointerId(2);
     pointerEvent->AddPointerItem(item);
+    knuckleDynamicDrawMgr.canvasNode_ = nullptr;
+    ASSERT_FALSE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    knuckleDynamicDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
     ASSERT_FALSE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
 }
 } // namespace MMI
