@@ -51,6 +51,10 @@ namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
+const std::string POINTER_COLOR = "pointerColor";
+const std::string POINTER_SIZE = "pointerSize";
+const std::string MAGIC_POINTER_COLOR = "magicPointerColor";
+const std::string MAGIC_POINTER_SIZE = "magicPointerSize";
 constexpr int32_t BASELINE_DENSITY = 160;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t MAGIC_INDEPENDENT_PIXELS = 25;
@@ -65,7 +69,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 constexpr int32_t MOUSE_ICON_BAIS = 5;
 constexpr int32_t VISIBLE_LIST_MAX_SIZE = 100;
-constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR = 2000;
+constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR = 4000;
 constexpr float ROTATION_ANGLE = 360.f;
 constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
@@ -948,6 +952,19 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
+void PointerDrawingManager::GetPreferenceKey(std::string &name)
+{
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor()) {
+        if (name == POINTER_COLOR) {
+            name = MAGIC_POINTER_COLOR;
+        } else if (name == POINTER_SIZE) {
+            name = MAGIC_POINTER_SIZE;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
@@ -956,7 +973,8 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     } else if (color > MAX_POINTER_COLOR) {
         color = MAX_POINTER_COLOR;
     }
-    std::string name = "pointerColor";
+    std::string name = POINTER_COLOR;
+    GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer color failed, color:%{public}d", color);
@@ -983,7 +1001,8 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 int32_t PointerDrawingManager::GetPointerColor()
 {
     CALL_DEBUG_ENTER;
-    std::string name = "pointerColor";
+    std::string name = POINTER_COLOR;
+    GetPreferenceKey(name);
     int32_t pointerColor = PREFERENCES_MGR->GetIntValue(name, DEFAULT_VALUE);
     tempPointerColor_ = pointerColor;
     if (pointerColor == DEFAULT_VALUE) {
@@ -1030,7 +1049,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     } else if (size > MAX_POINTER_SIZE) {
         size = MAX_POINTER_SIZE;
     }
-    std::string name = "pointerSize";
+    std::string name = POINTER_SIZE;
+    GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, size);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer size failed, code:%{public}d", ret);
@@ -1077,7 +1097,8 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 int32_t PointerDrawingManager::GetPointerSize()
 {
     CALL_DEBUG_ENTER;
-    std::string name = "pointerSize";
+    std::string name = POINTER_SIZE;
+    GetPreferenceKey(name);
     int32_t pointerSize = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_SIZE);
     MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
     return pointerSize;
@@ -1460,9 +1481,9 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
-        std::string name = "pointerColor";
+        std::string name = POINTER_COLOR;
         pointerStyle.color = PREFERENCES_MGR->GetIntValue(name, DEFAULT_VALUE);
-        name = "pointerSize";
+        name = POINTER_SIZE;
         pointerStyle.size = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_SIZE);
         name = "pointerStyle";
         int32_t style = PREFERENCES_MGR->GetIntValue(name, DEFAULT_POINTER_STYLE);
