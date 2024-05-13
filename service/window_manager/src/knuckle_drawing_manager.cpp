@@ -154,7 +154,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 #endif // USE_ROSEN_DRAWING
 
     screenId_ = static_cast<uint64_t>(displayId);
-    MMI_HILOGI("ScreenId: %{public}llu", screenId_);
+    MMI_HILOGI("ScreenId: %{public}llu", static_cast<unsigned long long>(screenId_));
     surfaceNode_->SetRotation(0);
 
     CreateCanvasNode();
@@ -226,7 +226,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
     CHKPR(canvas, RET_ERR);
     if (!isActionUp_) {
         if (pointerInfos_.size() != MAX_POINTER_NUM) {
-            MMI_HILOGE("Size of pointerInfos_:%{public}u", pointerInfos_.size());
+            MMI_HILOGE("Size of pointerInfos_:%{public}zu", pointerInfos_.size());
             return RET_ERR;
         }
         paint_.SetWidth(PAINT_STROKE_WIDTH);

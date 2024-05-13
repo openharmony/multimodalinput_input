@@ -126,7 +126,7 @@ void LibinputAdapter::EventDispatch(int32_t fd)
     } else if (fd == hotplugDetector_.GetFd()) {
         hotplugDetector_.OnEvent();
     } else {
-        MMI_HILOGE("EventDispatch() called with unknown fd: %{public}d.", fd);
+        MMI_HILOGE("EventDispatch() called with unknown fd:%{public}d", fd);
     }
 }
 

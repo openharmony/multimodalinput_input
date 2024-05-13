@@ -854,6 +854,8 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("EventDumpTest") {
@@ -887,6 +889,7 @@ ohos_unittest("EventDumpTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
