@@ -380,7 +380,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
     if (switchType < SwitchEvent::SwitchType::DEFAULT) {
-        MMI_HILOGE("switch type error");
+        MMI_HILOGE("switch type error, switchType:%{public}d", switchType);
         return RET_ERR;
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
