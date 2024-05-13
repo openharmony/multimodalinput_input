@@ -705,10 +705,10 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
 
     if (IsExcludeKey(key)) {
-        MMI_HILOGI("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
+        MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
                    key->GetKeyCode(), key->GetKeyAction());
         auto items = key->GetKeyItems();
-        MMI_HILOGI("KeyItemsSize:%{public}d", items.size());
+        MMI_HILOGD("KeyItemsSize:%{public}d", items.size());
         if (items.size() != 1) {
             return enableCombineKey_;
         }
@@ -1326,7 +1326,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
         MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
         std::string bundleName = sequence.ability.bundleName;
         std::string matchName = ".ohos.screenshot";
-        if(bundleName.find(matchName) != std::string::npos) {
+        if (bundleName.find(matchName) != std::string::npos) {
             bundleName = bundleName.substr(bundleName.size() - matchName.size());
         }
         if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
