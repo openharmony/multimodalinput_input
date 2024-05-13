@@ -16,13 +16,11 @@
 #include <fstream>
 
 #include <gtest/gtest.h>
-
-#include "mmi_log.h"
-#include "uds_server.h"
-
-#include "input_device_manager.h"
 #include "libinput-private.h"
 
+#include "libinput-private.h"
+#include "mmi_log.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
