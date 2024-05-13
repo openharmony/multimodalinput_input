@@ -85,6 +85,7 @@ public:
     int32_t SwitchPointerStyle() override;
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
+    void GetPreferenceKey(std::string &name);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
