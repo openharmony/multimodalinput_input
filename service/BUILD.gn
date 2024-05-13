@@ -988,13 +988,13 @@ ohos_unittest("DeviceManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [
+  sources = [ "device_manager/test/input_device_manager_test.cpp" ]
+
+  deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
-
-  deps = [ "${mmi_path}/service:libmmi-server" ]
 
   external_deps = [ "hilog:libhilog" ]
 }
