@@ -43,6 +43,7 @@ public:
  */
 HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     std::shared_ptr<InputDevice> inputDeviceManager{nullptr};
     int32_t id = 1;
@@ -59,6 +60,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     ASSERT_NO_FATAL_FAILURE(inputDevice.GetInputDeviceIds());
 }
@@ -71,6 +73,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     std::vector<int32_t> keyCodes{12};
@@ -88,6 +91,7 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetDeviceConfig_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
@@ -103,6 +107,7 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceConfig_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
@@ -119,6 +124,7 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t keyboardType = 1;
@@ -135,6 +141,7 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, HasTouchDevice_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     bool ret = inputDevice.HasTouchDevice();
     EXPECT_FALSE(ret);
@@ -148,6 +155,7 @@ HWTEST_F(InputDeviceManagerTest, HasTouchDevice_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, ScanPointerDevice_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     ASSERT_NO_FATAL_FAILURE(inputDevice.ScanPointerDevice());
 }
@@ -160,6 +168,7 @@ HWTEST_F(InputDeviceManagerTest, ScanPointerDevice_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, Dump_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t fd = 1;
     std::vector<std::string> args{"test"};
@@ -174,6 +183,7 @@ HWTEST_F(InputDeviceManagerTest, Dump_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, DumpDeviceList_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t fd = 1;
     std::vector<std::string> args{"test"};
@@ -188,6 +198,7 @@ HWTEST_F(InputDeviceManagerTest, DumpDeviceList_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetVendorConfig_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     ASSERT_NO_FATAL_FAILURE(inputDevice.GetVendorConfig(deviceId));
@@ -201,6 +212,7 @@ HWTEST_F(InputDeviceManagerTest, GetVendorConfig_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, OnEnableInputDevice_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     bool enable = true;
     int32_t ret = inputDevice.OnEnableInputDevice(enable);
@@ -218,6 +230,7 @@ HWTEST_F(InputDeviceManagerTest, OnEnableInputDevice_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
 }
