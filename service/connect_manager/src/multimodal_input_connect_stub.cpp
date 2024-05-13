@@ -1239,7 +1239,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
         MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    LogTracer lt(event->GetId());
+    LogTracer lt(event->GetId(), event->GetEventType(), event->GetKeyAction());
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!isNativeInject && !PerHelper->VerifySystemApp()) {
@@ -1248,7 +1248,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     }
     EndLogTraceId(event->GetId());
     event->UpdateId();
-    LogTracer lt1(event->GetId());
+    LogTracer lt1(event->GetId(), event->GetEventType(), event->GetKeyAction());
     int32_t ret = InjectKeyEvent(event, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);

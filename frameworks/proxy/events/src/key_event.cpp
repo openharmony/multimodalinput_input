@@ -1336,6 +1336,22 @@ void KeyEvent::SetRepeat(bool repeat)
     repeat_ = repeat;
 }
 
+const char *KeyEvent::ActionToShortString(int32_t action)
+{
+    switch (action) {
+        case KeyEvent::KEY_ACTION_CANCEL:
+            return "K:C:";
+        case KeyEvent::KEY_ACTION_UNKNOWN:
+            return "K:UK:";
+        case KeyEvent::KEY_ACTION_UP:
+            return "K:U:";
+        case KeyEvent::KEY_ACTION_DOWN:
+            return "K:D:";
+        default:
+            return "A:?:";
+    }
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void KeyEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
 {

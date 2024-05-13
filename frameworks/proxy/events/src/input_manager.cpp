@@ -169,14 +169,14 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    LogTracer lt(keyEvent->GetId());
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    LogTracer lt(pointerEvent->GetId());
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
@@ -184,7 +184,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder)
 {
     CHKPV(pointerEvent);
-    LogTracer lt(pointerEvent->GetId());
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(zOrder);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
@@ -513,7 +513,7 @@ void InputManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> wa
 
 int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime, bool enable)
 {
-    LogTracer lt(eventId);
+    LogTracer lt(eventId, 0, 0);
     if (enable) {
         return InputMgrImpl.MarkProcessed(eventId, actionTime);
     }
