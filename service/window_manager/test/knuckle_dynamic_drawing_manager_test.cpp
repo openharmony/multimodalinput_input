@@ -28,6 +28,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t POINT_SYSTEM_SIZE = 50;
+constexpr int32_t MAX_DIVERGENCE_NUM = 10;
 } // namespace
 
 class KnuckleDynamicDrawingManagerTest : public testing::Test {
@@ -92,6 +94,50 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Pixe
     ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
     pixelFmt = static_cast<Media::PixelFormat>(100);
     ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_InitPointerPathPaint
+ * @tc.desc: Test Overrides InitPointerPathPaint function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_InitPointerPathPaint, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    knuckleDynamicDrawMgr.glowTraceSystem_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
+    Rosen::Drawing::Bitmap bitmap;
+    knuckleDynamicDrawMgr.glowTraceSystem_ =
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
+ * @tc.desc: Test Overrides IsSingleKnuckle function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_IsSingleKnuckle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_TRUE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    item.SetPointerId(2);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(2);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_FALSE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
