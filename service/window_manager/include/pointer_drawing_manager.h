@@ -85,6 +85,7 @@ public:
     int32_t SwitchPointerStyle() override;
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
+    void GetPreferenceKey(std::string &name);
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
@@ -110,6 +111,7 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void CreateMagicCursorChangeObserver();
     void CreatePointerSwiftObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);

@@ -58,6 +58,7 @@ public:
  */
 HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     auto keyEvent = KeyEvent::Create();
     keySubscriberHandler.HandleKeyEvent(keyEvent);
@@ -85,6 +86,7 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     keySubscriberHandler.EnableCombineKey(false);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -105,6 +107,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_0
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     keySubscriberHandler.EnableCombineKey(false);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -127,6 +130,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_0
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_EnableCombineKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     ASSERT_EQ(keySubscriberHandler.EnableCombineKey(true), RET_OK);
 }
@@ -238,6 +242,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsPreKeysMatch_001, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEqualPreKeys_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::set<int32_t> preKeys = {1, 2, 3};
     std::set<int32_t> pressedKeys = {4, 5, 6};
@@ -256,6 +261,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEqualPreKeys_001, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchForegroundPid_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subs;
     std::set<int32_t> foregroundPids = {1, 2, 3};
@@ -270,6 +276,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsMatchForegroundPid
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownSubscriber_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     auto keyOption = std::make_shared<KeyOption>();
@@ -288,6 +295,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownSubscri
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNow_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
@@ -381,6 +389,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyDown_001, T
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyCode_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::vector<int32_t> keyCodes;
     handler.RemoveKeyCode(1, keyCodes);
@@ -400,6 +409,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyCode_001, T
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     SessionPtr sess;
     std::shared_ptr<KeyOption> keyOption;
@@ -424,6 +434,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, T
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsFunctionKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     auto keyEvent = std::make_shared<KeyEvent>(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
     ASSERT_FALSE(handler.IsFunctionKey(keyEvent));
@@ -449,6 +460,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsFunctionKey_001, T
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_CloneKeyEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_TRUE(handler.CloneKeyEvent(keyEvent));
@@ -464,6 +476,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_CloneKeyEvent_001, T
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyUpSubscriber_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
@@ -487,6 +500,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyUpSubscribe
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKeySwipe_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
@@ -521,6 +535,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKeySw
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
@@ -545,6 +560,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSubscribeKeyEvent_
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     UDSServer udsServer;
     auto keyOption = std::make_shared<KeyOption>();
@@ -570,6 +586,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete_001,
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearSubscriberTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     SessionPtr sess;
     std::shared_ptr<KeyOption> keyOption;
@@ -589,6 +606,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearSubscriberTimer
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     SessionPtr sess;
     std::shared_ptr<KeyOption> keyOption;
@@ -606,6 +624,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer_001, TestSiz
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     SessionPtr sess;
     std::shared_ptr<KeyOption> keyOption;
@@ -621,6 +640,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
@@ -640,6 +660,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUp_001, Tes
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     SessionPtr sess;
     std::shared_ptr<KeyOption> keyOption;
@@ -661,6 +682,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_001
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyCancel_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     UDSServer udsServer;
     SessionPtr sess = udsServer.GetSessionByPid(1);
@@ -683,6 +705,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyCancel_001,
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::vector<int32_t> keyCodes = {KeyEvent::KEYCODE_VOLUME_DOWN};
     EXPECT_TRUE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_VOLUME_DOWN, keyCodes));
@@ -700,6 +723,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubs
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     auto keyOption = std::make_shared<KeyOption>();
     keyOption->SetFinalKey(1);
@@ -717,6 +741,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyUpLog_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber> subscriber;
     subscriber->id_ = 1;
@@ -736,6 +761,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyUpLog_001, T
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     SessionPtr sess;
     auto keyOption = std::make_shared<KeyOption>();
@@ -758,6 +784,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_INCOMING);
@@ -779,6 +806,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_001, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
@@ -804,6 +832,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_002, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
@@ -829,6 +858,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_003, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
@@ -854,6 +884,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_004, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_INCOMING);
@@ -876,6 +907,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_005, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
@@ -901,6 +933,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_007, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     OHOS::EventFwk::Want want;
     want.SetParam("state", StateType::CALL_STATUS_DISCONNECTED);
@@ -922,6 +955,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_007, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_008, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -937,6 +971,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_008, 
  */
 HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_009, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
