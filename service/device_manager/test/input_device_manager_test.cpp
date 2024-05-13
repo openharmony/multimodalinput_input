@@ -228,7 +228,7 @@ HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_001, TestSize.Leve
  */
 HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     std::shared_ptr<InputDevice> inputDeviceManager{nullptr};
     int32_t id = -1;
@@ -253,7 +253,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     struct InputDeviceInfo {
         bool enable;
     };
@@ -275,7 +275,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t COMMON_PARAMETER_ERROR =401;
@@ -313,7 +313,7 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, IsMatchKeys_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     libinput_device* deviceOrigin = new(std::nothrow)libinput_device;
     std::vector<int32_t> keyCodes = {1, 2, 3};
@@ -328,7 +328,7 @@ HWTEST_F(InputDeviceManagerTest, IsMatchKeys_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetDeviceConfig_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = -1;
     int32_t keyboardType = 5;
@@ -352,7 +352,7 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceConfig_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetKeyboardBusMode_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t ret = inputDevice.GetKeyboardBusMode(deviceId);
@@ -374,7 +374,7 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardBusMode_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t keyboardType = -5;
@@ -399,7 +399,7 @@ HWTEST_F(InputDeviceManagerTest, GetDeviceSupportKey_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_002, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     int32_t keyboardType = -100;
@@ -424,7 +424,7 @@ HWTEST_F(InputDeviceManagerTest, GetKeyboardType_Test_002, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, SetInputStatusChangeCallback_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     using InputDeviceCallback = std::function<void(int, std::string, std::string)>;
     InputDeviceCallback callback = [](int status, const std::string& deviceName, const std::string& deviceId) {
@@ -440,7 +440,7 @@ HWTEST_F(InputDeviceManagerTest, SetInputStatusChangeCallback_Test_001, TestSize
  */
 HWTEST_F(InputDeviceManagerTest, AddDevListener_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
     ASSERT_NO_FATAL_FAILURE(inputDevice.AddDevListener(session));
@@ -454,7 +454,7 @@ HWTEST_F(InputDeviceManagerTest, AddDevListener_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, RemoveDevListener_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     SessionPtr session = std::shared_ptr<OHOS::MMI::UDSSession>();
     ASSERT_NO_FATAL_FAILURE(inputDevice.RemoveDevListener(session));
@@ -468,7 +468,7 @@ HWTEST_F(InputDeviceManagerTest, RemoveDevListener_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, HasPointerDevice_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     bool ret = inputDevice.HasPointerDevice();
     EXPECT_FALSE(ret);
@@ -484,7 +484,7 @@ HWTEST_F(InputDeviceManagerTest, HasPointerDevice_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo inDevice;
@@ -499,7 +499,7 @@ HWTEST_F(InputDeviceManagerTest, NotifyDevCallback_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, OnInputDeviceAdded_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     libinput_device* inputDevices = nullptr;
     ASSERT_NO_FATAL_FAILURE(inputDevice.OnInputDeviceAdded(inputDevices));
@@ -513,7 +513,7 @@ HWTEST_F(InputDeviceManagerTest, OnInputDeviceAdded_Test_001, TestSize.Level1)
  */
 HWTEST_F(InputDeviceManagerTest, OnInputDeviceRemoved_Test_001, TestSize.Level1)
 {
-    CALL_DEBUG_ENTER;
+    CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     libinput_device* inputDevices = nullptr;
     ASSERT_NO_FATAL_FAILURE(inputDevice.OnInputDeviceRemoved(inputDevices));
