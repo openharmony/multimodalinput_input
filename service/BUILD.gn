@@ -562,6 +562,7 @@ ohos_unittest("WindowManagerTest") {
   sources = [
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
+    "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
     "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
@@ -853,6 +854,8 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("EventDumpTest") {
@@ -886,6 +889,7 @@ ohos_unittest("EventDumpTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]

@@ -34,6 +34,7 @@ constexpr int32_t TOUCHPAD_POINTER_SPEED = 9;
 constexpr int32_t RIGHT_CLICK_TYPE = 1;
 constexpr int32_t POINTER_COLOR = -1;
 constexpr int32_t POINTER_SIZE = 1;
+constexpr int32_t MAGIC_POINTER_SIZE = 3;
 constexpr int32_t POINTER_STYLE = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr bool BOOL_DEFAULT = true;
@@ -92,6 +93,10 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     g_touchpadScrollSwitch = touchpadPref->GetBool(touchpadScrollSwitch, BOOL_DEFAULT);
     g_touchpadRightClickType = touchpadPref->GetInt(touchpadRightClickType, RIGHT_CLICK_TYPE);
     g_touchpadScrollDirection = touchpadPref->GetBool(touchpadScrollDirection, BOOL_DEFAULT);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    g_magicPointerSize = mousePref->GetInt(magicPointerSize, MAGIC_POINTER_SIZE);
+    g_magicPointerColor = mousePref->GetInt(magicPointerColor, POINTER_COLOR);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(path + mouseFileName);
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(path + keyboarFileName);
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(path + touchpadFileName);
@@ -116,6 +121,10 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap[touchpadScrollSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollSwitch)};
     preferencesMap[touchpadRightClickType] = {touchpadFileName, g_touchpadRightClickType};
     preferencesMap[touchpadScrollDirection] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollDirection)};
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    preferencesMap[magicPointerSize] = {mouseFileName, g_magicPointerSize};
+    preferencesMap[magicPointerColor] = {mouseFileName, g_magicPointerColor};
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return RET_OK;
 }
 

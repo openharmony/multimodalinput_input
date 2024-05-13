@@ -99,7 +99,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 void UDSSession::Close()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Enter fd_:%{public}d.", fd_);
+    MMI_HILOGD("Enter fd_:%{public}d", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
