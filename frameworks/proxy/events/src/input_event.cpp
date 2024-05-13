@@ -14,6 +14,9 @@
  */
 
 #include "input_event.h"
+#include "pointer_event.h"
+#include "key_event.h"
+#include "axis_event.h"
 
 #include <cassert>
 #include <chrono>
@@ -331,5 +334,140 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     extraData_ = sp;
     return true;
 }
+
+const char *InputEvent::ActionToShortString(int32_t action)
+{
+    switch (action) {
+        case InputEvent::ACTION_CANCEL:
+            return "B:C:";
+        case InputEvent::ACTION_UNKNOWN:
+            return "B:UK:";
+        default:
+            return "B:?:";
+    }
+}
+
+struct LogTraceKey {
+    int64_t Id;
+    int32_t action;
+    int32_t evtType;
+};
+
+thread_local std::vector<LogTraceKey> traceids;
+thread_local std::unordered_map<int64_t, size_t> traceIdToIdx;
+thread_local std::string traceStr;
+
+
+const char *action2String(int32_t evtType, int32_t action)
+{
+    switch (evtType) {
+        case InputEvent::EVENT_TYPE_KEY: {
+            return KeyEvent::ActionToShortString(action);
+        }
+        case InputEvent::EVENT_TYPE_POINTER:
+        case InputEvent::EVENT_TYPE_FINGERPRINT: {
+            return PointerEvent::ActionToShortString(action);
+        }
+        case InputEvent::EVENT_TYPE_AXIS: {
+            return AxisEvent::ActionToShortString(action);
+        }
+        case InputEvent::EVENT_TYPE_BASE: {
+            return InputEvent::ActionToShortString(action);
+        }
+        default: {
+            return "?:?:";
+        }
+    }
+}
+
+void RefreshTraceString()
+{
+    traceStr = "";
+    for (auto item = traceids.begin(); item < traceids.end(); item++) {
+        if (item != traceids.begin()) {
+            traceStr += "/";
+        }
+        traceStr += action2String(item->evtType, item->action) + std::to_string(item->Id);
+    }
+}
+
+void StartLogTraceId(int64_t newId, int32_t evtType, int32_t action)
+{
+    if (newId == -1) {
+        return;
+    }
+    auto iter = traceIdToIdx.find(newId);
+    if (iter == traceIdToIdx.end()) {
+        traceids.push_back({newId, action, evtType});
+        traceIdToIdx.emplace(newId, traceids.size() - 1);
+
+        auto currentTraceStr = action2String(evtType, action) + std::to_string(newId);
+        if (traceids.size() == 1) {
+            traceStr = currentTraceStr;
+        } else {
+            traceStr += "/" + currentTraceStr;
+        }
+        return;
+    }
+    LogTraceKey &old = traceids.at(iter->second);
+    if (old.evtType != evtType || old.action != action) {
+        old.evtType = evtType;
+        old.action = action;
+        RefreshTraceString();
+    }
+};
+
+void EndLogTraceId(int64_t id)
+{
+    auto iter = traceIdToIdx.find(id);
+    if (iter == traceIdToIdx.end()) {
+        return;
+    }
+    auto Idx = iter->second;
+    traceIdToIdx.erase(iter);
+    auto IdCount = traceids.size();
+    if (IdCount <= Idx) {
+        return;
+    }
+
+    if (IdCount == Idx + 1) {
+        traceids.pop_back();
+    } else {
+        auto item = traceids.begin();
+        item += Idx;
+        traceids.erase(item);
+    }
+    RefreshTraceString();
+}
+
+const char *FormatLogTrace()
+{
+    return traceStr.c_str();
+}
+
+
+void ResetLogTrace()
+{
+    traceids.clear();
+    traceIdToIdx.clear();
+    traceStr = "";
+}
+
+LogTracer::LogTracer(int64_t id, int32_t evtType, int32_t action)
+{
+    this->id = id;
+    StartLogTraceId(id, evtType, action);
+}
+
+LogTracer::~LogTracer()
+{
+    EndLogTraceId(this->id);
+}
+
+LogTracer::LogTracer()
+{
+    id = -1;
+}
+
 } // namespace MMI
 } // namespace OHOS
