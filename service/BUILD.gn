@@ -854,6 +854,8 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("EventDumpTest") {
