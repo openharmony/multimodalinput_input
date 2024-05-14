@@ -40,11 +40,11 @@ public:
 
 class MockUDSSession : public UDSSession {
 public:
-    MockUDSSession(const std::string &programName, const int32_t moduleType,
-        const int32_t fd, const int32_t uid, const int32_t pid)
+    MOCK_METHOD1(SendMsg, int32_t(NetPacket &));
+    MockUDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid, 
+        const int32_t pid) 
             : UDSSession(programName, moduleType, fd, uid, pid) {}
 };
-
 
 /**
  * @tc.name: GetInputDevice_Test_001
@@ -272,7 +272,7 @@ HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_003, TestSize.Leve
     InputDeviceManager inputDevice;
     inputDevice.sessionLostCallbackInitialized_ = false;
     ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
-    EXPECT_FALSE(inputDevice.sessionLostCallbackInitialized_);
+    EXPECT_FALSE(inputDevice.sessionLostCallbackInitialized_); 
 }
 
 /**
@@ -285,7 +285,12 @@ HWTEST_F(InputDeviceManagerTest, OnSessionLost_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    SessionPtr session = std::make_shared<MockUDSSession>();
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>(programName, moduleType, fd, uid, pid);
     ASSERT_NE(session, nullptr);
     ASSERT_NO_FATAL_FAILURE(inputDevice.OnSessionLost(session));
     session = nullptr;
@@ -303,7 +308,12 @@ HWTEST_F(InputDeviceManagerTest, NotifyMessage_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>();
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>(programName, moduleType, fd, uid, pid);
     EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(true));
     int32_t result = inputDevice.NotifyMessage(mockSession, 1, "type");
     EXPECT_EQ(result, RET_OK);
@@ -319,7 +329,12 @@ HWTEST_F(InputDeviceManagerTest, NotifyMessage_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>();
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>(programName, moduleType, fd, uid, pid);
     EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(false));
     int32_t result = inputDevice.NotifyMessage(mockSession, 1, "type");
     EXPECT_EQ(result, RET_OK);
@@ -335,7 +350,12 @@ HWTEST_F(InputDeviceManagerTest, NotifyMessage_Test_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>();
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>(programName, moduleType, fd, uid, pid);
     EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(false));
     SessionPtr nullSession = nullptr;
     int32_t result = inputDevice.NotifyMessage(nullSession, 1, "type");
