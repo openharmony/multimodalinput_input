@@ -764,6 +764,7 @@ ohos_unittest("ModuleLoaderTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
@@ -1043,6 +1044,8 @@ ohos_unittest("DelegateTaskTest") {
   sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
 
   deps = [ "${mmi_path}/service:libmmi-server" ]
+
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("ConnectManagerTest") {
