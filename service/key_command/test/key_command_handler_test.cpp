@@ -494,6 +494,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMultiTapTest__002, T
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "aaa";
     int32_t delay = 0;
@@ -512,6 +513,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_001, TestSize.Level1)
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_EnableCombineKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     ASSERT_EQ(eventKeyCommandHandler.EnableCombineKey(true), RET_OK);
 }
@@ -524,6 +526,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_EnableCombineKey_001, Test
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     eventKeyCommandHandler.EnableCombineKey(false);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -544,6 +547,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_001, Te
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     eventKeyCommandHandler.EnableCombineKey(false);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -567,6 +571,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_002, Te
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "com.ohos.camera";
     int32_t delay = -1;
@@ -583,6 +588,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_002, TestSize.Level1)
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "";
     int32_t delay = 100;
