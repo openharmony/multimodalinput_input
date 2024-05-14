@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "mmi_fd_listener.h"
 
 #include <cinttypes>
@@ -41,23 +41,45 @@ void MMIFdListener::OnReadable(int32_t fd)
     }
     CHKPV(mmiClient_);
     char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
-        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-        if (size > 0) {
-            mmiClient_->OnRecvMsg(szBuf, size);
-        } else if (size < 0) {
-            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+    size_t recvSize = 0;
+    bool shouldTry = true;
+    while (shouldTry) {
+        size_t oneRecvSize = 0;
+        while (oneRecvSize < MAX_PACKET_BUF_SIZE) {
+            ssize_t size = recv(fd, szBuf + oneRecvSize, MAX_PACKET_BUF_SIZE - oneRecvSize,
+                                MSG_DONTWAIT | MSG_NOSIGNAL);
+            if (size > 0) {
+                recvSize += size;
+                oneRecvSize += size;
                 continue;
             }
-            MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
-            break;
-        } else {
-            MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
-                "errno:%{public}d", i, errno);
-            break;
+
+            // size 0 means it the fd may be closed.
+            if (size == 0) {
+                shouldTry = false;
+                MMI_HILOGE("received %{public}zu, now received 0 from fd %{public}d, wait for next readable", recvSize,
+                           fd);
+                break;
+            }
+
+            // size < 0 means there is an error occurred, need to handle the error.
+            int32_t recvError = errno;
+            if (recvError == EAGAIN || recvError == EWOULDBLOCK) {
+                shouldTry = false;
+                break;
+            } else if (recvError == EINTR) {
+                MMI_HILOGW("received %{public}zu, fd %{public}d is interrupted by signal, continue to recv", recvSize,
+                           fd);
+                continue;
+            } else {
+                shouldTry = false;
+                MMI_HILOGE("received %{public}zu, unexpected errno %{public}d on fd %{public}d, wait for next readable",
+                           recvSize, recvError, fd);
+                break;
+            }
         }
-        if (size < MAX_PACKET_BUF_SIZE) {
-            break;
+        if (oneRecvSize > 0) {
+            mmiClient_->OnRecvMsg(szBuf, oneRecvSize);
         }
     }
 }

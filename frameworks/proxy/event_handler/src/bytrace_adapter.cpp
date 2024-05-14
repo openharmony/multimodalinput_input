@@ -68,7 +68,7 @@ std::string BytraceAdapter::GetPointerTraceString(std::shared_ptr<PointerEvent> 
     for (const auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+            MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
             return "";
         }
         pointerItems.emplace_back(item);
