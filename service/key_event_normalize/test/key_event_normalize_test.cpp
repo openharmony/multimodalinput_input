@@ -42,6 +42,7 @@ public:
  */
 HWTEST_F(KeyEventNormalizeTest, shieldMode_Equal_lastShieldMode, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = true;
     int32_t shieldMode = -1;
     int32_t result = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -56,6 +57,7 @@ HWTEST_F(KeyEventNormalizeTest, shieldMode_Equal_lastShieldMode, TestSize.Level1
  */
 HWTEST_F(KeyEventNormalizeTest, shieldMode_NotEqual_lastShieldMode, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = 3;
     int32_t result = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -70,6 +72,7 @@ HWTEST_F(KeyEventNormalizeTest, shieldMode_NotEqual_lastShieldMode, TestSize.Lev
  */
 HWTEST_F(KeyEventNormalizeTest, SetShieldStatus_FACTORY_MODE, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = 0;
     int32_t result = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -84,6 +87,7 @@ HWTEST_F(KeyEventNormalizeTest, SetShieldStatus_FACTORY_MODE, TestSize.Level1)
  */
 HWTEST_F(KeyEventNormalizeTest, SetShieldStatus_OOBE_MODE, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = 1;
     int32_t result = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -98,6 +102,7 @@ HWTEST_F(KeyEventNormalizeTest, SetShieldStatus_OOBE_MODE, TestSize.Level1)
  */
 HWTEST_F(KeyEventNormalizeTest, SetShieldStatus_NotFound, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = -1;
     int32_t result = KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -112,6 +117,7 @@ HWTEST_F(KeyEventNormalizeTest, SetShieldStatus_NotFound, TestSize.Level1)
  */
 HWTEST_F(KeyEventNormalizeTest, GetShieldStatus_FACTORY_MODE, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = 0;
     int32_t result = KeyEventHdr->GetShieldStatus(shieldMode, isShield);
@@ -126,6 +132,7 @@ HWTEST_F(KeyEventNormalizeTest, GetShieldStatus_FACTORY_MODE, TestSize.Level1)
  */
 HWTEST_F(KeyEventNormalizeTest, GetShieldStatus_OOBE_MODE, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = 1;
     int32_t result = KeyEventHdr->GetShieldStatus(shieldMode, isShield);
@@ -140,6 +147,7 @@ HWTEST_F(KeyEventNormalizeTest, GetShieldStatus_OOBE_MODE, TestSize.Level1)
  */
 HWTEST_F(KeyEventNormalizeTest, GetShieldStatus_NotFound, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool isShield = false;
     int32_t shieldMode = -1;
     int32_t result = KeyEventHdr->GetShieldStatus(shieldMode, isShield);
