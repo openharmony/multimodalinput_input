@@ -261,9 +261,9 @@ HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_002, TestSize.Level1)
     };
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     InputDeviceManager manager;
-    inputDevice_[1] {true};
-    inputDevice_[2] {true};
-    inputDevice_[3] {true};
+    inputDevice_[1] = true;
+    inputDevice_[2] = true;
+    inputDevice_[3] = true;
     std::vector<int32_t> expectedIds = {1, 2, 3};
     std::vector<int32_t> actualIds = manager.GetInputDeviceIds();
     ASSERT_NE(expectedIds, actualIds);
@@ -302,7 +302,7 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
     deviceId = 1;
     keyCodes.clear();
     keystrokes.clear();
-    ret = inputDevice.SupportKeys(deviceId, keyCode, keystrokes);
+    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
     EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
     EXPECT_FALSE(keystrokes.empty());
 }
