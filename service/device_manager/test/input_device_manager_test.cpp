@@ -232,10 +232,10 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    std::shared_ptr<InputDevice> inputDeviceManager{nullptr};
+
     int32_t id = -1;
     bool checked = true;
-    inputDeviceManager = inputDevice.GetInputDevice(id, checked);
+    std::shared_ptr inputDeviceManager = inputDevice.GetInputDevice(id, checked);
     EXPECT_EQ(inputDeviceManager, nullptr);
     id = 1;
     checked = false;
@@ -261,9 +261,9 @@ HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_002, TestSize.Level1)
     };
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     InputDeviceManager manager;
-    inputDevice_[1] = {true};
-    inputDevice_[2] = {true};
-    inputDevice_[3] = {true};
+    inputDevice_[1] {true};
+    inputDevice_[2] {true};
+    inputDevice_[3] {true};
     std::vector<int32_t> expectedIds = {1, 2, 3};
     std::vector<int32_t> actualIds = manager.GetInputDeviceIds();
     ASSERT_NE(expectedIds, actualIds);
@@ -280,31 +280,31 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     int32_t deviceId = 1;
-    int32_t COMMON_PARAMETER_ERROR =401;
+    int32_t COMMON_PARAMETER_ERROR = 401;
     std::vector<int32_t> keyCodes = {1, 2, 3};
-    std::vector<bool> keystroke{true};
-    int32_t ret = inputDevice.SupportKeys(deviceId, keyCodes, keystroke);
+    std::vector<bool> keystrokes{true};
+    int32_t ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
     EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
-    EXPECT_NE(keystroke.size(), keyCodes.size());
-    EXPECT_TRUE(keystroke[0]);
-    EXPECT_FALSE(keystroke[1]);
-    EXPECT_FALSE(keystroke[2]);
+    EXPECT_NE(keystrokes.size(), keyCodes.size());
+    EXPECT_TRUE(keystrokes[0]);
+    EXPECT_FALSE(keystrokes[1]);
+    EXPECT_FALSE(keystrokes[2]);
     deviceId = -1;
     keyCodes = {1, 2, 3};
-    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystroke);
+    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
     EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
-    EXPECT_FALSE(keystroke.empty());
+    EXPECT_FALSE(keystrokes.empty());
     deviceId = 100;
     keyCodes = {1, 2, 3};
-    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystroke);
+    ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
     EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
-    EXPECT_FALSE(keystroke.empty());
+    EXPECT_FALSE(keystrokes.empty());
     deviceId = 1;
-    std::vector<int32_t> keyCode;
-    std::vector<bool> keystrokes;
+    keyCodes.clear();
+    keystrokes.clear();
     ret = inputDevice.SupportKeys(deviceId, keyCode, keystrokes);
     EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
-    EXPECT_FALSE(keystroke.empty());
+    EXPECT_FALSE(keystrokes.empty());
 }
 
 /**
@@ -317,7 +317,8 @@ HWTEST_F(InputDeviceManagerTest, IsMatchKeys_Test_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
-    libinput_device* deviceOrigin = new(std::nothrow)libinput_device;
+    libinput_device* deviceOrigin = new (std::nothrow) libinput_device;
+    ASSERT_NE(deviceOrigin, nullptr);
     std::vector<int32_t> keyCodes = {1, 2, 3};
     ASSERT_NO_FATAL_FAILURE(inputDevice.IsMatchKeys(deviceOrigin, keyCodes));
 }
