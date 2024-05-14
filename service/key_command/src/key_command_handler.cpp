@@ -1176,7 +1176,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-    if (matchedSequence_.timerId >= 0) {
+    if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGD("Remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
         matchedSequence_.timerId = -1;
