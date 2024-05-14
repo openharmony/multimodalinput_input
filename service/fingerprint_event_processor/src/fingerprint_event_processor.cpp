@@ -135,12 +135,10 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent);
-    MMI_HILOGD("fingerprint ux:%{public}f, uy:%{public}f", ux, uy);
+    MMI_HILOGD("fingerprint key:%{public}d, ux:%{public}f, uy:%{public}f", pointerEvent->GetPointerAction(), ux, uy);
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;
 }
-
-
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 } // namespace MMI
 } // namespace OHOS

@@ -46,6 +46,7 @@ public:
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
     std::shared_ptr<KeyEvent>event = KeyEvent::Create();
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
@@ -59,6 +60,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_001, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
@@ -72,6 +74,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_002, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
     ASSERT_NO_FATAL_FAILURE(handler.HandleTouchEvent(pointerEvent));
@@ -85,6 +88,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_003, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
     std::shared_ptr<KeyEvent>event = KeyEvent::Create();
     EXPECT_FALSE(handler.OnHandleEvent(event));
@@ -98,6 +102,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_004, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
     EXPECT_FALSE(handler.OnHandleEvent(pointerEvent));
@@ -111,6 +116,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_007, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler::InterceptorCollection interceptorHandler;
     std::shared_ptr<KeyEvent>KeyEvent = KeyEvent::Create();
     bool ret = interceptorHandler.HandleEvent(KeyEvent);
@@ -125,6 +131,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_007, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler::InterceptorCollection interceptorHandler;
     std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -150,6 +157,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler interceptorHandler;
     SessionPtr sess = nullptr;
     InputHandlerType handlerType = InputHandlerType::NONE;
@@ -167,6 +175,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_01
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler interceptorHandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -184,6 +193,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_02
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInputHandler, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler interceptorHandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
@@ -201,6 +211,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInputHandler
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnSessionLost, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler interceptorHandler;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     ASSERT_NO_FATAL_FAILURE(interceptorHandler.OnSessionLost(sess));
@@ -214,6 +225,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnSessionLost, Tes
  */
 HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Dump, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventInterceptorHandler interceptorHandler;
     int32_t fd = 1;
     std::vector<std::string> args = {"-i"};
