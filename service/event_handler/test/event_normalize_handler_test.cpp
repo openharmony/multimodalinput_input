@@ -199,5 +199,55 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
 }
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandleTouchEvent_001
+ * @tc.desc: Test the function HandleTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent_001, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    EventNormalizeHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchEvent(pointerEvent));
+    pointerEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_UpdateKeyEventHandlerChain_001
+ * @tc.desc: Test the function UpdateKeyEventHandlerChain
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_UpdateKeyEventHandlerChain_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    EventNormalizeHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateKeyEventHandlerChain(keyEvent));
+    keyEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.UpdateKeyEventHandlerChain(keyEvent));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_SetOriginPointerId_001
+ * @tc.desc: Test the function SetOriginPointerId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_SetOriginPointerId_001, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    EventNormalizeHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.SetOriginPointerId(pointerEvent));
+    pointerEvent = nullptr;
+    int32_t ret = handler.SetOriginPointerId(pointerEvent);
+    pointerEvent = nullptr;
+    ASSERT_EQ(ret, ERROR_NULL_POINTER);
+}
 } // namespace MMI
 } // namespace OHOS
