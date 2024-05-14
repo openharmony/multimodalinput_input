@@ -40,7 +40,7 @@ ohos_executable("uinput_inject") {
   install_enable = true
 
   sources = uinput_inject_sources
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

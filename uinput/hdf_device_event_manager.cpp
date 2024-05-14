@@ -26,10 +26,6 @@
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
-HdfDeviceEventManager::HdfDeviceEventManager() {}
-
-HdfDeviceEventManager::~HdfDeviceEventManager() {}
-
 void HdfDeviceEventManager::ConnectHDFInit()
 {
     std::string name = "mmi-hdf";

@@ -28,7 +28,7 @@ ohos_shared_library("keyevent") {
     "src/js_key_event.cpp",
     "src/native_register_module.cpp",
   ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
     ubsan = true

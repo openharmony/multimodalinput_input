@@ -87,7 +87,7 @@ static std::string GetThisThreadIdOfString()
         char buf[BUF_TID_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
-            printf("ERR: in %s, #%d, call sprintf_s failed, ret = %d.", __func__, __LINE__, ret);
+            printf("ERR: in %s, #%d, call sprintf_s failed, ret = %d", __func__, __LINE__, ret);
             return threadLocalId;
         }
         buf[BUF_TID_SIZE - 1] = '\0';
@@ -188,13 +188,13 @@ const char *GetProgramName()
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
-        KMSG_LOGE("The fp is nullptr, filename = %s.", buf);
+        KMSG_LOGE("The fp is nullptr, filename = %s", buf);
         return "";
     }
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
-        KMSG_LOGE("fgets failed.");
+        KMSG_LOGE("fgets failed");
         if (fclose(fp) != 0) {
             KMSG_LOGW("Close file:%s failed", buf);
         }
@@ -209,12 +209,12 @@ const char *GetProgramName()
     std::string tempName(bufLine);
     tempName = GetFileName(tempName);
     if (tempName.empty()) {
-        KMSG_LOGE("tempName is empty.");
+        KMSG_LOGE("tempName is empty");
         return "";
     }
     const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
-        KMSG_LOGE("The copySize is 0.");
+        KMSG_LOGE("The copySize is 0");
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
