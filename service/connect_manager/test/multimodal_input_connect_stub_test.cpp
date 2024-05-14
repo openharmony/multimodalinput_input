@@ -41,7 +41,7 @@ public:
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -95,7 +95,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_002, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -149,7 +149,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_002, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_003, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -203,7 +203,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_003, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_004, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -257,7 +257,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_004, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_005, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -311,7 +311,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_005, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_006, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -365,7 +365,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_006, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_007, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -419,7 +419,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_007, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_008, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -473,7 +473,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_008, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_009, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -527,7 +527,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_009, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_010, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -581,7 +581,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_010, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_011, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -629,7 +629,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_011, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubHandleAllocSocketFd_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -645,7 +645,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubHandleAllocSocketFd_001, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubAddInputEventFilter_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 22;
@@ -661,7 +661,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputEventFilter_001, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventFilter_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 201;
@@ -677,7 +677,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventFilter_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseScrollRows_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -693,7 +693,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseScrollRows_001, TestSize.Le
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -709,7 +709,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -725,7 +725,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -741,7 +741,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -757,7 +757,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_001, TestSize.Le
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -773,7 +773,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -789,7 +789,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
@@ -805,7 +805,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerSize_002, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -824,7 +824,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetMousePrimaryButton_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetMousePrimaryButton(data, reply);
@@ -839,7 +839,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetM
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetMousePrimaryButton_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetMousePrimaryButton(data, reply);
@@ -854,7 +854,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetM
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetHoverScrollState_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetHoverScrollState(data, reply);
@@ -869,7 +869,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetH
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetHoverScrollState_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetHoverScrollState(data, reply);
@@ -884,7 +884,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetH
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerVisible_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetPointerVisible(data, reply);
@@ -899,7 +899,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubIsPointerVisible_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubIsPointerVisible(data, reply);
@@ -914,7 +914,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubIsPo
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubMarkProcessed_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubMarkProcessed(data, reply);
@@ -929,7 +929,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubMark
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerColor_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -948,7 +948,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerColor_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -967,7 +967,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerSpeed_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetPointerSpeed(data, reply);
@@ -982,7 +982,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerSpeed_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetPointerSpeed(data, reply);
@@ -997,7 +997,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubNotifyNapOnline_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubNotifyNapOnline(data, reply);
@@ -1012,7 +1012,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubNoti
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubRemoveInputEventObserver(data, reply);
@@ -1027,7 +1027,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_001, TestS
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerStyle_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetPointerStyle(data, reply);
@@ -1042,7 +1042,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubClearWindowPointerStyle(data, reply);
@@ -1057,7 +1057,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerStyle_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetPointerStyle(data, reply);
@@ -1072,7 +1072,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSupportKeys_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSupportKeys(data, reply);
@@ -1405,7 +1405,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_001, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetWindowPid_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1424,7 +1424,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetW
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAppendExtraData_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1443,7 +1443,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAppe
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnableCombineKey_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1462,7 +1462,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnableInputDevice_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1481,7 +1481,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetKeyDownDuration_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1500,7 +1500,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_VerifyTouchPadSetting_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->VerifyTouchPadSetting();
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
@@ -1517,7 +1517,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_VerifyTo
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadScrollSwitch(data, reply);
@@ -1532,7 +1532,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollSwitch_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadScrollSwitch(data, reply);
@@ -1547,7 +1547,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollSwitch_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollDirection_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadScrollDirection(data, reply);
@@ -1562,7 +1562,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollDirection_001, Tes
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollDirection_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadScrollDirection(data, reply);
@@ -1577,7 +1577,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollDirection_001, Tes
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetTouchpadTapSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadTapSwitch(data, reply);
@@ -1592,7 +1592,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetT
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetTouchpadTapSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadTapSwitch(data, reply);
@@ -1607,7 +1607,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetT
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadPointerSpeed_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadPointerSpeed(data, reply);
@@ -1622,7 +1622,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadPointerSpeed_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadPointerSpeed_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadPointerSpeed(data, reply);
@@ -1637,7 +1637,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadPointerSpeed_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetKeyboardRepeatDelay_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1656,7 +1656,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetKeyboardRepeatRate_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1675,7 +1675,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetK
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetKeyboardRepeatDelay_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1694,7 +1694,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetK
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetKeyboardRepeatRate_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1713,7 +1713,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetK
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadPinchSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadPinchSwitch(data, reply);
@@ -1728,7 +1728,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadPinchSwitch_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadPinchSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadPinchSwitch(data, reply);
@@ -1743,7 +1743,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadPinchSwitch_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadSwipeSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadSwipeSwitch(data, reply);
@@ -1758,7 +1758,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadSwipeSwitch_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadSwipeSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadSwipeSwitch(data, reply);
@@ -1773,7 +1773,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadSwipeSwitch_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadRightClickType_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadRightClickType(data, reply);
@@ -1788,7 +1788,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadRightClickType_001, Test
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadRightClickType_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadRightClickType(data, reply);
@@ -1803,7 +1803,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadRightClickType_001, Test
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadRotateSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetTouchpadRotateSwitch(data, reply);
@@ -1818,7 +1818,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadRotateSwitch_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadRotateSwitch_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetTouchpadRotateSwitch(data, reply);
@@ -1833,7 +1833,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadRotateSwitch_001, TestSi
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetShieldStatus_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetShieldStatus(data, reply);
@@ -1848,7 +1848,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetShieldStatus_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetShieldStatus_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1867,7 +1867,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetS
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetShieldStatus_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1886,7 +1886,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetS
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetKeyState(data, reply);
@@ -1901,7 +1901,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubAuthorize_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubAuthorize(data, reply);
@@ -1916,7 +1916,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAuthorize_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubCancelInjection_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubCancelInjection(data, reply);
@@ -1931,7 +1931,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubCancelInjection_001, TestSize.Level
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubHasIrEmitter_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubHasIrEmitter(data, reply);
@@ -1946,7 +1946,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubHasIrEmitter_001, TestSize.Level1)
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubGetInfraredFrequencies_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetInfraredFrequencies(data, reply);
@@ -1961,7 +1961,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetInfraredFrequencies_001, TestSiz
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubTransmitInfrared(data, reply);
@@ -1976,7 +1976,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_001, TestSize.Leve
  */
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPixelMapData_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
@@ -1995,7 +1995,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_001, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubSetCurrentUser(data, reply);
@@ -2010,7 +2010,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_001, TestSize.Level1
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubHandleAllocSocketFd_002, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -2029,7 +2029,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubHandleAllocSocketFd_002, TestSize.L
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseScrollRows_002, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -2048,7 +2048,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseScrollRows_002, TestSize.Le
  */
 HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_002, TestSize.Level1)
 {
-    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
