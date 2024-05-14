@@ -25,7 +25,7 @@ config("virtual_device_public_config") {
 
 ohos_source_set("libmmi-virtual-device") {
   sources = libmmi_virtual_device_sources
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -40,7 +40,7 @@ ohos_source_set("libmmi-virtual-device") {
 
 ohos_executable("vuinput") {
   sources = [ "src/mmi_virtual_device_main.cpp" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

@@ -164,11 +164,11 @@ const std::vector<WindowInfo> &InputWindowsManager::GetWindowGroupInfoByDisplayI
     CALL_DEBUG_ENTER;
     auto iter = windowsPerDisplay_.find(displayId);
     if (displayId == -1 || iter == windowsPerDisplay_.end()) {
-        MMI_HILOGW("GetWindowInfo displayId: %{public}d is null from windowGroupInfo_", displayId);
+        MMI_HILOGW("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
         return displayGroupInfo_.windowsInfo;
     }
     if (iter->second.windowsInfo.empty()) {
-        MMI_HILOGW("GetWindowInfo displayId: %{public}d is empty", displayId);
+        MMI_HILOGW("GetWindowInfo displayId:%{public}d is empty", displayId);
         return displayGroupInfo_.windowsInfo;
     }
     return iter->second.windowsInfo;
@@ -305,7 +305,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
     CHKPR(windowInfo, INVALID_PID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
-        MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window.", focusWindowId);
+        MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
         return INVALID_PID;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -588,7 +588,7 @@ void InputWindowsManager::UpdateDisplayMode()
     }
     DisplayMode mode = displayGroupInfo_.displaysInfo[0].displayMode;
     if (mode == displayMode_) {
-        MMI_HILOGD("displaymode not change, mode: %{public}d, diaplayMode_: %{public}d", mode, displayMode_);
+        MMI_HILOGD("displaymode not change, mode:%{public}d, diaplayMode_:%{public}d", mode, displayMode_);
         return;
     }
     displayMode_ = mode;
@@ -596,7 +596,7 @@ void InputWindowsManager::UpdateDisplayMode()
         MMI_HILOGD("send fingersense display mode is nullptr");
         return;
     }
-    MMI_HILOGI("update fingersense display mode, displayMode: %{public}d", displayMode_);
+    MMI_HILOGI("update fingersense display mode, displayMode:%{public}d", displayMode_);
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -632,7 +632,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         PointerStyle pointerStyle;
         if (!isDragBorder_) {
             int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-            MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
+            MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
                 info.windowPid, info.windowId, pointerStyle.id);
             CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
         }
@@ -1328,7 +1328,7 @@ int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t window
     CALL_DEBUG_ENTER;
     auto it = pointerStyle_.find(pid);
     if (it == pointerStyle_.end()) {
-        MMI_HILOG_CURSORE("Pid: %{public}d does not exist in mmi", pid);
+        MMI_HILOG_CURSORE("Pid:%{public}d does not exist in mmi", pid);
         return RET_OK;
     }
     auto windowIt = it->second.find(windowId);
@@ -1482,7 +1482,7 @@ bool InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             pointerStyle.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
             break;
         default:
-            MMI_HILOGD("pointerStyle in default is: %{public}d", pointerStyle.id);
+            MMI_HILOGD("pointerStyle in default is:%{public}d", pointerStyle.id);
             break;
     }
     MMI_HILOGD("pointerStyle after switch ID is :%{public}d", pointerStyle.id);
@@ -2287,7 +2287,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         touchItemDownInfos_[pointerId] = windowInfoEX;
         MMI_HILOG_DISPATCHI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        MMI_HILOG_DISPATCHD("Clear extra data.");
+        MMI_HILOG_DISPATCHD("Clear extra data");
         pointerEvent->ClearBuffer();
         lastTouchEvent_ = nullptr;
         lastTouchWindowInfo_.id = -1;

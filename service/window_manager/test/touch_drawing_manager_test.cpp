@@ -115,6 +115,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, 
  */
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t width = 100;
     int32_t height = 200;
     int32_t physicalX = 50;
@@ -132,6 +133,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
  */
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t width = 100;
     int32_t height = 200;
     int32_t physicalX = 50;
@@ -149,6 +151,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
  */
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t width = 100;
     int32_t height = 200;
     int32_t physicalX = 50;
@@ -166,6 +169,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
  */
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t width = 100;
     int32_t height = 200;
     int32_t physicalX = 50;
@@ -183,6 +187,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
  */
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TouchDrawingManager manager;
     bool ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_TRUE(ret);
