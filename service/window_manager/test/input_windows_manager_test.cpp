@@ -2429,5 +2429,96 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerAction_04
     WinMgr->UpdatePointerAction(pointerEvent);
     ASSERT_NO_FATAL_FAILURE(pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayId_002
+ * @tc.desc: Test UpdateDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_002, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetTargetDisplayId(1);
+    auto id = pointerEvent->GetTargetDisplayId();
+    ASSERT_TRUE(WinMgr->UpdateDisplayId(id));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayId_003
+ * @tc.desc: Test UpdateDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_003, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetTargetDisplayId(10);
+    auto id = pointerEvent->GetTargetDisplayId();
+    ASSERT_FALSE(WinMgr->UpdateDisplayId(id));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_Init_001
+ * @tc.desc: Test Init
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_Init_001, TestSize.Level1)
+{
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateCaptureMode_002
+ * @tc.desc: Test UpdateCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode_002, TestSize.Level1)
+{
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo info;
+    info.id = 1;
+    info.x =1;
+    info.y = 1;
+    info.width = 2;
+    info.height = 2;
+    info.dpi = 240;
+    info.name = "pp";
+    info.uniq = "pp";
+    info.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(info);
+    WinMgr->UpdateCaptureMode(displayGroupInfo);
+    ASSERT_FALSE(WinMgr->captureModeInfo_.isCaptureMode);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsWindowVisible_002
+ * @tc.desc: Test IsWindowVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible_002, TestSize.Level1)
+{
+    int32_t pid = 1000;
+    auto ret = WinMgr->IsWindowVisible(pid);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsWindowVisible_003
+ * @tc.desc: Test IsWindowVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible_003, TestSize.Level1)
+{
+    int32_t pid = -1;
+    auto ret = WinMgr->IsWindowVisible(pid);
+    ASSERT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
