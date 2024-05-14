@@ -313,6 +313,8 @@ struct WindowInfo {
     void* pixelMap { nullptr };
 
     WindowInputType windowInputType { WindowInputType::NORMAL };
+
+    enum SecureFlag privacyMode { DEFAULT_MODE };
 };
 
 /**
