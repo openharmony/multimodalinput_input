@@ -73,7 +73,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
     } else {
-        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
 }
 
@@ -84,7 +84,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
     } else {
-        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
 }
 
