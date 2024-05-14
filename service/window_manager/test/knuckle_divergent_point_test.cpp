@@ -15,10 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include "mmi_log.h"
-#include "pointer_event.h"
-#include "knuckle_divergent_point.h"
-
 #include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
@@ -31,6 +27,10 @@
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
 #include "render/rs_pixel_map_util.h"
+
+#include "mmi_log.h"
+#include "pointer_event.h"
+#include "knuckle_divergent_point.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDivergentPointTest"
