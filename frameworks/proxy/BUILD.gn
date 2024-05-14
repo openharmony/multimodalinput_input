@@ -58,7 +58,7 @@ ohos_source_set("libmmi-common") {
   sources = libmmi_common_sources
   public_configs = [ ":libmmi_client_config" ]
   visibility = [ "${mmi_path}/*" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   external_deps = [
     "c_utils:utils",
     "ffrt:libffrt",
@@ -73,7 +73,7 @@ ohos_shared_library("libmmi-client") {
   sources = libmmi_client_sources
   version_script = "${mmi_path}/interfaces/native/innerkits/libmmi-client-map"
   innerapi_tags = [ "platformsdk" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
