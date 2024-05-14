@@ -627,14 +627,13 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
         }
         return ERR_OK;
-    } else {
-        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
-        if (!ret.second) {
-            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
-        }
-        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
-        return ERR_OK;
     }
+    auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
+    if (!ret.second) {
+        MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+    }
+    MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
+    return ERR_OK;
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()
