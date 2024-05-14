@@ -31,6 +31,7 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_event_normalize.h"
+#include "key_event_value_transformation.h"
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
@@ -106,6 +107,8 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    keyEvent->SetKeyIntention(keyIntention);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);

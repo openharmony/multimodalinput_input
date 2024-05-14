@@ -29,12 +29,12 @@
       "sequenceKeys": [
         {
           "keyCode": 17,
-          "keyAction": 1,
+          "keyAction": 2,
           "delay": 200
         },
         {
           "keyCode": 18,
-          "keyAction": 1,
+          "keyAction": 2,
           "delay": 0
         }
       ],
@@ -59,12 +59,12 @@
       "sequenceKeys": [
         {
           "keyCode": 18,
-          "keyAction": 1,
+          "keyAction": 2,
           "delay": 200
         },
         {
           "keyCode": 17,
-          "keyAction": 1,
+          "keyAction": 2,
           "delay": 0
         }
       ],
@@ -89,12 +89,12 @@
       "sequenceKeys": [
         {
           "keyCode": 18,
-          "keyAction": 1,
+          "keyAction": 2,
           "delay": 200
         },
         {
           "keyCode": 16,
-          "keyAction": 1,
+          "keyAction": 2,
           "delay": 0
         }
       ],
