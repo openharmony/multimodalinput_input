@@ -314,7 +314,7 @@ struct WindowInfo {
 
     WindowInputType windowInputType { WindowInputType::NORMAL };
 
-    enum SecureFlag privacyMode { DEFAULT_MODE };
+    SecureFlag privacyMode { DEFAULT_MODE };
 };
 
 /**
