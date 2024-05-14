@@ -77,6 +77,7 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
 int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
     struct libinput_event_keyboard* keyEvent = libinput_event_get_keyboard_event(event);
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto key = libinput_event_keyboard_get_key(keyEvent);
