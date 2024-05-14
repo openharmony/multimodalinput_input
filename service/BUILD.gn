@@ -838,6 +838,35 @@ ohos_unittest("KeyCommandTest") {
   ]
 }
 
+ohos_unittest("StylusKeyTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_command/test/stylus_key_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
+
 ohos_unittest("InterceptorTest") {
   module_out_path = module_output_path
 
