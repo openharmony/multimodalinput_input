@@ -98,6 +98,7 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));
