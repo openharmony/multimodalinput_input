@@ -63,11 +63,11 @@ bool HotplugDetector::Init(const callback& addFunc, const callback& removeFunc)
 
     auto fd = UniqueFd{inotify_init1(IN_CLOEXEC)};
     if (fd < 0) {
-        MMI_HILOGE("Failed to initialize inotify. Error:%{public}s.", SystemError().message().c_str());
+        MMI_HILOGE("Failed to initialize inotify. Error:%{public}s", SystemError().message().c_str());
         return false;
     }
     if (inotify_add_watch(fd, INPUT_DEVICES_PATH, IN_DELETE | IN_CREATE) < 0) {
-        MMI_HILOGE("Failed to add watch for input devices. Error:%{public}s.", SystemError().message().c_str());
+        MMI_HILOGE("Failed to add watch for input devices. Error:%{public}s", SystemError().message().c_str());
         return false;
     }
     if (!Scan()) {
@@ -83,7 +83,7 @@ bool HotplugDetector::Scan() const
     using namespace std::literals::string_literals;
     auto* dir = opendir(INPUT_DEVICES_PATH);
     if (dir == nullptr) {
-        MMI_HILOGE("Failed to open device input dir. Error:%{public}s.", SystemError().message().c_str());
+        MMI_HILOGE("Failed to open device input dir. Error:%{public}s", SystemError().message().c_str());
         return false;
     }
     dirent* entry = nullptr;
@@ -109,7 +109,7 @@ void HotplugDetector::OnEvent() const
     if (res < EVSIZE) {
         auto err = SystemError();
         if (err != std::errc::resource_unavailable_try_again) {
-            MMI_HILOGE("Filed to read inotify event. Error:%{public}s.", err.message().c_str());
+            MMI_HILOGE("Filed to read inotify event. Error:%{public}s", err.message().c_str());
         }
         return;
     }

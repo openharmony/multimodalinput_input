@@ -1591,6 +1591,7 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
             return true;
     }
+    MMI_HILOGD("not fingerprint event");
     return false;
 }
 } // namespace MMI
