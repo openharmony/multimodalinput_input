@@ -159,7 +159,8 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     libinput_event* event = nullptr;
     bool ret = handler.ProcessNullEvent(event, frameTime);
     ASSERT_FALSE(ret);
-    event = new(std::nothrow)libinput_event;
+    event = new (std::nothrow) libinput_event;
+    ASSERT_NE(event, nullptr);
     event->type = LIBINPUT_EVENT_NONE;
     ret = handler.ProcessNullEvent(event, frameTime);
     ASSERT_FALSE(ret);
@@ -173,10 +174,10 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyEvent_001, TestSize.Level1)
 {
-    EventNormalizeHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetRepeat(true);
+    EventNormalizeHandler handler;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
     keyEvent->SetRepeat(false);
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
@@ -190,9 +191,9 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyEvent_001
  */
 HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent_001, TestSize.Level1)
 {
-    EventNormalizeHandler handler;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    EventNormalizeHandler handler;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
