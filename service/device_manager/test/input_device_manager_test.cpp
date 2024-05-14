@@ -42,8 +42,7 @@ class MockUDSSession : public UDSSession {
 public:
     MOCK_METHOD1(SendMsg, int32_t(NetPacket &));
     MockUDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid, 
-        const int32_t pid) 
-            : UDSSession(programName, moduleType, fd, uid, pid) {}
+        const int32_t pid) : UDSSession(programName, moduleType, fd, uid, pid) {}
 };
 
 /**
