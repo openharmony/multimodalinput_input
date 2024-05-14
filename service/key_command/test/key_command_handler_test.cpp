@@ -37,6 +37,7 @@ constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
+constexpr int32_t INTERVAL_TIME_OUT = 500000;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
@@ -703,6 +704,124 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_003, TestSize.
     singlePointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     keyCommandHandler.HandlePointerActionUpEvent(singlePointerEvent);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleTest_004
+ * @tc.desc: Test sing knuckle double click interval time out
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = SetupSingleKnuckleDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
+    int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    pointerEvent->SetActionTime(actionTime);
+    keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    actionTime = actionTime + INTERVAL_TIME_OUT;
+    pointerEvent->SetActionTime(actionTime);
+    keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleTest_005
+ * @tc.desc: Test double knuckle double CLICK click interval time out
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = SetupDoubleKnuckleDownEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    pointerEvent->SetActionTime(actionTime);
+    KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
+    keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    actionTime = actionTime + INTERVAL_TIME_OUT;
+    pointerEvent->SetActionTime(actionTime);
+    keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleTest_006
+ * @tc.desc: Test the tool type is TOOL_TYPE_TOUCHPAD Action down
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    int32_t downX = 100;
+    int32_t downY = 200;
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_KnuckleTest_007
+ * @tc.desc: Test the tool type is TOOL_TYPE_TOUCHPAD Action up
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_007, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    int32_t downX = 100;
+    int32_t downY = 200;
+    item.SetDisplayX(downX);
+    item.SetDisplayY(downY);
+    item.SetPressed(true);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
     ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
     ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
 }
