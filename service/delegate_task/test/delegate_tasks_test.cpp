@@ -17,7 +17,7 @@
 
 #include "delegate_tasks.h"
 #include "error_multimodal.h"
-#include "uds_server.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
