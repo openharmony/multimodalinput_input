@@ -86,7 +86,7 @@ void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundle
     int32_t getUid = uid;
     std::string getName = bundleName;
     int32_t getStatus = syncStatus;
-    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("SyncBundleName info is :%{public}d, %{public}d, %{public}s, %{public}d",
         getPid, getUid, getName.c_str(), getStatus);
 }
 
@@ -2501,7 +2501,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_002, TestSize
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -2538,7 +2538,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
