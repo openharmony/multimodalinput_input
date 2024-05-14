@@ -49,15 +49,16 @@ public:
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent) override;
 #endif // OHOS_BUILD_ENABLE_SWITCH
-    int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
+    int32_t SubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(SessionPtr sess, int32_t subscribeId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
-        Subscriber(int32_t id, SessionPtr sess)
-            : id_(id), sess_(sess), timerId_(-1) {}
+        Subscriber(int32_t id, SessionPtr sess, int32_t switchType)
+            : id_(id), sess_(sess), switchType_(switchType), timerId_(-1) {}
         int32_t id_ { -1 };
         SessionPtr sess_ { nullptr };
+        int32_t switchType_ { -1 };
         int32_t timerId_ { -1 };
         std::shared_ptr<SwitchEvent> switchEvent_ { nullptr };
     };
