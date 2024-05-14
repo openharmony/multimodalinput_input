@@ -114,7 +114,7 @@ private:
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+                MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
                 return;
             }
             MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
@@ -171,7 +171,7 @@ private:
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+                MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
                 return;
             }
             MMI_HILOGD("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
