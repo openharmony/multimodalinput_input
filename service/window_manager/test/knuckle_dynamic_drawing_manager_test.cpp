@@ -190,5 +190,71 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_IsSi
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
     ASSERT_FALSE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_CheckPointerAction
+ * @tc.desc: Test Overrides CheckPointerAction function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_CheckPointerAction, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
+    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    knuckleDynamicDrawMgr.isStop_ = true;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    item.SetPointerId(2);
+    pointerEvent->SetPointerId(2);
+    pointerEvent->AddPointerItem(item);
+    Rosen::Drawing::Bitmap bitmap;
+    knuckleDynamicDrawMgr.glowTraceSystem_ =
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_StartTouchDraw
+ * @tc.desc: Test Overrides StartTouchDraw function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_StartTouchDraw, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent));
+
+    knuckleDynamicDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
+    knuckleDynamicDrawMgr.displayInfo_.width = 200;
+    knuckleDynamicDrawMgr.displayInfo_.height = 200;
+    Rosen::Drawing::Bitmap bitmap;
+    knuckleDynamicDrawMgr.glowTraceSystem_ =
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+    knuckleDynamicDrawMgr.isDrawing_ = true;
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
