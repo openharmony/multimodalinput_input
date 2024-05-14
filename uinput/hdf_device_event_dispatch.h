@@ -29,7 +29,7 @@ class HdfDeviceEventDispatch : public IInputCallback {
 public:
     HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
     DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
-    virtual ~HdfDeviceEventDispatch();
+    virtual ~HdfDeviceEventDispatch() = default;
 
     int32_t EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex) override;
     int32_t HotPlugCallback(const HotPlugEvent &event) override;

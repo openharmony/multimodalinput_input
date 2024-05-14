@@ -49,6 +49,7 @@ void AddTimerCallback()
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
@@ -63,6 +64,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
@@ -77,6 +79,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
@@ -92,6 +95,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_003, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
     int32_t intervalMs = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
@@ -106,6 +110,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_004, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
     int32_t intervalMs  = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, nullptr);
@@ -120,6 +125,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_005, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t intervalMs = 0;
     int32_t repeatCount = 1;
@@ -140,6 +146,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimer_001, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_RemoveTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     auto ret = timermanager.RemoveTimer(timerId);
@@ -157,6 +164,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_RemoveTimer_001, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimer_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     auto ret = timermanager.ResetTimer(timerId);
@@ -175,6 +183,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimer_001, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_IsExist_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     auto ret = timermanager.IsExist(timerId);
@@ -192,6 +201,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_IsExist_001, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelay_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     auto ret = timermanager.CalcNextDelay();
     EXPECT_EQ(ret, -1);;
@@ -205,6 +215,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelay_001, TestSize.Level1)
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_TakeNextTimerId_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     auto ret = timermanager.TakeNextTimerId();
     EXPECT_EQ(ret, 0);
@@ -218,6 +229,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_TakeNextTimerId_001, TestSize.Level1
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimerInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t intervalMs = 50;
     int32_t repeatCount = 1;
@@ -242,6 +254,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_AddTimerInternal_001, TestSize.Level
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_RemoveTimerInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     auto ret = timermanager.RemoveTimerInternal(timerId);
@@ -259,6 +272,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_RemoveTimerInternal_001, TestSize.Le
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimerInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     timermanager.AddTimer(timerId, 1000, []() {});
@@ -274,6 +288,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ResetTimerInternal_001, TestSize.Lev
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_IsExistInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     auto ret = timermanager.IsExistInternal(timerId);
@@ -294,6 +309,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_IsExistInternal_001, TestSize.Level1
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     auto timer = std::make_unique<TimerManager::TimerItem>();
     timer->nextCallTime = 100;
@@ -309,6 +325,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_001, TestSize.Le
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     auto timer1 = std::make_unique<TimerManager::TimerItem>();
     timer1->nextCallTime = 100;
@@ -327,6 +344,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_002, TestSize.Le
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     auto timer1 = std::make_unique<TimerManager::TimerItem>();
     timer1->nextCallTime = 100;
@@ -348,6 +366,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_InsertTimerInternal_003, TestSize.Le
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     int32_t timerId = 1;
     timermanager.AddTimer(timerId, 1000, []() {});
@@ -363,6 +382,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal_001, TestSize.
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager tMgr;
     auto timer = std::make_unique<TimerManager::TimerItem>();
     timer->nextCallTime = -1;
@@ -378,6 +398,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_CalcNextDelayInternal, TestSize.Leve
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager timermanager;
     ASSERT_NO_FATAL_FAILURE(timermanager.ProcessTimersInternal());
 }
@@ -390,6 +411,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal_001, TestSize.
  */
 HWTEST_F(TimerManagerTest, TimerManagerTest_ProcessTimersInternal, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     TimerManager tMgr;
     auto timer = std::make_unique<TimerManager::TimerItem>();
     timer->nextCallTime = 10000000000;
