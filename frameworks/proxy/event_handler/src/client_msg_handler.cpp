@@ -124,7 +124,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     pkt >> fd;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, key) != ERR_OK) {
-        MMI_HILOG_DISPATCHE("Failed to deserialize enhance data key event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize enhance data key event");
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -164,12 +164,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
-        MMI_HILOG_DISPATCHE("Failed to deserialize pointer event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize pointer event");
         return RET_ERR;
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
-        MMI_HILOG_DISPATCHE("Failed to deserialize enhance data pointer event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize enhance data pointer event");
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -177,7 +177,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         pointerEvent->GetId(), pointerEvent->GetPointerAction());
     EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
-        MMI_HILOG_DISPATCHI("Operation canceled.");
+        MMI_HILOG_DISPATCHI("Operation canceled");
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
@@ -276,7 +276,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     auto keyEvent = KeyEvent::Create();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent) != ERR_OK) {
-        MMI_HILOG_DISPATCHE("Failed to deserialize key event.");
+        MMI_HILOG_DISPATCHE("Failed to deserialize key event");
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);

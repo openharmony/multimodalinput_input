@@ -90,7 +90,7 @@ int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int3
 void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+    while (!circBuf.IsEmpty()) {
         const int32_t unreadSize = circBuf.UnreadSize();
         if (unreadSize < headSize) {
             break;
