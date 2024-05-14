@@ -25,6 +25,11 @@ inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 
 inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
 
+enum SecureFlag {
+    DEFAULT_MODE = 0,
+    PRIVACY_MODE = 1,
+};
+
 /**
  * @brief Enumerates the fold display mode.
  */
