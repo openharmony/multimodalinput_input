@@ -29,7 +29,7 @@ ohos_static_library("mmi_libudev") {
   configs = [ ":mmi_libudev_config" ]
 
   sources = [ "src/udev_device.cpp" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

@@ -118,6 +118,7 @@ bool InputDisplayBindHelperTest::InitConfigFile()
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
@@ -139,6 +140,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_001, TestSize.Le
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
@@ -160,6 +162,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_002, TestSize.Le
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>think 123\nkeyboard<=>hp 223\n");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
@@ -181,6 +184,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_003, TestSize.Le
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
@@ -226,6 +230,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_004, TestSize.Le
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNameByInputDevice_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>think 123\nkeyboard<=>hp 223\n");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
@@ -258,6 +263,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>think 123\nkeyboard<=>hp 223\n");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
     // 多模初始化
@@ -287,6 +293,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdNames_007, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     using IdNames = std::set<std::pair<int32_t, std::string>>;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>think 123\nkeyboard<=>hp 223\n");
     InputDisplayBindHelper bindInfo(InputDisplayBindHelperTest::GetCfgFileName());
@@ -320,6 +327,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
  */
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_008, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
     if (!(InputDisplayBindHelperTest::InitInputNode())) {
         return;

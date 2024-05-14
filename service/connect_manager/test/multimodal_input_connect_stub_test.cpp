@@ -2001,5 +2001,62 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_001, TestSize.Level1
     int32_t ret = stub->StubSetCurrentUser(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: StubHandleAllocSocketFd_002
+ * @tc.desc: Test the function StubHandleAllocSocketFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubHandleAllocSocketFd_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubHandleAllocSocketFd(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubHandleAllocSocketFd(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubSetMouseScrollRows_002
+ * @tc.desc: Test the function StubSetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseScrollRows_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetMouseScrollRows(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetMouseScrollRows(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubSetCustomCursor_002
+ * @tc.desc: Test the function StubSetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetCustomCursor(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetCustomCursor(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
