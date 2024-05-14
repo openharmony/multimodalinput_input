@@ -17,6 +17,7 @@
 
 #include "delegate_tasks.h"
 #include "error_multimodal.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,6 +39,7 @@ public:
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_Init_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     ASSERT_NO_FATAL_FAILURE(delegateTasks.Init());
     ASSERT_NO_FATAL_FAILURE(delegateTasks.ProcessTasks());
@@ -52,6 +54,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_Init_001, TestSize.Level1)
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     auto callback = []() { return 0; };
     EXPECT_EQ(delegateTasks.PostSyncTask(callback), 65142804);
@@ -65,6 +68,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_002, TestSize.Level1)
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     auto callback = []() { return 0; };
     EXPECT_EQ(delegateTasks.PostSyncTask(callback), ETASKS_POST_SYNCTASK_FAIL);
@@ -78,6 +82,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_003, TestSize.Level1)
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     auto callback = []() { std::this_thread::sleep_for(std::chrono::seconds(4)); return 0; };
     EXPECT_NE(delegateTasks.PostSyncTask(callback), ETASKS_WAIT_TIMEOUT);
@@ -91,6 +96,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_004, TestSize.Level1)
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     auto callback = []() { return 0; };
     EXPECT_NE(delegateTasks.PostSyncTask(callback), ETASKS_WAIT_DEFERRED);
@@ -104,6 +110,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostSyncTask_005, TestSize.Level1)
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostAsyncTask_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     EXPECT_EQ(delegateTasks.PostAsyncTask(nullptr), ERROR_NULL_POINTER);
 }
@@ -116,6 +123,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostAsyncTask_001, TestSize.Level1
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     std::vector<DelegateTasks::TaskPtr> tasks;
     ASSERT_NO_FATAL_FAILURE(delegateTasks.PopPendingTaskList(tasks));
@@ -129,6 +137,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_001, TestSize.L
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     std::vector<DelegateTasks::TaskPtr> tasks;
     for (int32_t i = 0; i < 15; i++) {
@@ -145,6 +154,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PopPendingTaskList_002, TestSize.L
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     for (int32_t i = 0; i < 1001; i++) {
         delegateTasks.PostTask(nullptr, nullptr);
@@ -161,6 +171,7 @@ HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_001, TestSize.Level1)
  */
 HWTEST_F(DelegateTasksTest, DelegateTasksTest_PostTask_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     DelegateTasks delegateTasks;
     DelegateTasks::Promise promise;
     auto task = delegateTasks.PostTask(nullptr, &promise);
