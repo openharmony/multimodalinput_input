@@ -261,7 +261,7 @@ void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_sour
         MMI_HILOGE("Failed to get scroll direct switch flag, default is true.");
     }
 
-    if (scrollDirectionState == true) {
+    if (scrollDirectionState == true && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         direction = -1;
     }
 }
