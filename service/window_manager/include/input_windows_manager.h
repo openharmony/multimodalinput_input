@@ -67,13 +67,13 @@ public:
         FoldStatusLisener() = default;
         virtual ~FoldStatusLisener() = default;
 
-        FoldStatusLisener(const FoldStatusLisener&) = delete;
-        FoldStatusLisener& operator=(const FoldStatusLisener&) = delete;
-        FoldStatusLisener(FoldStatusLisener&&) = delete;
-        FoldStatusLisener& operator=(FoldStatusLisener&&) = delete;
+        FoldStatusLisener(const FoldStatusLisener& foldStatusLisener) = delete;
+        FoldStatusLisener& operator=(const FoldStatusLisener& foldStatusLisener) = delete;
+        FoldStatusLisener(FoldStatusLisener&& foldStatusLisener) = delete;
+        FoldStatusLisener& operator=(FoldStatusLisener&& foldStatusLisener) = delete;
 
         /**
-        * @param FoldStatus uint32_t; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
+        * @param FoldStatus; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
         */
         void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
 
@@ -201,7 +201,7 @@ private:
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
     void RegisterFoldStatusListener();
-    void UnRegisterFoldStatusListener();
+    void UnregisterFoldStatusListener();
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
