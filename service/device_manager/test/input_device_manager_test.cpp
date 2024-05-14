@@ -256,14 +256,7 @@ HWTEST_F(InputDeviceManagerTest, GetInputDevice_Test_002, TestSize.Level1)
 HWTEST_F(InputDeviceManagerTest, GetInputDeviceIds_Test_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    struct InputDeviceInfo {
-        bool enable;
-    };
-    std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     InputDeviceManager manager;
-    inputDevice_[1] = true;
-    inputDevice_[2] = true;
-    inputDevice_[3] = true;
     std::vector<int32_t> expectedIds = {1, 2, 3};
     std::vector<int32_t> actualIds = manager.GetInputDeviceIds();
     ASSERT_NE(expectedIds, actualIds);
