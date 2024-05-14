@@ -256,5 +256,48 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
     knuckleDynamicDrawMgr.isDrawing_ = true;
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent));
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_ProcessMoveEvent
+ * @tc.desc: Test Overrides ProcessMoveEvent function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_ProcessMoveEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    knuckleDynamicDrawMgr.pointCounter_ = 6;
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+
+    Rosen::Drawing::Bitmap bitmap;
+    knuckleDynamicDrawMgr.glowTraceSystem_ =
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->AddPointerItem(item);
+    knuckleDynamicDrawMgr.pointCounter_ = 2;
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+
+    Rosen::Drawing::Point point;
+    point.SetX(100);
+    point.SetY(100);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    point.SetX(150);
+    point.SetY(150);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    point.SetX(200);
+    point.SetY(200);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    point.SetX(300);
+    point.SetY(300);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    knuckleDynamicDrawMgr.lastUpdateTimeMillis_ = 50;
+    pointerEvent->SetActionTime(100);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
