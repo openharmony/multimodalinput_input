@@ -184,7 +184,7 @@ void InputWindowsManager::UnregisterFoldStatusListener()
     CHKPV(foldStatusListener_);
     auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
-        MMI_LOG_HANDLERDE("Failed to unRegister fold status listener");
+        MMI_LOG_HANDLERDE("Failed to unregister fold status listener");
     }
 }
 
