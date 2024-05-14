@@ -289,7 +289,7 @@ HWTEST_F(InputDeviceManagerTest, OnSessionLost_Test_001, TestSize.Level1)
     int32_t fd = 2;
     int32_t uid = 3;
     int32_t pid = 4;
-    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+    std::shared_ptr<MockUDSSession> session = std::make_shared<MockUDSSession>
         (programName, moduleType, fd, uid, pid);
     ASSERT_NE(session, nullptr);
     ASSERT_NO_FATAL_FAILURE(inputDevice.OnSessionLost(session));
