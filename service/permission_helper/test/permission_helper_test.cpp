@@ -39,8 +39,6 @@ class PermissionHelperTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    static void SetUp() {}
-    static void TearDown() {}
 };
 
 /**
@@ -106,5 +104,72 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_GetTokenType, TestSize.Level
     int32_t result = PerHelper->GetTokenType();
     EXPECT_EQ(result, TokenType::TOKEN_SHELL);
 }
+
+/**
+ * @tc.name: PermissionHelperTest_CheckDispatchControl
+ * @tc.desc: Test CheckDispatchControl
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControl, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 2;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result = PerHelper->CheckDispatchControl();
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission
+ * @tc.desc: Test CheckHapPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    std::string permissionCode = "access";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result = PerHelper->CheckHapPermission(tokenId, permissionCode);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_VerifySystemApp
+ * @tc.desc: Test VerifySystemApp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_VerifySystemApp, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t callerToken = 3;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
+    bool result = PerHelper->VerifySystemApp();
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckPermission
+ * @tc.desc: Test CheckPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckPermission, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 1;
+    uint32_t required = 2;
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+    bool result = PerHelper->CheckPermission(required);
+    ASSERT_TRUE(result);
+}
+
 } // namespace MMI
 } // namespace OHOS
