@@ -71,7 +71,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSi
     int32_t action = 1;
     std::string name = "ExampleProgram";
     uint32_t processId = 12345;
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(action, name, processId));
+    int32_t touchCnt = 0;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(action, name, processId, touchCnt));
 }
 
 /**
@@ -106,6 +107,73 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.
     EXPECT_EQ(ret, -1);
 }
 
+/**
+ * @tc.name: EventDispatchTest_AcquireEnableMark
+ * @tc.desc: Test Acquire Enable Mark
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    ASSERT_NE(event, nullptr);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ASSERT_FALSE(dispatch.AcquireEnableMark(event));
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_TRUE(dispatch.AcquireEnableMark(event));
+}
 
+/**
+ * @tc.name: EventDispatchTest_HandlePointerEventInner
+ * @tc.desc: Test HandlePointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerEvent->SetPointerId(5);
+    pointerItem.SetPointerId(5);
+    pointerEvent->AddPointerItem(pointerItem);
+    ASSERT_NO_FATAL_FAILURE(dispatch.HandlePointerEventInner(pointerEvent));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner
+ * @tc.desc: Test Dispatch Pointer Event Inner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = -1;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    dispatch.eventTime_ = 1000;
+    pointerEvent->SetActionTime(5000);
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchKeyEventPid
+ * @tc.desc: Test Dispatch Key Event Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    std::shared_ptr<KeyEvent> KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    dispatch.eventTime_ = 1000;
+    KeyEvent->SetActionTime(5000);
+    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -32,6 +32,7 @@ class MouseEventNormalize final : public std::enable_shared_from_this<MouseEvent
 public:
     DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
     std::shared_ptr<PointerEvent> GetPointerEvent();
+    std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
     int32_t OnEvent(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);

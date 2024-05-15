@@ -48,7 +48,7 @@ private:
     int32_t g_keyboardRepeatDelay { 500 };
     int32_t g_mouseScrollRows { 3 };
     int32_t g_mousePrimaryButton { 0 };
-    int32_t g_pointerSpeed { 5 };
+    int32_t g_pointerSpeed { 7 };
     int32_t g_touchpadRightClickType { 1 };
     int32_t g_touchpadPointerSpeed { 9 };
     bool g_touchpadTapSwitch { true };
@@ -76,6 +76,12 @@ private:
     const std::string pointerColor = "pointerColor";
     const std::string pointerSize = "pointerSize";
     const std::string pointerStyle = "pointerStyle";
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t g_magicPointerColor { -1 };
+    int32_t g_magicPointerSize { 3 };
+    const std::string magicPointerColor = "magicPointerColor";
+    const std::string magicPointerSize = "magicPointerSize";
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 };
 
 #define PREFERENCES_MGR ::OHOS::DelayedSingleton<MultiModalInputPreferencesManager>::GetInstance()

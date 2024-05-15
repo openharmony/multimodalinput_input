@@ -288,6 +288,8 @@ private:
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool isHandleSequence_ { false };
+    bool isParseMaxCount_ { false };
+    bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
 };
 } // namespace MMI

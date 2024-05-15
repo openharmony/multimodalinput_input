@@ -27,6 +27,8 @@
 #include "parameters.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_WINDOW
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputDisplayBindHelper"
 

@@ -29,6 +29,8 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeySubscriberHandler"
 
@@ -104,7 +106,6 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
 
 int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
     return RemoveSubscriber(sess, subscribeId);
@@ -235,7 +236,8 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT) {
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT ||
+        keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
         MMI_HILOGD("subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
         return IsEnableCombineKeySwipe(keyEvent);
     }
@@ -257,7 +259,8 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
     for (const auto &item : keyEvent->GetKeyItems()) {
         int32_t keyCode = item.GetKeyCode();
         if (keyCode != KeyEvent::KEYCODE_CTRL_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
-            keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT) {
+            keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT &&
+            keyCode != KeyEvent::KEYCODE_DPAD_LEFT) {
             return enableCombineKey_;
         }
     }

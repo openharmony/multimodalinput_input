@@ -28,10 +28,11 @@
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "knuckle_drawing_manager.h"
+#include "knuckle_dynamic_drawing_manager.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "window_info.h"
-#include "window_manager.h"
+#include "window_manager_lite.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -289,6 +290,7 @@ private:
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
+    std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
