@@ -2523,7 +2523,7 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);
-    if(statusObserver == nullptr) {
+    if (statusObserver == nullptr) {
         MMI_HILOGE("Create observer failed");
         return;
     }
