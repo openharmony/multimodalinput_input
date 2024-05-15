@@ -47,13 +47,13 @@ public:
         info.dpi = displayDpi;
         info.name = "display";
         info.uniq = "xx";
-        if (knuckleDrawMgr == nullptr) {
-            knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
+        if (knuckleDrawMgr_ == nullptr) {
+            knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
         }
-        knuckleDrawMgr->UpdateDisplayInfo(info);
+        knuckleDrawMgr_->UpdateDisplayInfo(info);
     }
 private:
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 };
 
 /**
@@ -128,7 +128,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -155,7 +155,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -191,7 +191,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     item2.SetDisplayY(displayY);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->AddPointerItem(item2);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -218,7 +218,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -245,7 +245,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -272,7 +272,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
