@@ -269,6 +269,10 @@ MAGIC_CURSOR_SHAPE:
 
 MAGIC_CURSOR_SIZE:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the size of Magic Cursor}
+  MOUSE_SIZE: {type: STRING, desc: mouse size}
+  FILL_CODE: {type: STRING, desc: fill code}
 
 FANTASY_CURSOR_FAILED:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report ERROR of Magic Cursor}
+  ERROR_CODE: {type: STRING, desc: error code}
+  ERROR_NAME: {type: STRING, desc: fill code}
