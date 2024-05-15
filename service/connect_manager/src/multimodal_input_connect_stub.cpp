@@ -1167,9 +1167,11 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
     }
 
     int32_t subscribeId;
+    int32_t switchType;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, switchType, IPC_PROXY_DEAD_OBJECT_ERR);
 
-    int32_t ret = SubscribeSwitchEvent(subscribeId);
+    int32_t ret = SubscribeSwitchEvent(subscribeId, switchType);
     if (ret != RET_OK) {
         MMI_HILOGE("SubscribeSwitchEvent failed, ret:%{public}d", ret);
     }
