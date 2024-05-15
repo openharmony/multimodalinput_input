@@ -2058,5 +2058,62 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_002, TestSize.Level
     ret = stub->StubSetCustomCursor(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: StubSetMouseIcon_002
+ * @tc.desc: Test the function StubSetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetMouseIcon(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetMouseIcon(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubSetMouseHotSpot_002
+ * @tc.desc: Test the function StubSetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetMouseHotSpot(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetMouseHotSpot(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubGetMouseScrollRows_002
+ * @tc.desc: Test the function StubGetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubGetMouseScrollRows(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubGetMouseScrollRows(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
