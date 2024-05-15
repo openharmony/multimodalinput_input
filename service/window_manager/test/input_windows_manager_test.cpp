@@ -1730,6 +1730,62 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001,
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_SkipNavigationWindow_001
+ * @tc.desc: Test updating window information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_001, TestSize.Level1)
+{
+    ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SkipNavigationWindow_002
+ * @tc.desc: Test updating window information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_002, TestSize.Level1)
+{
+    ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::NORMAL, PointerEvent::TOOL_TYPE_RUBBER));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SkipNavigationWindow_003
+ * @tc.desc: Test updating window information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_003, TestSize.Level1)
+{
+    ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::NORMAL, PointerEvent::TOOL_TYPE_PEN));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SkipNavigationWindow_004
+ * @tc.desc: Test updating window information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_004, TestSize.Level1)
+{
+    ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_RUBBER));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SkipNavigationWindow_005
+ * @tc.desc: Test updating window information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_005, TestSize.Level1)
+{
+    WinMgr->SetAntiMisTake(true);
+    ASSERT_TRUE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_JudgMouseIsDownOrUp_001
  * @tc.desc: This test verifies the functionality of judging whether the mouse button is down or up
  * @tc.type: FUNC
