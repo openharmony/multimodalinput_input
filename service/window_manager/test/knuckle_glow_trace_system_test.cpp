@@ -53,7 +53,7 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_Init_001, TestSi
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
-    KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
+    EXPECT_NO_FATAL_FAILURE(KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum));
 }
 
 /**
@@ -72,7 +72,7 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_Update_001, Test
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
-    knuckleGlowTraceSystem.Update();
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowTraceSystem.Update());
 }
 
 /**
@@ -94,7 +94,7 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_Draw_001, TestSi
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode->
         BeginRecording(0, 0));
-    knuckleGlowTraceSystem.Draw(canvas);
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowTraceSystem.Draw(canvas));
 }
 
 /**
@@ -115,7 +115,7 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_ResetDivergentPo
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
     double pointX = 0.1;
     double pointY = 0.1;
-    knuckleGlowTraceSystem.ResetDivergentPoints(pointX, pointY);
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowTraceSystem.ResetDivergentPoints(pointX, pointY));
 }
 
 /**
@@ -136,7 +136,7 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_AddGlowPoints_00
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
     Rosen::Drawing::Path path;
     int64_t timeInterval = 100;
-    knuckleGlowTraceSystem.AddGlowPoints(path, timeInterval);
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowTraceSystem.AddGlowPoints(path, timeInterval));
 }
 } // namespace MMI
 } // namespace OHOS

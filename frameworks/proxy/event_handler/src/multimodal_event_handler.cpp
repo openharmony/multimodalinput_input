@@ -94,10 +94,10 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-int32_t MultimodalEventHandler::SubscribeSwitchEvent(int32_t subscribeId)
+int32_t MultimodalEventHandler::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
-    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeSwitchEvent(subscribeId);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeSwitchEvent(subscribeId, switchType);
 }
 
 int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)

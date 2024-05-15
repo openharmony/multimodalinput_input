@@ -105,9 +105,10 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeKeyEvent(subscriberId);
 }
 
-int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
+    SwitchEvent::SwitchType switchType)
 {
-    return InputMgrImpl.SubscribeSwitchEvent(callback);
+    return InputMgrImpl.SubscribeSwitchEvent(static_cast<int32_t>(switchType), callback);
 }
 
 void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)

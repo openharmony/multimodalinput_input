@@ -51,7 +51,7 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPoint_KnuckleGlowPoint_001, TestSize.L
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
-    KnuckleGlowPoint knuckleGlowPoint(bitmap);
+    EXPECT_NO_FATAL_FAILURE(KnuckleGlowPoint knuckleGlowPoint(bitmap));
 }
 
 /**
@@ -68,7 +68,7 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Update_001, TestSize.Level1)
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowPoint = KnuckleGlowPoint(bitmap);
-    knuckleGlowPoint.Update();
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Update());
 }
 
 /**
@@ -87,7 +87,7 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Draw_001, TestSize.Level1)
     auto knuckleGlowPoint = KnuckleGlowPoint(bitmap);
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode->BeginRecording(0, 0));
-    knuckleGlowPoint.Draw(canvas);
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Draw(canvas));
 }
 
 /**
@@ -107,7 +107,7 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Reset_001, TestSize.Level1)
     double pointX = 0.1;
     double pointY = 0.1;
     float lifespanoffset = 0.1f;
-    knuckleGlowPoint.Reset(pointX, pointY, lifespanoffset);
+    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Reset(pointX, pointY, lifespanoffset));
 }
 
 /**
