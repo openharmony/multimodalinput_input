@@ -20,6 +20,9 @@
 #include "define_multimodal.h"
 #include "tablet_tool_tranform_processor.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TabletToolTranformProcessorTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -57,6 +60,7 @@ void TabletToolTranformProcessorTest::TearDown()
  */
 HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TabletToolTransformProcessor processor(deviceId);
     libinput_event *event = nullptr;
@@ -72,6 +76,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
  */
 HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TabletToolTransformProcessor processor(deviceId);
     libinput_event *event = nullptr;
@@ -87,6 +92,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_
  */
 HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipDown_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TabletToolTransformProcessor processor(deviceId);
     libinput_event_tablet_tool *event = nullptr;
@@ -102,6 +108,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipD
  */
 HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TabletToolTransformProcessor processor(deviceId);
     libinput_event *event = nullptr;
@@ -117,6 +124,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipM
  */
 HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipUp_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TabletToolTransformProcessor processor(deviceId);
     libinput_event_tablet_tool *event = nullptr;
