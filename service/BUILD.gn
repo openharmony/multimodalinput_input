@@ -57,6 +57,7 @@ config("libmmi_server_config") {
     "event_handler/include",
     "event_dump/include",
     "fingersense_wrapper/include",
+    "gesturesense_wrapper/include",
     "monitor/include",
     "interceptor/include",
     "dfx/include",
