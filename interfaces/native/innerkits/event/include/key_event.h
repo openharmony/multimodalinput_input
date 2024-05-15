@@ -2840,7 +2840,7 @@ public:
     /**
      * Stylus key
      *
-     * @since 9
+     * @since 12
      */
     static const int32_t KEYCODE_STYLUS_SCREEN;
 

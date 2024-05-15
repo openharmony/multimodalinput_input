@@ -16,7 +16,10 @@
 #include <gtest/gtest.h>
 
 #include "event_filter_death_recipient.h"
+#include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventFilterDeathRecipientTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -40,6 +43,7 @@ public:
  */
 HWTEST_F(EventFilterDeathRecipientTest, EventFilterDeathRecipientTest_Interface_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool flag = false;
     EventFilterDeathRecipient item {[&](const wptr<IRemoteObject> &object) {
         flag = true;

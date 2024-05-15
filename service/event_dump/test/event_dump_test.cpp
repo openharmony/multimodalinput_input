@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,18 +39,18 @@ const std::string TEST_FILE_NAME = "/data/log.log";
 
 class EventDumpTest : public testing::Test {
 public:
-void SetUp() override
-{
-    fd_ = open(TEST_FILE_NAME.c_str(), O_WRONLY);
-}
+    void SetUp() override
+    {
+        fd_ = open(TEST_FILE_NAME.c_str(), O_WRONLY);
+    }
 
-void TearDown() override
-{
-    close(fd_);
-    fd_ = -1;
-}
+    void TearDown() override
+    {
+        close(fd_);
+        fd_ = -1;
+    }
 
-int32_t fd_;
+    int32_t fd_;
 };
 
 /**

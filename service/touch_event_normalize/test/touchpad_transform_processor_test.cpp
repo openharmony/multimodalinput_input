@@ -20,6 +20,9 @@
 #include "define_multimodal.h"
 #include "touchpad_transform_processor.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchPadTransformProcessorTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -69,6 +72,7 @@ void TouchPadTransformProcessorTest::TearDown()
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadPinchSwitch_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
@@ -83,6 +87,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadPinchSwitch_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
@@ -100,6 +105,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadSwipeSwitch_03, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
@@ -114,6 +120,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadSwipeSwitch_04, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
@@ -131,6 +138,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadRotateSwitch_05, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool rotateSwitch = false;
@@ -145,6 +153,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadRotateSwitch_06, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     bool rotateSwitch = false;
@@ -162,6 +171,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchPadMultiTapData, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
@@ -177,6 +187,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_ProcessTouchPadPinchDataEvent, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     int32_t fingerCount = 2;
@@ -203,6 +214,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_ProcessT
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMulFingersTap_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     MultiFingersTapHandler processor;
     libinput_event_touch *event = nullptr;
     int32_t type = 1;
@@ -219,6 +231,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
  */
 HWTEST_F(TouchPadTransformProcessorTest, SetMULTI_FINGERTAP_HDRDefault_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     MultiFingersTapHandler processor;
     bool isAlldefault = true;
     ASSERT_NO_FATAL_FAILURE(processor.SetMULTI_FINGERTAP_HDRDefault(isAlldefault));
@@ -234,6 +247,7 @@ HWTEST_F(TouchPadTransformProcessorTest, SetMULTI_FINGERTAP_HDRDefault_001, Test
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_ClearPointerItems_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     MultiFingersTapHandler processor;
     auto pointer = PointerEvent::Create();
     bool ret = processor.ClearPointerItems(pointer);
@@ -248,6 +262,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_ClearPoi
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_PutConfigDataToDatabase_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
@@ -264,6 +279,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_PutConfi
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_PutConfigDataToDatabase_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
@@ -280,6 +296,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_PutConfi
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetConfigDataFromDatabase_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
@@ -296,6 +313,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetConfi
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetConfigDataFromDatabase_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     std::string key = "testKey";
@@ -312,6 +330,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetConfi
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventTouchPadDown_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     libinput_event *event = nullptr;
@@ -327,6 +346,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventTouchPadMotion_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     libinput_event *event = nullptr;
@@ -342,6 +362,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
  */
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventTouchPadUp_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
     libinput_event *event = nullptr;

@@ -15,12 +15,15 @@
 
 #include <fstream>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "mmi_log.h"
 #include "uds_server.h"
+#include "uds_session.h"
 
 #include "input_device_manager.h"
+#include "libinput-private.h"
 
 
 namespace OHOS {
@@ -33,6 +36,13 @@ class InputDeviceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+};
+
+class MockUDSSession : public UDSSession {
+public:
+    MOCK_METHOD1(SendMsg, int32_t(NetPacket &));
+    MockUDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
+        const int32_t pid) : UDSSession(programName, moduleType, fd, uid, pid) {}
 };
 
 /**
@@ -233,6 +243,126 @@ HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_001, TestSize.Leve
     CALL_TEST_DEBUG;
     InputDeviceManager inputDevice;
     ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
+}
+
+/**
+ * @tc.name: InitSessionLostCallback_Test_002
+ * @tc.desc: Test the function InitSessionLostCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    inputDevice.sessionLostCallbackInitialized_ = true;
+    ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
+}
+
+/**
+ * @tc.name: InitSessionLostCallback_Test_003
+ * @tc.desc: Test the function InitSessionLostCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InitSessionLostCallback_Test_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    inputDevice.sessionLostCallbackInitialized_ = false;
+    ASSERT_NO_FATAL_FAILURE(inputDevice.InitSessionLostCallback());
+    EXPECT_FALSE(inputDevice.sessionLostCallbackInitialized_);
+}
+
+/**
+ * @tc.name: OnSessionLost_Test_001
+ * @tc.desc: Test the function OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, OnSessionLost_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> session = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    ASSERT_NE(session, nullptr);
+    ASSERT_NO_FATAL_FAILURE(inputDevice.OnSessionLost(session));
+    session = nullptr;
+    ASSERT_NO_FATAL_FAILURE(inputDevice.OnSessionLost(session));
+}
+
+
+/**
+ * @tc.name: NotifyMessage_Test_001
+ * @tc.desc: Test the function NotifyMessage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, NotifyMessage_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(true));
+    int32_t result = inputDevice.NotifyMessage(mockSession, 1, "type");
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: NotifyMessage_Test_002
+ * @tc.desc: Test the function NotifyMessage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, NotifyMessage_Test_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(false));
+    int32_t result = inputDevice.NotifyMessage(mockSession, 1, "type");
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: NotifyMessage_Test_003
+ * @tc.desc: Test the function NotifyMessage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, NotifyMessage_Test_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    std::string programName = "program";
+    int32_t moduleType = 1;
+    int32_t fd = 2;
+    int32_t uid = 3;
+    int32_t pid = 4;
+    std::shared_ptr<MockUDSSession> mockSession = std::make_shared<MockUDSSession>
+        (programName, moduleType, fd, uid, pid);
+    EXPECT_CALL(*mockSession, SendMsg(testing::_)).WillRepeatedly(testing::Return(false));
+    SessionPtr nullSession = nullptr;
+    int32_t result = inputDevice.NotifyMessage(nullSession, 1, "type");
+    EXPECT_NE(result, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
