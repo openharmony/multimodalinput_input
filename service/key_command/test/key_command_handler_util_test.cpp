@@ -189,7 +189,3 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_005, Te
 }
 } // namespace MMI
 } // namespace OHOS
-
-
-
-
