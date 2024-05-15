@@ -27,6 +27,7 @@ namespace OHOS {
 namespace MMI {
 const std::string STYLUS_ABILITY_NAME = "HiNotePcMainAbility";
 const std::string STYLUS_BUNDLE_NAME = "com.hmos.hinote";
+const std::string IS_SCREEN_OFF = "is_sceen_off";
 
 StylusKeyHandler::StylusKeyHandler() {}
 StylusKeyHandler::~StylusKeyHandler() {}
@@ -51,6 +52,7 @@ void StylusKeyHandler::IsLaunchAbility()
     if (stylusKey_.lastEventIsStylus) {
         stylusKey_.ability.abilityName = STYLUS_ABILITY_NAME;
         stylusKey_.ability.bundleName = STYLUS_BUNDLE_NAME;
+        stylusKey_.ability.params.emplace(IS_SCREEN_OFF, "true");
         LaunchAbility(stylusKey_.ability);
         stylusKey_.lastEventIsStylus = false;
         stylusKey_.isLaunchAbility = true;
