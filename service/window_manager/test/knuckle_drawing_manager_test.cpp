@@ -57,6 +57,54 @@ private:
 };
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_StartTouchDraw
+ * @tc.desc: Test Overrides StartTouchDraw function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_StartTouchDraw, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    kceDrawMgr.canvasNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.StartTouchDraw(pointerEvent));
+
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    kceDrawMgr.isActionUp_ = true;
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.StartTouchDraw(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow
+ * @tc.desc: Test Overrides CreateTouchWindow function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateTouchWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    int32_t displayId = 10;
+    kceDrawMgr.surfaceNode_ = nullptr;
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.CreateTouchWindow(displayId));
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "touch window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.CreateTouchWindow(displayId));
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_001
  * @tc.desc: Test KnuckleDrawHandler
  * @tc.type: Function
