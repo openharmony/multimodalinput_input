@@ -2115,5 +2115,81 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_002, TestSize.Le
     ret = stub->StubGetMouseScrollRows(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: StubSetPointerSize_002
+ * @tc.desc: Test the function StubSetPointerSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetPointerSize(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetPointerSize(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubSetNapStatus_002
+ * @tc.desc: Test the function StubSetNapStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetNapStatus(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetNapStatus(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubInjectKeyEvent_002
+ * @tc.desc: Test the function StubInjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubInjectKeyEvent(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubInjectKeyEvent(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubInjectPointerEvent_001
+ * @tc.desc: Test the function StubInjectPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubInjectPointerEvent(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubInjectPointerEvent(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
