@@ -57,7 +57,7 @@ private:
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     Rosen::Drawing::Brush brush_;
