@@ -77,7 +77,9 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
-    if (devConf.autoSwitch != OPEN_AUTO_REPEAT) {
+    MMI_HILOGD("AutoRepeatSwitch::%{public}d, keyEvent flag:%{public}x", devConf.autoSwitch, keyEvent->GetFlag());
+    if (devConf.autoSwitch != OPEN_AUTO_REPEAT && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        MMI_HILOGI("AutoRepeatSwitch not open and is not simulate event");
         return;
     }
     keyEvent_ = keyEvent;
