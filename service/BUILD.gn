@@ -986,6 +986,36 @@ ohos_unittest("ServerMsgHandlerTest") {
   ]
 }
 
+ohos_unittest("PermissionHelperTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "permission_helper/test/permission_helper_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "security_component_manager:libsecurity_component_sdk",
+  ]
+}
+
 ohos_unittest("DisplayStateManagerTest") {
   module_out_path = module_output_path
 
