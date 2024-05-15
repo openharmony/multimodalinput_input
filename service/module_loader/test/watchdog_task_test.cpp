@@ -15,8 +15,11 @@
 
 #include <gtest/gtest.h>
 
+#include "mmi_log.h"
 #include "watchdog_task.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "WatchdogTaskTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -37,6 +40,7 @@ public:
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetFirstLine_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     std::string path;
     auto ret = watchdogtask.GetFirstLine(path);
@@ -51,6 +55,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetFirstLine_001, TestSize.Level1)
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetProcessNameFromProcCmdline_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     std::string expectedDescription;
     int32_t pid = -1;
@@ -66,6 +71,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetProcessNameFromProcCmdline_001, T
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_IsNumberic_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     std::string testString = "12345";
     bool ret = watchdogtask.IsNumberic(testString);
@@ -80,6 +86,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_IsNumberic_001, TestSize.Level1)
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_IsProcessDebug_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     int32_t pid = 1;
     bool ret = watchdogtask.IsProcessDebug(pid);
@@ -94,6 +101,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_IsProcessDebug_001, TestSize.Level1)
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetBlockDescription_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     std::string desc = "Watchdog: thread(mmi_service) blocked 5000s";
     uint64_t timeInterval = 5000;
@@ -109,6 +117,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetBlockDescription_001, TestSize.Le
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetSelfProcName_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     std::string desc = "ut-mmi-service-";
     auto ret = watchdogtask.GetSelfProcName();
@@ -123,6 +132,7 @@ HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_GetSelfProcName_001, TestSize.Level1
  */
 HWTEST_F(WatchdogTaskTest, WatchdogTaskTest_SendEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     WatchdogTask watchdogtask;
     std::string message = "This is a test message";
     std::string event = "TestEvent";
