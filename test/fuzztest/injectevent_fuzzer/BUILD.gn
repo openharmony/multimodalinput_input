@@ -34,6 +34,7 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/gesturesense_wrapper/include",
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/interceptor/include",
     "${mmi_path}/service/dfx/include",

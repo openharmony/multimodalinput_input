@@ -56,6 +56,7 @@
 #include "display_event_monitor.h"
 #include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
+#include "gesturesense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
@@ -308,6 +309,9 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener success");
     DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
