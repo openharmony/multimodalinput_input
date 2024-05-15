@@ -30,9 +30,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
-const std::string inputInterceptor = "ohos.permission.INTERCEPT_INPUT_EVENT";
-const std::string inputDispatchControl = "ohos.permission.INPUT_CONTROL_DISPATCHING";
+const std::string INPUT_MONITORING = "ohos.permission.INPUT_MONITORING";
+const std::string INPUT_INTERCEPTOR = "ohos.permission.INTERCEPT_INPUT_EVENT";
+const std::string INPUT_DISPATCHCONTROL = "ohos.permission.INPUT_CONTROL_DISPATCHING";
 } // namespace
 
 class PermissionHelperTest : public testing::Test {
@@ -53,7 +53,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckMonitorPermission, Test
 {
     CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputMonitor);
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_MONITORING);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
     bool result = PerHelper->CheckMonitorPermission(tokenId);
     ASSERT_FALSE(result);
@@ -69,7 +69,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInterceptorPermission, 
 {
     CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputInterceptor);
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_INTERCEPTOR);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
     bool result = PerHelper->CheckInterceptorPermission(tokenId);
     ASSERT_FALSE(result);
@@ -85,7 +85,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControlPermissi
 {
     CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputDispatchControl);
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_DISPATCHCONTROL);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
     bool result = PerHelper->CheckDispatchControlPermission(tokenId);
     ASSERT_FALSE(result);
