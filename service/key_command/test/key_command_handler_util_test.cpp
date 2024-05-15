@@ -35,7 +35,7 @@ public:
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_IsSpecialType_001
- * @tc.desc: 
+ * @tc.desc: Test the function IsSpecialType
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -62,7 +62,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_001,
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetBusinessId_001
- * @tc.desc: 
+ * @tc.desc: Test the function GetBusinessId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -79,7 +79,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetBusinessId_001,
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetBusinessId_002
- * @tc.desc: 
+ * @tc.desc: Test the function GetBusinessId
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -97,7 +97,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetBusinessId_002,
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetPreKeys_001
- * @tc.desc: 
+ * @tc.desc: Test the function GetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -113,7 +113,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_001, Te
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetPreKeys_002
- * @tc.desc: 
+ * @tc.desc: Test the function GetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -134,7 +134,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_002, Te
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetPreKeys_003
- * @tc.desc: 
+ * @tc.desc: Test the function GetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -151,7 +151,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_003, Te
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetPreKeys_004
- * @tc.desc: 
+ * @tc.desc: Test the function GetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -170,7 +170,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_004, Te
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetPreKeys_005
- * @tc.desc: 
+ * @tc.desc: Test the function GetPreKeys
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -187,10 +187,6 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_005, Te
     EXPECT_FALSE(result);
     cJSON_Delete(jsonData);
 }
-
-
-
-
 } // namespace MMI
 } // namespace OHOS
 
