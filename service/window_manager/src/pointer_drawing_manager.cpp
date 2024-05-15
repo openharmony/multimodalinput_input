@@ -148,7 +148,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     return;
 }
 
-void PointerDrawingManager::DrawMovePointer(itn32_t displayId, int32_t physicalX, int32_t physicalY)
+void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
