@@ -228,6 +228,51 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
 }
 
 /**
+ * @tc.name: KnuckleDrawingManagerTest_IsValidAction
+ * @tc.desc: Test Overrides IsValidAction function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_TRUE(kceDrawMgr.IsValidAction(action));
+    action = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_TRUE(kceDrawMgr.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_MOVE;
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_TRUE(kceDrawMgr.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_UNKNOWN;
+    kceDrawMgr.pointerInfos_.clear();
+    ASSERT_FALSE(kceDrawMgr.IsValidAction(action));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_UpdateDisplayInfo
+ * @tc.desc: Test Overrides UpdateDisplayInfo function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 200;
+    kceDrawMgr.displayInfo_.dpi = 200;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.UpdateDisplayInfo(displayInfo));
+    kceDrawMgr.displayInfo_.dpi = 300;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.UpdateDisplayInfo(displayInfo));
+}
+
+/**
  * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
