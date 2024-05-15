@@ -706,7 +706,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
                    key->GetKeyCode(), key->GetKeyAction());
         auto items = key->GetKeyItems();
-        MMI_HILOGD("KeyItemsSize:%{public}d", items.size());
+        MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
             return enableCombineKey_;
         }
