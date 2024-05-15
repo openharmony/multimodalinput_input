@@ -163,9 +163,9 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
-        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback[0]), REFERENCE_REF);
+        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback), REFERENCE_REF);
     } else {
-        event->callback[0] = nullptr;
+        event->callback = nullptr;
     }
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
@@ -252,7 +252,6 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
             if (MatchCombinationKeys(monitorInfo, keyEvent)) {
-                monitorInfo->keyEvent = keyEvent;
                 EmitAsyncCallbackWork(monitorInfo);
             }
             ++infoIter;
@@ -284,7 +283,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -297,7 +295,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            napi_delete_reference(env, event->callback[0]);
             delete event;
             return nullptr;
         }
@@ -338,7 +335,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -352,9 +348,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    }
-    if (event->callback[0] != nullptr) {
-        napi_delete_reference(env, event->callback[0]);
     }
     delete event;
     return nullptr;
@@ -461,6 +454,19 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "ShieldMode", result), SET_NAMED_PROPERTY);
     return exports;
+}
+
+KeyEventMonitorInfo::~KeyEventMonitorInfo()
+{
+    if (callback == nullptr) {
+        return;
+    }
+    uint32_t refcount = 0;
+    CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
+    if (refcount == 0) {
+        CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
+    }
+    callback = nullptr;
 }
 
 EXTERN_C_START
