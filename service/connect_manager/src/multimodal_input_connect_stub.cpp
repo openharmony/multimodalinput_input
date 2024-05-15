@@ -22,6 +22,7 @@
 
 #include "string_ex.h"
 
+#include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
@@ -57,6 +58,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    BytraceAdapter::StartIpcServer(code);
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
             return StubHandleAllocSocketFd(data, reply);
@@ -321,6 +323,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
+    BytraceAdapter::StopIpcServer();
     return RET_ERR;
 }
 
