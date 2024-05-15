@@ -285,7 +285,7 @@ void BytraceAdapter::StopIpcServer()
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
-void BytraceAdapter::StartPackageEvent(std::string msg)
+void BytraceAdapter::StartPackageEvent(const std::string& msg)
 {
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, msg);
 }
@@ -332,7 +332,7 @@ void BytraceAdapter::StopSocketHandle()
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
-void BytraceAdapter::StartLaunchAbility(int32_t type, std::string bundleName)
+void BytraceAdapter::StartLaunchAbility(int32_t type, const std::string& bundleName)
 {
     StartTrace(HITRACE_TAG_MULTIMODALINPUT,
         "launchAbility type:" + std::to_string(type) + ", bundleName:" + bundleName);
