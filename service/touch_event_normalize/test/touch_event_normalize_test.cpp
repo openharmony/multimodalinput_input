@@ -21,6 +21,9 @@
 #include "touch_transform_processor.h"
 #include "touch_event_normalize.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TouchEventNormalizeTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -90,6 +93,7 @@ HWTEST_F(JoystickTransformProcessorTest, JoystickTransformProcessorTest_Libinput
  */
 HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_UpdatePointerItemProperties, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TouchTransformProcessor touchTransformProcessor(deviceId);
     PointerEvent::PointerItem item;
@@ -111,6 +115,7 @@ HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_UpdatePointerI
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 123456;
     ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH), nullptr);
     ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TABLET_TOOL), nullptr);
@@ -128,6 +133,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadPinchSwitch_01, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadPinchSwitch(flag) == RET_OK);
 }
@@ -140,6 +146,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadPinchSwitch
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch_02, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool flag = true;
     TouchEventHdr->SetTouchpadPinchSwitch(flag);
     bool newFlag = true;
@@ -155,6 +162,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadSwipeSwitch_03, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadSwipeSwitch(flag) == RET_OK);
 }
@@ -167,6 +175,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadSwipeSwitch
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch_04, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool flag = true;
     TouchEventHdr->SetTouchpadSwipeSwitch(flag);
     bool newFlag = true;
@@ -182,6 +191,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitch_05, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool rotateSwitch = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
 }
@@ -194,6 +204,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitc
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitch_06, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     bool rotateSwitch = true;
     TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch);
     bool newRotateSwitch = true;
