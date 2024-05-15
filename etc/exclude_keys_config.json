@@ -2,7 +2,7 @@
   "excludeKeys": [
     {
       "keyCode": 18,
-      "keyAction": 2,
+      "keyAction": 3,
       "delay": 0
     }
   ]

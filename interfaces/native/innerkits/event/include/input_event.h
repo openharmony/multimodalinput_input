@@ -111,6 +111,9 @@ public:
      */
     static constexpr uint32_t EVENT_FLAG_HIDE_POINTER = 0x00000008;
 
+    static constexpr uint32_t EVENT_FLAG_RAW_POINTER_MOVEMENT = 0x00000010;
+    static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
+
 public:
     /**
      * Copy constructor function for InputEvent
@@ -329,6 +332,14 @@ public:
      * @since 9
      */
     void ClearFlag();
+
+    /**
+     * @brief Clears all flags of an input event.
+     * @param flag Indicates the flag of the input event.
+     * @return void
+     * @since 12
+     */
+    void ClearFlag(uint32_t flag);
 
     /**
      * @brief Marks an input event as completed.

@@ -48,5 +48,80 @@ void TabletToolTranformProcessorTest::SetUp()
 void TabletToolTranformProcessorTest::TearDown()
 {
 }
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnEvent_001
+ * @tc.desc: Verify that TabletToolTranformProcessor can correctly handle events when receive
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEvent_001, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event *event = nullptr;
+    std::shared_ptr<PointerEvent> ret = processor.OnEvent(event);
+    ASSERT_EQ(ret, nullptr);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTip_001
+ * @tc.desc: Tablet tool transformation processor test, testing under the tip function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_001, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event *event = nullptr;
+    bool ret = processor.OnTip(event);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipDown_001
+ * @tc.desc: Test the OnTipDown method in the TabletToolTranformProcessor class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipDown_001, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool *event = nullptr;
+    bool ret = processor.OnTipDown(event);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipMotion_001
+ * @tc.desc: Test the response of TabletToolTranformProcessor when the tip is moving
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipMotion_001, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event *event = nullptr;
+    bool ret = processor.OnTipMotion(event);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnTipUp_001
+ * @tc.desc: Test case for the OnTipUp method of the TabletToolTranformProcessor class
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTipUp_001, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool *event = nullptr;
+    bool ret = processor.OnTipUp(event);
+    ASSERT_FALSE(ret);
+}
 }
 }

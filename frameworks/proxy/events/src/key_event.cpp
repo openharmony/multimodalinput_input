@@ -816,11 +816,11 @@ const int32_t KeyEvent::KEYCODE_LAUNCHER_MENU = 10008;
 const int32_t KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER = 10009;
 const int32_t KeyEvent::KEYCODE_CALL_CONTROL_CENTER = 10010;
 
-const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0XFFFFFFFF;
-const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000000;
+const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0X00000000;
+const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;
 
-const int32_t KeyEvent::KEY_ACTION_DOWN = 0x00000001;
-const int32_t KeyEvent::KEY_ACTION_UP = 0X00000002;
+const int32_t KeyEvent::KEY_ACTION_DOWN = 0x00000002;
+const int32_t KeyEvent::KEY_ACTION_UP = 0X00000003;
 
 const int32_t KeyEvent::INTENTION_UNKNOWN = -1;
 const int32_t KeyEvent::INTENTION_UP = 1;
@@ -958,6 +958,22 @@ std::shared_ptr<KeyEvent> KeyEvent::Create()
     auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(InputEvent::EVENT_TYPE_KEY));
     CHKPP(event);
     return event;
+}
+
+void KeyEvent::Reset()
+{
+    InputEvent::Reset();
+    keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
+    keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
+    keyIntention_ = KeyEvent::INTENTION_UNKNOWN;
+    numLock_ = false;
+    capsLock_ = false;
+    scrollLock_ = false;
+    repeat_ = false;
+    keys_.clear();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    enhanceData_.clear();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 }
 
 int32_t KeyEvent::GetKeyCode() const

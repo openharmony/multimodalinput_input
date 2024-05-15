@@ -68,7 +68,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-    int32_t OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
+    int32_t OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType);
     int32_t OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
@@ -111,6 +111,8 @@ private:
     bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
+    int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     UDSServer *udsServer_ { nullptr };

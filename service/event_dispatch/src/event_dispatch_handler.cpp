@@ -34,6 +34,8 @@
 #include "util.h"
 #include <transaction/rs_interfaces.h>
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventDispatchHandler"
 
@@ -118,8 +120,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
             windowX = windowXY.first;
             windowY = windowXY.second;
         }
-        pointerItem.SetDisplayX(windowX);
-        pointerItem.SetDisplayY(windowY);
+        pointerItem.SetWindowX(windowX);
+        pointerItem.SetWindowY(windowY);
         pointerItem.SetTargetWindowId(windowId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
@@ -127,14 +129,10 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
 }
 
-void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName, uint32_t pid)
+void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
+    uint32_t pid, int32_t pointCnt)
 {
-    if (isTouchEnable_) {
-        MMI_HILOGD("touch interface to RS Enable");
-        OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction);
-    } else {
-        MMI_HILOGD("touch interface to RS NOT Enable");
-    }
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -184,7 +182,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
         MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
-            "application not response", point->GetId());
+            "application not response. PointerEvent(deviceid:%{public}d, action:%{public}s)",
+            point->GetId(), point->GetDeviceId(), point->DumpPointerAction());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -201,8 +200,9 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
         || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        int32_t pointerCnt = pointerEvent->GetPointerCount();
         NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
-            static_cast<uint32_t>(session->GetPid()));
+            static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
         MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
@@ -238,7 +238,9 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("The key event does not report normally, application not response");
+        MMI_HILOGW("The key event does not report normally, application not response."
+            "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+            key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
         return RET_OK;
     }
 

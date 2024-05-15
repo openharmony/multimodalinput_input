@@ -23,6 +23,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+const std::string PROGRAM_NAME = "uds_server_test";
+constexpr int32_t MODULE_TYPE = 1;
+constexpr int32_t UDS_FD = -1;
+constexpr int32_t UDS_UID = 100;
+constexpr int32_t UDS_PID = 100;
 } // namespace
 
 class UDSServerTest : public testing::Test {
@@ -735,6 +740,125 @@ HWTEST_F(UDSServerTest, NotifySessionDeleted_002, TestSize.Level1)
     UDSServer udsServer;
     SessionPtr ses = nullptr;
     ASSERT_NO_FATAL_FAILURE(udsServer.NotifySessionDeleted(ses));
+}
+
+/**
+ * @tc.name: UDSServerTest_GetClientFd
+ * @tc.desc: Test Get Client Fd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetClientFd, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t pid = 1000;
+    int32_t fd = 150;
+    udsServer.idxPidMap_.insert(std::make_pair(pid, fd));
+    ASSERT_EQ(udsServer.GetClientFd(pid), fd);
+}
+
+/**
+ * @tc.name: UDSServerTest_GetClientPid
+ * @tc.desc: Test Get Client Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetClientPid, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 150;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_EQ(udsServer.GetClientPid(fd), UDS_PID);
+}
+
+/**
+ * @tc.name: UDSServerTest_SendMsg
+ * @tc.desc: Test Send Msg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_SendMsg, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 150;
+    MmiMessageId msgId = MmiMessageId::INVALID;
+    NetPacket pkt(msgId);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_FALSE(udsServer.SendMsg(fd, pkt));
+}
+
+/**
+ * @tc.name: UDSServerTest_GetSession
+ * @tc.desc: Test Get Session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetSession, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 150;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    ASSERT_EQ(udsServer.GetSession(fd), session);
+}
+
+/**
+ * @tc.name: UDSServerTest_GetSessionByPid
+ * @tc.desc: Test Get Session By Pid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_GetSessionByPid, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 150;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    udsServer.idxPidMap_.insert(std::make_pair(UDS_PID, fd));
+    ASSERT_EQ(udsServer.GetSessionByPid(UDS_PID), session);
+}
+
+/**
+ * @tc.name: UDSServerTest_AddSession
+ * @tc.desc: Test Add Session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_AddSession, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t udsSessionFd = 100;
+    int32_t udsSessionPid = -1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, udsSessionFd, UDS_UID, udsSessionPid);
+    ASSERT_FALSE(udsServer.AddSession(session));
+
+    udsSessionPid = 1000;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, udsSessionFd, UDS_UID, udsSessionPid);
+    udsServer.sessionsMap_.insert(std::make_pair(udsSessionFd, sess));
+    ASSERT_TRUE(udsServer.AddSession(sess));
+    SessionPtr sessPtr = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, udsSessionFd, UDS_UID, udsSessionPid);
+    for (int32_t i = 0; i < MAX_SESSON_ALARM + 1; ++i) {
+        udsServer.sessionsMap_.insert(std::make_pair(i, sessPtr));
+    }
+    ASSERT_TRUE(udsServer.AddSession(sessPtr));
+}
+
+/**
+ * @tc.name: UDSServerTest_DelSession
+ * @tc.desc: Test Delete Session
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSServerTest, UDSServerTest_DelSession, TestSize.Level1)
+{
+    UDSServer udsServer;
+    int32_t fd = 100;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    udsServer.idxPidMap_.insert(std::make_pair(UDS_PID, fd));
+    ASSERT_NO_FATAL_FAILURE(udsServer.DelSession(fd));
 }
 } // namespace MMI
 } // namespace OHOS

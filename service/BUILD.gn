@@ -136,14 +136,18 @@ ohos_rust_unittest("rust_mmi_test") {
 
 ohos_shared_library("libmmi-server") {
   sources = libmmi_service_sources
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
   sources += [
+    "window_manager/src/knuckle_divergent_point.cpp",
     "window_manager/src/knuckle_drawing_manager.cpp",
+    "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
+    "window_manager/src/knuckle_glow_point.cpp",
+    "window_manager/src/knuckle_glow_trace_system.cpp",
     "window_manager/src/touch_drawing_manager.cpp",
   ]
 
@@ -224,7 +228,7 @@ ohos_shared_library("libmmi-server") {
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
-    external_deps += [ "window_manager:libwm" ]
+    external_deps += [ "window_manager:libwm_lite" ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -273,7 +277,7 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "window_manager:libwm",
+    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 
@@ -558,6 +562,7 @@ ohos_unittest("WindowManagerTest") {
   sources = [
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
+    "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
     "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
@@ -606,6 +611,7 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   external_deps = [
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "window_manager:libwm",
   ]
 }
@@ -719,6 +725,7 @@ ohos_unittest("MonitorTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -788,6 +795,7 @@ ohos_unittest("KeyEventNormalizeTest") {
   external_deps = [
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -830,6 +838,35 @@ ohos_unittest("KeyCommandTest") {
   ]
 }
 
+ohos_unittest("StylusKeyTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "key_command/test/stylus_key_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
+
 ohos_unittest("InterceptorTest") {
   module_out_path = module_output_path
 
@@ -849,6 +886,8 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("EventDumpTest") {
@@ -866,8 +905,10 @@ ohos_unittest("EventDumpTest") {
 
   sources = [
     "event_handler/test/anr_manager_test.cpp",
+    "event_handler/test/event_normalize_handler_test.cpp",
     "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/input_event_handler_test.cpp",
+    "event_handler/test/key_auto_repeat_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
   ]
 
@@ -881,6 +922,7 @@ ohos_unittest("EventDumpTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -907,6 +949,39 @@ ohos_unittest("EventDispatchTest") {
   ]
 
   external_deps = [ "c_utils:utils" ]
+}
+
+ohos_unittest("ServerMsgHandlerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "message_handle/test/server_msg_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:dataobs_manager",
+    "c_utils:utils",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "napi:ace_napi",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
+  ]
 }
 
 ohos_unittest("DisplayStateManagerTest") {

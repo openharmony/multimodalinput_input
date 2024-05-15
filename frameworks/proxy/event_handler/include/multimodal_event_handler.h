@@ -45,7 +45,7 @@ public:
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-    int32_t SubscribeSwitchEvent(int32_t subscribeId);
+    int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)

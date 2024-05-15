@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace MMI {
 struct StylusKey {
-    int32_t durationTimes { 0 };
     bool lastEventIsStylus { false };
     bool isLaunchAbility { false };
     Ability ability;
@@ -34,7 +33,7 @@ class StylusKeyHandler final {
     public:
         DISALLOW_COPY_AND_MOVE(StylusKeyHandler);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-        bool HandleStylusKey(const std::shared_ptr<KeyEvent> keyEvent);
+        bool HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent);
         void IsLaunchAbility();
         void SetLastEventState(bool state);
     private:

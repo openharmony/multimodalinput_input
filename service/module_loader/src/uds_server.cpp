@@ -27,6 +27,8 @@
 #include "util.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "UDSServer"
 
@@ -146,17 +148,18 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
 int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t& toReturnClientFd)
 {
     static size_t bufferSize = 64 * 1024;
+    static size_t serverBufferSize = 64 * 1024;
     static size_t nativeBufferSize = 128 * 1024;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bufferSize = 512 * 1024;
     nativeBufferSize = 1024 * 1024;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
-    if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
+    if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &serverBufferSize, sizeof(bufferSize)) != 0) {
         MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
         return RET_ERR;
     }
-    if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
+    if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &serverBufferSize, sizeof(bufferSize)) != 0) {
         MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
         return RET_ERR;
     }

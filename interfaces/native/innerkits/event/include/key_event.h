@@ -2840,7 +2840,7 @@ public:
     /**
      * Stylus key
      *
-     * @since 9
+     * @since 12
      */
     static const int32_t KEYCODE_STYLUS_SCREEN;
 
@@ -3233,6 +3233,8 @@ public:
      * @since 9
      */
     static std::shared_ptr<KeyEvent> Create();
+
+    virtual void Reset() override;
 
     /**
      * @brief Obtains the key code of this key event.

@@ -20,8 +20,11 @@
 #include "event_normalize_handler.h"
 #include "event_filter_service.h"
 #include "i_input_event_handler.h"
+#include "mmi_log.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventFilterHandlerTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -57,6 +60,7 @@ public:
  */
 HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_KeyEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     EXPECT_NE(keyEvent, nullptr);
     EventFilterHandler event;
@@ -76,6 +80,7 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_KeyEvent_001, TestSize.L
  */
 HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_Dump_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventFilterHandler event;
     int32_t fd = 0;
     std::vector<std::string> args = {};
@@ -93,6 +98,7 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_Dump_001, TestSize.Level
 
 HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_AddInputEventFilter_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto event = std::make_shared<EventFilterHandler>();
     EXPECT_NE(event, nullptr);
     sptr<IEventFilter> filter = new (std::nothrow) MyEventFilter();
@@ -118,6 +124,7 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_AddInputEventFilter_001,
  */
 HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_RemoveInputEventFilter_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto event = std::make_shared<EventFilterHandler>();
     EXPECT_NE(event, nullptr);
     sptr<IEventFilter> filter = new (std::nothrow) MyEventFilter();
@@ -148,6 +155,7 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_RemoveInputEventFilter_0
  */
 HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEventFilter_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto event = std::make_shared<EventFilterHandler>();
     EXPECT_NE(event, nullptr);
     sptr<IEventFilter> filter = new (std::nothrow) MyEventFilter();
@@ -182,6 +190,7 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEventFilter_001
  */
 HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandlePointerEventFilter_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto event = std::make_shared<EventFilterHandler>();
     EXPECT_NE(event, nullptr);
     sptr<IEventFilter> filter = new (std::nothrow) MyEventFilter();

@@ -19,13 +19,14 @@
 #include "text/font_mgr.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_CURSOR
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchDrawingManager"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr const OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchDrawingManager" };
 const static Rosen::Drawing::Color LABELS_DEFAULT_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(192, 255, 255, 255);
 const static Rosen::Drawing::Color LABELS_RED_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(192, 255, 0, 0);
 const static Rosen::Drawing::Color TRACKER_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 96, 255);
@@ -51,7 +52,7 @@ constexpr float TEXT_SIZE = 40.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
-const std::string pointerPositionSwitchName = "settings.input.show_pointer_position_hint";
+const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
@@ -116,7 +117,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
-    itemRectW_ = displayInfo_.width / RECT_COUNT;
+    itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
 }
 
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
@@ -439,8 +440,8 @@ void TouchDrawingManager::DrawLabels()
     std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
     std::string viewX = "X: " + FormatNumber(currentPhysicalX_, ONE_PRECISION);
     std::string viewY = "Y: " + FormatNumber(currentPhysicalY_, ONE_PRECISION);
-    auto dx = currentPhysicalX_ - currentPointerItem_.GetDisplayX();
-    auto dy = currentPhysicalY_ - currentPointerItem_.GetDisplayY();
+    auto dx = currentPhysicalX_ - firstPointerItem_.GetDisplayX();
+    auto dy = currentPhysicalY_ - firstPointerItem_.GetDisplayY();
     std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
     std::string viewDy = "dY: " + FormatNumber(dy, ONE_PRECISION);
     std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
@@ -516,12 +517,15 @@ void TouchDrawingManager::UpdatePointerPosition()
             currentPointerId_ = lastPointerItem_.front().GetPointerId();
         }
     }
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        return;
+    if (isFirstDownAction_) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
+            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+            return;
+        }
+        firstPointerItem_ = pointerItem;
+        isFirstDownAction_ = false;
     }
-    currentPointerItem_ = pointerItem;
     UpdateVelocity();
     UpdateDisplayCoord();
 }
@@ -556,7 +560,7 @@ void TouchDrawingManager::UpdateVelocity()
             }
             int32_t physicalX = pointerItem.GetDisplayX();
             int32_t physicalY = pointerItem.GetDisplayY();
-            double diffTime = (actionTime - lastActionTime_) / 1000;
+            double diffTime = static_cast<double>(actionTime - lastActionTime_) / 1000;
             if (MMI_EQ(diffTime, 0.0)) {
                 xVelocity_ = 0.0;
                 yVelocity_ = 0.0;
