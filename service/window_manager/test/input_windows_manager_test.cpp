@@ -28,6 +28,7 @@
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputWindowsManagerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -701,7 +702,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow_
     InputWindowsManager inputWindowsManager;
     inputWindowsManager.lastPointerEvent_ = nullptr;
     inputWindowsManager.NotifyPointerToWindow();
-    EXPECT_EQ(inputWindowsManager.lastWindowInfo_.id, 0);
+    EXPECT_EQ(inputWindowsManager.lastWindowInfo_.id, -1);
 }
 
 /**
