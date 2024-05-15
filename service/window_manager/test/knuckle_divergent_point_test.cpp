@@ -185,8 +185,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_001, TestSize
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    double pointX = 0.f;
-    double pointY = 0.f;
+    double pointX = 0.0;
+    double pointY = 0.0;
     EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
 }
 
@@ -199,8 +199,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_001, TestSiz
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    double pointX = 1.f;
-    double pointY = 1.f;
+    double pointX = 1.0;
+    double pointY = 1.0;
     EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
 }
 

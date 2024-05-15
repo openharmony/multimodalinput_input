@@ -47,6 +47,7 @@ public:
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     auto keyEvent = KeyEvent::Create();
     eventMonitorHandler.HandleKeyEvent(keyEvent);
@@ -99,6 +100,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_001, Tes
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_InitSessionLostCallback_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     eventMonitorHandler.sessionLostCallbackInitialized_ = true;
     eventMonitorHandler.InitSessionLostCallback();
@@ -119,6 +121,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_InitSessionLostCallbac
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
@@ -138,6 +141,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_001, T
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 1;
@@ -155,6 +159,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveInputHandler_001
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
@@ -173,6 +178,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_001, Test
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddMonitor_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler::MonitorCollection monitorCollection;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
@@ -200,6 +206,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddMonitor_001, TestSi
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler::MonitorCollection monitorCollection;
     InputHandlerType handlerType = InputHandlerType::NONE;
     HandleEventType eventType = 0;
@@ -223,6 +230,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_RemoveMonitor_001, Tes
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     int32_t eventId = 100;
@@ -237,6 +245,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed, TestSize
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
@@ -254,6 +263,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump, TestSize.Level1)
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnSessionLost, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
@@ -273,6 +283,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnSessionLost, TestSiz
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HasMonitor, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventMonitorHandler::MonitorCollection monitorCollection;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
@@ -288,6 +299,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HasMonitor, TestSize.L
  */
 HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_UpdateConsumptionState, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     EventMonitorHandler::MonitorCollection monitorCollection;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();

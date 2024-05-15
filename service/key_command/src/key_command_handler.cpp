@@ -91,9 +91,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     STYLUS_HANDLER->SetLastEventState(false);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -705,7 +703,10 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
 
     if (IsExcludeKey(key)) {
+        MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
+                   key->GetKeyCode(), key->GetKeyAction());
         auto items = key->GetKeyItems();
+        MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
             return enableCombineKey_;
         }
@@ -835,11 +836,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return false;
     }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (STYLUS_HANDLER->HandleStylusKey(key)) {
         return true;
     }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
@@ -918,9 +917,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     STYLUS_HANDLER->SetLastEventState(false);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -1173,7 +1170,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-    if (matchedSequence_.timerId >= 0) {
+    if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGD("Remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
         matchedSequence_.timerId = -1;
@@ -1321,13 +1318,16 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     if (keysSize == sequenceKeysSize) {
         std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
         MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
-        if (sequence.ability.bundleName == "com.ohos.screenshot" &&
-            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        std::string bundleName = sequence.ability.bundleName;
+        std::string matchName = ".ohos.screenshot";
+        if (bundleName.find(matchName) != std::string::npos) {
+            bundleName = bundleName.substr(bundleName.size() - matchName.size());
+        }
+        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGI("screen off, com.ohos.screenshot invalid");
             return false;
         }
-        if (sequence.ability.bundleName == "com.ohos.screenshot" &&
-            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
             MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }

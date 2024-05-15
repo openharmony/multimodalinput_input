@@ -554,7 +554,8 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+int32_t ServerMsgHandler::OnSubscribeSwitchEvent(
+    IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -562,7 +563,7 @@ int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
-    return subscriberHandler->SubscribeSwitchEvent(sess, subscribeId);
+    return subscriberHandler->SubscribeSwitchEvent(sess, subscribeId, switchType);
 }
 
 int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
@@ -627,14 +628,13 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
         }
         return ERR_OK;
-    } else {
-        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
-        if (!ret.second) {
-            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
-        }
-        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
-        return ERR_OK;
     }
+    auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
+    if (!ret.second) {
+        MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+    }
+    MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
+    return ERR_OK;
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()

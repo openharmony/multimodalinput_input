@@ -107,8 +107,7 @@
           "//foundation/multimodalinput/input/patch:patch_packages",
           "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
-          "//foundation/multimodalinput/input:mmi_uinput.rc",
-          "//foundation/multimodalinput/input:examples_group"
+          "//foundation/multimodalinput/input:mmi_uinput.rc"
         ]
       },
       "inner_kits": [
