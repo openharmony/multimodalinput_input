@@ -766,6 +766,7 @@ ohos_unittest("ModuleLoaderTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
@@ -1027,7 +1028,13 @@ ohos_unittest("DeviceManagerTest") {
 
   sources = [ "device_manager/test/input_device_manager_test.cpp" ]
 
-  deps = [ "${mmi_path}/service:libmmi-server" ]
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
 
   external_deps = [ "hilog:libhilog" ]
 }
@@ -1069,6 +1076,8 @@ ohos_unittest("DelegateTaskTest") {
   sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
 
   deps = [ "${mmi_path}/service:libmmi-server" ]
+
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("ConnectManagerTest") {
