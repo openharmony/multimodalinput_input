@@ -77,6 +77,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
     }
+    BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -147,6 +148,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
     }
+    BytraceAdapter::StopHandleInput();
     DfxHisysevent::ReportDispTimes();
 }
 
@@ -274,6 +276,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    BytraceAdapter::StartPackageEvent("package keyEvent");
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
@@ -292,7 +295,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
-
+    BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
@@ -334,6 +337,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    BytraceAdapter::StartPackageEvent("package mouseEvent");
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -351,6 +355,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     }
     pointerEvent->SetPressedKeys(pressedKeys);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     HandlePalmEvent(event, pointerEvent);
     if (SetOriginPointerId(pointerEvent) != RET_OK) {
@@ -507,6 +512,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+    BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     if (event != nullptr) {
         CHKPR(event, ERROR_NULL_POINTER);
@@ -526,6 +532,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             pointerEvent = outputEvent;
         }
     }
+    BytraceAdapter::StopPackageEvent();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (KeyEventHdr != nullptr) {
         const auto &keyEvent = KeyEventHdr->GetKeyEvent();
@@ -576,7 +583,9 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
+    BytraceAdapter::StartPackageEvent("package penEvent");
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
+    BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
@@ -598,7 +607,9 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
+    BytraceAdapter::StartPackageEvent("package joystickEvent");
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);

@@ -268,10 +268,12 @@ int32_t MMIService::Init()
     }
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
+    MMI_HILOGD("Libinput service init");
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
+    MMI_HILOGD("Init DelegateTasks init");
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
@@ -311,6 +313,7 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
+    MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();

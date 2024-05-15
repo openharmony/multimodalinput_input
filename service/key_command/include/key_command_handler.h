@@ -39,6 +39,14 @@
 
 namespace OHOS {
 namespace MMI {
+enum KeyCommandType : int32_t {
+    TYPE_SHORTKEY = 0,
+    TYPE_SEQUENCE = 1,
+    TYPE_FINGERSCENE = 2,
+    TYPE_REPEAT_KEY = 3,
+    TYPE_MULTI_FINGERS = 4,
+};
+
 struct Ability {
     std::string bundleName;
     std::string abilityName;
