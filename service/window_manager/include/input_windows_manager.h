@@ -284,7 +284,7 @@ private:
         bool isOpen { false };
     } antiMistake_;
     bool isOpenAntiMisTakeObserver_ { false };
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
     int32_t pointerActionFlag_ { -1 };
