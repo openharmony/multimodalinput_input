@@ -2450,8 +2450,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    if (knuckleDrawMgr == nullptr) {
-        knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
+    if (knuckleDrawMgr_ == nullptr) {
+        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
     }
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
@@ -2461,8 +2461,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
     
-    knuckleDrawMgr->UpdateDisplayInfo(*physicDisplayInfo);
-    knuckleDrawMgr->KnuckleDrawHandler(pointerEvent);
+    knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
+    knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
 
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
