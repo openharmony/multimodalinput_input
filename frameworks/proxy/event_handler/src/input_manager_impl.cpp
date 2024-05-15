@@ -409,6 +409,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     CHK_PID_AND_TID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
+    BytraceAdapter::StopConsumer();
     MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
@@ -431,6 +432,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
+        BytraceAdapter::StartConsumer(keyEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
             this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
@@ -438,7 +440,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
             return;
         }
     } else {
+        BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
+        BytraceAdapter::StopConsumer();
         MMI_HILOG_DISPATCHD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     MMI_HILOG_DISPATCHD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
@@ -454,6 +458,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
+    BytraceAdapter::StopConsumer();
     MMI_HILOG_DISPATCHD("Pointer event callback pointerId:%{public}d",
         pointerEvent->GetPointerId());
 }
@@ -481,6 +486,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
+        BytraceAdapter::StartConsumer(pointerEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
             this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
@@ -488,7 +494,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             return;
         }
     } else {
+        BytraceAdapter::StartConsumer(pointerEvent);
         inputConsumer->OnInputEvent(pointerEvent);
+        BytraceAdapter::StopConsumer();
     }
     MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
         pointerEvent->GetPointerId());
