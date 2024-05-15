@@ -2048,13 +2048,13 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
         antiMistake_.switchName = navigationSwitchName;
         CreateAntiMisTakeObserver(antiMistake_);
         isOpenAntiMisTakeObserver_ = true;
-        MMI_HILOGI("get anti mistake touch switch start");
+        MMI_HILOGI("Get anti mistake touch switch start");
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName,
             antiMistake_.isOpen);
-        MMI_HILOGI("get anti mistake touch switch end");
+        MMI_HILOGI("Get anti mistake touch switch end");
     }
     if (antiMistake_.isOpen) {
-        MMI_HILOGD("anti mistake switch is open.");
+        MMI_HILOGD("Anti mistake switch is open");
         return true;
     }
     return false;
@@ -2476,15 +2476,19 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
     CALL_INFO_TRACE;
     SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         if (SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, item.isOpen) != RET_OK) {
-            MMI_HILOGE("get settingdata failed, key: %{public}s", key.c_str());
+            MMI_HILOGE("Get settingdata failed, key: %{public}s", key.c_str());
         }
-        MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isOpen);
+        MMI_HILOGI("Anti mistake observer key: %{public}s, statusValue: %{public}d", key.c_str(), item.isOpen);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);
+    if(statusObserver == nullptr) {
+        MMI_HILOGE("Create observer failed");
+        return;
+    }
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
-        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        MMI_HILOGE("Register setting observer failed, ret: %{public}d", ret);
         statusObserver = nullptr;
     }
 }
