@@ -303,5 +303,91 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle, T
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
     ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_GetPointerPos
+ * @tc.desc: Test Overrides GetPointerPos function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_GetPointerPos, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_OK);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_ERR);
+
+    pointerEvent->SetPointerId(0);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_ERR);
+
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
+ * @tc.desc: Test Overrides DrawGraphic function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(500);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
+
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 200;
+    pointerInfo.y = 200;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
