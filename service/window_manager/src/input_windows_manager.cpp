@@ -2933,8 +2933,6 @@ void InputWindowsManager::SetPrivacyModeFlag(SecureFlag privacyMode, std::shared
         return;
     }
     event->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
-    event->AddFlag(InputEvent::EVENT_FLAG_NO_MONITOR);
-    event->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
 }
 
 int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
