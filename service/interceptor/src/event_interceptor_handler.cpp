@@ -372,11 +372,12 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s | ProgramName:%s \t",
                 item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
                 session->GetFd(),
-                session->GetEarliestEventTime(), session->GetDescript().c_str());
+                session->GetEarliestEventTime(), session->GetDescript().c_str(),
+                session->GetProgramName().c_str());
     }
 }
 } // namespace MMI
