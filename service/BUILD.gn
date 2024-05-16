@@ -1186,6 +1186,7 @@ ohos_unittest("EventDumpTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
