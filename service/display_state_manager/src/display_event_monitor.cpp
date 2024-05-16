@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,8 @@
 #include "display_event_monitor.h"
 #include "stylus_key_handler.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "DisplayEventMonitor"
 
@@ -60,7 +62,6 @@ public:
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
-            return;
         }
     }
 };
@@ -71,7 +72,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
     } else {
-        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
 }
 
@@ -82,7 +83,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
     } else {
-        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
 }
 
@@ -96,6 +97,7 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));

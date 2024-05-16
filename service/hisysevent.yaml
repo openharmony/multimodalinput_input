@@ -258,3 +258,21 @@ TOUCHPAD_POINTER_SPEED_SETTING:
 TOUCHPAD_RIGHT_CLICK_SETTING:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad right click setting}
   SWITCH_VALUE: {type: INT32, desc: touchpad right click setting}
+
+MAGIC_CURSOR_COLOR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the color of Magic Cursor}
+  FILL_COLOR: {type: STRING, desc: fill color}
+  STROKE_COLOR: {type: STRING, desc: stroke color}
+
+MAGIC_CURSOR_SHAPE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the SHAPE of Magic Cursor}
+
+MAGIC_CURSOR_SIZE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the size of Magic Cursor}
+  MOUSE_SIZE: {type: STRING, desc: mouse size}
+  FILL_CODE: {type: STRING, desc: fill code}
+
+FANTASY_CURSOR_FAILED:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report ERROR of Magic Cursor}
+  ERROR_CODE: {type: STRING, desc: error code}
+  ERROR_NAME: {type: STRING, desc: fill code}

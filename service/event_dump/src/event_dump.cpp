@@ -37,6 +37,8 @@
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventDump"
 
@@ -52,9 +54,9 @@ EventDump::~EventDump() {}
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-    mprintf(fd, "DEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
-    mprintf(fd, "EXP_CONFIG: %s\n", DEF_EXP_CONFIG);
-    mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
+    mprintf(fd, "DEF_MMI_DATA_ROOT:%s\n", DEF_MMI_DATA_ROOT);
+    mprintf(fd, "EXP_CONFIG:%s\n", DEF_EXP_CONFIG);
+    mprintf(fd, "EXP_SOPATH:%s\n", DEF_EXP_SOPATH);
 }
 
 void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, int32_t &count)

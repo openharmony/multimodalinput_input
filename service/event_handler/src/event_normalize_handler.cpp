@@ -39,6 +39,8 @@
 #include "fingerprint_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventNormalizeHandler"
 
@@ -75,6 +77,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
     }
+    BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -145,6 +148,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
     }
+    BytraceAdapter::StopHandleInput();
     DfxHisysevent::ReportDispTimes();
 }
 
@@ -272,6 +276,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    BytraceAdapter::StartPackageEvent("package keyEvent");
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
@@ -290,7 +295,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
-
+    BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
@@ -332,6 +337,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    BytraceAdapter::StartPackageEvent("package mouseEvent");
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -349,6 +355,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     }
     pointerEvent->SetPressedKeys(pressedKeys);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     HandlePalmEvent(event, pointerEvent);
     if (SetOriginPointerId(pointerEvent) != RET_OK) {
@@ -427,7 +434,14 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     double logicalX = libinput_event_touchpad_get_x(touchpad);
     double logicalY = libinput_event_touchpad_get_y(touchpad);
     auto originType = libinput_event_get_type(event);
-    auto actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, RET_ERR);
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    auto mouseEvent = MouseEventHdr->GetPointerEvent(deviceId);
+    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    if (mouseEvent == nullptr || mouseEvent->GetPressedButtons().empty()) {
+        actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    }
     if (actionType == PointerEvent::POINTER_ACTION_UNKNOWN) {
         MMI_HILOGD("Gesture identify failed");
         return RET_ERR;
@@ -498,6 +512,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+    BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     if (event != nullptr) {
         CHKPR(event, ERROR_NULL_POINTER);
@@ -517,7 +532,16 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
             pointerEvent = outputEvent;
         }
     }
-
+    BytraceAdapter::StopPackageEvent();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    if (KeyEventHdr != nullptr) {
+        const auto &keyEvent = KeyEventHdr->GetKeyEvent();
+        if (keyEvent != nullptr && pointerEvent != nullptr) {
+            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+            pointerEvent->SetPressedKeys(pressedKeys);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     if (pointerEvent != nullptr) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
         if (SetOriginPointerId(pointerEvent) != RET_OK) {
@@ -559,7 +583,9 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
+    BytraceAdapter::StartPackageEvent("package penEvent");
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
+    BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
@@ -581,7 +607,9 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
+    BytraceAdapter::StartPackageEvent("package joystickEvent");
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
@@ -604,9 +632,14 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
     CHKPR(swev, ERROR_NULL_POINTER);
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
-    MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d",
-        libinput_event_switch_get_switch(swev), state);
-    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int>(state));
+    enum libinput_switch sw = libinput_event_switch_get_switch(swev);
+    MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
+    if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
+        MMI_HILOGD("privacy switch event ignored");
+        return RET_OK;
+    }
+    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
+    swEvent->SetSwitchType(static_cast<int32_t>(sw));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("switch device does not support");

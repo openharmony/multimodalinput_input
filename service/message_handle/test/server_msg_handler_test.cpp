@@ -21,6 +21,7 @@
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
+#include "util_napi_error.h"
 
 #include "define_multimodal.h"
 #include "server_msg_handler.h"
@@ -41,7 +42,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp() {}
-    void TearDoen() {}
+    void TearDown() {}
 };
 
 /**
@@ -131,9 +132,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     int32_t pid = 1;
-    bool isNativeInject = false;
+    bool isNativeInject = true;
     int32_t result = servermsghandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_EQ(result, COMMON_PERMISSION_CHECK_ERROR);
 }
 
 /**
@@ -146,7 +147,11 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_01, TestSize.Lev
 {
     ServerMsgHandler servermsghandler;
     bool isAuthorize = true;
+    InjectionType InjectionType_ = InjectionType::KEYEVENT;
     int32_t result = servermsghandler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(result, ERR_OK);
+    InjectionType_ = InjectionType::POINTEREVENT;
+    result = servermsghandler.OnAuthorize(isAuthorize);
     EXPECT_EQ(result, ERR_OK);
 }
 

@@ -1198,6 +1198,8 @@ int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerE
         MMI_HILOGW("Set distanceY property failed");
         return RET_ERR;
     }
+    MMI_HILOGD("jsfingerprint key:%{public}d, x:%{public}f, y:%{public}f", actionValue,
+        pointerEvent->GetFingerprintDistanceX(), pointerEvent->GetFingerprintDistanceY());
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -1430,6 +1432,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
             default: {
+                MMI_HILOGE("This event is invalid");
                 break;
             }
         }
@@ -1588,6 +1591,7 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
             return true;
     }
+    MMI_HILOGD("not fingerprint event");
     return false;
 }
 } // namespace MMI

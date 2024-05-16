@@ -23,11 +23,13 @@
 #include "knuckle_drawing_manager.h"
 #include "window_info.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KnuckleDrawingManagerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDrawingManagerTest" };
 } // namespace
 class KnuckleDrawingManagerTest : public testing::Test {
 public:
@@ -45,14 +47,62 @@ public:
         info.dpi = displayDpi;
         info.name = "display";
         info.uniq = "xx";
-        if (knuckleDrawMgr == nullptr) {
-            knuckleDrawMgr = std::make_shared<KnuckleDrawingManager>();
+        if (knuckleDrawMgr_ == nullptr) {
+            knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
         }
-        knuckleDrawMgr->UpdateDisplayInfo(info);
+        knuckleDrawMgr_->UpdateDisplayInfo(info);
     }
 private:
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 };
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_StartTouchDraw
+ * @tc.desc: Test Overrides StartTouchDraw function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_StartTouchDraw, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    kceDrawMgr.canvasNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.StartTouchDraw(pointerEvent));
+
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    kceDrawMgr.isActionUp_ = true;
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.StartTouchDraw(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow
+ * @tc.desc: Test Overrides CreateTouchWindow function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateTouchWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    int32_t displayId = 10;
+    kceDrawMgr.surfaceNode_ = nullptr;
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.CreateTouchWindow(displayId));
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "touch window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.CreateTouchWindow(displayId));
+}
 
 /**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler_001
@@ -78,7 +128,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -105,7 +155,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -141,7 +191,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     item2.SetDisplayY(displayY);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->AddPointerItem(item2);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -168,7 +218,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -195,7 +245,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
 }
 
 /**
@@ -222,7 +272,170 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_KnuckleDrawHandler
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr->KnuckleDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_IsValidAction
+ * @tc.desc: Test Overrides IsValidAction function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_TRUE(kceDrawMgr.IsValidAction(action));
+    action = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_TRUE(kceDrawMgr.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_MOVE;
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_TRUE(kceDrawMgr.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_UNKNOWN;
+    kceDrawMgr.pointerInfos_.clear();
+    ASSERT_FALSE(kceDrawMgr.IsValidAction(action));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_UpdateDisplayInfo
+ * @tc.desc: Test Overrides UpdateDisplayInfo function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 200;
+    kceDrawMgr.displayInfo_.dpi = 200;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.UpdateDisplayInfo(displayInfo));
+    kceDrawMgr.displayInfo_.dpi = 300;
+    ASSERT_NO_FATAL_FAILURE(kceDrawMgr.UpdateDisplayInfo(displayInfo));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
+ * @tc.desc: Test Overrides IsSingleKnuckle function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_TRUE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    kceDrawMgr.canvasNode_ = nullptr;
+    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_GetPointerPos
+ * @tc.desc: Test Overrides GetPointerPos function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_GetPointerPos, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_OK);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_ERR);
+
+    pointerEvent->SetPointerId(0);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_ERR);
+
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_EQ(kceDrawMgr.GetPointerPos(pointerEvent), RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
+ * @tc.desc: Test Overrides DrawGraphic function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(500);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
+
+    kceDrawMgr.displayInfo_.width = 200;
+    kceDrawMgr.displayInfo_.height = 200;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+
+    PointerInfo pointerInfo;
+    pointerInfo.x = 100;
+    pointerInfo.y = 100;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerInfo.x = 150;
+    pointerInfo.y = 150;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 200;
+    pointerInfo.y = 200;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    pointerInfo.x = 300;
+    pointerInfo.y = 300;
+    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

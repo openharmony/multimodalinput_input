@@ -68,7 +68,7 @@ ohos_shared_library("libmmi-util") {
   sources = libmmi_util_sources
   public_configs = [ "${mmi_path}:coverage_flags" ]
   configs = [ ":libmmi_util_public_config" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   deps = [ ":mmi_rust_key_config" ]
 
   external_deps = [

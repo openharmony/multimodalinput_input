@@ -19,6 +19,8 @@
 #include "input_device_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventFilterHandler"
 

@@ -19,6 +19,8 @@
 #include "input_event_handler.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "FingerprintEventProcessor"
 
@@ -75,6 +77,7 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
 int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
     struct libinput_event_keyboard* keyEvent = libinput_event_get_keyboard_event(event);
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto key = libinput_event_keyboard_get_key(keyEvent);
@@ -111,6 +114,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent);
+    MMI_HILOGD("fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;
 }
@@ -132,11 +136,10 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent);
+    MMI_HILOGD("fingerprint key:%{public}d, ux:%{public}f, uy:%{public}f", pointerEvent->GetPointerAction(), ux, uy);
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;
 }
-
-
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 } // namespace MMI
 } // namespace OHOS

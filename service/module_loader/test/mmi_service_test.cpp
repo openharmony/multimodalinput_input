@@ -17,9 +17,12 @@
 
 #include "proto.h"
 
+#include "mmi_log.h"
 #include "mmi_service.h"
 #include "udp_wrap.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIServerTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -903,6 +906,22 @@ HWTEST_F(MMIServerTest, SetShieldStatus_001, TestSize.Level1)
     EXPECT_EQ(ret, returnCode);
     ret = mmiService.GetShieldStatus(shieldMode, isShield);
     EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: MMIServerTest_InitService
+ * @tc.desc: Test Init Service
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InitService, TestSize.Level1)
+{
+    MMIService service;
+    service.state_ = ServiceRunningState::STATE_RUNNING;
+    ASSERT_FALSE(service.InitService());
+    service.state_ = ServiceRunningState::STATE_NOT_START;
+    service.mmiFd_ = 1000;
+    ASSERT_FALSE(service.InitService());
 }
 } // namespace MMI
 } // namespace OHOS

@@ -372,13 +372,18 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-int32_t InputManagerImpl::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
+    std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
-    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(callback);
+    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+        MMI_HILOGE("switch type error, switchType:%{public}d", switchType);
+        return RET_ERR;
+    }
+    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
 #else
     MMI_HILOGW("Switch device does not support");
     return ERROR_UNSUPPORT;
@@ -404,6 +409,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     CHK_PID_AND_TID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
+    BytraceAdapter::StopConsumer();
     MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
@@ -421,22 +427,25 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
-    MMI_HILOGI("InputTracking id:%{public}d Key Event", keyEvent->GetId());
+    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d Key Event", keyEvent->GetId());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
+        BytraceAdapter::StartConsumer(keyEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
             this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
-            MMI_HILOGE("Post task failed");
+            MMI_HILOG_DISPATCHE("Post task failed");
             return;
         }
     } else {
+        BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StopConsumer();
+        MMI_HILOG_DISPATCHD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
-    MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOG_DISPATCHD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -449,7 +458,9 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
+    BytraceAdapter::StopConsumer();
+    MMI_HILOG_DISPATCHD("Pointer event callback pointerId:%{public}d",
+        pointerEvent->GetPointerId());
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -471,19 +482,24 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOGI("InputTracking id:%{public}d Pointer Event", pointerEvent->GetId());
+        MMI_HILOG_DISPATCHI("InputTracking id:%{public}d Pointer Event",
+            pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
+        BytraceAdapter::StartConsumer(pointerEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
             this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
-            MMI_HILOGE("Post task failed");
+            MMI_HILOG_DISPATCHE("Post task failed");
             return;
         }
     } else {
+        BytraceAdapter::StartConsumer(pointerEvent);
         inputConsumer->OnInputEvent(pointerEvent);
+        BytraceAdapter::StopConsumer();
     }
-    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+    MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
+        pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -1265,7 +1281,8 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
             PointerEvent::PointerItem item;
             int32_t pointerId = lastPointerEvent_->GetPointerId();
             if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerId);
+                MMI_HILOG_DISPATCHD("Get pointer item failed. pointer:%{public}d",
+                    pointerId);
                 return false;
             }
             item.SetPressed(false);
@@ -1482,19 +1499,19 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Client init failed");
+        MMI_HILOG_ANRDETECTE("Client init failed");
         return;
     }
     for (auto iter = anrObservers_.begin(); iter != anrObservers_.end(); ++iter) {
         if (*iter == observer) {
-            MMI_HILOGE("Observer already exist");
+            MMI_HILOG_ANRDETECTE("Observer already exist");
             return;
         }
     }
     anrObservers_.push_back(observer);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
+        MMI_HILOG_ANRDETECTE("Set anr observer failed, ret:%{public}d", ret);
     }
 }
 
@@ -1509,7 +1526,7 @@ void InputManagerImpl::OnAnr(int32_t pid)
             observer->OnAnr(pid);
         }
     }
-    MMI_HILOGI("ANR noticed pid:%{public}d", pid);
+    MMI_HILOG_ANRDETECTI("ANR noticed pid:%{public}d", pid);
 }
 
 bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)

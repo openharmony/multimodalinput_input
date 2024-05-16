@@ -34,6 +34,8 @@
 #include "util.h"
 #include <transaction/rs_interfaces.h>
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventDispatchHandler"
 
@@ -180,7 +182,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
         MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
-            "application not response", point->GetId());
+            "application not response. PointerEvent(deviceid:%{public}d, action:%{public}s)",
+            point->GetId(), point->GetDeviceId(), point->DumpPointerAction());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -235,7 +238,9 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("The key event does not report normally, application not response");
+        MMI_HILOGW("The key event does not report normally, application not response."
+            "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+            key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
         return RET_OK;
     }
 
