@@ -133,14 +133,6 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("The windows info or display info is empty!");
-        return PARAM_INPUT_INVALID;
-    }
-    if (!IsValiadWindowAreas(displayGroupInfo.windowsInfo)) {
-        MMI_HILOGE("Invalid window information");
-        return PARAM_INPUT_INVALID;
-    }
     displayGroupInfo_ = displayGroupInfo;
     int32_t ret = SendDisplayInfo();
     if (ret != RET_OK) {

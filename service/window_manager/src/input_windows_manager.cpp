@@ -479,7 +479,7 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
 
 void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo)
 {
-    if (captureModeInfo_.isCaptureMode &&
+    if (captureModeInfo_.isCaptureMode && (!displayGroupInfo_.windowsInfo.empty()) &&
         ((displayGroupInfo_.focusWindowId != displayGroupInfo.focusWindowId) ||
         (displayGroupInfo_.windowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
@@ -599,7 +599,10 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
-    auto action = displayGroupInfo.windowsInfo.back().action;
+    auto action = WINDOW_UPDATE_ACTION::ADD_END;
+    if (!displayGroupInfo.windowsInfo.empty()) {
+        action = displayGroupInfo.windowsInfo.back().action;
+    }
     MMI_HILOGD("Current action is:%{public}d", action);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     pointerDrawFlag_ = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
