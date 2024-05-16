@@ -1472,7 +1472,12 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         }
         pointerStyle = style;
     }
-    DrawPointerStyle(pointerStyle);
+    // Draw mouse style only when the current window is the top-level window
+    if (windowId == windowId_) {
+        DrawPointerStyle(pointerStyle);
+    } else {
+        MMI_HILOGW("set windowid:%{public}d, top windowid:%{public}d, dont draw pointer", windowId, windowId_);
+    }
     MMI_HILOGI("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle.id);
     return RET_OK;
 }
