@@ -2215,7 +2215,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-    SetPrivacyModeFlag(touchWindow.privacyMode, pointerEvent);
+    SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
