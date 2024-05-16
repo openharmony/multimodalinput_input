@@ -159,7 +159,7 @@ void InputWindowsManager::Init(UDSServer& udsServer)
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     TimerMgr->AddTimer(WAIT_TIME_FOR_REGISTER, 1, [this]() {
-        MMI_LOG_HANDLERD("Timer callback");
+        MMI_HILOG_HANDLERD("Timer callback");
         RegisterFoldStatusListener();
     });
 }
@@ -168,17 +168,17 @@ void InputWindowsManager::RegisterFoldStatusListener()
 {
     CALL_INFO_TRACE;
     if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        MMI_LOG_HANDLERD("The device is not foldable");
+        MMI_HILOG_HANDLERD("The device is not foldable");
         return;
     }
     foldStatusListener_ = new (std::nothrow) FoldStatusLisener();
     CHKPV(foldStatusListener_);
     auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
-        MMI_LOG_HANDLERDE("Failed to register fold status listener");
+        MMI_HILOG_HANDLERE("Failed to register fold status listener");
         foldStatusListener_ = nullptr;
     } else {
-        MMI_LOG_HANDLERD("Register fold status listener successed");
+        MMI_HILOG_HANDLERD("Register fold status listener successed");
     }
 }
 
@@ -188,20 +188,20 @@ void InputWindowsManager::UnregisterFoldStatusListener()
     CHKPV(foldStatusListener_);
     auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
-        MMI_LOG_HANDLERDE("Failed to unregister fold status listener");
+        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
     }
 }
 
 void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
 {
     CALL_INFO_TRACE;
-    MMI_LOG_HANDLERD("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
+    MMI_HILOG_HANDLERD("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
     if (lastFoldStatus_ == foldStatus) {
-        MMI_LOG_HANDLERD("No need to set foldStatus");
+        MMI_HILOG_HANDLERD("No need to set foldStatus");
         return;
     }
     if (WinMgr->lastPointerEventForFold_ == nullptr) {
-        MMI_LOG_HANDLERDE("lastPointerEventForFold_ is nullptr");
+        MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*(WinMgr->lastPointerEventForFold_));
