@@ -22,6 +22,7 @@
 
 #include "string_ex.h"
 
+#include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
@@ -57,6 +58,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    BytraceAdapter::StartIpcServer(code);
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
             return StubHandleAllocSocketFd(data, reply);
@@ -321,6 +323,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
+    BytraceAdapter::StopIpcServer();
     return RET_ERR;
 }
 
@@ -1167,9 +1170,11 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
     }
 
     int32_t subscribeId;
+    int32_t switchType;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, switchType, IPC_PROXY_DEAD_OBJECT_ERR);
 
-    int32_t ret = SubscribeSwitchEvent(subscribeId);
+    int32_t ret = SubscribeSwitchEvent(subscribeId, switchType);
     if (ret != RET_OK) {
         MMI_HILOGE("SubscribeSwitchEvent failed, ret:%{public}d", ret);
     }
@@ -1237,13 +1242,16 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
         MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
+    LogTracer lt(event->GetId(), event->GetEventType(), event->GetKeyAction());
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!isNativeInject && !PerHelper->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    EndLogTraceId(event->GetId());
     event->UpdateId();
+    LogTracer lt1(event->GetId(), event->GetEventType(), event->GetKeyAction());
     int32_t ret = InjectKeyEvent(event, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);

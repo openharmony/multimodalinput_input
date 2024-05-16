@@ -23,6 +23,7 @@
 #include "pixel_map.h"
 #include "singleton.h"
 
+#include "display_manager.h"
 #include "extra_data.h"
 #include "input_display_bind_helper.h"
 #include "input_event.h"
@@ -61,6 +62,25 @@ struct WindowInfoEX {
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
+    class FoldStatusLisener : public Rosen::DisplayManager::IFoldStatusListener {
+    public:
+        FoldStatusLisener() = default;
+        virtual ~FoldStatusLisener() = default;
+
+        FoldStatusLisener(const FoldStatusLisener& foldStatusLisener) = delete;
+        FoldStatusLisener& operator=(const FoldStatusLisener& foldStatusLisener) = delete;
+        FoldStatusLisener(FoldStatusLisener&& foldStatusLisener) = delete;
+        FoldStatusLisener& operator=(FoldStatusLisener&& foldStatusLisener) = delete;
+
+        /**
+        * @param FoldStatus; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
+        */
+        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+
+    private:
+        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
+    };
+
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
@@ -181,6 +201,8 @@ private:
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
+    void RegisterFoldStatusListener();
+    void UnregisterFoldStatusListener();
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -213,6 +235,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
+    bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
@@ -220,11 +243,14 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
+    void SetAntiMisTake(bool state);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
     bool InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
+    template <class T>
+    void CreateAntiMisTakeObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -277,12 +303,19 @@ private:
     bool isDragBorder_ { false };
     bool pointerDrawFlag_ { false };
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr { nullptr };
+    struct AntiMisTake {
+        std::string switchName;
+        bool isOpen { false };
+    } antiMistake_;
+    bool isOpenAntiMisTakeObserver_ { false };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
+    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

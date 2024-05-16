@@ -151,6 +151,7 @@ std::shared_ptr<PointerEvent> GestureTransformProcessor::OnEvent(struct libinput
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     return pointerEvent_;
 }
 } // namespace MMI

@@ -119,6 +119,13 @@ public:
      */
     void SetAxisValue(int32_t axisValue);
 
+    /**
+     * @brief Converts a Axis event action into a short string.
+     * @param Indicates the Axis event action.
+     * @return Returns the string converted from the Axis action.
+     * @since 12
+    */
+    static std::string_view ActionToShortStr(int32_t action);
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method

@@ -91,9 +91,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     STYLUS_HANDLER->SetLastEventState(false);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -328,7 +326,9 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
         MMI_HILOGI("knuckle gesture start launch ability");
         knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
         LaunchAbility(knuckleGesture.ability, 0);
+        BytraceAdapter::StopLaunchAbility();
         knuckleGesture.state = true;
         ReportKnuckleScreenCapture(touchEvent);
     } else {
@@ -450,7 +450,9 @@ void KeyCommandHandler::StartTwoFingerGesture()
         twoFingerGesture_.ability.params.emplace("displayX2", std::to_string(twoFingerGesture_.touches[1].x));
         twoFingerGesture_.ability.params.emplace("displayY2", std::to_string(twoFingerGesture_.touches[1].y));
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
         LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
+        BytraceAdapter::StopLaunchAbility();
     });
 }
 
@@ -705,7 +707,10 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
 
     if (IsExcludeKey(key)) {
+        MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
+                   key->GetKeyCode(), key->GetKeyAction());
         auto items = key->GetKeyItems();
+        MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
             return enableCombineKey_;
         }
@@ -835,11 +840,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return false;
     }
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (STYLUS_HANDLER->HandleStylusKey(key)) {
         return true;
     }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
@@ -918,9 +921,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointer);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     STYLUS_HANDLER->SetLastEventState(false);
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -990,7 +991,9 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         if (!statusValue) {
             return false;
         }
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
         LaunchAbility(item.ability);
+        BytraceAdapter::StopLaunchAbility();
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
@@ -1173,7 +1176,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-    if (matchedSequence_.timerId >= 0) {
+    if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGD("Remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
         matchedSequence_.timerId = -1;
@@ -1258,7 +1261,9 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
 {
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, sequence] () {
         MMI_HILOGI("Timer callback");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
@@ -1274,13 +1279,17 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
 {
     if (sequence.abilityStartDelay == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        BytraceAdapter::StopLaunchAbility();
         isLaunchAbility = true;
         return true;
     }
     sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
         MMI_HILOGI("Timer callback");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
@@ -1321,13 +1330,16 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     if (keysSize == sequenceKeysSize) {
         std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
         MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
-        if (sequence.ability.bundleName == "com.ohos.screenshot" &&
-            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        std::string bundleName = sequence.ability.bundleName;
+        std::string matchName = ".ohos.screenshot";
+        if (bundleName.find(matchName) != std::string::npos) {
+            bundleName = bundleName.substr(bundleName.size() - matchName.size());
+        }
+        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGI("screen off, com.ohos.screenshot invalid");
             return false;
         }
-        if (sequence.ability.bundleName == "com.ohos.screenshot" &&
-            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
             MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
@@ -1341,7 +1353,9 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
         MMI_HILOGI("The touchpad trip tap will launch ability");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, threeFingersTap_.ability.bundleName);
         LaunchAbility(threeFingersTap_.ability, 0);
+        BytraceAdapter::StopLaunchAbility();
         return true;
     }
     return false;
@@ -1381,13 +1395,17 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+        BytraceAdapter::StopLaunchAbility();
         return true;
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
         MMI_HILOGI("Timer callback");
         currentLaunchAbilityKey_ = shortcutKey;
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+        BytraceAdapter::StopLaunchAbility();
     });
     if (shortcutKey.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
@@ -1414,7 +1432,9 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     CHKPF(keyEvent);
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+        BytraceAdapter::StopLaunchAbility();
         return true;
     }
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
@@ -1431,7 +1451,9 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
         return false;
     }
     MMI_HILOGI("Start launch ability immediately");
+    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
     LaunchAbility(shortcutKey);
+    BytraceAdapter::StopLaunchAbility();
     return true;
 }
 

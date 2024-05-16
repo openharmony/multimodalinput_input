@@ -133,14 +133,6 @@ int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         MMI_HILOGE("Failed to initialize MMI client");
         return RET_ERR;
     }
-    if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("The windows info or display info is empty!");
-        return PARAM_INPUT_INVALID;
-    }
-    if (!IsValiadWindowAreas(displayGroupInfo.windowsInfo)) {
-        MMI_HILOGE("Invalid window information");
-        return PARAM_INPUT_INVALID;
-    }
     displayGroupInfo_ = displayGroupInfo;
     int32_t ret = SendDisplayInfo();
     if (ret != RET_OK) {
@@ -372,13 +364,18 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-int32_t InputManagerImpl::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
+    std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
-    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(callback);
+    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+        MMI_HILOGE("switch type error, switchType:%{public}d", switchType);
+        return RET_ERR;
+    }
+    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
 #else
     MMI_HILOGW("Switch device does not support");
     return ERROR_UNSUPPORT;
@@ -404,6 +401,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     CHK_PID_AND_TID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
+    BytraceAdapter::StopConsumer();
     MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
@@ -426,6 +424,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
+        BytraceAdapter::StartConsumer(keyEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
             this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
@@ -433,7 +432,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
             return;
         }
     } else {
+        BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
+        BytraceAdapter::StopConsumer();
         MMI_HILOG_DISPATCHD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     MMI_HILOG_DISPATCHD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
@@ -449,6 +450,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
+    BytraceAdapter::StopConsumer();
     MMI_HILOG_DISPATCHD("Pointer event callback pointerId:%{public}d",
         pointerEvent->GetPointerId());
 }
@@ -476,6 +478,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
+        BytraceAdapter::StartConsumer(pointerEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
             this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
@@ -483,7 +486,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
             return;
         }
     } else {
+        BytraceAdapter::StartConsumer(pointerEvent);
         inputConsumer->OnInputEvent(pointerEvent);
+        BytraceAdapter::StopConsumer();
     }
     MMI_HILOG_DISPATCHD("Pointer event pointerId:%{public}d",
         pointerEvent->GetPointerId());

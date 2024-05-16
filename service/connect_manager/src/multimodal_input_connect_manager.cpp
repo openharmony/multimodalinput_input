@@ -384,16 +384,16 @@ int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
     return multimodalInputConnectService_->UnsubscribeKeyEvent(subscribeId);
 }
 
-int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId)
+int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SubscribeSwitchEvent(subscribeId);
+    return multimodalInputConnectService_->SubscribeSwitchEvent(subscribeId, switchType);
 }
 
 int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeId)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SubscribeSwitchEvent(subscribeId);
+    return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
 }
 
 int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)

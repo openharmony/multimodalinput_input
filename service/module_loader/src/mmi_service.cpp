@@ -268,10 +268,12 @@ int32_t MMIService::Init()
     }
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
+    MMI_HILOGD("Libinput service init");
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
+    MMI_HILOGD("Init DelegateTasks init");
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
@@ -311,6 +313,7 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
+    MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
@@ -1163,6 +1166,7 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, boo
 int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
 }
 
@@ -1186,6 +1190,7 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
     bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -1307,13 +1312,13 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId)
+int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&ServerMsgHandler::OnSubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId));
+        std::bind(&ServerMsgHandler::OnSubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId, switchType));
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe switch event processed failed, ret:%{public}d", ret);
         return RET_ERR;

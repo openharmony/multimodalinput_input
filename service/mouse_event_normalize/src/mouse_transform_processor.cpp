@@ -306,6 +306,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 CHKPV(pointerEvent);
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                 pointerEvent->UpdateId();
+                LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
@@ -386,6 +387,7 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
     pointerItem.SetRawDx(0);
     pointerItem.SetRawDy(0);
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(time);
@@ -428,6 +430,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
 
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(time);
@@ -564,6 +567,7 @@ void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& poi
     pointerItem.SetPressure(0);
 
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(time);

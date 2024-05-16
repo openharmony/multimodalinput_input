@@ -37,6 +37,7 @@ ohos_static_library("mmi_libudev") {
   }
   external_deps = [ "hilog:libhilog" ]
 
+  defines += [ "MMI_DISABLE_LOG_TRACE" ]
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -75,6 +76,8 @@ ohos_unittest("libudev-test") {
     "//third_party/googletest:gmock_main",
     "//third_party/libevdev",
   ]
+
+  defines += [ "MMI_DISABLE_LOG_TRACE" ]
 }
 
 ohos_unittest("e2e-libudev-test") {
