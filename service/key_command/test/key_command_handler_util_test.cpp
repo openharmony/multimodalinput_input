@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "mmi_log.h"
 #include "key_command_handler_util.h"
+#include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerUtilTest"
