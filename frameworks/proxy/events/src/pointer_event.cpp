@@ -261,7 +261,11 @@ double PointerEvent::PointerItem::GetPressure() const
 
 void PointerEvent::PointerItem::SetPressure(double pressure)
 {
-    pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+    if (pressure < 0.0) {
+        pressure_ = 0.0;
+    } else {
+        pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+    }
 }
 
 int32_t PointerEvent::PointerItem::GetLongAxis() const
