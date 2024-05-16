@@ -897,7 +897,15 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
     mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
-
+    std::ostringstream pidStringStream;
+    for (int32_t pid : foregroundPids_) {
+        pidStringStream << pid << " ";
+    }
+    std::string pidString = pidStringStream.str();
+    mprintf(fd, "subscribers Foreground Pids: %s", pidString.c_str());
+    mprintf(fd, "subscribers enableCombineKey_: %s", enableCombineKey_ ? "true" : "false");
+    mprintf(fd, "subscribers isForegroundExits_: %s", isForegroundExits_ ? "true" : "false");
+    mprintf(fd, "subscribers needSkipPowerKeyUp_: %s", needSkipPowerKeyUp_ ? "true" : "false");
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
         auto &subscribers = iter->second;
         for (auto item = subscribers.begin(); item != subscribers.end(); item++) {
@@ -909,10 +917,12 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
             CHKPV(keyOption);
             mprintf(fd,
                     "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
-                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s "
+                    "| ProgramName:%s \t",
                     subscriber->id_, subscriber->timerId_, session->GetPid(),
                     session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
-                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false",
+                    session->GetProgramName().c_str());
             std::set<int32_t> preKeys = keyOption->GetPreKeys();
             for (const auto &preKey : preKeys) {
                 mprintf(fd, "preKeys:%d\t", preKey);

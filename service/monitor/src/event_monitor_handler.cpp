@@ -477,10 +477,12 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s "
+                "| EventType:%s | ProgramName:%s \t",
                 item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
-                session->GetEarliestEventTime(), session->GetDescript().c_str());
+                session->GetEarliestEventTime(), session->GetDescript().c_str(),
+                item.eventType_, session->GetProgramName().c_str());
     }
 }
 } // namespace MMI
