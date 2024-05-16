@@ -897,6 +897,12 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
     mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
+    std::ostringstream pidStringStream;
+    for (int32_t pid : foregroundPids_) {
+        pidStringStream << pid << " ";
+    }
+    std::string pidString = pidStringStream.str();
+    mprintf(fd, "subscribers Foreground Pids: %s", pidString.c_str());
 
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
         auto &subscribers = iter->second;
@@ -909,10 +915,13 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
             CHKPV(keyOption);
             mprintf(fd,
                     "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
-                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s "
+                    "| EnableCombineKey_:%s | IsForegroundExits_:%s | NeedSkipPowerKeyUp_:%s \t",
                     subscriber->id_, subscriber->timerId_, session->GetPid(),
                     session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
-                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false",
+                    enableCombineKey_ ? "true" : "false", isForegroundExits_? "true" : "false",
+                    needSkipPowerKeyUp_? "true" : "false");
             std::set<int32_t> preKeys = keyOption->GetPreKeys();
             for (const auto &preKey : preKeys) {
                 mprintf(fd, "preKeys:%d\t", preKey);
