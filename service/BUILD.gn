@@ -329,6 +329,7 @@ ohos_unittest("event_resample_test") {
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -370,6 +371,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -468,6 +470,7 @@ ohos_unittest("EventFilterHandlerTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "preferences:native_preferences",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -581,6 +584,7 @@ ohos_unittest("WindowManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -614,6 +618,7 @@ ohos_unittest("TouchEventNormalizeTest") {
   external_deps = [
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -729,6 +734,7 @@ ohos_unittest("MonitorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -771,6 +777,7 @@ ohos_unittest("ModuleLoaderTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -800,6 +807,7 @@ ohos_unittest("KeyEventNormalizeTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -837,6 +845,7 @@ ohos_unittest("KeyCommandTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -927,6 +936,7 @@ ohos_unittest("EventDumpTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1041,6 +1051,7 @@ ohos_unittest("DisplayStateManagerTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "image_framework:image_native",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1139,6 +1150,7 @@ ohos_unittest("ConnectManagerTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
