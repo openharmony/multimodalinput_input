@@ -23,6 +23,7 @@
 #include "pixel_map.h"
 #include "singleton.h"
 
+#include "display_manager.h"
 #include "extra_data.h"
 #include "input_display_bind_helper.h"
 #include "input_event.h"
@@ -61,6 +62,25 @@ struct WindowInfoEX {
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
+    class FoldStatusLisener : public Rosen::DisplayManager::IFoldStatusListener {
+    public:
+        FoldStatusLisener() = default;
+        virtual ~FoldStatusLisener() = default;
+
+        FoldStatusLisener(const FoldStatusLisener& foldStatusLisener) = delete;
+        FoldStatusLisener& operator=(const FoldStatusLisener& foldStatusLisener) = delete;
+        FoldStatusLisener(FoldStatusLisener&& foldStatusLisener) = delete;
+        FoldStatusLisener& operator=(FoldStatusLisener&& foldStatusLisener) = delete;
+
+        /**
+        * @param FoldStatus; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
+        */
+        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+
+    private:
+        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
+    };
+
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
@@ -180,6 +200,8 @@ private:
         std::vector<Rect> &windowHotAreas);
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
+    void RegisterFoldStatusListener();
+    void UnregisterFoldStatusListener();
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -291,6 +313,8 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
+    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
