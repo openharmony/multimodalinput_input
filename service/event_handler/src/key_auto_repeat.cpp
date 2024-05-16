@@ -121,6 +121,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
+        LogTracer lt(this->keyEvent_->GetId(), this->keyEvent_->GetEventType(), this->keyEvent_->GetKeyAction());
         inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         this->keyEvent_->UpdateId();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

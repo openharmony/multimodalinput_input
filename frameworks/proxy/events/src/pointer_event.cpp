@@ -1159,5 +1159,78 @@ void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
 {
     dispatchTimes_ = dispatchTimes;
 }
+
+std::string_view PointerEvent::ActionToShortStr(int32_t action)
+{
+    // 该函数逻辑简单，功能单一，考虑性能影响，使用switch-case而不是表驱动实现。
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+            return "P:C:";
+        case PointerEvent::POINTER_ACTION_DOWN:
+            return "P:D:";
+        case PointerEvent::POINTER_ACTION_MOVE:
+            return "P:M:";
+        case PointerEvent::POINTER_ACTION_UP:
+            return "P:U:";
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+            return "P:AB:";
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+            return "P:AU:";
+        case PointerEvent::POINTER_ACTION_AXIS_END:
+            return "P:AE:";
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+            return "P:BD:";
+        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+            return "P:BU:";
+        case PointerEvent::POINTER_ACTION_ENTER_WINDOW:
+            return "P:EW:";
+        case PointerEvent::POINTER_ACTION_LEAVE_WINDOW:
+            return "P:LW:";
+        case PointerEvent::POINTER_ACTION_PULL_DOWN:
+            return "P:PD:";
+        case PointerEvent::POINTER_ACTION_PULL_MOVE:
+            return "P:PM:";
+        case PointerEvent::POINTER_ACTION_PULL_UP:
+            return "P:PU:";
+        case PointerEvent::POINTER_ACTION_PULL_IN_WINDOW:
+            return "P:PI:";
+        case PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW:
+            return "P:PO:";
+        case PointerEvent::POINTER_ACTION_SWIPE_BEGIN:
+            return "P:SB:";
+        case PointerEvent::POINTER_ACTION_SWIPE_UPDATE:
+            return "P:SU:";
+        case PointerEvent::POINTER_ACTION_SWIPE_END:
+            return "P:SE:";
+        case PointerEvent::POINTER_ACTION_ROTATE_BEGIN:
+            return "P:RB:";
+        case PointerEvent::POINTER_ACTION_ROTATE_UPDATE:
+            return "P:RU:";
+        case PointerEvent::POINTER_ACTION_ROTATE_END:
+            return "P:RE:";
+        case PointerEvent::POINTER_ACTION_TRIPTAP:
+            return "P:TT:";
+        case PointerEvent::POINTER_ACTION_QUADTAP:
+            return "P:Q:";
+        case PointerEvent::POINTER_ACTION_HOVER_MOVE:
+            return "P:HM:";
+        case PointerEvent::POINTER_ACTION_HOVER_ENTER:
+            return "P:HE:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN:
+            return "P:FD:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_UP:
+            return "P:FU:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE:
+            return "P:FS:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH:
+            return "P:FR:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK:
+            return "P:FC:";
+        case PointerEvent::POINTER_ACTION_UNKNOWN:
+            return "P:UK:";
+        default:
+            return "P:?:";
+    }
+}
 } // namespace MMI
 } // namespace OHOS

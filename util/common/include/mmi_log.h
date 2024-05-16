@@ -27,6 +27,39 @@
 #include "util.h"
 #include "klog.h"
 
+#ifndef MMI_DISABLE_LOG_TRACE
+
+namespace OHOS {
+namespace MMI {
+class LogTracer {
+public:
+    LogTracer();
+
+    LogTracer(int64_t, int32_t, int32_t);
+
+    ~LogTracer();
+
+private:
+    int64_t traceId_;
+};
+
+void StartLogTraceId(int64_t, int32_t, int32_t);
+
+void EndLogTraceId(int64_t);
+
+const char *FormatLogTrace();
+
+void ResetLogTrace();
+}
+}
+
+#define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
+#define MMI_TRACE_ID  (OHOS::MMI::FormatLogTrace()),
+#else
+#define MMI_FUNC_FMT "[%{public}s:%{public}d] "
+#define MMI_TRACE_ID
+#endif //MMI_DISABLE_LOG_TRACE
+
 #ifdef MMI_LOG_DOMAIN
 #undef MMI_LOG_DOMAIN
 #endif
@@ -61,10 +94,6 @@
 
 #define MMI_LOG_DOMAIN MMI_LOG_FRAMEWORK
 
-#ifndef MMI_FUNC_FMT
-#define MMI_FUNC_FMT "[%{public}s:%{public}d] "
-#endif
-
 #ifndef MMI_FUNC_INFO
 #define MMI_FUNC_INFO __FUNCTION__
 #endif
@@ -77,165 +106,133 @@
 #define MMI_LINE_INFO   MMI_FILE_NAME, __LINE__
 #endif
 
+#define MMI_HILOG_BASE(type, level, domain, tag, fmt, ...) do { \
+        HILOG_IMPL(type, level, domain, tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
 #define MMI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_SERVERD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_SERVER, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_SERVER, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOG_SERVERI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_SERVER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_SERVERW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_SERVER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_SERVERE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_SERVER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_SERVERF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_SERVER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_HANDLERD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_HANDLER, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_HANDLER, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOG_HANDLERI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_HANDLER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HANDLERW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_HANDLER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HANDLERE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_HANDLER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_HANDLERF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_HANDLER, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_WINDOWD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_WINDOW, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_WINDOW, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOG_WINDOWI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_WINDOW, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_WINDOWW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_WINDOW, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_WINDOWE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_WINDOW, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_WINDOWF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_WINDOW, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_CURSORD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_CURSOR, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_CURSOR, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOG_CURSORI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_CURSOR, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_CURSORW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_CURSOR, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_CURSORE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_CURSOR, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_CURSORF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_CURSOR, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_DISPATCHD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOG_DISPATCHI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_DISPATCHW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_DISPATCHE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_DISPATCHF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_ANRDETECTD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
-        HILOG_IMPL(LOG_CORE, LOG_DEBUG, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
-            MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOG_ANRDETECTI(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_INFO, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_ANRDETECTW(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_WARN, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_ANRDETECTE(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_ERROR, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOG_ANRDETECTF(fmt, ...) do { \
-    HILOG_IMPL(LOG_CORE, LOG_FATAL, MMI_LOG_ANRDETECT, MMI_LOG_TAG, \
-        MMI_FUNC_FMT fmt, MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \
@@ -265,11 +262,11 @@
 
 namespace OHOS {
 namespace MMI {
-inline constexpr int32_t EVENT_TYPE_POINTER { 0X00020000 };
-inline constexpr int32_t TIMEOUT { 100000 };
-inline constexpr int32_t POINTER_ACTION_UP { 4 };
-inline constexpr int32_t POINTER_ACTION_MOVE { 3 };
-inline constexpr int32_t FINAL_FINGER { 1 };
+inline constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
+inline constexpr int32_t TIMEOUT = 100000;
+inline constexpr int32_t POINTER_ACTION_UP = 4;
+inline constexpr int32_t POINTER_ACTION_MOVE = 3;
+inline constexpr int32_t FINAL_FINGER = 1;
 
 class InnerFunctionTracer {
 public:

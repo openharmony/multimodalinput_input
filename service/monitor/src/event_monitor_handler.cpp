@@ -107,6 +107,7 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, Handl
 
 void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
 {
+    LogTracer lt(eventId, 0, 0);
     monitors_.MarkConsumed(eventId, session);
 }
 

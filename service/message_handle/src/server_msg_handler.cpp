@@ -97,6 +97,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
         CurrentPID_ = pid;
         auto iter = authorizationCollection_.find(pid);
@@ -158,6 +159,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
         CurrentPID_ = pid;
         auto iter = authorizationCollection_.find(pid);
@@ -178,12 +180,14 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EndLogTraceId(pointerEvent->GetId());
     pointerEvent->UpdateId();
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction())) {
                 return RET_ERR;
             }
@@ -203,8 +207,6 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return ret;
             }
             UpdatePointerEvent(pointerEvent);
-            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {

@@ -59,6 +59,8 @@ ohos_executable("uinput_inject") {
     "hilog:libhilog",
   ]
 
+  defines = [ "MMI_DISABLE_LOG_TRACE" ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
