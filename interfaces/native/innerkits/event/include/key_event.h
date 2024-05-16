@@ -2840,7 +2840,7 @@ public:
     /**
      * Stylus key
      *
-     * @since 9
+     * @since 12
      */
     static const int32_t KEYCODE_STYLUS_SCREEN;
 
@@ -3413,6 +3413,13 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    /**
+     * @brief Converts a key event action into a short string.
+     * @param Indicates the key event action.
+     * @return Returns the string converted from the key action.
+     * @since 12
+    */
+    static std::string_view ActionToShortStr(int32_t action);
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method

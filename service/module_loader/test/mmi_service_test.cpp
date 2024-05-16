@@ -17,9 +17,12 @@
 
 #include "proto.h"
 
+#include "mmi_log.h"
 #include "mmi_service.h"
 #include "udp_wrap.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIServerTest"
 namespace OHOS {
 namespace MMI {
 namespace {

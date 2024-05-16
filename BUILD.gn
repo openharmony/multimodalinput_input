@@ -59,6 +59,8 @@ ohos_executable("uinput_inject") {
     "hilog:libhilog",
   ]
 
+  defines = [ "MMI_DISABLE_LOG_TRACE" ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -140,8 +142,8 @@ group("mmi_tests") {
   testonly = true
   deps = [
     "frameworks/proxy:InputManagerFilterManualTest",
+    "frameworks/proxy:InputManagerInjectTest",
     "frameworks/proxy:InputManagerManualTest",
-    "frameworks/proxy:InputManagerSimulateTest",
     "frameworks/proxy:InputManagerTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
@@ -157,6 +159,7 @@ group("mmi_tests") {
     "service:EventDumpTest",
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
+    "service:EventHandlerTest",
     "service:InterceptorTest",
     "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
@@ -164,6 +167,7 @@ group("mmi_tests") {
     "service:MonitorTest",
     "service:MouseEventNormalizeTest",
     "service:NapProcessTest",
+    "service:StylusKeyTest",
     "service:SubscriberTest",
     "service:TimerManagerTest",
     "service:TouchEventNormalizeTest",

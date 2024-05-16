@@ -29,7 +29,10 @@ ohos_fuzztest("GetDeviceIdsFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "getdeviceids_fuzzer.cpp" ]
-  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",

@@ -274,5 +274,73 @@ void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
         }
     }
 }
+
+void BytraceAdapter::StartIpcServer(uint32_t code)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "ipcServerHandle code:" + std::to_string(code));
+}
+
+void BytraceAdapter::StopIpcServer()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartPackageEvent(const std::string& msg)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, msg);
+}
+
+void BytraceAdapter::StopPackageEvent()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartHandleInput(int32_t code)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "originEventHandle code:" + std::to_string(code));
+}
+
+void BytraceAdapter::StopHandleInput()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartConsumer(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "eventConsume pointerEventId:" + std::to_string(pointerEvent->GetId()));
+}
+
+void BytraceAdapter::StopConsumer()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartConsumer(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "eventConsume keyEventId:" + std::to_string(keyEvent->GetId()));
+}
+
+void BytraceAdapter::StartSocketHandle(int32_t msgId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "socketMsgHandle msgId:" + std::to_string(msgId));
+}
+
+void BytraceAdapter::StopSocketHandle()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartLaunchAbility(int32_t type, const std::string& bundleName)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT,
+        "launchAbility type:" + std::to_string(type) + ", bundleName:" + bundleName);
+}
+
+void BytraceAdapter::StopLaunchAbility()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
 } // namespace MMI
 } // namespace OHOS

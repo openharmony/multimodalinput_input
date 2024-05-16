@@ -58,5 +58,23 @@ int32_t AxisEvent::GetAxisValue() const
 }
 
 void AxisEvent::SetAxisValue(int32_t axisValue) {}
+
+std::string_view AxisEvent::ActionToShortStr(int32_t action)
+{
+    switch (action) {
+        case AxisEvent::AXIS_ACTION_CANCEL:
+            return "A:C:";
+        case AxisEvent::AXIS_ACTION_START:
+            return "A:S:";
+        case AxisEvent::AXIS_ACTION_UPDATE:
+            return "A:U:";
+        case AxisEvent::AXIS_ACTION_END:
+            return "A:E:";
+        case AxisEvent::AXIS_ACTION_UNKNOWN:
+            return "A:UK:";
+        default:
+            return "A:?:";
+    }
+}
 } // namespace MMI
 } // namespace OHOS

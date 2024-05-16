@@ -48,7 +48,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_001, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
-    std::shared_ptr<KeyEvent>event = KeyEvent::Create();
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
     ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(event));
 }
 
@@ -62,7 +62,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_002, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
-    std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
 }
 
@@ -76,7 +76,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_003, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
-    std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NO_FATAL_FAILURE(handler.HandleTouchEvent(pointerEvent));
 }
 
@@ -90,7 +90,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_004, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
-    std::shared_ptr<KeyEvent>event = KeyEvent::Create();
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
     EXPECT_FALSE(handler.OnHandleEvent(event));
 }
 
@@ -104,7 +104,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_005, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler handler;
-    std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_FALSE(handler.OnHandleEvent(pointerEvent));
 }
 
@@ -118,7 +118,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_007, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler::InterceptorCollection interceptorHandler;
-    std::shared_ptr<KeyEvent>KeyEvent = KeyEvent::Create();
+    std::shared_ptr<KeyEvent> KeyEvent = KeyEvent::Create();
     bool ret = interceptorHandler.HandleEvent(KeyEvent);
     EXPECT_FALSE(ret);
 }
@@ -133,7 +133,7 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize
 {
     CALL_TEST_DEBUG;
     EventInterceptorHandler::InterceptorCollection interceptorHandler;
-    std::shared_ptr<PointerEvent>pointerEvent = PointerEvent::Create();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t deviceTags = 4;
     bool ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);

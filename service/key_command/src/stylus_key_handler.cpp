@@ -25,19 +25,14 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StylusKeyHandler" };
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-} // namespace
 const std::string STYLUS_ABILITY_NAME = "HiNotePcMainAbility";
 const std::string STYLUS_BUNDLE_NAME = "com.hmos.hinote";
+const std::string IS_SCREEN_OFF = "is_sceen_off";
 
 StylusKeyHandler::StylusKeyHandler() {}
 StylusKeyHandler::~StylusKeyHandler() {}
 
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-bool StylusKeyHandler::HandleStylusKey(const std::shared_ptr<KeyEvent> keyEvent)
+bool StylusKeyHandler::HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_STYLUS_SCREEN) {
@@ -57,6 +52,7 @@ void StylusKeyHandler::IsLaunchAbility()
     if (stylusKey_.lastEventIsStylus) {
         stylusKey_.ability.abilityName = STYLUS_ABILITY_NAME;
         stylusKey_.ability.bundleName = STYLUS_BUNDLE_NAME;
+        stylusKey_.ability.params.emplace(IS_SCREEN_OFF, "true");
         LaunchAbility(stylusKey_.ability);
         stylusKey_.lastEventIsStylus = false;
         stylusKey_.isLaunchAbility = true;
@@ -89,6 +85,5 @@ void StylusKeyHandler::SetLastEventState(bool state)
     stylusKey_.lastEventIsStylus = state;
 }
 
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -147,12 +147,14 @@ public:
      * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,
      * the <b>callback</b> specified is invoked to process the event.
      * @param callback Indicates the callback.
+     * @param switchType Indicates the type of switch input event.
      * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
      * If the value is greater than or equal to <b>0</b>,
      * the subscription is successful. Otherwise, the subscription fails.
      * @since 9
      */
-    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
+        SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::DEFAULT);
 
     /**
      * @brief Unsubscribes from a switch input event.

@@ -107,6 +107,7 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, Handl
 
 void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
 {
+    LogTracer lt(eventId, 0, 0);
     monitors_.MarkConsumed(eventId, session);
 }
 
@@ -177,7 +178,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
     }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
     }
 }
 
