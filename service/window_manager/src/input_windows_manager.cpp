@@ -42,6 +42,7 @@
 #include "multimodal_input_preferences_manager.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
+#include "timer_manager.h"
 #include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "res_sched_client.h"
@@ -74,6 +75,7 @@ constexpr int32_t BOTTOM_RIGHT_AREA = 4;
 constexpr int32_t BOTTOM_AREA = 5;
 constexpr int32_t BOTTOM_LEFT_AREA = 6;
 constexpr int32_t LEFT_AREA = 7;
+constexpr int32_t WAIT_TIME_FOR_REGISTER = 2000;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT = 1;
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -126,7 +128,13 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
     displayGroupInfo_.height = 0;
 }
 
-InputWindowsManager::~InputWindowsManager() {}
+InputWindowsManager::~InputWindowsManager()
+{
+    CALL_INFO_TRACE;
+    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        UnregisterFoldStatusListener();
+    }
+}
 
 void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus)
 {
@@ -149,6 +157,61 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 #endif // OHOS_BUILD_ENABLE_POINTER
     InputDevMgr->SetInputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+
+    TimerMgr->AddTimer(WAIT_TIME_FOR_REGISTER, 1, [this]() {
+        MMI_HILOG_HANDLERD("Timer callback");
+        RegisterFoldStatusListener();
+    });
+}
+
+void InputWindowsManager::RegisterFoldStatusListener()
+{
+    CALL_INFO_TRACE;
+    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        MMI_HILOG_HANDLERD("The device is not foldable");
+        return;
+    }
+    foldStatusListener_ = new (std::nothrow) FoldStatusLisener();
+    CHKPV(foldStatusListener_);
+    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOG_HANDLERE("Failed to register fold status listener");
+        foldStatusListener_ = nullptr;
+    } else {
+        MMI_HILOG_HANDLERD("Register fold status listener successed");
+    }
+}
+
+void InputWindowsManager::UnregisterFoldStatusListener()
+{
+    CALL_INFO_TRACE;
+    CHKPV(foldStatusListener_);
+    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
+    }
+}
+
+void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
+{
+    CALL_INFO_TRACE;
+    MMI_HILOG_HANDLERD("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
+    if (lastFoldStatus_ == foldStatus) {
+        MMI_HILOG_HANDLERD("No need to set foldStatus");
+        return;
+    }
+    if (WinMgr->lastPointerEventForFold_ == nullptr) {
+        MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
+        return;
+    }
+    auto pointerEvent = std::make_shared<PointerEvent>(*(WinMgr->lastPointerEventForFold_));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetActionTime(GetSysClockTime());
+    pointerEvent->UpdateId();
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -2541,6 +2604,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
+    lastPointerEventForFold_ = pointerEvent;
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
