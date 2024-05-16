@@ -75,6 +75,7 @@ const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
+const std::string SETTING_KNUCKLE_SWITCH = "settings.game.forbid_finger_knuckle";
 
 enum SpecialType {
     SPECIAL_ALL = 0,
