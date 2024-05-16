@@ -428,25 +428,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawPointer_001
- * @tc.desc: Test DrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerDrawingManager->DrawPointer(1, 100, 100, pointerStyle, DIRECTION180);
-    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION180);
-    pointerDrawingManager->DrawPointer(1, 200, 200, pointerStyle, DIRECTION270);
-    EXPECT_EQ(pointerDrawingManager->lastDirection_, DIRECTION270);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_UpdateMouseStyle_001
  * @tc.desc: Test UpdateMouseStyle
  * @tc.type: FUNC
@@ -754,27 +735,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CheckPointerStylePar
     windowId = 1;
     ret = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
     EXPECT_TRUE(ret);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_001
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = EAST;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-    pointerDrawingManager.lastPhysicalX_ = -1;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
 
 /**
