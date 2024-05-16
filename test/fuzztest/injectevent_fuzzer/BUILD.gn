@@ -75,6 +75,7 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [

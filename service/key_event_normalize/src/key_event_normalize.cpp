@@ -48,6 +48,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
+    StartLogTraceId(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
@@ -74,6 +75,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     keyEvent->SetDeviceId(deviceId);
     keyEvent->SetKeyCode(keyCode);
     keyEvent->SetKeyAction(keyAction);
+    StartLogTraceId(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetPressedKeys().empty()) {
         keyEvent->SetActionStartTime(time);
     }

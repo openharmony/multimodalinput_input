@@ -390,6 +390,7 @@ ohos_unittest("TransformPointTest") {
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

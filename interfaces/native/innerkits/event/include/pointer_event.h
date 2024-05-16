@@ -1479,6 +1479,13 @@ public:
      */
     static bool HasAxis(uint32_t axes, AxisType axis);
 
+    /**
+     * @brief Converts a pointer event action into a short string.
+     * @param Indicates the pointer event action.
+     * @return Returns the string converted from the pointer action.
+     * @since 12
+     */
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
