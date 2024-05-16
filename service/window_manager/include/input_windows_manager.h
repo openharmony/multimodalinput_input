@@ -154,6 +154,7 @@ public:
     void GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
     void ClearTargetWindowIds();
+    void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
 
