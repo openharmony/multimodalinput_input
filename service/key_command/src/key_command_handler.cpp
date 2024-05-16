@@ -252,7 +252,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (singleKnuckleGesture_.statusConfigValue) {
+    if (!singleKnuckleGesture_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
