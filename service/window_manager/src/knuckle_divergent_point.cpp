@@ -15,13 +15,9 @@
 
 #include "knuckle_divergent_point.h"
 
-#include <ctime>
-#include <iostream>
 #include <random>
 
 #include "include/core/SkColorFilter.h"
-
-#include "define_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -29,21 +25,16 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleDivergentPoint" };
-constexpr double PI = 3.14159265358979323846;
-constexpr double MOVE_SPEED = 10.0;
-Rosen::Drawing::Pen KnuckleDivergentPoint::sTracePaint;
-int32_t KnuckleDivergentPoint::BASIC_LIFESPAN = 15;
-double KnuckleDivergentPoint::BASIC_GRAVITY_Y = 0.5;
-int32_t KnuckleDivergentPoint::DEFAULT_LIFESPAN = -1;
-float KnuckleDivergentPoint::DOUBLE = 2.0f;
-int KnuckleDivergentPoint::TRACE_COLOR = 255;
-int KnuckleDivergentPoint::DEFAULT_SIZE = 80;
-int KnuckleDivergentPoint::DEFAULT_SIZE_OFFSET = 20;
-int KnuckleDivergentPoint::DEFAULT_SPEED = 8;
-int KnuckleDivergentPoint::DEFAULT_SPEED_OFFSET = 8;
+namespace {
+constexpr double PI = 3.14159265358979323846f;
+constexpr double MOVE_SPEED = 10.0f;
+constexpr double BASIC_GRAVITY_Y = 0.5f;
+constexpr int32_t BASIC_LIFESPAN = 15;
+constexpr float DOUBLE = 2.0f;
+} // namespace
 
-KnuckleDivergentPoint::KnuckleDivergentPoint(OHOS::Rosen::Drawing::Bitmap bitMap) : traceShadow_(bitMap)
+KnuckleDivergentPoint::KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap)
+    : traceShadow_(bitmap)
 {
     CALL_DEBUG_ENTER;
 }
@@ -97,7 +88,7 @@ void KnuckleDivergentPoint::Reset(double pointX, double pointY)
     moveVelocityY_ = std::sin(baseVelocity) * MOVE_SPEED;
 }
 
-bool KnuckleDivergentPoint::IsEnded()
+bool KnuckleDivergentPoint::IsEnded() const
 {
     CALL_DEBUG_ENTER;
     return lifespan_ < 0;

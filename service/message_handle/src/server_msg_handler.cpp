@@ -20,6 +20,7 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "authorization_dialog.h"
+#include "bytrace_adapter.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -31,6 +32,7 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_event_normalize.h"
+#include "key_event_value_transformation.h"
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
@@ -39,6 +41,8 @@
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ServerMsgHandler"
 
@@ -75,12 +79,14 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     CHKPV(sess);
     auto id = pkt.GetMsgId();
     TimeCostChk chk("ServerMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
+    BytraceAdapter::StartSocketHandle(static_cast<int32_t>(id));
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
         MMI_HILOGE("Unknown msg id:%{public}d,errCode:%{public}d", id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*callback)(sess, pkt);
+    BytraceAdapter::StopSocketHandle();
     if (ret < 0) {
         MMI_HILOGE("Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
@@ -104,6 +110,8 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
+    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    keyEvent->SetKeyIntention(keyIntention);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
@@ -549,7 +557,8 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+int32_t ServerMsgHandler::OnSubscribeSwitchEvent(
+    IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -557,7 +566,7 @@ int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
-    return subscriberHandler->SubscribeSwitchEvent(sess, subscribeId);
+    return subscriberHandler->SubscribeSwitchEvent(sess, subscribeId, switchType);
 }
 
 int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
@@ -622,14 +631,13 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
         }
         return ERR_OK;
-    } else {
-        auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
-        if (!ret.second) {
-            MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
-        }
-        MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
-        return ERR_OK;
     }
+    auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
+    if (!ret.second) {
+        MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
+    }
+    MMI_HILOGD("Reject application injection,pid:%{public}d", CurrentPID_);
+    return ERR_OK;
 }
 
 int32_t ServerMsgHandler::OnCancelInjection()

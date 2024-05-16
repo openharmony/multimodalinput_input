@@ -30,6 +30,8 @@
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseEventNormalize"
 
@@ -69,11 +71,22 @@ int32_t MouseEventNormalize::GetCurrentDeviceId() const
     return currentDeviceId_;
 }
 
-std::shared_ptr<PointerEvent>MouseEventNormalize::GetPointerEvent()
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent()
 {
     auto processor = GetCurrentProcessor();
     CHKPP(processor);
     return processor->GetPointerEvent();
+}
+
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent(int32_t deviceId)
+{
+    auto iter = processors_.find(deviceId);
+    if (iter == processors_.end()) {
+        MMI_HILOGE("Can't find mouse processor by deviceId:%{public}d", deviceId);
+        return nullptr;
+    }
+    CHKPP(iter->second);
+    return iter->second->GetPointerEvent();
 }
 
 int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)

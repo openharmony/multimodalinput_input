@@ -28,8 +28,8 @@
 namespace OHOS {
 namespace MMI {
 struct PointerInfo {
-    int32_t x {0};
-    int32_t y {0};
+    int32_t x { 0 };
+    int32_t y { 0 };
 };
 
 class KnuckleDrawingManager {

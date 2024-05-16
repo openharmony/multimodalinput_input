@@ -50,6 +50,24 @@ public:
     static void StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn, HandlerType handlerType);
     static void StartBytrace(TraceBtn traceBtn, EventType eventType);
 
+    static void StartIpcServer(uint32_t code);
+    static void StopIpcServer();
+
+    static void StartHandleInput(int32_t code);
+    static void StopHandleInput();
+    static void StartPackageEvent(const std::string& msg);
+    static void StopPackageEvent();
+
+    static void StartSocketHandle(int32_t msgId);
+    static void StopSocketHandle();
+
+    static void StartLaunchAbility(int32_t type, const std::string& bundleName);
+    static void StopLaunchAbility();
+
+    static void StartConsumer(std::shared_ptr<PointerEvent> pointerEvent);
+    static void StartConsumer(std::shared_ptr<KeyEvent> key);
+    static void StopConsumer();
+
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);

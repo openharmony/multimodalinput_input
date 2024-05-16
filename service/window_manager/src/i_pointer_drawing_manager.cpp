@@ -17,6 +17,9 @@
 
 #include "define_multimodal.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_CURSOR
+
 namespace OHOS {
 namespace MMI {
 std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()

@@ -29,6 +29,7 @@ group("test") {
     "getkeyboardtype_fuzzer:fuzztest",
     "getmouseprimarybutton_fuzzer:fuzztest",
     "getwindowpid_fuzzer:fuzztest",
+    "injectevent_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "pointerspeed_fuzzer:fuzztest",

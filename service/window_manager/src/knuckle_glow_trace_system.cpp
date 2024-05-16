@@ -16,8 +16,6 @@
 #include "knuckle_glow_trace_system.h"
 
 #include "include/core/SkPathMeasure.h"
-
-#include "define_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -26,18 +24,17 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KnuckleGlowTraceSystem" };
-}
+constexpr float BASIC_DISTANCE_BETWEEN_POINTS = 5.0f;
+} // namespace
 
-KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, OHOS::Rosen::Drawing::Bitmap bitMap,
-    int32_t maxDivergenceNum)
+KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, const OHOS::Rosen::Drawing::Bitmap &bitmap,
+    int32_t maxDivergenceNum) : maxDivergenceNum_(maxDivergenceNum)
 {
     CALL_DEBUG_ENTER;
     for (int32_t i = 0; i < pointSize; ++i) {
-        divergentPoints_.emplace_back(std::make_shared<KnuckleDivergentPoint>(bitMap));
-        glowPoints_.emplace_back(std::make_shared<KnuckleGlowPoint>(bitMap));
+        divergentPoints_.emplace_back(std::make_shared<KnuckleDivergentPoint>(bitmap));
+        glowPoints_.emplace_back(std::make_shared<KnuckleGlowPoint>(bitmap));
     }
-    maxDivergenceNum_ = maxDivergenceNum;
 }
 
 KnuckleGlowTraceSystem::~KnuckleGlowTraceSystem() {}
@@ -74,7 +71,7 @@ void KnuckleGlowTraceSystem::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     }
 }
 
-void KnuckleGlowTraceSystem::ResetDivergentPoints(double pointx, double pointY)
+void KnuckleGlowTraceSystem::ResetDivergentPoints(double pointX, double pointY)
 {
     CALL_DEBUG_ENTER;
     int32_t divergenceNum = 0;
@@ -85,21 +82,21 @@ void KnuckleGlowTraceSystem::ResetDivergentPoints(double pointx, double pointY)
         if (divergentPoint->IsEnded() && divergenceNum < maxDivergenceNum_) {
             divergenceNum++;
             MMI_HILOGE("reset divergentPoint");
-            divergentPoint->Reset(pointx, pointY);
+            divergentPoint->Reset(pointX, pointY);
         }
     }
 }
 
-void KnuckleGlowTraceSystem::AddGlowPoints(Rosen::Drawing::Path path, int64_t timeInteval)
+void KnuckleGlowTraceSystem::AddGlowPoints(Rosen::Drawing::Path path, int64_t timeInterval)
 {
     CALL_DEBUG_ENTER;
     double pathlength = path.GetLength(false);
     Rosen::Drawing::Point pathPoints;
     Rosen::Drawing::Point tangent;
     float distanceFromEnd = 0;
-    float lifespanOffset = timeInteval;
-    float splitRatio = (float) std::ceil(pathlength / BASIC_DISTANCE_BETWEEN_POINTS);
-    float baseTime = timeInteval / splitRatio;
+    float lifespanOffset = timeInterval;
+    float splitRatio = static_cast<float>(std::ceil(pathlength / BASIC_DISTANCE_BETWEEN_POINTS));
+    float baseTime = timeInterval / splitRatio;
     for (auto glowPoint : glowPoints_) {
         if (glowPoint != nullptr && glowPoint->IsEnded() && distanceFromEnd <= pathlength) {
             if (path.GetPositionAndTangent(distanceFromEnd, pathPoints, tangent, true)) {

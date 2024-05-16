@@ -21,6 +21,8 @@
 
 #include "tokenid_kit.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "PermissionHelper"
 
@@ -31,18 +33,18 @@ PermissionHelper::~PermissionHelper() {}
 
 bool PermissionHelper::VerifySystemApp()
 {
-    MMI_HILOGD("verify system App");
+    MMI_HILOGD("Verify system App");
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
+    MMI_HILOGD("Token type is %{public}d", static_cast<int32_t>(tokenType));
     if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE
         || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        MMI_HILOGD("called tokenType is native, verify success");
+        MMI_HILOGD("Called tokenType is native, verify success");
         return true;
     }
     uint64_t accessTokenIdEx = IPCSkeleton::GetCallingFullTokenID();
     if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(accessTokenIdEx)) {
-        MMI_HILOGE("system api is called by non-system app");
+        MMI_HILOGE("System api is called by non-system app");
         return false;
     }
     return true;

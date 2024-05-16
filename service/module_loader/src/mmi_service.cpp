@@ -62,6 +62,8 @@
 #endif
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
 
 namespace OHOS {
 namespace MMI {
@@ -266,10 +268,12 @@ int32_t MMIService::Init()
     }
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
+    MMI_HILOGD("Libinput service init");
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
+    MMI_HILOGD("Init DelegateTasks init");
     if (!InitDelegateTasks()) {
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
@@ -309,6 +313,7 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
+    MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
@@ -1305,13 +1310,13 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId)
+int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&ServerMsgHandler::OnSubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId));
+        std::bind(&ServerMsgHandler::OnSubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId, switchType));
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe switch event processed failed, ret:%{public}d", ret);
         return RET_ERR;
