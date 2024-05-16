@@ -39,15 +39,17 @@ private:
     {
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
+        std::string isRepeat = event->IsRepeat() ? "true" : "false";
         MMI_HILOGI("InputTracking id:%{public}d, KeyCode:%{public}d,ActionTime:%{public}" PRId64
             ",EventType:%{public}s,KeyAction:%{public}s,NumLock:%{public}d,CapsLock:%{public}d,"
-            "ScrollLock:%{public}d,keyItemsCount:%{public}zu,DisplayId:%{public}d,IsSimulate:%{public}s",
+            "ScrollLock:%{public}d,keyItemsCount:%{public}zu,DisplayId:%{public}d,IsRepeat:%{public}s,"
+            "IsSimulate:%{public}s",
             event->GetId(), event->GetKeyCode(), event->GetActionTime(),
             InputEvent::EventTypeToString(event->GetEventType()),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
-            event->GetTargetDisplayId(), isSimulate.c_str());
+            event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         for (const auto &item : eventItems) {
             MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,",
             item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());

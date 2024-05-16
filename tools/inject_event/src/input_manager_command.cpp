@@ -152,6 +152,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"down", required_argument, nullptr, 'd'},
         {"up", required_argument, nullptr, 'u'},
         {"long_press", required_argument, nullptr, 'l'},
+        {"repeat", required_argument, nullptr, 'r'},
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
@@ -687,7 +688,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 int64_t time = GetSysClockTime();
-                while ((c = getopt_long(argc, argv, "d:u:l:i:", keyboardSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "d:u:l:r:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -813,6 +814,84 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                             item.SetPressed(false);
                             keyEvent->AddKeyItem(item);
+                            InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+                            break;
+                        }
+                        case 'r': {
+                            constexpr int32_t ARGC_MIN = 4;
+                            if (argc < ARGC_MIN) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "wrong number of parameters" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (argc >= ARGC_MIN) {
+                                if (!StrToInt(optarg, keyCode)) {
+                                    std::cout << "invalid key code value" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            int32_t pressTimeMs = 3000;
+                            constexpr int32_t ARGC_MAX = 5;
+                            if (argc >= ARGC_MAX) {
+                                if (!StrToInt(argv[optind], pressTimeMs)) {
+                                    std::cout << "invalid key code value or press time" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            static constexpr int32_t minKeyCode = 0;
+                            static constexpr int32_t maxKeyCode = 5000;
+                            if ((keyCode < minKeyCode) || (keyCode > maxKeyCode)) {
+                                std::cout << "key code is out of range:" << minKeyCode << " <= "
+                                    << keyCode << " <= " << maxKeyCode << std::endl;
+                                return RET_ERR;
+                            }
+                            static constexpr int32_t minPressTimeMs = 3000;
+                            static constexpr int32_t maxPressTimeMs = 15000;
+                            if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
+                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
+                                    << pressTimeMs << " <= " << maxPressTimeMs << " ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::cout << " key code: " << keyCode << std::endl
+                                << "long press time: " << pressTimeMs << " ms" << std::endl;
+                            auto keyEvent = KeyEvent::Create();
+                            if (keyEvent == nullptr) {
+                                std::cout << "failed to create input event object" << std::endl;
+                                return RET_ERR;
+                            }
+                            keyEvent->SetKeyCode(keyCode);
+                            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+                            KeyEvent::KeyItem item;
+                            item.SetKeyCode(keyCode);
+                            int64_t time = GetSysClockTime();
+                            item.SetPressed(true);
+                            auto keyEventTemp = KeyEvent::Clone(keyEvent);
+                            if (keyEventTemp == nullptr) {
+                                std::cout << "failed to clone key event object" << std::endl;
+                                return RET_ERR;
+                            }
+                            keyEventTemp->SetActionTime(time);
+                            keyEventTemp->AddKeyItem(item);
+                            keyEventTemp->SetRepeat(true);
+                            std::string isRepeat = keyEventTemp->IsRepeat() ? "true" : "false";
+                            MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
+                                KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
+                            InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
+
+                            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+                            item.SetPressed(false);
+                            keyEvent->AddKeyItem(item);
+                            time = GetSysClockTime();
+                            keyEvent->SetActionTime(time);
+                            keyEvent->SetRepeat(true);
+                            isRepeat = keyEvent->IsRepeat() ? "true" : "false";
+                            MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                                KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
                             InputManager::GetInstance()->SimulateInputEvent(keyEvent);
                             break;
                         }
@@ -1590,6 +1669,8 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
     std::cout << "-l <key> [long press time] --long_press <key> [long press time] -press and hold the key";
+    std::cout << std::endl;
+    std::cout << "-r <key> [repeat output time] --repeat output <key> [repeat output time] -press and hold the key";
     std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
