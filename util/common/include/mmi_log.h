@@ -29,26 +29,28 @@
 
 #ifndef MMI_DISABLE_LOG_TRACE
 
-namespace OHOS::MMI {
-    class LogTracer {
-    public:
-        LogTracer();
+namespace OHOS {
+namespace MMI {
+class LogTracer {
+public:
+    LogTracer();
 
-        LogTracer(int64_t, int32_t, int32_t);
+    LogTracer(int64_t, int32_t, int32_t);
 
-        ~LogTracer();
+    ~LogTracer();
 
-    private:
-        int64_t traceId_;
-    };
+private:
+    int64_t traceId_;
+};
 
-    void StartLogTraceId(int64_t, int32_t, int32_t);
+void StartLogTraceId(int64_t, int32_t, int32_t);
 
-    void EndLogTraceId(int64_t);
+void EndLogTraceId(int64_t);
 
-    const char *FormatLogTrace();
+const char *FormatLogTrace();
 
-    void ResetLogTrace();
+void ResetLogTrace();
+}
 }
 
 #define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
@@ -56,7 +58,7 @@ namespace OHOS::MMI {
 #else
 #define MMI_FUNC_FMT "[%{public}s:%{public}d] "
 #define MMI_TRACE_ID
-#endif
+#endif //MMI_DISABLE_LOG_TRACE
 
 #ifdef MMI_LOG_DOMAIN
 #undef MMI_LOG_DOMAIN

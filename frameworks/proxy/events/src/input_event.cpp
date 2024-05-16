@@ -382,7 +382,7 @@ std::string_view Action2Str(int32_t eventType, int32_t action)
 void RefreshTraceStr()
 {
     g_traceStr.clear();
-    for (auto item = g_traceIds.begin(); item < g_traceIds.end(); item++) {
+    for (auto item = g_traceIds.begin(); item < g_traceIds.end(); ++item) {
         if (item != g_traceIds.begin()) {
             g_traceStr += "/";
         }
@@ -423,18 +423,18 @@ void EndLogTraceId(int64_t id)
     if (iter == g_traceIdToIdx.end()) {
         return;
     }
-    size_t Idx = iter->second;
+    size_t idx = iter->second;
     g_traceIdToIdx.erase(iter);
-    size_t IdCount = g_traceIds.size();
-    if (IdCount <= Idx) {
+    size_t idCount = g_traceIds.size();
+    if (idCount <= idx) {
         return;
     }
 
-    if (IdCount == Idx + 1) {
+    if (idCount == idx + 1) {
         g_traceIds.pop_back();
     } else {
         auto item = g_traceIds.begin();
-        item += Idx;
+        item += idx;
         g_traceIds.erase(item);
     }
     RefreshTraceStr();
