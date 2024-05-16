@@ -59,7 +59,7 @@ int32_t AxisEvent::GetAxisValue() const
 
 void AxisEvent::SetAxisValue(int32_t axisValue) {}
 
-const char *AxisEvent::ActionToShortString(int32_t action)
+std::string_view AxisEvent::ActionToShortStr(int32_t action)
 {
     switch (action) {
         case AxisEvent::AXIS_ACTION_CANCEL:

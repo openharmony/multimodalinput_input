@@ -584,6 +584,5 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
     }
     return realPath;
 }
-
 } // namespace MMI
 } // namespace OHOS

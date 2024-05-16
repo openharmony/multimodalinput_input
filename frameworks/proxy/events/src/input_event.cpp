@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "input_event.h"
-#include "pointer_event.h"
-#include "key_event.h"
 #include "axis_event.h"
+#include "input_event.h"
+#include "key_event.h"
+#include "pointer_event.h"
 
 #include <cassert>
 #include <chrono>
@@ -335,7 +335,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     return true;
 }
 
-const char *InputEvent::ActionToShortString(int32_t action)
+std::string_view InputEvent::ActionToShortStr(int32_t action)
 {
     switch (action) {
         case InputEvent::ACTION_CANCEL:
@@ -353,26 +353,25 @@ struct LogTraceKey {
     int32_t evtType;
 };
 
-thread_local std::vector<LogTraceKey> traceids;
-thread_local std::unordered_map<int64_t, size_t> traceIdToIdx;
-thread_local std::string traceStr;
+thread_local std::vector<LogTraceKey> g_traceIds;
+thread_local std::unordered_map<int64_t, size_t> g_traceIdToIdx;
+thread_local std::string g_traceStr;
 
-
-const char *action2String(int32_t evtType, int32_t action)
+std::string_view Action2Str(int32_t eventType, int32_t action)
 {
-    switch (evtType) {
+    switch (eventType) {
         case InputEvent::EVENT_TYPE_KEY: {
-            return KeyEvent::ActionToShortString(action);
+            return KeyEvent::ActionToShortStr(action);
         }
         case InputEvent::EVENT_TYPE_POINTER:
         case InputEvent::EVENT_TYPE_FINGERPRINT: {
-            return PointerEvent::ActionToShortString(action);
+            return PointerEvent::ActionToShortStr(action);
         }
         case InputEvent::EVENT_TYPE_AXIS: {
-            return AxisEvent::ActionToShortString(action);
+            return AxisEvent::ActionToShortStr(action);
         }
         case InputEvent::EVENT_TYPE_BASE: {
-            return InputEvent::ActionToShortString(action);
+            return InputEvent::ActionToShortStr(action);
         }
         default: {
             return "?:?:";
@@ -380,93 +379,94 @@ const char *action2String(int32_t evtType, int32_t action)
     }
 }
 
-void RefreshTraceString()
+void RefreshTraceStr()
 {
-    traceStr = "";
-    for (auto item = traceids.begin(); item < traceids.end(); item++) {
-        if (item != traceids.begin()) {
-            traceStr += "/";
+    g_traceStr.clear();
+    for (auto item = g_traceIds.begin(); item < g_traceIds.end(); item++) {
+        if (item != g_traceIds.begin()) {
+            g_traceStr += "/";
         }
-        traceStr += action2String(item->evtType, item->action) + std::to_string(item->Id);
+        g_traceStr += Action2Str(item->evtType, item->action);
+        g_traceStr += std::to_string(item->Id);
     }
 }
 
-void StartLogTraceId(int64_t newId, int32_t evtType, int32_t action)
+void StartLogTraceId(int64_t traceId, int32_t eventType, int32_t action)
 {
-    if (newId == -1) {
+    if (traceId == -1) {
         return;
     }
-    auto iter = traceIdToIdx.find(newId);
-    if (iter == traceIdToIdx.end()) {
-        traceids.push_back({newId, action, evtType});
-        traceIdToIdx.emplace(newId, traceids.size() - 1);
-
-        auto currentTraceStr = action2String(evtType, action) + std::to_string(newId);
-        if (traceids.size() == 1) {
-            traceStr = currentTraceStr;
+    auto iter = g_traceIdToIdx.find(traceId);
+    if (iter == g_traceIdToIdx.end()) {
+        g_traceIds.push_back({traceId, action, eventType});
+        g_traceIdToIdx.emplace(traceId, g_traceIds.size() - 1);
+        std::string currentTraceStr(Action2Str(eventType, action));
+        currentTraceStr += std::to_string(traceId);
+        if (g_traceIds.size() == 1) {
+            g_traceStr = currentTraceStr;
         } else {
-            traceStr += "/" + currentTraceStr;
+            g_traceStr += "/" + currentTraceStr;
         }
         return;
     }
-    LogTraceKey &old = traceids.at(iter->second);
-    if (old.evtType != evtType || old.action != action) {
-        old.evtType = evtType;
+    LogTraceKey &old = g_traceIds.at(iter->second);
+    if (old.evtType != eventType || old.action != action) {
+        old.evtType = eventType;
         old.action = action;
-        RefreshTraceString();
+        RefreshTraceStr();
     }
 };
 
 void EndLogTraceId(int64_t id)
 {
-    auto iter = traceIdToIdx.find(id);
-    if (iter == traceIdToIdx.end()) {
+    auto iter = g_traceIdToIdx.find(id);
+    if (iter == g_traceIdToIdx.end()) {
         return;
     }
-    auto Idx = iter->second;
-    traceIdToIdx.erase(iter);
-    auto IdCount = traceids.size();
+    size_t Idx = iter->second;
+    g_traceIdToIdx.erase(iter);
+    size_t IdCount = g_traceIds.size();
     if (IdCount <= Idx) {
         return;
     }
 
     if (IdCount == Idx + 1) {
-        traceids.pop_back();
+        g_traceIds.pop_back();
     } else {
-        auto item = traceids.begin();
+        auto item = g_traceIds.begin();
         item += Idx;
-        traceids.erase(item);
+        g_traceIds.erase(item);
     }
-    RefreshTraceString();
+    RefreshTraceStr();
 }
 
 const char *FormatLogTrace()
 {
-    return traceStr.c_str();
+    return g_traceStr.c_str();
 }
 
 
 void ResetLogTrace()
 {
-    traceids.clear();
-    traceIdToIdx.clear();
-    traceStr = "";
+    g_traceIds.clear();
+    g_traceIdToIdx.clear();
+    g_traceStr.clear();
 }
 
-LogTracer::LogTracer(int64_t id, int32_t evtType, int32_t action)
+LogTracer::LogTracer(int64_t traceId, int32_t evtType, int32_t action)
 {
-    this->id = id;
-    StartLogTraceId(id, evtType, action);
+    traceId_ = traceId;
+    StartLogTraceId(traceId, evtType, action);
 }
 
 LogTracer::~LogTracer()
 {
-    EndLogTraceId(this->id);
+    EndLogTraceId(traceId_);
 }
 
 LogTracer::LogTracer()
 {
-    id = -1;
+    traceId_ = -1;
 }
 
 } // namespace MMI

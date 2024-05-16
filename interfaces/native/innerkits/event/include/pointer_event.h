@@ -1485,7 +1485,7 @@ public:
      * @return Returns the string converted from the pointer action.
      * @since 12
      */
-    static const char *ActionToShortString(int32_t action);
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
