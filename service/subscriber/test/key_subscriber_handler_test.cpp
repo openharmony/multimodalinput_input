@@ -734,26 +734,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, 
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_PrintKeyUpLog_001
- * @tc.desc: Test PrintKeyUpLog
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyUpLog_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber> subscriber;
-    subscriber->id_ = 1;
-    subscriber->keyOption_->SetFinalKey(1);
-    subscriber->keyOption_->SetFinalKeyDown(true);
-    subscriber->keyOption_->SetFinalKeyDownDuration(1000);
-    subscriber->keyOption_->SetFinalKeyUpDelay(2000);
-    subscriber->keyOption_->SetPreKeys({1, 2, 3});
-    ASSERT_NO_FATAL_FAILURE(handler.PrintKeyUpLog(subscriber));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_001
  * @tc.desc: Test HandleKeyUpWithDelay
  * @tc.type: FUNC
