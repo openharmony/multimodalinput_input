@@ -1156,8 +1156,9 @@ void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
     dispatchTimes_ = dispatchTimes;
 }
 
-const char *PointerEvent::ActionToShortString(int32_t action)
+std::string_view PointerEvent::ActionToShortStr(int32_t action)
 {
+    // 该函数逻辑简单，功能单一，考虑性能影响，使用switch-case而不是表驱动实现。
     switch (action) {
         case PointerEvent::POINTER_ACTION_CANCEL:
             return "P:C:";

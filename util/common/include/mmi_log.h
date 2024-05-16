@@ -34,12 +34,12 @@ namespace OHOS::MMI {
     public:
         LogTracer();
 
-        explicit LogTracer(int64_t, int32_t, int32_t);
+        LogTracer(int64_t, int32_t, int32_t);
 
         ~LogTracer();
 
     private:
-        int64_t id;
+        int64_t traceId_;
     };
 
     void StartLogTraceId(int64_t, int32_t, int32_t);

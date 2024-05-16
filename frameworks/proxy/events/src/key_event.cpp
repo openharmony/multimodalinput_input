@@ -1336,7 +1336,7 @@ void KeyEvent::SetRepeat(bool repeat)
     repeat_ = repeat;
 }
 
-const char *KeyEvent::ActionToShortString(int32_t action)
+std::string_view KeyEvent::ActionToShortStr(int32_t action)
 {
     switch (action) {
         case KeyEvent::KEY_ACTION_CANCEL:

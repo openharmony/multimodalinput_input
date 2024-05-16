@@ -125,7 +125,7 @@ public:
      * @return Returns the string converted from the Axis action.
      * @since 12
     */
-    static const char *ActionToShortString(int32_t action);
+    static std::string_view ActionToShortStr(int32_t action);
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
