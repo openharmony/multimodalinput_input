@@ -49,4 +49,6 @@ public:
 };
 }
 }
+}
+}
 #endif // INFRARED_EMMITTER_DEF_H
