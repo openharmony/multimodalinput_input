@@ -206,6 +206,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
 #endif // USE_ROSEN_DRAWING
+            canvas->Clear();
             traceControlPoints_.clear();
             pointerPath_.Reset();
             auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
@@ -265,6 +266,7 @@ void KnuckleDynamicDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> 
 void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(glowTraceSystem_);
     if (pointerPath_.IsValid()) {
         auto id = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
@@ -303,7 +305,9 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
             displayInfo_.height, physicalX, physicalY);
     }
-    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
+    if (!traceControlPoints_.empty()) {
+        traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
+    }
     glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
     isDrawing_ = false;
     isStop_ = false;
