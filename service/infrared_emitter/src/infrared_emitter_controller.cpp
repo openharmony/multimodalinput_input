@@ -62,8 +62,7 @@ void InfraredEmitterController::InitInfraredEmitter()
     if (!soIrHandle) {
         MMI_HILOGD("begin load so %{public}s", IR_WRAPPER_PATH.c_str());
         soIrHandle = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
-        if (nullptr == soIrHandle)
-        {
+        if (nullptr == soIrHandle) {
             MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
             return;
         }
@@ -151,8 +150,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
         return false;
     }
     std::string context = "size:" + std::to_string(outRange.size()) + ";";
-    for (size_t i = 0; i < outRange.size(); i++)
-    {
+    for (size_t i = 0; i < outRange.size(); i++) {
         InfraredFrequencyInfo item;
         context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max_) +
                   ": per.min:" + std::to_string(outRange[i].min_) + ";;";
