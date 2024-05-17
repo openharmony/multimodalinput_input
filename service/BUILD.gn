@@ -283,6 +283,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
+    "hdf_core:libhdi",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
