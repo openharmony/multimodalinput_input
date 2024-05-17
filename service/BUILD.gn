@@ -1152,6 +1152,7 @@ ohos_unittest("ConnectManagerTest") {
     "ability_runtime:app_manager",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
