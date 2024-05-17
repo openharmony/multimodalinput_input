@@ -54,13 +54,11 @@ InfraredEmitterController::~InfraredEmitterController()
 void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
-    if (!irInterface_)
-    {
+    if (!irInterface_) {
         MMI_HILOGE("infrared emitter inited");
         return;
     }
-    if (!soIrHandle)
-    {
+    if (!soIrHandle) {
         MMI_HILOGD("begin load so %{public}s", IR_WRAPPER_PATH.);
         soIrHandle = dlopen(IR_WRAPPER_PATH.c_str());
         if (nullptr == soIrHandle)
@@ -73,15 +71,13 @@ void InfraredEmitterController::InitInfraredEmitter()
     funCreate_prt fnCreate = nullptr;
     fnCreate = (funCreate_prt)dlsym(soIrHandle, "ConsumerIrImplGetInstance");
     const char *dlsymError = dlerror();
-    if (dlsymError)
-    {
+    if (dlsymError) {
         MMI_HILOGE("load ConsumerIrImplGetInstance, error: %{public}s", dlsymError);
         dlclose(soIrHandle);
         soIrHandle = nullptr;
         return;
     }
-    if (!fnCreate)
-    {
+    if (!fnCreate) {
         MMI_HILOGE("loaded ConsumerIrImplGetInstance is null");
         dlclose(soIrHandle);
         soIrHandle = nullptr;
@@ -89,8 +85,7 @@ void InfraredEmitterController::InitInfraredEmitter()
     }
     MMI_HILOGI("infrared emitter call ConsumerIr:fnCreate begin");
     irInterface_ = (ConsumerIr *)fnCreate();
-    if (nullptr == irInterface_)
-    {
+    if (nullptr == irInterface_) {
         MMI_HILOGE("infrared emitter init fail irInterface_ is nullptr");
         dlclose(soIrHandle);
         soIrHandle = nullptr;
@@ -103,16 +98,14 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
 {
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();
-    if (!irInterface_)
-    {
+    if (!irInterface_) {
         MMI_HILOGE("infrared emitter not init");
         return false;
     }
     int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
     std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
-    for (size_t i = 0; i < pattern.size(); i++)
-    {
+    for (size_t i = 0; i < pattern.size(); i++) {
         int32_t per = pattern[i];
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(per) + ";";
         tempPattern.push_back(per);
@@ -121,13 +114,11 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
     bool outRet = false;
     int32_t ret = irInterface_->Transmit(tempCarrierFreq, tempPattern, outRet);
     MMI_HILOGI("irInterface_->Transmit ret:%{public}d", ret);
-    if (ret < 0)
-    {
+    if (ret < 0) {
         MMI_HILOGE("infrared emitter transmit %{public}d", ret);
         return false;
     }
-    if (!outRet)
-    {
+    if (!outRet) {
         MMI_HILOGE("infrared emitter transmit out false");
         return false;
     }
