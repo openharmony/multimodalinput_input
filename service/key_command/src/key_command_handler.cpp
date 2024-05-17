@@ -252,7 +252,10 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-
+    if (!singleKnuckleGesture_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
     auto id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -603,6 +606,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
+    singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -753,6 +757,7 @@ void KeyCommandHandler::ParseStatusConfigObserver()
         }
         CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
     }
+    CreateStatusConfigObserver<KnuckleGesture>(singleKnuckleGesture_);
 }
 
 template <class T>
