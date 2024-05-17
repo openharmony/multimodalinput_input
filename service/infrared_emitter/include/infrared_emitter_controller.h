@@ -17,8 +17,7 @@
 #define INFRARED_EMMITTER_CONTROLLER_H
 
 #include "nocopyable.h"
-#include "v1_0/consumer_ir.h"
-#include "v1_0/types.h"
+#include "infrared_emitter_def.h"
 
 namespace OHOS {
 namespace MMI {
