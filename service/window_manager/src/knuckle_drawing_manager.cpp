@@ -95,6 +95,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
 #endif // USE_ROSEN_DRAWING
+            canvas->Clear();
             auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
             canvasNode->ResetSurface();
             canvasNode_->FinishRecording();
