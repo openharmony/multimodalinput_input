@@ -2088,8 +2088,7 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &req
     MMI_HILOGI("start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
-    for (auto &item : infos)
-    {
+    for (auto &item : infos) {
         InfraredFrequency info;
         info.min_ = item.min_;
         info.max_ = item.max_;
@@ -2097,8 +2096,7 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &req
     }
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
-    for (int32_t i = 0; i < size; i++)
-    {
+    for (int32_t i = 0; i < size; i++) {
         context = context + "requencys[" + std::to_string(i) + "]. max=" + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
@@ -2109,8 +2107,7 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
 {
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
-    for (int32_t i = 0; i < size; i++)
-    {
+    for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
