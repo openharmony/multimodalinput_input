@@ -103,5 +103,27 @@ HWTEST_F(MouseDeviceStateTest, MouseDeviceStateTest_LibinputChangeToPointer_004,
     int32_t idNames = PointerEvent::MOUSE_BUTTON_LEFT;
     ASSERT_EQ(MouseState->LibinputChangeToPointer(keyValue), idNames);
 }
+
+/**
+ * @tc.name: MouseDeviceStateTest_ChangeMouseState
+ * @tc.desc: Test ChangeMouseState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseDeviceStateTest, MouseDeviceStateTest_ChangeMouseState, TestSize.Level1)
+{
+    int32_t btnStateCount = 1;
+    MouseState->ChangeMouseState(BUTTON_STATE_PRESSED, btnStateCount);
+    EXPECT_EQ(btnStateCount, 2);
+    btnStateCount = 2;
+    MouseState->ChangeMouseState(BUTTON_STATE_RELEASED, btnStateCount);
+    EXPECT_EQ(btnStateCount, 1);
+    btnStateCount = 10;
+    MouseState->ChangeMouseState(BUTTON_STATE_PRESSED, btnStateCount);
+    EXPECT_EQ(btnStateCount, 8);
+    btnStateCount = -1;
+    MouseState->ChangeMouseState(BUTTON_STATE_RELEASED, btnStateCount);
+    EXPECT_EQ(btnStateCount, 0);
+}
 }
 }
