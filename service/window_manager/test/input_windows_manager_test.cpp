@@ -19,6 +19,7 @@
 
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
+#include "fingersense_wrapper.h"
 #include "mmi_log.h"
 #include "proto.h"
 #include "scene_board_judgement.h"
@@ -87,6 +88,7 @@ private:
     bool preHoverScrollState_ { true };
 };
 
+void FingersenseWrapperTest(int32_t num) {}
 
 /**
  * @tc.name: InputWindowsManagerTest_GetClientFd_001
@@ -2697,6 +2699,225 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsWindowVisible_003, T
     int32_t pid = -1;
     auto ret = WinMgr->IsWindowVisible(pid);
     ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowGroupInfoByDisplayId
+ * @tc.desc: Test GetWindowGroupInfoByDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDisplayId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowGroupInfo windowGroupInfo;
+    int32_t displayId = 1;
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    EXPECT_TRUE(inputWindowsManager.GetWindowGroupInfoByDisplayId(displayId).empty());
+
+    WindowInfo windowInfo;
+    displayId = 2;
+    windowInfo.id = 1;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(displayId, windowGroupInfo));
+    EXPECT_TRUE(!inputWindowsManager.GetWindowGroupInfoByDisplayId(displayId).empty());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd
+ * @tc.desc: Test GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd, TestSize.Level1)
+{
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = false;
+    pointerEvent->SetPointerId(0);
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetTargetWindowId(15);
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = 0;
+    windowInfo.pid = 5;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = 15;
+    windowInfo.pid = 6;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
+    UDSServer udsServer;
+    udsServer.idxPidMap_.insert(std::make_pair(6, 15));
+    inputWindowsManager.udsServer_ = &udsServer;
+    EXPECT_NE(inputWindowsManager.udsServer_, nullptr);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), 15);
+    pointerEvent->SetTargetWindowId(20);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    inputWindowsManager.touchItemDownInfos_.clear();
+    windowInfoEX.flag = true;
+    windowInfoEX.window.agentWindowId = 1;
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+    pointerEvent->SetPointerId(7);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    inputWindowsManager.mouseDownInfo_.pid = 1;
+    inputWindowsManager.mouseDownInfo_.agentWindowId = 6;
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+    inputWindowsManager.mouseDownInfo_.pid = -1;
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_002
+ * @tc.desc: Test GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    UDSServer udsServer;
+    int32_t udsPid = 20;
+    int32_t udsFd = 15;
+    udsServer.idxPidMap_.insert(std::make_pair(udsPid, udsFd));
+    inputWindowsManager.udsServer_ = &udsServer;
+    int32_t windowId = 15;
+    EXPECT_NE(inputWindowsManager.udsServer_, nullptr);
+    WindowGroupInfo widGroupInfo;
+    WindowInfo windowInfo;
+    pointerEvent->SetTargetDisplayId(15);
+    windowInfo.id = 5;
+    windowInfo.pid = 10;
+    widGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = 15;
+    windowInfo.pid = 20;
+    widGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), widGroupInfo));
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent, windowId), udsFd);
+    windowId = 7;
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent, windowId), INVALID_FD);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckFocusWindowChange
+ * @tc.desc: Test CheckFocusWindowChange
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFocusWindowChange, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CheckFocusWindowChange(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckZorderWindowChange
+ * @tc.desc: Test CheckZorderWindowChange
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckZorderWindowChange, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::vector<WindowInfo> oldWindowsInfo;
+    std::vector<WindowInfo> newWindowsInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.CheckZorderWindowChange(oldWindowsInfo, newWindowsInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateCaptureMode
+ * @tc.desc: Test UpdateCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCaptureMode, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo;
+    WindowInfo windowInfo;
+    inputWindowsManager.captureModeInfo_.isCaptureMode = true;
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 25;
+    displayGroupInfo.focusWindowId = 25;
+    windowInfo.id = 10;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    windowInfo.id = 11;
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateCaptureMode(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfoByIncrementalInfo
+ * @tc.desc: Test UpdateDisplayInfoByIncrementalInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfoByIncrementalInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    WindowInfo window;
+    DisplayGroupInfo displayGroupInfo;
+    WindowInfo windowInfo;
+    window.action = WINDOW_UPDATE_ACTION::ADD_END;
+    window.id = 5;
+    windowInfo.id = 10;
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo));
+    window.id = 5;
+    window.action = WINDOW_UPDATE_ACTION::DEL;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo));
+    window.action = WINDOW_UPDATE_ACTION::CHANGE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo));
+    window.id = 10;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo));
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayInfoByIncrementalInfo(window, displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayMode
+ * @tc.desc: Test UpdateDisplayMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayMode, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.displayMode = DisplayMode::FULL;
+    inputWindowsManager.displayMode_ = DisplayMode::FULL;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
+    inputWindowsManager.displayMode_ = DisplayMode::MAIN;
+    FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
+    inputWindowsManager.displayMode_ = DisplayMode::MAIN;
+    FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ = FingersenseWrapperTest;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
 }
 } // namespace MMI
 } // namespace OHOS
