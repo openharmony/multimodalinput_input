@@ -30,10 +30,6 @@ namespace {
 }
 using namespace OHOS::HDI::Consumerir::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
-InfraredEmitterController *InfraredEmitterController::GetInstance()
-{
-    return instance_;
-}
 InfraredEmitterController::InfraredEmitterController()
 {
 }
@@ -51,6 +47,11 @@ InfraredEmitterController::~InfraredEmitterController()
     MMI_HILOGD("end release");
 }
 
+InfraredEmitterController *InfraredEmitterController::GetInstance()
+{
+    return instance_;
+}
+
 void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
@@ -59,17 +60,17 @@ void InfraredEmitterController::InitInfraredEmitter()
         return;
     }
     if (!soIrHandle) {
-        MMI_HILOGD("begin load so %{public}s", IR_WRAPPER_PATH.);
-        soIrHandle = dlopen(IR_WRAPPER_PATH.c_str());
+        MMI_HILOGD("begin load so %{public}s", IR_WRAPPER_PATH.c_str());
+        soIrHandle = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
         if (nullptr == soIrHandle)
         {
             MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
             return;
         }
     }
-    typedef ConsumerIr *(funCreate_prt)(void);
-    funCreate_prt fnCreate = nullptr;
-    fnCreate = (funCreate_prt)dlsym(soIrHandle, "ConsumerIrImplGetInstance");
+    typedef ConsumerIr* (*funCreate_ptr) (void);
+    funCreate_ptr fnCreate = nullptr;
+    fnCreate = (funCreate_ptr)dlsym(soIrHandle, "ConsumerIrImplGetInstance");
     const char *dlsymError = dlerror();
     if (dlsymError) {
         MMI_HILOGE("load ConsumerIrImplGetInstance, error: %{public}s", dlsymError);
@@ -153,10 +154,10 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     for (size_t i = 0; i < outRange.size(); i++)
     {
         InfraredFrequencyInfo item;
-        context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
-                  ": per.min:" + std::to_string(outRange[i].min) + ";;";
-        item.max_ = outRange[i].max;
-        item.min_ = outRange[i].min;
+        context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max_) +
+                  ": per.min:" + std::to_string(outRange[i].min_) + ";;";
+        item.max_ = outRange[i].max_;
+        item.min_ = outRange[i].min_;
         frequencyInfo.push_back(item);
     }
     MMI_HILOGI("data from hdf: %{public}s", context.c_str());
