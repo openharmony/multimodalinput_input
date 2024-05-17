@@ -69,6 +69,7 @@ config("libmmi_server_config") {
     "subscriber/include",
     "timer_manager/include",
     "permission_helper/include",
+    "infrared_emitter/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/device_state_manager/include",
     "${mmi_service_path}/filter/include",
@@ -171,6 +172,8 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_switch) {
     sources += [ "subscriber/src/switch_subscriber_handler.cpp" ]
   }
+
+  sources += [ "infrared_emitter/src/infrared_emitter_controller.cpp" ]
 
   if (input_feature_mouse || input_feature_touchscreen) {
     sources += [ "touch_event_normalize/src/touch_event_normalize.cpp" ]
