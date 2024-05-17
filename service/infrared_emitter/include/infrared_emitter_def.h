@@ -28,10 +28,10 @@ using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
-} _attribute_((aligned(8)));
+} __attribute__ ((aligned(8)));
 class ConsumerIr: public HdiBase {
 public:
-    DECLARE_HDI_DESCRIPROT(u"ohos.hdi.consumerir.v1_0.ConsumerIr");
+    DECLARE_HDI_DESCRIPTOR(u"ohos.hdi.consumerir.v1_0.ConsumerIr");
     virtual ~ConsumerIr() = default;
 
     static sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> Get(bool isStub = false);
