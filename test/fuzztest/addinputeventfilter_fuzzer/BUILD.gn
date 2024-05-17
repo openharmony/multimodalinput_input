@@ -61,7 +61,7 @@ ohos_fuzztest("AddInputEventFilterFuzzTest") {
     "${mmi_path}/service/touch_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
     "${preferences_path}/frameworks/native/include",
-    ]
+  ]
   cflags = [
     "-g",
     "-O0",
@@ -113,12 +113,18 @@ ohos_fuzztest("AddInputEventFilterFuzzTest") {
     "preferences:native_preferences",
     "preferences:native_preferences",
     "relational_store:native_rdb",
-    "resource_schedule_service:ressched_client",
     "safwk:system_ability_fwk",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
 }
 
 ###############################################################################
