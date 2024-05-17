@@ -30,9 +30,7 @@ namespace {
 }
 using namespace OHOS::HDI::Consumerir::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
-InfraredEmitterController::InfraredEmitterController()
-{
-}
+InfraredEmitterController::InfraredEmitterController() {}
 
 InfraredEmitterController::~InfraredEmitterController()
 {
