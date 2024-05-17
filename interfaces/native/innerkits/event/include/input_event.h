@@ -113,6 +113,7 @@ public:
 
     static constexpr uint32_t EVENT_FLAG_RAW_POINTER_MOVEMENT = 0x00000010;
     static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
+    static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
 
 public:
     /**

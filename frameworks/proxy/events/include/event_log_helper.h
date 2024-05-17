@@ -119,6 +119,16 @@ private:
                 MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
                 return;
             }
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%d,"
+                    "DisplayY:%d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,WindowId:%{public}d,"
+                    "DisplayXPos:%f,DisplayYPos:%f,WindowXPos:%f,WindowYPos::%f, OriginPointerId:%{public}d",
+                    pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                    item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                    item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
+                    item.GetOriginPointerId());
+                continue;
+            }
             MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
                 "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,"
                 "WindowId:%{public}d,DisplayXPos:%{public}f,DisplayYPos:%{public}f,WindowXPos:%{public}f,"
@@ -175,6 +185,19 @@ private:
             if (!event->GetPointerItem(pointerId, item)) {
                 MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
                 return;
+            }
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGD("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%d,"
+                    "DisplayY:%d,WindowX:%d,WindowY:%d,Width:%{public}d,Height:%{public}d,TiltX:%.2f,TiltY:%.2f,"
+                    "ToolDisplayX:%d,ToolDisplayY:%d,ToolWindowX:%d,ToolWindowY:%d,ToolWidth:%{public}d,"
+                    "ToolHeight:%{public}d,Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,"
+                    "ShortAxis:%{public}d,RawDx:%d,RawDy:%d",
+                    pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                    item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
+                    item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
+                    item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
+                    item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
+                continue;
             }
             MMI_HILOGD("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
                 "DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,Width:%{public}d,Height:%{public}d,"

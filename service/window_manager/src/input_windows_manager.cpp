@@ -374,6 +374,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
         return INVALID_PID;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    SetPrivacyModeFlag(windowInfo->privacyMode, keyEvent);
     keyEvent->SetTargetWindowId(windowInfo->id);
     keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOG_DISPATCHD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
@@ -852,6 +853,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
         return;
     }
     pointerEvent->SetTargetDisplayId(displayId);
+    SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(0);
@@ -930,6 +932,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     currentPointerItem.SetPointerId(0);
 
     pointerEvent->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
+    SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(0);
@@ -999,10 +1002,10 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
-            "zOrder:%{public}f",
+            "zOrder:%{public}f, privacyMode:%{public}d",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
-            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
+            item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder, item.privacyMode);
         for (const auto &win : item.defaultHotAreas) {
             MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
@@ -2008,6 +2011,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
     }
+    SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     auto windowX = logicalX - touchWindow->area.x;
@@ -2312,6 +2316,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
+    SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
@@ -2467,6 +2472,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     pointerEvent->UpdateId();
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->SetTargetDisplayId(lastTouchEvent_->GetTargetDisplayId());
+    SetPrivacyModeFlag(lastTouchWindowInfo_.privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(lastTouchWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastTouchWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(lastPointerId);
@@ -2543,6 +2549,7 @@ int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> 
         }
     }
     CHKPR(windowInfo, ERROR_NULL_POINTER);
+    SetPrivacyModeFlag(windowInfo->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(windowInfo->id);
     pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOG_DISPATCHD("focusWindow:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
@@ -3048,6 +3055,14 @@ void InputWindowsManager::ClearTargetWindowIds()
 {
     CALL_DEBUG_ENTER;
     targetWindowIds_.clear();
+}
+
+void InputWindowsManager::SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event)
+{
+    if (privacyMode == SecureFlag::PRIVACY_MODE) {
+        MMI_HILOGD("Window security mode is privacy");
+        event->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+    }
 }
 
 int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
