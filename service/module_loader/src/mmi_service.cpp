@@ -1193,6 +1193,49 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
 }
+
+int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointerId:%{public}d", pointerId);
+        return RET_ERR;
+    }
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    CHKPR(display, ERROR_NULL_POINTER);
+    enum ResolutionIndex {
+        FIRST = 0,
+        CURRENT = 1
+    };
+    if (displays_[FIRST] == nullptr) {
+        displays_[FIRST] = display;
+    } else {
+        displays_[CURRENT] = display;
+    }
+    if (displays_[FIRST] != nullptr && displays_[CURRENT] != nullptr) {
+        int32_t sourceX = pointerItem.GetDisplayX();
+        int32_t sourceY = pointerItem.GetDisplayY();
+        if ((displays_[FIRST]->GetWidth() == 0) || (displays_[FIRST]->GetHeight() == 0)) {
+            MMI_HILOGE("Invalid display, screen resolution width:%{public}d, height:%{public}d",
+                displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight());
+            return RET_ERR;
+        }
+        int32_t destX = sourceX * displays_[CURRENT]->GetWidth() / displays_[FIRST]->GetWidth();
+        int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
+        pointerItem.SetDisplayX(destX);
+        pointerItem.SetDisplayY(destY);
+        MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
+            "Screen resolution width:%{public}d, height:%{public}d first got,"
+            "Screen resolution width:%{public}d, height:%{public}d current got,"
+            "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
+            sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
+            displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+    }
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
@@ -1201,6 +1244,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
     int32_t pid = GetCallingPid();
+    AdaptScreenResolution(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject);
 #else
