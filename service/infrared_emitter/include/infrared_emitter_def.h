@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INFRARED_EMMITTER_CONTROLLER_H
-#define INFRARED_EMMITTER_CONTROLLER_H
+#ifndef INFRARED_EMMITTER_DEF_H
+#define INFRARED_EMMITTER_DEF_H
 
 #include <stdint.h>
 #include <vector.h>
@@ -49,4 +49,4 @@ public:
 };
 }
 }
-#endif // INFRARED_EMMITTER_CONTROLLER_H
+#endif // INFRARED_EMMITTER_DEF_H
