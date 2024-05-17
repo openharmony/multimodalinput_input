@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,7 +79,7 @@ int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t s
         MMI_HILOGE("Invalid subscribeId");
         return RET_ERR;
     }
-    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+    if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
         MMI_HILOGE("Invalid switchType");
         return RET_ERR;
     }
@@ -111,15 +111,15 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
     CHKPF(switchEvent);
     MMI_HILOGD("switchValue:%{public}d", switchEvent->GetSwitchValue());
 
-    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::LID) {
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_LID) {
         DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
     }
 
     bool handled = false;
     for (const auto &subscriber : subscribers_) {
-        if (subscriber->switchType_ == switchEvent->GetSwitchType()
-            || (subscriber->switchType_ == SwitchEvent::SwitchType::DEFAULT &&
-                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::PRIVACY)) {
+        if (subscriber->switchType_ == switchEvent->GetSwitchType() ||
+            (subscriber->switchType_ == SwitchEvent::SwitchType::SWITCH_DEFAULT &&
+                switchEvent->GetSwitchType() != SwitchEvent::SwitchType::SWITCH_PRIVACY)) {
             NotifySubscriber(switchEvent, subscriber);
             handled = true;
         }

@@ -154,7 +154,7 @@ public:
      * @since 9
      */
     int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
-        SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::DEFAULT);
+        SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::SWITCH_DEFAULT);
 
     /**
      * @brief Unsubscribes from a switch input event.

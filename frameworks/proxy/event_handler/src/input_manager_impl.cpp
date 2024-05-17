@@ -371,7 +371,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
-    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+    if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
         MMI_HILOGE("switch type error, switchType:%{public}d", switchType);
         return RET_ERR;
     }
