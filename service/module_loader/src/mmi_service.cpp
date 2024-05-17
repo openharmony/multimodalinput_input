@@ -2095,7 +2095,8 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &req
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
     for (int32_t i = 0; i < size; i++) {
-        context = context + "requencys[" + std::to_string(i) + "]. max=" + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) + ";";
+        context = context + "requencys[" + std::to_string(i) + "]. max=" + std::to_string(requencys[i].max_) +
+        ",min=" + std::to_string(requencys[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
     return RET_OK;

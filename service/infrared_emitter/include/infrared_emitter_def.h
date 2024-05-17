@@ -29,7 +29,7 @@ struct ConsumerIrFreqRange {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
 } __attribute__ ((aligned(8)));
-class ConsumerIr: public HdiBase {
+class ConsumerIr : public HdiBase {
 public:
     DECLARE_HDI_DESCRIPTOR(u"ohos.hdi.consumerir.v1_0.ConsumerIr");
     virtual ~ConsumerIr() = default;
@@ -39,7 +39,8 @@ public:
 
     virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t> &pattern, bool &ret) = 0;
 
-    virtual int32_t GetCarrierFreqs(bool &ret, std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange> &range) = 0;
+    virtual int32_t GetCarrierFreqs(bool &ret,
+                                    std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange> &range) = 0;
 
     virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer) = 0;
 
