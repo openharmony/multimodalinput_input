@@ -3058,11 +3058,10 @@ void InputWindowsManager::ClearTargetWindowIds()
 
 void InputWindowsManager::SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event)
 {
-    if (privacyMode == SecureFlag::DEFAULT_MODE) {
-        MMI_HILOGD("Window security mode is default");
-        return;
+    if (privacyMode == SecureFlag::PRIVACY_MODE){
+        MMI_HILOGD("Window security mode is privacy");
+        event->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
     }
-    event->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
 }
 
 int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid)
