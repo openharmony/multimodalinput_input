@@ -129,8 +129,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
 {
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();
-    if (!irInterface_)
-    {
+    if (!irInterface_) {
         MMI_HILOGE("infrared emitter not init");
         return false;
     }
@@ -139,13 +138,11 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     MMI_HILOGI("irInterface_->GetCarrierFreqs");
     int32_t ret = irInterface_->GetCarrierFreqs(outRet, outRange);
     MMI_HILOGI("irInterface_->GetCarrierFreqs ret:%{public}d", ret);
-    if (ret < 0)
-    {
+    if (ret < 0) {
         MMI_HILOGE("infrared emitter GetCarrierFreqs %{public}d", ret);
         return false;
     }
-    if (!outRet)
-    {
+    if (!outRet) {
         MMI_HILOGE("infrared emitter GetCarrierFreqs out false");
         return false;
     }
