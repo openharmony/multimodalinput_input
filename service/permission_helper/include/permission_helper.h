@@ -17,6 +17,7 @@
 #define PERMISSION_HELPER_H
 
 #include "accesstoken_kit.h"
+#include "message_parcel.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -37,6 +38,7 @@ public:
     int32_t GetTokenType();
     bool CheckDispatchControl();
     bool VerifySystemApp();
+    bool VerifySystemApp(MessageParcel& data);
     bool CheckInfraredEmmit();
 
 private:

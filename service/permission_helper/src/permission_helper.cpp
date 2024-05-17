@@ -50,6 +50,54 @@ bool PermissionHelper::VerifySystemApp()
     return true;
 }
 
+bool PermissionHelper::VerifySystemApp(MessageParcel& data)
+{
+    int32_t userID = -1;
+    int32_t instIndex = -1;
+    std::string bundleName = "";
+    READINT32(data, userID, IPC_PROXY_DEAD_OBJECT_ERR);
+    READSTRING(data, bundleName, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, instIndex, IPC_PROXY_DEAD_OBJECT_ERR);
+    if ((userID < 0) || (instIndex < 0) || (bundleName == "")) {
+        MMI_HILOGD("MultimodalVerifySystemApp UserID, instIndex, bundleName failed, UserID=%{public}d, "
+            "bundleName=%{public}s, instIndex=%{public}d", userID, bundleName.c_str(), instIndex);
+        uint32_t callingTokenId = IPCSkeleton::GetCallingTokenID();
+        Security::AccessToken::HapTokenInfo hapTokenInfo;
+        int ret = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callingTokenId, hapTokenInfo);
+        if (ret) {
+            MMI_HILOGD("MultimodalVerifySystemApp failed to get haptokeninfo, result = %{public}d", ret);
+            return false;
+        }
+        if (hapTokenInfo.instIndex < 0) {
+            MMI_HILOGD("MultimodalVerifySystemApp get invalid appindex from haptokeninfo, index = %{public}d",
+                hapTokenInfo.instIndex);
+            return false;
+        }
+        instIndex = static_cast<int32_t>(hapTokenInfo.instIndex);
+        userID = static_cast<int32_t>(hapTokenInfo.userID);
+        bundleName = hapTokenInfo.bundleName;
+    }
+    auto callerToken = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenID(userID, bundleName, instIndex);
+    MMI_HILOGD("MultimodalVerifySystemApp UserID=%{public}d, bundleName=%{public}s, instIndex=%{public}d, "
+        "callerToken=%{public}d.", userID, bundleName.c_str(), instIndex, callerToken);
+
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    MMI_HILOGD("MultimodalVerifySystemApp tokentype is %{public}d", static_cast<int32_t>(tokenType));
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE ||
+        tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGD("MultimodalVerifySystemApp calledtokenType is native, verifysuccess");
+        return true;
+    }
+
+    uint64_t accessTokenIdEx = static_cast<uint64_t>(callerToken);
+    if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(accessTokenIdEx)) {
+        MMI_HILOGE("MultimodalVerifySystemApp systemapi called by non-system app");
+        return false;
+    }
+    return true;
+}
+
+
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
     CALL_DEBUG_ENTER;
