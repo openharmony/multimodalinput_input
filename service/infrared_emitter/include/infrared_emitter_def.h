@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Consumerir {
 namespace V1_0 {
-using namespace OHOS::HDI
+using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
