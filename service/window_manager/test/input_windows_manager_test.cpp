@@ -2732,7 +2732,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowGroupInfoByDi
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
@@ -2754,12 +2753,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd, TestSize.
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
     UDSServer udsServer;
-    int32_t udsPid = 6;
-    int32_t udsFd = 15;
-    udsServer.idxPidMap_.insert(std::make_pair(udsPid, udsFd));
+    udsServer.idxPidMap_.insert(std::make_pair(6, 15));
     inputWindowsManager.udsServer_ = &udsServer;
     EXPECT_NE(inputWindowsManager.udsServer_, nullptr);
-    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), udsFd);
+    EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), 15);
     pointerEvent->SetTargetWindowId(20);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
     EXPECT_EQ(inputWindowsManager.GetClientFd(pointerEvent), INVALID_FD);
