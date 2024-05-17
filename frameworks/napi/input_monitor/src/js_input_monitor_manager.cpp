@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string REFERENCE_UNREF = "napi_reference_unref";
 constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
 } // namespace
 
