@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
-using namespace OHOS::HID::Consumerir::V1_0;
+using namespace OHOS::HDI::Consumerir::V1_0;
 struct InfraredFrequencyInfo {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
