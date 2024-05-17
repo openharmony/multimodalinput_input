@@ -780,7 +780,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     }
     int32_t pointerStyle = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
-    if (pointerStyle < DEFAULT || pointerStyle > RUNNING) {
+    if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > RUNNING) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
         return nullptr;
@@ -828,7 +828,7 @@ napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_inf
     }
     int32_t pointerStyle = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
-    if (pointerStyle < DEFAULT || pointerStyle > RUNNING) {
+    if ((pointerStyle < DEFAULT && pointerStyle != DEVELOPER_DEFINED_ICON) || pointerStyle > RUNNING) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
         return nullptr;
@@ -996,6 +996,8 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(napi_create_int32(env, MOUSE_ICON::LOADING, &loading), CREATE_INT32);
     napi_value running = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::RUNNING, &running), CREATE_INT32);
+    napi_value developer_defined_icon = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::DEVELOPER_DEFINED_ICON, &developer_defined_icon), CREATE_INT32);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DEFAULT", defaults),
@@ -1042,6 +1044,7 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CIRCLE", cursor_circle),
         DECLARE_NAPI_STATIC_PROPERTY("LOADING", loading),
         DECLARE_NAPI_STATIC_PROPERTY("RUNNING", running),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVELOPER_DEFINED_ICON", developer_defined_icon),
     };
     napi_value result = nullptr;
     CHKRP(napi_define_class(env, "PointerStyle", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
