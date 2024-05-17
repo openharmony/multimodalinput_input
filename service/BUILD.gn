@@ -569,6 +569,8 @@ ohos_unittest("WindowManagerTest") {
     "window_manager/test/input_windows_manager_test.cpp",
     "window_manager/test/knuckle_drawing_manager_test.cpp",
     "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
+    "window_manager/test/knuckle_glow_point_test.cpp",
+    "window_manager/test/knuckle_glow_trace_system_test.cpp",
     "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
