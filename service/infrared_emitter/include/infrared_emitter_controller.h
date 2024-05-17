@@ -44,7 +44,7 @@ private:
     DISALLOW_COPY_AND_MOVE(InfraredEmitterController);
     static InfraredEmitterController *instance_;
     ConsumerIr *irInterface_ {nullptr};
-    void * soIrHandle {nullptr};
+    void *soIrHandle {nullptr};
 };
 }
 }
