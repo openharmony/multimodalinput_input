@@ -17,7 +17,7 @@
 #define INFRARED_EMMITTER_DEF_H
 
 #include <stdint.h>
-#include <vector.h>
+#include <vector>
 #include "hdi_base.h"
 
 namespace OHOS {
