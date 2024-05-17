@@ -286,19 +286,19 @@ void TouchDrawingManager::CreateTouchWindow()
 #endif
     surfaceNode_->SetRotation(0);
     if (bubbleCanvasNode_ != nullptr) {
-        MMI_HILOGD("add child bubble canvas node");
+        MMI_HILOGD("Add child bubble canvas node");
         surfaceNode_->AddChild(bubbleCanvasNode_, DEFAULT_VALUE);
     }
     if (trackerCanvasNode_ != nullptr) {
-        MMI_HILOGD("add child pointer position canvas node");
+        MMI_HILOGD("Add child pointer position canvas node");
         surfaceNode_->AddChild(trackerCanvasNode_, DEFAULT_VALUE);
     }
     if (crosshairCanvasNode_ != nullptr) {
-        MMI_HILOGD("add child crosshair canvas node");
+        MMI_HILOGD("Add child crosshair canvas node");
         surfaceNode_->AddChild(crosshairCanvasNode_, DEFAULT_VALUE);
     }
     if (labelsCanvasNode_ != nullptr) {
-        MMI_HILOGD("add child labels canvas node");
+        MMI_HILOGD("Add child labels canvas node");
         surfaceNode_->AddChild(labelsCanvasNode_, DEFAULT_VALUE);
     }
     surfaceNode_->AttachToDisplay(static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId()));
