@@ -49,7 +49,7 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
-static const int SIG_KILL = 9;
+static const int32_t SIG_KILL = 9;
 static constexpr int32_t DEFAULT_API_VERSION = 8;
 
 HapInfoParams infoManagerTestInfoParms = {
@@ -271,7 +271,7 @@ struct PointerFilter : public IInputEventFilter {
             }
             MMI_HILOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2");
         } while (0);
-        int ret = sem_post(&sem);
+        int32_t ret = sem_post(&sem);
         EXPECT_EQ(ret, 0);
         return result;
     }
@@ -296,7 +296,7 @@ void Simulate(int32_t x, int32_t y)
 void WaitPointerEnd(sem_t &sem)
 {
     struct timespec ts;
-    int ret = clock_gettime(CLOCK_REALTIME, &ts);
+    int32_t ret = clock_gettime(CLOCK_REALTIME, &ts);
     ASSERT_NE(ret, -1);
     int32_t waitForSeconds = 3;
     ts.tv_sec += waitForSeconds;
@@ -308,7 +308,7 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
     CALL_DEBUG_ENTER;
     MMI_HILOGI("enter HandlePointerEventFilter_001");
     sem_t sem;
-    int ret = sem_init(&sem, 0, 0);
+    int32_t ret = sem_init(&sem, 0, 0);
     ASSERT_EQ(ret, 0);
     bool result = false;
     auto filter = std::make_shared<PointerFilter>(10, 10, sem, result);
@@ -360,7 +360,7 @@ struct KeyFilter002 : public IInputEventFilter {
                 break;
             }
         } while (0);
-        int ret = sem_post(&sem);
+        int32_t ret = sem_post(&sem);
         EXPECT_EQ(ret, 0);
         return result;
     }
@@ -372,7 +372,7 @@ struct KeyFilter002 : public IInputEventFilter {
 void WaitKeyEnd(sem_t &sem)
 {
     struct timespec ts;
-    int ret = clock_gettime(CLOCK_REALTIME, &ts);
+    int32_t ret = clock_gettime(CLOCK_REALTIME, &ts);
     ASSERT_NE(ret, -1);
     int32_t waitForSeconds = 5;
     ts.tv_sec += waitForSeconds;
@@ -411,7 +411,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
     ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
 
     sem_t semA;
-    int ret = sem_init(&semA, 0, 0);
+    int32_t ret = sem_init(&semA, 0, 0);
     ASSERT_EQ(ret, 0);
     bool resultA = false;
     auto filterA = std::make_shared<KeyFilter002>(KeyEvent::KEYCODE_A, semA, resultA);
