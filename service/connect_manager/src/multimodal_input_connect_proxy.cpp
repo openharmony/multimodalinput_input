@@ -14,6 +14,7 @@
  */
 
 #include <unistd.h>
+
 #include "multimodal_input_connect_proxy.h"
 #include "pixel_map.h"
 #include "message_option.h"

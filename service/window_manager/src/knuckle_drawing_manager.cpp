@@ -14,6 +14,7 @@
  */
 
 #include "knuckle_drawing_manager.h"
+#include "touch_drawing_manager.h"
 
 #include "image/bitmap.h"
 #include "image_source.h"
@@ -25,6 +26,7 @@
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
 
+#include "define_multimodal.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -84,10 +86,19 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
         touchEvent->GetPointerIds().size() != 1) {
-        if (canvasNode_ != nullptr) {
-            path_.Reset();
+        if (!pointerInfos_.empty()) {
             pointerInfos_.clear();
-            canvasNode_->ResetSurface();
+#ifndef USE_ROSEN_DRAWING
+            auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
+                BeginRecording(displayInfo_.width, displayInfo_.height));
+#else
+            auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
+                BeginRecording(displayInfo_.width, displayInfo_.height));
+#endif // USE_ROSEN_DRAWING
+            canvas->Clear();
+            auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+            canvasNode->ResetSurface();
+            canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         MMI_HILOGE("touch tool type is not single knuckle");
@@ -99,8 +110,10 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
 bool KnuckleDrawingManager::IsValidAction(const int32_t action)
 {
     CALL_DEBUG_ENTER;
-    if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_UP ||
-        (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty()))) {
+    if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
+        (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty())) ||
+        (action == PointerEvent::POINTER_ACTION_PULL_MOVE && (!pointerInfos_.empty())) ||
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
         return true;
     }
     MMI_HILOGE("action is not down or move or up, action:%{public}d", action);
@@ -110,10 +123,6 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
 void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
-    if (displayInfo.dpi == displayInfo_.dpi) {
-        MMI_HILOGD("dpi is not need to change");
-        return;
-    }
     displayInfo_ = displayInfo;
 }
 
@@ -195,6 +204,10 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
     }
     pointerInfo.x = pointerItem.GetDisplayX();
     pointerInfo.y = pointerItem.GetDisplayY();
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+            displayInfo_.height, pointerInfo.x, pointerInfo.y);
+    }
     pointerInfos_.push_back(pointerInfo);
 
     if (pointerInfos_.size() == MAX_POINTER_NUM) {
@@ -242,7 +255,8 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         MMI_HILOGD("isActionUp_ is true");
         isActionUp_ = false;
         pointerInfos_.clear();
-        canvasNode_->ResetSurface();
+        auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+        canvasNode->ResetSurface();
     }
     path_.Reset();
     canvasNode_->FinishRecording();

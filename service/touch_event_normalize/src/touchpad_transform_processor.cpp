@@ -271,7 +271,7 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(
             return PointerEvent::TOOL_TYPE_PEN;
         }
         case MT_TOOL_PALM: {
-            MMI_HILOGD("ToolType is MT_TOOL_PALM");
+            MMI_HILOGD("toolType is MT_TOOL_PALM");
             return PointerEvent::TOOL_TYPE_PALM;
         }
         default : {

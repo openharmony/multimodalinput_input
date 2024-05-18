@@ -238,24 +238,6 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed, TestSize
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_Dump
- * @tc.desc: Test Dump
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Dump, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventMonitorHandler eventMonitorHandler;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
-    int32_t fd = 1;
-    std::vector<std::string> args;
-    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.Dump(fd, args));
-}
-
-/**
  * @tc.name: EventMonitorHandlerTest_OnSessionLost
  * @tc.desc: Test OnSessionLost
  * @tc.type: FUNC

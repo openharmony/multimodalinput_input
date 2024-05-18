@@ -45,6 +45,7 @@ inline constexpr std::string_view QUEUE_ASYNC_WORK = "napi_queue_async_work";
 inline constexpr std::string_view RESOLVE_DEFERRED = "napi_resolve_deferred";
 inline constexpr std::string_view REJECT_DEFERRED = "napi_reject_deferred";
 inline constexpr std::string_view REFERENCE_REF = "napi_reference_ref";
+inline constexpr std::string_view REFERENCE_UNREF = "napi_reference_unref";
 inline constexpr std::string_view SET_NAMED_PROPERTY = "napi_set_named_property";
 inline constexpr std::string_view STRICT_EQUALS = "napi_strict_equals";
 inline constexpr std::string_view TYPEOF = "napi_typeof";
