@@ -1133,8 +1133,6 @@ ohos_unittest("DelegateTaskTest") {
 ohos_unittest("ConnectManagerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/permission_helper/include" ]
-
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_server_config",
