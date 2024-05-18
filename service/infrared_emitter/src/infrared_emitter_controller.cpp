@@ -34,15 +34,12 @@ InfraredEmitterController::InfraredEmitterController() {}
 
 InfraredEmitterController::~InfraredEmitterController()
 {
-    CALL_DEBUG_ENTER;
+    CALL_DEBUG_ENTER; 
     CHKPV(irInterface_);
-    MMI_HILOGD("start release irInterface_");
     irInterface_ = nullptr;
-    CHKPV(soIrHandle);
-    MMI_HILOGD("start release so handler");
-    dlclose(soIrHandle);
-    soIrHandle = nullptr;
-    MMI_HILOGD("end release");
+    CHKPV(soIrHandle_);
+    dlclose(soIrHandle_);
+    soIrHandle_ = nullptr;
 }
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
@@ -53,40 +50,37 @@ InfraredEmitterController *InfraredEmitterController::GetInstance()
 void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
-    if (!irInterface_) {
-        MMI_HILOGE("infrared emitter inited");
-        return;
-    }
-    if (!soIrHandle) {
+    CHKPV(irInterface_);
+    if (soIrHandle_ == nullptr) {
         MMI_HILOGD("begin load so %{public}s", IR_WRAPPER_PATH.c_str());
-        soIrHandle = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
-        if (nullptr == soIrHandle) {
+        soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
+        if (soIrHandle_ == nullptr) {
             MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
             return;
         }
     }
     typedef ConsumerIr* (*funCreate_ptr) (void);
     funCreate_ptr fnCreate = nullptr;
-    fnCreate = (funCreate_ptr)dlsym(soIrHandle, "ConsumerIrImplGetInstance");
+    fnCreate = (funCreate_ptr)dlsym(soIrHandle_, "ConsumerIrImplGetInstance");
     const char *dlsymError = dlerror();
-    if (dlsymError) {
+    if (dlsymError != nullptr) {
         MMI_HILOGE("load ConsumerIrImplGetInstance, error: %{public}s", dlsymError);
-        dlclose(soIrHandle);
-        soIrHandle = nullptr;
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
         return;
     }
-    if (!fnCreate) {
+    if (fnCreate == nullptr) {
         MMI_HILOGE("loaded ConsumerIrImplGetInstance is null");
-        dlclose(soIrHandle);
-        soIrHandle = nullptr;
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
         return;
     }
     MMI_HILOGI("infrared emitter call ConsumerIr:fnCreate begin");
     irInterface_ = (ConsumerIr *)fnCreate();
-    if (nullptr == irInterface_) {
+    if (irInterface_ == nullptr) {
         MMI_HILOGE("infrared emitter init fail irInterface_ is nullptr");
-        dlclose(soIrHandle);
-        soIrHandle = nullptr;
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
         return;
     }
     MMI_HILOGI("infrared emitter init sucess.");
@@ -96,10 +90,7 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
 {
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();
-    if (!irInterface_) {
-        MMI_HILOGE("infrared emitter not init");
-        return false;
-    }
+    CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
     std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
