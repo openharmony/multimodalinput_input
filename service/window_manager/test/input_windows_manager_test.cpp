@@ -3061,7 +3061,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointe
     pointerStyle.id = defaultPointerStyle;
     std::map<int32_t, PointerStyle> pointerStyleMap;
     pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
-    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid,pointerStyleMap));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetGlobalDefaultPointerStyle());
 
     pointerStyle.id = cursorCircleStyle;
