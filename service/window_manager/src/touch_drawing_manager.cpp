@@ -177,7 +177,7 @@ void TouchDrawingManager::UpdateBubbleData()
 {
     if (bubbleMode_.isShow) {
         return;
-    } 
+    }
     ClearBubbleData();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
