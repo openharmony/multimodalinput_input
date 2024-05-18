@@ -550,7 +550,7 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMouseScrollRows, this, std::ref(rows)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the number of mouse scrolling rows failed, return %{public}d", ret);
+        MMI_HILOGE("Get the number of mouse scrolling rows failed, ret:%{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER

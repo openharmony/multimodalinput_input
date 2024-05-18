@@ -53,7 +53,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckMonitorPermission, Test
     uint32_t tokenId = 1;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_MONITORING);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
-    bool result = PerHelper->CheckMonitorPermission(tokenId);
+    bool result = PER_HELPER->CheckMonitorPermission(tokenId);
     ASSERT_FALSE(result);
 }
 
@@ -69,7 +69,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInterceptorPermission, 
     uint32_t tokenId = 1;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_INTERCEPTOR);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
-    bool result = PerHelper->CheckInterceptorPermission(tokenId);
+    bool result = PER_HELPER->CheckInterceptorPermission(tokenId);
     ASSERT_FALSE(result);
 }
 
@@ -85,7 +85,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControlPermissi
     uint32_t tokenId = 1;
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_DISPATCHCONTROL);
     ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
-    bool result = PerHelper->CheckDispatchControlPermission(tokenId);
+    bool result = PER_HELPER->CheckDispatchControlPermission(tokenId);
     ASSERT_FALSE(result);
 }
 
@@ -101,7 +101,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_GetTokenType, TestSize.Level
     uint32_t tokenId = 5;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
-    int32_t result = PerHelper->GetTokenType();
+    int32_t result = PER_HELPER->GetTokenType();
     EXPECT_EQ(result, TokenType::TOKEN_SHELL);
 }
 
@@ -117,7 +117,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControl, TestSi
     uint32_t tokenId = 2;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
-    bool result = PerHelper->CheckDispatchControl();
+    bool result = PER_HELPER->CheckDispatchControl();
     ASSERT_TRUE(result);
 }
 
@@ -134,7 +134,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission, TestSize
     std::string permissionCode = "access";
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
-    bool result = PerHelper->CheckHapPermission(tokenId, permissionCode);
+    bool result = PER_HELPER->CheckHapPermission(tokenId, permissionCode);
     ASSERT_FALSE(result);
 }
 
@@ -150,7 +150,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_VerifySystemApp, TestSize.Le
     uint32_t callerToken = 3;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     tokenType = OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE;
-    bool result = PerHelper->VerifySystemApp();
+    bool result = PER_HELPER->VerifySystemApp();
     ASSERT_TRUE(result);
 }
 
@@ -167,7 +167,7 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckPermission, TestSize.Le
     uint32_t required = 2;
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
-    bool result = PerHelper->CheckPermission(required);
+    bool result = PER_HELPER->CheckPermission(required);
     ASSERT_TRUE(result);
 }
 

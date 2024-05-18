@@ -145,6 +145,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
@@ -156,7 +157,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     }
 
     // touch pad tap switch is disable
-    if (type == LIBINPUT_EVENT_POINTER_TAP && tpTapSwitch == false) {
+    if (type == LIBINPUT_EVENT_POINTER_TAP && !tpTapSwitch) {
         MMI_HILOGD("Touch pad is disable.");
         return RET_ERR;
     }
@@ -254,11 +255,11 @@ void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_sour
     bool scrollDirectionState = true;
 
     if (GetTouchpadScrollSwitch(tpScrollSwitch) != RET_OK) {
-        MMI_HILOGE("Failed to get scroll switch flag, default is true.");
+        MMI_HILOGE("Failed to get scroll switch flag, default is true");
     }
 
     if (GetTouchpadScrollDirection(scrollDirectionState) != RET_OK) {
-        MMI_HILOGE("Failed to get scroll direct switch flag, default is true.");
+        MMI_HILOGE("Failed to get scroll direct switch flag, default is true");
     }
 
     if (scrollDirectionState == true && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
@@ -277,7 +278,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
 
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
     HandleTouchPadAxisState(source, tpScrollDirection, tpScrollSwitch);
-    if (tpScrollSwitch == false && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+    if (!tpScrollSwitch && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         MMI_HILOGD("TouchPad axis event is disable.");
         return RET_ERR;
     }
@@ -775,12 +776,12 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
 {
     int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
     if (GetTouchpadRightClickType(switchTypeData) != RET_OK) {
-        MMI_HILOGD("Failed to get right click switch, default is TP_RIGHT_BUTTON.");
+        MMI_HILOGE("Failed to get right click switch, default is TP_RIGHT_BUTTON");
     }
 
     RightClickType switchType = RightClickType(switchTypeData);
     if (evenType != LIBINPUT_EVENT_POINTER_TAP && evenType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        MMI_HILOGD("Event not from touchpad.");
+        MMI_HILOGE("Event not from touchpad");
         return;
     }
 
@@ -797,7 +798,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
             HandleTouchpadTwoFingerButton(data, evenType, button);
             break;
         default:
-            MMI_HILOGD("Invalid type.");
+            MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
             break;
     }
 }
@@ -806,7 +807,7 @@ int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(bool switchFlag)
 {
     std::string name = "scrollSwitch";
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll switch flag to mem.");
+        MMI_HILOGE("Failed to set scroll switch flag to mem, name:%s, switchFlag:%{public}d", name.c_str(), switchFlag);
         return RET_ERR;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_SETTING,
