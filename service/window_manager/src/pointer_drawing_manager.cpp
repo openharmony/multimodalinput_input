@@ -446,7 +446,7 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     std::shared_ptr<OHOS::Media::PixelMap> pixelmap =
         DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_RIGHT].iconPath);
     CHKPV(pixelmap);
-    MMI_HILOGD("set mouseicon to OHOS system");
+    MMI_HILOGD("Set mouseicon to OHOS system");
 
 #ifndef USE_ROSEN_DRAWING
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
@@ -810,7 +810,7 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
             pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
         }
         CHKPV(pixelmap);
-        MMI_HILOGD("set mouseicon to OHOS system");
+        MMI_HILOGD("Set mouseicon to OHOS system");
         OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *pixelmap, 0, 0);
     }
 }
