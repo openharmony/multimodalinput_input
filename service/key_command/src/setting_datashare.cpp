@@ -254,7 +254,7 @@ ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::stri
 
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper()
 {
-    auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
+    auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
     if (helper == nullptr) {
         return nullptr;
     }
