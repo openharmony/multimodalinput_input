@@ -40,7 +40,8 @@ sptr<IRemoteObject> SettingDataShare::remoteObj_;
 namespace {
 static constexpr char SETTING_COLUMN_KEYWORD[] = "KEYWORD";
 static constexpr char SETTING_COLUMN_VALUE[] = "VALUE";
-static constexpr char SETTING_URI_PROXY[] = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+static constexpr char SETTING_URI_PROXY[] =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 static constexpr char SETTINGS_DATA_EXT_URI[] = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr int32_t LONG_CAST_NUM = 10;
 } // namespace
