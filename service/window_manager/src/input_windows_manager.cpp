@@ -459,6 +459,8 @@ void InputWindowsManager::UpdateDisplayIdAndName()
             ++it;
         }
     }
+    const auto &displayInfo = displayGroupInfo_.displaysInfo[0];
+    bindInfo_.AddLocalDisplay(displayInfo.id, displayInfo.uniq);
     for (const auto &item : newInfo) {
         if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
             bindInfo_.AddDisplay(item.first, item.second);
