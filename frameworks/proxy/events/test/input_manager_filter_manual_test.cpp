@@ -233,12 +233,12 @@ public:
  * @tc.require:
  */
 struct PointerFilter : public IInputEventFilter {
-    const int32_t exceptX_;
-    const int32_t exceptY_;
-    sem_t &sem_;
-    bool &result_;
+    const int32_t exceptX;
+    const int32_t exceptY;
+    sem_t &sem;
+    bool &result;
     PointerFilter(int32_t exceptX, int32_t exceptY, sem_t &sem, bool &result)
-        : exceptX_(exceptX), exceptY_(exceptY), sem_(sem), result_(result)
+        : exceptX(exceptX), exceptY(exceptY), sem(sem), result(result)
     {}
     virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
     {
@@ -247,7 +247,7 @@ struct PointerFilter : public IInputEventFilter {
     bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
         MMI_HILOGD("Callback enter");
-        result_ = false;
+        result = false;
         do {
             CHKPB(pointerEvent);
             const std::vector<int32_t> ids = pointerEvent->GetPointerIds();
@@ -263,17 +263,17 @@ struct PointerFilter : public IInputEventFilter {
             }
             const int32_t x = item.GetDisplayX();
             const int32_t y = item.GetDisplayY();
-            if (x == exceptX_ && y == exceptY_) {
+            if (x == exceptX && y == exceptY) {
                 MMI_HILOGI(
                     "The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
-                result_ = true;
+                result = true;
                 break;
             }
             MMI_HILOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2");
         } while (0);
-        int ret = sem_post(&sem_);
+        int ret = sem_post(&sem);
         EXPECT_EQ(ret, 0);
-        return result_;
+        return result;
     }
 };
 void Simulate(int32_t x, int32_t y)
@@ -340,29 +340,29 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
  * @tc.require:
  */
 struct KeyFilter002 : public IInputEventFilter {
-    const int32_t exceptKeyCode_;
-    sem_t &sem_;
-    bool &result_;
+    const int32_t exceptKeyCode;
+    sem_t &sem;
+    bool &result;
     KeyFilter002(int32_t exceptKeyCode, sem_t &sem, bool &result)
-        : exceptKeyCode_(exceptKeyCode), sem_(sem), result_(result)
+        : exceptKeyCode(exceptKeyCode), sem(sem), result(result)
     {}
     bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
     {
         MMI_HILOGI("KeyFilter::OnInputEvent enter, pid: %{public}d, exceptKeyCode:%{public}d", getpid(),
-            exceptKeyCode_);
+            exceptKeyCode);
         do {
-            result_ = false;
+            result = false;
             CHKPB(keyEvent);
             auto keyCode = keyEvent->GetKeyCode();
             MMI_HILOGI("KeyFilter::OnInputEvent receive keyCode: %{public}d return true", keyCode);
-            if (keyCode == exceptKeyCode_) {
-                result_ = true;
+            if (keyCode == exceptKeyCode) {
+                result = true;
                 break;
             }
         } while (0);
-        int ret = sem_post(&sem_);
+        int ret = sem_post(&sem);
         EXPECT_EQ(ret, 0);
-        return result_;
+        return result;
     }
     bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {

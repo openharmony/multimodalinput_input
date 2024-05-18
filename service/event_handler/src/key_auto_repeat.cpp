@@ -222,10 +222,10 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
     }
     std::string name = "keyboardRepeatRate";
     if (PutConfigDataToDatabase(name, repeatRateTime) != RET_OK) {
-        MMI_HILOGE("Failed to set keyboard repeat rate.");
+        MMI_HILOGE("Failed to set keyboard repeat rate");
         return RET_ERR;
     }
-    MMI_HILOGD("Set keyboard repeat rate rate:%{public}d", repeatRateTime);
+    MMI_HILOGD("Successfully set keyboard repeat for rate:%{public}d", repeatRateTime);
     return RET_OK;
 }
 
