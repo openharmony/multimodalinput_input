@@ -2796,12 +2796,12 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
     cursorPos_.displayId = displayId;
-    if (isRealData) {
-        cursorPos_.cursorPos.x = x;
-        cursorPos_.cursorPos.y = y;
+    if (displayInfo->displayDirection == DIRECTION0 && !isRealData) {
+        ReverseRotateScreen(*displayInfo, x, y, cursorPos_.cursorPos);
         return;
     }
-    ReverseRotateScreen(*displayInfo, x, y, cursorPos_.cursorPos);
+    cursorPos_.cursorPos.x = x;
+    cursorPos_.cursorPos.y = y;
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
