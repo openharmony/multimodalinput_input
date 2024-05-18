@@ -67,7 +67,7 @@ void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
         return;
     }
-    //  黄区添加
+
     std::random_device rd;
     std::default_random_engine e(rd());
     std::uniform_real_distribution<double> u(0.0, DYNAMIC_EFFECT_SIZE);

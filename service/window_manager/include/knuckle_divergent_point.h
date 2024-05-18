@@ -48,7 +48,7 @@ private:
     double pointY_ { 0.0 };
     int32_t lifespan_ { DEFAULT_LIFESPAN };
     Rosen::Drawing::Bitmap traceShadow_;
-    Rosen::Drawing::Matrix traceMatrix_;  // 黄区添加
+    Rosen::Drawing::Matrix traceMatrix_;
 };
 } // namespace MMI
 } // namespace OHOS
