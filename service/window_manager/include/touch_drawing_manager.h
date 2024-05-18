@@ -62,7 +62,7 @@ public:
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
     void SetPointerPositionState(bool state);
-    void UpBubbleData();
+    void UpdateBubbleData();
     void ClearBubbleData();
 private:
     void CreateObserver();
