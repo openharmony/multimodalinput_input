@@ -173,6 +173,16 @@ void TouchDrawingManager::UpdateLabels()
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
+void TouchDrawingManager::UpBubbleData()
+{
+    if (bubbleMode_.isShow) {
+        return;
+    } else {
+        ClearBubbleData();
+    }
+    Rosen::RSTransaction::FlushImplicitTransaction();
+}
+
 void TouchDrawingManager::CreateObserver()
 {
     CALL_DEBUG_ENTER;
@@ -201,6 +211,7 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
+        TOUCH_DRAWING_MGR->UpBubbleData();
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -600,6 +611,16 @@ void TouchDrawingManager::ClearPointerPosition()
     labelsCanvasNode_->FinishRecording();
     isFirstDraw_ = true;
     pressure_ = 0.0;
+}
+
+void TouchDrawingManager::ClearBubbleData()
+{
+    CHKPV(bubbleCanvasNode_);
+    auto canvas = static_cast<RosenCanvas *>
+        (bubbleCanvasNode_->BeginRecording(displayInfo_.width, displayInfo_.height));
+    CHKPV(canvas);
+    canvas->Clear();
+    bubbleCanvasNode_->FinishRecording();
 }
 
 void TouchDrawingManager::ClearTracker()
