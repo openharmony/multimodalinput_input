@@ -798,7 +798,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
             HandleTouchpadTwoFingerButton(data, evenType, button);
             break;
         default:
-            MMI_HILOGD("Invalid type.");
+            MMI_HILOGD("Invalid type, switchType:%{public}d", switchType);
             break;
     }
 }
