@@ -34,7 +34,7 @@ InfraredEmitterController::InfraredEmitterController() {}
 
 InfraredEmitterController::~InfraredEmitterController()
 {
-    CALL_DEBUG_ENTER; 
+    CALL_DEBUG_ENTER;
     CHKPV(irInterface_);
     irInterface_ = nullptr;
     CHKPV(soIrHandle_);
