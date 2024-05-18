@@ -38,11 +38,10 @@ std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
 std::mutex SettingDataShare::mutex_;
 sptr<IRemoteObject> SettingDataShare::remoteObj_;
 namespace {
-static constexpr char SETTING_COLUMN_KEYWORD[] = "KEYWORD";
-static constexpr char SETTING_COLUMN_VALUE[] = "VALUE";
-static constexpr char SETTING_URI_PROXY[] =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
-static constexpr char SETTINGS_DATA_EXT_URI[] = "datashare:///com.ohos.settingsdata.DataAbility";
+const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
+const std::string SETTING_COLUMN_VALUE = "VALUE";
+const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr int32_t LONG_CAST_NUM = 10;
 } // namespace
 
@@ -272,7 +271,7 @@ bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataSha
 
 Uri SettingDataShare::AssembleUri(const std::string& key)
 {
-    Uri uri(std::string(SETTING_URI_PROXY) + "&key=" + key);
+    Uri uri(SETTING_URI_PROXY + "&key=" + key);
     return uri;
 }
 }
