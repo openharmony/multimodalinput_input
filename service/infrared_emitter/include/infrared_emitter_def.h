@@ -23,7 +23,6 @@
 
 namespace OHOS {
 namespace HDI {
-namespace Consumerir {
 namespace V1_0 {
 using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
@@ -43,8 +42,7 @@ public:
     virtual bool IsProxy();
     virtual const std::u16string GetDesc();
 };
-}
-}
-}
-}
+} // namespace V1_0
+} // namespace HDI
+} // namespace OHOS
 #endif // INFRARED_EMMITTER_DEF_H
