@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <vector>
+
 #include "hdi_base.h"
 
 namespace OHOS {
@@ -28,24 +29,18 @@ using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
-} __attribute__ ((aligned(8)));
+};
 class ConsumerIr : public HdiBase {
 public:
     DECLARE_HDI_DESCRIPTOR(u"ohos.hdi.consumerir.v1_0.ConsumerIr");
     virtual ~ConsumerIr() = default;
-
     static sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> Get(bool isStub = false);
     static sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> Get(const std::string &serviceName, bool isStub = false);
-
-    virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t> &pattern, bool &ret) = 0;
-
-    virtual int32_t GetCarrierFreqs(bool &ret,
+    virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t> &pattern, bool &status) = 0;
+    virtual int32_t GetCarrierFreqs(bool &status,
                                     std::vector<OHOS::HDI::Consumerir::V1_0::ConsumerIrFreqRange> &range) = 0;
-
     virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer) = 0;
-
     virtual bool IsProxy();
-
     virtual const std::u16string GetDesc();
 };
 }
