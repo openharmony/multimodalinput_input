@@ -1902,7 +1902,6 @@ void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> w
         MMI_HILOGD("winChecker_ is not null in %{public}d", getpid());
         winChecker_ = windowChecker;
     #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    return;
 }
 
 int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
@@ -1936,10 +1935,8 @@ void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32
         return;
     }
     SendWindowAreaInfo(area, pid, windowId);
-    return;
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
-    return;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
