@@ -387,7 +387,7 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
     CALL_DEBUG_ENTER;
     int32_t windowPid = -1;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        MMI_HILOGD("get windowID %{public}d", item.id);
+        MMI_HILOGD("get windowId:%{public}d", item.id);
         if (item.id == windowId) {
             windowPid = item.pid;
             break;
