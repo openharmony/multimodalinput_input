@@ -33,7 +33,7 @@ struct ConsumerIrFreqRange {
 class ConsumerIr : public HdiBase {
 public:
     DECLARE_HDI_DESCRIPTOR(u"ohos.hdi.consumerir.v1_0.ConsumerIr");
-    virtual ~ConsumerIr() = default;
+    virtual ~ConsumerIr() = default;1
     static sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> Get(bool isStub = false);
     static sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> Get(const std::string &serviceName, bool isStub = false);
     virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t> &pattern, bool &status) = 0;
