@@ -119,6 +119,7 @@ public:
     {
         return 0;
     }
+    virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

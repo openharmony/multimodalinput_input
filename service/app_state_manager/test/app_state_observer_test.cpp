@@ -16,7 +16,10 @@
 #include <gtest/gtest.h>
 
 #include "app_state_observer.h"
+#include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ApplicationStateObserverTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -40,6 +43,7 @@ public:
  */
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_ForegroundAppData_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     std::vector<AppExecFwk::AppStateData> appDatas {};
     APP_OBSERVER_MGR->SetForegroundAppData(appDatas);
     auto result = APP_OBSERVER_MGR->GetForegroundAppData();
@@ -54,6 +58,7 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_ForegroundAp
  */
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_InitAppStateObserver_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     APP_OBSERVER_MGR->hasInit_ = true;
     ASSERT_NO_FATAL_FAILURE(APP_OBSERVER_MGR->InitAppStateObserver());
     APP_OBSERVER_MGR->hasInit_ = false;
@@ -68,6 +73,7 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_InitAppState
  */
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     ApplicationStateObserver obsever;
     auto appManager = obsever.GetAppMgr();
     EXPECT_NE(appManager, nullptr);
@@ -83,6 +89,7 @@ HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetAppMgr_00
  */
 HWTEST_F(ApplicationStateObserverTest, ApplicationStateObserverTest_GetForegroundApplicationInfo_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     ApplicationStateObserver obsever;
     std::vector<AppExecFwk::AppStateData> appDatas {};
     int32_t ret = obsever.GetForegroundApplicationInfo(appDatas);

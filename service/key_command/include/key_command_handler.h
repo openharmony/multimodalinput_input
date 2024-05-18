@@ -118,6 +118,8 @@ struct KnuckleGesture {
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
+    std::string statusConfig;
+    bool statusConfigValue { true };
     Ability ability;
     struct {
         int32_t id { 0 };
