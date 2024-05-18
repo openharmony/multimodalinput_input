@@ -64,6 +64,7 @@ public:
     void SetPointerPositionState(bool state);
     void UpdateBubbleData();
     void ClearBubbleData();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     void CreateObserver();
     void InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
