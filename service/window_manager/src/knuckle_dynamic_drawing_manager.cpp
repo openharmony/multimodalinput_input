@@ -369,7 +369,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("surfaceNode is already.");
+        MMI_HILOGD("surfaceNode_ is already");
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
