@@ -17,7 +17,10 @@
 
 #include "key_event.h"
 #include "key_event_value_transformation.h"
+#include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventValueTransformationTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -39,6 +42,7 @@ public:
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -56,6 +60,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_002, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -73,6 +78,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_003, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -90,6 +96,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_004, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -107,6 +114,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_005, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -124,6 +132,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_006, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -141,6 +150,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_007, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -158,6 +168,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_008, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -177,6 +188,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_009, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -196,6 +208,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_010, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -215,6 +228,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_011, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -234,6 +248,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_012, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -253,6 +268,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_013, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -272,6 +288,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_014, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -289,6 +306,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_015, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item;
@@ -306,6 +324,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_016, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -325,6 +344,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_017, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -344,6 +364,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_018, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -363,6 +384,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_019, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -382,6 +404,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_020, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -401,6 +424,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_021, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -420,6 +444,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_022, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -439,6 +464,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyIntention_023, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent::KeyItem item[KEY_ITEM_SIZE];
@@ -458,6 +484,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
  */
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     int32_t nonExistingKeyValue = 999;
@@ -473,6 +500,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_Transf
 HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_InputTransformationKeyValue_001,
      TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     int32_t result = InputTransformationKeyValue(0);
