@@ -1720,7 +1720,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
 
 bool MultimodalInputConnectStub::VerifySystemApp(MessageParcel& data)
 {
-    return PerHelper->VerifySystemApp(data);
+    return PER_HELPER->VerifySystemApp(data);
 }
 
 int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply)
