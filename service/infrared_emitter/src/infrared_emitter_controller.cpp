@@ -52,7 +52,6 @@ InfraredEmitterController *InfraredEmitterController::GetInstance()
 void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(irInterface_);
     if (soIrHandle_ == nullptr) {
         soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
         if (soIrHandle_ == nullptr) {
