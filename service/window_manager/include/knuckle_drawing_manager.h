@@ -56,7 +56,6 @@ private:
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
-    Rosen::Drawing::Matrix traceMatrix_;  // 黄区添加
 };
 } // namespace MMI
 } // namespace OHOS
