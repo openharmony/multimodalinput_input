@@ -28,18 +28,20 @@ namespace MMI {
 namespace {
     const std::string IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
 }
-using namespace OHOS::HDI::Consumerir::V1_0;
+using namespace OHOS::HDI::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
 InfraredEmitterController::InfraredEmitterController() {}
 
 InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(irInterface_);
-    irInterface_ = nullptr;
-    CHKPV(soIrHandle_);
-    dlclose(soIrHandle_);
-    soIrHandle_ = nullptr;
+    if (irInterface_ != nullptr) {
+        irInterface_ = nullptr;
+    }
+    if (soIrHandle_ != nullptr) {
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
+    }
 }
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
