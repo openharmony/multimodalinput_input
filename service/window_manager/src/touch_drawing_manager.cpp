@@ -173,13 +173,12 @@ void TouchDrawingManager::UpdateLabels()
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void TouchDrawingManager::UpBubbleData()
+void TouchDrawingManager::UpdateBubbleData()
 {
     if (bubbleMode_.isShow) {
         return;
-    } else {
-        ClearBubbleData();
-    }
+    } 
+    ClearBubbleData();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -211,7 +210,7 @@ void TouchDrawingManager::CreateBubbleObserver(T &item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpBubbleData();
+        TOUCH_DRAWING_MGR->UpdateBubbleData();
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
