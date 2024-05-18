@@ -18,7 +18,6 @@
 
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
-#include "permission_helper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -2200,32 +2199,39 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_001, TestSize.Le
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp001()
 {
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
+    MessageParcel reply;
     int32_t userID = -1;
     int32_t instIndex = -1;
+    int32_t returnCode = 22;
     WRITEINT32(data, userID, RET_ERR);
     WRITESTRING(data, "VerifySystemApp_001", RET_ERR);
     WRITEINT32(data, instIndex, RET_ERR);
-    bool ret = PER_HELPER->VerifySystemApp(data);
-    EXPECT_NE(ret, true);
+    int32_t ret = stub->StubAddInputEventFilter(data, reply);
+    EXPECT_EQ(ret, returnCode);
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp002()
 {
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
+    MessageParcel reply;
     int32_t userID = 123;
     int32_t instIndex = 456;
+    int32_t returnCode = 22;
     WRITEINT32(data, userID, RET_ERR);
     WRITESTRING(data, "", RET_ERR);
     WRITEINT32(data, instIndex, RET_ERR);
-    bool ret = PER_HELPER->VerifySystemApp(data);
-    EXPECT_NE(ret, true);
+    int32_t ret = stub->StubAddInputEventFilter(data, reply);
+    EXPECT_EQ(ret, returnCode);
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp003()
 {
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::vector<std::int32_t> directives {
         1083943472, 1670933590, 319664736, 101075694, 302485518, 1153447329, 1864579187,
         1160667870, 1231569351, 190550799, 1297853727, 349520038, 2134193229, 60559057, 970575243,
@@ -2234,19 +2240,22 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp003()
         };
 
     MessageParcel data;
+    MessageParcel reply;
     int32_t instIndex = 123456;
+    int32_t returnCode = 22;
     for (auto s : directives) {
         WRITEINT32(data, s, RET_ERR);
         WRITESTRING(data, "VerifySystemApp003", RET_ERR);
         WRITEINT32(data, instIndex, RET_ERR);
-        bool ret = PER_HELPER->VerifySystemApp(data);
-        EXPECT_NE(ret, true);
+        int32_t ret = stub->StubAddInputEventFilter(data, reply);
+        EXPECT_EQ(ret, returnCode);
     }
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp004()
 {
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::vector<std::int32_t> directives {
         1083943472, 1670933590, 319664736, 101075694, 302485518, 1153447329, 1864579187,
         1160667870, 1231569351, 190550799, 1297853727, 349520038, 2134193229, 60559057, 970575243,
@@ -2255,19 +2264,22 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp004()
         };
 
     MessageParcel data;
+    MessageParcel reply;
     int32_t userID = 7890;
+    int32_t returnCode = 22;
     for (auto s : directives) {
         WRITEINT32(data, userID, RET_ERR);
         WRITESTRING(data, "VerifySystemApp004", RET_ERR);
         WRITEINT32(data, s, RET_ERR);
-        bool ret = PER_HELPER->VerifySystemApp(data);
-        EXPECT_NE(ret, true);
+        int32_t ret = stub->StubAddInputEventFilter(data, reply);
+        EXPECT_EQ(ret, returnCode);
     }
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStubTest::VerifySystemApp005()
 {
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     std::vector<std::string> directives {
         "accesstoken_test01", "accesstoken_test02", "accesstoken_test03", "accesstoken_test04", "accesstoken_test05",
         "accesstoken_test06", "accesstoken_test07", "accesstoken_test08", "accesstoken_test09", "accesstoken_test10",
@@ -2278,14 +2290,16 @@ int32_t MultimodalInputConnectStubTest::VerifySystemApp005()
         };
 
     MessageParcel data;
+    MessageParcel reply;
     int32_t userID = 89093490;
     int32_t instIndex = 13411143;
+    int32_t returnCode = 22;
     for (auto s : directives) {
         WRITEINT32(data, userID, RET_ERR);
         WRITESTRING(data, s, RET_ERR);
         WRITEINT32(data, instIndex, RET_ERR);
-        bool ret = PER_HELPER->VerifySystemApp(data);
-        EXPECT_NE(ret, true);
+        int32_t ret = stub->StubAddInputEventFilter(data, reply);
+        EXPECT_EQ(ret, returnCode);
     }
     return RET_OK;
 }
