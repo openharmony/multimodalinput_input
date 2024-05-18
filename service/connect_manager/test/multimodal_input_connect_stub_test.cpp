@@ -18,6 +18,7 @@
 
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
+#include "permission_helper.h"
 
 namespace OHOS {
 namespace MMI {
