@@ -41,7 +41,7 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
     CHKPR(device, false);
     std::string name = libinput_device_get_name(device);
     if (name != FINGERPRINT_SOURCE_KEY && name != FINGERPRINT_SOURCE_POINT) {
-        MMI_HILOGD("not FingerprintEvent");
+        MMI_HILOGD("Not FingerprintEvent");
         return false;
     }
     if (name == FINGERPRINT_SOURCE_KEY) {
@@ -50,7 +50,7 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
         auto key = libinput_event_keyboard_get_key(keyBoard);
         if (key != FINGERPRINT_CODE_DOWN && key != FINGERPRINT_CODE_UP
             && key != FINGERPRINT_CODE_CLICK && key != FINGERPRINT_CODE_RETOUCH) {
-            MMI_HILOGD("not FingerprintEvent event");
+            MMI_HILOGD("Not FingerprintEvent event");
             return false;
         }
     }
