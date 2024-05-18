@@ -31,6 +31,7 @@ constexpr double MOVE_SPEED = 10.0f;
 constexpr double BASIC_GRAVITY_Y = 0.5f;
 constexpr int32_t BASIC_LIFESPAN = 15;
 constexpr float DOUBLE = 2.0f;
+constexpr float DYNAMIC_EFFECT_SIZE = 0.8;
 } // namespace
 
 KnuckleDivergentPoint::KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap)
@@ -66,6 +67,14 @@ void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
         return;
     }
+    //  黄区添加
+    std::random_device rd;
+    std::default_random_engine e(rd());
+    std::uniform_real_distribution<double> u(0.0, DYNAMIC_EFFECT_SIZE);
+    float proportion = u(e);
+    traceMatrix_.Reset();
+    traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
+    canvas->SetMatrix(traceMatrix_);
 
     OHOS::Rosen::Drawing::Brush brush;
     canvas->AttachBrush(brush);
