@@ -52,7 +52,6 @@ void InfraredEmitterController::InitInfraredEmitter()
     CALL_DEBUG_ENTER;
     CHKPV(irInterface_);
     if (soIrHandle_ == nullptr) {
-        MMI_HILOGD("begin load so %{public}s", IR_WRAPPER_PATH.c_str());
         soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
         if (soIrHandle_ == nullptr) {
             MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
