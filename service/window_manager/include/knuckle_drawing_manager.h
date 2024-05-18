@@ -49,7 +49,7 @@ private:
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::vector<PointerInfo> pointerInfos_;
     Rosen::Drawing::Paint paint_;
     Rosen::Drawing::Path path_;
