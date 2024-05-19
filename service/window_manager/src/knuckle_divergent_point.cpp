@@ -31,7 +31,7 @@ constexpr double MOVE_SPEED = 10.0f;
 constexpr double BASIC_GRAVITY_Y = 0.5f;
 constexpr int32_t BASIC_LIFESPAN = 15;
 constexpr float DOUBLE = 2.0f;
-constexpr float DYNAMIC_EFFECT_SIZE = 0.8;
+constexpr float DYNAMIC_EFFECT_SIZE = 0.8f;
 } // namespace
 
 KnuckleDivergentPoint::KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap)
@@ -69,9 +69,9 @@ void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     }
 
     std::random_device rd;
-    std::default_random_engine e(rd());
+    std::default_random_engine randomEngine(rd());
     std::uniform_real_distribution<double> u(0.0, DYNAMIC_EFFECT_SIZE);
-    float proportion = u(e);
+    float proportion = u(randomEngine);
     traceMatrix_.Reset();
     traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
     canvas->SetMatrix(traceMatrix_);
@@ -89,9 +89,9 @@ void KnuckleDivergentPoint::Reset(double pointX, double pointY)
     pointY_ = pointY;
     lifespan_ = BASIC_LIFESPAN;
     std::random_device rd;
-    std::default_random_engine e(rd());
+    std::default_random_engine randomEngine(rd());
     std::uniform_real_distribution<double> u(0.0, 1.0);
-    double baseVelocity = u(e) * DOUBLE * PI;
+    double baseVelocity = u(randomEngine) * DOUBLE * PI;
 
     moveVelocityX_ = std::cos(baseVelocity) * MOVE_SPEED;
     moveVelocityY_ = std::sin(baseVelocity) * MOVE_SPEED;
