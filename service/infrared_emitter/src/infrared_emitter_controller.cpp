@@ -35,9 +35,7 @@ InfraredEmitterController::InfraredEmitterController() {}
 InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
-    if (irInterface_ != nullptr) {
-        irInterface_ = nullptr;
-    }
+    irInterface_ = nullptr;
     if (soIrHandle_ != nullptr) {
         dlclose(soIrHandle_);
         soIrHandle_ = nullptr;
@@ -52,7 +50,7 @@ InfraredEmitterController *InfraredEmitterController::GetInstance()
 void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
-    if (!irInterface_) {
+    if (irInterface_ != nullptr) {
         return;
     }
     if (soIrHandle_ == nullptr) {
@@ -86,7 +84,6 @@ void InfraredEmitterController::InitInfraredEmitter()
         soIrHandle_ = nullptr;
         return;
     }
-    MMI_HILOGI("infrared emitter init sucess.");
 }
 
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_t> pattern)
@@ -141,10 +138,10 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     std::string context = "size:" + std::to_string(outRange.size()) + ";";
     for (size_t i = 0; i < outRange.size(); i++) {
         InfraredFrequencyInfo item;
-        context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max_) +
-                  ": per.min:" + std::to_string(outRange[i].min_) + ";;";
-        item.max_ = outRange[i].max_;
-        item.min_ = outRange[i].min_;
+        context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
+                  ": per.min:" + std::to_string(outRange[i].min) + ";;";
+        item.max_ = outRange[i].max;
+        item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);
     }
     MMI_HILOGI("data from hdf: %{public}s", context.c_str());
