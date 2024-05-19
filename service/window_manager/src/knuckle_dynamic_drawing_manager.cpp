@@ -52,7 +52,7 @@ constexpr float PAINT_STROKE_WIDTH = 10.0f;
 constexpr float DOUBLE = 2.0f;
 constexpr int32_t POINT_TOTAL_SIZE = 5;
 constexpr int32_t POINT_SYSTEM_SIZE = 500;
-constexpr int32_t MAX_DIVERGENCE_NUM = 10;
+constexpr int32_t MAX_DIVERGENCE_NUM = 15;
 constexpr int32_t DEFAULT_POINTER_SIZE = 1;
 constexpr int32_t DESIRED_SIZE = 80;
 } // namespace
