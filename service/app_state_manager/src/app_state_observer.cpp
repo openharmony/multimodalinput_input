@@ -61,10 +61,7 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 {
     CALL_DEBUG_ENTER;
     auto appMgr = GetAppMgr();
-    if (appMgr == nullptr) {
-        MMI_HILOGE("GetAppMgr failed");
-        return RET_ERR;
-    }
+    CHKPR(appMgr, RET_ERR);
     int32_t ret = appMgr->GetForegroundApplications(list);
     if (ret == RET_OK) {
         MMI_HILOGD("GetForegroundApplications success");
