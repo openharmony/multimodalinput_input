@@ -16,7 +16,7 @@
 #ifndef INFRARED_EMMITTER_DEF_H
 #define INFRARED_EMMITTER_DEF_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 #include "hdi_base.h"
@@ -26,8 +26,8 @@ namespace HDI {
 namespace V1_0 {
 using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
-    int64_t max_ { 0 };
-    int64_t min_ { 0 };
+    int64_t max { 0 };
+    int64_t min { 0 };
 };
 class ConsumerIr : public HdiBase {
 public:
