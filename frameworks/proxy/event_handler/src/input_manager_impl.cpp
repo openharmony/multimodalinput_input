@@ -311,10 +311,7 @@ EventHandlerPtr InputManagerImpl::GetEventHandler() const
     if (eventHandler_ == nullptr) {
         MMI_HILOGD("eventHandler_ is nullptr");
         auto MMIClient = MMIEventHdl.GetMMIClient();
-        if (MMIClient == nullptr) {
-            MMI_HILOGE("Get MMIClient is failed");
-            return nullptr;
-        }
+        CHKPP(MMIClient);
         return MMIClient->GetEventHandler();
     }
     return eventHandler_;
@@ -539,10 +536,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
 int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 {
     CALL_INFO_TRACE;
-    if (enhanceCfg_ == nullptr) {
-        MMI_HILOGE("security info config failed");
-        return RET_ERR;
-    }
+    CHKPR(enhanceCfg_, RET_ERR);
     pkt << enhanceCfgLen_;
     for (uint32_t i = 0; i < enhanceCfgLen_; i++) {
         pkt << enhanceCfg_[i];
@@ -697,10 +691,7 @@ void InputManagerImpl::PrintWindowGroupInfo()
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManagerImpl::PrintEnhanceConfig()
 {
-    if (enhanceCfg_ == nullptr) {
-        MMI_HILOGE("SecCompEnhanceCfg is null");
-        return;
-    }
+    CHKPV(enhanceCfg_);
     MMI_HILOGD("securityConfigInfo, cfg len:%{public}d", enhanceCfgLen_);
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -1918,10 +1909,7 @@ int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bun
 void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus)
 {
     CALL_INFO_TRACE;
-    if (eventObserver_ == nullptr) {
-        MMI_HILOGE("eventObserver_ is nullptr");
-        return;
-    }
+    CHKPV(eventObserver_);
     eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
 }
 
