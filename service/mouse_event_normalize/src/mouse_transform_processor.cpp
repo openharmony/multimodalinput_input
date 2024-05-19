@@ -27,6 +27,7 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mouse_device_state.h"
+#include "parameters.h"
 #include "preferences.h"
 #include "preferences_impl.h"
 #include "preferences_errno.h"
@@ -49,7 +50,7 @@ namespace {
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t DEFAULT_SPEED = 7;
-constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
+constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 6;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
@@ -57,6 +58,12 @@ constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
 constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
 constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
+constexpr int32_t HARD_HARDEN_DEVICE_WIDTH = 2880;
+constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
+constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH = 3120;
+constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT = 2080;
+const std::string DEVICE_TYPE_HARDEN = "HAD";
+const std::string DEVICE_TYPE_KLV = "HYM";
 const std::string mouseFileName = "mouse_settings.xml";
 } // namespace
 
@@ -99,11 +106,11 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
-
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
+        DeviceType deviceType = CheckDeviceType(event);
         ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
@@ -607,6 +614,42 @@ void MouseTransformProcessor::DumpInner()
         device->GetName().c_str());
 }
 
+DeviceType MouseTransformProcessor::CheckDeviceType(struct libinput_event* event)
+{
+    CALL_INFO_TRACE;
+    CHKPR(event, DeviceType::DEVICE_UNKOWN);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, DeviceType::DEVICE_UNKOWN);
+    double width = 0.0;
+    double height = 0.0;
+    libinput_device_get_size(device, &width, &height);
+
+    DeviceType ret = DeviceType::DEVICE_KLV;
+    static bool hasCheckedDeviceType_ = false;
+    if (!hasCheckedDeviceType_) {
+        hasCheckedDeviceType_ = true;
+        const std::string deviceType = OHOS::system::GetParameter("const.build.product", "false");
+        if (deviceType == DEVICE_TYPE_KLV) {
+            ret = DeviceType::DEVICE_KLV;
+        } else if (deviceType == DEVICE_TYPE_HARDEN) {
+            if (HARD_HARDEN_DEVICE_WIDTH == static_cast<int32_t>(width)
+                && HARD_HARDEN_DEVICE_HEIGHT == static_cast<int32_t>(height)) {
+                ret = DeviceType::DEVICE_HARD_HARDEN;
+            } else if (SOFT_HARDEN_DEVICE_WIDTH == static_cast<int32_t>(width)
+                && SOFT_HARDEN_DEVICE_WIDTH == static_cast<int32_t>(height)) {
+                ret = DeviceType::DEVICE_SOFT_HARDEN;
+            } else {
+                MMI_HILOGE("undefined width: %{public}f, height: %{public}f", width, height);
+            }
+            MMI_HILOGD("device width: %{public}f, height:%{public}f", width, height);
+        } else {
+            MMI_HILOGE("undefined deviceType:%{public}s", deviceType.c_str());
+        }
+        MMI_HILOGI("deviceType:%{public}s, ret:%{public}d", deviceType.c_str(), ret);
+    }
+    return ret;
+}
+
 void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
@@ -898,20 +941,9 @@ int32_t MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
         MMI_HILOGE("Failed to get touch pad pointer speed from mem.");
         return RET_ERR;
     }
-
-    if (speed == 0) {
-        speed = DEFAULT_TOUCHPAD_SPEED;
-    }
-
-    // if speed < MIN_SPEED | speed > MAX_SPEED, touchpad would be out of action
-    if (speed < MIN_SPEED) {
-        speed = MIN_SPEED;
-    }
-
-    if (speed > MAX_SPEED) {
-        speed = MAX_SPEED;
-    }
-
+    speed = speed == 0 ? DEFAULT_TOUCHPAD_SPEED : speed;
+    speed = speed < MIN_SPEED ? MIN_SPEED : speed;
+    speed = speed > MAX_SPEED ? MAX_SPEED : speed;
     return RET_OK;
 }
 
