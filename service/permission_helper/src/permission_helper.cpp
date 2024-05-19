@@ -59,17 +59,17 @@ bool PermissionHelper::VerifySystemApp(MessageParcel& data)
     READSTRING(data, bundleName, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, instIndex, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((userID < 0) || (instIndex < 0) || (bundleName.empty())) {
-        MMI_HILOGD("MultimodalVerifySystemApp UserID, instIndex, bundleName failed, UserID=%{public}d, "
-            "bundleName=%{public}s, instIndex=%{public}d", userID, bundleName.c_str(), instIndex);
+        MMI_HILOGD("MultimodalVerifySystemApp UserID, instIndex, bundleName failed, "
+            "bundleName=%{public}s, instIndex=%{public}d", bundleName.c_str(), instIndex);
         uint32_t callingTokenId = IPCSkeleton::GetCallingTokenID();
         Security::AccessToken::HapTokenInfo hapTokenInfo;
         int32_t ret = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callingTokenId, hapTokenInfo);
         if (ret != 0) {
-            MMI_HILOGD("MultimodalVerifySystemApp failed to get haptokeninfo, result = %{public}d", ret);
+            MMI_HILOGD("MultimodalVerifySystemApp failed to get haptokeninfo, ret:%{public}d", ret);
             return false;
         }
         if (hapTokenInfo.instIndex < 0) {
-            MMI_HILOGD("MultimodalVerifySystemApp get invalid appindex from haptokeninfo, index = %{public}d",
+            MMI_HILOGD("MultimodalVerifySystemApp get invalid appindex from haptokeninfo, index:%{public}d",
                 hapTokenInfo.instIndex);
             return false;
         }
