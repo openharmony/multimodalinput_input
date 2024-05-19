@@ -99,10 +99,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     auto id = pkt.GetMsgId();
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto callback = GetMsgCallback(id);
-    if (callback == nullptr) {
-        MMI_HILOGE("Unknown msg id:%{public}d", id);
-        return;
-    }
+    CHKPV(callback);
     ResetLogTrace();
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
