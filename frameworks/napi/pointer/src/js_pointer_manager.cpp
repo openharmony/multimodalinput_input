@@ -897,7 +897,7 @@ napi_value JsPointerManager::SetTouchpadPointerSpeed(napi_env env, int32_t speed
 napi_value JsPointerManager::GetTouchpadPointerSpeed(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    int32_t speed;
+    int32_t speed = 0;
     int32_t ret = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
     return GetTouchpadInt32Data(env, handle, speed, ret);
 }
