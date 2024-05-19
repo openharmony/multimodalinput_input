@@ -50,6 +50,50 @@ bool PermissionHelper::VerifySystemApp()
     return true;
 }
 
+bool PermissionHelper::VerifySystemApp(MessageParcel& data)
+{
+    int32_t userID = -1;
+    int32_t instIndex = -1;
+    std::string bundleName;
+    READINT32(data, userID, IPC_PROXY_DEAD_OBJECT_ERR);
+    READSTRING(data, bundleName, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, instIndex, IPC_PROXY_DEAD_OBJECT_ERR);
+    if ((userID < 0) || (instIndex < 0) || (bundleName.empty())) {
+        MMI_HILOGD("MultimodalVerifySystemApp UserID, instIndex, bundleName failed, "
+            "bundleName=%{public}s, instIndex=%{public}d", bundleName.c_str(), instIndex);
+        uint32_t callingTokenId = IPCSkeleton::GetCallingTokenID();
+        Security::AccessToken::HapTokenInfo hapTokenInfo;
+        int32_t ret = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(callingTokenId, hapTokenInfo);
+        if (ret != 0) {
+            MMI_HILOGD("MultimodalVerifySystemApp failed to get haptokeninfo, ret:%{public}d", ret);
+            return false;
+        }
+        if (hapTokenInfo.instIndex < 0) {
+            MMI_HILOGD("MultimodalVerifySystemApp get invalid appindex from haptokeninfo, index:%{public}d",
+                hapTokenInfo.instIndex);
+            return false;
+        }
+        instIndex = static_cast<int32_t>(hapTokenInfo.instIndex);
+        userID = static_cast<int32_t>(hapTokenInfo.userID);
+        bundleName = hapTokenInfo.bundleName;
+    }
+    auto callerToken = OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenID(userID, bundleName, instIndex);
+
+    int32_t tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE ||
+        tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        return true;
+    }
+
+    uint64_t accessTokenIdEx = static_cast<uint64_t>(callerToken);
+    if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(accessTokenIdEx)) {
+        MMI_HILOGE("MultimodalVerifySystemApp systemapi called by non-system app");
+        return false;
+    }
+    return true;
+}
+
+
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
     CALL_DEBUG_ENTER;
