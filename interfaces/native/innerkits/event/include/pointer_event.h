@@ -455,7 +455,7 @@ public:
     /**
      * Indicates a knuckle.
      *
-     * @since 9
+     * @since 11
      */
     static constexpr int32_t TOOL_TYPE_KNUCKLE = 8;
 
