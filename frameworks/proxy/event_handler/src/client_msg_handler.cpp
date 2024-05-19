@@ -154,7 +154,7 @@ int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& p
     std::string bundleName;
     pkt >> pid >> uid >> bundleName >> syncStatus;
     InputMgrImpl.NotifyBundleName(pid, uid, bundleName, syncStatus);
-    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("NotifyBundleName pid:%{public}d, uid:%{public}d, bundleName:%{public}s, syncStatus:%{public}d",
         pid, uid, bundleName.c_str(), syncStatus);
     return RET_OK;
 }
