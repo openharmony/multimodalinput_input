@@ -385,7 +385,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
 int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 {
     CALL_DEBUG_ENTER;
-    int32_t windowPid = -1;
+    int32_t windowPid = INVALID_PID;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         MMI_HILOGD("get windowId:%{public}d", item.id);
         if (item.id == windowId) {
@@ -398,7 +398,7 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 
 int32_t InputWindowsManager::GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const
 {
-    int32_t windowPid = -1;
+    int32_t windowPid = INVALID_PID;
     for (const auto &item : windowsInfo) {
         if (item.id == windowId) {
             windowPid = item.pid;
