@@ -125,7 +125,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             break;
         }
         default:
-            // Don't care about other actions
             MMI_HILOGD("other action not match.");
             break;
     }
@@ -154,7 +153,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         default: {
-            // other tool type are not processed
             isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
@@ -206,7 +204,6 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             break;
         }
         default: {
-            // other tool type are not processed
             MMI_HILOGW("Current touch event tool type:%{public}d", toolType);
             break;
         }
