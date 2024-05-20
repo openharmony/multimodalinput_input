@@ -65,7 +65,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
 
         // Update touch state object
         EventDump("UpdateTouchState", inputEvent_);
-        EventLogHelper::PrintEventData(pointerEvent_);
+        EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         UpdateTouchState(inputEvent_);
         return pointerEvent_;
@@ -74,7 +74,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
     if ((ERR_OK == result) && (nullptr != outEvent)) {
         // Update pointer event
         UpdatePointerEvent(outEvent);
-        EventLogHelper::PrintEventData(pointerEvent_);
+        EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         return pointerEvent_;
     }
@@ -118,7 +118,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
 
     // Check that event can be consumed and initialize motion event.
     if (nullptr != pointerEvent) {
-        EventLogHelper::PrintEventData(pointerEvent_);
+        EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         pointerAction = pointerEvent->GetPointerAction();
         MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,

@@ -202,7 +202,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     }
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -298,7 +298,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
     BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());

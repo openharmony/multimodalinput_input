@@ -54,9 +54,11 @@ void ResetLogTrace();
 }
 
 #define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
+#define MMI_FUNC_NOLINE_FMT "[%{public}s][%{public}s] "
 #define MMI_TRACE_ID  (OHOS::MMI::FormatLogTrace()),
 #else
 #define MMI_FUNC_FMT "[%{public}s:%{public}d] "
+#define MMI_FUNC_NOLINE_FMT "[%{public}s] "
 #define MMI_TRACE_ID
 #endif //MMI_DISABLE_LOG_TRACE
 
@@ -108,6 +110,10 @@ void ResetLogTrace();
 
 #define MMI_HILOG_BASE(type, level, domain, tag, fmt, ...) do { \
         HILOG_IMPL(type, level, domain, tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HEADER(level, lh, fmt, ...) do { \
+        HILOG_IMPL(LOG_CORE, level, lh.domain, lh.tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID lh.func, lh.line, \
+        ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
@@ -270,12 +276,12 @@ inline constexpr int32_t FINAL_FINGER = 1;
 
 class InnerFunctionTracer {
 public:
-    InnerFunctionTracer(LogLevel level, const char* tag, const char* logfn)
-        : level_ { level }, tag_ { tag }, logfn_ { logfn }
+    InnerFunctionTracer(LogLevel level, const char* tag, const char* logfn, uint32_t logline)
+        : level_ { level }, tag_ { tag }, logfn_ { logfn }, logline_ { logline }
     {
         if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, "in %{public}s, enter", logfn_);
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, MMI_FUNC_FMT "enter", MMI_TRACE_ID logfn_, logline_);
             }
         }
     }
@@ -283,7 +289,7 @@ public:
     {
         if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, "in %{public}s, leave", logfn_);
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, MMI_FUNC_NOLINE_FMT "leave", MMI_TRACE_ID logfn_);
             }
         }
     }
@@ -291,14 +297,24 @@ private:
     LogLevel level_ { LOG_LEVEL_MIN };
     const char* tag_ { nullptr };
     const char* logfn_ { nullptr };
+    const uint32_t logline_ { 0 };
+};
+
+struct LogHeader {
+    const uint32_t domain;
+    const char* tag;
+    const char* func;
+    const uint32_t line;
 };
 } // namespace MMI
 } // namespace OHOS
 
+#define MMI_LOG_HEADER { MMI_LOG_DOMAIN, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
+
 #define CALL_DEBUG_ENTER ::OHOS::MMI::InnerFunctionTracer __innerFuncTracer_Debug___ \
-    { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__ }
+    { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
 #define CALL_INFO_TRACE ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
-    { LOG_INFO, MMI_LOG_TAG, __FUNCTION__ }
+    { LOG_INFO, MMI_LOG_TAG, __FUNCTION__, __LINE__  }
 #define CALL_TEST_DEBUG ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
-    { LOG_DEBUG, MMI_LOG_TAG, test_info_ == nullptr ? "TestBody" : test_info_->name() }
+    { LOG_DEBUG, MMI_LOG_TAG, test_info_ == nullptr ? "TestBody" : test_info_->name(), __LINE__ }
 #endif // MMI_LOG_H

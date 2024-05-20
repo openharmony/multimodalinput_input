@@ -16,16 +16,15 @@
 #ifndef INPUT_TABLE_DUMP_H
 #define INPUT_TABLE_DUMP_H
 
-#include <iostream>
 #include <iomanip>
-#include <vector>
-#include <tuple>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <tuple>
+#include <vector>
 
 namespace OHOS {
 namespace MMI {
-
 constexpr size_t extraCharactersCount = 3;
 constexpr int32_t elementSpaceCount = 2;
 
@@ -122,5 +121,4 @@ inline void DumpFullTable(std::ostream &os, const std::string &tableName, const 
 }
 }
 }
-
 #endif //INPUT_TABLE_DUMP_H
