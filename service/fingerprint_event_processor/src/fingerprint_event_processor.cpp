@@ -113,7 +113,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
-    EventLogHelper::PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGD("fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;
@@ -135,7 +135,7 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetFingerprintDistanceY(uy);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
-    EventLogHelper::PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGD("fingerprint key:%{public}d, ux:%{public}f, uy:%{public}f", pointerEvent->GetPointerAction(), ux, uy);
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;

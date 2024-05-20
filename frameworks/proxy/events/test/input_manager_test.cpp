@@ -297,7 +297,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, true, FINAL_KEY_DOWN_DURATION_TWO);
     int32_t subscribeId1 = INVAID_VALUE;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -310,7 +310,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     std::shared_ptr<KeyOption> keyOption2 = InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, false, 0);
     int32_t subscribeId2 = INVAID_VALUE;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER up trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -340,27 +340,27 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, FINAL_KEY_DOWN_DURATION_ONE);
     int32_t subscribeId1 = INVAID_VALUE;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
     });
     std::shared_ptr<KeyOption> keyOption2 =
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, false, 0);
     int32_t subscribeId2 = INVAID_VALUE;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
     });
     std::shared_ptr<KeyOption> keyOption3 = InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, 0);
     int32_t subscribeId3 = INVAID_VALUE;
     subscribeId3 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption3, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
     });
     std::shared_ptr<KeyOption> keyOption4 =
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, false, 0);
     int32_t subscribeId4 = INVAID_VALUE;
     subscribeId4 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption4, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
     });
 
@@ -390,7 +390,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_04, TestSize.Level
     keyOption->SetFinalKeyDownDuration(INVAID_VALUE);
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

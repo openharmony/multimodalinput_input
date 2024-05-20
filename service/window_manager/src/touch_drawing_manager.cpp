@@ -14,11 +14,13 @@
  */
 
 #include "touch_drawing_manager.h"
-#include "i_multimodal_input_connect.h"
+
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
-#include "table_dump.h"
+
+#include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
+#include "table_dump.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
