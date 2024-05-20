@@ -607,7 +607,7 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 
 void MouseTransformProcessor::DumpInner()
 {
-    EventLogHelper::PrintEventData(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
