@@ -359,7 +359,6 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         pointCounter_ = 1;
         // Add glowing particles onto the last path segment that was drawn
         int64_t now = pointerEvent->GetActionTime();
-        double len = pointerPath_.GetLength(false);
         glowTraceSystem_->AddGlowPoints(pointerPath_, (now - lastUpdateTimeMillis_) / TIME_DIMENSION);
         pointerPath_.Reset();
         lastUpdateTimeMillis_ = now;
