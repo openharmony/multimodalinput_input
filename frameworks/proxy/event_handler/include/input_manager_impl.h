@@ -111,7 +111,6 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    void HandlePointerId(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
     template<typename T>
     bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
