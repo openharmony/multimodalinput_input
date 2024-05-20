@@ -481,8 +481,6 @@ void TouchDrawingManager::DrawLabels()
     }
     DrawRectItem(canvas, viewXv, rect, LABELS_DEFAULT_COLOR);
     DrawRectItem(canvas, viewYv, rect, LABELS_DEFAULT_COLOR);
-    std::shared_ptr<Rosen::Drawing::TextBlob> textPrs = Rosen::Drawing::TextBlob::MakeFromString(viewPrs.c_str(),
-        Rosen::Drawing::Font(nullptr, TEXT_SIZE, TEXT_SCALE, TEXT_SKEW), Rosen::Drawing::TextEncoding::UTF8);
     color = isFirstDraw_ ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
     DrawRectItem(canvas, viewPrs, rect, color);
     labelsCanvasNode_->FinishRecording();
