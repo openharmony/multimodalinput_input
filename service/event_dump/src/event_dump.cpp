@@ -36,6 +36,7 @@
 #include "switch_subscriber_handler.h"
 #include "securec.h"
 #include "touch_drawing_manager.h"
+#include "key_command_handler.h"
 #include "util_ex.h"
 #include "util.h"
 
@@ -99,6 +100,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "filter", no_argument, 0, 'f' },
         { "mouse", no_argument, 0, 'm' },
         { "cursor", no_argument, 0, 'c' },
+        { "keycommand", no_argument, 0, 'k' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -206,6 +208,12 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_TOUCH
                 break;
             }
+            case 'k': {
+                auto keyHandler = InputHandler->GetKeyCommandHandler();
+                CHKPV(keyHandler);
+                keyHandler->Dump(fd, args);
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -241,6 +249,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
     mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
+    mprintf(fd, "      -k, --keycommand: dump the keycommand information\t");
 }
 } // namespace MMI
 } // namespace OHOS

@@ -39,6 +39,7 @@
 #include "stylus_key_handler.h"
 #include "timer_manager.h"
 #include "util_ex.h"
+#include "table_dump.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -1654,6 +1655,92 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
         return;
     }
     downToPrevDownDistanceConfig_ = distance;
+}
+void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<std::tuple<std::string, std::string, bool, int32_t, int32_t,
+        std::string, std::string, std::string>> shortcutKeyInfo;
+    for (const auto &item : shortcutKeys_) {
+        auto &shortcutKey = item.second;
+        for (const auto &prekey : shortcutKey.preKeys) {
+            mprintf(fd, "PreKey:%d", prekey);
+        }
+        shortcutKeyInfo.emplace_back(shortcutKey.businessId, shortcutKey.statusConfig,
+            shortcutKey.statusConfigValue, shortcutKey.finalKey, shortcutKey.triggerType,
+            shortcutKey.ability.bundleName, shortcutKey.ability.abilityName, shortcutKey.ability.action);
+    }
+    std::ostringstream oss;
+    auto shortcutKeysTitles = std::make_tuple("BusinessId", "StatusConfig", "StatusConfigValue",
+                                   "FinalKey", "TriggerType", "BundleName", "AbilityName", "Action");
+    DumpFullTable(oss, "KeyCommandHandler shortcutKey", shortcutKeysTitles, shortcutKeyInfo);
+    oss << std::endl;
+
+    std::vector<std::tuple<std::string, std::string, std::string>> SequenceKeyInfo;
+    for (const auto &item : sequences_) {
+        for (const auto& sequenceKey : item.sequenceKeys) {
+            mprintf(fd, "keyCode:%d | keyAction:%d", sequenceKey.keyCode, sequenceKey.keyAction);
+        }
+        SequenceKeyInfo.emplace_back(item.ability.bundleName, item.ability.abilityName,
+            item.ability.action);
+    }
+    auto SequenceKeyTitles = std::make_tuple("BundleName", "AbilityName", "Action");
+    DumpFullTable(oss, "KeyCommandHandler SequenceKey", SequenceKeyTitles, SequenceKeyInfo);
+    oss << std::endl;
+
+    std::vector<std::tuple<int32_t, int32_t>> excludeKeysInfo;
+    for (const auto &item : excludeKeys_) {
+        excludeKeysInfo.emplace_back(item.keyCode, item.keyAction);
+    }
+    auto excludeKeyTitles = std::make_tuple("KeyCode", "KeyAction");
+    DumpFullTable(oss, "KeyCommandHandler excludeKeys", excludeKeyTitles, excludeKeysInfo);
+    oss << std::endl;
+
+    std::vector<std::tuple<int32_t, int32_t, int32_t, std::string, bool,
+        std::string, std::string, std::string>> RepeatKeyInfo;
+    for (const auto &item : repeatKeys_) {
+        RepeatKeyInfo.emplace_back(item.keyCode, item.keyAction, item.times,
+            item.statusConfig, item.statusConfigValue, item.ability.bundleName,
+            item.ability.abilityName, item.ability.action);
+    }
+    auto RepeatKeyTitles = std::make_tuple("KeyCode", "KeyAction", "Times",
+        "StatusConfig", "StatusConfigValue", "BundleName", "AbilityName", "Action");
+    DumpFullTable(oss, "KeyCommandHandler excludeKeys", RepeatKeyTitles, RepeatKeyInfo);
+    oss << std::endl;
+
+    auto TwoFingerGestureTitles = std::make_tuple("Active", "BundleName", "AbilityName", "Action");
+    auto TwoFingerGestureInfo = std::vector{std::make_tuple(twoFingerGesture_.active,
+        twoFingerGesture_.ability.bundleName, twoFingerGesture_.ability.abilityName,
+        twoFingerGesture_.ability.action)};
+    DumpFullTable(oss, "KeyCommandHandler TwoFingerGesture", TwoFingerGestureTitles,
+        TwoFingerGestureInfo);
+    oss << std::endl;
+
+    auto singleFingerGestureTitles = std::make_tuple("State", "BundleName", "AbilityName", "Action");
+    auto singleFingerGestureInfo = std::vector{std::make_tuple(singleKnuckleGesture_.state,
+        singleKnuckleGesture_.ability.bundleName, singleKnuckleGesture_.ability.abilityName,
+        singleKnuckleGesture_.ability.action)};
+    DumpFullTable(oss, "KeyCommandHandler singleFingerGesture", singleFingerGestureTitles,
+        singleFingerGestureInfo);
+    oss << std::endl;
+
+    auto doubleFingerGestureTitles = std::make_tuple("State", "BundleName", "AbilityName", "Action");
+    auto doubleFingerGestureInfo = std::vector{std::make_tuple(doubleKnuckleGesture_.state,
+        doubleKnuckleGesture_.ability.bundleName, doubleKnuckleGesture_.ability.abilityName,
+        doubleKnuckleGesture_.ability.action)};
+    DumpFullTable(oss, "KeyCommandHandler doubleFingerGesture", doubleFingerGestureTitles,
+        doubleFingerGestureInfo);
+    oss << std::endl;
+
+    auto threeFingersTapTitles = std::make_tuple("BundleName", "AbilityName", "Action");
+    auto threeFingersTapInfo = std::vector{std::make_tuple(threeFingersTap_.ability.bundleName,
+        threeFingersTap_.ability.abilityName, threeFingersTap_.ability.action)};
+    DumpFullTable(oss, "KeyCommandHandler threeFingersTap", threeFingersTapTitles,
+        threeFingersTapInfo);
+    oss << std::endl;
+
+    std::string dumpInfo = oss.str();
+    dprintf(fd, dumpInfo.c_str());
 }
 } // namespace MMI
 } // namespace OHOS
