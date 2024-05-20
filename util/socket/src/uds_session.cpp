@@ -96,7 +96,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
                 "INPUT_EVENT_SOCKET_TIMEOUT", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
                 "MSG", "remote client buffer full, cant send msg");
         if (ret != 0) {
-            MMI_HILOGE("save dfx event failed, ret:%{public}d", ret);
+            MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
         }
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
