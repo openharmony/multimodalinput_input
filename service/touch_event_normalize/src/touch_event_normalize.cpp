@@ -98,7 +98,7 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t devic
         CHKPP(iter->second);
         return iter->second->GetPointerEvent();
     }
-    return nullptr
+    return nullptr;
 }
 
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
