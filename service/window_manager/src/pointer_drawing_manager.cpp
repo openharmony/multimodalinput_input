@@ -19,6 +19,7 @@
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
+#include "table_dump.h"
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_drawing_manager.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -1631,6 +1632,56 @@ void PointerDrawingManager::RotateDegree(Direction direction)
     surfaceNode_->SetPivot(0, 0);
     float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
     surfaceNode_->SetRotation(degree);
+}
+
+void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    std::ostringstream oss;
+    oss << std::endl;
+
+    auto displayTitles = std::make_tuple("ID", "X", "Y", "Width", "Height", "DPI", "Name", "Uniq",
+                                         "Direction", "Display Direction", "Display Mode");
+    DisplayInfo &di = displayInfo_;
+    auto displayInfo = std::vector{std::make_tuple(di.id, di.x, di.y, di.width, di.height, di.dpi, di.name, di.uniq,
+                                                   di.direction, di.displayDirection,
+                                                   static_cast<int32_t>(di.displayMode))};
+    DumpFullTable(oss, "Display Info", displayTitles, displayInfo);
+    oss << std::endl;
+
+    auto titles1 = std::make_tuple("hasDisplay", "hasPointerDevice", "lastPhysicalX", "lastPhysicalY",
+                                   "pid", "windowId", "imageWidth", "imageHeight", "canvasWidth", "canvasHeight");
+    auto data1 = std::vector{std::make_tuple(hasDisplay_, hasPointerDevice_, lastPhysicalX_, lastPhysicalY_,
+                                             pid_, windowId_, imageWidth_, imageHeight_, canvasWidth_, canvasHeight_)};
+    DumpFullTable(oss, "Cursor Info", titles1, data1);
+    oss << std::endl;
+
+    auto titles2 = std::make_tuple("mouseDisplayState", "mouseIconUpdate", "screenId", "userIconHotSpotX",
+                                   "userIconHotSpotY", "tempPointerColor", "lastDirection", "currentDirection");
+    auto data2 = std::vector{std::make_tuple(mouseDisplayState_, mouseIconUpdate_, screenId_, userIconHotSpotX_,
+                                             userIconHotSpotY_, tempPointerColor_, lastDirection_, currentDirection_)};
+
+    DumpFullTable(oss, "Cursor Info", titles2, data2);
+    oss << std::endl;
+
+    auto styleTitles = std::make_tuple("name", "Size", "Color", "ID");
+    auto styleData = std::vector{
+            std::make_tuple("lastMouseStyle", lastMouseStyle_.size, lastMouseStyle_.color, lastMouseStyle_.id),
+            std::make_tuple("currentMouseStyle", currentMouseStyle_.size, currentMouseStyle_.color,
+                            currentMouseStyle_.id)};
+    DumpFullTable(oss, "Cursor Style Info", styleTitles, styleData);
+    oss << std::endl;
+
+    auto pidTitles = std::make_tuple("pid", "visible");
+    std::vector<std::tuple<int32_t, bool>> pidInfos;
+    for (const auto &pidInfo: pidInfos_) {
+        pidInfos.emplace_back(pidInfo.pid, pidInfo.visible);
+    }
+    DumpFullTable(oss, "Visible Info", pidTitles, pidInfos);
+    oss << std::endl;
+
+    std::string dumpInfo = oss.str();
+    dprintf(fd, dumpInfo.c_str());
 }
 } // namespace MMI
 } // namespace OHOS
