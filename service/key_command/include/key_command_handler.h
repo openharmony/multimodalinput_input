@@ -152,6 +152,7 @@ public:
     int32_t EnableCombineKey(bool enable);
     KnuckleGesture GetSingleKnuckleGesture();
     KnuckleGesture GetDoubleKnuckleGesture();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
