@@ -299,10 +299,7 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
         return;
     }
     state.isMonitorConsumed_ = true;
-    if (state.lastPointerEvent_ == nullptr) {
-        MMI_HILOGE("No former touch event");
-        return;
-    }
+    CHKPV(state.lastPointerEvent_);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MMI_HILOGD("Cancel operation");
     auto pointerEvent = std::make_shared<PointerEvent>(*state.lastPointerEvent_);
