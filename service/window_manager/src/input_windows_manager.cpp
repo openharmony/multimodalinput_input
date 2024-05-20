@@ -265,6 +265,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
     if (windowInfo != nullptr) {
+        FoldScreenRotation(pointerEvent);
         MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
@@ -295,6 +296,37 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 #endif // OHOS_BUILD_ENABLE_POINTER
     MMI_HILOGD("get clientFd by %{public}d", pid);
     return udsServer_->GetClientFd(pid);
+}
+
+void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
+    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+    if (iter == touchItemDownInfos_.end()) {
+        MMI_HILOG_DISPATCHE("Unable to find finger information for touch.pointerId:%{public}d",
+            pointerEvent->GetPointerId());
+        return;
+    }
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    auto physicDisplayInfo = GetPhysicalDisplay(displayId);
+    CHKPV(physicDisplayInfo);
+    if (physicDisplayInfo->displayDirection == DIRECTION0) {
+        MMI_HILOG_DISPATCHD("Not in the unfolded state of the folding screen");
+        return;
+    }
+    if (lastDirection_ == static_cast<Direction>(-1)) {
+        lastDirection_ = physicDisplayInfo->direction;
+    } else {
+        if (physicDisplayInfo->direction != lastDirection_) {
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+                MMI_HILOG_DISPATCHI("touch event send cancel");
+                iter->second.flag = false;
+            }
+        }
+        lastDirection_ = physicDisplayInfo->direction;
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
