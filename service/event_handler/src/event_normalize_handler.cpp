@@ -646,7 +646,11 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
         return RET_OK;
     }
     auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
-    swEvent->SetSwitchType(static_cast<int32_t>(sw));
+    int32_t switchStatus = static_cast<int32_t>(sw);
+    if (switchStatus) {
+        RestoreTouchPadStatus();
+    }
+    swEvent->SetSwitchType(switchStatus);
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("switch device does not support");
@@ -684,6 +688,24 @@ int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> 
     MMI_HILOGD("pointerId:%{public}d, originPointerId:%{public}d",
         pointerId, pointerItem.GetPointerId());
     return RET_OK;
+}
+
+void EventNormalizeHandler::RestoreTouchPadStatus()
+{
+    CALL_INFO_TRACE;
+    auto ids = InputDevMgr->GetTouchPadIds();
+    for (auto id : ids) {
+        MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
+        auto mouseEvent = TouchEventHdr->GetPointerEvent(id);
+        if (mouseEvent != nullptr) {
+            mouseEvent->Reset();
+        }
+        mouseEvent = MouseEventHdr->GetPointerEvent(id);
+        if (mouseEvent != nullptr) {
+            mouseEvent->Reset();
+        }
+    }
+    buttonIds_.clear();
 }
 } // namespace MMI
 } // namespace OHOS
