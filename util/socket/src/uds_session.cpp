@@ -24,8 +24,8 @@
 #include <unistd.h>
 
 #include "hisysevent.h"
-#include "uds_socket.h"
 #include "proto.h"
+#include "uds_socket.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "UDSSession"
