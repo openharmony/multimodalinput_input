@@ -831,7 +831,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
         return RET_ERR;
     }
     if (windowId < 0) {
-        MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
+        MMI_HILOGE("windowId is invalid, windowId:%{public}d", windowId);
         return RET_ERR;
     }
     if (WinMgr->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
@@ -852,7 +852,7 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
-    MMI_HILOGD("style.id: %{public}d, userIconHotSpotX_: %{public}d, userIconHotSpotY_: %{public}d",
+    MMI_HILOGD("style.id:%{public}d, userIconHotSpotX_:%{public}d, userIconHotSpotY_:%{public}d",
         style.id, userIconHotSpotX_, userIconHotSpotY_);
     return ret;
 }
