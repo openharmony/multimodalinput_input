@@ -109,9 +109,9 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
-        MMI_HILOGE("touch tool type is not single knuckle");
         return false;
     }
+    MMI_HILOGI("touch tool type is single knuckle");
     return true;
 }
 
