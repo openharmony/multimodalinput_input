@@ -17,6 +17,7 @@
 #include "i_multimodal_input_connect.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
+#include "table_dump.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -652,6 +653,45 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
         return true;
     }
     return false;
+}
+
+void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    std::ostringstream oss;
+    auto titles1 = std::make_tuple("currentPointerId", "maxPointerCount", "currentPointerCount",
+                                   "currentPhysicalX", "currentPhysicalY", "lastActionTime", "xVelocity",
+                                   "yVelocity");
+
+    auto data1 = std::vector{std::make_tuple(currentPointerId_, maxPointerCount_, currentPointerCount_,
+                                             currentPhysicalX_, currentPhysicalY_, lastActionTime_, xVelocity_,
+                                             yVelocity_)};
+    DumpFullTable(oss, "Touch Location Info", titles1, data1);
+    oss << std::endl;
+
+    auto titles2 = std::make_tuple("pressure", "itemRectW", "hasBubbleObserver",
+                                   "hasPointerObserver", "isFirstDownAction", "isDownAction", "isFirstDraw");
+
+    auto data2 = std::vector{std::make_tuple(pressure_, itemRectW_, hasBubbleObserver_,
+                                             hasPointerObserver_, isFirstDownAction_, isDownAction_, isFirstDraw_)};
+    DumpFullTable(oss, "Touch Location Info", titles2, data2);
+    oss << std::endl;
+
+    auto bubbleTitles = std::make_tuple("innerCircleRadius", "outerCircleRadius", "outerCircleWidth");
+    auto bubbleData = std::vector{
+            std::make_tuple(bubble_.innerCircleRadius, bubble_.outerCircleRadius, bubble_.outerCircleWidth)};
+    DumpFullTable(oss, "Bubble Info", bubbleTitles, bubbleData);
+    oss << std::endl;
+
+    auto devModeTitles = std::make_tuple("Name", "SwitchName", "IsShow");
+    auto devModeData = std::vector{
+            std::make_tuple("BubbleMode", bubbleMode_.SwitchName, bubbleMode_.isShow),
+            std::make_tuple("PointerMode", pointerMode_.SwitchName, pointerMode_.isShow)};
+    DumpFullTable(oss, "DevMode Info", devModeTitles, devModeData);
+    oss << std::endl;
+
+    std::string dumpInfo = oss.str();
+    dprintf(fd, dumpInfo.c_str());
 }
 } // namespace MMI
 } // namespace OHOS
