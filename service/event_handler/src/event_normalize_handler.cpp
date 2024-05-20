@@ -343,6 +343,8 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    TerminateRotate(event);
+    TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         return RET_ERR;
@@ -706,6 +708,45 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
         }
     }
     buttonIds_.clear();
+}
+
+void EventNormalizeHandler::TerminateRotate(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    if (!GESTURE_HANDLER->GetRotateStatus()) {
+        return;
+    }
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        MMI_HILOGI("Terminate rotate event");
+        auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
+        int32_t actionType = PointerEvent::POINTER_ACTION_ROTATE_END;
+        if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
+            MMI_HILOGE("OnEvent is failed");
+            return;
+        }
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        CHKPV(pointerEvent);
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+        GESTURE_HANDLER->InitRotateGesture();
+    }
+}
+
+void EventNormalizeHandler::TerminateAxis(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        bool result = MouseEventHdr->CheckAndPackageAxisEvent(event);
+        if (!result) {
+            return;
+        }
+        MMI_HILOGI("Terminate axis event");
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        CHKPV(pointerEvent);
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
