@@ -1672,7 +1672,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     }
     std::ostringstream oss;
     auto shortcutKeysTitles = std::make_tuple("BusinessId", "StatusConfig", "StatusConfigValue",
-                                   "FinalKey", "TriggerType", "BundleName", "AbilityName", "Action");
+        "FinalKey", "TriggerType", "BundleName", "AbilityName", "Action");
     DumpFullTable(oss, "KeyCommandHandler shortcutKey", shortcutKeysTitles, shortcutKeyInfo);
     oss << std::endl;
 
