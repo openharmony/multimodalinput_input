@@ -621,6 +621,7 @@ ohos_unittest("TouchEventNormalizeTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
@@ -808,6 +809,7 @@ ohos_unittest("KeyEventNormalizeTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
@@ -1056,6 +1058,7 @@ ohos_unittest("DisplayStateManagerTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
@@ -1110,6 +1113,7 @@ ohos_unittest("DeviceConfigTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]
 }
@@ -1129,7 +1133,10 @@ ohos_unittest("DelegateTaskTest") {
 
   sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
 
-  deps = [ "${mmi_path}/service:libmmi-server" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [ "hilog:libhilog" ]
 }

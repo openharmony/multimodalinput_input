@@ -295,6 +295,9 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         MMI_HILOGI("Libinput event axis source type is finger");
+        if (!isAxisBegin_) {
+            return RET_ERR;
+        }
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     } else {
         if (TimerMgr->IsExist(timerId_)) {
@@ -448,6 +451,20 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+    return true;
+}
+
+bool MouseTransformProcessor::CheckAndPackageAxisEvent()
+{
+    CALL_INFO_TRACE;
+    if (!isAxisBegin_) {
+        return false;
+    }
+    pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    isAxisBegin_ = false;
+    PointerEvent::PointerItem item;
+    HandleAxisPostInner(item);
+    WinMgr->UpdateTargetPointer(pointerEvent_);
     return true;
 }
 
@@ -607,7 +624,7 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 
 void MouseTransformProcessor::DumpInner()
 {
-    EventLogHelper::PrintEventData(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
