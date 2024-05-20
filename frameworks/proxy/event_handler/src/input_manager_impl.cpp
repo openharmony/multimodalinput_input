@@ -870,21 +870,6 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         maxPointerId += 1;
         pointerItem.SetPointerId(maxPointerId);
     }
-    pointerEvent->RemoveAllPointerItems();
-    for (auto &pointerItem : pointerItems) {
-        pointerEvent->AddPointerItem(pointerItem);
-    }
-    if ((pointerEvent->GetPointerId() < 0) && !pointerItems.empty()) {
-        pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
-        MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
-    }
-    HandlePointerId(pointerEvent);
-}
-
-void InputManagerImpl::HandlePointerId(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_INFO_TRACE;
-    std::list<PointerEvent::PointerItem> pointerItems = pointerEvent->GetAllPointerItems();
     for (auto &pointerItem : pointerItems) {
         int32_t pointerId = pointerItem.GetPointerId();
         pointerItem.SetOriginPointerId(pointerId);
@@ -893,6 +878,10 @@ void InputManagerImpl::HandlePointerId(std::shared_ptr<PointerEvent> pointerEven
     pointerEvent->RemoveAllPointerItems();
     for (auto &pointerItem : pointerItems) {
         pointerEvent->AddPointerItem(pointerItem);
+    }
+    if ((pointerEvent->GetPointerId() < 0) && !pointerItems.empty()) {
+        pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
+        MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
     pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
 }
