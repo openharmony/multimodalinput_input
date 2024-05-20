@@ -500,11 +500,10 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
         CHKPR(outputEvent, RET_OK);
         MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
-                    outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
+            outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
         EndLogTraceId(pointerEvent->GetId());
         pointerEvent = outputEvent;
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-
     }
     BytraceAdapter::StopPackageEvent();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
