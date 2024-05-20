@@ -97,6 +97,7 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
+    DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DumpInner();
 
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
@@ -125,7 +126,7 @@ public:
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
     static int32_t GetTouchpadSpeed();
-    static DeviceType CheckDeviceType(struct libinput_event* event);
+    
 
 private:
     static int32_t globalPointerSpeed_;
