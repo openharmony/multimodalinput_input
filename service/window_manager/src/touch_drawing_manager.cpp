@@ -47,13 +47,19 @@ constexpr int32_t RECT_TOP = 118;
 constexpr int32_t RECT_HEIGHT = 50;
 constexpr int32_t TEXT_TOP = 40;
 constexpr int32_t PEN_WIDTH = 1;
+constexpr int32_t TOUCH_SLOP = 30;
 constexpr int32_t RECT_SPACEING = 1;
 constexpr int32_t THREE_PRECISION = 3;
 constexpr int32_t TWO_PRECISION = 2;
 constexpr int32_t ONE_PRECISION = 1;
+constexpr int32_t ROTATION_ANGLE_90 = 90;
+constexpr int32_t ROTATION_ANGLE_180 = 180;
+constexpr int32_t ROTATION_ANGLE_270 = 270;
 constexpr float TEXT_SIZE = 40.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
+constexpr float CALCULATE_TEMP = 2.0f;
+
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
 } // namespace
@@ -79,11 +85,68 @@ TouchDrawingManager::TouchDrawingManager()
 
 TouchDrawingManager::~TouchDrawingManager() {}
 
+void TouchDrawingManager::ConvertPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (pointerEvent_ == nullptr) {
+        pointerEvent_ = PointerEvent::Create();
+    }
+    CHKPV(pointerEvent_);
+    pointerEvent_->Reset();
+    pointerEvent_->SetTargetDisplayId(pointerEvent->GetTargetDisplayId());
+    pointerEvent_->SetPointerAction(pointerEvent->GetPointerAction());
+    pointerEvent_->SetPointerId(pointerEvent->GetPointerId());
+    std::list<PointerEvent::PointerItem> items = pointerEvent->GetAllPointerItems();
+    for (auto item : items) {
+        int32_t displayX = item.GetDisplayX();
+        int32_t displayY = item.GetDisplayY();
+        GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+            displayInfo_.height, displayX, displayY);
+        item.SetDisplayX(displayX);
+        item.SetDisplayY(displayY);
+        pointerEvent_->AddPointerItem(item);
+    }
+}
+
+void TouchDrawingManager::RecordLabelsInfo(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(currentPointerId_, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", currentPointerId_);
+        return;
+    }
+    if (pointerItem.IsPressed()) {
+        currentPt_.SetX(pointerItem.GetDisplayX());
+        currentPt_.SetY(pointerItem.GetDisplayY());
+        pressure_ = pointerItem.GetPressure();
+    }
+    if (isFirstDownAction_) {
+        firstPt_.SetX(pointerItem.GetDisplayX());
+        firstPt_.SetY(pointerItem.GetDisplayY());
+        isFirstDownAction_ = false;
+    }
+    int64_t actionTime = pointerEvent->GetActionTime();
+    if (pointerEvent->GetPointerId() == currentPointerId_ && !lastPointerItem_.empty()) {
+        double diffTime = static_cast<double>(actionTime - lastActionTime_) / 1000;
+        if (MMI_EQ(diffTime, 0.0)) {
+            xShowVelocity_ = 0.0;
+            yShowVelocity_ = 0.0;
+        } else {
+            auto diffX = currentPt_.GetX() - lastPt_.GetX();
+            auto diffY = currentPt_.GetY() - lastPt_.GetY();
+            xShowVelocity_ = diffX / diffTime;
+            yShowVelocity_ = diffY / diffTime;
+        }
+        lastActionTime_ = actionTime;
+    }
+}
+
 void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    pointerEvent_ = pointerEvent;
+    ConvertPointerEvent(pointerEvent);
     CreateObserver();
     if (bubbleCanvasNode_ == nullptr) {
         bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
@@ -108,7 +171,9 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
     if (pointerMode_.isShow) {
         UpdatePointerPosition();
         ClearTracker();
+        RecordLabelsInfo(pointerEvent);
         DrawPointerPositionHandler();
+        lastPt_ = currentPt_;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -121,6 +186,11 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
     itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
+    if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+        rectTopPosition_ = RECT_TOP;
+    } else {
+        rectTopPosition_ = 0;
+    }
 }
 
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
@@ -250,7 +320,7 @@ void TouchDrawingManager::CreatePointerObserver(T &item)
 }
 
 template <class T>
-std::string TouchDrawingManager::FormatNumber(T& number, int32_t precision)
+std::string TouchDrawingManager::FormatNumber(T number, int32_t precision)
 {
     std::string temp(".000");
     auto str = std::to_string(number);
@@ -348,10 +418,6 @@ void TouchDrawingManager::DrawBubble()
         }
         int32_t physicalX = pointerItem.GetDisplayX();
         int32_t physicalY = pointerItem.GetDisplayY();
-        if (displayInfo_.displayDirection == DIRECTION0) {
-            GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
-                displayInfo_.height, physicalX, physicalY);
-        }
         Rosen::Drawing::Point centerPt(physicalX, physicalY);
         bubblePen_.SetWidth(bubble_.outerCircleWidth);
         canvas->AttachPen(bubblePen_);
@@ -435,13 +501,19 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
 void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
+    int32_t width = displayInfo_.width;
+    int32_t height =  displayInfo_.height;
+    if (displayInfo_.direction == DIRECTION90 || displayInfo_.direction == DIRECTION270) {
+        width = displayInfo_.height;
+        height = displayInfo_.width;
+    }
     crosshairsPen_.SetWidth(PEN_WIDTH);
     canvas->AttachPen(crosshairsPen_);
     Rosen::Drawing::Point left(0, y);
-    Rosen::Drawing::Point right(displayInfo_.width, y);
+    Rosen::Drawing::Point right(width, y);
     canvas->DrawLine(left, right);
     Rosen::Drawing::Point top(x, 0);
-    Rosen::Drawing::Point bottom(x, displayInfo_.height);
+    Rosen::Drawing::Point bottom(x, height);
     canvas->DrawLine(top, bottom);
     canvas->DetachPen();
 }
@@ -451,32 +523,41 @@ void TouchDrawingManager::DrawLabels()
     CALL_DEBUG_ENTER;
     CHKPV(labelsCanvasNode_);
     std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
-    std::string viewX = "X: " + FormatNumber(currentPhysicalX_, ONE_PRECISION);
-    std::string viewY = "Y: " + FormatNumber(currentPhysicalY_, ONE_PRECISION);
-    auto dx = currentPhysicalX_ - firstPointerItem_.GetDisplayX();
-    auto dy = currentPhysicalY_ - firstPointerItem_.GetDisplayY();
+        std::string viewX = "X: " + FormatNumber(currentPt_.GetX(), ONE_PRECISION);
+    std::string viewY = "Y: " + FormatNumber(currentPt_.GetY(), ONE_PRECISION);
+    auto dx = currentPt_.GetX() - firstPt_.GetX();
+    auto dy = currentPt_.GetY() - firstPt_.GetY();
     std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
     std::string viewDy = "dY: " + FormatNumber(dy, ONE_PRECISION);
-    std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
-    std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
+    std::string viewXv = "Xv: " + FormatNumber(xShowVelocity_, THREE_PRECISION);
+    std::string viewYv = "Yv: " + FormatNumber(yShowVelocity_, THREE_PRECISION);
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
-    Rosen::Drawing::Rect rect;
-    rect.left_ = 0;
-    rect.right_ = itemRectW_ + rect.left_;
-    rect.top_ = RECT_TOP;
-    rect.bottom_ = RECT_TOP + RECT_HEIGHT;
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
     auto canvas = static_cast<RosenCanvas *>
         (labelsCanvasNode_->BeginRecording(displayInfo_.width, displayInfo_.height));
     CHKPV(canvas);
+    Rosen::Drawing::Rect rect;
+    rect.top_ = rectTopPosition_;
+    rect.bottom_ = rectTopPosition_ + RECT_HEIGHT;
+    rect.left_ = 0;
+    rect.right_ = itemRectW_ + rect.left_;
+    if (displayInfo_.direction == Direction::DIRECTION90) {
+        canvas->Translate(0, displayInfo_.width);
+        canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
+    } else if (displayInfo_.direction == Direction::DIRECTION180) {
+        canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_TEMP, displayInfo_.height / CALCULATE_TEMP);
+    } else if (displayInfo_.direction == Direction::DIRECTION270) {
+        canvas->Translate(displayInfo_.height, 0);
+        canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
+    }
     DrawRectItem(canvas, viewP, rect, color);
     if (isDownAction_ || !lastPointerItem_.empty()) {
         DrawRectItem(canvas, viewX, rect, color);
         DrawRectItem(canvas, viewY, rect, color);
     } else {
-        color = dx == 0 ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+        color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDx, rect, color);
-        color = dy == 0 ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+        color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDy, rect, color);
     }
     DrawRectItem(canvas, viewXv, rect, LABELS_DEFAULT_COLOR);
@@ -497,7 +578,7 @@ void TouchDrawingManager::DrawRectItem(RosenCanvas* canvas, const std::string &t
     canvas->DrawRect(rect);
     canvas->DetachBrush();
     canvas->AttachBrush(textBrush_);
-    canvas->DrawTextBlob(textBlob.get(), rect.left_, RECT_TOP + TEXT_TOP);
+    canvas->DrawTextBlob(textBlob.get(), rect.left_, rectTopPosition_ + TEXT_TOP);
     canvas->DetachBrush();
     rect.left_ += itemRectW_ + RECT_SPACEING;
     rect.right_ += itemRectW_ + RECT_SPACEING;
@@ -528,17 +609,7 @@ void TouchDrawingManager::UpdatePointerPosition()
             currentPointerId_ = lastPointerItem_.front().GetPointerId();
         }
     }
-    if (isFirstDownAction_) {
-        PointerEvent::PointerItem pointerItem;
-        if (!pointerEvent_->GetPointerItem(pointerId, pointerItem)) {
-            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-            return;
-        }
-        firstPointerItem_ = pointerItem;
-        isFirstDownAction_ = false;
-    }
     UpdateVelocity();
-    UpdateDisplayCoord();
 }
 
 void TouchDrawingManager::UpdateLastPointerItem(int32_t pointerId, PointerEvent::PointerItem &pointerItem)
@@ -582,22 +653,6 @@ void TouchDrawingManager::UpdateVelocity()
                 yVelocity_ = diffY / diffTime;
             }
         }
-        lastActionTime_ = actionTime;
-    }
-}
-
-void TouchDrawingManager::UpdateDisplayCoord()
-{
-    CHKPV(pointerEvent_);
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent_->GetPointerItem(currentPointerId_, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", currentPointerId_);
-        return;
-    }
-    if (pointerItem.IsPressed()) {
-        currentPhysicalX_ = pointerItem.GetDisplayX();
-        currentPhysicalY_ = pointerItem.GetDisplayY();
-        pressure_ = pointerItem.GetPressure();
     }
 }
 
@@ -660,12 +715,10 @@ void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
     CALL_DEBUG_ENTER;
     std::ostringstream oss;
     auto titles1 = std::make_tuple("currentPointerId", "maxPointerCount", "currentPointerCount",
-                                   "currentPhysicalX", "currentPhysicalY", "lastActionTime", "xVelocity",
-                                   "yVelocity");
+                                   "lastActionTime", "xVelocity", "yVelocity");
 
     auto data1 = std::vector{std::make_tuple(currentPointerId_, maxPointerCount_, currentPointerCount_,
-                                             currentPhysicalX_, currentPhysicalY_, lastActionTime_, xVelocity_,
-                                             yVelocity_)};
+                                             lastActionTime_, xVelocity_, yVelocity_)};
     DumpFullTable(oss, "Touch Location Info", titles1, data1);
     oss << std::endl;
 
