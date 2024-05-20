@@ -409,6 +409,8 @@ void TouchDrawingManager::DrawBubble()
         if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
             pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
             pointerEvent_->GetPointerId() == pointerId) {
+            MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
+                pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
             continue;
         }
         PointerEvent::PointerItem pointerItem;
@@ -427,6 +429,12 @@ void TouchDrawingManager::DrawBubble()
         canvas->AttachBrush(bubbleBrush_);
         canvas->DrawCircle(centerPt, bubble_.innerCircleRadius);
         canvas->DetachBrush();
+        if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+            pointerEvent_->GetPointerId() == pointerId) {
+            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d",
+                pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
+        }
     }
     bubbleCanvasNode_->FinishRecording();
 }
