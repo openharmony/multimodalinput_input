@@ -159,11 +159,11 @@ private:
         }
         MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",SensorInputTime:%{public}" PRIu64
             ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
-            "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"
-            "HorizontalAxisValue:%{public}.2f,PinchAxisValue:%{public}.2f,"
-            "XAbsValue:%{public}.2f,YAbsValue:%{public}.2f,ZAbsValue:%{public}.2f,"
-            "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
-            "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
+            "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.5f,"
+            "HorizontalAxisValue:%{public}.5f,PinchAxisValue:%{public}.5f,"
+            "XAbsValue:%{public}.5f,YAbsValue:%{public}.5f,ZAbsValue:%{public}.5f,"
+            "RzAbsValue:%{public}.5f,GasAbsValue:%{public}.5f,BrakeAbsValue:%{public}.5f,"
+            "Hat0xAbsValue:%{public}.5f,Hat0yAbsValue:%{public}.5f,ThrottleAbsValue:%{public}.5f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
             "BufferCount:%{public}zu,Buffer:%{public}s,MarkEnabled:%{public}d",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetSensorInputTime(),
