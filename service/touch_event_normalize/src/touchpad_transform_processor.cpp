@@ -580,6 +580,11 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
     return RET_OK;
 }
 
+std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
+{
+    return pointerEvent_;
+}
+
 MultiFingersTapHandler::MultiFingersTapHandler() {}
 
 MultiFingersTapHandler::~MultiFingersTapHandler() {}

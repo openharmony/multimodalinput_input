@@ -27,6 +27,7 @@ public:
     DISALLOW_COPY_AND_MOVE(TabletToolTransformProcessor);
     ~TabletToolTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
+    std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
 
 private:
     int32_t GetToolType(struct libinput_event_tablet_tool* tabletEvent);

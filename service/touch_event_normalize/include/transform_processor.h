@@ -26,6 +26,7 @@ namespace MMI {
 class TransformProcessor {
 public:
     virtual std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) = 0;
+    virtual std::shared_ptr<PointerEvent> GetPointerEvent() = 0;
 };
 } // namespace MMI
 } // namespace OHOS
