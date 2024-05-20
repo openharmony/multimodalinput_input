@@ -1462,19 +1462,17 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         }
     }
     auto iconPath = GetMouseIconPath();
-    auto it = iconPath.find(MOUSE_ICON(pointerStyle.id));
-    if (it == iconPath.end()) {
+    if (iconPath.find(MOUSE_ICON(pointerStyle.id)) == iconPath.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
     }
     if (UpdateDefaultPointerStyle(pid, windowId, pointerStyle) != RET_OK) {
-        MMI_HILOGE("Update default pointer iconPath failed!");
+        MMI_HILOGE("Update default pointer iconPath failed");
         return RET_ERR;
     }
-    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
-    if (ret != RET_OK) {
+    if (WinMgr->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension) != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
-        return ret;
+        return RET_ERR;
     }
     if (!InputDevMgr->HasPointerDevice()) {
         MMI_HILOGD("The pointer device is not exist");
@@ -1489,7 +1487,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         iconPath[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
         PointerStyle style;
         if (WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) != RET_OK) {
-            MMI_HILOGE("Get global pointer style failed!");
+            MMI_HILOGE("Get global pointer style failed");
             return RET_ERR;
         }
         pointerStyle = style;
