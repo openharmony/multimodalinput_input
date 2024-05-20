@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <ostream>
+#include <sstream>
+
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
@@ -1319,16 +1322,19 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
 
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
-            MMI_HILOGI("The keyCode or keyAction not matching");
+            MMI_HILOGD("The keyCode or keyAction not matching");
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
         if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay >= delay)) {
-            MMI_HILOGI("Delay is not matching");
+            MMI_HILOGD("Delay is not matching");
             return false;
         }
     }
 
+    std::ostringstream oss;
+    oss << sequence;
+    MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
     if (keysSize == sequenceKeysSize) {
         std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
         MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
@@ -1655,5 +1661,16 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
     }
     downToPrevDownDistanceConfig_ = distance;
 }
+
+std::ostream& operator<<(std::ostream& os, const Sequence& seq)
+{
+    os << "keys: [";
+    for (const SequenceKey &singleKey: seq.sequenceKeys) {
+        os << "(kc:" << singleKey.keyCode << ",ka:" << singleKey.keyAction << "d:" << singleKey.delay << "),";
+    }
+    os << "]: " << seq.ability.bundleName << ":" << seq.ability.abilityName;
+    return os;
+}
+
 } // namespace MMI
 } // namespace OHOS
