@@ -92,12 +92,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         }
     }
     if (socketErrorNo == EWOULDBLOCK) {
-        int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-                "INPUT_EVENT_SOCKET_TIMEOUT", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-                "MSG", "remote client buffer full, cant send msg");
-        if (ret != 0) {
-            MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
-        }
+        ReportSocketBufferFull();
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
         MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
@@ -141,6 +136,18 @@ bool UDSSession::SendMsg(NetPacket &pkt) const
     StreamBuffer buf;
     pkt.MakeData(buf);
     return SendMsg(buf.Data(), buf.Size());
+}
+
+void UDSSession::ReportSocketBufferFull()
+{
+    int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+                                  "INPUT_EVENT_SOCKET_TIMEOUT",
+                                  OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+                                  "MSG",
+                                  "remote client buffer full, cant send msg");
+    if (ret != 0) {
+        MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
+    }
 }
 
 void UDSSession::SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId)
