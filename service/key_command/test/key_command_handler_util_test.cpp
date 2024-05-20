@@ -597,5 +597,374 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyFinalKey_003
     EXPECT_EQ(finalKeyInt, 123);
     cJSON_Delete(jsonData);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_007
+ * @tc.desc: Test for normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateArray();
+    cJSON* param1 = cJSON_CreateObject();
+    cJSON* key1 = cJSON_CreateString("key");
+    cJSON* value1 = cJSON_CreateString("value1");
+    cJSON* param2 = cJSON_CreateObject();
+    cJSON* key2 = cJSON_CreateString("key");
+    cJSON* value2 = cJSON_CreateString("value2");
+    cJSON_AddItemToObject(param1, "key", key1);
+    cJSON_AddItemToObject(param1, "value", value1);
+    cJSON_AddItemToObject(param2, "key", key2);
+    cJSON_AddItemToObject(param2, "value", value2);
+    cJSON_AddItemToArray(params, param1);
+    cJSON_AddItemToArray(params, param2);
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_TRUE(result);
+    ASSERT_EQ(ability.params.size(), 1);
+    ASSERT_EQ(ability.params["key"], "value1");
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ackageAbility_001
+ * @tc.desc: Test jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ackageAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = nullptr;
+    ASSERT_FALSE(OHOS::MMI::PackageAbility(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_001
+ * @tc.desc: The test case jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = nullptr;
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_002
+ * @tc.desc: Test case 2 GetBusinessId failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_003
+ * @tc.desc: Test case 3 GetPreKeys failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonData, "businessId", "test");
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_004
+ * @tc.desc: Test case 4 GetKeyFinalKey failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonData, "businessId", "test");
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(2));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(3));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(4));
+    cJSON_AddItemToObject(jsonData, "preKeys", cJSON_CreateArray());
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_005
+ * @tc.desc: Test case 5 GetTrigger failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonData, "businessId", "test");
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(2));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(3));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(4));
+    cJSON_AddItemToObject(jsonData, "preKeys", cJSON_CreateArray());
+    cJSON_AddNumberToObject(jsonData, "finalKey", 123);
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_006
+ * @tc.desc: Test case 6 GetKeyDownDuration failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonData, "businessId", "test");
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(2));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(3));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(4));
+    cJSON_AddItemToObject(jsonData, "preKeys", cJSON_CreateArray());
+    cJSON_AddNumberToObject(jsonData, "finalKey", 123);
+    cJSON_AddStringToObject(jsonData, "trigger", "key_down");
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_007
+ * @tc.desc: Test case 7 Ability is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonData, "businessId", "test");
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(2));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(3));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(4));
+    cJSON_AddItemToObject(jsonData, "preKeys", cJSON_CreateArray());
+    cJSON_AddNumberToObject(jsonData, "finalKey", 123);
+    cJSON_AddStringToObject(jsonData, "trigger", "key_down");
+    cJSON_AddNumberToObject(jsonData, "keyDownDuration", 1);
+    cJSON_AddItemToObject(jsonData, "statusConfig", cJSON_CreateString("test"));
+    cJSON_AddItemToObject(jsonData, "ability", cJSON_CreateString("test"));
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_ConvertToShortcutKey_008
+ * @tc.desc: Test for normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_ConvertToShortcutKey_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = cJSON_CreateObject();
+    cJSON_AddStringToObject(jsonData, "businessId", "test");
+    cJSON* preKey = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonData, "preKey", preKey);
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(1));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(2));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(3));
+    cJSON_AddItemToArray(preKey, cJSON_CreateNumber(4));
+    cJSON_AddItemToObject(jsonData, "preKeys", cJSON_CreateArray());
+    cJSON_AddNumberToObject(jsonData, "finalKey", 123);
+    cJSON_AddStringToObject(jsonData, "trigger", "key_down");
+    cJSON_AddNumberToObject(jsonData, "keyDownDuration", 1);
+    cJSON_AddItemToObject(jsonData, "statusConfig", cJSON_CreateString("test"));
+    cJSON *ability = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "ability", ability);
+    ShortcutKey shortcutKey;
+    std::vector<std::string> businessIds;
+    bool result = OHOS::MMI::ConvertToShortcutKey(jsonData, shortcutKey, businessIds);
+    ASSERT_TRUE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyCode_001
+ * @tc.desc: The test case jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyCode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *jsonData = nullptr;
+    int32_t keyCodeInt;
+    bool result = OHOS::MMI::GetKeyCode(jsonData, keyCodeInt);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyCode_002
+ * @tc.desc: Test that the value of the keyCode field is not a number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyCode_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char* jsonStr = "{\"otherKey\": \"value\"}";
+    cJSON *jsonData = cJSON_Parse(jsonStr);
+    int32_t keyCodeInt;
+    bool result = OHOS::MMI::GetKeyCode(jsonData, keyCodeInt);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyCode_003
+ * @tc.desc: The value of the test keyCode field is negative
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyCode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char* jsonStr = "{\"keyCode\": -123}";
+    cJSON *jsonData = cJSON_Parse(jsonStr);
+    int32_t keyCodeInt;
+    bool result = OHOS::MMI::GetKeyCode(jsonData, keyCodeInt);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyCode_004
+ * @tc.desc: Test for normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyCode_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const char* jsonStr = "{\"keyCode\": 123}";
+    cJSON *jsonData = cJSON_Parse(jsonStr);
+    int32_t keyCodeInt;
+    bool result = OHOS::MMI::GetKeyCode(jsonData, keyCodeInt);
+    EXPECT_TRUE(result);
+    EXPECT_EQ(keyCodeInt, 123);
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyAction_001
+ * @tc.desc: The test case jsonData is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const cJSON* jsonData = nullptr;
+    int32_t keyActionInt;
+    EXPECT_FALSE(OHOS::MMI::GetKeyAction(jsonData, keyActionInt));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyAction_002
+ * @tc.desc: The value of the test keyAction field is not a number
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyAction_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonData, "keyAction", cJSON_CreateString("down"));
+    int32_t keyActionInt;
+    EXPECT_FALSE(OHOS::MMI::GetKeyAction(jsonData, keyActionInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyAction_003
+ * @tc.desc: The value of the Test Caiaction field is 999
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyAction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyAction", 999);
+    int32_t keyActionInt;
+    EXPECT_FALSE(OHOS::MMI::GetKeyAction(jsonData, keyActionInt));
+    cJSON_Delete(jsonData);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyAction_004
+ * @tc.desc: Test for normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyAction_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON* jsonData = cJSON_CreateObject();
+    cJSON_AddNumberToObject(jsonData, "keyAction", KeyEvent::KEY_ACTION_DOWN);
+    int32_t keyActionInt;
+    EXPECT_TRUE(OHOS::MMI::GetKeyAction(jsonData, keyActionInt));
+    EXPECT_EQ(keyActionInt, KeyEvent::KEY_ACTION_DOWN);
+    cJSON_Delete(jsonData);
+}
 } // namespace MMI
 } // namespace OHOS
