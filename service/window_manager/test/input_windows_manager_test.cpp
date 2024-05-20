@@ -2919,5 +2919,275 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayMode, Tes
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ = FingersenseWrapperTest;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayMode());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPhysicalDisplay
+ * @tc.desc: Test GetPhysicalDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplay, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t id = 1;
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    displayInfo.id = 1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NE(inputWindowsManager.GetPhysicalDisplay(id), nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FindPhysicalDisplayInfo
+ * @tc.desc: Test FindPhysicalDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    std::string uniq = "uniq_test";
+    displayInfo.uniq = "uniq_test";
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NE(inputWindowsManager.FindPhysicalDisplayInfo(uniq), nullptr);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnSessionLost
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pointerStylePid = 10;
+    int32_t uidRoot = 0;
+    std::string programName = "uds_sesion_test";
+    int32_t moduleType = 3;
+    int32_t pid = 9;
+    int32_t fd = -1;
+    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, fd, uidRoot, pid);
+    int32_t windowId = 1;
+    PointerStyle pointerStyle;
+    pointerStyle.size = 1;
+    pointerStyle.color = 2;
+    pointerStyle.id = 3;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pointerStylePid, pointerStyleMap));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnSessionLost(sess));
+
+    pid = 10;
+    SessionPtr session = std::make_shared<UDSSession>(programName, moduleType, fd, uidRoot, pid);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnSessionLost(session));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePoinerStyle
+ * @tc.desc: Test UpdatePoinerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pid = 1;
+    int32_t windowId = 1;
+    PointerStyle pointerStyle;
+    pointerStyle.size = 1;
+    pointerStyle.color = 2;
+    pointerStyle.id = 3;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    windowId = 2;
+    WindowInfo windowInfo;
+    windowInfo.id = 3;
+    windowInfo.pid = 6;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    windowInfo.id = 2;
+    windowInfo.pid = 1;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePoinerStyle(pid, windowId, pointerStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateSceneBoardPointerStyle
+ * @tc.desc: Test UpdateSceneBoardPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pid = 1000;
+    int32_t windowId = 987654321;
+    bool isUiExtension = true;
+    PointerStyle style;
+    style.id = 0;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, style));
+    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    pid = 1001;
+    EXPECT_EQ(inputWindowsManager.UpdateSceneBoardPointerStyle(pid, windowId, style, isUiExtension), RET_OK);
+    pid = 1000;
+    windowId = 123456789;
+    EXPECT_EQ(inputWindowsManager.UpdateSceneBoardPointerStyle(pid, windowId, style, isUiExtension), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle
+ * @tc.desc: Test SetGlobalDefaultPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t defaultPointerStyle = 0;
+    int32_t cursorCircleStyle = 41;
+    int32_t pid = 100;
+    int32_t windowId = 1000;
+    PointerStyle pointerStyle;
+    pointerStyle.id = defaultPointerStyle;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetGlobalDefaultPointerStyle());
+
+    pointerStyle.id = cursorCircleStyle;
+    inputWindowsManager.pointerStyle_[pid][windowId] = pointerStyle;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetGlobalDefaultPointerStyle());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle
+ * @tc.desc: Test SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    bool isUiExtension = false;
+    int32_t pid = 100;
+    int32_t windowId = 1000;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
+    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ClearWindowPointerStyle
+ * @tc.desc: Test ClearWindowPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearWindowPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pid = 100;
+    int32_t windowId = 1000;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
+    inputWindowsManager.pointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    windowId = 1001;
+    EXPECT_EQ(inputWindowsManager.ClearWindowPointerStyle(pid, windowId), RET_OK);
+    windowId = 1000;
+    EXPECT_EQ(inputWindowsManager.ClearWindowPointerStyle(pid, windowId), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPointerStyle
+ * @tc.desc: Test GetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    bool isUiExtension = true;
+    int32_t pid = 100;
+    int32_t windowId = 1000;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    std::map<int32_t, PointerStyle> pointerStyleMap;
+    pointerStyleMap.insert(std::make_pair(windowId, pointerStyle));
+    inputWindowsManager.uiExtensionPointerStyle_.insert(std::make_pair(pid, pointerStyleMap));
+    pid = 101;
+    EXPECT_EQ(inputWindowsManager.GetPointerStyle(pid, windowId, pointerStyle, isUiExtension), RET_OK);
+    pid = 100;
+    windowId = 100;
+    EXPECT_EQ(inputWindowsManager.GetPointerStyle(pid, windowId, pointerStyle, isUiExtension), RET_OK);
+    windowId = 1000;
+    EXPECT_EQ(inputWindowsManager.GetPointerStyle(pid, windowId, pointerStyle, isUiExtension), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayId
+ * @tc.desc: Test UpdateDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t displayId = -1;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_TRUE(inputWindowsManager.UpdateDisplayId(displayId));
+    EXPECT_TRUE(inputWindowsManager.UpdateDisplayId(displayId));
+    displayId = 15;
+    EXPECT_FALSE(inputWindowsManager.UpdateDisplayId(displayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo
+ * @tc.desc: Test SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t desplayId = 10;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(10);
+    WindowInfo windowInfo;
+    windowInfo.id = 10;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(desplayId, windowGroupInfo));
+    inputWindowsManager.firstBtnDownWindowId_ = 10;
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    pointerEvent->SetButtonPressed(1);
+    pointerEvent->SetButtonPressed(2);
+    EXPECT_NE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
+}
 } // namespace MMI
 } // namespace OHOS
