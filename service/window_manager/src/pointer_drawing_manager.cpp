@@ -83,6 +83,7 @@ constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
+constexpr uint64_t FOLD_SCREEN_ID {5};
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -701,6 +702,20 @@ void RsRemoteDiedCallback()
     isRsRemoteDied = true;
 }
 
+void PointerDrawingManager::AttachToDisplay()
+{
+    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
+    if (surfaceNode_ == nullptr) {
+        MMI_HILOGE("Draw pointer is failed, get node is nullptr");
+        return;
+    }
+    if ((WinMgr->GetDisplayMode() == DisplayMode::MAIN) && (screenId_ == 0)) {
+        screenId_ = FOLD_SCREEN_ID;
+    }
+    surfaceNode_->AttachToDisplay(screenId_);
+}
+
 void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY,
     Direction direction)
 {
@@ -725,7 +740,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
-    surfaceNode_->AttachToDisplay(screenId_);
+    AttachToDisplay();
     RotateDegree(direction);
     lastDirection_ = direction;
 
@@ -1538,7 +1553,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
         if (surfaceNode_ != nullptr) {
-            surfaceNode_->AttachToDisplay(screenId_);
+            AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
