@@ -876,7 +876,7 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
     }
     pointerEvent->RemoveAllPointerItems();
-    for (auto &pointerItem : pointerItems) {
+    for (const auto &pointerItem : pointerItems) {
         pointerEvent->AddPointerItem(pointerItem);
     }
     if ((pointerEvent->GetPointerId() < 0) && !pointerItems.empty()) {
