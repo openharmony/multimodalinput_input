@@ -331,6 +331,12 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
 
 bool PointerDrawingManager::HasMagicCursor()
 {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (!MAGIC_CURSOR->isExistDefaultStyle) {
+        MMI_HILOGE("MagicCursor default icon file is not exist");
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return hasMagicCursor_.isShow;
 }
 
