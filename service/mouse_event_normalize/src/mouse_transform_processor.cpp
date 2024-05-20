@@ -108,7 +108,12 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     int32_t ret = RET_ERR;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        DeviceType deviceType = CheckDeviceType(event);
+        DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
+        if (deviceType == DeviceType::DEVICE_UNKOWN) {
+            MMI_HILOGE("undefined deviceType: %{public}d, width: %{public}d, height: %{public}d",
+                deviceType, displayInfo->width, displayInfo->height);
+            return RET_ERR;
+        }
         ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
@@ -614,39 +619,26 @@ void MouseTransformProcessor::DumpInner()
         device->GetName().c_str());
 }
 
-DeviceType MouseTransformProcessor::CheckDeviceType(struct libinput_event* event)
+DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t height)
 {
     CALL_INFO_TRACE;
-    CHKPR(event, DeviceType::DEVICE_UNKOWN);
-    auto device = libinput_event_get_device(event);
-    CHKPR(device, DeviceType::DEVICE_UNKOWN);
-    double width = 0.0;
-    double height = 0.0;
-    libinput_device_get_size(device, &width, &height);
-
-    DeviceType ret = DeviceType::DEVICE_KLV;
-    static bool hasCheckedDeviceType_ = false;
-    if (!hasCheckedDeviceType_) {
-        hasCheckedDeviceType_ = true;
-        const std::string deviceType = OHOS::system::GetParameter("const.build.product", "false");
-        if (deviceType == DEVICE_TYPE_KLV) {
-            ret = DeviceType::DEVICE_KLV;
-        } else if (deviceType == DEVICE_TYPE_HARDEN) {
-            if (HARD_HARDEN_DEVICE_WIDTH == static_cast<int32_t>(width)
-                && HARD_HARDEN_DEVICE_HEIGHT == static_cast<int32_t>(height)) {
-                ret = DeviceType::DEVICE_HARD_HARDEN;
-            } else if (SOFT_HARDEN_DEVICE_WIDTH == static_cast<int32_t>(width)
-                && SOFT_HARDEN_DEVICE_WIDTH == static_cast<int32_t>(height)) {
-                ret = DeviceType::DEVICE_SOFT_HARDEN;
-            } else {
-                MMI_HILOGE("undefined width: %{public}f, height: %{public}f", width, height);
-            }
-            MMI_HILOGD("device width: %{public}f, height:%{public}f", width, height);
+    DeviceType ret = DeviceType::DEVICE_UNKOWN;
+    const std::string deviceType = OHOS::system::GetParameter("const.build.product", "false");
+    if (deviceType == DEVICE_TYPE_KLV) {
+        ret = DeviceType::DEVICE_KLV;
+    } else if (deviceType == DEVICE_TYPE_HARDEN) {
+        if (HARD_HARDEN_DEVICE_WIDTH == width && HARD_HARDEN_DEVICE_HEIGHT == height) {
+            ret = DeviceType::DEVICE_HARD_HARDEN;
+        } else if (SOFT_HARDEN_DEVICE_WIDTH == width && SOFT_HARDEN_DEVICE_WIDTH == height) {
+            ret = DeviceType::DEVICE_SOFT_HARDEN;
         } else {
-            MMI_HILOGE("undefined deviceType:%{public}s", deviceType.c_str());
+            MMI_HILOGE("undefined width: %{public}f, height: %{public}f", width, height);
         }
-        MMI_HILOGI("deviceType:%{public}s, ret:%{public}d", deviceType.c_str(), ret);
+        MMI_HILOGD("device width: %{public}f, height:%{public}f", width, height);
+    } else {
+        MMI_HILOGE("undefined deviceType:%{public}s", deviceType.c_str());
     }
+    MMI_HILOGI("deviceType:%{public}s, ret:%{public}d", deviceType.c_str(), ret);
     return ret;
 }
 
