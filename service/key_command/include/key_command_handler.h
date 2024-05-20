@@ -96,6 +96,7 @@ struct Sequence {
     int64_t abilityStartDelay { 0 };
     int32_t timerId { -1 };
     Ability ability;
+    friend std::ostream& operator<<(std::ostream&, const Sequence&);
 };
 
 struct TwoFingerGesture {

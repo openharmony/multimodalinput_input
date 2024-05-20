@@ -395,6 +395,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_INFO_TRACE;
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     CHK_PID_AND_TID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
@@ -443,6 +444,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(pointerEvent);
@@ -836,9 +838,10 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
+    MMI_HILOGI("KeyCode: %{public}d, action: %{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
@@ -873,9 +876,10 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
+    MMI_HILOGI("Action: %{public}d", pointerEvent->GetPointerAction());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
