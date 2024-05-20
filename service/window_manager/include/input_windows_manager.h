@@ -176,6 +176,7 @@ public:
     void ClearTargetWindowIds();
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
+    DisplayMode GetDisplayMode() const;
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
