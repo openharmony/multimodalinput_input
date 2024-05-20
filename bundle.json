@@ -79,7 +79,8 @@
         "audio_framework",
         "drivers_interface_tros_extra",
         "hdf_core",
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "qos_manager"
       ],
       "third_party": [
         "cJSON",
