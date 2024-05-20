@@ -337,6 +337,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         MMI_HILOGE("%{public}s failed", std::string(REFERENCE_REF).c_str());
         return;
     }
+    dataWorker->keyOption = reportEvent->keyOption;
     auto *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     work->data = static_cast<void *>(dataWorker);
