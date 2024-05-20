@@ -449,10 +449,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetCustomCursor failed ret:%{public}d", ret);
@@ -471,10 +468,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     int32_t windowId = 0;
     int32_t winPid = -1;
     OHOS::Media::PixelMap *pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("Reading windowid the tlv count %{public}d", windowId);
@@ -2182,10 +2176,7 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
