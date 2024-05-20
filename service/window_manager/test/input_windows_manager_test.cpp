@@ -1739,6 +1739,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_001,
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_001, TestSize.Level1)
 {
+    WinMgr->SetAntiMisTakeStatus(false);
     ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
 }
 
@@ -1750,6 +1751,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_002, TestSize.Level1)
 {
+    WinMgr->SetAntiMisTakeStatus(false);
     ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::NORMAL, PointerEvent::TOOL_TYPE_RUBBER));
 }
 
@@ -1761,6 +1763,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_003, TestSize.Level1)
 {
+    WinMgr->SetAntiMisTakeStatus(false);
     ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::NORMAL, PointerEvent::TOOL_TYPE_PEN));
 }
 
@@ -1772,6 +1775,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_004, TestSize.Level1)
 {
+    WinMgr->SetAntiMisTakeStatus(false);
     ASSERT_FALSE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_RUBBER));
 }
 
@@ -1784,6 +1788,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_005, TestSize.Level1)
 {
     WinMgr->SetAntiMisTake(true);
+    WinMgr->SetAntiMisTakeStatus(false);
     ASSERT_TRUE(WinMgr->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
 }
 
