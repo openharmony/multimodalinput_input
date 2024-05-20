@@ -57,6 +57,14 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     paint_.SetJoinStyle(Rosen::Drawing::Pen::JoinStyle::ROUND_JOIN);
     paint_.SetCapStyle(Rosen::Drawing::Pen::CapStyle::ROUND_CAP);
     paint_.SetPathEffect(Rosen::Drawing::PathEffect::CreateCornerPathEffect(PAINT_PATH_RADIUS));
+    displayInfo_.x = 0;
+    displayInfo_.y = 0;
+    displayInfo_.id = 0;
+    displayInfo_.dpi = 0;
+    displayInfo_.width = 0;
+    displayInfo_.height = 0;
+    displayInfo_.direction = Direction::DIRECTION0;
+    displayInfo_.displayDirection = Direction::DIRECTION0;
 }
 
 KnuckleDrawingManager::~KnuckleDrawingManager() {}
