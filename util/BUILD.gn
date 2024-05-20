@@ -75,6 +75,7 @@ ohos_shared_library("libmmi-util") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "hisysevent:libhisysevent",
   ]
   public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 

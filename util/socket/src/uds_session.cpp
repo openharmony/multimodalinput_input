@@ -23,6 +23,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include "hisysevent.h"
 #include "uds_socket.h"
 #include "proto.h"
 
@@ -66,11 +67,13 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     int32_t retryCount = 0;
     const int32_t bufSize = static_cast<int32_t>(size);
     int32_t remSize = bufSize;
+    int32_t socketErrorNo = 0;
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                socketErrorNo = errno;
                 MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
@@ -86,6 +89,14 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         if (remSize > 0) {
             MMI_HILOGW("Remsize:%{public}d", remSize);
             usleep(SEND_RETRY_SLEEP_TIME);
+        }
+    }
+    if (socketErrorNo == EWOULDBLOCK) {
+        int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+                "INPUT_EVENT_SOCKET_TIMEOUT", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+                "MSG", "remote client buffer full, cant send msg");
+        if (ret != 0) {
+            MMI_HILOGE("save dfx event failed, ret:%{public}d", ret);
         }
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
