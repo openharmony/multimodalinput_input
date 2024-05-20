@@ -127,7 +127,6 @@ protected:
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t VerifyTouchPadSetting(void);
-    int32_t VerifyTouchPadSetting(MessageParcel& data);
 };
 } // namespace MMI
 } // namespace OHOS
