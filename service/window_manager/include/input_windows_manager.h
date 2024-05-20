@@ -244,6 +244,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
     void SetAntiMisTake(bool state);
+    void SetAntiMisTakeStatus(bool state);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
