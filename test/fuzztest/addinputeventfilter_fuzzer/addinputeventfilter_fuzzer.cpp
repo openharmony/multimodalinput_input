@@ -18,29 +18,12 @@
 #include "input_manager.h"
 #include "define_multimodal.h"
 #include "mmi_log.h"
-#include "mmi_service.h"
-#include "multimodal_input_connect_stub.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "AddInputEventFilterFuzzTest"
 
 namespace OHOS {
 namespace MMI {
-
-void VerifySystemAppFuzzTest(const uint8_t *data, size_t size)
-{
-    auto stub = OHOS::DelayedSingleton<MMIService>::GetInstance();
-    uint32_t offset = 0;
-    MessageParcel request;
-    MessageParcel reply;
-    MessageOption option;
-    int32_t ret = stub->OnRemoteRequest(offset + size, request, reply, option);
-    if (ret == RET_ERR) {
-        MMI_HILOGE("VerifySystemApp falied,ret:%{public}d", ret);
-        return;
-    }
-}
-
 void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
 {
     struct TestFilter : public IInputEventFilter {
@@ -57,7 +40,6 @@ void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
             return false;
         }
     };
-    VerifySystemAppFuzzTest(data, size);
     auto filter = std::make_shared<TestFilter>();
     const auto priority = 200 + (size % 100);
     uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
