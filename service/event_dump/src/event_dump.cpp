@@ -101,8 +101,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "mouse", no_argument, 0, 'm' },
         { "cursor", no_argument, 0, 'c' },
         { "keycommand", no_argument, 0, 'k' },
-        { "keycommand1", no_argument, 0, 'a' },
-        { "keycommand2", no_argument, 0, 'e' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -129,14 +127,8 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmck", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
-            case 'e': {
-                auto keyHandler = InputHandler->GetKeyCommandHandler();
-                CHKPV(keyHandler);
-                keyHandler->Dump(fd, args);
-                break;
-            }
             case 'h': {
                 DumpEventHelp(fd, args);
                 break;
@@ -222,12 +214,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 keyHandler->Dump(fd, args);
                 break;
             }
-            case 'a': {
-                auto keyHandler = InputHandler->GetKeyCommandHandler();
-                CHKPV(keyHandler);
-                keyHandler->Dump(fd, args);
-                break;
-            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -264,8 +250,6 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
     mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
     mprintf(fd, "      -k, --keycommand: dump the keycommand information\t");
-    mprintf(fd, "      -a, --keycommand: dump the keycommand1 information\t");
-    mprintf(fd, "      -e, --keycommand: dump the keycommand2 information\t");
 }
 } // namespace MMI
 } // namespace OHOS
