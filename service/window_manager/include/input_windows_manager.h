@@ -204,6 +204,7 @@ private:
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
     void RegisterFoldStatusListener();
     void UnregisterFoldStatusListener();
+    void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -318,6 +319,7 @@ private:
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
+    Direction lastDirection_ = static_cast<Direction>(-1);
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
