@@ -26,9 +26,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include <unistd.h>
+
 #include <libudev.h>
 #include <linux/input.h>
-#include <unistd.h>
 
 #include "mmi_log.h"
 
