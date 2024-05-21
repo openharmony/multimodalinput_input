@@ -705,11 +705,7 @@ void RsRemoteDiedCallback()
 void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
-    CALL_INFO_TRACE;
-    if (surfaceNode_ == nullptr) {
-        MMI_HILOGE("Draw pointer is failed, get node is nullptr");
-        return;
-    }
+    CHKPV(surfaceNode_);
     if ((WinMgr->GetDisplayMode() == DisplayMode::MAIN) && (screenId_ == 0)) {
         screenId_ = FOLD_SCREEN_ID;
     }
