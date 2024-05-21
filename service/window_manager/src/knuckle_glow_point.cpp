@@ -29,7 +29,7 @@ constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t PAINT_WIDTH = 20;
 constexpr int32_t ARGB_A = 0;
 constexpr int32_t ARGB_RGB = 255;
-constexpr double BASIC_LIFESPAN = 400.0f;
+constexpr double BASIC_LIFESPAN = 150.0f;
 constexpr int32_t TRACE_COLOR = 255;
 constexpr float BASIC_SIZE = 100.0f;
 } // namespace

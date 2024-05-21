@@ -717,5 +717,18 @@ void InputDeviceManager::OnSessionLost(SessionPtr session)
     CALL_DEBUG_ENTER;
     devListener_.remove(session);
 }
+
+std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> ids;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (libinput_device_has_capability(inputDevice, LIBINPUT_DEVICE_CAP_TABLET_PAD)) {
+            ids.push_back(item.first);
+        }
+    }
+    return ids;
+}
 } // namespace MMI
 } // namespace OHOS

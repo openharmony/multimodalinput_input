@@ -202,7 +202,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     }
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -298,7 +298,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
     BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
@@ -343,6 +343,8 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    TerminateRotate(event);
+    TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         return RET_ERR;
@@ -397,8 +399,8 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
-    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
@@ -646,7 +648,11 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
         return RET_OK;
     }
     auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
-    swEvent->SetSwitchType(static_cast<int32_t>(sw));
+    int32_t switchStatus = static_cast<int32_t>(sw);
+    if (switchStatus) {
+        RestoreTouchPadStatus();
+    }
+    swEvent->SetSwitchType(switchStatus);
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("switch device does not support");
@@ -684,6 +690,63 @@ int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> 
     MMI_HILOGD("pointerId:%{public}d, originPointerId:%{public}d",
         pointerId, pointerItem.GetPointerId());
     return RET_OK;
+}
+
+void EventNormalizeHandler::RestoreTouchPadStatus()
+{
+    CALL_INFO_TRACE;
+    auto ids = InputDevMgr->GetTouchPadIds();
+    for (auto id : ids) {
+        MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
+        auto mouseEvent = TouchEventHdr->GetPointerEvent(id);
+        if (mouseEvent != nullptr) {
+            mouseEvent->Reset();
+        }
+        mouseEvent = MouseEventHdr->GetPointerEvent(id);
+        if (mouseEvent != nullptr) {
+            mouseEvent->Reset();
+        }
+    }
+    buttonIds_.clear();
+}
+
+void EventNormalizeHandler::TerminateRotate(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    if (!GESTURE_HANDLER->GetRotateStatus()) {
+        return;
+    }
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        MMI_HILOGI("Terminate rotate event");
+        auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
+        int32_t actionType = PointerEvent::POINTER_ACTION_ROTATE_END;
+        if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
+            MMI_HILOGE("OnEvent is failed");
+            return;
+        }
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        CHKPV(pointerEvent);
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+        GESTURE_HANDLER->InitRotateGesture();
+    }
+}
+
+void EventNormalizeHandler::TerminateAxis(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        bool result = MouseEventHdr->CheckAndPackageAxisEvent(event);
+        if (!result) {
+            return;
+        }
+        MMI_HILOGI("Terminate axis event");
+        auto pointerEvent = MouseEventHdr->GetPointerEvent();
+        CHKPV(pointerEvent);
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

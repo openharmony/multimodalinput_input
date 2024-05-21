@@ -72,6 +72,7 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchPadTransformProcessor);
     ~TouchPadTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
+    std::shared_ptr<PointerEvent> GetPointerEvent() override;
 
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);
     static int32_t GetTouchpadPinchSwitch(bool &switchFlag);

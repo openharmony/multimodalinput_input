@@ -16,6 +16,10 @@
 #include <gtest/gtest.h>
 
 #include "mmi_client.h"
+#include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIClientTest"
 
 namespace OHOS {
 namespace MMI {
@@ -39,6 +43,7 @@ ConnectCallback connectFun;
  */
 HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     MMIClient mmiClient;
     ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterConnectedFunction(connectFun));
 }
@@ -51,6 +56,7 @@ HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     MMIClient mmiClient;
     ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterDisconnectedFunction(connectFun));
 }
@@ -63,6 +69,7 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
     EXPECT_TRUE(client->Start());
     client->Stop();
@@ -76,6 +83,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Start__001, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
     client->Start();
     EXPECT_TRUE(client->GetCurrentConnectedStatus());
@@ -90,6 +98,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_GetCurrentConnectedStatus__001, TestSize.L
  */
 HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
     client->Start();
     EXPECT_FALSE(client->Reconnect());
@@ -104,6 +113,7 @@ HWTEST_F(MMIClientTest, MMIClientTest_Reconnect_001, TestSize.Level1)
  */
 HWTEST_F(MMIClientTest, MMIClientTest_OnDisconnect_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<MMIClient> client = std::make_shared<MMIClient>();
     client->Start();
     client->OnDisconnect();
