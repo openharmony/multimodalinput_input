@@ -1239,7 +1239,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_00
 
 /**
  * @tc.name: KeyCommandHandlerUtilTest_GetSequenceKeys_003
- * @tc.desc: Tests sequenceKeysSize number must less 
+ * @tc.desc: Tests sequenceKeysSize number must less
  * @tc.type: FUNC
  * @tc.require:
  */
