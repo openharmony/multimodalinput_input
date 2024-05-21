@@ -212,16 +212,16 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
 
     napi_property_descriptor fingerprintActionArr[] = {
-            DECLARE_NAPI_STATIC_PROPERTY("DOWN", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::DOWN))),
-            DECLARE_NAPI_STATIC_PROPERTY("UP", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::UP))),
-            DECLARE_NAPI_STATIC_PROPERTY("SLIDE", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::SLIDE))),
-            DECLARE_NAPI_STATIC_PROPERTY("RETOUCH", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::RETOUCH))),
-            DECLARE_NAPI_STATIC_PROPERTY("CLICK", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CLICK))),
+        DECLARE_NAPI_STATIC_PROPERTY("DOWN", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("UP", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("SLIDE", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::SLIDE))),
+        DECLARE_NAPI_STATIC_PROPERTY("RETOUCH", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::RETOUCH))),
+        DECLARE_NAPI_STATIC_PROPERTY("CLICK", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CLICK))),
     };
     napi_value fingerprintAction = nullptr;
     CHKRP(napi_define_class(env, "FingerprintAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
-                            sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr),
-                            fingerprintActionArr, &fingerprintAction), DEFINE_CLASS);
+        sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr), fingerprintActionArr, &fingerprintAction),
+        DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "fingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
     return exports;
 }
