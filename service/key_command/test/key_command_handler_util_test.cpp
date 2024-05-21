@@ -820,6 +820,8 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_006, Tes
     bool result = OHOS::MMI::GetParams(jsonAbility, ability);
     ASSERT_FALSE(result);
     cJSON_Delete(jsonAbility);
+}
+
  * @tc.name: KeyCommandHandlerUtilTest_GetParams_007
  * @tc.desc: Test for normal conditions
  * @tc.type: FUNC
