@@ -617,16 +617,16 @@ void MouseTransformProcessor::DumpInner()
 DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t height)
 {
     CALL_DEBUG_ENTER;
-    DeviceType ret = DeviceType::DEVICE_TYPE_KLV;
+    DeviceType ret = DeviceType::DEVICE_KLV;
     if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
         if (HARD_HARDEN_DEVICE_WIDTH == width && HARD_HARDEN_DEVICE_HEIGHT == height) {
             ret = DeviceType::DEVICE_HARD_HARDEN;
         } else if (SOFT_HARDEN_DEVICE_WIDTH == width && SOFT_HARDEN_DEVICE_WIDTH == height) {
             ret = DeviceType::DEVICE_SOFT_HARDEN;
         } else {
-            MMI_HILOGE("undefined width: %{public}f, height: %{public}f", width, height);
+            MMI_HILOGE("undefined width: %{public}d, height: %{public}d", width, height);
         }
-        MMI_HILOGD("device width: %{public}f, height:%{public}f", width, height);
+        MMI_HILOGD("device width: %{public}d, height:%{public}d", width, height);
     }
     return ret;
 }
