@@ -33,9 +33,15 @@ extern "C" {
         double dx;
         double dy;
     };
+    enum class DeviceType {
+        DEVICE_UNKOWN = 0,
+        DEVICE_KLV = 1,
+        DEVICE_SOFT_HARDEN = 2,
+        DEVICE_HARD_HARDEN = 3,
+    };
     int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
     int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed);
+        int32_t speed, int32_t deviceType);
 }
 
 namespace MMI {
@@ -70,6 +76,7 @@ public:
     int32_t Normalize(struct libinput_event *event);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool CheckAndPackageAxisEvent();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -119,6 +126,7 @@ public:
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
     static int32_t GetTouchpadSpeed();
+    static DeviceType CheckDeviceType(struct libinput_event* event);
 
 private:
     static int32_t globalPointerSpeed_;

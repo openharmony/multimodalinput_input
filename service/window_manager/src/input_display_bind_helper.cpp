@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -444,6 +444,44 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
     info.AddDisplay(id, name);
     infos_->Add(info);
     Store();
+}
+
+void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
+    if (infos_ == nullptr) {
+        return;
+    }
+
+    const auto &infos = infos_->GetInfos();
+    std::vector<std::string> unbindDevices;
+    for (const auto &info : infos) {
+        if (info.DisplayNotBind()) {
+            unbindDevices.push_back(info.GetInputDeviceName());
+            MMI_HILOGI("Unbind InputDevice, id:%{public}d, inputDevice:%{public}s",
+                info.GetInputDeviceId(), info.GetInputDeviceName().c_str());
+        }
+    }
+    
+    bool IsStore = false;
+    for (auto &item : unbindDevices) {
+        auto inputDeviceName = item;
+        if (IsDualDisplayFoldDevice()) {
+            std::string deviceName = GetInputDeviceById(id);
+            if (!deviceName.empty()) {
+                inputDeviceName = deviceName;
+            }
+        }
+        BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
+        info.AddDisplay(id, name);
+        infos_->Add(info);
+        IsStore = true;
+    }
+    if (IsStore) {
+        Store();
+    }
+    unbindDevices.clear();
 }
 
 std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)

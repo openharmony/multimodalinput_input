@@ -57,9 +57,7 @@
 #include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
 #include "multimodal_input_preferences_manager.h"
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
-#endif
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -86,7 +84,7 @@ template <class... Ts> void CheckDefineOutput(const char *fmt, Ts... args)
     char buf[MAX_PACKET_BUF_SIZE] = {};
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
-        KMSG_LOGI("Call snprintf_s failed.ret = %d", ret);
+        KMSG_LOGE("Call snprintf_s failed.ret = %d", ret);
         return;
     }
     KMSG_LOGI("%s", buf);
@@ -137,7 +135,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     auto eventData = std::make_shared<mmi_epoll_event>();
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGI("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGI("userdata:[fd:%{public}d, type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -224,7 +222,7 @@ bool MMIService::InitService()
         MMI_HILOGE("Service initialization failed");
         return false;
     }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -241,7 +239,7 @@ bool MMIService::InitDelegateTasks()
         EpollClose();
         return false;
     }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
 __attribute__((no_sanitize("cfi")))
@@ -2127,10 +2125,9 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &requencys)
 {
     MMI_HILOGI("start get infrared frequency");
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
     for (auto &item : infos) {
@@ -2139,27 +2136,24 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency>& req
         info.max_ = item.max_;
         requencys.push_back(info);
     }
-#endif
     std::string context = "";
     int32_t size = static_cast<int32_t>(requencys.size());
     for (int32_t i = 0; i < size; i++) {
-        context = context + "requencys[" + std::to_string(i) + "]. max="
-                + std::to_string(requencys[i].max_) + ",min=" + std::to_string(requencys[i].min_) +";";
+        context = context + "requencys[" + std::to_string(i) + "]. max=" + std::to_string(requencys[i].max_) +
+        ",min=" + std::to_string(requencys[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
     return RET_OK;
 }
 
-int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t>& pattern)
+int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t> &pattern)
 {
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
-#endif
     MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());
     return RET_OK;
 }

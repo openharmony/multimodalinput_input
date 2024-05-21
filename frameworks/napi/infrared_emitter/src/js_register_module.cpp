@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const uint32_t NUMBER_PARAMETERS = 2;
-const int32_t  MAX_NUMBER_ARRAY_ELEMENT = 50;
+constexpr int32_t  MAX_NUMBER_ARRAY_ELEMENT = 500;
 }
 
 bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)

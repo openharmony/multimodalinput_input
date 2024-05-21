@@ -99,10 +99,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     auto id = pkt.GetMsgId();
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto callback = GetMsgCallback(id);
-    if (callback == nullptr) {
-        MMI_HILOGE("Unknown msg id:%{public}d", id);
-        return;
-    }
+    CHKPV(callback);
     ResetLogTrace();
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
@@ -136,7 +133,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     }
     MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
     MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
-    EventLogHelper::PrintEventData(key);
+    EventLogHelper::PrintEventData(key, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -154,7 +151,7 @@ int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& p
     std::string bundleName;
     pkt >> pid >> uid >> bundleName >> syncStatus;
     InputMgrImpl.NotifyBundleName(pid, uid, bundleName, syncStatus);
-    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("NotifyBundleName pid:%{public}d, uid:%{public}d, bundleName:%{public}s, syncStatus:%{public}d",
         pid, uid, bundleName.c_str(), syncStatus);
     return RET_OK;
 }
@@ -178,7 +175,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_DISPATCHI("InputTracking id:%{public}d action:%{public}d PointerEvent ReceivedMsg",
         pointerEvent->GetId(), pointerEvent->GetPointerAction());
-    EventLogHelper::PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
     }

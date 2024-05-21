@@ -61,6 +61,9 @@ private:
     std::set<int32_t> buttonIds_ {};
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
+    void RestoreTouchPadStatus();
+    void TerminateRotate(libinput_event* event);
+    void TerminateAxis(libinput_event* event);
 };
 } // namespace MMI
 } // namespace OHOS

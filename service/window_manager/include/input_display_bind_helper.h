@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,7 @@ public:
     bool IsDisplayAdd(int32_t id, const std::string &name);
     std::set<std::pair<int32_t, std::string>> GetDisplayIdNames() const;
     void AddDisplay(int32_t id, const std::string &name);
+    void AddLocalDisplay(int32_t id, const std::string &name);
     void RemoveDisplay(int32_t id);
     void Load();
     std::string Dumps() const;

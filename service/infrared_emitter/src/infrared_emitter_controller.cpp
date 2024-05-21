@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <dlfcn.h>
+
 #include "infrared_emitter_controller.h"
 #include "mmi_log.h"
 
@@ -23,8 +25,23 @@
 
 namespace OHOS {
 namespace MMI {
-using namespace OHOS::HDI::Consumerir::V1_0;
+namespace {
+    const std::string IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
+}
+using namespace OHOS::HDI::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();
+InfraredEmitterController::InfraredEmitterController() {}
+
+InfraredEmitterController::~InfraredEmitterController()
+{
+    CALL_DEBUG_ENTER;
+    irInterface_ = nullptr;
+    if (soIrHandle_ != nullptr) {
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
+    }
+}
+
 InfraredEmitterController *InfraredEmitterController::GetInstance()
 {
     return instance_;
@@ -34,26 +51,46 @@ void InfraredEmitterController::InitInfraredEmitter()
 {
     CALL_DEBUG_ENTER;
     if (irInterface_ != nullptr) {
-        MMI_HILOGE("infrared emitter has inited");
         return;
     }
-    MMI_HILOGI("infrared emitter call ConsumerIr::Get()");
-    irInterface_ = ConsumerIr::Get();
+    if (soIrHandle_ == nullptr) {
+        soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
+        if (soIrHandle_ == nullptr) {
+            MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
+            return;
+        }
+    }
+    typedef ConsumerIr* (*funCreate_ptr) (void);
+    funCreate_ptr fnCreate = nullptr;
+    fnCreate = (funCreate_ptr)dlsym(soIrHandle_, "ConsumerIrImplGetInstance");
+    const char *dlsymError = dlerror();
+    if (dlsymError != nullptr) {
+        MMI_HILOGE("load ConsumerIrImplGetInstance, error: %{public}s", dlsymError);
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
+        return;
+    }
+    if (fnCreate == nullptr) {
+        MMI_HILOGE("loaded ConsumerIrImplGetInstance is null");
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
+        return;
+    }
+    MMI_HILOGI("infrared emitter call ConsumerIr:fnCreate begin");
+    irInterface_ = (ConsumerIr *)fnCreate();
     if (irInterface_ == nullptr) {
-        MMI_HILOGE("infrared emitter init error");
+        MMI_HILOGE("infrared emitter init fail irInterface_ is nullptr");
+        dlclose(soIrHandle_);
+        soIrHandle_ = nullptr;
         return;
     }
-    MMI_HILOGI("infrared emitter init ok");
 }
 
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();
-    if (!irInterface_) {
-        MMI_HILOGE("infrared emitter not init");
-        return false;
-    }
+    CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
     std::vector<int32_t> tempPattern;
     std::string context = "infraredFrequency:" + std::to_string(tempCarrierFreq) + ";";
@@ -66,7 +103,7 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_
     bool outRet = false;
     int32_t ret = irInterface_->Transmit(tempCarrierFreq, tempPattern, outRet);
     MMI_HILOGI("irInterface_->Transmit ret:%{public}d", ret);
-    if (ret < HDF_SUCCESS) {
+    if (ret < 0) {
         MMI_HILOGE("infrared emitter transmit %{public}d", ret);
         return false;
     }
@@ -90,7 +127,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     MMI_HILOGI("irInterface_->GetCarrierFreqs");
     int32_t ret = irInterface_->GetCarrierFreqs(outRet, outRange);
     MMI_HILOGI("irInterface_->GetCarrierFreqs ret:%{public}d", ret);
-    if (ret < HDF_SUCCESS) {
+    if (ret < 0) {
         MMI_HILOGE("infrared emitter GetCarrierFreqs %{public}d", ret);
         return false;
     }
@@ -102,7 +139,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     for (size_t i = 0; i < outRange.size(); i++) {
         InfraredFrequencyInfo item;
         context = context + "index:" + std::to_string(i) + ": per.max:" + std::to_string(outRange[i].max) +
-         ": per.min:" + std::to_string(outRange[i].min) + ";;";
+                  ": per.min:" + std::to_string(outRange[i].min) + ";;";
         item.max_ = outRange[i].max;
         item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);

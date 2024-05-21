@@ -17,11 +17,11 @@
 #define INFRARED_EMMITTER_CONTROLLER_H
 
 #include "nocopyable.h"
-#include "v1_0/consumer_ir.h"
-#include "v1_0/types.h"
+#include "infrared_emitter_def.h"
 
 namespace OHOS {
 namespace MMI {
+using namespace OHOS::HDI::V1_0;
 struct InfraredFrequencyInfo {
     int64_t max_ { 0 };
     int64_t min_ { 0 };
@@ -34,16 +34,17 @@ public:
      * @since 12
      */
     static InfraredEmitterController *GetInstance();
-    virtual ~InfraredEmitterController() = default;
+    virtual ~InfraredEmitterController();
     void InitInfraredEmitter();
     bool Transmit(int64_t carrierFreq, std::vector<int64_t> pattern);
     bool GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo);
 
 private:
-     InfraredEmitterController() =default;
-     DISALLOW_COPY_AND_MOVE(InfraredEmitterController);
-     static InfraredEmitterController *instance_;
-     sptr<OHOS::HDI::Consumerir::V1_0::ConsumerIr> irInterface_ {nullptr};
+    InfraredEmitterController();
+    DISALLOW_COPY_AND_MOVE(InfraredEmitterController);
+    static InfraredEmitterController *instance_;
+    ConsumerIr *irInterface_ {nullptr};
+    void *soIrHandle_ {nullptr};
 };
 }
 }

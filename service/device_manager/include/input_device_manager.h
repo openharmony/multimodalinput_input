@@ -78,6 +78,7 @@ public:
     void SetInputStatusChangeCallback(inputDeviceCallback callback);
     VendorConfig GetVendorConfig(int32_t deviceId) const;
     int32_t OnEnableInputDevice(bool enable);
+    std::vector<int32_t> GetTouchPadIds();
 
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);

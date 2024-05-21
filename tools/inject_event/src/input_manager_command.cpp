@@ -216,7 +216,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                                 if ((px < 0) || (py < 0)) {
-                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                     return RET_ERR;
                                 }
                                 std::cout << "move to " << px << " " << py << std::endl;
@@ -250,7 +250,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     optind += 3;
                                 }
                                 if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                     return RET_ERR;
                                 }
                                 if (argc - optind >= 1) {
@@ -493,7 +493,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             if ((px < 0) || (py < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             if (!StrToInt(argv[optind + 1], buttonId)) {
@@ -587,7 +587,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             if (argc >= 8) {
@@ -960,7 +960,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             const int64_t minTotalTimeMs = 1;
@@ -1038,7 +1038,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if ((px1 < 0) || (py1 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
@@ -1066,7 +1066,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if ((px1 < 0) || (py1 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
@@ -1112,7 +1112,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             if ((px1 < 0) || (py1 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
@@ -1186,7 +1186,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             const int32_t minTotalTimeMs = 1000;
@@ -1498,7 +1498,7 @@ int32_t InputManagerCommand::SingleKnuckleGestureProcesser(int32_t argc, char *a
         return EVENT_REG_FAIL;
     }
     if (IsCoordinateInvalid(firstDownX, firstDownY, secondDownX, secondDownY)) {
-        std::cout << "Coordinate value must be greater than 0" << std::endl;
+        std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
         return RET_ERR;
     }
     std::cout << "single knuckle first down coordinate: ("<< firstDownX << ", " << firstDownY << ")" << std::endl;
@@ -1548,7 +1548,7 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
         return EVENT_REG_FAIL;
     }
     if (IsCoordinateInvalid(firstDownX, firstDownY, secondDownX, secondDownY)) {
-        std::cout << "Coordinate value must be greater than 0" << std::endl;
+        std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
         return RET_ERR;
     }
     std::cout << "double knukle first click coordinate: ("<< firstDownX << ", "  << firstDownY << ")" << std::endl;
