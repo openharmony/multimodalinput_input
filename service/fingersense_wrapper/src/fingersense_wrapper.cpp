@@ -45,25 +45,19 @@ void FingersenseWrapper::InitFingerSenseWrapper()
 {
     CALL_DEBUG_ENTER;
     fingerSenseWrapperHandle_ = dlopen(FINGERSENSE_WRAPPER_PATH.c_str(), RTLD_NOW);
-    if (fingerSenseWrapperHandle_ == nullptr) {
-        MMI_HILOGE("libfingersense_wrapper.z.so was not loaded, error: %{public}s", dlerror());
-        return;
-    }
+    CHKPV(fingerSenseWrapperHandle_);
 
     setCurrentToolType_ = (SET_CURRENT_TOOL_TYPE)dlsym(fingerSenseWrapperHandle_, "SetCurrentToolType");
     notifyTouchUp_ = (NOTIFY_TOUCH_UP)dlsym(fingerSenseWrapperHandle_, "NotifyTouchUp");
     enableFingersense_ = (ENABLE_FINGERSENSE)dlsym(fingerSenseWrapperHandle_, "EnableFingersense");
     disableFingerSense_ = (DISABLE_FINGERSENSE)dlsym(fingerSenseWrapperHandle_, "DisableFingerSense");
-    if (setCurrentToolType_ == nullptr || notifyTouchUp_ == nullptr || enableFingersense_ == nullptr ||
-        disableFingerSense_ == nullptr) {
-        MMI_HILOGE("fingersense wrapper symbol failed, error: %{public}s", dlerror());
-        return;
-    }
+    CHKPV(setCurrentToolType_);
+    CHKPV(notifyTouchUp_);
+    CHKPV(enableFingersense_);
+    CHKPV(disableFingerSense_);
+
     sendFingerSenseDisplayMode_ = (SEND_FINGERSENSE_DISPLAYMODE)dlsym(fingerSenseWrapperHandle_, "UpdateDisplayMode");
-    if (sendFingerSenseDisplayMode_ == nullptr) {
-        MMI_HILOGE("send fingersense display mode symbol failed, error: %{public}s", dlerror());
-        return;
-    }
+    CHKPV(sendFingerSenseDisplayMode_);
     MMI_HILOGD("fingersense wrapper init success");
 }
 } // namespace MMI
