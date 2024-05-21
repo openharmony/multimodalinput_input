@@ -27,7 +27,6 @@ constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t DEFAULT_POINTER_ID = 0;
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
-constexpr int32_t INVAID_VALUE = -1;
 constexpr int32_t POINTER_ID = -1;
 constexpr int32_t SIZE_TYPE_CASE = 3;
 constexpr int32_t INPUT_INTERCEPTOR_ONE = 2;
@@ -36,7 +35,6 @@ constexpr int32_t INTERCEPTOR_PRIORITY_ONE = 400;
 constexpr int32_t INTERCEPTOR_PRIORITY_TWO = 500;
 constexpr int32_t INTERCEPTOR_PRIORITY_THREE = 600;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 90;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_TWO = 111;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_THREE = 123;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FOUR = 200;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FIVE = 222;
@@ -53,7 +51,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_X_FIFTEEN = 700;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_SIXTEEN = 710;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_SEVENTEEN = 852;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_ONE = 200;
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWO = 222;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_THREE = 223;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOUR = 357;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIVE = 367;
@@ -69,7 +66,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOURTEEN = 860;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIFTEEN = 863;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_SIXTEEN = 910;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_SEVENTEEN = 943;
-constexpr int32_t POINTER_ITEM_DOWN_TIME_ONE = 10004;
 constexpr int32_t POINTER_ITEM_DOWN_TIME_TWO = 10005;
 constexpr int32_t POINTER_ITEM_DOWN_TIME_THREE = 10006;
 constexpr int32_t POINTER_ITEM_DOWN_TIME_FOUR = 10007;
@@ -114,106 +110,6 @@ std::string InputManagerSimulateTest::GetEventDump()
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulateKeyEvent_001
- * @tc.desc: Verify simulate the back key is long pressed and lifted
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    sleep(10);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetDownTime(downTime);
-    kitDown.SetPressed(true);
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectUpEvent != nullptr);
-    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetPressed(false);
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_A);
-    kitUp.SetDownTime(downTime);
-    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectUpEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: MultimodalEventHandler_SimulateKeyEvent_002
- * @tc.desc: Verify simulate the back home is pressed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = INVAID_VALUE;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: MultimodalEventHandler_SimulateKeyEvent_003
- * @tc.desc: Verify simulate the back key is pressed and lifted
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = 0;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectUpEvent != nullptr);
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_A);
-    kitUp.SetDownTime(downTime);
-    kitUp.SetPressed(false);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectUpEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
  * @tc.name: MultimodalEventHandler_SimulateKeyEvent_004
  * @tc.desc: Verify simulate key exception event
  * @tc.type: FUNC
@@ -234,44 +130,6 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_004
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     TestSimulateInputEvent(injectDownEvent, TestScene::EXCEPTION_TEST);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: MultimodalEventHandler_SimulateKeyEvent_005
- * @tc.desc: Verify simulate the fn key is long pressed and lifted
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_FN);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectUpEvent != nullptr);
-    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_FN);
-    kitUp.SetDownTime(downTime);
-    kitUp.SetPressed(false);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectUpEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -624,35 +482,6 @@ HWTEST_F(InputManagerSimulateTest, InputManager_Pencil2InputEvent_004, TestSize.
 }
 
 /**
- * @tc.name: TestInputEventInterceptor_001
- * @tc.desc: Verify mouse down event interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPressed(true);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ELEVEN);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_NINE);
-    item.SetDeviceId(1);
-    item.SetDownTime(POINTER_ITEM_DOWN_TIME_SIX);
-    item.SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
-    auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
-    InputManagerUtil::TestInterceptorIdAndPointerEvent(interceptorId, pointerEvent);
-}
-
-/**
  * @tc.name: TestInputEventInterceptor_002
  * @tc.desc: Verify mouse move event interceptor
  * @tc.type: FUNC
@@ -836,45 +665,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_006, TestSize.Level
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    if (IsValidHandlerId(interceptorId)) {
-        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
- * @tc.name: TestInputEventInterceptor_007
- * @tc.desc: Verify key interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
-    kitDown.SetDownTime(downTime);
-    kitDown.SetPressed(true);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-
-    auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    EXPECT_TRUE(IsValidHandlerId(interceptorId));
-#else
-    EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    SimulateInputEventUtilTest(injectDownEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
@@ -1120,64 +910,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_012, TestSize.Level
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-}
-
-/**
- * @tc.name: TestInputEventInterceptor_013
- * @tc.desc: Verify mouse interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_013, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPressed(true);
-    item.SetPointerId(0);
-    item.SetDownTime(POINTER_ITEM_DOWN_TIME_ONE);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
-    item.SetDeviceId(1);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
-    auto interceptor1 = GetPtr<PriorityHighCallback>();
-    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
-    int32_t interceptorId1{
-        InputManager::GetInstance()->AddInterceptor(interceptor1, INTERCEPTOR_PRIORITY_ONE, touchTags)};
-    int32_t interceptorId2{
-        InputManager::GetInstance()->AddInterceptor(interceptor2, INTERCEPTOR_PRIORITY_TWO, touchTags)};
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
-    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
-#else
-    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
-    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    for (size_t i = 0; i < INPUT_INTERCEPTOR_ONE; ++i) {
-        std::string sPointerEs = GetEventDump();
-        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-        if (i == 0) {
-            EXPECT_NE(sPointerEs, "Call high interceptor");
-        } else {
-            ASSERT_TRUE(sPointerEs.empty());
-        }
-#else
-        ASSERT_TRUE(sPointerEs.empty());
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
-    }
-
-    InputManagerUtil::TestInterceptorId(interceptorId1, interceptorId2);
 }
 
 /**

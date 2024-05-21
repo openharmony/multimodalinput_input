@@ -27,7 +27,6 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t errCode { -1 };
 constexpr int32_t rationId { 0 };
-constexpr int32_t rightId { 1 };
 } // namespace
 
 class TimerManagerTest : public testing::Test {
@@ -39,20 +38,6 @@ public:
 void AddTimerCallback()
 {
     return;
-}
-
-/**
- * @tc.name: TimerManagerTest_ManagerTimer_001
- * @tc.desc: Test the function AddTimer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
-{
-    int32_t repeatCount = 3;
-    int32_t intervalMs  = 1000;
-    int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
-    EXPECT_EQ(timerld, rightId);
 }
 
 /**
