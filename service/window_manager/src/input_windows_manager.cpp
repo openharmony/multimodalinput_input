@@ -200,10 +200,7 @@ void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStat
         MMI_HILOG_HANDLERD("No need to set foldStatus");
         return;
     }
-    if (WinMgr->lastPointerEventForFold_ == nullptr) {
-        MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
-        return;
-    }
+    CHKPV(WinMgr->lastPointerEventForFold_);
     auto pointerEvent = std::make_shared<PointerEvent>(*(WinMgr->lastPointerEventForFold_));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
@@ -376,13 +373,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    if (windowInfo == nullptr) {
-        MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
-        return INVALID_FD;
-    } else {
-        MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
-        return udsServer_->GetClientFd(windowInfo->pid);
-    }
+    CHKPR(windowInfo, INVALID_FD);
+    MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
+    return udsServer_->GetClientFd(windowInfo->pid);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -704,10 +697,7 @@ void InputWindowsManager::UpdateDisplayMode()
         return;
     }
     displayMode_ = mode;
-    if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
-        MMI_HILOGD("send fingersense display mode is nullptr");
-        return;
-    }
+    CHKPV(FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_);
     MMI_HILOGI("update fingersense display mode, displayMode:%{public}d", displayMode_);
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
 }
@@ -726,10 +716,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         int32_t logicX = mouseLocation.physicalX + displayInfo->x;
         int32_t logicY = mouseLocation.physicalY + displayInfo->y;
         std::optional<WindowInfo> windowInfo;
-        if (lastPointerEvent_ == nullptr) {
-            MMI_HILOGD("lastPointerEvent_ is nullptr");
-            return;
-        }
+        CHKPV(lastPointerEvent_);
         if ((lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
             lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
             lastPointerEvent_->GetPressedButtons().empty()) {
@@ -1004,10 +991,7 @@ void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_DEBUG_ENTER;
     std::optional<WindowInfo> windowInfo;
-    if (lastPointerEvent_ == nullptr) {
-        MMI_HILOGD("lastPointerEvent_ is nullptr");
-        return;
-    }
+    CHKPV(lastPointerEvent_);
     windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
@@ -2534,10 +2518,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
     auto fd = udsServer_->GetClientFd(lastTouchWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
-    if (sess == nullptr) {
-        MMI_HILOGI("The last window has disappeared");
-        return;
-    }
+    CHKPV(sess);
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
@@ -2648,10 +2629,7 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);
-    if (statusObserver == nullptr) {
-        MMI_HILOGE("Create observer failed");
-        return;
-    }
+    CHKPV(statusObserver);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret: %{public}d", ret);
@@ -3127,9 +3105,7 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
 {
     CALL_DEBUG_ENTER;
-    if (pixelMap == nullptr) {
-        return false;
-    }
+    CHKPF(pixelMap);
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
