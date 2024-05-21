@@ -37,6 +37,10 @@ public:
 
     LogTracer(int64_t, int32_t, int32_t);
 
+    LogTracer(LogTracer &&other) noexcept;
+
+    LogTracer &operator=(LogTracer &&other) noexcept;
+
     ~LogTracer();
 
 private:
