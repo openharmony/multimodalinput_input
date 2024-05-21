@@ -1665,61 +1665,70 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    mprintf(fd, "-------------------------- ShortcutKey information -----------------------------\t");
+    mprintf(fd, "ShortcutKey: count = %d", shortcutKeys_.size());
     for (const auto &item : shortcutKeys_) {
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
             mprintf(fd, "PreKey:%d", prekey);
         }
         mprintf(fd,
-            "BusinessId:%s | StatusConfig:%s | StatusConfigValue %s",
-            "| FinalKey:%d | TriggerType:%d | BundleName:%s | AbilityName%s,"
-            "| Action %s \t", shortcutKey.businessId.c_str(), shortcutKey.statusConfig.c_str(),
+            "BusinessId: %s | StatusConfig: %s | StatusConfigValue: %s"
+            "| FinalKey: %d | TriggerType: %d | BundleName: %s | AbilityName: %s"
+            "| Action: %s \t", shortcutKey.businessId.c_str(), shortcutKey.statusConfig.c_str(),
             shortcutKey.statusConfigValue ? "true" : "false", shortcutKey.finalKey, shortcutKey.triggerType,
             shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str(),
             shortcutKey.ability.action.c_str());
     }
-
+    mprintf(fd, "-------------------------- Sequence information -----------------------------\t");
+    mprintf(fd, "Sequence: count = %d", sequences_.size());
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
             mprintf(fd, "keyCode:%d | keyAction:%d", sequenceKey.keyCode, sequenceKey.keyAction);
         }
-        mprintf(fd, "BundleName:%s | AbilityName:%s | Action:%s",
+        mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
     }
-
+    mprintf(fd, "-------------------------- ExcludeKey information -----------------------------\t");
+    mprintf(fd, "ExcludeKey: count = %d", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
         mprintf(fd, "keyCode:%d | keyAction:%d", item.keyCode, item.keyAction);
     }
-   
+    mprintf(fd, "-------------------------- RepeatKey information -----------------------------\t");
+    mprintf(fd, "RepeatKey: count = %d", repeatKeys_.size());
     for (const auto &item : repeatKeys_) {
         mprintf(fd,
-            "KeyCode:%d | KeyAction:%d | Times:%d",
-            "| StatusConfig:%s | StatusConfigValue:%s | BundleName:%s | AbilityName:%s",
+            "KeyCode:%d | KeyAction:%d | Times:%d"
+            "| StatusConfig:%s | StatusConfigValue:%s | BundleName:%s | AbilityName:%s"
             "| Action:%s \t", item.keyCode, item.keyAction, item.times,
             item.statusConfig.c_str(), item.statusConfigValue ? "true" : "false",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
     }
+    PrintGestureInfo(fd);
+}
 
+void KeyCommandHandler::PrintGestureInfo(int32_t fd) {
+    mprintf(fd, "-------------------------- TwoFingerGesture information -----------------------------\t");
     mprintf(fd,
-        "TwoFingerGestureActive:%s | TwoFingerGestureBundleName:%s | TwoFingerGestureAbilityName:%s",
+        "TwoFingerGestureActive:%s | TwoFingerGestureBundleName:%s | TwoFingerGestureAbilityName:%s"
         "| TwoFingerGestureAction:%s \t", twoFingerGesture_.active ? "true" : "false",
         twoFingerGesture_.ability.bundleName.c_str(), twoFingerGesture_.ability.abilityName.c_str(),
         twoFingerGesture_.ability.action.c_str());
-    
+    mprintf(fd, "-------------------------- SingleFingerGesture information -----------------------------\t");
     mprintf(fd,
-        "SingleFingerGestureState:%s | SingleFingerGestureBundleName:%s | SingleFingerGestureAbilityName:%s",
+        "SingleFingerGestureState:%s | SingleFingerGestureBundleName:%s | SingleFingerGestureAbilityName:%s"
         "| SingleFingerGestureAction:%s \t", singleKnuckleGesture_.state ? "true" : "false",
         singleKnuckleGesture_.ability.bundleName.c_str(), singleKnuckleGesture_.ability.abilityName.c_str(),
         singleKnuckleGesture_.ability.action.c_str());
-    
+    mprintf(fd, "-------------------------- DoubleFingerGesture information -----------------------------\t");
     mprintf(fd,
-        "DoubleFingerGestureState:%s | DoubleFingerGestureBundleName:%s | DoubleFingerGestureAbilityName:%s",
+        "DoubleFingerGestureState:%s | DoubleFingerGestureBundleName:%s | DoubleFingerGestureAbilityName:%s"
         "| DoubleFingerGestureAction:%s \t", doubleKnuckleGesture_.state ? "true" : "false",
         doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
         doubleKnuckleGesture_.ability.action.c_str());
-    
+    mprintf(fd, "-------------------------- ThreeFingersTap information -----------------------------\t");
     mprintf(fd,
-        "ThreeFingersTapBundleName:%s | ThreeFingersTapAbilityName:%s",
+        "ThreeFingersTapBundleName:%s | ThreeFingersTapAbilityName:%s"
         "| ThreeFingersTapAction:%s \t", threeFingersTap_.ability.bundleName.c_str(),
         threeFingersTap_.ability.abilityName.c_str(), threeFingersTap_.ability.action.c_str());
 }
