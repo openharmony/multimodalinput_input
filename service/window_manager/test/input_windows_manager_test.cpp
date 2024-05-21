@@ -3194,5 +3194,268 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo, Test
     pointerEvent->SetButtonPressed(2);
     EXPECT_NE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent), std::nullopt);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetWindowInfo
+ * @tc.desc: Test GetWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    WindowInfo windowInfo;
+    windowInfo.flags = 1;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_EQ(inputWindowsManager.GetWindowInfo(logicalX, logicalY), std::nullopt);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateLeftRightArea
+ * @tc.desc: Test UpdateLeftRightArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateLeftRightArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    Rect windowArea;
+    std::vector<int32_t> pointerChangeAreas {5, 0, 5, 0, 5, 0, 5, 0};
+    std::vector<Rect> windowHotAreas;
+    windowArea.x = 200;
+    windowArea.y = 200;
+    windowArea.height = 400;
+    windowArea.width = 400;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateInnerAngleArea
+ * @tc.desc: Test UpdateInnerAngleArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    Rect windowArea;
+    std::vector<int32_t> pointerChangeAreas {0, 16, 0, 16, 0, 16, 0, 16};
+    std::vector<Rect> windowHotAreas;
+    windowArea.x = 200;
+    windowArea.y = 200;
+    windowArea.height = 400;
+    windowArea.width = 400;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerEvent
+ * @tc.desc: Test UpdatePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePointerEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo touchWindow;
+    touchWindow.id = 1;
+    inputWindowsManager.lastWindowInfo_.id = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdatePointerEvent(logicalX, logicalY, pointerEvent, touchWindow));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTarget
+ * @tc.desc: Test UpdateMouseTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(-1);
+    EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
+
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    pointerEvent->SetPointerId(5);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_JudgMouseIsDownOrUp
+ * @tc.desc: Test JudgMouseIsDownOrUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_JudgMouseIsDownOrUp, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    bool dragState = false;
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    inputWindowsManager.pointerActionFlag_ = PointerEvent::POINTER_ACTION_BUTTON_UP;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.JudgMouseIsDownOrUp(dragState));
+
+    dragState = true;
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    inputWindowsManager.pointerActionFlag_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.JudgMouseIsDownOrUp(dragState));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateJoystickTarget
+ * @tc.desc: Test UpdateJoystickTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateJoystickTarget, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 150;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(-1);
+    WindowInfo windowInfo;
+    windowInfo.id = 150;
+    windowInfo.agentWindowId = 200;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateJoystickTarget(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateAndAdjustMouseLocation
+ * @tc.desc: Test UpdateAndAdjustMouseLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLocation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t displayId = 1;
+    double x = 200;
+    double y = 200;
+    bool isRealData = true;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 500;
+    displayInfo.height = 500;
+    displayInfo.displayDirection = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
+    isRealData = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateAndAdjustMouseLocation(displayId, x, y, isRealData));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetMouseInfo
+ * @tc.desc: Test GetMouseInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.mouseLocation_.displayId = -1;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 600;
+    displayInfo.height = 600;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_EQ(inputWindowsManager.GetMouseInfo().displayId, displayInfo.id);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetCursorPos
+ * @tc.desc: Test GetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.cursorPos_.displayId = -1;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 300;
+    displayInfo.height = 300;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_EQ(inputWindowsManager.GetCursorPos().displayId, displayInfo.id);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetCursorPos
+ * @tc.desc: Test ResetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 300;
+    displayInfo.height = 300;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_EQ(inputWindowsManager.ResetCursorPos().displayId, displayInfo.id);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetTargetWindowIds
+ * @tc.desc: Test GetTargetWindowIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetTargetWindowIds, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pointerItemId = 1;
+    std::vector<int32_t> windowIds { 1, 2, 3 };
+    inputWindowsManager.targetWindowIds_.insert(std::make_pair(pointerItemId, windowIds));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetTargetWindowIds(pointerItemId, windowIds));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckWindowIdPermissionByPid_001
+ * @tc.desc: Test CheckWindowIdPermissionByPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissionByPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 300;
+    int32_t pid = 500;
+    WindowInfo windowInfo;
+    windowInfo.id = 300;
+    windowInfo.pid = 500;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_EQ(inputWindowsManager.CheckWindowIdPermissionByPid(windowId, pid), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
