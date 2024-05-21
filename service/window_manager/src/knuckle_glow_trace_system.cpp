@@ -76,10 +76,7 @@ void KnuckleGlowTraceSystem::ResetDivergentPoints(double pointX, double pointY)
     CALL_DEBUG_ENTER;
     int32_t divergenceNum = 0;
     for (const auto &divergentPoint : divergentPoints_) {
-        if (divergentPoint == nullptr) {
-            MMI_HILOGE("divergentPoint is nullptr");
-            continue;
-        }
+        CHKPC(divergentPoint);
         if (divergentPoint->IsEnded() && divergenceNum < maxDivergenceNum_) {
             divergenceNum++;
             MMI_HILOGE("reset divergentPoint");
