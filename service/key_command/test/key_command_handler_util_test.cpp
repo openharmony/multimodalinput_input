@@ -822,6 +822,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_006, Tes
     cJSON_Delete(jsonAbility);
 }
 
+/**
  * @tc.name: KeyCommandHandlerUtilTest_GetParams_007
  * @tc.desc: Test for normal conditions
  * @tc.type: FUNC
