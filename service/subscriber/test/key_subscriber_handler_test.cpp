@@ -902,7 +902,8 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, 
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
