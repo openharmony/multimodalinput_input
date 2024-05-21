@@ -1951,11 +1951,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     int32_t physicalX = pointerItem.GetDisplayX();
     int32_t physicalY = pointerItem.GetDisplayY();
-    IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+            IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
             return RET_ERR;
         }
         touchWindow = std::make_optional(mouseDownInfo_);
