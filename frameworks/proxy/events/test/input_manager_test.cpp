@@ -264,7 +264,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
  * @tc.desc: Verify invalid parameter.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
@@ -284,7 +284,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  * @tc.name: InputManagerTest_SubscribeKeyEvent_02
  * @tc.desc: Verify subscribe power key event.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  * @tc.author: zhaoxueyuan
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level1)
@@ -1620,7 +1620,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
  * @tc.name: InputManagerTest_ClearWindowPointerStyle_001
  * @tc.desc: Verify invalid parameter.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
@@ -2456,7 +2456,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputKeyEvent_001, TestSize.Leve
  * @tc.name: InputManagerTest_SetWindowPointerStyle_001
  * @tc.desc: Verify valid parameter.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.Level1)
 {

@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const uint32_t NUMBER_PARAMETERS = 2;
-constexpr int32_t  MAX_NUMBER_ARRAY_ELEMENT = 500;
+constexpr int32_t MAX_NUMBER_ARRAY_ELEMENT = 500;
 }
 
 bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)
@@ -123,7 +123,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
         return false;
     }
     if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of pattern", "must be less than or equal  50");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of pattern", "must be less than or equal 50");
         return false;
     }
     return true;
