@@ -222,7 +222,7 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
     CHKRP(napi_define_class(env, "FingerprintAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr), fingerprintActionArr, &fingerprintAction),
         DEFINE_CLASS);
-    CHKRP(napi_set_named_property(env, exports, "fingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "FingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI
