@@ -63,7 +63,7 @@ constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
 constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH = 3120;
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT = 2080;
 const std::string DEVICE_TYPE_HARDEN = "HAD";
-const std::string DEVICE_TYPE_KLV = "HYM";
+const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string mouseFileName = "mouse_settings.xml";
 } // namespace
 
@@ -109,11 +109,6 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
         DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
-        if (deviceType == DeviceType::DEVICE_UNKOWN) {
-            MMI_HILOGE("undefined deviceType: %{public}d, width: %{public}d, height: %{public}d",
-                deviceType, displayInfo->width, displayInfo->height);
-            return RET_ERR;
-        }
         ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
@@ -621,12 +616,9 @@ void MouseTransformProcessor::DumpInner()
 
 DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t height)
 {
-    CALL_INFO_TRACE;
-    DeviceType ret = DeviceType::DEVICE_UNKOWN;
-    const std::string deviceType = OHOS::system::GetParameter("const.build.product", "false");
-    if (deviceType == DEVICE_TYPE_KLV) {
-        ret = DeviceType::DEVICE_KLV;
-    } else if (deviceType == DEVICE_TYPE_HARDEN) {
+    CALL_DEBUG_ENTER;
+    DeviceType ret = DeviceType::DEVICE_TYPE_KLV;
+    if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
         if (HARD_HARDEN_DEVICE_WIDTH == width && HARD_HARDEN_DEVICE_HEIGHT == height) {
             ret = DeviceType::DEVICE_HARD_HARDEN;
         } else if (SOFT_HARDEN_DEVICE_WIDTH == width && SOFT_HARDEN_DEVICE_WIDTH == height) {
@@ -635,10 +627,7 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             MMI_HILOGE("undefined width: %{public}f, height: %{public}f", width, height);
         }
         MMI_HILOGD("device width: %{public}f, height:%{public}f", width, height);
-    } else {
-        MMI_HILOGE("undefined deviceType:%{public}s", deviceType.c_str());
     }
-    MMI_HILOGI("deviceType:%{public}s, ret:%{public}d", deviceType.c_str(), ret);
     return ret;
 }
 
