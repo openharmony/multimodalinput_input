@@ -119,7 +119,7 @@ HWTEST_F(TouchTransformProcessorTest, GetTouchToolType_001, TestSize.Level1)
     int32_t deviceId = 6;
     TouchTransformProcessor processor(deviceId);
     struct libinput_device *device = nullptr;
-    int32_t toolType  = processor.GetTouchToolType(device);
+    int32_t toolType = processor.GetTouchToolType(device);
     ASSERT_EQ(toolType, PointerEvent::TOOL_TYPE_FINGER);
 }
 
