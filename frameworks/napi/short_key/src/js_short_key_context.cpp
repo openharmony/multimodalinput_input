@@ -218,11 +218,11 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
             DECLARE_NAPI_STATIC_PROPERTY("RETOUCH", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::RETOUCH))),
             DECLARE_NAPI_STATIC_PROPERTY("CLICK", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CLICK))),
     };
-    napi_value toolType = nullptr;
-    CHKRP(napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    napi_value fingerprintAction = nullptr;
+    CHKRP(napi_define_class(env, "FingerprintAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
                             sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr),
-                            fingerprintActionArr, &toolType), DEFINE_CLASS);
-    CHKRP(napi_set_named_property(env, exports, "ToolType", toolType), SET_NAMED_PROPERTY);
+                            fingerprintActionArr, &fingerprintAction), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "fingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI
