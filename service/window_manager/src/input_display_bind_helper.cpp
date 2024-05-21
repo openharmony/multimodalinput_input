@@ -381,9 +381,7 @@ InputDisplayBindHelper::InputDisplayBindHelper(const std::string bindCfgFile)
 std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return {};
-    }
+    CHKPO(infos_);
     return infos_->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
@@ -450,9 +448,7 @@ void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
-    if (infos_ == nullptr) {
-        return;
-    }
+    CHKPV(infos_);
 
     const auto &infos = infos_->GetInfos();
     std::vector<std::string> unbindDevices;
@@ -551,10 +547,7 @@ std::string InputDisplayBindHelper::GetContent(const std::string &fileName)
     CALL_DEBUG_ENTER;
     std::string content;
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("The realpath return nullptr");
-        return content;
-    }
+    CHKPR(realpath(fileName.c_str(), realPath), content);
     std::ifstream file(realPath);
     if (file.is_open()) {
         std::string line;
@@ -596,14 +589,9 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 void InputDisplayBindHelper::Store()
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return;
-    }
+    CHKPV(infos_);
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName_.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("file name is empty");
-        return;
-    }
+    CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("file path is invalid");
         return;
@@ -620,10 +608,7 @@ void InputDisplayBindHelper::Store()
 int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        MMI_HILOGE("Infos_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(infos_, RET_ERR);
     for (const auto &item : infos_->GetInfos()) {
         infos.push_back({
             .inputDeviceId = item.GetInputDeviceId(),
@@ -716,10 +701,7 @@ void InputDisplayBindHelper::Load()
 {
     CALL_DEBUG_ENTER;
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName_.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("file name is empty");
-        return;
-    }
+    CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("file path is invalid");
         return;
@@ -737,9 +719,7 @@ void InputDisplayBindHelper::Load()
 std::string InputDisplayBindHelper::Dumps() const
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return {};
-    }
+    CHKPO(infos_);
     std::ostringstream oss;
     oss << *infos_;
     return oss.str();
