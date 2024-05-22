@@ -553,7 +553,7 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
 
 int32_t InputManager::GetWinSyncBatchSize(int32_t batchSize)
 {
-    return InputMgrImpl.GetBatchSize(windowSize);
+    return InputMgrImpl.GetBatchSize(batchSize);
 }
 } // namespace MMI
 } // namespace OHOS
