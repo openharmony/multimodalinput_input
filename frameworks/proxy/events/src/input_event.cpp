@@ -469,5 +469,19 @@ LogTracer::LogTracer()
     traceId_ = -1;
 }
 
+LogTracer::LogTracer(LogTracer &&other) noexcept: traceId_(other.traceId_)
+{
+    other.traceId_ = -1;
+}
+
+LogTracer &LogTracer::operator=(LogTracer &&other) noexcept
+{
+    if (this != &other) {
+        traceId_ = other.traceId_;
+        other.traceId_ = -1;
+    }
+    return *this;
+}
+
 } // namespace MMI
 } // namespace OHOS
