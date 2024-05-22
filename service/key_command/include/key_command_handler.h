@@ -155,6 +155,7 @@ public:
     KnuckleGesture GetDoubleKnuckleGesture();
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void PrintGestureInfo(int32_t fd);
+    std::string KeyActionToString(int32_t keyAction);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
