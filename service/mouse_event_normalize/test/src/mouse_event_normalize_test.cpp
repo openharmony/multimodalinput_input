@@ -461,5 +461,62 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
 }
+
+/**
+ * @tc.name: MouseEventNormalizeTest_CheckAndPackageAxisEvent_025
+ * @tc.desc: Test CheckAndPackageAxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEvent_025, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+
+    auto it = InputDevMgr->inputDevice_.begin();
+    for (; it != InputDevMgr->inputDevice_.end(); ++it) {
+        if (it->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(it != InputDevMgr->inputDevice_.end());
+    int32_t deviceId = it->first;
+    struct InputDeviceManager::InputDeviceInfo info = it->second;
+    InputDevMgr->inputDevice_.erase(it);
+
+    MouseEventHdr->CheckAndPackageAxisEvent(event);
+
+    InputDevMgr->inputDevice_[deviceId] = info;
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_CheckAndPackageAxisEvent_026
+ * @tc.desc: Test CheckAndPackageAxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEvent_026, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    MouseEventHdr->CheckAndPackageAxisEvent(event);
+}
 }
 }
