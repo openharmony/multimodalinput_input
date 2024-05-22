@@ -179,6 +179,73 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.
 }
 
 /**
+ * @tc.name: MouseEventNormalizeTest_NormalizeRotateEvent_025
+ * @tc.desc: Test NormalizeRotateEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_025, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+
+    auto iter = InputDevMgr->inputDevice_.begin();
+    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+        if (iter->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    int32_t deviceId = iter->first;
+    struct InputDeviceManager::InputDeviceInfo info = iter->second;
+    InputDevMgr->inputDevice_.erase(iter);
+
+    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    double angle = 0.5;
+    EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
+    InputDevMgr->inputDevice_[deviceId] = info;
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_NormalizeRotateEvent_026
+ * @tc.desc: Test NormalizeRotateEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_026, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(dev);
+    auto iter = MouseEventHdr->processors_.find(deviceId);
+    if (iter != MouseEventHdr->processors_.end()) {
+        MouseEventHdr->processors_.erase(iter);
+    }
+
+    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    double angle = 0.5;
+    EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
+    EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
+}
+
+/**
  * @tc.name: MouseEventNormalizeTest_NormalizeMoveMouse_004
  * @tc.desc: Test NormalizeMoveMouse
  * @tc.type: FUNC
