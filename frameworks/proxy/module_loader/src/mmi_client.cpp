@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
+#include "qos.h"
 
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
@@ -117,6 +118,7 @@ bool MMIClient::StartEventRunner()
         } else {
             auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
             eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+            SetThreadQosLevel(eventHandler_);
             MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
             int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
             if (ret != 0) {
@@ -141,6 +143,20 @@ bool MMIClient::StartEventRunner()
         }
     }
     return true;
+}
+
+void MMIClient::SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler> handler)
+{
+    if (handler != nullptr) {
+        handler->PostTask([]() {
+            auto ret = OHOS::QOS::SetThreadQos(OHOS::QOS::QosLevel::QOS_USER_INTERACTIVE);
+            if (ret != 0) {
+                MMI_HILOGE("SetThreadQos failed, ret:%{public}d", ret);
+            } else {
+                MMI_HILOGI("SetThreadQos success");
+            }
+        });
+    }
 }
 
 bool MMIClient::AddFdListener(int32_t fd)

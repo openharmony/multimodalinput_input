@@ -509,12 +509,8 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
-        if (data == nullptr) {
-            MMI_HILOGE("The data is nullptr");
-        }
-        if (pointerEvent_ == nullptr) {
-            MMI_HILOGE("The pointerEvent_ is nullptr");
-        }
+        CHKPL(data);
+        CHKPL(pointerEvent_);
         return RET_ERR;
     }
     WinMgr->UpdateTargetPointer(pointerEvent_);
@@ -533,12 +529,8 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
     if (!HandlePostInner(data, pointerItem)) {
-        if (data == nullptr) {
-            MMI_HILOGE("The data is nullptr");
-        }
-        if (pointerEvent_ == nullptr) {
-            MMI_HILOGE("The pointerEvent_ is nullptr");
-        }
+        CHKPL(data);
+        CHKPL(pointerEvent_);
         return ERROR_NULL_POINTER;
     }
     WinMgr->UpdateTargetPointer(pointerEvent_);

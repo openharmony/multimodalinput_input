@@ -353,10 +353,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
     std::regex pattern("^event(\\d+)$");
     std::smatch mr;
     const char *sysName = libinput_device_get_sysname(inputDevice);
-    if (sysName == nullptr) {
-        MMI_HILOGE("The return value of the libinput_device_get_sysname is null");
-        return -1;
-    }
+    CHKPR(sysName, RET_ERR);
     std::string strName(sysName);
     if (std::regex_match(strName, mr, pattern)) {
         if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
@@ -364,7 +361,7 @@ int32_t InputDeviceManager::ParseDeviceId(struct libinput_device *inputDevice)
         }
     }
     MMI_HILOGE("Parsing strName failed: \'%{public}s\'", strName.c_str());
-    return -1;
+    return RET_ERR;
 }
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
@@ -644,7 +641,7 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
     CALL_DEBUG_ENTER;
     auto it = inputDevice_.find(deviceId);
     if (it == inputDevice_.end()) {
-        MMI_HILOGE("Device info not find id: %{public}d", deviceId);
+        MMI_HILOGE("Device info not find id:%{public}d", deviceId);
         return {};
     }
     return it->second.vendorConfig;
@@ -653,7 +650,7 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
 int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Enable input device: %{public}s", enable ? "true" : "false");
+    MMI_HILOGD("Enable input device:%{public}s", enable ? "true" : "false");
     for (auto &item : inputDevice_) {
         if (item.second.isRemote && item.second.enable != enable) {
             int32_t keyboardType = KEYBOARD_TYPE_NONE;

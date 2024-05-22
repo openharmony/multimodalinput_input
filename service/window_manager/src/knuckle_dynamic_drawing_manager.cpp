@@ -82,9 +82,7 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is nullptr");
-    }
+    CHKPL(pixelMap);
     pixelMap_ = pixelMap;
     return pixelMap;
 }

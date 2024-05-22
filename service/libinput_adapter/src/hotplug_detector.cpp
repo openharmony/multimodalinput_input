@@ -82,10 +82,7 @@ bool HotplugDetector::Scan() const
     CALL_DEBUG_ENTER;
     using namespace std::literals::string_literals;
     auto* dir = opendir(INPUT_DEVICES_PATH);
-    if (dir == nullptr) {
-        MMI_HILOGE("Failed to open device input dir. Error:%{public}s", SystemError().message().c_str());
-        return false;
-    }
+    CHKPF(dir);
     dirent* entry = nullptr;
     while ((entry = readdir(dir)) != nullptr) {
         if (entry->d_name == "."s || entry->d_name == ".."s) {

@@ -83,6 +83,7 @@ constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
+constexpr uint64_t FOLD_SCREEN_ID {5};
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -304,10 +305,7 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MAGIC_CURSOR->InitRenderThread([]() { IPointerDrawingManager::GetInstance()->SwitchPointerStyle(); });
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-            if (surfaceNode_ == nullptr) {
-                MMI_HILOGE("surfaceNode_ is nullptr, no need detach");
-                return;
-            }
+            CHKPV(surfaceNode_);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
             MMI_HILOGI("switch pointer style");
             int64_t nodeId = surfaceNode_->GetId();
@@ -359,10 +357,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    if (surfaceNode_ == nullptr) {
-        MMI_HILOGE("surfaceNode_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(surfaceNode_, RET_ERR);
     DrawLoadingPointerStyle(mouseStyle);
     DrawRunningPointerAnimate(mouseStyle);
     sptr<OHOS::Surface> layer = GetLayer();
@@ -701,6 +696,16 @@ void RsRemoteDiedCallback()
     isRsRemoteDied = true;
 }
 
+void PointerDrawingManager::AttachToDisplay()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(surfaceNode_);
+    if ((WinMgr->GetDisplayMode() == DisplayMode::MAIN) && (screenId_ == 0)) {
+        screenId_ = FOLD_SCREEN_ID;
+    }
+    surfaceNode_->AttachToDisplay(screenId_);
+}
+
 void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY,
     Direction direction)
 {
@@ -725,7 +730,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
-    surfaceNode_->AttachToDisplay(screenId_);
+    AttachToDisplay();
     RotateDegree(direction);
     lastDirection_ = direction;
 
@@ -747,10 +752,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
 {
     CALL_DEBUG_ENTER;
-    if (surfaceNode_ == nullptr) {
-        MMI_HILOGE("Draw pointer is failed, get node is nullptr");
-        return nullptr;
-    }
+    CHKPP(surfaceNode_);
     return surfaceNode_->GetSurface();
 }
 
@@ -891,10 +893,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("pid is invalid return -1");
         return RET_ERR;
     }
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is null!");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
         return RET_ERR;
@@ -972,9 +971,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     }
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is nullptr");
-    }
+    CHKPL(pixelMap);
     return pixelMap;
 }
 
@@ -1538,7 +1535,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
         if (surfaceNode_ != nullptr) {
-            surfaceNode_->AttachToDisplay(screenId_);
+            AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
