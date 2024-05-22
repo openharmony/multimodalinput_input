@@ -264,7 +264,7 @@ void PointerEvent::PointerItem::SetPressure(double pressure)
     if (pressure < 0.0) {
         pressure_ = 0.0;
     } else if (TOOL_TYPE_PEN == GetToolType()) {
-       pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+        pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
     } else {
         pressure_ = pressure;
     }
