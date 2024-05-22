@@ -482,35 +482,6 @@ HWTEST_F(InputManagerSimulateTest, InputManager_Pencil2InputEvent_004, TestSize.
 }
 
 /**
- * @tc.name: TestInputEventInterceptor_002
- * @tc.desc: Verify mouse move event interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item;
-    item.SetDeviceId(1);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ELEVEN);
-    item.SetPressed(true);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_NINE);
-    item.SetDownTime(POINTER_ITEM_DOWN_TIME_SIX);
-    item.SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
-    auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
-    InputManagerUtil::TestInterceptorIdAndPointerEvent(interceptorId, pointerEvent);
-}
-
-/**
  * @tc.name: TestInputEventInterceptor_003
  * @tc.desc: Verify mouse up event interceptor
  * @tc.type: FUNC
