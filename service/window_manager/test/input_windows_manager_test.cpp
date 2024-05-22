@@ -3461,6 +3461,80 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissio
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_FindPhysicalDisplay_002
+ * @tc.desc: This test verifies the functionality of finding physical displays
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    DisplayInfo displaysInfo;
+    int32_t logicalX = 300;
+    int32_t logicalY = 400;
+    int32_t physicalX = 100;
+    int32_t physicalY =200;
+    int32_t displayId = -1;
+    displayInfo.x = INT32_MAX;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    displayInfo.x = 200;
+    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(logicalX, physicalX + displayInfo.x);
+    displayInfo.y = INT32_MAX ;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    displayInfo.y = 200;
+    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(logicalY, physicalY + displayInfo.y);
+    displaysInfo.x = 100;
+    displaysInfo.width = INT32_MAX;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FindPhysicalDisplay_003
+ * @tc.desc: This test verifies the functionality of finding physical displays
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FindPhysicalDisplay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    DisplayInfo displaysInfo;
+    int32_t logicalX = 300;
+    int32_t logicalY = 400;
+    int32_t physicalX = 100;
+    int32_t physicalY =200;
+    int32_t displayMaxX = 300;
+    int32_t displayMaxY = 400;
+    int32_t displayId = -1;
+    displayInfo.x = 200;
+    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(logicalX, physicalX + displayInfo.x);
+    displayInfo.y = 200;
+    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(logicalY, physicalY + displayInfo.y);
+    displaysInfo.x = 200;
+    displaysInfo.width = 100;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(displayMaxX, displaysInfo.x + displaysInfo.width);
+    displaysInfo.y = 100;
+    displaysInfo.height = INT32_MAX;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId));
+    displaysInfo.y = 200;
+    displaysInfo.height = 200;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    inputWindowsManager.FindPhysicalDisplay(displayInfo, physicalX, physicalY, displayId);
+    EXPECT_EQ(displayMaxY, displaysInfo.y + displaysInfo.height);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo
  * @tc.desc: Test PointerDrawingManagerOnDisplayInfo
  * @tc.type: FUNC
