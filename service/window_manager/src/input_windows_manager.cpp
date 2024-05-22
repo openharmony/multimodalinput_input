@@ -99,6 +99,20 @@ enum PointerHotArea : int32_t {
     BOTTOM_RIGHT = 7,
 };
 
+std::shared_ptr<InputWindowsManager> InputWindowsManager::instance_;
+std::mutex InputWindowsManager::mutex_;
+
+std::shared_ptr<InputWindowsManager> InputWindowsManager::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<InputWindowsManager>();
+        }
+    }
+    return instance_;
+}
+
 InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
 {
     MMI_HILOGI("Bind cfg file name:%{public}s", bindCfgFileName.c_str());
