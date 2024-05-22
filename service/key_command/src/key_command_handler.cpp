@@ -40,8 +40,8 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "stylus_key_handler.h"
-#include "timer_manager.h"
 #include "table_dump.h"
+#include "timer_manager.h"
 #include "util_ex.h"
 
 
@@ -1733,7 +1733,6 @@ void KeyCommandHandler::PrintGestureInfo(int32_t fd)
         "| GestureAction:%s \t", doubleKnuckleGesture_.state ? "true" : "false",
         doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
         doubleKnuckleGesture_.ability.action.c_str());
-    
 }
 
 std::ostream& operator<<(std::ostream& os, const Sequence& seq)
