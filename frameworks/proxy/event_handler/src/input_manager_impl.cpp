@@ -2081,7 +2081,7 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     return ret;
 }
 
-int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t batchSize);
+int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t batchSize)
 {
     if (batchSize <= 0) {
         MMI_HILOGE("The window size is invalid");
