@@ -31,12 +31,12 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
+#include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "securec.h"
 #include "touch_drawing_manager.h"
-#include "key_command_handler.h"
 #include "util_ex.h"
 #include "util.h"
 
@@ -249,7 +249,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
     mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
-    mprintf(fd, "      -k, --keycommand: dump the keycommand information\t");
+    mprintf(fd, "      -k, --keycommand: dump the key command information\t");
 }
 } // namespace MMI
 } // namespace OHOS
