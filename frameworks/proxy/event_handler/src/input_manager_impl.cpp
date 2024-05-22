@@ -2083,7 +2083,7 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
 
 int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t batchSize);
 {
-    if (batchSize <= 0 || batchSize > WindowInfo::MAX_WINDOW_SIZE) {
+    if (batchSize <= 0) {
         MMI_HILOGE("The window size is equal to 0 or greater than 8K");
         return RET_ERR;
     }
