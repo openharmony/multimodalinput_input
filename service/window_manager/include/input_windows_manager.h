@@ -60,7 +60,6 @@ struct WindowInfoEX {
 };
 
 class InputWindowsManager final {
-    DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
     class FoldStatusLisener : public Rosen::DisplayManager::IFoldStatusListener {
     public:
@@ -81,6 +80,8 @@ public:
         Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
     };
 
+    InputWindowsManager();
+    ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
@@ -177,6 +178,8 @@ public:
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
+
+    static std::shared_ptr<InputWindowsManager> GetInstance();
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
@@ -320,9 +323,12 @@ private:
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
+
+    static std::shared_ptr<InputWindowsManager> instance_;
+    static std::mutex mutex_;
 };
 
-#define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
+#define WinMgr ::OHOS::MMI::InputWindowsManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_WINDOWS_MANAGER_H

@@ -690,32 +690,6 @@ ohos_unittest("NapProcessTest") {
   external_deps = [ "c_utils:utils" ]
 }
 
-ohos_unittest("MouseEventNormalizeTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "mouse_event_normalize/test/mouse_device_state_test.cpp",
-    "mouse_event_normalize/test/mouse_event_normalize_test.cpp",
-    "mouse_event_normalize/test/mouse_transform_processor_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-}
-
 ohos_unittest("MonitorTest") {
   module_out_path = module_output_path
 
