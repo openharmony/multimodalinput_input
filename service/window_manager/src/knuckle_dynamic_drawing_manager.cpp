@@ -55,6 +55,10 @@ constexpr int32_t POINT_SYSTEM_SIZE = 500;
 constexpr int32_t MAX_DIVERGENCE_NUM = 15;
 constexpr int32_t DEFAULT_POINTER_SIZE = 1;
 constexpr int32_t DESIRED_SIZE = 80;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
+constexpr float VPR_CONFIG = 3.25f;
+constexpr int32_t POW_SQUARE = 2;
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -265,6 +269,8 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
 {
     CALL_DEBUG_ENTER;
     CHKPV(glowTraceSystem_);
+    CHKPV(pointerEvent);
+    lastUpTime_ = pointerEvent->GetActionTime();
     if (pointerPath_.IsValid()) {
         auto id = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
@@ -291,6 +297,9 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    int64_t intervalTime = pointerEvent->GetActionTime() - lastUpTime_;
+    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+
     UpdateTrackColors();
     lastUpdateTimeMillis_ = pointerEvent->GetActionTime();
     pointCounter_ = 0;
@@ -299,6 +308,15 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
     pointerEvent->GetPointerItem(id, pointerItem);
     int32_t physicalX = pointerItem.GetDisplayX();
     int32_t physicalY = pointerItem.GetDisplayY();
+    float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - physicalX, POW_SQUARE) +
+        pow(lastDownY_ - physicalY, POW_SQUARE)));
+    bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
+    if (isTimeIntervalReady && isDistanceReady) {
+        isDrawing_ = true;
+        return;
+    }
+    lastDownX_ = physicalX;
+    lastDownY_ = physicalY;
     if (displayInfo_.displayDirection == DIRECTION0) {
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
             displayInfo_.height, physicalX, physicalY);
