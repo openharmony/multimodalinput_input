@@ -551,7 +551,7 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
     return InputMgrImpl.SetCurrentUser(userId);
 }
 
-uint32_t InputManager::GetBatchSize(uint32_t windowSize)
+int32_t InputManager::GetWinSyncBatchSize(int32_t batchSize)
 {
     return InputMgrImpl.GetBatchSize(windowSize);
 }

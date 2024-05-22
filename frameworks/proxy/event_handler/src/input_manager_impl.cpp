@@ -2081,14 +2081,13 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     return ret;
 }
 
-uint32_t InputManagerImpl::GetBatchSize(uint32_t windowSize)
+int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t batchSize);
 {
-    CALL_DEBUG_ENTER;
-    if (windowSize == 0 || windowSize > WindowInfo::MAX_WINDOW_SIZE) {
+    if (batchSize <= 0 || batchSize > WindowInfo::MAX_WINDOW_SIZE) {
         MMI_HILOGE("The window size is equal to 0 or greater than 8K");
         return RET_ERR;
     }
-    return WindowInfo::MAX_WINDOW_SIZE / windowSize;
+    return WindowInfo::MAX_WINDOW_SIZE / batchSize;
 }
 } // namespace MMI
 } // namespace OHOS
