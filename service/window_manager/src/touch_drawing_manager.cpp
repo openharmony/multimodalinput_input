@@ -510,7 +510,7 @@ void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t
 {
     CALL_DEBUG_ENTER;
     int32_t width = displayInfo_.width;
-    int32_t height =  displayInfo_.height;
+    int32_t height = displayInfo_.height;
     if (displayInfo_.direction == DIRECTION90 || displayInfo_.direction == DIRECTION270) {
         width = displayInfo_.height;
         height = displayInfo_.width;

@@ -423,7 +423,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     CHKPR(device, RET_ERR);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     auto mouseEvent = MouseEventHdr->GetPointerEvent(deviceId);
-    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     if (mouseEvent == nullptr || mouseEvent->GetPressedButtons().empty()) {
         actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
     }
