@@ -68,6 +68,8 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
+    int32_t toolType = GetTouchToolType(touch, device);
+    item.SetToolType(toolType);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -76,11 +78,9 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetPressed(true);
     UpdatePointerItemProperties(item, touchInfo);
     item.SetDeviceId(deviceId_);
-    int32_t toolType = GetTouchToolType(touch, device);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     NotifyFingersenseProcess(item, toolType);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    item.SetToolType(toolType);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
