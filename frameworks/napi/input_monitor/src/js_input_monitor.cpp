@@ -431,6 +431,15 @@ int32_t JsInputMonitor::GetAction(int32_t action) const
         case PointerEvent::POINTER_ACTION_UP: {
             return static_cast<int32_t>(JsTouchEvent::Action::UP);
         }
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_DOWN);
+        }
+        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_MOVE);
+        }
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_UP);
+        }
         default: {
             return RET_ERR;
         }
@@ -1062,7 +1071,8 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
         case PointerEvent::POINTER_ACTION_PULL_MOVE: {
             return MOVE;
         }
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
             return BUTTON_DOWN;
         }
         case PointerEvent::POINTER_ACTION_BUTTON_UP:
