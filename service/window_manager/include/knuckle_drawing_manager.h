@@ -28,8 +28,8 @@
 namespace OHOS {
 namespace MMI {
 struct PointerInfo {
-    int32_t x { 0 };
-    int32_t y { 0 };
+    float x { 0.0F };
+    float y { 0.0F };
 };
 
 class KnuckleDrawingManager {
@@ -46,6 +46,7 @@ private:
     int32_t DrawGraphic(std::shared_ptr<PointerEvent> touchEvent);
     int32_t GetPointerPos(std::shared_ptr<PointerEvent> touchEvent);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
+    bool IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
@@ -56,6 +57,8 @@ private:
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
+    PointerInfo lastDownPointer_ {};
+    int64_t lastUpTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
