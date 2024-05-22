@@ -550,5 +550,10 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
 {
     return InputMgrImpl.SetCurrentUser(userId);
 }
+
+uint32_t InputManager::GetBatchSize(uint32_t windowSize)
+{
+    return InputMgrImpl.GetBatchSize(windowSize);
+}
 } // namespace MMI
 } // namespace OHOS
