@@ -178,8 +178,6 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
             continue;
         }
         if (window.defaultHotAreas.empty() || window.pointerHotAreas.empty() ||
-            (window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            (window.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (!window.pointerChangeAreas.empty() &&
             window.pointerChangeAreas.size() != WindowInfo::POINTER_CHANGEAREA_COUNT) ||
             (!window.transform.empty() && window.transform.size() != WindowInfo::WINDOW_TRANSFORM_SIZE)) {
@@ -2081,6 +2079,16 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
     }
     return ret;
+}
+
+uint32_t InputManagerImpl::GetBatchSize(uint32_t windowSize)
+{
+    CALL_DEBUG_ENTER;
+    if (windowSize == 0 || windowSize > WindowInfo::MAX_WINDOW_SIZE) {
+        MMI_HILOGE("The window size is equal to 0 or greater than 8K");
+        return RET_ERR;
+    }
+    return WindowInfo::MAX_WINDOW_SIZE / windowSize;
 }
 } // namespace MMI
 } // namespace OHOS

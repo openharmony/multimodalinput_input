@@ -846,6 +846,8 @@ public:
 
     int32_t SetCurrentUser(int32_t userId);
 
+    uint32_t GetBatchSize(uint32_t windowSize);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
