@@ -17,10 +17,12 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+#include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
+#include "pointer_drawing_manager.h"
 #include "proto.h"
 #include "scene_board_judgement.h"
 #include "struct_multimodal.h"
@@ -3456,6 +3458,103 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissio
     windowInfo.pid = 500;
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
     EXPECT_EQ(inputWindowsManager.CheckWindowIdPermissionByPid(windowId, pid), RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo
+ * @tc.desc: Test PointerDrawingManagerOnDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingMgr =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    pointerDrawingMgr->displayInfo_.id = 521;
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.uniq = "uniq_test";
+    displayInfo.dpi = 1000;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    InputDevMgr->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    WinMgr->mouseLocation_.displayId = 10;
+    WinMgr->mouseLocation_.physicalX = 500;
+    WinMgr->mouseLocation_.physicalY = 500;
+    WinMgr->cursorPos_.displayId = 10;
+    WinMgr->cursorPos_.cursorPos.x = 300;
+    WinMgr->cursorPos_.cursorPos.y = 300;
+    displayInfo.id = 10;
+    displayInfo.x = 300;
+    displayInfo.y = 300;
+    WinMgr->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    WinMgr->lastPointerEvent_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
+    WinMgr->lastPointerEvent_ = PointerEvent::Create();
+    EXPECT_NE(WinMgr->lastPointerEvent_, nullptr);
+    WinMgr->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
+    WinMgr->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo_001
+ * @tc.desc: Test PointerDrawingManagerOnDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerOnDisplayInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingMgr =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    pointerDrawingMgr->displayInfo_.id = 521;
+    DisplayGroupInfo displayGroupInfo;
+    DisplayInfo displayInfo;
+    displayInfo.id = 521;
+    displayInfo.uniq = "uniq_test";
+    displayInfo.dpi = 1000;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    int32_t deviceId = 1;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    inputDeviceInfo.isPointerDevice = true;
+    InputDevMgr->inputDevice_.insert(std::make_pair(deviceId, inputDeviceInfo));
+    WinMgr->mouseLocation_.displayId = 10;
+    WinMgr->mouseLocation_.physicalX = 500;
+    WinMgr->mouseLocation_.physicalY = 500;
+    WinMgr->cursorPos_.displayId = 10;
+    WinMgr->cursorPos_.cursorPos.x = 300;
+    WinMgr->cursorPos_.cursorPos.y = 300;
+    displayInfo.id = 10;
+    displayInfo.x = 300;
+    displayInfo.y = 300;
+    WinMgr->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    WinMgr->lastPointerEvent_ = PointerEvent::Create();
+    EXPECT_NE(WinMgr->lastPointerEvent_, nullptr);
+    WinMgr->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    WinMgr->lastPointerEvent_->SetTargetDisplayId(-1);
+    WinMgr->firstBtnDownWindowId_ = -1;
+    WinMgr->extraData_.appended = false;
+    WinMgr->extraData_.sourceType = PointerEvent::SOURCE_TYPE_JOYSTICK;
+    WindowInfo windowInfo;
+    windowInfo.id = -1;
+    windowInfo.pid = 1;
+    WinMgr->displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    WinMgr->isDragBorder_ = true;
+    WinMgr->dragFlag_ = true;
+    EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
+    WinMgr->isDragBorder_ = false;
+    WinMgr->dragFlag_ = false;
+    WinMgr->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
+    WinMgr->lastPointerEvent_->SetButtonPressed(1);
+    WinMgr->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
 }
 } // namespace MMI
 } // namespace OHOS

@@ -421,7 +421,7 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPF(sm);
-    auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
+    auto sa = sm->CheckSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
     CHKPF(sa);
 
     std::weak_ptr<MultimodalInputConnectManager> weakPtr = shared_from_this();

@@ -87,7 +87,7 @@ public:
 
 private:
     static VirtualPen virtualPen_;
-    static std::string  devNode_;
+    static std::string devNode_;
 };
 
 VirtualPen TransformPointTest::virtualPen_;
