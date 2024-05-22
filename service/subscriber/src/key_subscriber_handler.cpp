@@ -901,8 +901,8 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
         mprintf(fd, "Foreground Pids: %s", item);
     }
     mprintf(fd,
-            "enableCombineKey_: %s | isForegroundExits_: %s"
-            "| needSkipPowerKeyUp_: %s \t",
+            "enableCombineKey: %s | isForegroundExits: %s"
+            "| needSkipPowerKeyUp: %s \t",
             enableCombineKey_ ? "true" : "false", isForegroundExits_ ? "true" : "false",
             needSkipPowerKeyUp_ ? "true" : "false");
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
