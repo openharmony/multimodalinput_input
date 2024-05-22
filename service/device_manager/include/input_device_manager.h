@@ -31,8 +31,7 @@
 namespace OHOS {
 namespace MMI {
 class InputDeviceManager final : public IDeviceObject {
-    DECLARE_DELAYED_SINGLETON(InputDeviceManager);
-
+private:
     struct InputDeviceInfo {
         struct libinput_device *inputDeviceOrigin { nullptr };
         std::string networkIdOrigin;
@@ -44,8 +43,12 @@ class InputDeviceManager final : public IDeviceObject {
         std::string sysUid;
         VendorConfig vendorConfig;
     };
+
 public:
+    InputDeviceManager() = default;
+    ~InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
+
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
@@ -80,6 +83,8 @@ public:
     int32_t OnEnableInputDevice(bool enable);
     std::vector<int32_t> GetTouchPadIds();
 
+    static std::shared_ptr<InputDeviceManager> GetInstance();
+
 private:
     int32_t ParseDeviceId(struct libinput_device *inputDevice);
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
@@ -91,6 +96,7 @@ private:
     int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
+
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
@@ -100,9 +106,12 @@ private:
     std::map<int32_t, std::string> displayInputBindInfos_;
     DeviceConfigManagement configManagement_;
     bool sessionLostCallbackInitialized_ { false };
+
+    static std::shared_ptr<InputDeviceManager> instance_;
+    static std::mutex mutex_;
 };
 
-#define InputDevMgr ::OHOS::DelayedSingleton<InputDeviceManager>::GetInstance()
+#define InputDevMgr ::OHOS::MMI::InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_MANAGER_H

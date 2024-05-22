@@ -13,6 +13,8 @@
 
 import("//build/ohos.gni")
 
+mmi_part_name = "input"
+mmi_subsystem_name = "multimodalinput"
 mmi_path = "//foundation/multimodalinput/input"
 graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
