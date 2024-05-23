@@ -25,6 +25,14 @@ constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
 const std::string SHORT_KEY_CLASS = "multimodalinput_short_key_class";
 const std::string SHORT_KEY_INSTANCE = "multimodalinput_short_key";
+
+enum class FingerprintAction : int32_t {
+    DOWN = 0,
+    UP = 1,
+    SLIDE = 2,
+    RETOUCH = 3,
+    CLICK = 4,
+};
 } // namespace
 
 JsShortKeyContext::JsShortKeyContext() : mgr_(std::make_shared<JsShortKeyManager>()) {}
@@ -171,6 +179,25 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay, argv[2]);
 }
 
+napi_value JsShortKeyContext::GetNapiInt32(napi_env env, int32_t code)
+{
+    CALL_DEBUG_ENTER;
+    napi_value ret = nullptr;
+    CHKRP(napi_create_int32(env, code, &ret), CREATE_INT32);
+    return ret;
+}
+
+napi_value JsShortKeyContext::EnumClassConstructor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value args[1] = { 0 };
+    napi_value ret = nullptr;
+    void *data = nullptr;
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    return ret;
+}
+
 napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -183,6 +210,19 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setKeyDownDuration", SetKeyDownDuration),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
+
+    napi_property_descriptor fingerprintActionArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("DOWN", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("UP", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("SLIDE", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::SLIDE))),
+        DECLARE_NAPI_STATIC_PROPERTY("RETOUCH", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::RETOUCH))),
+        DECLARE_NAPI_STATIC_PROPERTY("CLICK", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CLICK))),
+    };
+    napi_value fingerprintAction = nullptr;
+    CHKRP(napi_define_class(env, "FingerprintAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr), fingerprintActionArr, &fingerprintAction),
+        DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "FingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI
