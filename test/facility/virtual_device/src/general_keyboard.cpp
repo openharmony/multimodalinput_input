@@ -13,30 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUAL_MOUSE_H
-#define VIRTUAL_MOUSE_H
-
-#include "virtual_device.h"
-#include "v_input_device.h"
+#include "general_keyboard.h"
 
 namespace OHOS {
 namespace MMI {
-class VirtualMouse final : public VirtualDevice {
-public:
-    VirtualMouse();
-    ~VirtualMouse() = default;
-    DISALLOW_COPY_AND_MOVE(VirtualMouse);
 
-    bool SetUp() override;
-    void SendEvent(uint16_t type, uint16_t code, int32_t value);
+void GeneralKeyboard::Close()
+{
+    GeneralDevice::Close();
+    vKeyboard_.Close();
+}
 
-    std::string GetDevPath() const;
-
-    static std::string GetDeviceName();
-
-private:
-    std::unique_ptr<VInputDevice> vMouse_;
-};
+bool GeneralKeyboard::SetUp()
+{
+    return (
+        vKeyboard_.SetUp() &&
+        OpenDevice(std::string("Virtual keyboard"))
+    );
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // VIRTUAL_MOUSE_H

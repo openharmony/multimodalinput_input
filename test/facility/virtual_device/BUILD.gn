@@ -28,14 +28,20 @@ ohos_source_set("virtual_device_sources") {
   include_dirs = [ "include" ]
 
   sources = [
+    "src/general_device.cpp",
+    "src/general_keyboard.cpp",
+    "src/general_mouse.cpp",
+    "src/general_stylus.cpp",
+    "src/general_touchpad.cpp",
+    "src/general_touchscreen.cpp",
     "src/v_input_device.cpp",
-    "src/virtual_device.cpp",
-    "src/virtual_mouse.cpp",
   ]
 
   public_configs = [ ":virtual_device_sources_public_config" ]
 
   deps = [ "${mmi_path}/util:libmmi-util" ]
+
+  public_deps = [ "${mmi_path}/tools/vuinput:libmmi-virtual-device" ]
 
   external_deps = [
     "c_utils:utils",

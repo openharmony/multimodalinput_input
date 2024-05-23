@@ -16,11 +16,10 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "libinput.h"
+#include "general_mouse.h"
 #include "mouse_transform_processor.h"
 #include "window_info.h"
 #include "mouse_device_state.h"
-#include "virtual_mouse.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "libinput_wrapper.h"
@@ -42,7 +41,7 @@ public:
     void TearDown();
 
 private:
-    static VirtualMouse vMouse_;
+    static GeneralMouse vMouse_;
     static LibinputWrapper libinput_;
 
     MouseTransformProcessor g_processor_ { 0 };
@@ -56,7 +55,7 @@ private:
     bool preTapSwitch_ { true };
 };
 
-VirtualMouse MouseTransformProcessorTest::vMouse_;
+GeneralMouse MouseTransformProcessorTest::vMouse_;
 LibinputWrapper MouseTransformProcessorTest::libinput_;
 
 void MouseTransformProcessorTest::SetUpTestCase(void)
