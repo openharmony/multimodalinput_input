@@ -139,7 +139,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    auto id = touchEvent->GetPointerId();
+    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
@@ -175,7 +175,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
         MMI_HILOGD("Two finger gesture timer id is -1.");
         return;
     }
-    auto id = touchEvent->GetPointerId();
+    int32_t id = touchEvent->GetPointerId();
     auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
         [id](const auto& item) { return item.id == id; });
     if (pos == std::end(twoFingerGesture_.touches)) {
@@ -195,7 +195,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    auto id = touchEvent->GetPointerId();
+    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
@@ -229,7 +229,7 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
         StopTwoFingerGesture();
     }
     if (num > 0 && num <= TwoFingerGesture::MAX_TOUCH_NUM) {
-        auto id = touchEvent->GetPointerId();
+        int32_t id = touchEvent->GetPointerId();
         PointerEvent::PointerItem item;
         touchEvent->GetPointerItem(id, item);
         twoFingerGesture_.touches[num - 1].id = id;
@@ -258,7 +258,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
-    auto id = touchEvent->GetPointerId();
+    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
@@ -355,7 +355,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
 void KeyCommandHandler::UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent,
     KnuckleGesture &knuckleGesture)
 {
-    auto id = touchEvent->GetPointerId();
+    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     knuckleGesture.lastDownPointer.x = item.GetDisplayX();
