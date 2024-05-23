@@ -3815,5 +3815,41 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow,
     inputWindowsManager.lastWindowInfo_.id = 50;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayIdAndName_002
+ * @tc.desc: Test updating display ID and name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displaysInfo;
+    displaysInfo.id = 1;
+    displaysInfo.uniq = "abc";
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    inputWindowsManager.bindInfo_.AddDisplay(2, "cde");
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayIdAndName_003
+ * @tc.desc: Test updating display ID and name
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displaysInfo;
+    displaysInfo.id = 1;
+    displaysInfo.uniq = "abc";
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    inputWindowsManager.bindInfo_.AddDisplay(1, "abc");
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateDisplayIdAndName());
+}
 } // namespace MMI
 } // namespace OHOS
