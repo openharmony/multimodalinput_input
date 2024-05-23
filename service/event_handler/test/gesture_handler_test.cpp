@@ -17,7 +17,10 @@
 #include <libinput.h>
 
 #include "gesture_handler.h"
+#include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GestureHandlerTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -38,6 +41,7 @@ public:
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 10;
     double logicalY = 10;
@@ -59,6 +63,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_002, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 10;
     double logicalY = 10;
@@ -85,6 +90,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_002, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_003, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 9;
     double logicalY = 9;
@@ -116,6 +122,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_003, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_004, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 10;
     double logicalY = 10;
@@ -152,6 +159,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_004, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 0;
     double logicalY = 0;
@@ -179,6 +187,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_005, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t originType = 999;
     int32_t seatSlot = 0;
     double logicalX = 0.0;
@@ -195,6 +204,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_005, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadDownEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 2;
     double logicalX = 0.0;
     double logicalY = 0.0;
@@ -211,6 +221,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadDownEvent_001, Tes
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 0.0;
     double logicalY = 0.0;
@@ -227,6 +238,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_001, Tes
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_002, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 0.0;
     double logicalY = 0.0;
@@ -243,6 +255,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_002, Tes
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadUpEvent_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 0.0;
     double logicalY = 0.0;

@@ -31,26 +31,30 @@ namespace OHOS {
 namespace MMI {
 class EventLogHelper final {
 public:
-    template <class T> static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum);
-    template <class T> static void PrintEventData(std::shared_ptr<T> event);
+    template<class T>
+    static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum, const LogHeader &lh);
+
+    template<class T> static void PrintEventData(std::shared_ptr<T> event, const LogHeader &lh);
 
 private:
-    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event)
+    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event, const LogHeader &lh)
     {
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
-        MMI_HILOGI("InputTracking id:%{public}d, KeyCode:%{public}d,ActionTime:%{public}" PRId64
+        std::string isRepeat = event->IsRepeat() ? "true" : "false";
+        MMI_HILOG_HEADER(LOG_INFO, lh, "InputTracking id:%{public}d, KeyCode:%{public}d,ActionTime:%{public}" PRId64
             ",EventType:%{public}s,KeyAction:%{public}s,NumLock:%{public}d,CapsLock:%{public}d,"
-            "ScrollLock:%{public}d,keyItemsCount:%{public}zu,DisplayId:%{public}d,IsSimulate:%{public}s",
+            "ScrollLock:%{public}d,keyItemsCount:%{public}zu,DisplayId:%{public}d,IsRepeat:%{public}s,"
+            "IsSimulate:%{public}s",
             event->GetId(), event->GetKeyCode(), event->GetActionTime(),
             InputEvent::EventTypeToString(event->GetEventType()),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
-            event->GetTargetDisplayId(), isSimulate.c_str());
+            event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         for (const auto &item : eventItems) {
-            MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,",
-            item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
+            MMI_HILOG_HEADER(LOG_INFO, lh, "DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64
+            ",IsPressed:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -59,18 +63,17 @@ private:
             for (; cItr != pressedKeys.cend(); ++cItr) {
                 tmpStr += ("," + std::to_string(*cItr));
             }
-            MMI_HILOGI("%{public}s]", tmpStr.c_str());
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
         }
     }
 
-    static void Print(const std::shared_ptr<KeyEvent> event)
+    static void Print(const std::shared_ptr<KeyEvent> event, const LogHeader &lh)
     {
-        if (!HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG) &&
-            event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        if (!HiLogIsLoggable(lh.domain, lh.func, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
             return;
         }
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
-        MMI_HILOGD("KeyCode:%{public}d,KeyIntention:%{public}d,ActionTime:%{public}" PRId64
+        MMI_HILOG_HEADER(LOG_DEBUG, lh, "KeyCode:%{public}d,KeyIntention:%{public}d,ActionTime:%{public}" PRId64
             ",ActionStartTime:%{public}" PRId64
             ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,"
             "CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
@@ -78,12 +81,11 @@ private:
             InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-            event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
-            event->GetId(), eventItems.size());
+            event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
         for (const auto &item : eventItems) {
-            MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-                "GetUnicode:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed(),
-                item.GetUnicode());
+            MMI_HILOG_HEADER(LOG_INFO, lh, "DeviceNumber:%{public}d,KeyCode:"
+                "%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,GetUnicode:%{public}d",
+                item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed(), item.GetUnicode());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -92,12 +94,12 @@ private:
             for (; cItr != pressedKeys.cend(); ++cItr) {
                 tmpStr += ("," + std::to_string(*cItr));
             }
-            MMI_HILOGI("%{public}s]", tmpStr.c_str());
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
         }
     }
 
     __attribute__((no_sanitize("cfi")))
-    static void PrintInfoLog(const std::shared_ptr<PointerEvent> event)
+    static void PrintInfoLog(const std::shared_ptr<PointerEvent> event, const LogHeader &lh)
     {
         if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
             event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE) {
@@ -105,7 +107,7 @@ private:
         }
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
-        MMI_HILOGI("InputTracking id:%{public}d, EventType:%{public}s, ActionTime:%{public}" PRId64
+        MMI_HILOG_HEADER(LOG_INFO, lh, "InputTracking id:%{public}d, EventType:%{public}s, ActionTime:%{public}" PRId64
             ", PointerAction:%{public}s, SourceType:%{public}s, DisplayId:%{public}d"
             ", WindowId:%{public}d, DispatchTimes:%{public}d, IsSimulate:%{public}s",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
@@ -114,17 +116,26 @@ private:
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
+                MMI_HILOG_HEADER(LOG_ERROR, lh, "Invalid pointer:%{public}d", pointerId);
                 return;
             }
-            MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
-                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,"
-                "WindowId:%{public}d,DisplayXPos:%{public}f,DisplayYPos:%{public}f,WindowXPos:%{public}f,"
-                "WindowYPos::%{public}f, OriginPointerId:%{public}d",
-                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
-                item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
-                item.GetOriginPointerId());
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOG_HEADER(LOG_INFO, lh, "pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+                    "DisplayX:%d,DisplayY:%d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d,WindowId:"
+                    "%{public}d,DisplayXPos:%f,DisplayYPos:%f,WindowXPos:%f,WindowYPos::%f, OriginPointerId:%{public}d",
+                    pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                    item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                    item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
+                    item.GetOriginPointerId());
+                continue;
+            }
+            MMI_HILOG_HEADER(LOG_INFO, lh, "pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+                "DisplayX:%{public}d,DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:"
+                "%{public}d,WindowId:%{public}d,DisplayXPos:%{public}f,DisplayYPos:%{public}f,WindowXPos:%{public}f,"
+                "WindowYPos::%{public}f, OriginPointerId:%{public}d", pointerId, item.GetDownTime(), item.IsPressed(),
+                item.GetDisplayX(), item.GetDisplayY(), item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(),
+                item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(),
+                item.GetWindowYPos(), item.GetOriginPointerId());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -133,11 +144,11 @@ private:
             for (; cItr != pressedKeys.cend(); ++cItr) {
                 tmpStr += ("," + std::to_string(*cItr));
             }
-            MMI_HILOGI("%{public}s]", tmpStr.c_str());
+            MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
         }
     }
 
-    static void Print(const std::shared_ptr<PointerEvent> event)
+    static void Print(const std::shared_ptr<PointerEvent> event, const LogHeader &lh)
     {
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string str;
@@ -145,19 +156,18 @@ private:
         for (const auto &buff : buffer) {
             str += std::to_string(buff);
         }
-        MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",SensorInputTime:%{public}" PRIu64
-            ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
-            "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"
-            "HorizontalAxisValue:%{public}.2f,PinchAxisValue:%{public}.2f,"
-            "XAbsValue:%{public}.2f,YAbsValue:%{public}.2f,ZAbsValue:%{public}.2f,"
-            "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
-            "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
+        MMI_HILOG_HEADER(LOG_DEBUG, lh, "EventType:%{public}s,ActionTime:%{public}" PRId64 ",SensorInputTime:%{public}"
+            PRIu64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
+            "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.5f,"
+            "HorizontalAxisValue:%{public}.5f,PinchAxisValue:%{public}.5f,"
+            "XAbsValue:%{public}.5f,YAbsValue:%{public}.5f,ZAbsValue:%{public}.5f,"
+            "RzAbsValue:%{public}.5f,GasAbsValue:%{public}.5f,BrakeAbsValue:%{public}.5f,"
+            "Hat0xAbsValue:%{public}.5f,Hat0yAbsValue:%{public}.5f,ThrottleAbsValue:%{public}.5f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
             "BufferCount:%{public}zu,Buffer:%{public}s,MarkEnabled:%{public}d",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetSensorInputTime(),
-            event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
-            event->DumpPointerAction(), event->DumpSourceType(),
-            event->GetButtonId(), event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+            event->GetAction(), event->GetActionStartTime(), event->GetFlag(), event->DumpPointerAction(),
+            event->DumpSourceType(), event->GetButtonId(), event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z),
@@ -171,18 +181,31 @@ private:
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
+                MMI_HILOG_HEADER(LOG_ERROR, lh, "Invalid pointer:%{public}d", pointerId);
                 return;
             }
-            MMI_HILOGD("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOG_HEADER(LOG_DEBUG, lh,"pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+                    "DisplayX:%d,DisplayY:%d,WindowX:%d,WindowY:%d,Width:%{public}d,Height:%{public}d,TiltX:%.2f,"
+                    "TiltY:%.2f,ToolDisplayX:%d,ToolDisplayY:%d,ToolWindowX:%d,ToolWindowY:%d,ToolWidth:%{public}d,"
+                    "ToolHeight:%{public}d,Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,"
+                    "ShortAxis:%{public}d,RawDx:%d,RawDy:%d",
+                    pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                    item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
+                    item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
+                    item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
+                    item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
+                continue;
+            }
+            MMI_HILOG_HEADER(LOG_DEBUG, lh,
+                "pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
                 "DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,Width:%{public}d,Height:%{public}d,"
                 "TiltX:%{public}.2f,TiltY:%{public}.2f,ToolDisplayX:%{public}d,ToolDisplayY:%{public}d,"
                 "ToolWindowX:%{public}d,ToolWindowY:%{public}d,ToolWidth:%{public}d,ToolHeight:%{public}d,"
                 "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d,RawDx:%{public}d,"
-                "RawDy:%{public}d",
-                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
-                item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
-                item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
+                "RawDy:%{public}d", pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
+                item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
+                item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
                 item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
                 item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
         }
@@ -193,16 +216,17 @@ private:
             for (; cItr != pressedKeys.cend(); ++cItr) {
                 tmpStr += ("," + std::to_string(*cItr));
             }
-            MMI_HILOGD("%{public}s]", tmpStr.c_str());
+            MMI_HILOG_HEADER(LOG_DEBUG, lh, "%{public}s]", tmpStr.c_str());
         }
     }
 };
 
-template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
+template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum,
+                                                       const LogHeader &lh)
 {
     CHKPV(event);
-    PrintInfoLog(event);
-    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) {
+    PrintInfoLog(event, lh);
+    if (HiLogIsLoggable(lh.domain, lh.tag, LOG_DEBUG)) {
         static int64_t nowTimeUSec = 0;
         static int32_t dropped = 0;
         if (event->GetAction() == EVENT_TYPE_POINTER) {
@@ -211,22 +235,22 @@ template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event,
                 return;
             }
             if (actionType == POINTER_ACTION_UP && itemNum == FINAL_FINGER) {
-                MMI_HILOGD("This touch process discards %{public}d high frequent events", dropped);
+                MMI_HILOG_HEADER(LOG_DEBUG, lh, "This touch process discards %{public}d high frequent events", dropped);
                 dropped = 0;
             }
             nowTimeUSec = event->GetActionTime();
         }
-        EventLogHelper::Print(event);
+        EventLogHelper::Print(event, lh);
     }
 }
 
-template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
+template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, const LogHeader &lh)
 {
     CHKPV(event);
-    PrintInfoLog(event);
-    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG) ||
+    PrintInfoLog(event, lh);
+    if (HiLogIsLoggable(lh.domain, lh.tag, LOG_DEBUG) ||
         (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
-        EventLogHelper::Print(event);
+        EventLogHelper::Print(event, lh);
     }
 }
 } // namespace MMI

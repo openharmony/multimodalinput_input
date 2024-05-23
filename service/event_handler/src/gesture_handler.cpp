@@ -167,5 +167,10 @@ double GestureHandler::GetRotateAngle()
 {
     return rotateAngle_;
 }
+
+bool GestureHandler::GetRotateStatus()
+{
+    return isStartRotate_;
+}
 } // namespace MMI
 } // namespace OHOS

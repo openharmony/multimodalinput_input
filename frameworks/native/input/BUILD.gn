@@ -15,6 +15,7 @@ import("//build/ohos.gni")
 import("../../../multimodalinput_mini.gni")
 
 ohos_shared_library("oh_input_manager") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
     ubsan = true

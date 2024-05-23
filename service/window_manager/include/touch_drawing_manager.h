@@ -62,9 +62,13 @@ public:
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
     void SetPointerPositionState(bool state);
+    void UpdateBubbleData();
+    void ClearBubbleData();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     void CreateObserver();
     void InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
+    void ConvertPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent);
     void CreateTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
@@ -75,9 +79,9 @@ private:
     void DrawRectItem(RosenCanvas* canvas, const std::string &text,
         Rosen::Drawing::Rect &rect, const Rosen::Drawing::Color &color);
     void UpdatePointerPosition();
+    void RecordLabelsInfo(const std::shared_ptr<PointerEvent>& pointerEvent);
     void UpdateLastPointerItem(int32_t pointerId, PointerEvent::PointerItem &pointerItem);
     void UpdateVelocity();
-    void UpdateDisplayCoord();
     void ClearPointerPosition();
     void ClearTracker();
     void ClearLabels();
@@ -86,7 +90,7 @@ private:
     template <class T>
     void CreatePointerObserver(T& item);
     template <class T>
-    std::string FormatNumber(T& number, int32_t precision);
+    std::string FormatNumber(T number, int32_t precision);
     bool IsValidAction(const int32_t action);
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
@@ -104,16 +108,20 @@ private:
     Rosen::Drawing::Pen pointPen_;
     Rosen::Drawing::Pen linePen_;
     Rosen::Drawing::Pen crosshairsPen_;
+    Rosen::Drawing::Point firstPt_;
+    Rosen::Drawing::Point currentPt_;
+    Rosen::Drawing::Point lastPt_;
     DevMode bubbleMode_;
     DevMode pointerMode_;
     int32_t currentPointerId_ { 0 };
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };
-    int32_t currentPhysicalX_ { 0 };
-    int32_t currentPhysicalY_ { 0 };
+    int32_t rectTopPosition_ { 0 };
     int64_t lastActionTime_ { 0 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
+    double xShowVelocity_ { 0.0 };
+    double yShowVelocity_ { 0.0 };
     double pressure_ { 0.0 };
     double itemRectW_ { 0.0 };
     bool hasBubbleObserver_{ false };

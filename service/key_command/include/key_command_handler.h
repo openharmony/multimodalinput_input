@@ -39,6 +39,14 @@
 
 namespace OHOS {
 namespace MMI {
+enum KeyCommandType : int32_t {
+    TYPE_SHORTKEY = 0,
+    TYPE_SEQUENCE = 1,
+    TYPE_FINGERSCENE = 2,
+    TYPE_REPEAT_KEY = 3,
+    TYPE_MULTI_FINGERS = 4,
+};
+
 enum class NotifyType : int32_t {
     CANCEL,
     INCONSISTENTGESTURE,
@@ -96,6 +104,7 @@ struct Sequence {
     int64_t abilityStartDelay { 0 };
     int32_t timerId { -1 };
     Ability ability;
+    friend std::ostream& operator<<(std::ostream&, const Sequence&);
 };
 
 struct TwoFingerGesture {
@@ -118,6 +127,8 @@ struct KnuckleGesture {
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
+    std::string statusConfig;
+    bool statusConfigValue { true };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -150,6 +161,8 @@ public:
     int32_t EnableCombineKey(bool enable);
     KnuckleGesture GetSingleKnuckleGesture();
     KnuckleGesture GetDoubleKnuckleGesture();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void PrintGestureInfo(int32_t fd);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

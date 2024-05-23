@@ -76,12 +76,12 @@ public:
     int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t NotifyNapOnline();
-    void NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus);
+    void NotifyBundleName(int32_t pid, int32_t uid, const std::string &bundleName, int32_t syncStatus);
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);

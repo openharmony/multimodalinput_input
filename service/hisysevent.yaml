@@ -266,13 +266,15 @@ MAGIC_CURSOR_COLOR:
 
 MAGIC_CURSOR_SHAPE:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the SHAPE of Magic Cursor}
-
+  MOUSE_STYLE: {type: STRING, desc: mouse style}
+  FILL_CODE: {type: STRING, desc: fill code}
+  
 MAGIC_CURSOR_SIZE:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the size of Magic Cursor}
   MOUSE_SIZE: {type: STRING, desc: mouse size}
   FILL_CODE: {type: STRING, desc: fill code}
 
 FANTASY_CURSOR_FAILED:
-  __BASE: {type: BEHAVIOR, level: MINOR, desc: report ERROR of Magic Cursor}
+  __BASE: {type: FAULT, level: MINOR, desc: report ERROR of Magic Cursor}
+  ERROR_NAME: {type: STRING, desc: error name}
   ERROR_CODE: {type: STRING, desc: error code}
-  ERROR_NAME: {type: STRING, desc: fill code}

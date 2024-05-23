@@ -51,7 +51,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
-    int32_t intervalMs  = 1000;
+    int32_t intervalMs = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
     EXPECT_EQ(timerld, rightId);
 }
@@ -66,7 +66,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
-    int32_t intervalMs  = 1000;
+    int32_t intervalMs = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, AddTimerCallback);
     ASSERT_EQ(TimerMgr->RemoveTimer(timerld), rationId);
 }
@@ -112,7 +112,7 @@ HWTEST_F(TimerManagerTest, TimerManagerTest_ManagerTimer_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t repeatCount = 3;
-    int32_t intervalMs  = 1000;
+    int32_t intervalMs = 1000;
     int32_t timerld = TimerMgr->AddTimer(intervalMs, repeatCount, nullptr);
     EXPECT_EQ(timerld, errCode);
 }

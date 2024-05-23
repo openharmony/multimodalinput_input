@@ -83,6 +83,9 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
+    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
+    void Dump(int32_t fd, const std::vector<std::string> &args) override;
+    void AttachToDisplay();
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
     void GetPreferenceKey(std::string &name);

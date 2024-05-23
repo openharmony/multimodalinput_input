@@ -35,6 +35,8 @@ ohos_unittest("mmi-libadapter-hotplug-test") {
 
   deps = [ "//third_party/googletest:gmock_main" ]
 
+  defines = [ "MMI_DISABLE_LOG_TRACE" ]
+
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",

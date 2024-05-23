@@ -48,7 +48,7 @@ private:
     bool CheckDispatchControlPermission(uint32_t tokenId);
 };
 
-#define PerHelper ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()
+#define PER_HELPER ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // PERMISSION_HELPER_H

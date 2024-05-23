@@ -20,6 +20,7 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "authorization_dialog.h"
+#include "bytrace_adapter.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -78,12 +79,14 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     CHKPV(sess);
     auto id = pkt.GetMsgId();
     TimeCostChk chk("ServerMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
+    BytraceAdapter::StartSocketHandle(static_cast<int32_t>(id));
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
         MMI_HILOGE("Unknown msg id:%{public}d,errCode:%{public}d", id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*callback)(sess, pkt);
+    BytraceAdapter::StopSocketHandle();
     if (ret < 0) {
         MMI_HILOGE("Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
@@ -94,6 +97,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
         CurrentPID_ = pid;
         auto iter = authorizationCollection_.find(pid);
@@ -155,6 +159,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
         CurrentPID_ = pid;
         auto iter = authorizationCollection_.find(pid);
@@ -175,12 +180,14 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    EndLogTraceId(pointerEvent->GetId());
     pointerEvent->UpdateId();
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction())) {
                 return RET_ERR;
             }
@@ -200,8 +207,6 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return ret;
             }
             UpdatePointerEvent(pointerEvent);
-            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
@@ -248,7 +253,8 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
 
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
         ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetTouchpadSpeed());
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
+            MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_KLV));
     } else {
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed());
@@ -350,7 +356,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> byteCount;
+            >> info.windowInputType >> info.privacyMode >> byteCount;
 
         if (byteCount != 0) {
             MMI_HILOGD("byteCount:%{public}d", byteCount);
@@ -415,7 +421,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType;
+            >> info.windowInputType >> info.privacyMode;
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");

@@ -455,7 +455,7 @@ public:
     /**
      * Indicates a knuckle.
      *
-     * @since 9
+     * @since 11
      */
     static constexpr int32_t TOOL_TYPE_KNUCKLE = 8;
 
@@ -1126,15 +1126,15 @@ public:
         double windowYPos_ {};
         int32_t width_ {};
         int32_t height_ {};
-        double  tiltX_ {};
-        double  tiltY_ {};
+        double tiltX_ {};
+        double tiltY_ {};
         int32_t toolDisplayX_ {};
         int32_t toolDisplayY_ {};
         int32_t toolWindowX_ {};
         int32_t toolWindowY_ {};
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
-        double  pressure_ {};
+        double pressure_ {};
         int32_t longAxis_ {};
         int32_t shortAxis_ {};
         int32_t deviceId_ {};
@@ -1479,6 +1479,13 @@ public:
      */
     static bool HasAxis(uint32_t axes, AxisType axis);
 
+    /**
+     * @brief Converts a pointer event action into a short string.
+     * @param Indicates the pointer event action.
+     * @return Returns the string converted from the pointer action.
+     * @since 12
+     */
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.

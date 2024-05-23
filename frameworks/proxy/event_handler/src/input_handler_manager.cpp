@@ -41,7 +41,7 @@ InputHandlerManager::InputHandlerManager()
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         eventType = HANDLE_EVENT_TYPE_NONE;
@@ -54,19 +54,11 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         }
     }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    if ((monitorHandlers_.size() + interHandlers_.size()) >= MAX_N_INPUT_HANDLERS) {
-        MMI_HILOGE("The number of handlers exceeds the maximum");
-        return ERROR_EXCEED_MAX_COUNT;
-    }
+    CHKFR(((monitorHandlers_.size() + interHandlers_.size()) < MAX_N_INPUT_HANDLERS), ERROR_EXCEED_MAX_COUNT,
+          "The number of handlers exceeds the maximum");
     int32_t handlerId = GetNextId();
-    if (handlerId == INVALID_HANDLER_ID) {
-        MMI_HILOGE("Exceeded limit of 32-bit maximum number of integers");
-        return INVALID_HANDLER_ID;
-    }
-    if (eventType == HANDLE_EVENT_TYPE_NONE) {
-        MMI_HILOGE("Invalid event type");
-        return INVALID_HANDLER_ID;
-    }
+    CHKFR((handlerId != INVALID_HANDLER_ID), INVALID_HANDLER_ID, "Exceeded limit of 32-bit maximum number of integers");
+    CHKFR((eventType != HANDLE_EVENT_TYPE_NONE), INVALID_HANDLER_ID, "Invalid event type");
     const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d, currentType:%{public}d, deviceTags:%{public}d", handlerId, currentType,
         deviceTags);
@@ -75,17 +67,24 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType || ((currentTags & deviceTags) != deviceTags)) {
-            deviceTags = GetDeviceTags();
+            uint32_t allDeviceTags = GetDeviceTags();
             MMI_HILOGD("handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
-                handlerType, newType, deviceTags, priority);
-            int32_t ret = AddToServer(handlerType, newType, priority, deviceTags);
+                handlerType, newType, allDeviceTags, priority);
+            int32_t ret = AddToServer(handlerType, newType, priority, allDeviceTags);
             if (ret != RET_OK) {
-                MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
-                RemoveLocal(handlerId, handlerType, deviceTags);
+                MMI_HILOGE("Add Handler: %{public}d:%{public}d to server failed, (eventType,deviceTag) current: "
+                           "(%{public}d, %{public}d), new: (%{public}d, %{public}d), priority: %{public}d",
+                           handlerType, handlerId, currentType, currentTags, newType, deviceTags, priority);
+                RemoveLocal(handlerId, handlerType, allDeviceTags);
                 return ret;
             }
         }
+        MMI_HILOGI("Finish add Handler: %{public}d:%{public}d, (eventType,deviceTag) current:"
+                   " (%{public}d, %{public}d), new: (%{public}d, %{public}d), priority: %{public}d",
+                   handlerType, handlerId, currentType, currentTags, newType, deviceTags, priority);
     } else {
+        MMI_HILOGE("Add Handler: %{public}d:%{public}d local failed, (eventType,deviceTag,priority): "
+                   "(%{public}d, %{public}d, %{public}d)", handlerType, handlerId, eventType, deviceTags, priority);
         handlerId = INVALID_HANDLER_ID;
     }
     return handlerId;
@@ -93,14 +92,13 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
 
 void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     const HandleEventType currentType = GetEventType();
     uint32_t currentTags = GetDeviceTags();
     uint32_t deviceTags = 0;
     if (RET_OK == RemoveLocal(handlerId, handlerType, deviceTags)) {
-        MMI_HILOGD("Handler:%{public}d deviceTags:%{public}d unregistered, report to server", handlerId, deviceTags);
         const HandleEventType newType = GetEventType();
         const int32_t newLevel = GetPriority();
         const uint64_t newTags = GetDeviceTags();
@@ -108,6 +106,8 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
             RemoveFromServer(handlerType, newType, newLevel, newTags);
         }
     }
+    MMI_HILOGI("Remove Handler: %{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ", handlerType,
+               handlerId, currentType, currentTags);
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,

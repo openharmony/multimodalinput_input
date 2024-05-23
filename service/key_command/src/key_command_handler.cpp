@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <ostream>
+#include <sstream>
+
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
@@ -38,8 +41,10 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "stylus_key_handler.h"
+#include "table_dump.h"
 #include "timer_manager.h"
 #include "util_ex.h"
+
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -135,7 +140,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             break;
         }
         default:
-            // Don't care about other actions
             MMI_HILOGD("other action not match.");
             break;
     }
@@ -164,7 +168,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         default: {
-            // other tool type are not processed
             isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
@@ -222,7 +225,6 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             break;
         }
         default: {
-            // other tool type are not processed
             MMI_HILOGW("Current touch event tool type:%{public}d", toolType);
             break;
         }
@@ -268,7 +270,10 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-
+    if (!singleKnuckleGesture_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
     auto id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -348,7 +353,9 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
         MMI_HILOGI("knuckle gesture start launch ability");
         knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
         LaunchAbility(knuckleGesture.ability, 0);
+        BytraceAdapter::StopLaunchAbility();
         knuckleGesture.state = true;
         ReportKnuckleScreenCapture(touchEvent);
     } else {
@@ -470,7 +477,9 @@ void KeyCommandHandler::StartTwoFingerGesture()
         twoFingerGesture_.ability.params.emplace("displayX2", std::to_string(twoFingerGesture_.touches[1].x));
         twoFingerGesture_.ability.params.emplace("displayY2", std::to_string(twoFingerGesture_.touches[1].y));
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
         LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
+        BytraceAdapter::StopLaunchAbility();
     });
 }
 
@@ -611,7 +620,6 @@ void KeyCommandHandler::KnuckleGestureTouchUp()
             break;
         }
         default: {
-            MMI_HILOGW("Not a Region gesture or letter gesture!");
             break;
         }
     }
@@ -748,6 +756,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
+    singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -898,6 +907,7 @@ void KeyCommandHandler::ParseStatusConfigObserver()
         }
         CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
     }
+    CreateStatusConfigObserver<KnuckleGesture>(singleKnuckleGesture_);
 }
 
 template <class T>
@@ -1136,7 +1146,9 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         if (!statusValue) {
             return false;
         }
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
         LaunchAbility(item.ability);
+        BytraceAdapter::StopLaunchAbility();
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
@@ -1404,7 +1416,9 @@ bool KeyCommandHandler::HandleScreenLocked(Sequence& sequence, bool &isLaunchAbi
 {
     sequence.timerId = TimerMgr->AddTimer(LONG_ABILITY_START_DELAY, 1, [this, sequence] () {
         MMI_HILOGI("Timer callback");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
@@ -1420,13 +1434,17 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
 {
     if (sequence.abilityStartDelay == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        BytraceAdapter::StopLaunchAbility();
         isLaunchAbility = true;
         return true;
     }
     sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
         MMI_HILOGI("Timer callback");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SEQUENCE, sequence.ability.bundleName);
         LaunchAbility(sequence);
+        BytraceAdapter::StopLaunchAbility();
     });
     if (sequence.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
@@ -1454,16 +1472,19 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
 
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
-            MMI_HILOGI("The keyCode or keyAction not matching");
+            MMI_HILOGD("The keyCode or keyAction not matching");
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
         if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay >= delay)) {
-            MMI_HILOGI("Delay is not matching");
+            MMI_HILOGD("Delay is not matching");
             return false;
         }
     }
 
+    std::ostringstream oss;
+    oss << sequence;
+    MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
     if (keysSize == sequenceKeysSize) {
         std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
         MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
@@ -1490,7 +1511,9 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
         MMI_HILOGI("The touchpad trip tap will launch ability");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, threeFingersTap_.ability.bundleName);
         LaunchAbility(threeFingersTap_.ability, 0);
+        BytraceAdapter::StopLaunchAbility();
         return true;
     }
     return false;
@@ -1530,13 +1553,17 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+        BytraceAdapter::StopLaunchAbility();
         return true;
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
         MMI_HILOGI("Timer callback");
         currentLaunchAbilityKey_ = shortcutKey;
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+        BytraceAdapter::StopLaunchAbility();
     });
     if (shortcutKey.timerId < 0) {
         MMI_HILOGE("Add Timer failed");
@@ -1563,7 +1590,9 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     CHKPF(keyEvent);
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
+        BytraceAdapter::StopLaunchAbility();
         return true;
     }
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
@@ -1580,7 +1609,9 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
         return false;
     }
     MMI_HILOGI("Start launch ability immediately");
+    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
     LaunchAbility(shortcutKey);
+    BytraceAdapter::StopLaunchAbility();
     return true;
 }
 
@@ -1780,5 +1811,87 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
     }
     downToPrevDownDistanceConfig_ = distance;
 }
+void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "----------------------------- ShortcutKey information ----------------------------\t");
+    mprintf(fd, "ShortcutKey: count = %zu", shortcutKeys_.size());
+    for (const auto &item : shortcutKeys_) {
+        auto &shortcutKey = item.second;
+        for (const auto &prekey : shortcutKey.preKeys) {
+            mprintf(fd, "PreKey:%d", prekey);
+        }
+        mprintf(fd,
+            "BusinessId: %s | StatusConfig: %s | StatusConfigValue: %s "
+            "| FinalKey: %d | keyDownDuration: %d | TriggerType: %d | BundleName: %s | AbilityName: %s "
+            "| Action: %s \t", shortcutKey.businessId.c_str(), shortcutKey.statusConfig.c_str(),
+            shortcutKey.statusConfigValue ? "true" : "false", shortcutKey.finalKey, shortcutKey.keyDownDuration,
+            shortcutKey.triggerType, shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str(),
+            shortcutKey.ability.action.c_str());
+    }
+    mprintf(fd, "-------------------------- Sequence information ----------------------------------\t");
+    mprintf(fd, "Sequence: count = %zu", sequences_.size());
+    for (const auto &item : sequences_) {
+        for (const auto& sequenceKey : item.sequenceKeys) {
+            mprintf(fd, "keyCode: %d | keyAction: %d", sequenceKey.keyCode, sequenceKey.keyAction);
+        }
+        mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
+            item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
+    }
+    mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
+    mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
+    for (const auto &item : excludeKeys_) {
+        mprintf(fd, "keyCode: %d | keyAction: %d", item.keyCode, item.keyAction);
+    }
+    mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
+    mprintf(fd, "RepeatKey: count = %zu", repeatKeys_.size());
+    for (const auto &item : repeatKeys_) {
+        mprintf(fd,
+            "KeyCode: %d | KeyAction: %d | Times: %d"
+            "| StatusConfig: %s | StatusConfigValue: %s | BundleName: %s | AbilityName: %s"
+            "| Action:%s \t", item.keyCode, item.keyAction, item.times,
+            item.statusConfig.c_str(), item.statusConfigValue ? "true" : "false",
+            item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
+    }
+    PrintGestureInfo(fd);
+}
+
+void KeyCommandHandler::PrintGestureInfo(int32_t fd)
+{
+    mprintf(fd, "-------------------------- TouchPad Two Fingers Gesture --------------------------\t");
+    mprintf(fd,
+        "GestureActive: %s | GestureBundleName: %s | GestureAbilityName: %s"
+        "| GestureAction: %s \t", twoFingerGesture_.active ? "true" : "false",
+        twoFingerGesture_.ability.bundleName.c_str(), twoFingerGesture_.ability.abilityName.c_str(),
+        twoFingerGesture_.ability.action.c_str());
+    mprintf(fd, "-------------------------- TouchPad Three Fingers Tap Gesture --------------------\t");
+    mprintf(fd,
+        "TapBundleName: %s | TapAbilityName: %s"
+        "| TapAction: %s \t", threeFingersTap_.ability.bundleName.c_str(),
+        threeFingersTap_.ability.abilityName.c_str(), threeFingersTap_.ability.action.c_str());
+    mprintf(fd, "-------------------------- Knuckle Single Finger Gesture --------------------------\t");
+    mprintf(fd,
+        "GestureState: %s | GestureBundleName: %s | GestureAbilityName: %s"
+        "| GestureAction: %s \t", singleKnuckleGesture_.state ? "true" : "false",
+        singleKnuckleGesture_.ability.bundleName.c_str(), singleKnuckleGesture_.ability.abilityName.c_str(),
+        singleKnuckleGesture_.ability.action.c_str());
+    mprintf(fd, "-------------------------- Knuckle Two Fingers Gesture ----------------------------\t");
+    mprintf(fd,
+        "GestureState: %s | GestureBundleName: %s | GestureAbilityName: %s"
+        "| GestureAction:%s \t", doubleKnuckleGesture_.state ? "true" : "false",
+        doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
+        doubleKnuckleGesture_.ability.action.c_str());
+}
+
+std::ostream& operator<<(std::ostream& os, const Sequence& seq)
+{
+    os << "keys: [";
+    for (const SequenceKey &singleKey: seq.sequenceKeys) {
+        os << "(kc:" << singleKey.keyCode << ",ka:" << singleKey.keyAction << "d:" << singleKey.delay << "),";
+    }
+    os << "]: " << seq.ability.bundleName << ":" << seq.ability.abilityName;
+    return os;
+}
+
 } // namespace MMI
 } // namespace OHOS

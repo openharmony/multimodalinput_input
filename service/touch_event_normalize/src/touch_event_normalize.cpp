@@ -90,6 +90,17 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
     return processor;
 }
 
+std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = processors_.find(deviceId);
+    if (iter != processors_.end()) {
+        CHKPP(iter->second);
+        return iter->second->GetPointerEvent();
+    }
+    return nullptr;
+}
+
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
 {
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);

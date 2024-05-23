@@ -22,6 +22,7 @@
 
 #include "string_ex.h"
 
+#include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
@@ -43,7 +44,7 @@ const int32_t TUPLE_PID = 0;
 const int32_t TUPLE_UID = 1;
 const int32_t TUPLE_NAME = 2;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
-constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 50 };
+constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -57,6 +58,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    BytraceAdapter::StartIpcServer(code);
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
             return StubHandleAllocSocketFd(data, reply);
@@ -321,6 +323,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
+    BytraceAdapter::StopIpcServer();
     return RET_ERR;
 }
 
@@ -336,7 +339,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    int32_t tokenType = PerHelper->GetTokenType();
+    int32_t tokenType = PER_HELPER->GetTokenType();
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
         MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
@@ -360,7 +363,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -387,7 +390,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -410,7 +413,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, 
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -446,10 +449,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetCustomCursor failed ret:%{public}d", ret);
@@ -468,10 +468,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     int32_t windowId = 0;
     int32_t winPid = -1;
     OHOS::Media::PixelMap *pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("Reading windowid the tlv count %{public}d", windowId);
@@ -523,7 +520,7 @@ int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, 
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -547,7 +544,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, Mess
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -596,7 +593,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, Mess
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -615,7 +612,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -634,7 +631,7 @@ int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& dat
 int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -653,7 +650,7 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
 int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -672,7 +669,7 @@ int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -744,7 +741,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -768,7 +765,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -787,7 +784,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -805,7 +802,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -858,7 +855,8 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t pid, windowId;
+    int32_t pid;
+    int32_t windowId;
     READINT32(data, pid, RET_ERR);
     READINT32(data, windowId, RET_ERR);
     int32_t ret = ClearWindowPointerStyle(pid, windowId);
@@ -866,7 +864,7 @@ int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& d
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Successfully clean pointerStyle for window:%{public}d, pid:%{public}d", windowId, pid);
+    MMI_HILOGD("Successfully clean pointerStyle for windowId:%{public}d, pid:%{public}d", windowId, pid);
     return RET_OK;
 }
 
@@ -1007,7 +1005,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1018,11 +1016,11 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     }
     int32_t handlerType;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
-    if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PerHelper->CheckInterceptor())) {
+    if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;
     }
-    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
+    if ((handlerType == InputHandlerType::MONITOR) && (!PER_HELPER->CheckMonitor())) {
         MMI_HILOGE("Monitor permission check failed");
         return ERROR_NO_PERMISSION;
     }
@@ -1044,7 +1042,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1055,11 +1053,11 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     }
     int32_t handlerType;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
-    if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PerHelper->CheckInterceptor())) {
+    if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;
     }
-    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
+    if ((handlerType == InputHandlerType::MONITOR) && (!PER_HELPER->CheckMonitor())) {
         MMI_HILOGE("Monitor permission check failed");
         return ERROR_NO_PERMISSION;
     }
@@ -1081,7 +1079,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckMonitor()) {
+    if (!PER_HELPER->CheckMonitor()) {
         MMI_HILOGE("Permission check failed");
         return ERROR_NO_PERMISSION;
     }
@@ -1103,7 +1101,7 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1132,7 +1130,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1156,7 +1154,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1181,7 +1179,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
 int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1204,7 +1202,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1239,13 +1237,16 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
         MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
+    LogTracer lt(event->GetId(), event->GetEventType(), event->GetKeyAction());
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PerHelper->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    EndLogTraceId(event->GetId());
     event->UpdateId();
+    LogTracer lt1(event->GetId(), event->GetEventType(), event->GetKeyAction());
     int32_t ret = InjectKeyEvent(event, isNativeInject);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);
@@ -1269,7 +1270,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     }
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PerHelper->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1284,7 +1285,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1303,7 +1304,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1332,7 +1333,7 @@ int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1360,7 +1361,7 @@ int32_t MultimodalInputConnectStub::StubGetAllMmiSubscribedEvents(MessageParcel&
 int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1384,7 +1385,7 @@ int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1409,7 +1410,7 @@ int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data,
 int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1544,7 +1545,7 @@ int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1571,7 +1572,7 @@ int32_t MultimodalInputConnectStub::VerifyTouchPadSetting(void)
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1584,7 +1585,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollSwitch(MessageParcel& d
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1603,7 +1604,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollSwitch(MessageParcel& d
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1623,7 +1624,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollDirection(MessageParcel
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1642,7 +1643,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1662,7 +1663,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadTapSwitch(MessageParcel& data
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1681,7 +1682,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1701,7 +1702,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& d
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1720,7 +1721,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& d
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1742,7 +1743,7 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1763,7 +1764,7 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatRate(MessageParcel& dat
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1784,7 +1785,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1805,7 +1806,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatRate(MessageParcel& dat
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1824,7 +1825,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadPinchSwitch(MessageParcel& da
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1843,7 +1844,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPinchSwitch(MessageParcel& da
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1863,7 +1864,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadSwipeSwitch(MessageParcel& da
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1882,7 +1883,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadSwipeSwitch(MessageParcel& da
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1902,7 +1903,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRightClickType(MessageParcel&
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1921,7 +1922,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
@@ -1978,11 +1979,11 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubSetShieldStatus(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PerHelper->CheckDispatchControl()) {
+    if (!PER_HELPER->CheckDispatchControl()) {
         MMI_HILOGE("input dispatch control permission check failed");
         return ERROR_NO_PERMISSION;
     }
@@ -2007,11 +2008,11 @@ int32_t MultimodalInputConnectStub::StubSetShieldStatus(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetShieldStatus(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PerHelper->CheckDispatchControl()) {
+    if (!PER_HELPER->CheckDispatchControl()) {
         MMI_HILOGE("input dispatch control permission check failed");
         return ERROR_NO_PERMISSION;
     }
@@ -2060,7 +2061,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyState(MessageParcel& data, Message
 int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -2088,7 +2089,7 @@ int32_t MultimodalInputConnectStub::StubCancelInjection(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -2105,11 +2106,11 @@ int32_t MultimodalInputConnectStub::StubHasIrEmitter(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("GetInfraredFrequencies Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PerHelper->CheckInfraredEmmit()) {
+    if (!PER_HELPER->CheckInfraredEmmit()) {
         MMI_HILOGE("MulmodalConStub::StubGetInfr permi check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
     }
@@ -2130,11 +2131,11 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubTransmitInfrared Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PerHelper->CheckInfraredEmmit()) {
+    if (!PER_HELPER->CheckInfraredEmmit()) {
         MMI_HILOGE("StubTransmitInfrared permission check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
         return ERROR_NO_PERMISSION;
     }
@@ -2175,10 +2176,7 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(pixelMap, RET_ERR);
     int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);

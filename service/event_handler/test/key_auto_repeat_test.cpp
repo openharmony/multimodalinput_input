@@ -17,9 +17,12 @@
 #include <libinput.h>
 
 #include "key_auto_repeat.h"
+#include "mmi_log.h"
 #include "multimodal_input_preferences_manager.h"
 #include "timer_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyAutoRepeatTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -44,6 +47,7 @@ public:
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_AddDeviceConfig_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     struct libinput_device *device = nullptr;
     int32_t result = keyAutoRepeat.AddDeviceConfig(device);
@@ -58,6 +62,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_AddDeviceConfig_001, TestSize.Leve
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SelectAutoRepeat_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     auto keyEvent = KeyEvent::Create();
     EXPECT_NE(keyEvent, nullptr);
@@ -82,6 +87,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SelectAutoRepeat_001, TestSize.Lev
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetTomlFilePath_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     std::string fileName = "test";
     std::string expectedPath = "/vendor/etc/keymap/test.TOML";
@@ -99,6 +105,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetTomlFilePath_001, TestSize.Leve
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetIntervalTime_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t deviceId = 1;
     int32_t expected = DEFAULT_KEY_REPEAT_RATE;
@@ -115,6 +122,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetIntervalTime_001, TestSize.Leve
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetDelayTime_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t delayTime = keyAutoRepeat.GetDelayTime();
     EXPECT_EQ(delayTime, DEFAULT_KEY_REPEAT_DELAY);
@@ -128,6 +136,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetDelayTime_001, TestSize.Level1)
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatTime_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t deviceId = 1;
     bool isDelay = true;
@@ -148,6 +157,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatTime_001, TestSiz
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetAutoSwitch_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     std::map<int32_t, DeviceConfig> deviceConfig_;
     int32_t existingDeviceId = 1;
@@ -164,6 +174,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetAutoSwitch_001, TestSize.Level1
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatDelay_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t delay = 500;
     int32_t expectedResult = RET_OK;
@@ -185,6 +196,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatDelay_001, TestSi
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatRate_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t rate = 500;
     int32_t expectedResult = RET_OK;
@@ -209,6 +221,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatRate_001, TestSiz
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatDelay_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t delay = 0;
     int32_t expectedDelay = 1000;
@@ -227,6 +240,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatDelay_001, TestSi
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatRate_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     int32_t rate = 0;
     EXPECT_EQ(keyAutoRepeat.GetKeyboardRepeatRate(rate), RET_OK);
@@ -248,6 +262,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetKeyboardRepeatRate_001, TestSiz
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     std::string testKey = "testKey";
     int32_t testValue = 123;
@@ -264,6 +279,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
  */
 HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_GetConfigDataFromDatabase_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     KeyAutoRepeat keyAutoRepeat;
     std::string key = "test_key";
     int32_t value = 0;
