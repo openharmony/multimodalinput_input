@@ -99,10 +99,8 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     auto id = pkt.GetMsgId();
     TimeCostChk chk("ClientMsgHandler::OnMsgHandler", "overtime 300(us)", MAX_OVER_TIME, id);
     auto callback = GetMsgCallback(id);
-    if (callback == nullptr) {
-        MMI_HILOGE("Unknown msg id:%{public}d", id);
-        return;
-    }
+    CHKPV(callback);
+    ResetLogTrace();
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
         MMI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
@@ -120,6 +118,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOG_DISPATCHE("Read netPacket failed");
         return RET_ERR;
     }
+    LogTracer lt(key->GetId(), key->GetEventType(), key->GetKeyAction());
     int32_t fd = 0;
     pkt >> fd;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -134,7 +133,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     }
     MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
     MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
-    EventLogHelper::PrintEventData(key);
+    EventLogHelper::PrintEventData(key, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -152,7 +151,7 @@ int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& p
     std::string bundleName;
     pkt >> pid >> uid >> bundleName >> syncStatus;
     InputMgrImpl.NotifyBundleName(pid, uid, bundleName, syncStatus);
-    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("NotifyBundleName pid:%{public}d, uid:%{public}d, bundleName:%{public}s, syncStatus:%{public}d",
         pid, uid, bundleName.c_str(), syncStatus);
     return RET_OK;
 }
@@ -173,9 +172,10 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_DISPATCHI("InputTracking id:%{public}d action:%{public}d PointerEvent ReceivedMsg",
         pointerEvent->GetId(), pointerEvent->GetPointerAction());
-    EventLogHelper::PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
     }
@@ -199,6 +199,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         MMI_HILOGE("Read net packet failed");
         return RET_ERR;
     }
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
@@ -236,6 +237,7 @@ int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client
         MMI_HILOGE("Read net packet failed");
         return RET_ERR;
     }
+    LogTracer lt(switchEvent->GetId(), switchEvent->GetEventType(), switchEvent->GetAction());
     int32_t fd = -1;
     int32_t subscribeId = -1;
     pkt >> fd >> subscribeId;
@@ -279,6 +281,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOG_DISPATCHE("Failed to deserialize key event");
         return RET_ERR;
     }
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {
@@ -320,6 +323,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_HILOG_DISPATCHW("Failed to deserialize pointer event");
         return RET_ERR;
     }
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {

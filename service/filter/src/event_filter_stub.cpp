@@ -61,10 +61,7 @@ int32_t EventFilterStub::StubHandleKeyEvent(MessageParcel& data, MessageParcel& 
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-    if (event == nullptr) {
-        MMI_HILOGE("The event is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(event, RET_ERR);
 
     if (!event->ReadFromParcel(data)) {
         MMI_HILOGE("Read data error");
@@ -80,10 +77,7 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
-    if (event == nullptr) {
-        MMI_HILOGE("The event is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(event, RET_ERR);
 
     if (!event->ReadFromParcel(data)) {
         MMI_HILOGE("Read data error");

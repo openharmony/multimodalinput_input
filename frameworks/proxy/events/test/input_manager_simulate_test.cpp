@@ -1168,7 +1168,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_013, TestSize.Level
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         if (i == 0) {
-            EXPECT_NE(sPointerEs, "Call high interceptor");
+            EXPECT_EQ(sPointerEs, "Call high interceptor");
         } else {
             ASSERT_TRUE(sPointerEs.empty());
         }

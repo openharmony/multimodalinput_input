@@ -27,13 +27,16 @@
 
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
+#include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
+#include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "securec.h"
+#include "touch_drawing_manager.h"
 #include "util_ex.h"
 #include "util.h"
 
@@ -96,6 +99,8 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "interceptor", no_argument, 0, 'i' },
         { "filter", no_argument, 0, 'f' },
         { "mouse", no_argument, 0, 'm' },
+        { "cursor", no_argument, 0, 'c' },
+        { "keycommand", no_argument, 0, 'k' },
         { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -122,7 +127,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmck", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -190,6 +195,25 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_POINTER
                 break;
             }
+            case 'c': {
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+                IPointerDrawingManager::GetInstance()->Dump(fd, args);
+#else
+                mprintf(fd, "Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+                TOUCH_DRAWING_MGR->Dump(fd, args);
+#else
+                mprintf(fd, "Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_TOUCH
+                break;
+            }
+            case 'k': {
+                auto keyHandler = InputHandler->GetKeyCommandHandler();
+                CHKPV(keyHandler);
+                keyHandler->Dump(fd, args);
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -224,6 +248,8 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
+    mprintf(fd, "      -c, --cursor: dump the cursor draw information\t");
+    mprintf(fd, "      -k, --keycommand: dump the key command information\t");
 }
 } // namespace MMI
 } // namespace OHOS

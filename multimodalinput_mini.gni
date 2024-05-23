@@ -13,6 +13,8 @@
 
 import("//build/ohos.gni")
 
+mmi_part_name = "input"
+mmi_subsystem_name = "multimodalinput"
 mmi_path = "//foundation/multimodalinput/input"
 graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
@@ -63,6 +65,7 @@ declare_args() {
   ]
 
   libmmi_common_sources = [
+    "events/src/axis_event.cpp",
     "events/src/input_device.cpp",
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
@@ -79,7 +82,6 @@ declare_args() {
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/scene_board_judgement.cpp",
-    "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_fd_listener.cpp",

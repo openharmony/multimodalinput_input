@@ -140,7 +140,8 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
-    if (status != napi_ok || napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
+    if (status != napi_ok ||
+        napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
         MMI_HILOGE("Create async work failed");
         asyncContext->DecStrongRef(nullptr);
     }
@@ -897,7 +898,7 @@ napi_value JsPointerManager::SetTouchpadPointerSpeed(napi_env env, int32_t speed
 napi_value JsPointerManager::GetTouchpadPointerSpeed(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    int32_t speed;
+    int32_t speed = 0;
     int32_t ret = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
     return GetTouchpadInt32Data(env, handle, speed, ret);
 }

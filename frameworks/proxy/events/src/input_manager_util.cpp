@@ -879,9 +879,7 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerUtil::SetMouseIconTest(const 
     decodeOpts.desiredSize = {.width = MOUSE_ICON_SIZE, .height = MOUSE_ICON_SIZE};
 
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is nullptr");
-    }
+    CHKPL(pixelMap);
     return pixelMap;
 }
 

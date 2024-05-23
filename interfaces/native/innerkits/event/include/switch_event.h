@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,11 +27,20 @@ public:
     static constexpr int32_t SWITCH_ON = 0;
     static constexpr int32_t SWITCH_OFF = 1;
 
+    /**
+     * @brief Enumerated values of switch type.
+    *
+    * @since 12
+    */
     enum SwitchType {
-        DEFAULT = 0,
-        LID,
-        TABLET,
-        PRIVACY
+        /** Default, used to be compatible with calls to previously none switch type parameter */
+        SWITCH_DEFAULT = 0,
+        /** Lid switch type  */
+        SWITCH_LID,
+        /** Tablet switch type  */
+        SWITCH_TABLET,
+        /** Privacy switch type  */
+        SWITCH_PRIVACY
     };
 
 public:
@@ -69,11 +78,11 @@ public:
         : InputEvent(value),
         switchValue_(value),
         updateSwitchMask_(0),
-        switchType_(SwitchType::DEFAULT) {}
+        switchType_(SwitchType::SWITCH_DEFAULT) {}
 private:
         int32_t switchValue_ { 0 };
         int32_t updateSwitchMask_ { 0 };
-        int32_t switchType_ { SwitchType::DEFAULT };
+        int32_t switchType_ { SwitchType::SWITCH_DEFAULT };
 };
 } // namespace MMI
 } // namespace OHOS

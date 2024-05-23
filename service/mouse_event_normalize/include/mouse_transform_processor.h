@@ -33,9 +33,15 @@ extern "C" {
         double dx;
         double dy;
     };
+    enum class DeviceType {
+        DEVICE_UNKOWN = 0,
+        DEVICE_KLV = 1,
+        DEVICE_SOFT_HARDEN = 2,
+        DEVICE_HARD_HARDEN = 3,
+    };
     int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
     int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
-        int32_t speed);
+        int32_t speed, int32_t deviceType);
 }
 
 namespace MMI {
@@ -70,6 +76,7 @@ public:
     int32_t Normalize(struct libinput_event *event);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool CheckAndPackageAxisEvent();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -91,8 +98,8 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
+    DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DumpInner();
-
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
@@ -103,7 +110,7 @@ public:
     static int32_t GetDisplayId();
     static int32_t SetMousePrimaryButton(int32_t primaryButton);
     static int32_t GetMousePrimaryButton();
-    static int32_t SetMouseScrollRows(int rows);
+    static int32_t SetMouseScrollRows(int32_t rows);
     static int32_t GetMouseScrollRows();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
@@ -122,7 +129,6 @@ public:
 
 private:
     static int32_t globalPointerSpeed_;
-
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };

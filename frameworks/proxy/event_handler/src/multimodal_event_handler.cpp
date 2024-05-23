@@ -79,7 +79,9 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+    EndLogTraceId(keyEvent->GetId());
     keyEvent->UpdateId();
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetKeyCode() < 0) {
         MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
@@ -138,7 +140,7 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    EventLogHelper::PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);

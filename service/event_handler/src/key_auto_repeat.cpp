@@ -77,7 +77,9 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
-    if (devConf.autoSwitch != OPEN_AUTO_REPEAT) {
+    MMI_HILOGD("AutoRepeatSwitch::%{public}d, keyEvent flag:%{public}x", devConf.autoSwitch, keyEvent->GetFlag());
+    if (devConf.autoSwitch != OPEN_AUTO_REPEAT && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        MMI_HILOGI("AutoRepeatSwitch not open and is not simulate event");
         return;
     }
     keyEvent_ = keyEvent;
@@ -121,6 +123,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
+        LogTracer lt(this->keyEvent_->GetId(), this->keyEvent_->GetEventType(), this->keyEvent_->GetKeyAction());
         inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         this->keyEvent_->UpdateId();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -219,10 +222,10 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
     }
     std::string name = "keyboardRepeatRate";
     if (PutConfigDataToDatabase(name, repeatRateTime) != RET_OK) {
-        MMI_HILOGE("Failed to set keyboard repeat rate.");
+        MMI_HILOGE("Failed to set keyboard repeat rate");
         return RET_ERR;
     }
-    MMI_HILOGD("Set keyboard repeat rate rate:%{public}d", repeatRateTime);
+    MMI_HILOGD("Successfully set keyboard repeat for rate:%{public}d", repeatRateTime);
     return RET_OK;
 }
 

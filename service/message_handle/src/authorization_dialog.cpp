@@ -57,10 +57,7 @@ bool AuthorizationDialog::ConnectSystemUi()
         return true;
     }
     auto abilityMgr = AAFwk::AbilityManagerClient::GetInstance();
-    if (abilityMgr == nullptr) {
-        MMI_HILOGW("abilityMgr is nullptr");
-        return false;
-    }
+    CHKPF(abilityMgr);
 
     AAFwk::Want want;
     want.SetElementName("com.ohos.systemui", "com.ohos.systemui.dialog");

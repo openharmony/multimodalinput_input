@@ -154,7 +154,7 @@ public:
      * @since 9
      */
     int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
-        SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::DEFAULT);
+        SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::SWITCH_DEFAULT);
 
     /**
      * @brief Unsubscribes from a switch input event.
@@ -821,7 +821,7 @@ public:
 
     /**
      * @brief Get whether System has IrEmitter.
-     * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not.
+     * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12
      */
@@ -838,7 +838,7 @@ public:
     /**
      * @brief user IrEmitter with parameter number and pattern.
      * @param number   Frequency of IrEmitter works .
-     * @param pattern  Pattern of signal transmission in alternate on/off mode, in microseconds.
+     * @param pattern Pattern of signal transmission in alternate on/off mode, in microseconds.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12
      */

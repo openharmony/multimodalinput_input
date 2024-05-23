@@ -29,10 +29,12 @@
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventDumpTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDumpTest" };
 using namespace testing::ext;
 const std::string TEST_FILE_NAME = "/data/log.log";
 } // namespace
@@ -61,6 +63,7 @@ public:
  */
 HWTEST_F(EventDumpTest, EventDumpTest001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args;
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -75,6 +78,7 @@ HWTEST_F(EventDumpTest, EventDumpTest001, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"--help"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -90,6 +94,7 @@ HWTEST_F(EventDumpTest, EventDumpTest002, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-h"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -103,7 +108,9 @@ HWTEST_F(EventDumpTest, EventDumpTest003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventDumpTest, EventDumpTest004, TestSize.Level1) {
+HWTEST_F(EventDumpTest, EventDumpTest004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-abc"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -117,8 +124,9 @@ HWTEST_F(EventDumpTest, EventDumpTest004, TestSize.Level1) {
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventDumpTest, EventDumpTest005, TestSize.Level1) {
-
+HWTEST_F(EventDumpTest, EventDumpTest005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-a", "--help", "foo", "-bc", "bar"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -135,6 +143,7 @@ HWTEST_F(EventDumpTest, EventDumpTest005, TestSize.Level1) {
  */
 HWTEST_F(EventDumpTest, EventDumpTest006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-d"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -150,6 +159,7 @@ HWTEST_F(EventDumpTest, EventDumpTest006, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest007, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-l"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -165,6 +175,7 @@ HWTEST_F(EventDumpTest, EventDumpTest007, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest008, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-w"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
@@ -180,6 +191,7 @@ HWTEST_F(EventDumpTest, EventDumpTest008, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest009, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-u"};
     int32_t count = 0;
     auto udsServer = InputHandler->GetUDSServer();
@@ -197,6 +209,7 @@ HWTEST_F(EventDumpTest, EventDumpTest009, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest010, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-s"};
     int32_t count = 0;
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
@@ -214,6 +227,7 @@ HWTEST_F(EventDumpTest, EventDumpTest010, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest011, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-o"};
     int32_t count = 0;
     auto monitorHandler = InputHandler->GetMonitorHandler();
@@ -231,6 +245,7 @@ HWTEST_F(EventDumpTest, EventDumpTest011, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest012, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-i"};
     int32_t count = 0;
     auto interceptorHandler = InputHandler->GetInterceptorHandler();
@@ -248,6 +263,7 @@ HWTEST_F(EventDumpTest, EventDumpTest012, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest013, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-f"};
     int32_t count = 0;
     auto filterHandler = InputHandler->GetFilterHandler();
@@ -265,6 +281,7 @@ HWTEST_F(EventDumpTest, EventDumpTest013, TestSize.Level1)
  */
 HWTEST_F(EventDumpTest, EventDumpTest014, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::vector<std::string> args = {"-m"};
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);

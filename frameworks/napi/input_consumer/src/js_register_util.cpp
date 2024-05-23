@@ -141,33 +141,22 @@ int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *
         }
         if (handler != nullptr) {
             napi_value iterHandler = nullptr;
-            CHKRR(napi_get_reference_value(env, (*iter)->callback[0], &iterHandler),
-                GET_REFERENCE_VALUE, JS_CALLBACK_EVENT_FAILED);
+            CHKRR(napi_get_reference_value(env, (*iter)->callback, &iterHandler),
+                  GET_REFERENCE_VALUE, JS_CALLBACK_EVENT_FAILED);
             bool isEquals = false;
             CHKRR(napi_strict_equals(env, handler, iterHandler, &isEquals), STRICT_EQUALS, JS_CALLBACK_EVENT_FAILED);
             if (isEquals) {
-                CHKRR(napi_delete_reference(env, (*iter)->callback[0]), DELETE_REFERENCE, JS_CALLBACK_EVENT_FAILED);
-                if ((*iter)->callback[0] != nullptr) {
-                    MMI_HILOGW("current (*iter)->callback[0] is not nullptr");
-                    (*iter)->callback[0] = nullptr;
-                }
                 KeyEventMonitorInfo *monitorInfo = *iter;
                 info.erase(iter++);
                 if (info.empty()) {
                     subscribeId = monitorInfo->subscribeId;
                 }
                 delete monitorInfo;
-                monitorInfo = nullptr;
                 MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
                 return JS_CALLBACK_EVENT_SUCCESS;
             }
             ++iter;
             continue;
-        }
-        CHKRR(napi_delete_reference(env, (*iter)->callback[0]), DELETE_REFERENCE, JS_CALLBACK_EVENT_FAILED);
-        if ((*iter)->callback[0] != nullptr) {
-            MMI_HILOGW("(*iter)->callback[0] is not nullptr");
-            (*iter)->callback[0] = nullptr;
         }
         KeyEventMonitorInfo *monitorInfo = *iter;
         info.erase(iter++);
@@ -175,7 +164,6 @@ int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *
             subscribeId = monitorInfo->subscribeId;
         }
         delete monitorInfo;
-        monitorInfo = nullptr;
         MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
     }
     MMI_HILOGD("Callback size:%{public}zu", info.size());
@@ -191,15 +179,15 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         callbacks[event->eventType] = {};
     }
     napi_value handler1 = nullptr;
-    napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
+    napi_status status = napi_get_reference_value(env, event->callback, &handler1);
     if (status != napi_ok) {
         MMI_HILOGE("Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto it = callbacks.find(event->eventType);
-    for (const auto &iter : it->second) {
+    for (const auto &iter: it->second) {
         napi_value handler2 = nullptr;
-        status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
+        status = napi_get_reference_value(env, (*iter).callback, &handler2);
         if (status != napi_ok) {
             MMI_HILOGE("Handler2 get reference value failed");
             return JS_CALLBACK_EVENT_FAILED;
@@ -230,39 +218,52 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     auto &info = callbacks[event->eventType];
     MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu", event->eventType.c_str(), info.size());
     napi_value eventHandler = nullptr;
-    if (event->callback[0] != nullptr) {
-        CHKRR(napi_get_reference_value(env, event->callback[0], &eventHandler), GET_REFERENCE_VALUE,
-            JS_CALLBACK_EVENT_FAILED);
+    if (event->callback != nullptr) {
+        CHKRR(napi_get_reference_value(env, event->callback, &eventHandler), GET_REFERENCE_VALUE,
+              JS_CALLBACK_EVENT_FAILED);
     }
     return DelEventCallbackRef(env, info, eventHandler, subscribeId);
 }
 
-static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_value &result)
+static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOption, napi_value &result)
 {
-    CHKPV(event);
-    CHKPV(event->keyOption);
+    CHKPV(keyOption);
     MMI_HILOGD("Status > 0 enter");
     CHKRV(napi_create_object(env, &result), CREATE_OBJECT);
     napi_value arr;
     CHKRV(napi_create_array(env, &arr), CREATE_ARRAY);
-    std::set<int32_t> preKeys = event->keyOption->GetPreKeys();
+    std::set <int32_t> preKeys = keyOption->GetPreKeys();
     int32_t i = 0;
     napi_value value;
-    for (const auto &preKey : preKeys) {
+    for (const auto &preKey: preKeys) {
         CHKRV(napi_create_int32(env, preKey, &value), CREATE_INT32);
         CHKRV(napi_set_element(env, arr, i, value), SET_ELEMENT);
         ++i;
     }
     std::string preKeysStr = "preKeys";
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result, preKeysStr.c_str(), arr));
-    MMI::SetNamedProperty(env, result, "finalKey", event->keyOption->GetFinalKey());
-    MMI::SetNamedProperty(env, result, "isFinalKeyDown", event->keyOption->IsFinalKeyDown());
-    MMI::SetNamedProperty(env, result, "finalKeyDownDuration", event->keyOption->GetFinalKeyDownDuration());
+    MMI::SetNamedProperty(env, result, "finalKey", keyOption->GetFinalKey());
+    MMI::SetNamedProperty(env, result, "isFinalKeyDown", keyOption->IsFinalKeyDown());
+    MMI::SetNamedProperty(env, result, "finalKeyDownDuration", keyOption->GetFinalKeyDownDuration());
 }
 
 struct KeyEventMonitorInfoWorker {
-    napi_env env { nullptr };
-    KeyEventMonitorInfo *reportEvent { nullptr };
+    napi_env env{nullptr};
+    napi_ref callback{nullptr};
+    std::shared_ptr<KeyOption> keyOption{nullptr};
+
+    ~KeyEventMonitorInfoWorker()
+    {
+        if (callback == nullptr) {
+            return;
+        }
+        uint32_t refcount = 0;
+        CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
+        if (refcount == 0) {
+            CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
+        }
+        callback = nullptr;
+    }
 };
 
 void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
@@ -279,30 +280,38 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
     delete work;
     work = nullptr;
-    KeyEventMonitorInfo *event = dataWorker->reportEvent;
     napi_env env = dataWorker->env;
-    delete dataWorker;
-    dataWorker = nullptr;
-    CHKPV(event);
-    event->delCallback = nullptr;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
+        delete dataWorker;
         MMI_HILOGE("Scope is nullptr");
         return;
     }
     napi_value callback = nullptr;
     MMI_HILOGD("deliver uv work from %{public}d", GetPid());
-    if (event->callback[0] == nullptr) {
-        MMI_HILOGE("event->callback[0] is nullptr");
+    if (dataWorker->callback == nullptr) {
+        delete dataWorker;
+        MMI_HILOGE("dataWorker->callback is nullptr");
         napi_close_handle_scope(env, scope);
         return;
     }
-    CHKRV_SCOPE(env, napi_get_reference_value(env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
+    if ((napi_get_reference_value(env, dataWorker->callback, &callback)) != napi_ok) {
+        delete dataWorker;
+        MMI_HILOGE("%{public}s failed", std::string(GET_REFERENCE_VALUE).c_str());
+        napi_close_handle_scope(env, scope);
+        return;
+    }
     napi_value result = nullptr;
-    AsyncWorkFn(env, event, result);
+    AsyncWorkFn(env, dataWorker->keyOption, result);
     napi_value callResult = nullptr;
-    CHKRV_SCOPE(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
+    if ((napi_call_function(env, nullptr, callback, 1, &result, &callResult)) != napi_ok) {
+        delete dataWorker;
+        MMI_HILOGE("%{public}s failed", std::string(CALL_FUNCTION).c_str());
+        napi_close_handle_scope(env, scope);
+        return;
+    }
+    delete dataWorker;
     napi_close_handle_scope(env, scope);
 }
 
@@ -312,20 +321,32 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     CHKPV(reportEvent);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
-    uv_work_t *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
-    KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
+    auto *dataWorker = new(std::nothrow) KeyEventMonitorInfoWorker();
     if (dataWorker == nullptr) {
         MMI_HILOGE("dataWorker is nullptr");
-        delete work;
         return;
     }
-    reportEvent->delCallback = [dataWorker]() {dataWorker->reportEvent = nullptr;};
-    dataWorker->env = reportEvent->env;
-    dataWorker->reportEvent = reportEvent;
-    work->data = static_cast<void *>(dataWorker);
 
-    int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback, uv_qos_user_initiated);
+    dataWorker->env = reportEvent->env;
+    dataWorker->callback = reportEvent->callback;
+    // `callback` is "owned" by `reportEvent`, now `dataWorker` also reference to it, so add refcount.
+    // `callback` reference will be released in destructor of `KeyEventMonitorInfo` or `KeyEventMonitorInfoWorker`.
+    // it's up to which one has longer lifetime.
+    if ((napi_reference_ref(dataWorker->env, dataWorker->callback, nullptr)) != napi_ok) {
+        delete dataWorker;
+        MMI_HILOGE("%{public}s failed", std::string(REFERENCE_REF).c_str());
+        return;
+    }
+    dataWorker->keyOption = reportEvent->keyOption;
+    auto *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        MMI_HILOGE("work is nullptr");
+        delete dataWorker;
+        return;
+    }
+    work->data = static_cast<void *>(dataWorker);
+    int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback,
+                                         uv_qos_user_initiated);
     if (ret != 0) {
         delete dataWorker;
         delete work;

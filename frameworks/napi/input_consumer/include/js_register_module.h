@@ -55,17 +55,10 @@ struct KeyEventMonitorInfo {
     napi_async_work asyncWork{ nullptr };
     std::string eventType;
     std::string name;
-    napi_value handle{ nullptr };
-    std::shared_ptr<KeyEvent> keyEvent{ nullptr };
-    napi_ref callback[1]{ nullptr };
+    napi_ref callback{ nullptr };
     int32_t subscribeId{ 0 };
     std::shared_ptr<KeyOption> keyOption{ nullptr };
-    std::function<void()> delCallback;
-    ~KeyEventMonitorInfo() {
-        if (delCallback) {
-            delCallback();
-        }
-    }
+    ~KeyEventMonitorInfo();
 };
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI

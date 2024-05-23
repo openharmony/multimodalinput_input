@@ -245,9 +245,10 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     }
 
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     MMI_HILOGD("Pointer event dispatcher of server:");
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
+        pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s, type:%{public}d",
@@ -270,7 +271,7 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(
             return PointerEvent::TOOL_TYPE_PEN;
         }
         case MT_TOOL_PALM: {
-            MMI_HILOGD("ToolType is MT_TOOL_PALM");
+            MMI_HILOGD("toolType is MT_TOOL_PALM");
             return PointerEvent::TOOL_TYPE_PALM;
         }
         default : {
@@ -577,6 +578,11 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
 {
     value = PREFERENCES_MGR->GetBoolValue(key, true);
     return RET_OK;
+}
+
+std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
+{
+    return pointerEvent_;
 }
 
 MultiFingersTapHandler::MultiFingersTapHandler() {}

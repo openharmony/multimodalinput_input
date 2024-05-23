@@ -57,7 +57,12 @@ std::ifstream& MMISceneBoardJudgement::SafeGetLine(std::ifstream& configFile, st
 
 void MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enabled)
 {
-    std::ifstream configFile(filePath);
+    char checkPath[PATH_MAX] = { 0 };
+    if (realpath(filePath, checkPath) == nullptr) {
+        MMI_HILOGE("canonicalize failed. path is %{public}s", filePath);
+        return;
+    }
+    std::ifstream configFile(checkPath);
     std::string line;
     if (configFile.is_open() && SafeGetLine(configFile, line) && line == "ENABLED") {
         enabled = true;

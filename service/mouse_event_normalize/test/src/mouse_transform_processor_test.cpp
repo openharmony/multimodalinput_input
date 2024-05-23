@@ -922,5 +922,56 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadR
     uint32_t button = MouseDeviceState::LIBINPUT_LEFT_BUTTON_CODE;
     ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(data, eventType, button));
 }
+
+/**
+ * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_01
+ * @tc.desc: Trans touchpad right button verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadRightButton_01, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t eventType = LIBINPUT_EVENT_POINTER_TAP;
+    uint32_t button = MouseDeviceState::LIBINPUT_RIGHT_BUTTON_CODE;
+    processor.TransTouchpadRightButton(data, eventType, button);
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadRightButton(data, eventType, button));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_02
+ * @tc.desc: Trans touchpad right button verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadRightButton_02, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t eventType = LIBINPUT_EVENT_POINTER_TAP;
+    uint32_t button = MouseDeviceState::LIBINPUT_LEFT_BUTTON_CODE;
+    processor.TransTouchpadRightButton(data, eventType, button);
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadLeftButton(data, eventType, button));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_TransTouchpadRightButton_03
+ * @tc.desc: Trans touchpad right button verify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadRightButton_03, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    struct libinput_event_pointer* data = nullptr;
+    int32_t eventType = LIBINPUT_EVENT_POINTER_TAP;
+    uint32_t button = MouseDeviceState::LIBINPUT_MIDDLE_BUTTON_CODE;
+    processor.TransTouchpadRightButton(data, eventType, button);
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(data, eventType, button));
+}
 }
 }

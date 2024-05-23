@@ -30,32 +30,30 @@ int32_t ProcessingPenDevice::TransformJsonDataToInputData(const DeviceItem& penE
 {
     CALL_DEBUG_ENTER;
     if (penEventArrays.events.empty()) {
-        MMI_HILOGE("Manage pen array failed, inputData is empty.");
-        return RET_ERR;
-    }
-    std::vector<DeviceEvent> inputData = penEventArrays.events;
-    if (inputData.empty()) {
-        MMI_HILOGE("Manage pen array failed, inputData is empty.");
+        MMI_HILOGE("Manage pen array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<PenEvent> penEventArray;
-    if (AnalysisPenPadEvent(inputData, penEventArray) == RET_ERR) {
-        MMI_HILOGE("AnalysisPenPadEvent error.");
+    if (AnalysisPenPadEvent(penEventArrays.events, penEventArray) == RET_ERR) {
+        MMI_HILOGE("AnalysisPenPadEvent error");
         return RET_ERR;
     }
     TransformPenEventToInputEvent(penEventArray, inputEventArray);
     return RET_OK;
 }
 
-void ProcessingPenDevice::TransformPenEventToInputEvent(const std::vector<PenEvent>& penEventArray,
+void ProcessingPenDevice::TransformPenEventToInputEvent(const std::vector<PenEvent>& penEvents,
                                                         InputEventArray& inputEventArray)
 {
-    SetPenApproachPadEvent(penEventArray[0], inputEventArray);
-    for (const auto &item : penEventArray) {
+    if (penEvents.empty()) {
+        MMI_HILOGE("penEvents is empty");
+        return;
+    }
+    SetPenApproachPadEvent(penEvents.front(), inputEventArray);
+    for (const auto &item : penEvents) {
         SetPenSlidePadEvent(item, inputEventArray);
     }
-    uint64_t lastEventIndex = penEventArray.size() - 1;
-    SetPenLeavePadEvent(penEventArray[lastEventIndex], inputEventArray);
+    SetPenLeavePadEvent(penEvents[penEvents.back()], inputEventArray);
 }
 
 void ProcessingPenDevice::SetPenApproachPadEvent(const PenEvent& penEvent, InputEventArray& inputEventArray)
@@ -140,13 +138,11 @@ void ProcessingPenDevice::SetPenLeavePadEvent(const PenEvent& penEvent, InputEve
 int32_t ProcessingPenDevice::AnalysisPenPadEvent(const std::vector<DeviceEvent>& inputData,
     std::vector<PenEvent>& penEventArray)
 {
-    if (inputData.empty()) {
-        return RET_ERR;
-    }
-    uint64_t endEventIndex = inputData.size() - 1;
     if (AnalysisPenApproachPadEvent(inputData[0], penEventArray) == RET_ERR) {
         return RET_ERR;
     }
+
+    uint64_t endEventIndex = inputData.size() - 1;
     for (uint64_t i = 1; i < endEventIndex; i++) {
         if (AnalysisPenSlidePadEvent(inputData[i], penEventArray) == RET_ERR) {
             return RET_ERR;
@@ -161,12 +157,13 @@ int32_t ProcessingPenDevice::AnalysisPenPadEvent(const std::vector<DeviceEvent>&
 
 int32_t ProcessingPenDevice::AnalysisPenApproachPadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray)
 {
-    PenEvent penEvent = {};
-    penEvent.eventType = event.eventType;
-    if ((penEvent.eventType != "RUBBER_TOUCH") && (penEvent.eventType != "PEN_TOUCH")) {
+    if ((event.eventType != "RUBBER_TOUCH") && (event.eventType != "PEN_TOUCH")) {
         MMI_HILOGE("Enter the correct event type in the configuration file.");
         return RET_ERR;
     }
+
+    PenEvent penEvent;
+    penEvent.eventType = event.eventType;
     penEvent.distance = event.distance;
     penEvent.yPos = event.yPos;
     penEvent.tiltX = event.tiltX;
@@ -180,7 +177,7 @@ int32_t ProcessingPenDevice::AnalysisPenApproachPadEvent(const DeviceEvent& even
 
 int32_t ProcessingPenDevice::AnalysisPenSlidePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray)
 {
-    PenEvent penEvent = {};
+    PenEvent penEvent;
     penEvent.eventType = event.eventType;
     if (penEvent.eventType == "PEN_KEY") {
         penEvent.keyValue = event.keyValue;
@@ -202,12 +199,13 @@ int32_t ProcessingPenDevice::AnalysisPenSlidePadEvent(const DeviceEvent& event, 
 
 int32_t ProcessingPenDevice::AnalysisPenLeavePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray)
 {
-    PenEvent penEvent = {};
-    penEvent.eventType = event.eventType;
-    if ((penEvent.eventType != "RUBBER_TOUCH") && (penEvent.eventType != "PEN_TOUCH")) {
+    if ((event.eventType != "RUBBER_TOUCH") && (event.eventType != "PEN_TOUCH")) {
         MMI_HILOGE("Enter the correct event type in the configuration file.");
         return RET_ERR;
     }
+
+    PenEvent penEvent;
+    penEvent.eventType = event.eventType;
     penEvent.yPos = event.yPos;
     penEvent.tiltY = event.tiltY;
     penEvent.xPos = event.xPos;
