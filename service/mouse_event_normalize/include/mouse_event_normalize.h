@@ -50,15 +50,15 @@ public:
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t SetTouchpadScrollSwitch(bool switchFlag) const;
-    int32_t GetTouchpadScrollSwitch(bool &switchFlag) const;
+    void GetTouchpadScrollSwitch(bool &switchFlag) const;
     int32_t SetTouchpadScrollDirection(bool state) const;
-    int32_t GetTouchpadScrollDirection(bool &state) const;
+    void GetTouchpadScrollDirection(bool &state) const;
     int32_t SetTouchpadTapSwitch(bool switchFlag) const;
-    int32_t GetTouchpadTapSwitch(bool &switchFlag) const;
+    void GetTouchpadTapSwitch(bool &switchFlag) const;
     int32_t SetTouchpadRightClickType(int32_t type) const;
-    int32_t GetTouchpadRightClickType(int32_t &type) const;
+    void GetTouchpadRightClickType(int32_t &type) const;
     int32_t SetTouchpadPointerSpeed(int32_t speed) const;
-    int32_t GetTouchpadPointerSpeed(int32_t &speed) const;
+    void GetTouchpadPointerSpeed(int32_t &speed) const;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;

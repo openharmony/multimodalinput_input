@@ -223,9 +223,9 @@ int32_t MouseEventNormalize::SetTouchpadScrollSwitch(bool switchFlag) const
     return MouseTransformProcessor::SetTouchpadScrollSwitch(switchFlag);
 }
 
-int32_t MouseEventNormalize::GetTouchpadScrollSwitch(bool &switchFlag) const
+void MouseEventNormalize::GetTouchpadScrollSwitch(bool &switchFlag) const
 {
-    return MouseTransformProcessor::GetTouchpadScrollSwitch(switchFlag);
+    MouseTransformProcessor::GetTouchpadScrollSwitch(switchFlag);
 }
 
 int32_t MouseEventNormalize::SetTouchpadScrollDirection(bool state) const
@@ -233,9 +233,9 @@ int32_t MouseEventNormalize::SetTouchpadScrollDirection(bool state) const
     return MouseTransformProcessor::SetTouchpadScrollDirection(state);
 }
 
-int32_t MouseEventNormalize::GetTouchpadScrollDirection(bool &switchFlag) const
+void MouseEventNormalize::GetTouchpadScrollDirection(bool &switchFlag) const
 {
-    return MouseTransformProcessor::GetTouchpadScrollDirection(switchFlag);
+    MouseTransformProcessor::GetTouchpadScrollDirection(switchFlag);
 }
 
 int32_t MouseEventNormalize::SetTouchpadTapSwitch(bool switchFlag) const
@@ -243,9 +243,9 @@ int32_t MouseEventNormalize::SetTouchpadTapSwitch(bool switchFlag) const
     return MouseTransformProcessor::SetTouchpadTapSwitch(switchFlag);
 }
 
-int32_t MouseEventNormalize::GetTouchpadTapSwitch(bool &switchFlag) const
+void MouseEventNormalize::GetTouchpadTapSwitch(bool &switchFlag) const
 {
-    return MouseTransformProcessor::GetTouchpadTapSwitch(switchFlag);
+    MouseTransformProcessor::GetTouchpadTapSwitch(switchFlag);
 }
 
 int32_t MouseEventNormalize::SetTouchpadPointerSpeed(int32_t speed) const
@@ -253,9 +253,9 @@ int32_t MouseEventNormalize::SetTouchpadPointerSpeed(int32_t speed) const
     return MouseTransformProcessor::SetTouchpadPointerSpeed(speed);
 }
 
-int32_t MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
+void MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
 {
-    return MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
+    MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
 }
 
 int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
@@ -263,9 +263,9 @@ int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
     return MouseTransformProcessor::SetTouchpadRightClickType(type);
 }
 
-int32_t MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
+void MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
 {
-    return MouseTransformProcessor::GetTouchpadRightClickType(type);
+    MouseTransformProcessor::GetTouchpadRightClickType(type);
 }
 } // namespace MMI
 } // namespace OHOS

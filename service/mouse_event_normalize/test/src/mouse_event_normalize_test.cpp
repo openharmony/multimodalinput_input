@@ -390,7 +390,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitc
     bool flag = true;
     MouseEventHdr->SetTouchpadScrollSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollSwitch(flag) == RET_OK);
+    MouseEventHdr->GetTouchpadScrollSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -417,7 +417,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirec
     bool state = true;
     MouseEventHdr->SetTouchpadScrollDirection(state);
     bool newState = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollDirection(state) == RET_OK);
+    MouseEventHdr->GetTouchpadScrollDirection(state);
     ASSERT_TRUE(state == newState);
 }
 
@@ -444,7 +444,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_0
     bool flag = true;
     MouseEventHdr->SetTouchpadTapSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadTapSwitch(flag) == RET_OK);
+    MouseEventHdr->GetTouchpadTapSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -471,7 +471,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t speed = 8;
     MouseEventHdr->SetTouchpadPointerSpeed(speed);
     int32_t newSpeed = 4;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -498,7 +498,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t speed = 8;
     MouseEventHdr->SetTouchpadPointerSpeed(speed);
     int32_t newSpeed = 4;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -525,7 +525,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     int32_t type = 1;
     MouseEventHdr->SetTouchpadRightClickType(type);
     int32_t newType = 2;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
+    MouseEventHdr->GetTouchpadRightClickType(newType);
     ASSERT_TRUE(type == newType);
 }
 
