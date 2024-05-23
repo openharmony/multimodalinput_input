@@ -1665,7 +1665,8 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 }
 void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    static const std::unordered_map<int32_t, std::string> actionMap = { {0, "UNKNOWN"}, {1, "CANCEL"}, {2, "DOWN"}, {3, "UP"} };
+    static const std::unordered_map<int32_t, std::string> actionMap = { {0, "UNKNOWN"},
+        {1, "CANCEL"}, {2, "DOWN"}, {3, "UP"} };
     CALL_DEBUG_ENTER;
     mprintf(fd, "----------------------------- ShortcutKey information ----------------------------\t");
     mprintf(fd, "ShortcutKey: count = %zu", shortcutKeys_.size());
@@ -1686,7 +1687,8 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "Sequence: count = %zu", sequences_.size());
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
-            mprintf(fd, "keyCode: %d | keyAction: %s", sequenceKey.keyCode, KeyActionToString(sequenceKey.keyAction).c_str());
+            mprintf(fd, "keyCode: %d | keyAction: %s",
+                sequenceKey.keyCode, KeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
