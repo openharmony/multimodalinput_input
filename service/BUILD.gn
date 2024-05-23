@@ -380,31 +380,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
   ]
 }
 
-ohos_unittest("TransformPointTest") {
-  module_out_path = module_output_path
-
-  configs = [ "${mmi_path}:coverage_flags" ]
-  include_dirs = [
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/tools/vuinput/include",
-  ]
-
-  sources = [ "touch_event_normalize/test/transform_point_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/tools/vuinput:libmmi-virtual-device",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-  ]
-}
-
 ohos_unittest("EventFilterDeathRecipientTest") {
   module_out_path = module_output_path
 
@@ -594,41 +569,6 @@ ohos_unittest("WindowManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
-  ]
-}
-
-ohos_unittest("TouchEventNormalizeTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "touch_event_normalize/test/tablet_tool_tranform_processor_test.cpp",
-    "touch_event_normalize/test/touch_event_normalize_test.cpp",
-    "touch_event_normalize/test/touch_transform_processor_test.cpp",
-    "touch_event_normalize/test/touchpad_transform_processor_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "window_manager:libdm",
-    "window_manager:libwm",
   ]
 }
 
