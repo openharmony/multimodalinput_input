@@ -106,9 +106,6 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
-        if (!isOk) {
-            MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
-        }
     }
     return processor->Normalize(event);
 }
@@ -157,9 +154,6 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
-        if (!isOk) {
-            MMI_HILOGE("Duplicate device record, deviceId:%{public}d", deviceId);
-        }
     }
     return processor->NormalizeRotateEvent(event, type, angle);
 }
