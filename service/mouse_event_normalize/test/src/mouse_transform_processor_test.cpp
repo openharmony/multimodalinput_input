@@ -851,6 +851,100 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleTouchpad
 }
 
 /**
+ * @tc.name: MouseTransformProcessorTest_Normalize_01
+ * @tc.desc: Test the branch that handles mouse movement events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    EXPECT_EQ(processor.Normalize(event), RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_Normalize_02
+ * @tc.desc: Tests the branch that handles the left mouse button event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_KEY, BTN_LEFT, 1);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    EXPECT_EQ(processor.Normalize(event), RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_NormalizeRotateEvent_01
+ * @tc.desc: Test normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeRotateEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t type = 1;
+    double angle = 90.0;
+    int32_t result = processor.NormalizeRotateEvent(event, type, angle);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_NormalizeRotateEvent_02
+ * @tc.desc: Tests HandlePostInner return false
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeRotateEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t type = 0;
+    double angle = 0.0;
+    std::shared_ptr<PointerEvent::PointerItem> pointerItem = nullptr;
+    int32_t result = processor.NormalizeRotateEvent(event, type, angle);
+    EXPECT_EQ(result, RET_OK);
+}
+
+/**
  * @tc.name: MouseTransformProcessorTest_HandleTouchpadRightButton_003
  * @tc.desc: Handle touchpad right button verify
  * @tc.type: FUNC
