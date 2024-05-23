@@ -38,7 +38,7 @@ public:
     virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t> &pattern, bool &status) = 0;
     virtual int32_t GetCarrierFreqs(bool &status,
                                     std::vector<OHOS::HDI::V1_0::ConsumerIrFreqRange> &range) = 0;
-    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer);
+    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer) = 0;
     virtual bool IsProxy();
     virtual const std::u16string GetDesc();
 };
