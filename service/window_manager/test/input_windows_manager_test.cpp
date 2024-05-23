@@ -3773,5 +3773,47 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_002, T
     pointerAction = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_NotifyPointerToWindow
+ * @tc.desc: Test NotifyPointerToWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    UDSServer udsServer;
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    inputWindowsManager.lastLogicX_ = 200;
+    inputWindowsManager.lastLogicY_ = 300;
+    WindowInfo windowInfo;
+    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.pointerHotAreas.push_back({ 100, 100, INT32_MAX, 100 });
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
+    windowInfo.id = 10;
+    windowInfo.pointerHotAreas.clear();
+    windowInfo.pointerHotAreas.push_back({ 150, 250, 300, 500 });
+    inputWindowsManager.displayGroupInfo_.windowsInfo.insert(
+        inputWindowsManager.displayGroupInfo_.windowsInfo.begin(), windowInfo);
+    inputWindowsManager.lastWindowInfo_.id = 10;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
+    inputWindowsManager.lastWindowInfo_.id = 20;
+    inputWindowsManager.lastWindowInfo_.pid = 50;
+    int32_t udsFd = 100;
+    udsServer.idxPidMap_.insert(std::make_pair(inputWindowsManager.lastWindowInfo_.pid, udsFd));
+    inputWindowsManager.udsServer_ = &udsServer;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
+    inputWindowsManager.udsServer_ = nullptr;
+    inputWindowsManager.lastWindowInfo_.id = 30;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
+    windowInfo.id = 50;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.lastWindowInfo_.id = 50;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.NotifyPointerToWindow());
+}
 } // namespace MMI
 } // namespace OHOS
