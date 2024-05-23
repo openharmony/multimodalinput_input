@@ -17,7 +17,9 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
+#include "event_filter_handler.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "fingersense_wrapper.h"
@@ -3629,6 +3631,147 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PointerDrawingManagerO
     WinMgr->lastPointerEvent_->SetButtonPressed(1);
     WinMgr->lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     EXPECT_NO_FATAL_FAILURE(WinMgr->PointerDrawingManagerOnDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsInHotArea
+ * @tc.desc: Test IsInHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsInHotArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 200;
+    int32_t y = 300;
+    std::vector<Rect> rects;
+    WindowInfo window;
+    Rect rect;
+    rect.x = 100;
+    rect.width = INT32_MAX;
+    rects.push_back(rect);
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+    rects.clear();
+    rects = { {150, 100, 300, INT32_MAX} };
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+    rects.clear();
+    rects = { {150, 250, 300, 500} };
+    EXPECT_TRUE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+    x = 100;
+    y = 200;
+    EXPECT_FALSE(inputWindowsManager.IsInHotArea(x, y, rects, window));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InWhichHotArea
+ * @tc.desc: Test InWhichHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_InWhichHotArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t x = 500;
+    int32_t y = 800;
+    std::vector<Rect> rects;
+    PointerStyle pointerStyle;
+    rects = { { 100, 0, INT32_MAX, 0 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+    rects.clear();
+    rects = { { 150, 100, 300, INT32_MAX } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+    rects.clear();
+    rects = { { 150, 250, 300, 500 } };
+    EXPECT_FALSE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+    x = 200;
+    y = 300;
+    EXPECT_TRUE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+    int32_t cycleNum = 7;
+    for (int32_t i = 0; i < cycleNum; ++i) {
+        rects.insert(rects.begin(), { 1000, 1000, 1500, 1500 });
+        EXPECT_TRUE(inputWindowsManager.InWhichHotArea(x, y, rects, pointerStyle));
+    }
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchPointer
+ * @tc.desc: Test DispatchPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    inputWindowsManager.lastPointerEvent_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    EXPECT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    inputWindowsManager.lastPointerEvent_->AddPointerItem(item);
+    inputWindowsManager.lastPointerEvent_->SetPointerId(1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
+    inputWindowsManager.lastPointerEvent_->SetPointerId(0);
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    WindowInfo windowInfo;
+    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.pointerHotAreas.push_back({  100, 0, INT32_MAX, 0 });
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.lastLogicX_ = 200;
+    inputWindowsManager.lastLogicY_ = 200;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchPointer_002
+ * @tc.desc: Test DispatchPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_ENTER_WINDOW;
+    UDSServer udsServer;
+    inputWindowsManager.udsServer_ = &udsServer;
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    EXPECT_NE(inputWindowsManager.lastPointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(100);
+    item.SetDisplayY(100);
+    inputWindowsManager.lastPointerEvent_->AddPointerItem(item);
+    inputWindowsManager.lastPointerEvent_->SetPointerId(0);
+    inputWindowsManager.firstBtnDownWindowId_ = 1;
+    inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    inputWindowsManager.lastPointerEvent_->SetTargetDisplayId(-1);
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.lastWindowInfo_.id = 2;
+    inputWindowsManager.lastWindowInfo_.agentWindowId = 2;
+    inputWindowsManager.lastWindowInfo_.area.x = 100;
+    inputWindowsManager.lastWindowInfo_.area.y = 100;
+    inputWindowsManager.lastPointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    inputWindowsManager.lastPointerEvent_->SetDeviceId(5);
+    inputWindowsManager.extraData_.appended = true;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    InputHandler->eventFilterHandler_ = std::make_shared<EventFilterHandler>();
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
+    inputWindowsManager.lastWindowInfo_.id = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
+    inputWindowsManager.extraData_.appended = false;
+    pointerAction = PointerEvent::POINTER_ACTION_LEAVE_WINDOW;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.DispatchPointer(pointerAction));
 }
 } // namespace MMI
 } // namespace OHOS
