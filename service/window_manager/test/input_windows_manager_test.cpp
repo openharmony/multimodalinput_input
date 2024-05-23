@@ -3827,7 +3827,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     DisplayInfo displaysInfo;
-    std::set<std::pair<int32_t, std::string>> newInfo;
     displaysInfo.id = 1;
     displaysInfo.uniq = "abc";
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
@@ -3846,7 +3845,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayIdAndName
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     DisplayInfo displaysInfo;
-    std::set<std::pair<int32_t, std::string>> newInfo;
     displaysInfo.id = 1;
     displaysInfo.uniq = "abc";
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
