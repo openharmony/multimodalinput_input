@@ -26,8 +26,8 @@ namespace HDI {
 namespace V1_0 {
 using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
-    int64_t max { 0 };
-    int64_t min { 0 };
+    int32_t max { 0 };
+    int32_t min { 0 };
 };
 class ConsumerIr : public HdiBase {
 public:
@@ -38,7 +38,7 @@ public:
     virtual int32_t Transmit(int32_t carrierFreq, const std::vector<int32_t> &pattern, bool &status) = 0;
     virtual int32_t GetCarrierFreqs(bool &status,
                                     std::vector<OHOS::HDI::V1_0::ConsumerIrFreqRange> &range) = 0;
-    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer) = 0;
+    virtual int32_t GetVersion(uint32_t &majorVer, uint32_t &minorVer);
     virtual bool IsProxy();
     virtual const std::u16string GetDesc();
 };
