@@ -16,8 +16,10 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "libinput.h"
 #include "define_multimodal.h"
+#include "general_touchpad.h"
+#include "input_device_manager.h"
+#include "libinput_wrapper.h"
 #include "touchpad_transform_processor.h"
 
 #undef MMI_LOG_TAG
@@ -36,18 +38,50 @@ public:
     void TearDown();
 
 private:
+    static void SetupTouchpad();
+    static void CloseTouchpad();
+
+    static GeneralTouchpad vTouchpad_;
+    static LibinputWrapper libinput_;
+
     TouchPadTransformProcessor g_processor_ { 0 };
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
 };
 
+GeneralTouchpad TouchPadTransformProcessorTest::vTouchpad_;
+LibinputWrapper TouchPadTransformProcessorTest::libinput_;
+
 void TouchPadTransformProcessorTest::SetUpTestCase(void)
 {
+    ASSERT_TRUE(libinput_.Init());
+    SetupTouchpad();
 }
 
 void TouchPadTransformProcessorTest::TearDownTestCase(void)
 {
+    CloseTouchpad();
+}
+
+void TouchPadTransformProcessorTest::SetupTouchpad()
+{
+    ASSERT_TRUE(vTouchpad_.SetUp());
+    std::cout << "device node name: " << vTouchpad_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.AddPath(vTouchpad_.GetDevPath()));
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
+    struct libinput_device *device = libinput_event_get_device(event);
+    ASSERT_TRUE(device != nullptr);
+    InputDevMgr->OnInputDeviceAdded(device);
+}
+
+void TouchPadTransformProcessorTest::CloseTouchpad()
+{
+    libinput_.RemovePath(vTouchpad_.GetDevPath());
+    vTouchpad_.Close();
 }
 
 void TouchPadTransformProcessorTest::SetUp()
