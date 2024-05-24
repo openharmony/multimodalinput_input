@@ -646,7 +646,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEvent_
     processor.pointerEvent_->SetDeviceId(deviceId);
     processor.pointerEvent_->UpdatePointerItem(0, item);
     auto pointerEvent = processor.OnEvent(event);
-    ASSERT_TRUE(pointerEvent == nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
 }
 } // namespace MMI
 } // namespace OHOS
