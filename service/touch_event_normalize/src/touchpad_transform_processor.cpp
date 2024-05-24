@@ -44,7 +44,7 @@ constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 9 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
-constexpr int32_t defaultPointerId { 0 };
+constexpr int32_t DEFAULT_POINTER_ID {0 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 } // namespace
@@ -340,14 +340,14 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     }
 
     PointerEvent::PointerItem pointerItem;
-    pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
+    pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerItem.SetDownTime(time);
     pointerItem.SetDisplayX(sumX / fingerCount);
     pointerItem.SetDisplayY(sumY / fingerCount);
     pointerItem.SetDeviceId(deviceId_);
-    pointerItem.SetPointerId(defaultPointerId);
-    pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
+    pointerItem.SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
 
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
@@ -426,13 +426,13 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
-    pointerItem.SetPointerId(defaultPointerId);
+    pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
     auto mouseInfo = WinMgr->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
-    pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
 }
 
 void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale)
@@ -449,7 +449,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
     auto mouseInfo = WinMgr->GetMouseInfo();
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
-    pointerEvent_->SetPointerId(defaultPointerId);
+    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerAction(action);
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 
