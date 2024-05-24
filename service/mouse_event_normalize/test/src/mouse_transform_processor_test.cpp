@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include "general_mouse.h"
+#include "general_touchpad.h"
 #include "mouse_transform_processor.h"
 #include "window_info.h"
 #include "mouse_device_state.h"
@@ -42,6 +43,7 @@ public:
 
 private:
     static GeneralMouse vMouse_;
+    static GeneralTouchpad vTouchpad_ ;
     static LibinputWrapper libinput_;
 
     MouseTransformProcessor g_processor_ { 0 };
@@ -56,6 +58,7 @@ private:
 };
 
 GeneralMouse MouseTransformProcessorTest::vMouse_;
+GeneralTouchpad MouseTransformProcessorTest::vTouchpad_;
 LibinputWrapper MouseTransformProcessorTest::libinput_;
 
 void MouseTransformProcessorTest::SetUpTestCase(void)
@@ -76,6 +79,10 @@ void MouseTransformProcessorTest::SetupMouse()
     std::cout << "device node name: " << vMouse_.GetDevPath() << std::endl;
     ASSERT_TRUE(libinput_.AddPath(vMouse_.GetDevPath()));
 
+    ASSERT_TRUE(vTouchpad_.SetUp());
+    std::cout << "device node name: " << vTouchpad_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.AddPath(vTouchpad_.GetDevPath()));
+
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
     ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
@@ -88,6 +95,8 @@ void MouseTransformProcessorTest::CloseMouse()
 {
     libinput_.RemovePath(vMouse_.GetDevPath());
     vMouse_.Close();
+    libinput_.RemovePath(vTouchpad_.GetDevPath());
+    vTouchpad_.Close();
 }
 
 void MouseTransformProcessorTest::UpdateDisplayInfo()
@@ -1434,6 +1443,74 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_TransTouchpadR
     int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
     uint32_t button = BTN_RIGHT_MENUE_CODE;
     processor.TransTouchpadRightButton(data, evenType, button);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandlePostInner_01
+ * @tc.desc: Test HandlePostInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandlePostInner_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(10);
+    item.SetDisplayY(15);
+    item.SetWindowX(0);
+    item.SetWindowY(0);
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    item.SetDownTime(1000);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0.5);
+
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 2);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2220);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 727);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 710);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    libinput_event_pointer* data = libinput_event_get_pointer_event(event);
+    ASSERT_TRUE(data != nullptr);
+    libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
+    source = LIBINPUT_POINTER_AXIS_SOURCE_FINGER;
+
+    bool ret = processor.HandlePostInner(data, item);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisInner_02
+ * @tc.desc: Test HandleAxisInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInner_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    bool isAxisBegin;
+    MouseTransformProcessor processor(deviceId);
+
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 2);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2220);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 727);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 710);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto data = libinput_event_get_pointer_event(event);
+
+    isAxisBegin = false;
+    int32_t ret = processor.HandleAxisInner(data);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
 }
 }
 }
