@@ -1637,11 +1637,11 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
 
-KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()
+KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture() const
 {
     return singleKnuckleGesture_;
 }
-KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture()
+KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture() const
 {
     return doubleKnuckleGesture_;
 }
