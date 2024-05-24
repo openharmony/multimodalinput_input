@@ -71,6 +71,7 @@ bool HotplugDetector::Init(const callback& addFunc, const callback& removeFunc)
         return false;
     }
     if (!Scan()) {
+        MMI_HILOGE("Failed to open input devices path");
         return false;
     }
     inotifyFd_ = std::move(fd);
