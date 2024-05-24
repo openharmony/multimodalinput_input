@@ -18,6 +18,8 @@
 
 #include "singleton.h"
 #include "nocopyable.h"
+#include "aggregator.h"
+#include "timer_manager.h"
 #include "transform_processor.h"
 #include <map>
 
@@ -108,6 +110,15 @@ private:
     const int32_t defaultPointerId { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
+    Aggregator rl_ {
+            [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->ResetTimer(timerId);
+            }
+    };
 };
 } // namespace MMI
 } // namespace OHOS
