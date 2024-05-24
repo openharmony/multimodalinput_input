@@ -36,6 +36,7 @@ public:
     int32_t OnEvent(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
+    bool CheckAndPackageAxisEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -49,15 +50,15 @@ public:
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t SetTouchpadScrollSwitch(bool switchFlag) const;
-    int32_t GetTouchpadScrollSwitch(bool &switchFlag) const;
+    void GetTouchpadScrollSwitch(bool &switchFlag) const;
     int32_t SetTouchpadScrollDirection(bool state) const;
-    int32_t GetTouchpadScrollDirection(bool &state) const;
+    void GetTouchpadScrollDirection(bool &state) const;
     int32_t SetTouchpadTapSwitch(bool switchFlag) const;
-    int32_t GetTouchpadTapSwitch(bool &switchFlag) const;
+    void GetTouchpadTapSwitch(bool &switchFlag) const;
     int32_t SetTouchpadRightClickType(int32_t type) const;
-    int32_t GetTouchpadRightClickType(int32_t &type) const;
+    void GetTouchpadRightClickType(int32_t &type) const;
     int32_t SetTouchpadPointerSpeed(int32_t speed) const;
-    int32_t GetTouchpadPointerSpeed(int32_t &speed) const;
+    void GetTouchpadPointerSpeed(int32_t &speed) const;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;

@@ -225,7 +225,7 @@ void UDSServer::SetRecvFun(MsgServerFunCallback fun)
 
 void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);

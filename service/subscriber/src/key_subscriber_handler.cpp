@@ -897,15 +897,14 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
     mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
-    std::ostringstream pidStringStream;
-    for (int32_t pid : foregroundPids_) {
-        pidStringStream << pid << " ";
+    for (const auto &item : foregroundPids_) {
+        mprintf(fd, "Foreground Pids: %s", item);
     }
-    std::string pidString = pidStringStream.str();
-    mprintf(fd, "subscribers Foreground Pids: %s", pidString.c_str());
-    mprintf(fd, "subscribers enableCombineKey_: %s", enableCombineKey_ ? "true" : "false");
-    mprintf(fd, "subscribers isForegroundExits_: %s", isForegroundExits_ ? "true" : "false");
-    mprintf(fd, "subscribers needSkipPowerKeyUp_: %s", needSkipPowerKeyUp_ ? "true" : "false");
+    mprintf(fd,
+            "enableCombineKey: %s | isForegroundExits: %s"
+            "| needSkipPowerKeyUp: %s \t",
+            enableCombineKey_ ? "true" : "false", isForegroundExits_ ? "true" : "false",
+            needSkipPowerKeyUp_ ? "true" : "false");
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
         auto &subscribers = iter->second;
         for (auto item = subscribers.begin(); item != subscribers.end(); item++) {

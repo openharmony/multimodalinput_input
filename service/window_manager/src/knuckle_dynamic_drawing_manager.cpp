@@ -82,9 +82,7 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is nullptr");
-    }
+    CHKPL(pixelMap);
     pixelMap_ = pixelMap;
     return pixelMap;
 }
@@ -359,7 +357,6 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         pointCounter_ = 1;
         // Add glowing particles onto the last path segment that was drawn
         int64_t now = pointerEvent->GetActionTime();
-        double len = pointerPath_.GetLength(false);
         glowTraceSystem_->AddGlowPoints(pointerPath_, (now - lastUpdateTimeMillis_) / TIME_DIMENSION);
         pointerPath_.Reset();
         lastUpdateTimeMillis_ = now;

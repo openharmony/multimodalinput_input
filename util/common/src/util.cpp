@@ -187,10 +187,7 @@ const char *GetProgramName()
         return "";
     }
     FILE *fp = fopen(buf, "rb");
-    if (fp == nullptr) {
-        KMSG_LOGE("The fp is nullptr, filename = %s", buf);
-        return "";
-    }
+    CHKPS(fp);
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
@@ -300,10 +297,7 @@ void ReadProFile(const std::string &filePath, int32_t deviceId,
         return;
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGI("The realpath return nullptr");
-        return;
-    }
+    CHKPV(realpath(filePath.c_str(), realPath));
     if (!IsValidProPath(realPath)) {
         MMI_HILOGE("File path is error");
         return;
@@ -350,10 +344,7 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
         const char* line = strLine.c_str();
         int32_t len = strlen(line);
         char* realLine = static_cast<char*>(malloc(len + 1));
-        if (realLine == nullptr) {
-            MMI_HILOGE("Malloc failed");
-            return;
-        }
+        CHKPV(realLine);
         if (strcpy_s(realLine, len + 1, line) != EOK) {
             MMI_HILOGE("strcpy_s error");
             free(realLine);
@@ -389,10 +380,7 @@ std::string ReadJsonFile(const std::string &filePath)
         return "";
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
-        return "";
-    }
+    CHKPS(realpath(filePath.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("File path is error");
         return "";
@@ -489,10 +477,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGI("The realpath return nullptr");
-        return RET_ERR;
-    }
+    CHKPR(realpath(filePath.c_str(), realPath), RET_ERR);
     if (!IsValidTomlPath(realPath)) {
         MMI_HILOGE("File path is error");
         return RET_ERR;
@@ -529,10 +514,7 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
-        return RET_ERR;
-    }
+    CHKPR(realpath(filePath.c_str(), realPath), RET_ERR);
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         MMI_HILOGE("File size out of read range");
@@ -565,10 +547,7 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
         return "";
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGI("The realpath return nullptr");
-        return "";
-    }
+    CHKPS(realpath(filePath.c_str(), realPath));
     if (!IsFileExists(realPath)) {
         MMI_HILOGE("File is not existent");
         return "";

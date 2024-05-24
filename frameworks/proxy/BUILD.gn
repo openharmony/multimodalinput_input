@@ -120,6 +120,8 @@ ohos_shared_library("libmmi-client") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "qos_manager:concurrent_task_client",
+    "qos_manager:qos",
   ]
 }
 

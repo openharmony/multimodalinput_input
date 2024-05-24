@@ -33,9 +33,7 @@ bool ConnectReqParcel::Marshalling(Parcel& out) const
 ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
 {
     auto* request = new (std::nothrow) ConnectReqParcel();
-    if (request == nullptr) {
-        return nullptr;
-    }
+    CHKPP(request);
 
     if (!in.ReadInt32(request->data.moduleId)) {
         delete request;

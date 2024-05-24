@@ -42,19 +42,13 @@ int32_t EventFilterService::GetNextId()
 
 bool EventFilterService::HandleKeyEvent(const std::shared_ptr<KeyEvent> event)
 {
-    if (filter_ == nullptr) {
-        MMI_HILOGE("Filter is nullptr");
-        return false;
-    }
+    CHKPF(filter_);
     return filter_->OnInputEvent(event);
 }
 
 bool EventFilterService::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    if (filter_ == nullptr) {
-        MMI_HILOGE("Filter is nullptr");
-        return false;
-    }
+    CHKPF(filter_);
     return filter_->OnInputEvent(event);
 }
 } // namespace MMI

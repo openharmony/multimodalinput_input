@@ -217,10 +217,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
     void* pixelMap)
 {
     CALL_DEBUG_ENTER;
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr");
-        return ERR_INVALID_VALUE;
-    }
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     if (pixelMapPtr->GetCapacity() == 0) {
         MMI_HILOGE("pixelMap is empty");

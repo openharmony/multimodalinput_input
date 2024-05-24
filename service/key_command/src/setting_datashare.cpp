@@ -128,19 +128,13 @@ sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, S
 
 void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 {
-    if (observer == nullptr) {
-        MMI_HILOGE("observer is nullptr");
-        return;
-    }
+    CHKPV(observer);
     observer->OnChange();
 }
 
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
 {
-    if (observer == nullptr) {
-        MMI_HILOGE("observer is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey());
     auto helper = CreateDataShareHelper();
@@ -159,10 +153,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer)
 {
-    if (observer == nullptr) {
-        MMI_HILOGE("observer is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
     auto uri = AssembleUri(observer->GetKey());
     auto helper = CreateDataShareHelper();
@@ -179,13 +170,9 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
 void SettingDataShare::Initialize(int32_t systemAbilityId)
 {
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        return;
-    }
+    CHKPV(sam);
     auto remoteObj = sam->GetSystemAbility(systemAbilityId);
-    if (remoteObj == nullptr) {
-        return;
-    }
+    CHKPV(remoteObj);
     remoteObj_ = remoteObj;
 }
 
@@ -255,9 +242,7 @@ ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::stri
 std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper()
 {
     auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
-    if (helper == nullptr) {
-        return nullptr;
-    }
+    CHKPP(helper);
     return helper;
 }
 

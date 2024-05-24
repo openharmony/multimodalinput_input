@@ -56,6 +56,7 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) const;
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch) const;
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) const;
+    std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(

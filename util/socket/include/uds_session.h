@@ -107,6 +107,7 @@ public:
     std::list<int32_t> DelEvents(int32_t type, int32_t id);
     int64_t GetEarliestEventTime(int32_t type = 0) const;
     bool IsEventQueueEmpty(int32_t type = 0);
+    void ReportSocketBufferFull() const;
 
 protected:
     struct EventTime {

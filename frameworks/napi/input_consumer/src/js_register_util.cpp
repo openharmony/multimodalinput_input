@@ -337,8 +337,13 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         MMI_HILOGE("%{public}s failed", std::string(REFERENCE_REF).c_str());
         return;
     }
+    dataWorker->keyOption = reportEvent->keyOption;
     auto *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
+    if (work == nullptr) {
+        MMI_HILOGE("work is nullptr");
+        delete dataWorker;
+        return;
+    }
     work->data = static_cast<void *>(dataWorker);
     int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback,
                                          uv_qos_user_initiated);

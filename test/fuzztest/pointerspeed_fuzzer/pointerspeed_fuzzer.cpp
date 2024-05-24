@@ -41,7 +41,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
 
 void PointerSpeedFuzzTest(const uint8_t* data, size_t size)
 {
-    int32_t speed;
+    int32_t speed = 0;
     size_t startPos = 0;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, speed);
     InputManager::GetInstance()->SetPointerSpeed(speed);

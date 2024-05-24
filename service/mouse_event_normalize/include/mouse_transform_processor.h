@@ -76,6 +76,7 @@ public:
     int32_t Normalize(struct libinput_event *event);
     int32_t NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool CheckAndPackageAxisEvent();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -97,12 +98,12 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
+    DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DumpInner();
-
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
-    static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
+    static void GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
-    static int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
+    static void GetConfigDataFromDatabase(std::string &key, int32_t &value);
 
 public:
     static void OnDisplayLost(int32_t displayId);
@@ -115,21 +116,19 @@ public:
     static int32_t GetPointerSpeed();
     static int32_t SetPointerLocation(int32_t x, int32_t y);
     static int32_t SetTouchpadScrollSwitch(bool switchFlag);
-    static int32_t GetTouchpadScrollSwitch(bool &switchFlag);
+    static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);
-    static int32_t GetTouchpadScrollDirection(bool &state);
+    static void GetTouchpadScrollDirection(bool &state);
     static int32_t SetTouchpadTapSwitch(bool switchFlag);
-    static int32_t GetTouchpadTapSwitch(bool &switchFlag);
+    static void GetTouchpadTapSwitch(bool &switchFlag);
     static int32_t SetTouchpadRightClickType(int32_t type);
-    static int32_t GetTouchpadRightClickType(int32_t &type);
+    static void GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
-    static int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    static void GetTouchpadPointerSpeed(int32_t &speed);
     static int32_t GetTouchpadSpeed();
-    static DeviceType CheckDeviceType(struct libinput_event* event);
 
 private:
     static int32_t globalPointerSpeed_;
-
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
