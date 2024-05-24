@@ -1273,6 +1273,10 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
+    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
+        MMI_HILOGE("infos size is invalid");
+        return RET_ERR;
+    }
     infos.reserve(size);
     for (int32_t i = 0; i < size; ++i) {
         DisplayBindInfo info;
@@ -1306,6 +1310,10 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tup
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
+    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
+        MMI_HILOGE("datas size is invalid");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
         int32_t syncState;
