@@ -265,16 +265,16 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
     }
-    size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGLE_KNUCKLE_SIZE) {
+    size_t pointercnt = touchEvent->GetPointerIds().size();
+    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
         SingleKnuckleGestureProcesser(touchEvent);
         isDoubleClick_ = false;
         knuckleCount_++;
-    } else if (size == DOUBLE_KNUCKLE_SIZE) {
+    } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
         DoubleKnuckleGestureProcesser(touchEvent);
         isDoubleClick_ = true;
     } else {
-        MMI_HILOGW("Other kunckle size not process, size:%{public}zu", size);
+        MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
 }
 
@@ -282,13 +282,13 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    size_t size = touchEvent->GetPointerIds().size();
-    if ((size == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
+    size_t pointercnt = touchEvent->GetPointerIds().size();
+    if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
-    } else if (size == DOUBLE_KNUCKLE_SIZE) {
+    } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
-        MMI_HILOGW("Other kunckle size not process, size:%{public}zu", size);
+        MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
 }
 
@@ -423,23 +423,23 @@ void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<Poin
     KnuckleGesture &knuckleGesture)
 {
     CHKPV(touchEvent);
-    size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGLE_KNUCKLE_SIZE) {
+    size_t pointercnt = touchEvent->GetPointerIds().size();
+    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(knuckleGesture.downToPrevUpTime);
         return;
     }
-    MMI_HILOGW("current touch event size:%{public}zu", size);
+    MMI_HILOGW("current touch event pointercnt:%{public}zu", pointercnt);
 }
 
 void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPV(touchEvent);
-    size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGLE_KNUCKLE_SIZE) {
+    size_t pointercnt = touchEvent->GetPointerIds().size();
+    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
         DfxHisysevent::ReportScreenCaptureGesture();
         return;
     }
-    MMI_HILOGW("current touch event size:%{public}zu", size);
+    MMI_HILOGW("current touch event pointercnt:%{public}zu", pointercnt);
 }
 
 void KeyCommandHandler::StartTwoFingerGesture()
