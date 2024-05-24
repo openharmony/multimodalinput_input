@@ -98,7 +98,7 @@ private:
     int32_t OnEventTouchPadPinchUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadPinchEnd(struct libinput_event *event);
     int32_t SetTouchPadPinchData(struct libinput_event *event, int32_t action);
-    int32_t SetTouchPadMultiTapData();
+    void SetTouchPadMultiTapData();
     void SetPinchPointerItem(int64_t time);
     void ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale);
 

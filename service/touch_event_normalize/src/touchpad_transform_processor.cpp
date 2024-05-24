@@ -167,10 +167,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *eve
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
-        if (SetTouchPadMultiTapData() != RET_OK) {
-            MMI_HILOGE("Set touchpad multiFingers tap failed");
-            return RET_ERR;
-        }
+        SetTouchPadMultiTapData();
     } else {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     }
@@ -376,13 +373,12 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadSwipeEnd(struct libinput_even
     return SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_END);
 }
 
-int32_t TouchPadTransformProcessor::SetTouchPadMultiTapData()
+void TouchPadTransformProcessor::SetTouchPadMultiTapData()
 {
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
     auto state = MULTI_FINGERTAP_HDR->GetMultiFingersState();
     pointerEvent_->SetFingerCount(static_cast<int32_t>(state));
-    return RET_OK;
 }
 
 int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *event, int32_t action)
