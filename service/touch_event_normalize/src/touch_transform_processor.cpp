@@ -17,11 +17,13 @@
 
 #include <linux/input.h>
 
+#include "aggregator.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -203,24 +205,15 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->SetSensorInputTime(sensorTime);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            if (!OnEventTouchDown(event)) {
-                MMI_HILOGE("Get OnEventTouchDown failed");
-                return nullptr;
-            }
+            CHKFR(OnEventTouchDown(event), nullptr, "Get OnEventTouchDown failed");
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            if (!OnEventTouchUp(event)) {
-                MMI_HILOGE("Get OnEventTouchUp failed");
-                return nullptr;
-            }
+            CHKFR(OnEventTouchUp(event), nullptr, "Get OnEventTouchUp failed");
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            if (!OnEventTouchMotion(event)) {
-                MMI_HILOGE("Get OnEventTouchMotion failed");
-                return nullptr;
-            }
+            CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTouchMotion failed");
             break;
         }
         default: {
@@ -234,7 +227,10 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
     WinMgr->UpdateTargetPointer(pointerEvent_);
-    MMI_HILOGI("created:%{public}s,winId:%{public}d", device->GetName().c_str(), pointerEvent_->GetTargetWindowId());
+    aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
+        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
+        std::to_string(pointerEvent_->GetId()));
+
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
     WinMgr->DrawTouchGraphic(pointerEvent_);

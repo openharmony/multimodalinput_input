@@ -21,8 +21,10 @@
 
 #include "libinput.h"
 #include "singleton.h"
-#include "define_multimodal.h"
 
+#include "aggregator.h"
+#include "define_multimodal.h"
+#include "timer_manager.h"
 #include "pointer_event.h"
 #include "window_info.h"
 
@@ -136,6 +138,15 @@ private:
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
+    Aggregator aggregator_ {
+            [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->ResetTimer(timerId);
+            }
+    };
 };
 } // namespace MMI
 } // namespace OHOS
