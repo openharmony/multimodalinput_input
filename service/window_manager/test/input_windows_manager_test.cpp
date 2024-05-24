@@ -3817,6 +3817,81 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_NotifyPointerToWindow,
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_GetMouseInfo_002
+ * @tc.desc: Test the function GetMouseInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.mouseLocation_.displayId = -1;
+    DisplayInfo displaysInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetMouseInfo());
+    displaysInfo.id = 2;
+    displaysInfo.width = 20;
+    displaysInfo.height = 30;
+    displaysInfo.name = "name1";
+    displaysInfo.uniq = "uniq1";
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    MouseLocation result = inputWindowsManager.GetMouseInfo();
+    EXPECT_EQ(result.displayId, 2);
+    EXPECT_EQ(result.physicalX, 10);
+    EXPECT_EQ(result.physicalY, 15);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetCursorPos_002
+ * @tc.desc: Test the function GetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    inputWindowsManager.cursorPos_.displayId = -1;
+    DisplayInfo displaysInfo;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetCursorPos());
+    displaysInfo.id = 2;
+    displaysInfo.width = 30;
+    displaysInfo.height = 40;
+    displaysInfo.name = "name2";
+    displaysInfo.uniq = "uniq2";
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    CursorPosition result = inputWindowsManager.GetCursorPos();
+    EXPECT_EQ(result.displayId, 2);
+    EXPECT_EQ(result.cursorPos.x, 15);
+    EXPECT_EQ(result.cursorPos.y, 20);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ResetCursorPos_002
+ * @tc.desc: Test the function ResetCursorPos
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ResetCursorPos_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displaysInfo;
+    CursorPosition result = inputWindowsManager.ResetCursorPos();
+    EXPECT_EQ(result.displayId, -1);
+    displaysInfo.id = 3;
+    displaysInfo.width = 40;
+    displaysInfo.height = 50;
+    displaysInfo.name = "name3";
+    displaysInfo.uniq = "uniq3";
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displaysInfo);
+    result = inputWindowsManager.ResetCursorPos();
+    EXPECT_EQ(result.displayId, 3);
+    EXPECT_EQ(result.cursorPos.x, 20);
+    EXPECT_EQ(result.cursorPos.y, 25);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayIdAndName_002
  * @tc.desc: Test updating display ID and name
  * @tc.type: FUNC
