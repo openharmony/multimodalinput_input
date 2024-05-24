@@ -90,6 +90,7 @@ public:
     DISALLOW_COPY_AND_MOVE(JoystickTransformProcessor);
     ~JoystickTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
+    std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
 
 private:
     bool OnEventJoystickButton(struct libinput_event* event);

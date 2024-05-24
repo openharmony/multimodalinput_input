@@ -596,7 +596,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_004, TestSiz
 {
     CALL_TEST_DEBUG;
     auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGI("Add monitor SubscribeKeyEvent_004");
     };
     auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
@@ -634,7 +634,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_005, TestSiz
 {
     CALL_TEST_DEBUG;
     auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGI("Add monitor SubscribeKeyEvent_005");
     };
     auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);

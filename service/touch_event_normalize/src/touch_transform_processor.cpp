@@ -68,6 +68,8 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
+    int32_t toolType = GetTouchToolType(touch, device);
+    item.SetToolType(toolType);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -76,11 +78,9 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetPressed(true);
     UpdatePointerItemProperties(item, touchInfo);
     item.SetDeviceId(deviceId_);
-    int32_t toolType = GetTouchToolType(touch, device);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     NotifyFingersenseProcess(item, toolType);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    item.SetToolType(toolType);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
@@ -233,11 +233,10 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
-        device->GetName().c_str());
     WinMgr->UpdateTargetPointer(pointerEvent_);
+    MMI_HILOGI("created:%{public}s,winId:%{public}d", device->GetName().c_str(), pointerEvent_->GetTargetWindowId());
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
+        pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
     WinMgr->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;
 }

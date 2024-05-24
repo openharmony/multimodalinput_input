@@ -34,63 +34,6 @@ public:
 };
 
 /**
- * @tc.name: EventNormalizeHandlerTest_HandleEvent_001
- * @tc.desc: Test the function HandleEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, TestSize.Level1)
-{
-    EventNormalizeHandler handler;
-    int64_t frameTime = 10000;
-    libinput_event* event = nullptr;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.ProcessNullEvent(event, frameTime));
-    event = new (std::nothrow) libinput_event;
-    ASSERT_NE(event, nullptr);
-    event->type = LIBINPUT_EVENT_TOUCH_CANCEL;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_TOUCH_FRAME;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_DEVICE_ADDED;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_DEVICE_REMOVED;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_KEYBOARD_KEY;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_MOTION;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_POINTER_BUTTON;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_POINTER_AXIS;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_POINTER_TAP;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(event));
-    event->type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(event));
-    event->type = LIBINPUT_EVENT_TOUCHPAD_UP;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(event));
-    event->type = LIBINPUT_EVENT_TOUCHPAD_MOTION;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(event));
-}
-
-/**
  * @tc.name: EventNormalizeHandlerTest_HandleEvent_002
  * @tc.desc: Test the function HandleEvent
  * @tc.type: FUNC

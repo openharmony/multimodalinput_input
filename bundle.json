@@ -78,7 +78,8 @@
         "graphic_2d_ext",
         "audio_framework",
         "hdf_core",
-        "bounds_checking_function"
+        "bounds_checking_function",
+        "qos_manager"
       ],
       "third_party": [
         "cJSON",

@@ -193,7 +193,7 @@ bool MMIService::InitLibinputService()
             EpollClose();
             return false;
         }
-        MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
+        MMI_HILOGD("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
     }
     return true;
 }
