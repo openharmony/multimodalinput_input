@@ -350,7 +350,6 @@ void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("surfaceNode is already.");
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;

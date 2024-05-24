@@ -107,10 +107,9 @@ private:
     void InitToolType();
 private:
     const int32_t deviceId_ { -1 };
-    const int32_t defaultPointerId { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
-    Aggregator rl_ {
+    Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
             },

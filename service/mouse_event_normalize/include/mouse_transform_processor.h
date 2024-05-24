@@ -138,7 +138,7 @@ private:
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
-    Aggregator rl_ {
+    Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
             },
