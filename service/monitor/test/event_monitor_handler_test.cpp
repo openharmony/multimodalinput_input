@@ -169,11 +169,11 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_001, Test
     ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent, keyEventPkt));
 
     NetPacket pointerEventPkt(MmiMessageId::REPORT_POINTER_EVENT);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     if (InputEventDataTransformation::Marshalling(pointerEvent, pointerEventPkt) != RET_OK) {
         MMI_HILOGE("Marshalling pointer event failed");
         return;
     }
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(pointerEvent, pointerEventPkt));
 }
 
