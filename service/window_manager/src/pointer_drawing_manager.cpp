@@ -291,7 +291,7 @@ void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
         bool statusValue = false;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        bool statusValue = true;
+        statusValue = true;
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
