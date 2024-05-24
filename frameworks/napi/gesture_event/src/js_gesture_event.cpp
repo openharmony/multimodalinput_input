@@ -52,7 +52,7 @@ napi_value JsGestureEvent::EnumClassConstructor(napi_env env, napi_callback_info
 
 napi_value JsGestureEvent::Export(napi_env env, napi_value exports)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     napi_property_descriptor actionArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("CANCEL", GetNapiInt32(env, static_cast<int32_t>(ActionType::CANCEL))),
         DECLARE_NAPI_STATIC_PROPERTY("BEGIN", GetNapiInt32(env, static_cast<int32_t>(ActionType::BEGIN))),
