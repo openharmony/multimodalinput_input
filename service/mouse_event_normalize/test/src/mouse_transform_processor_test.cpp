@@ -30,6 +30,8 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
+constexpr int32_t HARD_HARDEN_DEVICE_WIDTH = 2880;
+constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
 }
 class MouseTransformProcessorTest : public testing::Test {
 public:
@@ -139,6 +141,21 @@ void MouseTransformProcessorTest::TearDown()
     g_processor_.SetTouchpadScrollSwitch(preScrollSwitch_);
     g_processor_.SetTouchpadScrollDirection(preScrollDirection_);
     g_processor_.SetTouchpadTapSwitch(preTapSwitch_);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_CheckDeviceType_01
+ * @tc.desc: Test CheckDeviceType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_CheckDeviceType_01, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t width = HARD_HARDEN_DEVICE_WIDTH;
+    int32_t height = HARD_HARDEN_DEVICE_HEIGHT;
+    ASSERT_NO_FATAL_FAILURE(processor.CheckDeviceType(width, height));
 }
 
 /**

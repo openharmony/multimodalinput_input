@@ -620,9 +620,9 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
     CALL_DEBUG_ENTER;
     DeviceType ret = DeviceType::DEVICE_KLV;
     if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
-        if (HARD_HARDEN_DEVICE_WIDTH == width && HARD_HARDEN_DEVICE_HEIGHT == height) {
+        if (width == HARD_HARDEN_DEVICE_WIDTH && height == HARD_HARDEN_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_HARD_HARDEN;
-        } else if (SOFT_HARDEN_DEVICE_WIDTH == width && SOFT_HARDEN_DEVICE_WIDTH == height) {
+        } else if (width == SOFT_HARDEN_DEVICE_WIDTH && height == SOFT_HARDEN_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_HARDEN;
         } else {
             MMI_HILOGE("undefined width: %{public}d, height: %{public}d", width, height);
