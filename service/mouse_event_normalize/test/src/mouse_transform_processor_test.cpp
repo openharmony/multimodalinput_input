@@ -1498,8 +1498,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInne
     bool isAxisBegin;
     MouseTransformProcessor processor(deviceId);
 
-    vTouchpad_.SendEvent(EV_REL, REL_X, 5);
-    vTouchpad_.SendEvent(EV_REL, REL_Y, -10);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 2);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2220);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 727);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 710);
     vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
