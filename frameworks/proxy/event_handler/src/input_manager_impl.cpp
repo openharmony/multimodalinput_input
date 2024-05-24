@@ -101,9 +101,8 @@ int32_t InputManagerImpl::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t,
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetAllMmiSubscribedEvents(datas);
     if (ret != RET_OK) {
         MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
-        return RET_ERR;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
