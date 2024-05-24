@@ -258,11 +258,8 @@ void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_sour
     int32_t& direction, bool& tpScrollSwitch)
 {
     bool scrollDirectionState = true;
-
     GetTouchpadScrollSwitch(tpScrollSwitch);
-
     GetTouchpadScrollDirection(scrollDirectionState);
-
     if (scrollDirectionState == true && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         direction = -1;
     }
