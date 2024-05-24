@@ -3864,7 +3864,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetCursorPos_002, Test
     EXPECT_EQ(result.displayId, 2);
     EXPECT_EQ(result.cursorPos.x, 15);
     EXPECT_EQ(result.cursorPos.y, 20);
-
 }
 
 /**
