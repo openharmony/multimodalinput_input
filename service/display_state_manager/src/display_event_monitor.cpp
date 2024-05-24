@@ -61,6 +61,10 @@ public:
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+            DISPLAY_MONITOR->SetScreenLocked(true);
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+            DISPLAY_MONITOR->SetScreenLocked(false);
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
         }
