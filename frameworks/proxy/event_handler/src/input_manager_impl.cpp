@@ -240,7 +240,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     }
     auto it = eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
-        MMI_HILOGW("Filter id duplicate");
+        MMI_HILOGW("filterId duplicate");
     }
     return filterId;
 }
