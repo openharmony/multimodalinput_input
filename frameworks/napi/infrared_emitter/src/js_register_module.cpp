@@ -47,6 +47,7 @@ bool IsArray(const napi_env& env, const napi_value& value)
     bool isArray = false;
     napi_status ret = napi_is_array(env, value, &isArray);
     if (ret != napi_ok) {
+        MMI_HILOGE("napi_is_array failed");
         return false;
     }
     return isArray;

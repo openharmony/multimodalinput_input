@@ -413,6 +413,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
         return INVALID_PID;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    PrintChangedWindowByEvent(InputEvent::EVENT_TYPE_KEY, *windowInfo);
     SetPrivacyModeFlag(windowInfo->privacyMode, keyEvent);
     keyEvent->SetTargetWindowId(windowInfo->id);
     keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
@@ -660,6 +661,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
         if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
+            PrintChangedWindowBySync(displayGroupInfoTmp_);
             displayGroupInfo_ = displayGroupInfoTmp_;
             UpdateWindowsInfoPerDisplay(displayGroupInfo);
         }
@@ -1983,7 +1985,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             return RET_OK;
         }
     }
-
+    PrintChangedWindowByEvent(InputEvent::EVENT_TYPE_POINTER, *touchWindow);
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
@@ -2352,6 +2354,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    PrintChangedWindowByEvent(InputEvent::EVENT_TYPE_POINTER, *touchWindow);
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
@@ -3137,6 +3140,34 @@ int32_t InputWindowsManager::SetCurrentUser(int32_t userId)
     CALL_DEBUG_ENTER;
     currentUserId_ = userId;
     return RET_OK;
+}
+
+void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo)
+{
+    auto iter = lastMatchedWindow_.find(eventType);
+    if (iter == lastMatchedWindow_.end()) {
+        WindowInfo info;
+        lastMatchedWindow_[eventType] = info;
+    }
+    if (iter->second.id != newWindowInfo.id) {
+        MMI_HILOGI("Target window changed %{public}d %{public}d %{public}d %{public}f %{public}d %{public}d %{public}f",
+        eventType, iter->second.id, iter->second.pid, iter->second.zOrder, newWindowInfo.id,
+        newWindowInfo.pid, newWindowInfo.zOrder);
+    }
+    lastMatchedWindow_[eventType] = newWindowInfo;
+}
+
+void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo)
+{
+    auto &oldWindows = displayGroupInfo_.windowsInfo;
+    auto &newWindows = newDisplayInfo.windowsInfo;
+    if (!oldWindows.empty() && !newWindows.empty()) {
+        if (oldWindows[0].id != newWindows[0].id) {
+            MMI_HILOGI("Window sync changed %{public}d %{public}d %{public}f %{public}d %{public}d %{public}f",
+                oldWindows[0].id, oldWindows[0].pid, oldWindows[0].zOrder, newWindows[0].id,
+                newWindows[0].pid, newWindows[0].zOrder);
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS
