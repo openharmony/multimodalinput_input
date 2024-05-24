@@ -20,7 +20,7 @@
 #include "input_windows_manager.h"
 #include "libinput_wrapper.h"
 #include "mouse_event_normalize.h"
-#include "virtual_mouse.h"
+#include "general_mouse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,7 +39,7 @@ public:
     void TearDown();
 
 private:
-    static VirtualMouse vMouse_;
+    static GeneralMouse vMouse_;
     static LibinputWrapper libinput_;
 
     int32_t prePointerSpeed_ { 5 };
@@ -52,7 +52,7 @@ private:
     bool preTapSwitch_ { true };
 };
 
-VirtualMouse MouseEventNormalizeTest::vMouse_;
+GeneralMouse MouseEventNormalizeTest::vMouse_;
 LibinputWrapper MouseEventNormalizeTest::libinput_;
 
 void MouseEventNormalizeTest::SetUpTestCase(void)
