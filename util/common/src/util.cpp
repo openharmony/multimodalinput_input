@@ -20,6 +20,7 @@
 #include <cinttypes>
 #include <cstdarg>
 #include <fstream>
+#include <iostream>
 
 #include <sys/prctl.h>
 #include <sys/stat.h>
@@ -28,6 +29,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "aggregator.h"
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -563,5 +565,75 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
     }
     return realPath;
 }
+
+
+bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::string &record)
+{
+    constexpr int32_t maxRecordCount = 20;
+    constexpr int32_t oneSecond = 1000;
+    if (timerId != -1) {
+        resetTimer_(timerId);
+    } else {
+        timerId = addTimer_(oneSecond, 1, [this, lh]() {
+            FlushRecords(lh);
+            timerId = -1;
+        });
+    }
+    if (key == key_) {
+        auto now = std::chrono::system_clock::now();
+        records_.push_back({record, now});
+        if (records_.size() >= maxRecordCount) {
+            FlushRecords(lh);
+        }
+        return true;
+    } else {
+        FlushRecords(lh, key, record);
+        key_ = key;
+        return false;
+    }
+}
+
+void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const std::string &extraRecord)
+{
+    constexpr uint32_t milliSecondWidth = 3;
+    constexpr uint32_t microToMilli = 1000;
+    size_t recordCount = records_.size();
+    std::ostringstream oss;
+    if (!records_.empty()) {
+        oss << key_;
+        oss << ", first: " << records_.front().record << "-(";
+        auto firstTime = records_.front().timestamp;
+        time_t firstTimeT = std::chrono::system_clock::to_time_t(firstTime);
+        std::tm bt = *std::localtime(&firstTimeT);
+        oss << std::put_time(&bt, "%Y-%m-%d %H:%M:%S");
+        auto since_epoch = firstTime.time_since_epoch();
+        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch).count() % microToMilli;
+        oss << '.' << std::setfill('0') << std::setw(milliSecondWidth) << millis << "ms)";
+
+        for (size_t i = 1; i < records_.size(); ++i) {
+            const auto &recordInfo = records_[i];
+            auto timeDiff = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    recordInfo.timestamp - firstTime).count();
+            oss << ", " << recordInfo.record << "+" << timeDiff;
+        }
+        records_.clear();
+        oss << ", count: " << recordCount;
+    }
+    if (!extraRecord.empty()) {
+        if (!oss.str().empty()) {
+            oss << ", last: ";
+        }
+        oss << key << ": " << extraRecord;
+    }
+    if (!oss.str().empty()) {
+        MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", oss.str().c_str());
+    }
+}
+
+Aggregator::~Aggregator()
+{
+    FlushRecords(MMI_LOG_HEADER);
+}
+
 } // namespace MMI
 } // namespace OHOS
