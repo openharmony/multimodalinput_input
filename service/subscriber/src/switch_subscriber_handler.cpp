@@ -64,7 +64,7 @@ void SwitchSubscriberHandler::HandleSwitchEvent(const std::shared_ptr<SwitchEven
 {
     CHKPV(switchEvent);
     if (OnSubscribeSwitchEvent(switchEvent)) {
-        MMI_HILOGD("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
+        MMI_HILOGI("Subscribe switchEvent filter success. switchValue:%{public}d", switchEvent->GetSwitchValue());
         return;
     }
     CHKPV(nextHandler_);
