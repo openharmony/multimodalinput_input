@@ -130,7 +130,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             break;
         }
         default:
-            MMI_HILOGD("other action not match.");
+            MMI_HILOGD("Unknown pointer action:%{public}d", touchEvent->GetPointerAction());
             break;
     }
 }
