@@ -598,7 +598,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
-    MMI_HILOGD("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
+    MMI_HILOGI("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
     if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
         MMI_HILOGD("privacy switch event ignored");
         return RET_OK;
