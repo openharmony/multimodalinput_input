@@ -15,6 +15,7 @@
 
 #include "hdf_device_event_manager.h"
 
+#include <dlfcn.h>
 #include <unistd.h>
 
 #include "hdf_device_event_dispatch.h"
@@ -64,6 +65,29 @@ int32_t main()
     sleep(sleepSeconds);
     OHOS::MMI::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
+
+    int32_t pid = getpid();
+    MMI_HILOGI("Current pid:%{public}d", pid);
+
+    void *libMemmgrClientHandle = dlopen("libmemmgrclient.z.so", RTLD_NOW);
+    if (!libMemmgrClientHandle) {
+        MMI_HILOGE("%{public}s, dlopen libmemmgrclient failed.", __func__);
+        goto nextStep;
+    }
+
+    int(* notifyProcessStatusFunc)(int, int, int) = (dlsym(libMemmgrClientHandle, "notify_process_status"));
+    if (!notifyProcessStatusFunc) {
+        MMI_HILOGE("%{public}s, dlsym notify_process_status failed.", __func__);
+        dlclose(libMemmgrClientHandle);
+        goto nextStep;
+    }
+    if (notifyProcessStatusFunc(pid, 2, 1) != 0) {
+        MMI_HILOGE("%{public}s, get device memory failed.", __func__);
+    }
+    dlclose(libMemmgrClientHandle);
+    MMI_HILOGI("notify_process_status execute end");
+
+nextStep:
     static std::int32_t usleepTime = 1500000;
     while (true) {
         usleep(usleepTime);
