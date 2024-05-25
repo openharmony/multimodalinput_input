@@ -183,7 +183,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
-            MMI_HILOGD("Output event: toolWindowX = %{public}d toolWindowY = %{public}d", toolWindowX, toolWindowY);
+            MMI_HILOGD("Output event: toolWindowX:%{public}d toolWindowY:%{public}d", toolWindowX, toolWindowY);
             auto logicX = it.second.coordX;
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
