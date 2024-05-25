@@ -38,9 +38,7 @@ constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
 constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
