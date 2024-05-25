@@ -15,6 +15,7 @@
 #include "inject_notice_manage.h"
 #include <atomic>
 #include "ability_manager_client.h"
+#include "ffrt_inner.h"
 #include "message_parcel.h"
 #include "mmi_log.h"
 
