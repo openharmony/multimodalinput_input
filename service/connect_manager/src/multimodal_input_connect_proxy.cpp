@@ -249,6 +249,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
 int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     if (pixelMapPtr->GetCapacity() == 0) {
         MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
@@ -1944,8 +1945,9 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
 int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
-    if (infoId < 0 || pixelMap == nullptr) {
-        MMI_HILOGE("Invalid infoId or pixelMap");
+    CHKPR(pixelMap, RET_ERR);
+    if (infoId < 0) {
+        MMI_HILOGE("Invalid infoId");
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
