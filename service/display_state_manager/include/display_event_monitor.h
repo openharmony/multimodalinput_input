@@ -53,7 +53,7 @@ class DisplayEventMonitor final {
         {
             isScreenLocked_ = isLocked;
         }
-        bool GetScreenLocked()
+        const bool GetScreenLocked()
         {
             return isScreenLocked_;
         }
