@@ -488,6 +488,9 @@ void InputWindowsManager::UpdateDisplayIdAndName()
         newInfo.insert(std::make_pair(item.id, item.uniq));
     }
     auto oldInfo = bindInfo_.GetDisplayIdNames();
+    if (newInfo == oldInfo) {
+        return;
+    }
     for (auto it = oldInfo.begin(); it != oldInfo.end();) {
         if (newInfo.find(*it) == newInfo.end()) {
             bindInfo_.RemoveDisplay(it->first);
