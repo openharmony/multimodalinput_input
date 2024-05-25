@@ -305,7 +305,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchMotion_002, TestSize.Level1)
     ASSERT_TRUE(event != nullptr);
     auto touch = libinput_event_get_touch_event(event);
     ASSERT_TRUE(touch != nullptr);
-    EXPECT_NO_FATAL_FAILURE(processor. OnEventTouchMotion(event));
+    EXPECT_NO_FATAL_FAILURE(processor.OnEventTouchMotion(event));
 }
 
 /**
@@ -405,7 +405,7 @@ HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_OnEvent_002, T
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-    EXPECT_NO_FATAL_FAILURE(processor. OnEvent(event));   
+    EXPECT_NO_FATAL_FAILURE(processor.OnEvent(event));
 }
 
 /**
@@ -437,7 +437,7 @@ HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_OnEvent_003, T
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-    EXPECT_NO_FATAL_FAILURE(processor. OnEvent(event));   
+    EXPECT_NO_FATAL_FAILURE(processor.OnEvent(event));
 }
 } // namespace MMI
 } // namespace OHOS
