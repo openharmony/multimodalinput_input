@@ -194,7 +194,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_OPERATION;
     }
-    int32_t count;
+    int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
