@@ -432,9 +432,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         return RET_ERR;
     }
     bool tpRotateSwitch = true;
-    if (TouchEventHdr->GetTouchpadRotateSwitch(tpRotateSwitch) != RET_OK) {
-        MMI_HILOGD("Failed to get touchpad rotate switch, default is true");
-    }
+    TouchEventHdr->GetTouchpadRotateSwitch(tpRotateSwitch);
     if (!tpRotateSwitch) {
         MMI_HILOGD("touchpad rotate switch is false");
         return RET_ERR;
