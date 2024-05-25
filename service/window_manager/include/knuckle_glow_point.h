@@ -31,8 +31,8 @@ namespace OHOS {
 namespace MMI {
 class KnuckleGlowPoint {
 public:
-    explicit KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap);
-    ~KnuckleGlowPoint();
+    explicit KnuckleGlowPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap);
+    ~KnuckleGlowPoint() = default;
     void Update();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
     void Reset(double pointX, double pointY, float lifespanOffset);
@@ -49,8 +49,7 @@ private:
     float traceSize_  { 0.f };
 
     Rosen::Drawing::Matrix traceMatrix_;
-    Rosen::Drawing::Bitmap traceShadow_;
-    Rosen::Drawing::Paint glowPaint_;
+    std::shared_ptr<Rosen::Drawing::Bitmap> traceShadow_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
