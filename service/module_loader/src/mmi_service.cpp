@@ -120,7 +120,7 @@ MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+    if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
@@ -152,7 +152,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
 {
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+    if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
