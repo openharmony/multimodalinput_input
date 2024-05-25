@@ -648,6 +648,9 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        InjectNoticeInfo noticeInfo;
+        noticeInfo.pid = CurrentPID_;
+        AddInjectNotice(noticeInfo);
         MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
         if (InjectionType_ == InjectionType::KEYEVENT) {
             OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
