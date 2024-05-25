@@ -34,7 +34,6 @@ constexpr int32_t DEFAULT_POINTER_SIZE = 1;
 constexpr int32_t MIN_POINTER_SIZE = 1;
 constexpr int32_t MAX_POINTER_SIZE = 7;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
-constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t THREE_PARAMETERS = 3;
 constexpr int32_t INVALID_VALUE = -2;
 } // namespace
@@ -232,11 +231,6 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
     }
     int32_t color = MIN_POINTER_COLOR;
     CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
-    if (color < MIN_POINTER_COLOR) {
-        color = MIN_POINTER_COLOR;
-    } else if (color > MAX_POINTER_COLOR) {
-        color = MAX_POINTER_COLOR;
-    }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -290,11 +284,6 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
     }
     int32_t color = MIN_POINTER_COLOR;
     CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
-    if (color < MIN_POINTER_COLOR) {
-        color = MIN_POINTER_COLOR;
-    } else if (color > MAX_POINTER_COLOR) {
-        color = MAX_POINTER_COLOR;
-    }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
