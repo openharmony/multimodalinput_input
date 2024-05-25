@@ -163,10 +163,9 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
     monitors_.OnSessionLost(session);
 }
 
-void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
-    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
@@ -181,11 +180,10 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
     }
 }
 
-void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
-    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     auto currentTime = GetSysClockTime();
@@ -200,10 +198,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
     pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
-        return;
-    }
-    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
     if (!session_->SendMsg(pkt)) {
@@ -318,9 +312,10 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
 {
     CHKPF(keyEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
+    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     for (const auto &mon : monitors_) {
         if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
-            mon.SendToClient(keyEvent);
+            mon.SendToClient(keyEvent, pkt);
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
@@ -423,9 +418,14 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
 {
     CHKPV(pointerEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
+    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
+    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
     for (const auto &monitor : monitors_) {
         if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
-            monitor.SendToClient(pointerEvent);
+            monitor.SendToClient(pointerEvent, pkt);
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
