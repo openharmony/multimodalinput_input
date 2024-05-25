@@ -72,18 +72,18 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
                 handlerType, newType, allDeviceTags, priority);
             int32_t ret = AddToServer(handlerType, newType, priority, allDeviceTags);
             if (ret != RET_OK) {
-                MMI_HILOGE("Add Handler: %{public}d:%{public}d to server failed, (eventType,deviceTag) current: "
-                           "(%{public}d, %{public}d), new: (%{public}d, %{public}d), priority: %{public}d",
+                MMI_HILOGE("Add Handler:%{public}d:%{public}d to server failed, (eventType,deviceTag) current: "
+                           "(%{public}d, %{public}d), new: (%{public}d, %{public}d), priority:%{public}d",
                            handlerType, handlerId, currentType, currentTags, newType, deviceTags, priority);
                 RemoveLocal(handlerId, handlerType, allDeviceTags);
                 return ret;
             }
         }
-        MMI_HILOGI("Finish add Handler: %{public}d:%{public}d, (eventType,deviceTag) current:"
-                   " (%{public}d, %{public}d), new: (%{public}d, %{public}d), priority: %{public}d",
+        MMI_HILOGI("Finish add Handler:%{public}d:%{public}d, (eventType,deviceTag) current:"
+                   " (%{public}d, %{public}d), new: (%{public}d, %{public}d), priority:%{public}d",
                    handlerType, handlerId, currentType, currentTags, newType, deviceTags, priority);
     } else {
-        MMI_HILOGE("Add Handler: %{public}d:%{public}d local failed, (eventType,deviceTag,priority): "
+        MMI_HILOGE("Add Handler:%{public}d:%{public}d local failed, (eventType,deviceTag,priority): "
                    "(%{public}d, %{public}d, %{public}d)", handlerType, handlerId, eventType, deviceTags, priority);
         handlerId = INVALID_HANDLER_ID;
     }
@@ -106,7 +106,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
             RemoveFromServer(handlerType, newType, newLevel, newTags);
         }
     }
-    MMI_HILOGI("Remove Handler: %{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ", handlerType,
+    MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ", handlerType,
                handlerId, currentType, currentTags);
 }
 
