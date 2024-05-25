@@ -1287,7 +1287,7 @@ napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_inf
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "switchFlag", "boolean");
         return nullptr;
