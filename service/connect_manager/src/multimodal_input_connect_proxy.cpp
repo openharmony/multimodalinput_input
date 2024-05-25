@@ -41,6 +41,7 @@ constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
+    CHKPR(inputDevice, RET_ERR);
     int32_t value;
     READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetId(value);
@@ -143,6 +144,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     uint32_t deviceTags)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(filter, ERR_INVALID_VALUE);
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
