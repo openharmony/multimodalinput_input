@@ -106,9 +106,9 @@ int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
 }
 
-int32_t TouchEventNormalize::GetTouchpadPinchSwitch(bool &switchFlag) const
+void TouchEventNormalize::GetTouchpadPinchSwitch(bool &switchFlag) const
 {
-    return TouchPadTransformProcessor::GetTouchpadPinchSwitch(switchFlag);
+    TouchPadTransformProcessor::GetTouchpadPinchSwitch(switchFlag);
 }
 
 int32_t TouchEventNormalize::SetTouchpadSwipeSwitch(bool switchFlag) const
@@ -116,9 +116,9 @@ int32_t TouchEventNormalize::SetTouchpadSwipeSwitch(bool switchFlag) const
     return TouchPadTransformProcessor::SetTouchpadSwipeSwitch(switchFlag);
 }
 
-int32_t TouchEventNormalize::GetTouchpadSwipeSwitch(bool &switchFlag) const
+void TouchEventNormalize::GetTouchpadSwipeSwitch(bool &switchFlag) const
 {
-    return TouchPadTransformProcessor::GetTouchpadSwipeSwitch(switchFlag);
+    TouchPadTransformProcessor::GetTouchpadSwipeSwitch(switchFlag);
 }
 
 int32_t TouchEventNormalize::SetTouchpadRotateSwitch(bool rotateSwitch) const
@@ -126,9 +126,9 @@ int32_t TouchEventNormalize::SetTouchpadRotateSwitch(bool rotateSwitch) const
     return TouchPadTransformProcessor::SetTouchpadRotateSwitch(rotateSwitch);
 }
 
-int32_t TouchEventNormalize::GetTouchpadRotateSwitch(bool &rotateSwitch) const
+void TouchEventNormalize::GetTouchpadRotateSwitch(bool &rotateSwitch) const
 {
-    return TouchPadTransformProcessor::GetTouchpadRotateSwitch(rotateSwitch);
+    TouchPadTransformProcessor::GetTouchpadRotateSwitch(rotateSwitch);
 }
 } // namespace MMI
 } // namespace OHOS
