@@ -29,6 +29,8 @@ namespace {
 const std::string GESTURESENSE_WRAPPER_PATH = "libgesture.z.so";
 } // namespace
 
+GesturesenseWrapper::GesturesenseWrapper() {}
+
 GesturesenseWrapper::~GesturesenseWrapper()
 {
     CALL_INFO_TRACE;
