@@ -151,7 +151,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/knuckle_glow_trace_system.cpp",
     "window_manager/src/touch_drawing_manager.cpp",
   ]
-  sources +=["message_handle/src/inject_notice_manage.cpp"]
+
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
