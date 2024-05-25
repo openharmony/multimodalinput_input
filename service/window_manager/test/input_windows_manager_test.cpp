@@ -3887,12 +3887,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendPointerEvent, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateMouseTarget
+ * @tc.name: InputWindowsManagerTest_UpdateMouseTarget001
  * @tc.desc: Test UpdateMouseTarget
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
