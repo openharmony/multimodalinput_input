@@ -339,7 +339,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchUp_002, TestSize.Level1)
     ASSERT_TRUE(event != nullptr);
     auto touch = libinput_event_get_touch_event(event);
     ASSERT_TRUE(touch != nullptr);
-    EXPECT_NO_FATAL_FAILURE(processor.OnEventTouchUp(event));  
+    EXPECT_NO_FATAL_FAILURE(processor.OnEventTouchUp(event));
 }
 
 /**
@@ -374,7 +374,7 @@ HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_OnEvent_001, T
     ASSERT_FALSE(ret);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-    EXPECT_NO_FATAL_FAILURE(processor.OnEvent(event));   
+    EXPECT_NO_FATAL_FAILURE(processor.OnEvent(event));
 }
 
 /**
