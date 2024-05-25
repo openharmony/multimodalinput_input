@@ -846,7 +846,7 @@ public:
 
     int32_t SetCurrentUser(int32_t userId);
 
-    int32_t GetWinSyncBatchSize(int32_t batchSize);
+    int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
 
 private:
     InputManager() = default;
