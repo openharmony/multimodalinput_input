@@ -530,7 +530,7 @@ int32_t JsInputMonitor::TransformPinchEvent(const std::shared_ptr<PointerEvent> 
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetPinchAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -550,7 +550,7 @@ int32_t JsInputMonitor::TransformRotateEvent(const std::shared_ptr<PointerEvent>
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetRotateAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -608,7 +608,7 @@ int32_t JsInputMonitor::TransformSwipeEvent(const std::shared_ptr<PointerEvent> 
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetSwipeAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -656,7 +656,7 @@ int32_t JsInputMonitor::TransformMultiTapEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetMultiTapAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -1101,7 +1101,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Transform Action Value failed");
+        MMI_HILOGE("Transform action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
