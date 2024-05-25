@@ -266,7 +266,7 @@ std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
     auto status = napi_get_named_property(env, object, name.c_str(), &napiValue);
     CHKRR(status, "get property", {});
 
-    uint32_t length;
+    uint32_t length = 0;
     status = napi_get_array_length(env, napiValue, &length);
     CHKRR(status, "get array length", {});
 
