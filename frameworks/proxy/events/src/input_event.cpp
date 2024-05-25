@@ -14,6 +14,7 @@
  */
 
 #include "axis_event.h"
+#include "event_log_helper.h"
 #include "input_event.h"
 #include "key_event.h"
 #include "pointer_event.h"
@@ -482,6 +483,9 @@ LogTracer &LogTracer::operator=(LogTracer &&other) noexcept
     }
     return *this;
 }
+
+int32_t OHOS::MMI::EventLogHelper::infoDictCount = 0;
+int32_t OHOS::MMI::EventLogHelper::debugDictCount = 0;
 
 } // namespace MMI
 } // namespace OHOS
