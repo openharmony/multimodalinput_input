@@ -683,6 +683,7 @@ void EventNormalizeHandler::TerminateRotate(libinput_event* event)
         }
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPV(pointerEvent);
+        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
         nextHandler_->HandlePointerEvent(pointerEvent);
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         GESTURE_HANDLER->InitRotateGesture();
@@ -701,6 +702,7 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
         MMI_HILOGI("Terminate axis event");
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPV(pointerEvent);
+        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
 }
