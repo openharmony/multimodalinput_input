@@ -81,6 +81,8 @@ constexpr float ROTATION_ANGLE90 = 90.f;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
+constexpr uint32_t RGB_CHANNEL_BITS_LENGTH = 24;
+constexpr float MAX_ALPHA_VALUE = 255.f;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 constexpr uint64_t FOLD_SCREEN_ID {5};
@@ -990,11 +992,18 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
-    if (color < MIN_POINTER_COLOR) {
-        color = MIN_POINTER_COLOR;
-    } else if (color > MAX_POINTER_COLOR) {
-        color = MAX_POINTER_COLOR;
+    if (surfaceNode_ != nullptr) {
+        MMI_HILOGW("surfaceNode_ is nullptr");
+    } else {
+        uint32_t alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
+        if (alphaRatio > 1) {
+            MMI_HILOGW("Invalid alphaRatio:%{public}u", alphaRatio);
+        } else {
+            surfaceNode_->SetAlpha(1 - alphaRatio);
+        }
     }
+    MMI_HILOGI("PointerColor:%{public}x", color);
+    color &= MAX_POINTER_COLOR;
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
