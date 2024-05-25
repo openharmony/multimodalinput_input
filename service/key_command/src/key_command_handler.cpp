@@ -586,8 +586,8 @@ void KeyCommandHandler::KnuckleGestureTouchMove(std::shared_ptr<PointerEvent> to
         if (isGesturing_ && !isLetterGesturing_) {
             auto getBoundingSquareness = GESTURESENSE_WRAPPER->getBoundingSquareness_;
             CHKPV(getBoundingSquareness);
-            auto result = getBoundingSquareness(gesturePoints_);
-            if (result > MIN_LETTER_GESTURE_SQUARENESS) {
+            auto boundingSquareness = getBoundingSquareness(gesturePoints_);
+            if (boundingSquareness > MIN_LETTER_GESTURE_SQUARENESS) {
                 isLetterGesturing_ = true;
             }
         }
@@ -599,15 +599,16 @@ void KeyCommandHandler::KnuckleGestureTouchUp()
     CALL_DEBUG_ENTER;
     auto touchUp = GESTURESENSE_WRAPPER->touchUp_;
     CHKPV(touchUp);
-    NotifyType result = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
+    NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
         isGesturing_, isLetterGesturing_));
-    switch (result) {
+    switch (notifyType) {
         case NotifyType::REGIONGESTURE:
         case NotifyType::LETTERGESTURE: {
-            KnuckleGestureTouchUpHandle(result);
+            KnuckleGestureTouchUpHandle(notifyType);
             break;
         }
         default: {
+            MMI_HILOGW("Not a Region gesture or letter gesture!");
             break;
         }
     }
