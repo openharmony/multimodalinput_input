@@ -36,7 +36,6 @@
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
-#include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
@@ -249,6 +248,13 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         .dx = pointerItem.GetRawDx(),
         .dy = pointerItem.GetRawDy(),
     };
+    auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_EMULATOR
+    if (displayInfo->displayDirection == DIRECTION0) {
+        CalculateOffset(displayInfo->direction, offset);
+    }
+#endif // OHOS_BUILD_EMULATOR
     int32_t ret = RET_OK;
 
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
@@ -267,6 +273,23 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
+}
+
+void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
+{
+    std::negate<double> neg;
+    if (direction == DIRECTION90) {
+        double tmp = offset.dx;
+        offset.dx = offset.dy;
+        offset.dy = neg(tmp);
+    } else if (direction == DIRECTION180) {
+        offset.dx = neg(offset.dx);
+        offset.dy = neg(offset.dy);
+    } else if (direction == DIRECTION270) {
+        double tmp = offset.dx;
+        offset.dx = neg(offset.dy);
+        offset.dy = tmp;
+    }
 }
 
 void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
