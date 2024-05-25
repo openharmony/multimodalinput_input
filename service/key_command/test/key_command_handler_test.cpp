@@ -1808,12 +1808,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportKnuckleDoubleClickEv
 
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 /**
- * @tc.name: KeyCommandHandlerTest_KnuckleGestureTouchDown_001
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchDown_001
  * @tc.desc: Test knuckle gesture touch down event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchDown_001, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchDown_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1828,18 +1828,18 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchDown_00
     touchEvent->SetActionTime(1);
     touchEvent->AddPointerItem(item);
     KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.KnuckleGestureTouchDown(touchEvent);
+    keyCommandHandler.HandleKnuckleGestureTouchDown(touchEvent);
 
     ASSERT_TRUE(handler.gestureTimeStamps_.empty());
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_KnuckleGestureTouchMove_001
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_001
  * @tc.desc: Test knuckle gesture touch move event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchMove_001, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchMove_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1857,17 +1857,17 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchMove_00
     touchEvent->SetActionTime(6);
     touchEvent->SetPointerId(2);
 
-    handler.KnuckleGestureTouchMove(touchEvent);
+    handler.HandleKnuckleGestureTouchMove(touchEvent);
     ASSERT_FALSE(handler.isLetterGesturing_);
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_KnuckleGestureTouchUp_001
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_001
  * @tc.desc: Test knuckle gesture touch up event partial screenshot
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchUp_001, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1879,16 +1879,16 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchUp_001,
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = true;
 
-    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureTouchUp());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp());
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_KnuckleGestureTouchUp_002
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_002
  * @tc.desc: Test knuckle gesture touch up event long screenshot
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchUp_002, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1900,16 +1900,16 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchUp_002,
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = true;
 
-    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureTouchUp());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp());
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_KnuckleGestureTouchUp_003
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_003
  * @tc.desc: Test knuckle gesture touch up event straight line
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchUp_003, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1921,16 +1921,16 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureTouchUp_003,
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = true;
 
-    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureTouchUp());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp());
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_KnuckleGestureReset_001
- * @tc.desc: Test KnuckleGestureReset function
+ * @tc.name: KeyCommandHandlerTest_ResetKnuckleGesture_001
+ * @tc.desc: Test ResetKnuckleGesture function
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureReset_001, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ResetKnuckleGesture_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1942,7 +1942,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureReset_001, T
     handler.gesturePoints_.assign(CURVE_COORDINATES.begin(), CURVE_COORDINATES.end());
     handler.gestureTimeStamps_.assign(CURVE_TIMESTAMPS.begin(), CURVE_TIMESTAMPS.end());
 
-    handler.KnuckleGestureReset();
+    handler.ResetKnuckleGesture();
     ASSERT_EQ(handler.gestureLastX_, 0.0f);
     ASSERT_EQ(handler.gestureLastY_, 0.0f);
     ASSERT_FALSE(handler.isGesturing_);
