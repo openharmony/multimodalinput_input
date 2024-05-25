@@ -1645,6 +1645,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
     windowPid = WinMgr->GetWindowPid(windowId);
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
+        return RET_ERR;
     }
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return RET_OK;
