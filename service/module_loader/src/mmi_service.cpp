@@ -1645,6 +1645,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
     windowPid = WinMgr->GetWindowPid(windowId);
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
+        return RET_ERR;
     }
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return RET_OK;
@@ -2011,7 +2012,7 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
         std::ref(rotateSwitch)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
