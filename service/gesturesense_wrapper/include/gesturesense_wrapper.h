@@ -34,7 +34,6 @@ public:
     GET_BOUNDING_SQUARENESS getBoundingSquareness_ = nullptr;
 
 private:
-    GesturesenseWrapper() = default;
     void* gesturesenseWrapperHandle_ = nullptr;
 };
 

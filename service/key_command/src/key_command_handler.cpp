@@ -184,7 +184,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     touchEvent->GetPointerItem(id, item);
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-        KnuckleGestureTouchMove(touchEvent);
+        HandleKnuckleGestureTouchMove(touchEvent);
     }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     if (!twoFingerGesture_.active) {
@@ -293,7 +293,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    KnuckleGestureTouchDown(touchEvent);
+    HandleKnuckleGestureTouchDown(touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
 
@@ -304,6 +304,9 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     size_t pointercnt = touchEvent->GetPointerIds().size();
     if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+        HandleKnuckleGestureTouchUp();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
@@ -545,7 +548,7 @@ int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-void KeyCommandHandler::KnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent)
+void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -561,7 +564,7 @@ void KeyCommandHandler::KnuckleGestureTouchDown(std::shared_ptr<PointerEvent> to
     gestureTimeStamps_.emplace_back(touchEvent->GetActionTime());
 }
 
-void KeyCommandHandler::KnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent)
+void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -584,9 +587,9 @@ void KeyCommandHandler::KnuckleGestureTouchMove(std::shared_ptr<PointerEvent> to
             }
         }
         if (isGesturing_ && !isLetterGesturing_) {
-            auto getBoundingSquareness = GESTURESENSE_WRAPPER->getBoundingSquareness_;
-            CHKPV(getBoundingSquareness);
-            auto boundingSquareness = getBoundingSquareness(gesturePoints_);
+            auto GetBoundingSquareness = GESTURESENSE_WRAPPER->getBoundingSquareness_;
+            CHKPV(GetBoundingSquareness);
+            auto boundingSquareness = GetBoundingSquareness(gesturePoints_);
             if (boundingSquareness > MIN_LETTER_GESTURE_SQUARENESS) {
                 isLetterGesturing_ = true;
             }
@@ -594,7 +597,7 @@ void KeyCommandHandler::KnuckleGestureTouchMove(std::shared_ptr<PointerEvent> to
     }
 }
 
-void KeyCommandHandler::KnuckleGestureTouchUp()
+void KeyCommandHandler::HandleKnuckleGestureTouchUp()
 {
     CALL_DEBUG_ENTER;
     auto touchUp = GESTURESENSE_WRAPPER->touchUp_;
@@ -604,18 +607,18 @@ void KeyCommandHandler::KnuckleGestureTouchUp()
     switch (notifyType) {
         case NotifyType::REGIONGESTURE:
         case NotifyType::LETTERGESTURE: {
-            KnuckleGestureTouchUpHandle(notifyType);
+            ProcessKnuckleGestureTouchUp(notifyType);
             break;
         }
         default: {
-            MMI_HILOGW("Not a Region gesture or letter gesture!");
+            MMI_HILOGW("Not a region gesture or letter gesture, notifyType:%{public}d", notifyType);
             break;
         }
     }
-    KnuckleGestureReset();
+    ResetKnuckleGesture();
 }
 
-void KeyCommandHandler::KnuckleGestureTouchUpHandle(NotifyType type)
+void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
 {
     Ability ability;
     ability.abilityName = SCREENSHOT_ABILITY_NAME;
@@ -631,7 +634,7 @@ void KeyCommandHandler::KnuckleGestureTouchUpHandle(NotifyType type)
     LaunchAbility(ability, 0);
 }
 
-void KeyCommandHandler::KnuckleGestureReset()
+void KeyCommandHandler::ResetKnuckleGesture()
 {
     gestureLastX_ = 0.0f;
     gestureLastY_ = 0.0f;
@@ -644,11 +647,10 @@ void KeyCommandHandler::KnuckleGestureReset()
 
 std::string KeyCommandHandler::GesturePointsToStr() const
 {
-    std::string result;
     auto count = gesturePoints_.size();
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
-        return result;
+        return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
     for (auto i = 0; i < count; i += EVEN_NUMBER) {
@@ -657,8 +659,10 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
         cJSON_AddItemToArray(jsonArray, jsonData);
     }
-    result = std::string(cJSON_Print(jsonArray));
+    char *jsonString = cJSON_Print(jsonArray);
+    std::string result = std::string(jsonString);
     cJSON_Delete(jsonArray);
+    cJSON_free(jsonString);
     return result;
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
