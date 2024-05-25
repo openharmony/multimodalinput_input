@@ -284,7 +284,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2) {
+    if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("Require three parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
