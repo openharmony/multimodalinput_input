@@ -166,11 +166,6 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
-    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write key event failed");
-        return;
-    }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -194,11 +189,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
                 pointerEvent->GetId(), pointerEvent->GetDeviceId(), pointerEvent->DumpPointerAction());
             return;
         }
-    }
-    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write pointer event failed");
-        return;
     }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
@@ -313,6 +303,11 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
     CHKPF(keyEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
+    pkt << InputHandlerType::MONITOR << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return false;
+    }
     for (const auto &mon : monitors_) {
         if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
             mon.SendToClient(keyEvent, pkt);
@@ -419,6 +414,11 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     CHKPV(pointerEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
+    pkt << InputHandlerType::MONITOR << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
+        return;
+    }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
