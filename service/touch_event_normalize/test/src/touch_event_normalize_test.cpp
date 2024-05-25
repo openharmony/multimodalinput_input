@@ -150,7 +150,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch
     bool flag = true;
     TouchEventHdr->SetTouchpadPinchSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(TouchEventHdr->GetTouchpadPinchSwitch(flag) == RET_OK);
+    TouchEventHdr->GetTouchpadPinchSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -179,7 +179,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
     bool flag = true;
     TouchEventHdr->SetTouchpadSwipeSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(TouchEventHdr->GetTouchpadSwipeSwitch(flag) == RET_OK);
+    TouchEventHdr->GetTouchpadSwipeSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -208,7 +208,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitc
     bool rotateSwitch = true;
     TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch);
     bool newRotateSwitch = true;
-    ASSERT_TRUE(TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 } // namespace MMI

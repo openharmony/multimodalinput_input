@@ -77,15 +77,15 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
 
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);
-    static int32_t GetTouchpadPinchSwitch(bool &switchFlag);
+    static void GetTouchpadPinchSwitch(bool &switchFlag);
     static int32_t SetTouchpadSwipeSwitch(bool switchFlag);
-    static int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
+    static void GetTouchpadSwipeSwitch(bool &switchFlag);
     static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
-    static int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+    static void GetTouchpadRotateSwitch(bool &rotateSwitch);
 
 private:
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
-    static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
+    static void GetConfigDataFromDatabase(std::string &key, bool &value);
 
     int32_t OnEventTouchPadDown(struct libinput_event *event);
     int32_t OnEventTouchPadMotion(struct libinput_event *event);

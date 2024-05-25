@@ -298,9 +298,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     CALL_DEBUG_ENTER;
 
     bool tpSwipeSwitch = true;
-    if (GetTouchpadSwipeSwitch(tpSwipeSwitch) != RET_OK) {
-        MMI_HILOGD("Failed to get touchpad swipe switch flag, default is true");
-    }
+    GetTouchpadSwipeSwitch(tpSwipeSwitch);
 
     if (!tpSwipeSwitch) {
         MMI_HILOGD("Touchpad swipe switch is false");
@@ -386,9 +384,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     CALL_DEBUG_ENTER;
 
     bool tpPinchSwitch = true;
-    if (GetTouchpadPinchSwitch(tpPinchSwitch) != RET_OK) {
-        MMI_HILOGD("Failed to get touchpad pinch switch flag, default is true");
-    }
+    GetTouchpadPinchSwitch(tpPinchSwitch);
 
     CHKPR(event, RET_ERR);
     auto gesture = libinput_event_get_gesture_event(event);
@@ -510,15 +506,10 @@ int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::GetTouchpadSwipeSwitch(bool &switchFlag)
+void TouchPadTransformProcessor::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
     std::string name = "touchpadSwipe";
-    if (GetConfigDataFromDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to get touchpad swpie switch flag from mem");
-        return RET_ERR;
-    }
-
-    return RET_OK;
+    GetConfigDataFromDatabase(name, switchFlag);
 }
 
 int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
@@ -534,15 +525,10 @@ int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
     return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
+void TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
 {
     std::string name = "touchpadPinch";
-    if (GetConfigDataFromDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to get touchpad pinch switch flag from mem");
-        return RET_ERR;
-    }
-
-    return RET_OK;
+    GetConfigDataFromDatabase(name, switchFlag);
 }
 
 int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
@@ -558,15 +544,10 @@ int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
     return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
+void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     std::string name = "touchpadRotate";
-    if (GetConfigDataFromDatabase(name, rotateSwitch) != RET_OK) {
-        MMI_HILOGE("GetConfigDataFromDatabase failed");
-        return RET_ERR;
-    }
-
-    return RET_OK;
+    GetConfigDataFromDatabase(name, rotateSwitch);
 }
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
@@ -574,10 +555,9 @@ int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bo
     return PREFERENCES_MGR->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
 }
 
-int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
+void TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
     value = PREFERENCES_MGR->GetBoolValue(key, true);
-    return RET_OK;
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
