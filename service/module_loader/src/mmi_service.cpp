@@ -1983,7 +1983,7 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
         std::ref(type)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad right button menu type failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
