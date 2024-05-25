@@ -2074,7 +2074,7 @@ int32_t MMIService::CancelInjection()
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnCancelInjection, this));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnAuthorize failed, ret:%{public}d", ret);
+        MMI_HILOGE("OnCancelInjection failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
