@@ -71,8 +71,6 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     displayInfo_.displayDirection = Direction::DIRECTION0;
 }
 
-KnuckleDrawingManager::~KnuckleDrawingManager() {}
-
 void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;

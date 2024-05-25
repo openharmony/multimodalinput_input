@@ -53,7 +53,7 @@ public:
             CHKPV(pixelMap);
             auto bitmap = PixelMapToBitmap(pixelMap);
             CHKPV(bitmap);
-            knuckleDivergentPoint = std::make_shared<KnuckleDivergentPoint>(*bitmap);
+            knuckleDivergentPoint = std::make_shared<KnuckleDivergentPoint>(bitmap);
         }
     }
 private:

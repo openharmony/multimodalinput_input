@@ -37,7 +37,7 @@ public:
     void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     KnuckleDrawingManager();
-    ~KnuckleDrawingManager();
+    ~KnuckleDrawingManager() = default;
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);
