@@ -43,6 +43,9 @@ constexpr int32_t MIN_DELAY = 0;
 constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
 constexpr int32_t ANR_DISPATCH = 0;
 constexpr uint8_t LOOP_COND = 2;
+constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
+constexpr int32_t POINTER_CHANGE_AREA_SIZE = 8;
+constexpr int32_t TRANSFORM_SIZE = 9;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -190,6 +193,21 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
         }
     }
     return true;
+}
+
+int32_t InputManagerImpl::GetDisplayMaxSize()
+{
+    return sizeof(DisplayInfo::id) + sizeof(DisplayInfo::x)+ sizeof(DisplayInfo::y)+ sizeof(DisplayInfo::width)
+           + sizeof(DisplayInfo::height)+ sizeof(DisplayInfo::dpi) + sizeof("display")
+           + std::to_string(std::numeric_limits<uint64_t>::max()).size() + sizeof("default")
+           + std::to_string(std::numeric_limits<uint64_t>::max()).size() + sizeof(DisplayInfo::direction)
+           + sizeof(DisplayInfo::displayDirection) + sizeof(DisplayInfo::displayMode);
+}
+
+int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
+{
+    return sizeof(WindowInfo) + sizeof(Rect) * maxAreasCount * 2
+           + sizeof(int32_t) * POINTER_CHANGE_AREA_SIZE + sizeof(float) * TRANSFORM_SIZE;
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -2081,13 +2099,9 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     return ret;
 }
 
-int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t batchSize)
+int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
 {
-    if (batchSize <= 0) {
-        MMI_HILOGE("The window size is invalid");
-        return RET_ERR;
-    }
-    return WindowInfo::MAX_WINDOW_SIZE / batchSize;
+    return (MAX_PKT_SIZE - GetDisplayMaxSize() * displayCount) / GetWindowMaxSize(maxAreasCount);
 }
 } // namespace MMI
 } // namespace OHOS
