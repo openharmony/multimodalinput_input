@@ -16,6 +16,7 @@
 #include "input_manager_impl.h"
 
 #include <cinttypes>
+
 #include <unistd.h>
 
 #include "define_multimodal.h"
