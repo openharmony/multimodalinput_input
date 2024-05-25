@@ -1051,7 +1051,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1092,7 +1092,7 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("RemoveInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("RemoveInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1313,7 +1313,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("SubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("SubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1343,7 +1343,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
