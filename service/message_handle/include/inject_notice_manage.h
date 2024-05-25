@@ -19,7 +19,6 @@
 #include <mutex>
 
 #include "ability_connect_callback_stub.h"
-#include "ffrt_inner.h"
 
 namespace OHOS {
 namespace MMI {
