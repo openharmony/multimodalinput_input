@@ -32,7 +32,7 @@ namespace MMI {
 class KnuckleDynamicDrawingManager {
 public:
     KnuckleDynamicDrawingManager();
-    ~KnuckleDynamicDrawingManager();
+    ~KnuckleDynamicDrawingManager() = default;
     void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
 

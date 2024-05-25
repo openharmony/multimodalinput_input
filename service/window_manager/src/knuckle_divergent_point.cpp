@@ -19,6 +19,7 @@
 
 #include "include/core/SkColorFilter.h"
 #include "mmi_log.h"
+#include "platform/ohos/overdraw/rs_overdraw_controller.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDivergentPoint"
@@ -32,15 +33,14 @@ constexpr double BASIC_GRAVITY_Y = 0.5f;
 constexpr int32_t BASIC_LIFESPAN = 15;
 constexpr float DOUBLE = 2.0f;
 constexpr float DYNAMIC_EFFECT_SIZE = 0.8f;
+constexpr int32_t ARGB_COLOR_ARRAY = 0x20c8ffff;
 } // namespace
 
-KnuckleDivergentPoint::KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap)
+KnuckleDivergentPoint::KnuckleDivergentPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap)
     : traceShadow_(bitmap)
 {
     CALL_DEBUG_ENTER;
 }
-
-KnuckleDivergentPoint::~KnuckleDivergentPoint() {};
 
 void KnuckleDivergentPoint::Update()
 {
@@ -75,10 +75,23 @@ void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     traceMatrix_.Reset();
     traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
     canvas->SetMatrix(traceMatrix_);
+    OHOS::Rosen::Drawing::Filter filter;
+    OHOS::Rosen::OverdrawColorArray colorArray = {
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        ARGB_COLOR_ARRAY,
+    };
 
+    auto protanomalyMat = OHOS::Rosen::Drawing::ColorFilter::CreateOverDrawColorFilter(colorArray.data());
+    filter.SetColorFilter(protanomalyMat);
+    
     OHOS::Rosen::Drawing::Brush brush;
+    brush.SetFilter(filter);
     canvas->AttachBrush(brush);
-    canvas->DrawBitmap(traceShadow_, pointX_, pointY_);
+    canvas->DrawBitmap(*traceShadow_, pointX_, pointY_);
     canvas->DetachBrush();
 }
 
