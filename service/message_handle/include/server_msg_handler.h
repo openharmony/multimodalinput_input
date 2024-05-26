@@ -98,7 +98,7 @@ public:
     int32_t OnCancelInjection();
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     bool InitInjectNoticeSource();
-    bool AddInjectNotice(InjectNoticeInfo& noticeInfo);
+    bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
