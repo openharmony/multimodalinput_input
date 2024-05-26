@@ -45,9 +45,7 @@ const int32_t TUPLE_UID = 1;
 const int32_t TUPLE_NAME = 2;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
