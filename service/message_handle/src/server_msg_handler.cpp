@@ -742,7 +742,7 @@ bool ServerMsgHandler::InitInjectNoticeSource()
     return true;
 }
 
-bool ServerMsgHandler::AddInjectNotice(InjectNoticeInfo &noticeInfo)
+bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
 {
     CALL_DEBUG_ENTER;
     bool isInit = InitInjectNoticeSource();
@@ -751,7 +751,7 @@ bool ServerMsgHandler::AddInjectNotice(InjectNoticeInfo &noticeInfo)
         return false;
     }
     MMI_HILOGD("submit begin");
-    ffrt::submit([this, &noticeInfo] {
+    ffrt::submit([this, noticeInfo] {
         MMI_HILOGD("submit enter");
         CHKPV(injectNotice_);
         auto pConnect = injectNotice_->GetConnection();
