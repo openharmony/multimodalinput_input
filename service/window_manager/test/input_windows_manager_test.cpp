@@ -95,6 +95,23 @@ private:
 void FingersenseWrapperTest(int32_t num) {}
 
 /**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_001
+ * @tc.desc: Test GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    UDSServer udsServer;
+    WinMgr->Init(udsServer);
+    WinMgr->GetDisplayGroupInfo();
+    int32_t idNames = -1;
+    ASSERT_EQ(WinMgr->GetClientFd(pointerEvent), idNames);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateTarget_003
  * @tc.desc: Test UpdateTarget
  * @tc.type: FUNC
