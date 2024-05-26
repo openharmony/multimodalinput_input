@@ -46,9 +46,9 @@ public:
             return;
         }
         MMI_HILOGD("receivedScreenStatus: %{public}s", action.c_str());
-        DISPLAY_MONITOR->SetScreenStatus(action);
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGD("display screen on");
+            DISPLAY_MONITOR->SetScreenStatus(action);
             STYLUS_HANDLER->IsLaunchAbility();
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGD("start enable fingersense");
@@ -57,13 +57,16 @@ public:
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("display screen off");
+            DISPLAY_MONITOR->SetScreenStatus(action);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+            MMI_HILOGD("display screen locked");
             DISPLAY_MONITOR->SetScreenLocked(true);
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+            MMI_HILOGD("display screen unlocked");
             DISPLAY_MONITOR->SetScreenLocked(false);
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
