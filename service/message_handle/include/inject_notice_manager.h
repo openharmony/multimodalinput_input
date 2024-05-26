@@ -45,7 +45,7 @@ public:
     };
     bool StartNoticeAbility();
     bool ConnectNoticeSrv();
-    bool AbilityIsStart();
+    bool IsAbilityStart() const;
     sptr<InjectNoticeConnection> GetConnection();
 
 private:
