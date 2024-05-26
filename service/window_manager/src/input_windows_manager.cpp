@@ -3123,7 +3123,9 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(pixelMap);
+    if (pixelMap == nullptr) {
+        return false;
+    }
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };

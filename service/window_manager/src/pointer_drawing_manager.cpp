@@ -177,9 +177,11 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     currentDirection_ = direction;
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
         physicalX, physicalY);
-    MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
-        ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
-
+    // Log printing only occurs when the mouse style changes
+    if (currentMouseStyle_.id != lastMouseStyle_.id) {
+        MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
+            ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+    }
     if (surfaceNode_ != nullptr) {
         DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
         return;
