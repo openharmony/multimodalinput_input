@@ -414,9 +414,9 @@ int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t temp;
-    int32_t pid;
-    int32_t windowId;
+    int32_t temp = 0;
+    int32_t pid = 0;
+    int32_t windowId = 0;
     pkt >> temp >> pid >> windowId;
     WindowArea area = static_cast<WindowArea>(temp);
     if (pkt.ChkRWError()) {
