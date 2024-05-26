@@ -718,7 +718,7 @@ bool ServerMsgHandler::InitInjectNoticeSource()
         injectNotice_ = std::make_shared<InjectNoticeManager>();
     }
     MMI_HILOGD("Injectnotice StartNoticeAbility ok");
-    if (!injectNotice_ ->AbilityIsStart()) {
+    if (!injectNotice_ ->IsAbilityStart()) {
         MMI_HILOGD("Injectnotice StartNoticeAbility begin");
         bool isStart = injectNotice_ ->StartNoticeAbility();
         if (!isStart) {

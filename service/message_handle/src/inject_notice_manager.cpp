@@ -87,7 +87,7 @@ bool InjectNoticeManager::ConnectNoticeSrv()
     return true;
 }
 
-bool InjectNoticeManager::AbilityIsStart()
+bool InjectNoticeManager::IsAbilityStart() const
 {
     return isStartSrv_;
 }
