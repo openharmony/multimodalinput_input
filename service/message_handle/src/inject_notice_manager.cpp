@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "inject_notice_manage.h"
+#include "inject_notice_manager.h"
 
 #include <atomic>
 
