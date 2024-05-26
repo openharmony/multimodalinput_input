@@ -145,9 +145,9 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t pid;
-    int32_t uid;
-    int32_t syncStatus;
+    int32_t pid = 0;
+    int32_t uid = 0;
+    int32_t syncStatus = 0;
     std::string bundleName;
     pkt >> pid >> uid >> bundleName >> syncStatus;
     InputMgrImpl.NotifyBundleName(pid, uid, bundleName, syncStatus);
@@ -253,7 +253,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     std::string type;
-    int32_t deviceId;
+    int32_t deviceId = 0;
     pkt >> type >> deviceId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read type failed");
@@ -269,7 +269,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 {
     CALL_DEBUG_ENTER;
     InputHandlerType handlerType;
-    uint32_t deviceTags;
+    uint32_t deviceTags = 0;
     pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOG_DISPATCHE("Packet read handler failed");
@@ -310,7 +310,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     InputHandlerType handlerType;
-    uint32_t deviceTags;
+    uint32_t deviceTags = 0;
     pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOG_DISPATCHE("Packet read Pointer data failed");
@@ -356,7 +356,7 @@ void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionT
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t pid;
+    int32_t pid = 0;
     pkt >> pid;
     if (pkt.ChkRWError()) {
         MMI_HILOG_ANRDETECTE("Packet read data failed");
