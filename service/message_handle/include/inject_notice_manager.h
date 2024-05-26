@@ -20,11 +20,9 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
 struct InjectNoticeInfo {
     int32_t pid { 0 };
 };
-} //namespace
 
 class InjectNoticeManager {
 public:
