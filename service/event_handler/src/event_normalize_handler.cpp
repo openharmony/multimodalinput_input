@@ -59,7 +59,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         return;
     }
 
-    CHKPV(event);
+    if (event == nullptr) {
+        return;
+    }
     DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
     TimeCostChk chk("HandleLibinputEvent", "overtime 1000(us)", MAX_INPUT_EVENT_TIME, type);
@@ -359,7 +361,9 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto touchpad = libinput_event_get_touchpad_event(event);
-    CHKPV(touchpad);
+    if (touchpad == nullptr) {
+        return;
+    }
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
         MMI_HILOGD("ToolType is MT_TOOL_PALM");
