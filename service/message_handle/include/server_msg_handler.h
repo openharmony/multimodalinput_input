@@ -29,7 +29,8 @@
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "window_info.h"
-#include "inject_notice_manage.h"
+#include "inject_notice_manager.h"
+
 namespace OHOS {
 namespace MMI {
 enum class AuthorizationStatus : int32_t {
@@ -97,7 +98,7 @@ public:
     int32_t OnCancelInjection();
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     bool InitInjectNoticeSource();
-    bool AddInjectNotice(InjectNoticeInfo &noticeInfo);
+    bool AddInjectNotice(InjectNoticeInfo& noticeInfo);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
@@ -127,7 +128,7 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
-    std::shared_ptr<InjectNoticeManage> injectNotice { nullptr };
+    std::shared_ptr<InjectNoticeManager> injectNotice_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

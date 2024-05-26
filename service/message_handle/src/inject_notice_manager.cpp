@@ -12,11 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "inject_notice_manage.h"
+
 #include <atomic>
+
 #include "ability_manager_client.h"
 #include "ffrt_inner.h"
 #include "message_parcel.h"
+
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -32,18 +36,17 @@ constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_SEND = 0;
 constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_CLOSE = 1;
 }
 
+InjectNoticeManager::InjectNoticeManager() : connectionCallback_(new (std::nothrow) InjectNoticeConnection()) {}
 
-InjectNoticeManage::InjectNoticeManage() : connectionCallback_(new InjectNoticeConnection()) {}
-
-InjectNoticeManage::~InjectNoticeManage()
+InjectNoticeManager::~InjectNoticeManager()
 {
     connectionCallback_ = nullptr;
 }
 
-bool InjectNoticeManage::StartNoticeAbility()
+bool InjectNoticeManager::StartNoticeAbility()
 {
     CALL_DEBUG_ENTER;
-    if (this->isStartSrv) {
+    if (isStartSrv_) {
         MMI_HILOGW("The injectNoticeAbility has start");
         return true;
     }
@@ -58,16 +61,16 @@ bool InjectNoticeManage::StartNoticeAbility()
         MMI_HILOGW("Start injectNoticeAbility failed, result:%{public}d", result);
         return false;
     }
-    this->isStartSrv = true;
+    isStartSrv_ = true;
     MMI_HILOGI("Start injectNoticeAbility success");
     return true;
 }
 
-bool InjectNoticeManage::ConnectNoticeSrv()
+bool InjectNoticeManager::ConnectNoticeSrv()
 {
     CALL_DEBUG_ENTER;
-    CHKPR(this->connectionCallback_, false);
-    if (this->connectionCallback_->IsConnected()) {
+    CHKPR(connectionCallback_, false);
+    if (connectionCallback_->IsConnected()) {
         MMI_HILOGD("InjectNoticeAbility has connected");
         return true;
     }
@@ -75,7 +78,7 @@ bool InjectNoticeManage::ConnectNoticeSrv()
     CHKPF(abilityMgr);
     AAFwk::Want want;
     want.SetElementName("com.ohos.powerdialog", "InjectNoticeAbility");
-    ErrCode result = abilityMgr->ConnectAbility(want, this->connectionCallback_, INVALID_USERID);
+    ErrCode result = abilityMgr->ConnectAbility(want, connectionCallback_, INVALID_USERID);
     if (result != ERR_OK) {
         MMI_HILOGW("Connect InjectNoticeAbility failed, result:%{public}d", result);
         return false;
@@ -84,38 +87,36 @@ bool InjectNoticeManage::ConnectNoticeSrv()
     return true;
 }
 
-bool InjectNoticeManage::AbilityIsStart()
+bool InjectNoticeManager::AbilityIsStart()
 {
-    return this->isStartSrv;
+    return isStartSrv_;
 }
 
-sptr<InjectNoticeManage::InjectNoticeConnection> InjectNoticeManage::GetConnection()
+sptr<InjectNoticeManager::InjectNoticeConnection> InjectNoticeManager::GetConnection()
 {
-    return this->connectionCallback_;
+    return connectionCallback_;
 }
 
-void InjectNoticeManage::InjectNoticeConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
-    const sptr<IRemoteObject> &remoteObject, int resultCode)
+void InjectNoticeManager::InjectNoticeConnection::OnAbilityConnectDone(const AppExecFwk::ElementName& element,
+    const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard lock(this->mutex_);
     CHKPV(remoteObject);
-    if (this->remoteObject == nullptr) {
-        this->remoteObject = remoteObject;
+    if (remoteObject_ == nullptr) {
+        remoteObject_ = remoteObject;
     }
-    this->isConnected = true;
+    isConnected_ = true;
 }
 
-void InjectNoticeManage::InjectNoticeConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
+void InjectNoticeManager::InjectNoticeConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName& element,
     int resultCode)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard lock(mutex_);
-    this->isConnected = false;
-    this->remoteObject = nullptr;
+    isConnected_ = false;
+    remoteObject_ = nullptr;
 }
 
-bool InjectNoticeManage::InjectNoticeConnection::SendNotice(InjectNoticeInfo &noticeInfo)
+bool InjectNoticeManager::InjectNoticeConnection::SendNotice(const InjectNoticeInfo& noticeInfo)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -124,7 +125,7 @@ bool InjectNoticeManage::InjectNoticeConnection::SendNotice(InjectNoticeInfo &no
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_SEND;
     MMI_HILOGD("Requst send notice begin");
-    int32_t ret = this->remoteObject->SendRequest(cmdCode, data, reply, option);
+    int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
         MMI_HILOGW("Requst send notice failed: %{public}d", ret);
         return false;
@@ -133,7 +134,7 @@ bool InjectNoticeManage::InjectNoticeConnection::SendNotice(InjectNoticeInfo &no
     return true;
 }
 
-bool InjectNoticeManage::InjectNoticeConnection::CancelNotice(InjectNoticeInfo &noticeInfo)
+bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNoticeInfo& noticeInfo)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -142,7 +143,7 @@ bool InjectNoticeManage::InjectNoticeConnection::CancelNotice(InjectNoticeInfo &
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_CLOSE;
     MMI_HILOGD("Requst send notice begin");
-    int32_t ret = this->remoteObject->SendRequest(cmdCode, data, reply, option);
+    int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
         MMI_HILOGW("Requst send notice failed: %{public}d", ret);
         return false;
@@ -151,10 +152,9 @@ bool InjectNoticeManage::InjectNoticeConnection::CancelNotice(InjectNoticeInfo &
     return true;
 }
 
-bool InjectNoticeManage::InjectNoticeConnection::IsConnected()
+bool InjectNoticeManager::InjectNoticeConnection::IsConnected() const
 {
-    std::lock_guard lock(this->mutex_);
-    return this->isConnected;
+    return isConnected_;
 }
 } // namespace MMI
 } // namespace OHOS
