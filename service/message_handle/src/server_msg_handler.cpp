@@ -728,7 +728,7 @@ bool ServerMsgHandler::InitInjectNoticeSource()
         MMI_HILOGD("Injectnotice StartNoticeAbility ok");
     }
     auto connection = injectNotice_->GetConnection();
-    CHKPF(connect);
+    CHKPF(connection);
     if (!connection->IsConnected()) {
         MMI_HILOGD("Injectnotice ConnectNoticeSrv begin");
         bool isConnect = injectNotice_->ConnectNoticeSrv();
