@@ -99,7 +99,7 @@ PointerDrawingManager::PointerDrawingManager()
     hasMagicCursor_.name = "isMagicCursor";
     TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
         MMI_HILOGD("Timer callback");
-        CreatePointerSwiftObserver(hasMagicCursor_);
+        CreatePointerSwitchObserver(hasMagicCursor_);
     });
 
     MAGIC_CURSOR->InitStyle();
@@ -289,7 +289,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     }
 }
 
-void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
+void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {

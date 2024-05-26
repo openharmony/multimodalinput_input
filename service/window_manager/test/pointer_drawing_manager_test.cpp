@@ -442,19 +442,19 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseStyle_001
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CreatePointerSwiftObserver_001
- * @tc.desc: Test CreatePointerSwiftObserver
+ * @tc.name: InputWindowsManagerTest_CreatePointerSwitchObserver_001
+ * @tc.desc: Test CreatePointerSwitchObserver
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerSwiftObserver_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerSwitchObserver_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
     isMagicCursor item;
     item.isShow = true;
     item.name = "test";
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerSwiftObserver(item));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerSwitchObserver(item));
 }
 
 /**

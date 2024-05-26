@@ -115,7 +115,7 @@ private:
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreateMagicCursorChangeObserver();
-    void CreatePointerSwiftObserver(isMagicCursor& item);
+    void CreatePointerSwitchObserver(isMagicCursor& item);
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
