@@ -443,7 +443,7 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t windowId = 0;
-    int32_t windowPid = -1;
+    int32_t windowPid = INVALID_PID;
     int32_t focusX = 0;
     int32_t focusY = 0;
     READINT32(data, windowPid, IPC_PROXY_DEAD_OBJECT_ERR);
