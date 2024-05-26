@@ -1376,7 +1376,7 @@ int32_t MultimodalInputConnectProxy::GetWindowPid(int32_t windowId)
         MMI_HILOGE("Send request fail, result:%{public}d", ret);
         return ret;
     }
-    int32_t windowPid = -1;
+    int32_t windowPid = INVALID_PID;
     READINT32(reply, windowPid, ERR_INVALID_VALUE);
     return windowPid;
 }
