@@ -417,7 +417,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
-    MMI_HILOG_DISPATCHI("InputTracking id:%{public}d Key Event", keyEvent->GetId());
+    MMI_HILOG_DISPATCHI("id:%{public}d recv", keyEvent->GetId());
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
@@ -473,8 +473,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_DISPATCHI("InputTracking id:%{public}d Pointer Event",
-            pointerEvent->GetId());
+        MMI_HILOG_DISPATCHI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartConsumer(pointerEvent);
