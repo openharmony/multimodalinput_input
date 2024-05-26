@@ -714,20 +714,20 @@ bool ServerMsgHandler::InitInjectNoticeSource()
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Init InjectNoticeSource enter");
-    if (!injectNotice_) {
+    if (injectNotice_ == nullptr) {
         injectNotice_ = std::make_shared<InjectNoticeManager>();
     }
     MMI_HILOGD("Injectnotice StartNoticeAbility ok");
-    if (!injectNotice_ ->IsAbilityStart()) {
+    if (!injectNotice_->IsAbilityStart()) {
         MMI_HILOGD("Injectnotice StartNoticeAbility begin");
-        bool isStart = injectNotice_ ->StartNoticeAbility();
+        bool isStart = injectNotice_->StartNoticeAbility();
         if (!isStart) {
             MMI_HILOGE("Injectnotice StartNoticeAbility isStart:%{public}d", isStart);
             return false;
         }
         MMI_HILOGD("Injectnotice StartNoticeAbility ok");
     }
-    auto connection = injectNotice_ ->GetConnection();
+    auto connection = injectNotice_->GetConnection();
     CHKPF(connect);
     if (!connection->IsConnected()) {
         MMI_HILOGD("Injectnotice ConnectNoticeSrv begin");
@@ -754,7 +754,7 @@ bool ServerMsgHandler::AddInjectNotice(InjectNoticeInfo &noticeInfo)
     ffrt::submit([this, &noticeInfo] {
         MMI_HILOGD("submit enter");
         CHKPV(injectNotice_);
-        auto pConnect = injectNotice_ ->GetConnection();
+        auto pConnect = injectNotice_->GetConnection();
         CHKPV(pConnect);
         int32_t timeSecond = 0;
         while (timeSecond <= SEND_NOTICE_OVERTIME) {
@@ -765,7 +765,7 @@ bool ServerMsgHandler::AddInjectNotice(InjectNoticeInfo &noticeInfo)
                 pConnect->SendNotice(noticeInfo);
                 break;
             }
-            timeSecond = timeSecond + 1;
+            timeSecond += 1;
             sleep(1);
         }
         MMI_HILOGD("submit leave");

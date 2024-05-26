@@ -20,9 +20,11 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {    
 struct InjectNoticeInfo {
     int32_t pid { 0 };
 };
+}
 
 class InjectNoticeManager {
 public:
@@ -46,7 +48,7 @@ public:
     bool StartNoticeAbility();
     bool ConnectNoticeSrv();
     bool IsAbilityStart() const;
-    sptr<InjectNoticeConnection> GetConnection();
+    sptr<InjectNoticeConnection> GetConnection() const;
 
 private:
     sptr<InjectNoticeConnection> connectionCallback_ { nullptr };
@@ -54,5 +56,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // INJECT_NOTICE_MANAGE_H

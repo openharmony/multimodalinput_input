@@ -92,7 +92,7 @@ bool InjectNoticeManager::IsAbilityStart() const
     return isStartSrv_;
 }
 
-sptr<InjectNoticeManager::InjectNoticeConnection> InjectNoticeManager::GetConnection()
+sptr<InjectNoticeManager::InjectNoticeConnection> InjectNoticeManager::GetConnection() const
 {
     return connectionCallback_;
 }
@@ -125,6 +125,7 @@ bool InjectNoticeManager::InjectNoticeConnection::SendNotice(const InjectNoticeI
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_SEND;
     MMI_HILOGD("Requst send notice begin");
+    CHKPF(remoteObject_);
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
         MMI_HILOGW("Requst send notice failed: %{public}d", ret);
@@ -143,6 +144,7 @@ bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNotic
     data.WriteInt32(noticeInfo.pid);
     int32_t cmdCode = MESSAGE_PARCEL_KEY_NOTICE_CLOSE;
     MMI_HILOGD("Requst send notice begin");
+    CHKPF(remoteObject_);
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
         MMI_HILOGW("Requst send notice failed: %{public}d", ret);
