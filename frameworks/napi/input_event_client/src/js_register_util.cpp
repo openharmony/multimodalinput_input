@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace MMI {
-int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name, bool& ret)
+int32_t GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
     napi_value napiValue = {};
     CHKRF(napi_get_named_property(env, object, name.c_str(), &napiValue), GET_NAMED_PROPERTY);
@@ -47,7 +47,7 @@ int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, cons
     return RET_OK;
 }
 
-int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name, int32_t& ret)
+int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name, int32_t &ret)
 {
     napi_value napiValue = {};
     if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
@@ -76,7 +76,7 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
     return RET_OK;
 }
 
-int32_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name, int64_t& ret)
+int32_t GetNamedPropertyInt64(const napi_env &env, const napi_value &object, const std::string &name, int64_t &ret)
 {
     napi_value napiValue = {};
     if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
@@ -105,7 +105,7 @@ int32_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, con
     return RET_OK;
 }
 
-int32_t GetNamedPropertyDouble(const napi_env& env, const napi_value& object, const std::string& name, double& ret)
+int32_t GetNamedPropertyDouble(const napi_env &env, const napi_value &object, const std::string &name, double &ret)
 {
     napi_value napiValue = {};
     if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
