@@ -14,7 +14,7 @@
  */
 
 //!
-use hilog_rust::{error, hilog, info, HiLogLabel, LogType};
+use hilog_rust::{error, hilog, info, debug, HiLogLabel, LogType};
 use std::ffi::{c_char, CString};
 use std::sync::Once;
 
@@ -362,7 +362,7 @@ extern {
 }
 
 fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
-    info!(LOG_LABEL, "get_speed_gain enter vin is set to {} speed {} ", @public(vin), @public(speed));
+    debug!(LOG_LABEL, "get_speed_gain enter vin is set to {} speed {} ", @public(vin), @public(speed));
     unsafe {
         if fabs(vin) < DOUBLE_ZERO {
             error!(LOG_LABEL, "{} less that the limit", DOUBLE_ZERO);
@@ -379,20 +379,20 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         for i in 0..3 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                info!(LOG_LABEL, "gain is set to {}", @public(*gain));
+                debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
                 return true;
             }
         }
         *gain = (item.slopes[2] * vin + item.diff_nums[2]) / vin;
-        info!(LOG_LABEL, "gain is set to {}", @public(*gain));
+        debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
     }
-    info!(LOG_LABEL, "get_speed_gain leave");
+    debug!(LOG_LABEL, "get_speed_gain leave");
     true
 }
 
 
 fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i32) -> bool {
-    info!(LOG_LABEL, "get_speed_gain_touchpad enter vin is set to {}, speed {}, device_type {}",
+    debug!(LOG_LABEL, "get_speed_gain_touchpad enter vin is set to {}, speed {}, device_type {}",
         @public(vin), @public(speed), @public(device_type));
     unsafe {
         if fabs(vin) < DOUBLE_ZERO {
@@ -415,14 +415,14 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         for i in 0..4 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                info!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
                 return true;
             }
         }
         *gain = (item.slopes[3] * vin + item.diff_nums[3]) / vin;
-        info!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[3])/ vin));
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[3])/ vin));
     }
-    info!(LOG_LABEL, "get_speed_gain_touchpad leave");
+    debug!(LOG_LABEL, "get_speed_gain_touchpad leave");
     true
 }
 
@@ -454,7 +454,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
         dx = (*offset).dx;
         dy = (*offset).dy;
         vin = (fmax(fabs(dx), fabs(dy)) + fmin(fabs(dx), fabs(dy))) / 2.0;
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
             @public(*abs_x),
@@ -474,7 +474,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
         }
         info!(
             LOG_LABEL,
-            "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
+            "abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
     }
     RET_OK

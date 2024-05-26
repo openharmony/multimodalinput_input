@@ -144,7 +144,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
         default: {
-            MMI_HILOGW("This device does not support :%d", type);
+            MMI_HILOGD("This device does not support :%d", type);
             break;
         }
     }
