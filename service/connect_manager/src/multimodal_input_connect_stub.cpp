@@ -45,6 +45,8 @@ const int32_t TUPLE_UID = 1;
 const int32_t TUPLE_NAME = 2;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
+constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
+
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -420,6 +422,10 @@ int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, 
 
     int32_t rows = 3; // the initial number of scrolling rows is 3.
     READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (rows > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || rows < 0) {
+        MMI_HILOGE("rows is invalid");
+        return RET_ERR;
+    }
     int32_t ret = SetMouseScrollRows(rows);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMouseScrollRows failed ret:%{public}d", ret);
@@ -526,6 +532,10 @@ int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, 
     }
 
     int32_t rows = 3; // the initial number of scrolling rows is 3.
+    if (rows > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || rows < 0) {
+        MMI_HILOGE("rows is invalid");
+        return RET_ERR;
+    }
     int32_t ret = GetMouseScrollRows(rows);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetMouseScrollRows failed ret:%{public}d", ret);
