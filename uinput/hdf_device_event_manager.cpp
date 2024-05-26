@@ -86,7 +86,7 @@ int32_t main()
         goto nextStep;
     }
     auto notifyProcessStatusFunc = reinterpret_cast<int32_t(*)(int32_t, int32_t, int32_t)>(notifyProcessStatus);
-    if (notifyProcessStatusFunc(pid, INPUT_PARAM_FIRST, INPUT_PARAM_SECOND) != 0) {
+    if (notifyProcessStatusFunc(pid, OHOS::MMI::INPUT_PARAM_FIRST, OHOS::MMI::INPUT_PARAM_SECOND) != 0) {
         MMI_HILOGE("%{public}s, get device memory failed.", __func__);
     }
     dlclose(libMemMgrClientHandle);
