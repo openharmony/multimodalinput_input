@@ -74,7 +74,7 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
     }
 }
 
-void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket &pkt)
+void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 {
     CHKPV(sess);
     auto id = pkt.GetMsgId();
@@ -232,7 +232,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
         (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) ||
         ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) &&
-        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE))) {
+         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE))) {
         return RET_OK;
     }
     PointerEvent::PointerItem pointerItem {};
@@ -259,20 +259,20 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     int32_t ret = RET_OK;
 
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
-        ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
-            &cursorPos.cursorPos.y, MouseTransformProcessor::GetTouchpadSpeed(),
-            static_cast<int32_t>(DeviceType::DEVICE_KLV));
+        ret = HandleMotionAccelerateTouchpad(&offset, WinMgr->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
+            MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_KLV));
     } else {
-        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &cursorPos.cursorPos.x,
-            &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed());
+        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed());
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
         return ret;
     }
     WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)", cursorPos.cursorPos.x,
-        cursorPos.cursorPos.y, cursorPos.displayId);
+    MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
 
@@ -338,8 +338,8 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         targetWindowId = iter->second;
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
-    if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER || action == PointerEvent::POINTER_ACTION_DOWN ||
-        targetWindowId < 0) {
+    if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
+        action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
         MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
         return true;
     }
@@ -366,8 +366,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     DisplayGroupInfo displayGroupInfo;
-    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId >>
-        displayGroupInfo.currentUserId;
+    pkt >> displayGroupInfo.width >> displayGroupInfo.height >>
+        displayGroupInfo.focusWindowId >> displayGroupInfo.currentUserId;
     uint32_t num = 0;
     pkt >> num;
     if (pkt.ChkRWError()) {
@@ -377,9 +377,10 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         int32_t byteCount = 0;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas >> info.pointerHotAreas >>
-            info.agentWindowId >> info.flags >> info.action >> info.displayId >> info.zOrder >>
-            info.pointerChangeAreas >> info.transform >> info.windowInputType >> info.privacyMode >> byteCount;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+            >> info.windowInputType >> info.privacyMode >> byteCount;
 
         if (byteCount != 0) {
             MMI_HILOGD("byteCount:%{public}d", byteCount);
@@ -394,8 +395,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> num;
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name >> info.uniq >>
-            info.direction >> info.displayDirection >> info.displayMode;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -441,9 +442,10 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
     }
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas >> info.pointerHotAreas >>
-            info.agentWindowId >> info.flags >> info.action >> info.displayId >> info.zOrder >>
-            info.pointerChangeAreas >> info.transform >> info.windowInputType >> info.privacyMode;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
+            >> info.windowInputType >> info.privacyMode;
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -483,8 +485,8 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority, uint32_t deviceTags)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("handlerType:%{public}d", handlerType);
@@ -505,8 +507,8 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority, uint32_t deviceTags)
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
@@ -557,8 +559,8 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
-    const std::shared_ptr<KeyOption> option)
+int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
+    int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -582,8 +584,8 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId,
-    int32_t switchType)
+int32_t ServerMsgHandler::OnSubscribeSwitchEvent(
+    IUdsServer *server, int32_t pid, int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -607,8 +609,8 @@ int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t p
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
-    uint32_t deviceTags, int32_t clientPid)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
+    int32_t filterId, int32_t priority, uint32_t deviceTags, int32_t clientPid)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
@@ -701,9 +703,9 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
         return ERR_INVALID_VALUE;
     }
 
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap *>(pixelMap));
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d", pixelMapPtr->GetByteCount(),
-        pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
+    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
     return RET_OK;
 }
@@ -712,27 +714,26 @@ bool ServerMsgHandler::InitInjectNoticeSource()
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Init InjectNoticeSource enter");
-    if (!this->injectNotice) {
-        this->injectNotice = std::make_shared<InjectNoticeManage>();
+    if (!injectNotice_) {
+        injectNotice_ = std::make_shared<InjectNoticeManager>();
     }
-    CHKPF(this->injectNotice);
     MMI_HILOGD("Injectnotice StartNoticeAbility ok");
-    if (!this->injectNotice->AbilityIsStart()) {
+    if (!injectNotice_ ->AbilityIsStart()) {
         MMI_HILOGD("Injectnotice StartNoticeAbility begin");
-        bool bStart = this->injectNotice->StartNoticeAbility();
-        if (!bStart) {
-            MMI_HILOGE("Injectnotice StartNoticeAbility bStart:%{public}d", bStart);
+        bool isStart = injectNotice_ ->StartNoticeAbility();
+        if (!isStart) {
+            MMI_HILOGE("Injectnotice StartNoticeAbility isStart:%{public}d", isStart);
             return false;
         }
         MMI_HILOGD("Injectnotice StartNoticeAbility ok");
     }
-    auto connection = this->injectNotice->GetConnection();
+    auto connection = injectNotice_ ->GetConnection();
     CHKPF(connect);
     if (!connection->IsConnected()) {
         MMI_HILOGD("Injectnotice ConnectNoticeSrv begin");
-        bool bConnect = this->injectNotice->ConnectNoticeSrv();
-        if (!bConnect) {
-            MMI_HILOGD("Injectnotice ConnectNoticeSrv bConnect:%{public}d", bConnect);
+        bool isConnect = injectNotice_->ConnectNoticeSrv();
+        if (!isConnect) {
+            MMI_HILOGD("Injectnotice ConnectNoticeSrv isConnect:%{public}d", isConnect);
             return false;
         }
         MMI_HILOGD("Injectnotice ConnectNoticeSrv ok");
@@ -744,16 +745,16 @@ bool ServerMsgHandler::InitInjectNoticeSource()
 bool ServerMsgHandler::AddInjectNotice(InjectNoticeInfo &noticeInfo)
 {
     CALL_DEBUG_ENTER;
-    bool bInit = InitInjectNoticeSource();
-    if (!bInit) {
-        MMI_HILOGE("InitInjectNoticeSource error");
+    bool isInit = InitInjectNoticeSource();
+    if (!isInit) {
+        MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
     MMI_HILOGD("submit begin");
     ffrt::submit([this, &noticeInfo] {
         MMI_HILOGD("submit enter");
-        CHKPV(this->injectNotice);
-        auto pConnect = this->injectNotice->GetConnection();
+        CHKPV(injectNotice_);
+        auto pConnect = injectNotice_ ->GetConnection();
         CHKPV(pConnect);
         int32_t timeSecond = 0;
         while (timeSecond <= SEND_NOTICE_OVERTIME) {

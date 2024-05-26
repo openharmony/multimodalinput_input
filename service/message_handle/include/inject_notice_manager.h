@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INJECT_NOTICE_MANAGE_H
-#define INJECT_NOTICE_MANAGE_H
-
-#include <mutex>
+#ifndef INJECT_NOTICE_MANAGER_H
+#define INJECT_NOTICE_MANAGER_H
 
 #include "ability_connect_callback_stub.h"
 
@@ -26,25 +24,24 @@ struct InjectNoticeInfo {
     int32_t pid { 0 };
 };
 
-class InjectNoticeManage {
+class InjectNoticeManager {
 public:
-    InjectNoticeManage();
-    ~InjectNoticeManage();
+    InjectNoticeManager();
+    ~InjectNoticeManager();
 
 public:
     class InjectNoticeConnection : public OHOS::AAFwk::AbilityConnectionStub {
     public:
-        void OnAbilityConnectDone(const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject,
+        void OnAbilityConnectDone(const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject,
             int resultCode) override;
-        void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
-        bool SendNotice(InjectNoticeInfo &noticeInfo);
-        bool CancelNotice(InjectNoticeInfo &noticeInfo);
-        bool IsConnected();
+        void OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode) override;
+        bool SendNotice(const InjectNoticeInfo &noticeInfo);
+        bool CancelNotice(const InjectNoticeInfo &noticeInfo);
+        bool IsConnected() const;
 
     private:
-        std::mutex mutex_;
-        sptr<IRemoteObject> remoteObject { nullptr };
-        std::atomic_bool isConnected = false;
+        sptr<IRemoteObject> remoteObject_ { nullptr };
+        std::atomic_bool isConnected_ = false;
     };
     bool StartNoticeAbility();
     bool ConnectNoticeSrv();
@@ -53,7 +50,7 @@ public:
 
 private:
     sptr<InjectNoticeConnection> connectionCallback_ { nullptr };
-    std::atomic_bool isStartSrv = false;
+    std::atomic_bool isStartSrv_ = false;
 };
 } // namespace MMI
 } // namespace OHOS
