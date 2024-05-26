@@ -993,8 +993,6 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGW("surfaceNode_ is nullptr");
-    } else {
         float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
         if (alphaRatio > 1) {
             MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
