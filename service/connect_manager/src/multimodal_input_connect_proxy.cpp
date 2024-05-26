@@ -41,7 +41,7 @@ constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
-    int32_t value;
+    int32_t value = 0;
     READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetId(value);
     READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -67,11 +67,11 @@ int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inp
     READUINT64(reply, caps, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetCapabilities(static_cast<unsigned long>(caps));
 
-    uint32_t size;
+    uint32_t size = 0;
     READUINT32(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
     InputDevice::AxisInfo axis;
     for (uint32_t i = 0; i < size; ++i) {
-        int32_t val;
+        int32_t val = 0;
         READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
         axis.SetMinimum(val);
         READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1309,7 +1309,7 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tup
     READINT32(reply, size, ERR_INVALID_VALUE);
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
-        int32_t syncState;
+        int32_t syncState = 0;
         READINT32(reply, data.pid, ERR_INVALID_VALUE);
         READINT32(reply, data.uid, ERR_INVALID_VALUE);
         READSTRING(reply, data.bundleName, ERR_INVALID_VALUE);
