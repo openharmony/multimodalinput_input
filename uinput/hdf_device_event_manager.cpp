@@ -27,6 +27,10 @@
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t INPUT_PARAM_FIRST { 2 };
+constexpr int32_t INPUT_PARAM_SECOND { 1 };
+} // namespace
 void HdfDeviceEventManager::ConnectHDFInit()
 {
     std::string name = "mmi-hdf";
@@ -75,13 +79,14 @@ int32_t main()
         goto nextStep;
     }
 
-    int(* notifyProcessStatusFunc)(int, int, int) = (dlsym(libMemmgrClientHandle, "notify_process_status"));
-    if (!notifyProcessStatusFunc) {
+    void * notifyProcessStatus= (dlsym(libMemMgrClientHandle, "notify_process_status"));
+    if (!notifyProcessStatus) {
         MMI_HILOGE("%{public}s, dlsym notify_process_status failed.", __func__);
         dlclose(libMemmgrClientHandle);
         goto nextStep;
     }
-    if (notifyProcessStatusFunc(pid, 2, 1) != 0) {
+    auto notifyProcessStatusFunc = reinterpret_cast<int32_t(*)(int32_t, int32_t, int32_t)>(notifyProcessStatus);
+    if (notifyProcessStatusFunc(pid, INPUT_PARAM_FIRST, INPUT_PARAM_SECOND) != 0) {
         MMI_HILOGE("%{public}s, get device memory failed.", __func__);
     }
     dlclose(libMemmgrClientHandle);
