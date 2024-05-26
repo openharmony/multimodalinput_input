@@ -799,7 +799,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
 
-    int32_t speed;
+    int32_t speed = 0;
     READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerSpeed(speed);
     if (ret != RET_OK) {
@@ -817,7 +817,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
 
-    int32_t speed;
+    int32_t speed = 0;
     int32_t ret = GetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Call get pointer speed failed ret:%{public}d", ret);
@@ -845,7 +845,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventObserver(MessageParcel& 
 int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t windowId;
+    int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
     PointerStyle pointerStyle;
     READINT32(data, pointerStyle.size, RET_ERR);
@@ -865,8 +865,8 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t pid;
-    int32_t windowId;
+    int32_t pid = 0;
+    int32_t windowId = 0;
     READINT32(data, pid, RET_ERR);
     READINT32(data, windowId, RET_ERR);
     int32_t ret = ClearWindowPointerStyle(pid, windowId);
@@ -881,7 +881,7 @@ int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& d
 int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t windowId;
+    int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
@@ -1024,7 +1024,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType;
+    int32_t handlerType = 0;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
@@ -1034,11 +1034,11 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         MMI_HILOGE("Monitor permission check failed");
         return ERROR_NO_PERMISSION;
     }
-    uint32_t eventType;
+    uint32_t eventType = 0;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t priority;
+    int32_t priority = 0;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t deviceTags;
+    int32_t deviceTags = 0;
     READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
         deviceTags);
@@ -1061,7 +1061,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType;
+    int32_t handlerType = 0;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
@@ -1071,11 +1071,11 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         MMI_HILOGE("Monitor permission check failed");
         return ERROR_NO_PERMISSION;
     }
-    uint32_t eventType;
+    uint32_t eventType = 0;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t priority;
+    int32_t priority = 0;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t deviceTags;
+    int32_t deviceTags = 0;
     READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
         deviceTags);
@@ -1098,7 +1098,7 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t eventId;
+    int32_t eventId = 0;
     READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = MarkEventConsumed(eventId);
     if (ret != RET_OK) {
@@ -1121,7 +1121,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t subscribeId;
+    int32_t subscribeId = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
     auto keyOption = std::make_shared<KeyOption>();
@@ -1150,7 +1150,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t subscribeId;
+    int32_t subscribeId = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
     int32_t ret = UnsubscribeKeyEvent(subscribeId);
@@ -1174,8 +1174,8 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t subscribeId;
-    int32_t switchType;
+    int32_t subscribeId = 0;
+    int32_t switchType = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, switchType, IPC_PROXY_DEAD_OBJECT_ERR);
 
@@ -1199,7 +1199,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
         return MMISERVICE_NOT_RUNNING;
     }
 
-    int32_t subscribeId;
+    int32_t subscribeId = 0;
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
     int32_t ret = UnsubscribeSwitchEvent(subscribeId);
@@ -1221,9 +1221,9 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t offsetX;
+    int32_t offsetX = 0;
     READINT32(data, offsetX, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t offsetY;
+    int32_t offsetY = 0;
     READINT32(data, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
 
     int32_t ret = MoveMouseEvent(offsetX, offsetY);
@@ -1565,7 +1565,7 @@ int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, 
     }
     std::string businessId;
     READSTRING(data, businessId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t delay;
+    int32_t delay = 0;
     READINT32(data, delay, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetKeyDownDuration(businessId, delay);
     if (ret != RET_OK) {
@@ -1757,7 +1757,7 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    int32_t delay;
+    int32_t delay = 0;
     READINT32(data, delay, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetKeyboardRepeatDelay(delay);
     if (ret != RET_OK) {
@@ -1778,7 +1778,7 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatRate(MessageParcel& dat
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    int32_t rate;
+    int32_t rate = 0;
     READINT32(data, rate, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetKeyboardRepeatRate(rate);
     if (ret != RET_OK) {
@@ -1799,7 +1799,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    int32_t delay;
+    int32_t delay = 0;
     int32_t ret = GetKeyboardRepeatDelay(delay);
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyboard repeat delay failed ret:%{public}d", ret);
@@ -1820,7 +1820,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatRate(MessageParcel& dat
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    int32_t rate;
+    int32_t rate = 0;
     int32_t ret = GetKeyboardRepeatRate(rate);
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyboard repeat rate failed ret:%{public}d", ret);
