@@ -126,7 +126,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         }
     }
     optind = 1;
-    int32_t c = 0;
+    int32_t c;
     while ((c = getopt_long (args.size(), argv, "hdlwusoifmck", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
