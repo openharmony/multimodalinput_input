@@ -238,10 +238,9 @@ void InputMonitor::SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) c
 
 bool InputMonitor::IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "pinch" &&
-        JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "threeFingersSwipe" &&
-        JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "fourFingersSwipe" &&
-        JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "threeFingersTap") {
+    auto ret = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName();
+    if (ret != "pinch" && ret != "threeFingersSwipe" &&
+        ret != "fourFingersSwipe" && ret != "threeFingersTap") {
         return false;
     }
     if (pointerEvent->GetPointerIds().size() == 1) {
