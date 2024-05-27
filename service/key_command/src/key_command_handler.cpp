@@ -1818,8 +1818,8 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
-    int32_t displayX = item->GetDisplayX();
-    int32_t displayY = item->GetDisplayY();
+    int32_t displayX = item.GetDisplayX();
+    int32_t displayY = item.GetDisplayY();
     int32_t displayId = touchEvent->GetTargetDisplayId();
     auto windows = WinMgr->GetWindowGroupInfoByDisplayId(displayId);
     for (auto window : windows) {
