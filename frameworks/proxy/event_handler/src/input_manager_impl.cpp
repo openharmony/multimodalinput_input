@@ -236,7 +236,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     if (ret != RET_OK) {
         MMI_HILOGE("AddInputEventFilter has send to server failed, priority:%{public}d, ret:%{public}d", priority, ret);
         service = nullptr;
-        return RET_ERR;  
+        return RET_ERR; 
     }
     auto it = eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
