@@ -32,37 +32,37 @@ public:
 
     void Init();
     void InitProcessedCallback();
-    void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
+    void OnMsgHandler(const UDSClient &client, NetPacket &pkt);
 
 protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
-    int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
+    int32_t OnKeyEvent(const UDSClient &client, NetPacket &pkt);
+    int32_t OnKeyMonitor(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
+    int32_t OnPointerEvent(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
+    int32_t OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-    int32_t OnSubscribeSwitchEventCallback(const UDSClient& client, NetPacket& pkt);
+    int32_t OnSubscribeSwitchEventCallback(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
-    int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
+    int32_t ReportKeyEvent(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-    int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
+    int32_t ReportPointerEvent(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    int32_t NotifyBundleName(const UDSClient& client, NetPacket& pkt);
-    int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
-    int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
-    int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
-    int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
-    int32_t OnDevListener(const UDSClient& client, NetPacket& pkt);
-    int32_t OnAnr(const UDSClient& client, NetPacket& pkt);
+    int32_t NotifyBundleName(const UDSClient &client, NetPacket &pkt);
+    int32_t OnInputDevice(const UDSClient &client, NetPacket &pkt);
+    int32_t OnInputDeviceIds(const UDSClient &client, NetPacket &pkt);
+    int32_t OnSupportKeys(const UDSClient &client, NetPacket &pkt);
+    int32_t OnInputKeyboardType(const UDSClient &client, NetPacket &pkt);
+    int32_t OnDevListener(const UDSClient &client, NetPacket &pkt);
+    int32_t OnAnr(const UDSClient &client, NetPacket &pkt);
 
 private:
     static void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);

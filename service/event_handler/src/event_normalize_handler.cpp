@@ -494,7 +494,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     LogTracer lt;
     if (event != nullptr) {
-        CHKPR(event, ERROR_NULL_POINTER);
         pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -519,14 +518,12 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    if (pointerEvent != nullptr) {
-        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-        if (SetOriginPointerId(pointerEvent) != RET_OK) {
-            MMI_HILOGE("Failed to set origin pointerId");
-            return RET_ERR;
-        }
-        nextHandler_->HandleTouchEvent(pointerEvent);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    if (SetOriginPointerId(pointerEvent) != RET_OK) {
+        MMI_HILOGE("Failed to set origin pointerId");
+        return RET_ERR;
     }
+    nextHandler_->HandleTouchEvent(pointerEvent);
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }

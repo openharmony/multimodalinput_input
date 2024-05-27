@@ -865,8 +865,10 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
     }
     for (auto &pointerItem : pointerItems) {
         int32_t pointerId = pointerItem.GetPointerId();
-        pointerItem.SetOriginPointerId(pointerId);
-        pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+        if (pointerId < SIMULATE_EVENT_START_ID) {
+            pointerItem.SetOriginPointerId(pointerId);
+            pointerItem.SetPointerId(pointerId + SIMULATE_EVENT_START_ID);
+        }
     }
     pointerEvent->RemoveAllPointerItems();
     for (auto &pointerItem : pointerItems) {
@@ -876,7 +878,9 @@ void InputManagerImpl::HandleSimulateInputEvent(std::shared_ptr<PointerEvent> po
         pointerEvent->SetPointerId(pointerItems.front().GetPointerId());
         MMI_HILOGD("Simulate pointer event id:%{public}d", pointerEvent->GetPointerId());
     }
-    pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
+    if (pointerEvent->GetPointerId() < SIMULATE_EVENT_START_ID) {
+        pointerEvent->SetPointerId(pointerEvent->GetPointerId() + SIMULATE_EVENT_START_ID);
+    }
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
