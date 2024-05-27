@@ -29,6 +29,7 @@ namespace {
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
+constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -575,7 +576,7 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem)
 {
     for (auto &item : pointers_) {
-        if (item.GetPointerId() == pointerId) {
+        if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) == pointerId) {
             item = pointerItem;
             return;
         }
@@ -850,7 +851,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < nPressedButtons; ++i) {
-        int32_t buttonId;
+        int32_t buttonId = 0;
         READINT32(in, buttonId);
         SetButtonPressed(buttonId);
     }
@@ -880,7 +881,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::ReadAxisFromParcel(Parcel &in)
 {
-    uint32_t axes;
+    uint32_t axes = 0;
     READUINT32(in, axes);
 
     for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
@@ -927,7 +928,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < size; i++) {
-        uint32_t val;
+        uint32_t val = 0;
         READUINT32(in, val);
         enhanceData_.emplace_back(val);
     }
@@ -937,7 +938,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
 
 bool PointerEvent::ReadBufferFromParcel(Parcel &in)
 {
-    int32_t bufflen;
+    int32_t bufflen = 0;
     READINT32(in, bufflen);
     if (bufflen > static_cast<int32_t>(MAX_N_BUFFER_SIZE)) {
         return false;

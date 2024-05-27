@@ -42,7 +42,7 @@ const std::string EMPTY_STRING { "" };
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    std::shared_ptr<InputDevice> dev = InputDevMgr->GetInputDevice(id);
+    std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(id);
     CHKPV(dev);
     std::string message;
     std::string name;
@@ -90,7 +90,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
-        std::shared_ptr dev = InputDevMgr->GetInputDevice(id);
+        std::shared_ptr dev = INPUT_DEV_MGR->GetInputDevice(id);
         CHKPV(dev);
         int32_t ret = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
@@ -192,7 +192,7 @@ void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer,
             "EVENTTYPE", pointer->GetEventType(),
             "AGENT_WINDOWID", pointer->GetAgentWindowId(),
             "TARGET_WINDOWID", pointer->GetTargetWindowId(),
-            "PID", WinMgr->GetWindowPid(pointer->GetTargetWindowId()),
+            "PID", WIN_MGR->GetWindowPid(pointer->GetTargetWindowId()),
             "FD", fd,
             "MSG", "The window manager successfully update target pointer");
         if (ret != 0) {
@@ -230,7 +230,7 @@ void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
             "FD", fd,
             "AGENT_WINDOWID", key->GetAgentWindowId(),
             "TARGET_WINDOWID", key->GetTargetWindowId(),
-            "PID", WinMgr->GetWindowPid(key->GetTargetWindowId()),
+            "PID", WIN_MGR->GetWindowPid(key->GetTargetWindowId()),
             "MSG", "The window manager successfully update target key");
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);

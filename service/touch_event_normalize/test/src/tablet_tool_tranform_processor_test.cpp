@@ -71,7 +71,7 @@ void TabletToolTranformProcessorTest::SetupStylus()
     ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
     struct libinput_device *device = libinput_event_get_device(event);
     ASSERT_TRUE(device != nullptr);
-    InputDevMgr->OnInputDeviceAdded(device);
+    INPUT_DEV_MGR->OnInputDeviceAdded(device);
 }
 
 void TabletToolTranformProcessorTest::CloseStylus()
@@ -94,7 +94,7 @@ void TabletToolTranformProcessorTest::UpdateDisplayInfo()
         .width = display->GetWidth(),
         .height = display->GetHeight(),
     });
-    WinMgr->UpdateDisplayInfo(displays);
+    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void TabletToolTranformProcessorTest::SetUp()
