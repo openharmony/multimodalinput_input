@@ -383,7 +383,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     int32_t gesture = GestureIdentify(event);
     if (gesture != RET_OK) {
         MMI_HILOGD("GestureIdentify failed");
-        return RET_ERR
+        return RET_ERR;
     }
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
