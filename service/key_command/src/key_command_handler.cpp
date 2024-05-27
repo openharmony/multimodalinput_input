@@ -1313,18 +1313,18 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
     MMI_HILOGD("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
-    std::string matchName = ".ohos.screenshot";
+    std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
         bundleName = bundleName.substr(bundleName.size() - matchName.size());
     }
     if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
         if (bundleName == matchName) {
-            MMI_HILOGI("screen off, com.ohos.screenshot invalid");
+            MMI_HILOGI("screen off, screenshot invalid");
             return false;
         }
     } else {
         if (bundleName == matchName && isScreenLocked) {
-            MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond");
+            MMI_HILOGI("screen locked, screenshot delay 2000 milisecond");
             return HandleScreenLocked(sequence, isLaunchAbility);
         }
     }
