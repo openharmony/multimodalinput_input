@@ -45,7 +45,6 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 
-
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
 #undef MMI_LOG_TAG
@@ -59,7 +58,7 @@ constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
 constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
-const std::string SCREENSHOT_ABILITY_NAME = "com.ohos.screenshot.ServiceExtAbility";
+const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -621,7 +620,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp()
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
 {
     Ability ability;
-    ability.abilityName = SCREENSHOT_ABILITY_NAME;
+    ability.abilityName = WAKEUP_ABILITY_NAME;
     ability.bundleName = AIBASE_BUNDLE_NAME;
     ability.abilityType = EXTENSION_ABILITY;
     if (type == NotifyType::REGIONGESTURE) {
