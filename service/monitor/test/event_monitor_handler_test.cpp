@@ -165,9 +165,15 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_SendToClient_001, Test
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent));
+    NetPacket keyEventPkt(MmiMessageId::REPORT_KEY_EVENT);
+    keyEventPkt << InputHandlerType::MONITOR << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent, keyEventPkt));
+
+    NetPacket pointerEventPkt(MmiMessageId::REPORT_POINTER_EVENT);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(pointerEvent));
+    pointerEventPkt << InputHandlerType::MONITOR << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pointerEventPkt);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(pointerEvent, pointerEventPkt));
 }
 
 /**

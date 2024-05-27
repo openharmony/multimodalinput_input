@@ -304,7 +304,7 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
@@ -402,7 +402,7 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
@@ -548,7 +548,7 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise, uv_qos_user_initiated);
@@ -576,7 +576,7 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise, uv_qos_user_initiated);
@@ -902,7 +902,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, 
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
@@ -930,7 +930,7 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
@@ -1057,7 +1057,7 @@ void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, i
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
@@ -1085,7 +1085,7 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
     CHKPV(work);
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
-    int32_t ret;
+    int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);

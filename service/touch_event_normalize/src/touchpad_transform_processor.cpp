@@ -158,7 +158,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, RET_ERR);
