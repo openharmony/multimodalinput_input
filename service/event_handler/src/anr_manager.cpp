@@ -115,7 +115,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
         CHKPV(sess);
-        if (type == ANR_MONITOR || WinMgr->IsWindowVisible(sess->GetPid())) {
+        if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
             DfxHisysevent::ApplicationBlockInput(sess);
             MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",

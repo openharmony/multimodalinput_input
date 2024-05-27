@@ -238,10 +238,9 @@ void InputMonitor::SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) c
 
 bool InputMonitor::IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "pinch" &&
-        JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "threeFingersSwipe" &&
-        JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "fourFingersSwipe" &&
-        JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "threeFingersTap") {
+    auto ret = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName();
+    if (ret != "pinch" && ret != "threeFingersSwipe" &&
+        ret != "fourFingersSwipe" && ret != "threeFingersTap") {
         return false;
     }
     if (pointerEvent->GetPointerIds().size() == 1) {
@@ -578,7 +577,7 @@ int32_t JsInputMonitor::GetPinchAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in pinch event");
+            MMI_HILOGD("Abnormal pointer action in pinch event");
             return RET_ERR;
         }
     }
@@ -597,7 +596,7 @@ int32_t JsInputMonitor::GetRotateAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in pinch event");
+            MMI_HILOGD("Abnormal pointer action in pinch event");
             return RET_ERR;
         }
     }
@@ -645,7 +644,7 @@ int32_t JsInputMonitor::GetSwipeAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in swipe event");
+            MMI_HILOGD("Abnormal pointer action in swipe event");
             return RET_ERR;
         }
     }
@@ -673,7 +672,7 @@ int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in multi tap event");
+            MMI_HILOGD("Abnormal pointer action in multi tap event");
             return RET_ERR;
         }
     }
@@ -1089,7 +1088,7 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
             return AXIS_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action");
+            MMI_HILOGD("Abnormal pointer action");
             return RET_ERR;
         }
     }

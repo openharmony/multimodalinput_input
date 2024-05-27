@@ -134,15 +134,15 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 break;
             }
             case 'd': {
-                InputDevMgr->Dump(fd, args);
+                INPUT_DEV_MGR->Dump(fd, args);
                 break;
             }
             case 'l': {
-                InputDevMgr->DumpDeviceList(fd, args);
+                INPUT_DEV_MGR->DumpDeviceList(fd, args);
                 break;
             }
             case 'w': {
-                WinMgr->Dump(fd, args);
+                WIN_MGR->Dump(fd, args);
                 break;
             }
             case 'u': {

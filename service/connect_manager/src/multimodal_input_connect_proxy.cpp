@@ -38,9 +38,11 @@ constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
 constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
+constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
+    CHKPR(inputDevice, RET_ERR);
     int32_t value;
     READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetId(value);
@@ -143,6 +145,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     uint32_t deviceTags)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(filter, ERR_INVALID_VALUE);
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
@@ -1274,6 +1277,10 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
+    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
+        MMI_HILOGE("infos size is invalid");
+        return RET_ERR;
+    }
     infos.reserve(size);
     for (int32_t i = 0; i < size; ++i) {
         DisplayBindInfo info;
@@ -1307,6 +1314,10 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tup
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
+    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
+        MMI_HILOGE("datas size is invalid");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
         int32_t syncState;
@@ -1365,7 +1376,7 @@ int32_t MultimodalInputConnectProxy::GetWindowPid(int32_t windowId)
         MMI_HILOGE("Send request fail, result:%{public}d", ret);
         return ret;
     }
-    int32_t windowPid = -1;
+    int32_t windowPid = INVALID_PID;
     READINT32(reply, windowPid, ERR_INVALID_VALUE);
     return windowPid;
 }

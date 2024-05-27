@@ -92,7 +92,7 @@ void TouchTransformProcessorTest::UpdateDisplayInfo()
         .width = display->GetWidth(),
         .height = display->GetHeight(),
     });
-    WinMgr->UpdateDisplayInfo(displays);
+    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void TouchTransformProcessorTest::SetUp()
