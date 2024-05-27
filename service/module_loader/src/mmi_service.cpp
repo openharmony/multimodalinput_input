@@ -1657,7 +1657,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
 int32_t MMIService::GetWindowPid(int32_t windowId)
 {
     CALL_INFO_TRACE;
-    int32_t windowPid = -1;
+    int32_t windowPid = INVALID_PID;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetWindowPid, this, windowId, std::ref(windowPid)));
     if (ret != RET_OK) {
