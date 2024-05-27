@@ -68,7 +68,6 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CALL_DEBUG_ENTER;
     return socketFd_;
 }
