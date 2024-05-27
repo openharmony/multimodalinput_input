@@ -111,7 +111,7 @@ private:
     static std::mutex mutex_;
 };
 
-#define InputDevMgr ::OHOS::MMI::InputDeviceManager::GetInstance()
+#define INPUT_DEV_MGR ::OHOS::MMI::InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_MANAGER_H

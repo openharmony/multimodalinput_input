@@ -54,7 +54,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
 
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{public}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
@@ -127,7 +127,7 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 {
-    if (InputDevMgr->IsKeyboardDevice(device) || InputDevMgr->IsPointerDevice(device)) {
+    if (INPUT_DEV_MGR->IsKeyboardDevice(device) || INPUT_DEV_MGR->IsPointerDevice(device)) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }

@@ -29,6 +29,7 @@ ohos_source_set("virtual_device_sources") {
 
   sources = [
     "src/general_device.cpp",
+    "src/general_joystick.cpp",
     "src/general_keyboard.cpp",
     "src/general_mouse.cpp",
     "src/general_stylus.cpp",
