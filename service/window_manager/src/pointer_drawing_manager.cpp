@@ -83,6 +83,8 @@ constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 constexpr uint32_t RGB_CHANNEL_BITS_LENGTH = 24;
 constexpr float MAX_ALPHA_VALUE = 255.f;
+constexpr int32_t MOUSE_STYLE_OPT = 0;
+constexpr int32_t MAGIC_STYLE_OPT = 1;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 constexpr uint64_t FOLD_SCREEN_ID {5};
