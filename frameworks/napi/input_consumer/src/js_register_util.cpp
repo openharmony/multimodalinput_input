@@ -76,7 +76,7 @@ std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_val
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
         return std::nullopt;
     }
-    int32_t ret;
+    int32_t ret = 0;
     if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
         MMI_HILOGE("Call napi_get_value_int32 failed");
         return std::nullopt;
