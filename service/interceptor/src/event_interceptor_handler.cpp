@@ -202,7 +202,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         MMI_HILOGE("keyItems is empty");
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(keyItems.front().GetDeviceId());
     CHKPF(inputDevice);
     uint32_t capKeyboard = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     for (const auto &interceptor : interceptors_) {
@@ -259,7 +259,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId(), false);
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(pointerItem.GetDeviceId(), false);
     CHKPF(inputDevice);
     uint32_t capPointer = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     uint32_t capTouch = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);

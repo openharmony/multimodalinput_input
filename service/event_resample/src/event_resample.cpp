@@ -212,13 +212,13 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
     if (pointerEvent == nullptr) {
         return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
     }
-    auto windows = WinMgr->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &window : windows) {
         if (pointerEvent->GetTargetWindowId() == window.id) {
             if (window.transform.empty()) {
                 return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
             }
-            auto windowXY = WinMgr->TransformWindowXY(window, logicX, logicY);
+            auto windowXY = WIN_MGR->TransformWindowXY(window, logicX, logicY);
             auto windowX = static_cast<int32_t>(windowXY.first);
             auto windowY = static_cast<int32_t>(windowXY.second);
             return {windowX, windowY};
@@ -509,7 +509,7 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
 
 void EventResample::PrintfDeviceName()
 {
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
         device->GetName().c_str());
