@@ -72,20 +72,21 @@ int32_t main()
 
     int32_t pid = getpid();
     MMI_HILOGI("Current pid:%{public}d", pid);
-
+    void *notifyProcessStatus = nullptr;
+    int32_t(* notifyProcessStatusFunc)(int32_t, int32_t, int32_t) = nullptr;
     void *libMemMgrClientHandle = dlopen("libmemmgrclient.z.so", RTLD_NOW);
     if (!libMemMgrClientHandle) {
         MMI_HILOGE("%{public}s, dlopen libmemmgrclient failed.", __func__);
         goto nextStep;
     }
 
-    void * notifyProcessStatus= (dlsym(libMemMgrClientHandle, "notify_process_status"));
+    notifyProcessStatus = (dlsym(libMemMgrClientHandle, "notify_process_status"));
     if (!notifyProcessStatus) {
         MMI_HILOGE("%{public}s, dlsym notify_process_status failed.", __func__);
         dlclose(libMemMgrClientHandle);
         goto nextStep;
     }
-    auto notifyProcessStatusFunc = reinterpret_cast<int32_t(*)(int32_t, int32_t, int32_t)>(notifyProcessStatus);
+    notifyProcessStatusFunc = reinterpret_cast<int32_t(*)(int32_t, int32_t, int32_t)>(notifyProcessStatus);
     if (notifyProcessStatusFunc(pid, OHOS::MMI::INPUT_PARAM_FIRST, OHOS::MMI::INPUT_PARAM_SECOND) != 0) {
         MMI_HILOGE("%{public}s, get device memory failed.", __func__);
     }
