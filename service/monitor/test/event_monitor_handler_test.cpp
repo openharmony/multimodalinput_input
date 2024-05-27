@@ -190,7 +190,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddMonitor_001, TestSi
     HandleEventType eventType = 0;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     EventMonitorHandler::SessionHandler sessionHandler { handlerType, eventType, session };
-    for (int i = 0; i < MAX_N_INPUT_MONITORS - 1; i++) {
+    for (int32_t i = 0; i < MAX_N_INPUT_MONITORS - 1; i++) {
         SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
         EventMonitorHandler::SessionHandler sessionHandler = { handlerType, eventType, session };
         monitorCollection.monitors_.insert(sessionHandler);
