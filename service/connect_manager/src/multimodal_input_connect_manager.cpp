@@ -74,6 +74,7 @@ int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() co
 
 int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
 }
@@ -81,18 +82,21 @@ int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &info
 int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
     int32_t> &datas)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
 }
 
 int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
 }
 
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetWindowPid(windowId);
 }
@@ -100,6 +104,7 @@ int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
 int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId,
     int32_t priority, uint32_t deviceTags)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
 }
@@ -113,12 +118,14 @@ int32_t MultimodalInputConnectManager::NotifyNapOnline()
 
 int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveInputEventObserver();
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
 }
