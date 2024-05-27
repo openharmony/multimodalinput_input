@@ -45,6 +45,7 @@ constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
 constexpr int32_t ANR_DISPATCH = 0;
 constexpr uint8_t LOOP_COND = 2;
 constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
+constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -204,7 +205,7 @@ int32_t InputManagerImpl::GetDisplayMaxSize()
 
 int32_t InputManagerImpl::GetWindowMaxSize(uint32_t maxAreasCount)
 {
-    return sizeof(WindowInfo) + sizeof(Rect) * maxAreasCount * 2
+    return sizeof(WindowInfo) + sizeof(Rect) * maxAreasCount * WINDOWINFO_RECT_COUNT
            + sizeof(int32_t) * WindowInfo::POINTER_CHANGEAREA_COUNT
            + sizeof(float) * WindowInfo::WINDOW_TRANSFORM_SIZE;
 }
