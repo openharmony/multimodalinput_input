@@ -1665,7 +1665,7 @@ int32_t InputManagerImpl::GetTouchpadScrollSwitch(bool &switchFlag)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollSwitch(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touchpad scroll switch failed");
+        MMI_HILOGE("Get the touchpad scroll switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1697,7 +1697,7 @@ int32_t InputManagerImpl::GetTouchpadScrollDirection(bool &state)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollDirection(state);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touchpad scroll direction switch failed");
+        MMI_HILOGE("Get the touchpad scroll direction switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
