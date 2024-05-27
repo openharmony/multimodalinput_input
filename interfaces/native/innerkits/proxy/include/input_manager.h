@@ -821,7 +821,7 @@ public:
 
     /**
      * @brief Get whether System has IrEmitter.
-     * @param hasIrEmitter the para takes the value which Indicates the device has  IrEmitter or not.
+     * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12
      */
@@ -838,7 +838,7 @@ public:
     /**
      * @brief user IrEmitter with parameter number and pattern.
      * @param number   Frequency of IrEmitter works .
-     * @param pattern  Pattern of signal transmission in alternate on/off mode, in microseconds.
+     * @param pattern Pattern of signal transmission in alternate on/off mode, in microseconds.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12
      */

@@ -36,28 +36,28 @@
 #include "key_map_manager.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
-#include "string_ex.h"
-#include "watchdog_task.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "string_ex.h"
+#include "watchdog_task.h"
 
+#include "display_event_monitor.h"
+#include "device_event_monitor.h"
+#include "fingersense_wrapper.h"
+#include "infrared_emitter_controller.h"
+#include "key_auto_repeat.h"
+#include "key_command_handler.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
 #include "timer_manager.h"
+#include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
 #include "xcollie/watchdog.h"
-#include "key_auto_repeat.h"
-#include "key_command_handler.h"
-#include "touch_event_normalize.h"
-#include "display_event_monitor.h"
-#include "device_event_monitor.h"
-#include "fingersense_wrapper.h"
-#include "multimodal_input_preferences_manager.h"
-#include "infrared_emitter_controller.h"
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -120,7 +120,7 @@ MMIService::~MMIService() {}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+    if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
@@ -152,7 +152,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
 {
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+    if (type < EPOLL_EVENT_BEGIN || type >= EPOLL_EVENT_END) {
         MMI_HILOGE("Invalid param type");
         return RET_ERR;
     }
@@ -193,7 +193,7 @@ bool MMIService::InitLibinputService()
             EpollClose();
             return false;
         }
-        MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
+        MMI_HILOGD("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
     }
     return true;
 }
@@ -308,6 +308,9 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener success");
     DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
@@ -549,7 +552,7 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMouseScrollRows, this, std::ref(rows)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get the number of mouse scrolling rows failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1051,7 +1054,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1092,7 +1095,7 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("RemoveInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("RemoveInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1313,7 +1316,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("SubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("SubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1343,7 +1346,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = UNSUBSCRIBED;
-        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1645,6 +1648,7 @@ int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
     windowPid = WinMgr->GetWindowPid(windowId);
     if (windowPid == RET_ERR) {
         MMI_HILOGE("Get window pid failed");
+        return RET_ERR;
     }
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return RET_OK;
@@ -1983,7 +1987,7 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
         std::ref(type)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad right button menu type failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -2011,7 +2015,7 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
         std::ref(rotateSwitch)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -2074,7 +2078,7 @@ int32_t MMIService::CancelInjection()
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnCancelInjection, this));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnAuthorize failed, ret:%{public}d", ret);
+        MMI_HILOGE("OnCancelInjection failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

@@ -60,7 +60,6 @@ struct WindowInfoEX {
 };
 
 class InputWindowsManager final {
-    DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
     class FoldStatusLisener : public Rosen::DisplayManager::IFoldStatusListener {
     public:
@@ -81,6 +80,8 @@ public:
         Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
     };
 
+    InputWindowsManager();
+    ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
@@ -178,6 +179,8 @@ public:
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
 
+    static std::shared_ptr<InputWindowsManager> GetInstance();
+
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
@@ -205,6 +208,8 @@ private:
     void RegisterFoldStatusListener();
     void UnregisterFoldStatusListener();
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
+    void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
+    void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -320,9 +325,13 @@ private:
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
+
+    static std::shared_ptr<InputWindowsManager> instance_;
+    static std::mutex mutex_;
+    std::map<int32_t, WindowInfo> lastMatchedWindow_;
 };
 
-#define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
+#define WinMgr ::OHOS::MMI::InputWindowsManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_WINDOWS_MANAGER_H

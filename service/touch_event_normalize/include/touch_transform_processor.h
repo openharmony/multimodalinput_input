@@ -16,10 +16,12 @@
 #ifndef TOUCH_TRANSFORM_PROCESSOR_H
 #define TOUCH_TRANSFORM_PROCESSOR_H
 
+#include "aggregator.h"
 #include "nocopyable.h"
 #include "transform_processor.h"
 #include "fingersense_manager.h"
 #include "struct_multimodal.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -45,6 +47,15 @@ private:
     const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
+    Aggregator aggregator_ {
+            [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->ResetTimer(timerId);
+            }
+    };
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     TouchType rawTouch_;
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER

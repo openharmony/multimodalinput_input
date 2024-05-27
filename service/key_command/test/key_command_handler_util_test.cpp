@@ -599,6 +599,230 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyFinalKey_003
 }
 
 /**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyVal_001
+ * @tc.desc: Test key does not exist in JSON object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyVal_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *json = nullptr;
+    std::string value;
+    OHOS::MMI::GetKeyVal(json, "key", value);
+    EXPECT_TRUE(value.empty());
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetKeyVal_002
+ * @tc.desc: The value corresponding to the test key is a string type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetKeyVal_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    cJSON *json = cJSON_CreateObject();
+    cJSON_AddStringToObject(json, "key", "value");
+    std::string value;
+    OHOS::MMI::GetKeyVal(json, "key", value);
+    EXPECT_EQ(value, "value");
+    cJSON_Delete(json);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_001
+ * @tc.desc: Testing jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = nullptr;
+    ASSERT_FALSE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_002
+ * @tc.desc: Test has no entities field
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    ASSERT_TRUE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_003
+ * @tc.desc: The test entities field exists but is not an array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonAbility, "entities", cJSON_CreateNumber(123));
+    ASSERT_FALSE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_004
+ * @tc.desc: Test array contains non-string elements
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* entities = cJSON_CreateArray();
+    cJSON_AddItemToArray(entities, cJSON_CreateNumber(123));
+    cJSON_AddItemToObject(jsonAbility, "entities", entities);
+    ASSERT_FALSE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetEntities_005
+ * @tc.desc: Test normal conditions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetEntities_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* entities = cJSON_CreateArray();
+    cJSON_AddItemToArray(entities, cJSON_CreateString("entity1"));
+    cJSON_AddItemToArray(entities, cJSON_CreateString("entity2"));
+    cJSON_AddItemToObject(jsonAbility, "entities", entities);
+    ASSERT_TRUE(OHOS::MMI::GetEntities(jsonAbility, ability));
+    EXPECT_EQ(ability.entities.size(), 2);
+    EXPECT_EQ(ability.entities[0], "entity1");
+    EXPECT_EQ(ability.entities[1], "entity2");
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_001
+ * @tc.desc: Test jsonAbility is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = nullptr;
+    ASSERT_FALSE(OHOS::MMI::GetParams(jsonAbility, ability));
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_002
+ * @tc.desc: Test params are not an array
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateString("not an array");
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    ASSERT_TRUE(ability.params.empty());
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_003
+ * @tc.desc: Test Params for nullptr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateArray();
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    cJSON_AddItemToArray(params, nullptr);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    EXPECT_TRUE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_004
+ * @tc.desc: Test param is not an object
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    cJSON* jsonAbility = cJSON_CreateObject();
+    cJSON* params = cJSON_CreateObject();
+    cJSON_AddItemToObject(jsonAbility, "params", params);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    EXPECT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_005
+ * @tc.desc: The test key is not a string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    const char* jsonStr = R"({"params":[{"key":123,"value":"value"}]})";
+    cJSON* jsonAbility = cJSON_Parse(jsonStr);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerUtilTest_GetParams_006
+ * @tc.desc: The test value is not a string
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetParams_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Ability ability;
+    const char* jsonStr = R"({"params":[{"key":"key","value":123}]})";
+    cJSON* jsonAbility = cJSON_Parse(jsonStr);
+    bool result = OHOS::MMI::GetParams(jsonAbility, ability);
+    ASSERT_FALSE(result);
+    cJSON_Delete(jsonAbility);
+}
+
+/**
  * @tc.name: KeyCommandHandlerUtilTest_GetParams_007
  * @tc.desc: Test for normal conditions
  * @tc.type: FUNC

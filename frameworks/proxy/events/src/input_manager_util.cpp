@@ -672,7 +672,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent004()
 
 void InputManagerUtil::PrintPointerEventId(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGI("PointerEvent pointerId: %{public}d", pointerEvent->GetPointerId());
+    MMI_HILOGI("PointerEvent pointerId:%{public}d", pointerEvent->GetPointerId());
     auto pointerItems = pointerEvent->GetAllPointerItems();
     auto it = pointerItems.begin();
     int32_t count = 1;

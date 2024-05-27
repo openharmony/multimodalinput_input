@@ -431,6 +431,15 @@ int32_t JsInputMonitor::GetAction(int32_t action) const
         case PointerEvent::POINTER_ACTION_UP: {
             return static_cast<int32_t>(JsTouchEvent::Action::UP);
         }
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_DOWN);
+        }
+        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_MOVE);
+        }
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
+            return static_cast<int32_t>(JsTouchEvent::Action::PULL_UP);
+        }
         default: {
             return RET_ERR;
         }
@@ -521,7 +530,7 @@ int32_t JsInputMonitor::TransformPinchEvent(const std::shared_ptr<PointerEvent> 
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetPinchAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -541,7 +550,7 @@ int32_t JsInputMonitor::TransformRotateEvent(const std::shared_ptr<PointerEvent>
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetRotateAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -569,7 +578,7 @@ int32_t JsInputMonitor::GetPinchAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in pinch event");
+            MMI_HILOGD("Abnormal pointer action in pinch event");
             return RET_ERR;
         }
     }
@@ -588,7 +597,7 @@ int32_t JsInputMonitor::GetRotateAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in pinch event");
+            MMI_HILOGD("Abnormal pointer action in pinch event");
             return RET_ERR;
         }
     }
@@ -599,7 +608,7 @@ int32_t JsInputMonitor::TransformSwipeEvent(const std::shared_ptr<PointerEvent> 
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetSwipeAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -636,7 +645,7 @@ int32_t JsInputMonitor::GetSwipeAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in swipe event");
+            MMI_HILOGD("Abnormal pointer action in swipe event");
             return RET_ERR;
         }
     }
@@ -647,7 +656,7 @@ int32_t JsInputMonitor::TransformMultiTapEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetMultiTapAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action Value failed");
+        MMI_HILOGE("Get action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -664,7 +673,7 @@ int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
             return GESTURE_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action in multi tap event");
+            MMI_HILOGD("Abnormal pointer action in multi tap event");
             return RET_ERR;
         }
     }
@@ -1062,7 +1071,8 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
         case PointerEvent::POINTER_ACTION_PULL_MOVE: {
             return MOVE;
         }
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
             return BUTTON_DOWN;
         }
         case PointerEvent::POINTER_ACTION_BUTTON_UP:
@@ -1079,7 +1089,7 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
             return AXIS_END;
         }
         default: {
-            MMI_HILOGE("Abnormal pointer action");
+            MMI_HILOGD("Abnormal pointer action");
             return RET_ERR;
         }
     }
@@ -1091,7 +1101,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Transform Action Value failed");
+        MMI_HILOGE("Transform action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {

@@ -91,12 +91,14 @@ std::optional<std::string> GetLinkValue(const std::string &slink, const std::str
     char target[UTIL_PATH_SIZE];
     ssize_t len = readlink(path.c_str(), target, sizeof(target));
     if (len <= 0 || len == static_cast<ssize_t>(sizeof(target))) {
+        MMI_HILOGE("Failed to read link");
         return std::nullopt;
     }
 
     std::string_view result{ target, len };
     auto pos = result.rfind('/');
     if (pos == std::string_view::npos) {
+        MMI_HILOGE("Failed to get link value");
         return std::nullopt;
     }
     return std::string{ result.substr(pos + 1) };
@@ -180,6 +182,7 @@ public:
         } else if (type == 'c') {
             typeStr = "char";
         } else {
+            MMI_HILOGE("Param invalid");
             errno = EINVAL;
             return nullptr;
         }

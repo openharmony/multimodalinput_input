@@ -78,6 +78,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     if (IsTouchpadMistouch(lpEvent)) {
         return;
     }
+    ResetLogTrace();
     eventNormalizeHandler_->HandleEvent(lpEvent, frameTime);
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;

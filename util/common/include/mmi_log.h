@@ -37,6 +37,10 @@ public:
 
     LogTracer(int64_t, int32_t, int32_t);
 
+    LogTracer(LogTracer &&other) noexcept;
+
+    LogTracer &operator=(LogTracer &&other) noexcept;
+
     ~LogTracer();
 
 private:
@@ -305,6 +309,9 @@ struct LogHeader {
     const char* tag;
     const char* func;
     const uint32_t line;
+
+    LogHeader(uint32_t domain, const char* tag, const char* func, uint32_t line)
+        : domain(domain), tag(tag), func(func), line(line) {}
 };
 } // namespace MMI
 } // namespace OHOS

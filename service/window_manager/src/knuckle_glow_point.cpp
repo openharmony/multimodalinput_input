@@ -17,6 +17,7 @@
 
 #include "include/core/SkColorFilter.h"
 #include "mmi_log.h"
+#include "platform/ohos/overdraw/rs_overdraw_controller.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleGlowPoint"
@@ -29,14 +30,14 @@ constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t PAINT_WIDTH = 20;
 constexpr int32_t ARGB_A = 0;
 constexpr int32_t ARGB_RGB = 255;
-constexpr double BASIC_LIFESPAN = 150.0f;
+constexpr double BASIC_LIFESPAN = 200.0f;
 constexpr int32_t TRACE_COLOR = 255;
 constexpr float BASIC_SIZE = 100.0f;
+constexpr int32_t ARGB_COLOR_ARRAY = 0x11c8ffff;
+constexpr int32_t HALF = 2;
 } // namespace
 
-KnuckleGlowPoint::KnuckleGlowPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap) : traceShadow_(bitmap) {}
-
-KnuckleGlowPoint::~KnuckleGlowPoint() {}
+KnuckleGlowPoint::KnuckleGlowPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap) : traceShadow_(bitmap) {}
 
 int64_t KnuckleGlowPoint::GetNanoTime() const
 {
@@ -62,27 +63,34 @@ void KnuckleGlowPoint::Update()
     lifespan_ -= timeInterval;
     traceSize_ = static_cast<float>((lifespan_ / BASIC_LIFESPAN) * BASIC_SIZE);
     UpdateMatrix();
-    glowPaint_.SetAlpha(static_cast<int32_t>(TRACE_COLOR * (lifespan_ / BASIC_LIFESPAN)));
-    glowPaint_.SetColor(Rosen::Drawing::Color::ColorQuadSetARGB(ARGB_A, ARGB_RGB, ARGB_RGB, ARGB_RGB));
-    glowPaint_.SetAntiAlias(true);
-    glowPaint_.SetWidth(PAINT_WIDTH);
 }
 
 void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
+    CHKPV(traceShadow_);
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
         return;
     }
-    Rosen::Drawing::Paint paint;
-    canvas->AttachPaint(glowPaint_);
+    OHOS::Rosen::Drawing::Filter filter;
+    OHOS::Rosen::OverdrawColorArray colorArray = {
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        ARGB_COLOR_ARRAY,
+    };
+    auto protanomalyMat = OHOS::Rosen::Drawing::ColorFilter::CreateOverDrawColorFilter(colorArray.data());
+    filter.SetColorFilter(protanomalyMat);
     canvas->SetMatrix(traceMatrix_);
     OHOS::Rosen::Drawing::Brush brush;
+    brush.SetFilter(filter);
     canvas->AttachBrush(brush);
-    canvas->DrawBitmap(traceShadow_, pointX_, pointY_);
+    canvas->DrawBitmap(*traceShadow_, pointX_ - traceShadow_->GetWidth() / HALF,
+        pointY_ - traceShadow_->GetHeight() / HALF);
     canvas->DetachBrush();
-    canvas->DetachPaint();
 }
 
 void KnuckleGlowPoint::Reset(double pointX, double pointY, float lifespanOffset)
@@ -104,8 +112,9 @@ bool KnuckleGlowPoint::IsEnded() const
 void KnuckleGlowPoint::UpdateMatrix()
 {
     CALL_DEBUG_ENTER;
+    CHKPV(traceShadow_);
     traceMatrix_.Reset();
-    float proportion = traceSize_ / traceShadow_.GetWidth();
+    float proportion = traceSize_ / traceShadow_->GetWidth();
     traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
 }
 } // namespace MMI
