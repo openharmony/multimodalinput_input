@@ -1781,10 +1781,12 @@ KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture() const
 {
     return singleKnuckleGesture_;
 }
+
 KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture() const
 {
     return doubleKnuckleGesture_;
 }
+
 void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
@@ -1794,6 +1796,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
     }
     downToPrevUpTimeConfig_ = interval;
 }
+
 void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 {
     CALL_DEBUG_ENTER;
@@ -1803,6 +1806,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
     }
     downToPrevDownDistanceConfig_ = distance;
 }
+
 void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = { {0, "UNKNOWN"},
