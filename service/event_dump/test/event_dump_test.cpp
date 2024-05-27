@@ -148,7 +148,7 @@ HWTEST_F(EventDumpTest, EventDumpTest006, TestSize.Level1)
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
-    ASSERT_NO_FATAL_FAILURE(InputDevMgr->Dump(fd_, args));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->Dump(fd_, args));
 }
 
 /**
@@ -164,7 +164,7 @@ HWTEST_F(EventDumpTest, EventDumpTest007, TestSize.Level1)
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
-    ASSERT_NO_FATAL_FAILURE(InputDevMgr->DumpDeviceList(fd_, args));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->DumpDeviceList(fd_, args));
 }
 
 /**
@@ -180,7 +180,7 @@ HWTEST_F(EventDumpTest, EventDumpTest008, TestSize.Level1)
     int32_t count = 0;
     MMIEventDump->CheckCount(fd_, args, count);
     MMIEventDump->ParseCommand(fd_, args);
-    ASSERT_NO_FATAL_FAILURE(WinMgr->Dump(fd_, args));
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->Dump(fd_, args));
 }
 
 /**

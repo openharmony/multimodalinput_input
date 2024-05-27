@@ -513,7 +513,7 @@ bool KeyCommandHandler::CheckTwoFingerGestureAction() const
         return false;
     }
 
-    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    auto displayInfo = WIN_MGR->GetDefaultDisplayInfo();
     CHKPR(displayInfo, false);
     auto leftLimit = ConvertVPToPX(TOUCH_LIFT_LIMIT);
     auto rightLimit = displayInfo->width - ConvertVPToPX(TOUCH_RIGHT_LIMIT);
@@ -535,7 +535,7 @@ int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
     if (vp <= 0) {
         return 0;
     }
-    auto displayInfo = WinMgr->GetDefaultDisplayInfo();
+    auto displayInfo = WIN_MGR->GetDefaultDisplayInfo();
     CHKPR(displayInfo, 0);
     int32_t dpi = displayInfo->dpi;
     if (dpi <= 0) {
