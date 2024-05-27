@@ -356,7 +356,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
-            >> info.windowInputType >> info.privacyMode >> byteCount;
+            >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
 
         if (byteCount != 0) {
             MMI_HILOGD("byteCount:%{public}d", byteCount);

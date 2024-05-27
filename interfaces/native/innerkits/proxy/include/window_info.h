@@ -182,6 +182,8 @@ struct WindowInfo {
      */
     static constexpr int32_t MAX_HOTAREA_COUNT = 50;
 
+    static constexpr int32_t DEFAULT_HOTAREA_COUNT = 10;
+
     /**
      * The number of pointer change areas
      *
@@ -315,6 +317,8 @@ struct WindowInfo {
     WindowInputType windowInputType { WindowInputType::NORMAL };
 
     SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
+
+    uint32_t windowType;
 };
 
 /**
