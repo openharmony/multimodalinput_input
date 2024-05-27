@@ -283,7 +283,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_002, TestSize.Leve
     void *event = nullptr;
     int64_t frameTime = 1234;
     inputEventHandler.eventNormalizeHandler_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event,frameTime));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
 }
 
 /**
@@ -299,7 +299,7 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_003, TestSize.Leve
     int64_t frameTime = 1234;
     inputEventHandler.eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     ASSERT_TRUE(inputEventHandler.eventNormalizeHandler_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event,frameTime));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
 }
 
 /**
@@ -341,9 +341,9 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_OnEvent_004, TestSize.Leve
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     inputEventHandler.idSeed_ = maxUInt64 + 1;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event,frameTime));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
     inputEventHandler.idSeed_ = 123;
-    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event,frameTime));
+    ASSERT_NO_FATAL_FAILURE(inputEventHandler.OnEvent(event, frameTime));
 }
 
 /**
@@ -418,7 +418,6 @@ HWTEST_F(InputEventHandlerTest, InputEventHandlerTest_IsTouchpadMistouch_002, Te
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
     auto touchpad = libinput_event_get_touchpad_event(event);
-    // ASSERT_TRUE(touchpad != nullptr);
     auto type = libinput_event_get_type(event);
     bool ret = inputEventHandler.IsTouchpadMistouch(event);
     ASSERT_FALSE(ret);
