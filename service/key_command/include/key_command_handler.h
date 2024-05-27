@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "nocopyable.h"
-
+#include "gesturesense_wrapper.h"
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
@@ -45,6 +45,14 @@ enum KeyCommandType : int32_t {
     TYPE_FINGERSCENE = 2,
     TYPE_REPEAT_KEY = 3,
     TYPE_MULTI_FINGERS = 4,
+};
+
+enum class NotifyType : int32_t {
+    CANCEL,
+    INCONSISTENTGESTURE,
+    REGIONGESTURE,
+    LETTERGESTURE,
+    OTHER
 };
 
 struct Ability {
@@ -260,6 +268,14 @@ private:
     void AdjustDistanceConfigIfNeed(float distance);
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    void HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureTouchUp();
+    void ProcessKnuckleGestureTouchUp(NotifyType type);
+    void ResetKnuckleGesture();
+    std::string GesturePointsToStr() const;
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
 private:
     Sequence matchedSequence_;
@@ -305,6 +321,15 @@ private:
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    bool isGesturing_ { false };
+    bool isLetterGesturing_ { false };
+    float gestureLastX_ { 0.0f };
+    float gestureLastY_ { 0.0f };
+    float gestureTrackLength_ { 0.0f };
+    std::vector<float> gesturePoints_;
+    std::vector<int64_t> gestureTimeStamps_;
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 };
 } // namespace MMI
 } // namespace OHOS

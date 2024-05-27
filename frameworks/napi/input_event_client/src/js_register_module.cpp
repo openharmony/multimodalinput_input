@@ -89,7 +89,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
         MMI_HILOGE("Get isIntercepted failed");
     }
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    int32_t keyDownDuration;
+    int32_t keyDownDuration = 0;
     if (GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration) != RET_OK) {
         MMI_HILOGE("Get keyDownDuration failed");
     }
@@ -97,7 +97,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
         MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
     }
-    int32_t keyCode;
+    int32_t keyCode = 0;
     if (GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode) != RET_OK) {
         MMI_HILOGE("Get keyCode failed");
     }
@@ -197,7 +197,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
 
 static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    int32_t button;
+    int32_t button = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "button", button) != RET_OK) {
         MMI_HILOGE("Get button failed");
     }
@@ -224,7 +224,7 @@ static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_
 static void HandleMouseAction(napi_env env, napi_value mouseHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
 {
-    int32_t action;
+    int32_t action = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "action", action) != RET_OK) {
         MMI_HILOGE("Get action failed");
         return;
@@ -261,15 +261,15 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
 static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
 {
-    int32_t screenX;
+    int32_t screenX = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "screenX", screenX) != RET_OK) {
         MMI_HILOGE("Get screenX failed");
     }
-    int32_t screenY;
+    int32_t screenY = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "screenY", screenY) != RET_OK) {
         MMI_HILOGE("Get screenY failed");
     }
-    int32_t toolType;
+    int32_t toolType = 0;
     if (GetNamedPropertyInt32(env, mouseHandle, "toolType", toolType) != RET_OK) {
         MMI_HILOGE("Get toolType failed");
     }
@@ -331,7 +331,7 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
 static int32_t HandleTouchAction(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
 {
-    int32_t action;
+    int32_t action = 0;
     if (GetNamedPropertyInt32(env, touchHandle, "action", action) != RET_OK) {
         MMI_HILOGE("Get action failed");
         return RET_ERR;
@@ -383,7 +383,7 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
 static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
 {
-    int32_t sourceType;
+    int32_t sourceType = 0;
     if (GetNamedPropertyInt32(env, touchHandle, "sourceType", sourceType) != RET_OK) {
         MMI_HILOGE("Get sourceType failed");
     }
@@ -396,11 +396,11 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     }
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     CHKPV(touchProperty);
-    int32_t screenX;
+    int32_t screenX = 0;
     if (GetNamedPropertyInt32(env, touchProperty, "screenX", screenX) != RET_OK) {
         MMI_HILOGE("Get screenX failed");
     }
-    int32_t screenY;
+    int32_t screenY = 0;
     if (GetNamedPropertyInt32(env, touchProperty, "screenY", screenY) != RET_OK) {
         MMI_HILOGE("Get screenY failed");
     }
@@ -408,7 +408,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (GetNamedPropertyInt64(env, touchProperty, "pressedTime", pressedTime) != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
-    int32_t toolType;
+    int32_t toolType = 0;
     if (GetNamedPropertyInt32(env, touchProperty, "toolType", toolType) != RET_OK) {
         MMI_HILOGE("Get toolType failed");
     }
@@ -495,7 +495,7 @@ static int32_t HandleJoystickButton(napi_env env, napi_value joystickHandle, std
 static int32_t HandleJoystickAction(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t action;
+    int32_t action = 0;
     if (GetNamedPropertyInt32(env, joystickHandle, "action", action) != RET_OK) {
         MMI_HILOGE("Get action failed");
         return RET_ERR;
@@ -543,7 +543,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
     }
     CHKPR(axesArray, RET_ERR);
 
-    uint32_t arrayLength;
+    uint32_t arrayLength = 0;
     if (napi_get_array_length(env, axesArray, &arrayLength) != napi_ok) {
         MMI_HILOGE("Call napi_get_array_length failed");
         return RET_ERR;
@@ -556,7 +556,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
             return RET_ERR;
         }
 
-        int32_t axis;
+        int32_t axis = 0;
         if (GetNamedPropertyInt32(env, axisObject, "axis", axis) != RET_OK) {
             MMI_HILOGE("Get axis failed");
             return RET_ERR;

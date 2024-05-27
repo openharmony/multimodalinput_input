@@ -229,7 +229,7 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
 
 ErrCode EventResample::ConsumeBatch(int64_t frameTime, MotionEvent** outEvent)
 {
-    int32_t result;
+    int32_t result = 0;
     for (size_t i = batches_.size(); i > 0;) {
         i--;
         Batch& batch = batches_.at(i);

@@ -99,7 +99,7 @@ PointerDrawingManager::PointerDrawingManager()
     hasMagicCursor_.name = "isMagicCursor";
     TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
         MMI_HILOGD("Timer callback");
-        CreatePointerSwiftObserver(hasMagicCursor_);
+        CreatePointerSwitchObserver(hasMagicCursor_);
     });
 
     MAGIC_CURSOR->InitStyle();
@@ -177,9 +177,11 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     currentDirection_ = direction;
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
         physicalX, physicalY);
-    MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
-        ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
-
+    // Log printing only occurs when the mouse style changes
+    if (currentMouseStyle_.id != lastMouseStyle_.id) {
+        MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
+            ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+    }
     if (surfaceNode_ != nullptr) {
         DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
         return;
@@ -287,7 +289,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     }
 }
 
-void PointerDrawingManager::CreatePointerSwiftObserver(isMagicCursor& item)
+void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
