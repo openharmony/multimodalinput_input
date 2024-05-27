@@ -145,9 +145,9 @@ void UDSSession::ReportSocketBufferFull() const
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "MSG",
         "remote client buffer full, cant send msg",
-        "programName",
+        "PROGRAM_NAME",
         programName_,
-        "remote pid",
+        "REMOTE_PID",
         pid_);
     if (ret != 0) {
         MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
