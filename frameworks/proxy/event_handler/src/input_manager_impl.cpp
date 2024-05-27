@@ -236,7 +236,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     if (ret != RET_OK) {
         MMI_HILOGE("AddInputEventFilter has send to server failed, priority:%{public}d, ret:%{public}d", priority, ret);
         service = nullptr;
-        return RET_ERR;
+        return RET_ERR;  
     }
     auto it = eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
@@ -1359,6 +1359,7 @@ void InputManagerImpl::SendEnhanceConfig()
 void InputManagerImpl::ReAddInputEventFilter()
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (eventFilterServices_.size() > MAX_FILTER_NUM) {
         MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
         return;
