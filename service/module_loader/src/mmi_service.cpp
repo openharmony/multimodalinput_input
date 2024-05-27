@@ -401,7 +401,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddSocketPairInfo failed,return %{public}d", ret);
         DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
-        return RET_ERR;
+        return ret;
     }
     MMI_HILOGIK("Leave, programName:%{public}s,moduleType:%{public}d,alloc success", programName.c_str(), moduleType);
     DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
@@ -623,7 +623,7 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
         delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMousePrimaryButton, this, std::ref(primaryButton)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get mouse primary button failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -658,7 +658,7 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
     if (ret != RET_OK) {
         MMI_HILOGE("Is pointer visible failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
@@ -672,7 +672,7 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
         delegateTasks_.PostSyncTask(std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
     if (ret != RET_OK) {
         MMI_HILOGD("Mark event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -719,7 +719,7 @@ int32_t MMIService::SetPointerSpeed(int32_t speed)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerSpeed, MouseEventHdr, speed));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -740,7 +740,7 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -880,7 +880,7 @@ int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, std::ref(ids)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get deviceids failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -923,7 +923,7 @@ int32_t MMIService::RegisterDevListener()
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnRegisterDevListener, this, pid));
     if (ret != RET_OK) {
         MMI_HILOGE("Register device listener failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -942,7 +942,7 @@ int32_t MMIService::UnregisterDevListener()
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnUnregisterDevListener, this, pid));
     if (ret != RET_OK) {
         MMI_HILOGE("Unregister device listener failed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -1044,7 +1044,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority, deviceTags));
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
         OHOS::MMI::NapProcess::NapStatusData napData;
@@ -1085,7 +1085,7 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
         std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority, deviceTags));
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
         OHOS::MMI::NapProcess::NapStatusData napData;
@@ -1123,7 +1123,7 @@ int32_t MMIService::MarkEventConsumed(int32_t eventId)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckMarkConsumed, this, pid, eventId));
     if (ret != RET_OK) {
         MMI_HILOGE("Mark event consumed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
@@ -1137,7 +1137,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
         delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
     if (ret != RET_OK) {
         MMI_HILOGE("The movemouse event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
@@ -1157,7 +1157,7 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, boo
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -1254,7 +1254,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
@@ -1306,7 +1306,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         std::bind(&ServerMsgHandler::OnSubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId, option));
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
         OHOS::MMI::NapProcess::NapStatusData napData;
@@ -1336,7 +1336,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         std::bind(&ServerMsgHandler::OnUnsubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId));
     if (ret != RET_OK) {
         MMI_HILOGE("The unsubscribe key event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
         OHOS::MMI::NapProcess::NapStatusData napData;
@@ -1366,7 +1366,7 @@ int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType
         std::bind(&ServerMsgHandler::OnSubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId, switchType));
     if (ret != RET_OK) {
         MMI_HILOGE("The subscribe switch event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_SWITCH
     return RET_OK;
@@ -1381,7 +1381,7 @@ int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
         std::bind(&ServerMsgHandler::OnUnsubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId));
     if (ret != RET_OK) {
         MMI_HILOGE("The unsubscribe switch event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_SWITCH
     return RET_OK;
@@ -1394,7 +1394,7 @@ int32_t MMIService::SetAnrObserver()
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ANRManager::SetANRNoticedPid, ANRMgr, pid));
     if (ret != RET_OK) {
         MMI_HILOGE("Set ANRNoticed pid failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -1406,7 +1406,7 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
         delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
     if (ret != RET_OK) {
         MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -1425,7 +1425,7 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
         std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
     if (ret != RET_OK) {
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -1438,7 +1438,7 @@ int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
         std::bind(&ServerMsgHandler::OnGetFunctionKeyState, &sMsgHandler_, funcKey, std::ref(state)));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to get the keyboard status, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     MMI_HILOGD("Function not supported");
@@ -1454,7 +1454,7 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
         std::bind(&ServerMsgHandler::OnSetFunctionKeyState, &sMsgHandler_, funcKey, enable));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to update the keyboard status, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     MMI_HILOGD("Function not supported");
@@ -1469,7 +1469,7 @@ int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerLocation, MouseEventHdr, x, y));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer location failed,ret %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
@@ -1637,7 +1637,7 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
         std::bind(&InputWindowsManager::SetMouseCaptureMode, WinMgr, windowId, isCaptureMode));
     if (ret != RET_OK) {
         MMI_HILOGE("Set capture failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -1662,7 +1662,7 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetWindowPid, this, windowId, std::ref(windowPid)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnGetWindowPid failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return windowPid;
@@ -1819,7 +1819,7 @@ int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
         std::ref(switchFlag)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad scroll switch failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1847,7 +1847,7 @@ int32_t MMIService::GetTouchpadScrollDirection(bool &state)
         std::ref(state)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad scroll direction switch failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1875,7 +1875,7 @@ int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
         std::ref(switchFlag)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad tap switch failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1903,7 +1903,7 @@ int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
         std::ref(speed)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad speed failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1931,7 +1931,7 @@ int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
         std::ref(switchFlag)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touch pad pinch switch failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -1959,7 +1959,7 @@ int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
         std::ref(switchFlag)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get touchpad swipe switch failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -2051,7 +2051,7 @@ int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int3
         std::ref(specialKeysState)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get pressed keys failed, return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -2063,7 +2063,7 @@ int32_t MMIService::Authorize(bool isAuthorize)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnAuthorize, this, isAuthorize));
     if (ret != RET_OK) {
         MMI_HILOGE("OnAuthorize failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -2079,7 +2079,7 @@ int32_t MMIService::CancelInjection()
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnCancelInjection, this));
     if (ret != RET_OK) {
         MMI_HILOGE("OnCancelInjection failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -2095,7 +2095,7 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnHasIrEmitter, this, std::ref(hasIrEmitter)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -2107,7 +2107,7 @@ int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& reque
                                                         this, std::ref(requencys)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -2118,7 +2118,7 @@ int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& patte
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnTransmitInfrared, this, number, pattern));
     if (ret != RET_OK) {
         MMI_HILOGE("OnTransmitInfrared failed, returnCode:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -2170,7 +2170,7 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
         infoId, pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -2181,7 +2181,7 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WinMgr, userId));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
