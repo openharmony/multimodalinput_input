@@ -852,10 +852,6 @@ int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, 
         MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
     }
-    if (keystroke.size() > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Device exceeds the max range");
-        return RET_ERR;
-    }
     return RET_OK;
 }
 
