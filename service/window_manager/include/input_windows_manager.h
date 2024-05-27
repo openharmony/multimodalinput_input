@@ -331,7 +331,7 @@ private:
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
 };
 
-#define WinMgr ::OHOS::MMI::InputWindowsManager::GetInstance()
+#define WIN_MGR ::OHOS::MMI::InputWindowsManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_WINDOWS_MANAGER_H

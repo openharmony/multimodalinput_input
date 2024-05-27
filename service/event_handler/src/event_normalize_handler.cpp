@@ -173,7 +173,7 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
-    InputDevMgr->OnInputDeviceAdded(device);
+    INPUT_DEV_MGR->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -189,7 +189,7 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     CHKPR(device, ERROR_NULL_POINTER);
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
-    InputDevMgr->OnInputDeviceRemoved(device);
+    INPUT_DEV_MGR->OnInputDeviceRemoved(device);
     return RET_OK;
 }
 
@@ -235,7 +235,7 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
     }
-    WinMgr->UpdateTargetPointer(pointerEvent);
+    WIN_MGR->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
@@ -248,7 +248,7 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     CHKPV(nextHandler_);
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
-    WinMgr->UpdateTargetPointer(pointerEvent);
+    WIN_MGR->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
     DfxHisysevent::CalcPointerDispTimes();
     DfxHisysevent::ReportDispTimes();
@@ -287,7 +287,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     BytraceAdapter::StopPackageEvent();
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
-    auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
+    auto device = INPUT_DEV_MGR->GetInputDevice(keyEvent->GetDeviceId());
     CHKPR(device, RET_ERR);
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
@@ -380,7 +380,11 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
-    GestureIdentify(event);
+    int32_t gesture = GestureIdentify(event);
+    if (gesture != RET_OK) {
+        MMI_HILOGD("GestureIdentify failed");
+        return RET_ERR;
+    }
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -425,7 +429,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     auto originType = libinput_event_get_type(event);
     auto device = libinput_event_get_device(event);
     CHKPR(device, RET_ERR);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     auto mouseEvent = MouseEventHdr->GetPointerEvent(deviceId);
     auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     if (mouseEvent == nullptr || mouseEvent->GetPressedButtons().empty()) {
@@ -494,7 +498,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     LogTracer lt;
     if (event != nullptr) {
-        CHKPR(event, ERROR_NULL_POINTER);
         pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -519,14 +522,12 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    if (pointerEvent != nullptr) {
-        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-        if (SetOriginPointerId(pointerEvent) != RET_OK) {
-            MMI_HILOGE("Failed to set origin pointerId");
-            return RET_ERR;
-        }
-        nextHandler_->HandleTouchEvent(pointerEvent);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    if (SetOriginPointerId(pointerEvent) != RET_OK) {
+        MMI_HILOGE("Failed to set origin pointerId");
+        return RET_ERR;
     }
+    nextHandler_->HandleTouchEvent(pointerEvent);
     if ((pointerEvent != nullptr) && (event != nullptr)) {
         ResetTouchUpEvent(pointerEvent, event);
     }
@@ -653,7 +654,7 @@ int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> 
 void EventNormalizeHandler::RestoreTouchPadStatus()
 {
     CALL_INFO_TRACE;
-    auto ids = InputDevMgr->GetTouchPadIds();
+    auto ids = INPUT_DEV_MGR->GetTouchPadIds();
     for (auto id : ids) {
         MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
         auto mouseEvent = TouchEventHdr->GetPointerEvent(id);

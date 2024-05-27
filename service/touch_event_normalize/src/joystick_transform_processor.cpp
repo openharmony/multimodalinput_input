@@ -143,7 +143,7 @@ std::shared_ptr<PointerEvent> JoystickTransformProcessor::OnEvent(struct libinpu
             return nullptr;
         }
     }
-    WinMgr->UpdateTargetPointer(pointerEvent_);
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
    
     return pointerEvent_;
 }
