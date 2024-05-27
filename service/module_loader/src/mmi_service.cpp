@@ -1659,7 +1659,7 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetWindowPid, this, windowId, std::ref(windowPid)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnGetWindowPid failed, ret:%{public}d", ret);
-        return ret;
+        return RET_ERR;
     }
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return windowPid;
