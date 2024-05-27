@@ -52,6 +52,7 @@ void GesturesenseWrapper::InitGestureSenseWrapper()
     touchUp_ = (TOUCH_UP)dlsym(gesturesenseWrapperHandle_, "TouchUp");
     if (touchUp_ == nullptr) {
         MMI_HILOGE("gesturesense wrapper symbol failed, error: %{public}s", dlerror());
+        goto fail;
         return;
     }
     getBoundingSquareness_ = (GET_BOUNDING_SQUARENESS)dlsym(gesturesenseWrapperHandle_, "GetBoundingSquareness");
@@ -61,6 +62,7 @@ void GesturesenseWrapper::InitGestureSenseWrapper()
         return;
     }
     MMI_HILOGI("gesturesense wrapper init success");
+    return;
 fail:
     dlclose(gesturesenseWrapperHandle_);
 }
