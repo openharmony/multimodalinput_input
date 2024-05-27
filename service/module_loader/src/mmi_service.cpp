@@ -478,6 +478,7 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
+        MMI_HILOGE("Check pid permission failed");
         return ret;
     }
     ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
@@ -496,6 +497,7 @@ int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
+        MMI_HILOGE("Check pid permission failed");
         return ret;
     }
     ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
@@ -514,6 +516,7 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
+        MMI_HILOGE("Check pid permission failed");
         return ret;
     }
     ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
@@ -531,6 +534,7 @@ int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     CALL_INFO_TRACE;
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
+        MMI_HILOGE("Check pid permission failed");
         return ret;
     }
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
@@ -780,6 +784,7 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
+        MMI_HILOGE("Check pid permission failed");
         return ret;
     }
     ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
