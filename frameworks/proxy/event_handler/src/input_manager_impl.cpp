@@ -202,7 +202,7 @@ int32_t InputManagerImpl::GetDisplayMaxSize()
            + sizeof(DisplayInfo::displayDirection) + sizeof(DisplayInfo::displayMode);
 }
 
-int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
+int32_t InputManagerImpl::GetWindowMaxSize(uint32_t maxAreasCount)
 {
     return sizeof(WindowInfo) + sizeof(Rect) * maxAreasCount * 2
            + sizeof(int32_t) * WindowInfo::POINTER_CHANGEAREA_COUNT
@@ -2097,7 +2097,7 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     return ret;
 }
 
-int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
+int32_t InputManagerImpl::GetWinSyncBatchSize(uint32_t maxAreasCount, uint32_t displayCount)
 {
     return (MAX_PKT_SIZE - GetDisplayMaxSize() * displayCount) / GetWindowMaxSize(maxAreasCount);
 }

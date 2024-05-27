@@ -199,7 +199,7 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
-    int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+    int32_t GetWinSyncBatchSize(uint32_t maxAreasCount, uint32_t displayCount);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -214,7 +214,7 @@ private:
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
     int32_t GetDisplayMaxSize();
-    int32_t GetWindowMaxSize(int32_t maxAreasCount);
+    int32_t GetWindowMaxSize(uint32_t maxAreasCount);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();
