@@ -164,7 +164,7 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
         MMI_HILOGE("keyItems is empty");
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(keyItems.front().GetDeviceId());
     CHKPF(inputDevice);
     for (auto &i: filters_) {
         if (!inputDevice->HasCapability(i.deviceTags)) {
@@ -192,7 +192,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(pointerItem.GetDeviceId());
     CHKPF(inputDevice);
     for (auto &i: filters_) {
         if (!inputDevice->HasCapability(i.deviceTags)) {
