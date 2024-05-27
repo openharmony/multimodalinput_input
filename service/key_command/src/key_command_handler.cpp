@@ -1821,7 +1821,7 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t displayX = item.GetDisplayX();
     int32_t displayY = item.GetDisplayY();
     int32_t displayId = touchEvent->GetTargetDisplayId();
-    auto windows = WinMgr->GetWindowGroupInfoByDisplayId(displayId);
+    auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
     for (auto window : windows) {
         if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
             continue;
