@@ -265,6 +265,10 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 
+#ifdef OHOS_BUILD_ENABLE_CROWN
+    int32_t UpdateCrownTarget(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_CROWN
+
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     void UpdateDisplayMode();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER

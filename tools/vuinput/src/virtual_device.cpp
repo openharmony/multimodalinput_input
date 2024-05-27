@@ -47,6 +47,7 @@
 #include "virtual_trackpad_mouse.h"
 #include "virtual_fingerprint_key.h"
 #include "virtual_fingerprint_mouse.h"
+#include "virtual_crown.h"
 
 namespace OHOS {
 namespace MMI {
@@ -253,6 +254,12 @@ static void StartFingerprint()
     fingerprintMouse.SetUp();
 }
 
+static void StartCrown()
+{
+    static VirtualCrown virtualCrown;
+    virtualCrown.SetUp();
+}
+
 using VirtualFun = void (*)();
 std::map<std::string, VirtualFun> mapFun = {
     {"mouse", &StartMouse},
@@ -267,7 +274,8 @@ std::map<std::string, VirtualFun> mapFun = {
     {"pc", &StartPc},
     {"touchscreen", &StartTouchScreen},
     {"pen", &StartPen},
-    {"fingerprint", &StartFingerprint}
+    {"fingerprint", &StartFingerprint},
+    {"crown", &StartCrown}
 };
 
 static void StartAllDevices()
