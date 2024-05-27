@@ -18,6 +18,8 @@
 
 #include "singleton.h"
 #include "nocopyable.h"
+#include "aggregator.h"
+#include "timer_manager.h"
 #include "transform_processor.h"
 #include <map>
 
@@ -75,15 +77,15 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
 
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);
-    static int32_t GetTouchpadPinchSwitch(bool &switchFlag);
+    static void GetTouchpadPinchSwitch(bool &switchFlag);
     static int32_t SetTouchpadSwipeSwitch(bool switchFlag);
-    static int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
+    static void GetTouchpadSwipeSwitch(bool &switchFlag);
     static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
-    static int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+    static void GetTouchpadRotateSwitch(bool &rotateSwitch);
 
 private:
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
-    static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
+    static void GetConfigDataFromDatabase(std::string &key, bool &value);
 
     int32_t OnEventTouchPadDown(struct libinput_event *event);
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
@@ -96,7 +98,7 @@ private:
     int32_t OnEventTouchPadPinchUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadPinchEnd(struct libinput_event *event);
     int32_t SetTouchPadPinchData(struct libinput_event *event, int32_t action);
-    int32_t SetTouchPadMultiTapData();
+    void SetTouchPadMultiTapData();
     void SetPinchPointerItem(int64_t time);
     void ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale);
 
@@ -105,9 +107,17 @@ private:
     void InitToolType();
 private:
     const int32_t deviceId_ { -1 };
-    const int32_t defaultPointerId { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
+    Aggregator aggregator_ {
+            [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->ResetTimer(timerId);
+            }
+    };
 };
 } // namespace MMI
 } // namespace OHOS

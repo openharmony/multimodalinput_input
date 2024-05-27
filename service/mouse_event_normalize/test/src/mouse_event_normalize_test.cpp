@@ -16,8 +16,11 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "libinput.h"
+#include "input_device_manager.h"
+#include "input_windows_manager.h"
+#include "libinput_wrapper.h"
 #include "mouse_event_normalize.h"
+#include "general_mouse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,10 +31,17 @@ class MouseEventNormalizeTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
+    static void SetupMouse();
+    static void CloseMouse();
+    static void UpdateDisplayInfo();
+
     void SetUp();
     void TearDown();
 
 private:
+    static GeneralMouse vMouse_;
+    static LibinputWrapper libinput_;
+
     int32_t prePointerSpeed_ { 5 };
     int32_t prePrimaryButton_ { 0 };
     int32_t preScrollRows_ { 3 };
@@ -42,12 +52,57 @@ private:
     bool preTapSwitch_ { true };
 };
 
+GeneralMouse MouseEventNormalizeTest::vMouse_;
+LibinputWrapper MouseEventNormalizeTest::libinput_;
+
 void MouseEventNormalizeTest::SetUpTestCase(void)
 {
+    ASSERT_TRUE(libinput_.Init());
+    SetupMouse();
+    UpdateDisplayInfo();
 }
 
 void MouseEventNormalizeTest::TearDownTestCase(void)
 {
+    CloseMouse();
+}
+
+void MouseEventNormalizeTest::SetupMouse()
+{
+    ASSERT_TRUE(vMouse_.SetUp());
+    std::cout << "device node name: " << vMouse_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.AddPath(vMouse_.GetDevPath()));
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
+    struct libinput_device *device = libinput_event_get_device(event);
+    ASSERT_TRUE(device != nullptr);
+    InputDevMgr->OnInputDeviceAdded(device);
+}
+
+void MouseEventNormalizeTest::CloseMouse()
+{
+    libinput_.RemovePath(vMouse_.GetDevPath());
+    vMouse_.Close();
+}
+
+void MouseEventNormalizeTest::UpdateDisplayInfo()
+{
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    ASSERT_TRUE(display != nullptr);
+
+    DisplayGroupInfo displays {
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+        .focusWindowId = -1,
+    };
+    displays.displaysInfo.push_back(DisplayInfo {
+        .name = "default display",
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+    });
+    WinMgr->UpdateDisplayInfo(displays);
 }
 
 void MouseEventNormalizeTest::SetUp()
@@ -105,9 +160,89 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent_002, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.Level1)
 {
-    libinput_event *event = nullptr;
-    int idNames = -1;
-    ASSERT_EQ(MouseEventHdr->OnEvent(event), idNames);
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    ASSERT_EQ(MouseEventHdr->OnEvent(event), RET_OK);
+
+    auto pointerEvent = MouseEventHdr->GetPointerEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    EXPECT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_MOVE);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_NormalizeRotateEvent_025
+ * @tc.desc: Test NormalizeRotateEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_025, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+
+    auto iter = InputDevMgr->inputDevice_.begin();
+    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+        if (iter->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    int32_t deviceId = iter->first;
+    struct InputDeviceManager::InputDeviceInfo info = iter->second;
+    InputDevMgr->inputDevice_.erase(iter);
+
+    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    double angle = 0.5;
+    EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
+    InputDevMgr->inputDevice_[deviceId] = info;
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_NormalizeRotateEvent_026
+ * @tc.desc: Test NormalizeRotateEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_026, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(dev);
+    auto iter = MouseEventHdr->processors_.find(deviceId);
+    if (iter != MouseEventHdr->processors_.end()) {
+        MouseEventHdr->processors_.erase(iter);
+    }
+
+    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    double angle = 0.5;
+    EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
+    EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
 }
 
 /**
@@ -255,7 +390,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitc
     bool flag = true;
     MouseEventHdr->SetTouchpadScrollSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollSwitch(flag) == RET_OK);
+    MouseEventHdr->GetTouchpadScrollSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -282,7 +417,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirec
     bool state = true;
     MouseEventHdr->SetTouchpadScrollDirection(state);
     bool newState = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollDirection(state) == RET_OK);
+    MouseEventHdr->GetTouchpadScrollDirection(state);
     ASSERT_TRUE(state == newState);
 }
 
@@ -309,7 +444,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_0
     bool flag = true;
     MouseEventHdr->SetTouchpadTapSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadTapSwitch(flag) == RET_OK);
+    MouseEventHdr->GetTouchpadTapSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -336,7 +471,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t speed = 8;
     MouseEventHdr->SetTouchpadPointerSpeed(speed);
     int32_t newSpeed = 4;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -363,7 +498,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t speed = 8;
     MouseEventHdr->SetTouchpadPointerSpeed(speed);
     int32_t newSpeed = 4;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -390,8 +525,65 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     int32_t type = 1;
     MouseEventHdr->SetTouchpadRightClickType(type);
     int32_t newType = 2;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
+    MouseEventHdr->GetTouchpadRightClickType(newType);
     ASSERT_TRUE(type == newType);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_CheckAndPackageAxisEvent_025
+ * @tc.desc: Test CheckAndPackageAxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEvent_025, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+
+    auto it = InputDevMgr->inputDevice_.begin();
+    for (; it != InputDevMgr->inputDevice_.end(); ++it) {
+        if (it->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(it != InputDevMgr->inputDevice_.end());
+    int32_t deviceId = it->first;
+    struct InputDeviceManager::InputDeviceInfo info = it->second;
+    InputDevMgr->inputDevice_.erase(it);
+
+    MouseEventHdr->CheckAndPackageAxisEvent(event);
+
+    InputDevMgr->inputDevice_[deviceId] = info;
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_CheckAndPackageAxisEvent_026
+ * @tc.desc: Test CheckAndPackageAxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEvent_026, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
+    MouseEventHdr->CheckAndPackageAxisEvent(event);
 }
 }
 }

@@ -14,6 +14,7 @@
  */
 
 #include "axis_event.h"
+#include "event_log_helper.h"
 #include "input_event.h"
 #include "key_event.h"
 #include "pointer_event.h"
@@ -468,6 +469,23 @@ LogTracer::LogTracer()
 {
     traceId_ = -1;
 }
+
+LogTracer::LogTracer(LogTracer &&other) noexcept: traceId_(other.traceId_)
+{
+    other.traceId_ = -1;
+}
+
+LogTracer &LogTracer::operator=(LogTracer &&other) noexcept
+{
+    if (this != &other) {
+        traceId_ = other.traceId_;
+        other.traceId_ = -1;
+    }
+    return *this;
+}
+
+int32_t OHOS::MMI::EventLogHelper::infoDictCount = 0;
+int32_t OHOS::MMI::EventLogHelper::debugDictCount = 0;
 
 } // namespace MMI
 } // namespace OHOS

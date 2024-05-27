@@ -65,6 +65,7 @@ int32_t MultimodalEventHandler::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(),
         subscribeInfo.GetKeyOption());
 }
@@ -72,6 +73,7 @@ int32_t MultimodalEventHandler::SubscribeKeyEvent(
 int32_t MultimodalEventHandler::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeKeyEvent(subscribeId);
 }
 
@@ -86,6 +88,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
         MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
     }
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectKeyEvent(keyEvent, isNativeInject);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
@@ -99,12 +102,14 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
 int32_t MultimodalEventHandler::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     return MULTIMODAL_INPUT_CONNECT_MGR->SubscribeSwitchEvent(subscribeId, switchType);
 }
 
 int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     return MULTIMODAL_INPUT_CONNECT_MGR->UnsubscribeSwitchEvent(subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
@@ -141,6 +146,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->InjectPointerEvent(pointerEvent, isNativeInject);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
@@ -154,6 +160,7 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
@@ -165,6 +172,7 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 
 int32_t MultimodalEventHandler::Authorize(bool isAuthorize)
 {
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->Authorize(isAuthorize);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
@@ -175,6 +183,7 @@ int32_t MultimodalEventHandler::Authorize(bool isAuthorize)
 
 int32_t MultimodalEventHandler::CancelInjection()
 {
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->CancelInjection();
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);

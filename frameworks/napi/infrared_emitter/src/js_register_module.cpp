@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const uint32_t NUMBER_PARAMETERS = 2;
-constexpr int32_t  MAX_NUMBER_ARRAY_ELEMENT = 500;
+constexpr int32_t MAX_NUMBER_ARRAY_ELEMENT = 500;
 }
 
 bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)
@@ -47,6 +47,7 @@ bool IsArray(const napi_env& env, const napi_value& value)
     bool isArray = false;
     napi_status ret = napi_is_array(env, value, &isArray);
     if (ret != napi_ok) {
+        MMI_HILOGE("napi_is_array failed");
         return false;
     }
     return isArray;
@@ -102,7 +103,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
 {
     CALL_DEBUG_ENTER;
     size_t argc = NUMBER_PARAMETERS;
-    napi_value argv[NUMBER_PARAMETERS];
+    napi_value argv[NUMBER_PARAMETERS] = { 0 };
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != NUMBER_PARAMETERS) {
         MMI_HILOGE("ParseTransmitInfraredJSParam Parameter number error");
@@ -123,7 +124,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
         return false;
     }
     if (vecPattern.size() > MAX_NUMBER_ARRAY_ELEMENT) {
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of pattern", "must be less than or equal  50");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size of pattern", "must be less than or equal 50");
         return false;
     }
     return true;

@@ -25,5 +25,9 @@
                 <filteritem type="filename" name="*.gif" desc="GIF file for README"/>
             </filefilter>
         </filefilterlist>
+        <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies" >
+            <filteritem type="filepath" name="etc/mouse_icon/src/Screenshot_Cursor.png" desc="icon"/>
+            <filteritem type="filepath" name="etc/mouse_icon/src/Cursor_Circle.png" desc="icon"/>
+        </filefilter>
     </oatconfig>
 </configuration>

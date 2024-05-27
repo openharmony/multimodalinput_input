@@ -163,7 +163,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Init
     KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
     knuckleDynamicDrawMgr.glowTraceSystem_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
-    Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
@@ -234,7 +234,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
     item.SetPointerId(2);
     pointerEvent->SetPointerId(2);
     pointerEvent->AddPointerItem(item);
-    Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
     ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
@@ -259,7 +259,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
     knuckleDynamicDrawMgr.displayInfo_.width = 200;
     knuckleDynamicDrawMgr.displayInfo_.height = 200;
-    Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
     knuckleDynamicDrawMgr.isDrawing_ = true;
@@ -281,7 +281,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Proc
     knuckleDynamicDrawMgr.pointCounter_ = 6;
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
 
-    Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
     PointerEvent::PointerItem item;
@@ -327,7 +327,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Draw
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
     knuckleDynamicDrawMgr.displayInfo_.width = 200;
     knuckleDynamicDrawMgr.displayInfo_.height = 200;
-    Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
     knuckleDynamicDrawMgr.isDrawing_ = false;

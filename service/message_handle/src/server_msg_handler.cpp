@@ -36,7 +36,6 @@
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
-#include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #include "util_napi_error.h"
@@ -52,9 +51,10 @@ namespace {
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+constexpr int32_t SEND_NOTICE_OVERTIME = 5;
 } // namespace
 
-void ServerMsgHandler::Init(UDSServer& udsServer)
+void ServerMsgHandler::Init(UDSServer &udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
@@ -249,6 +249,13 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         .dx = pointerItem.GetRawDx(),
         .dy = pointerItem.GetRawDy(),
     };
+    auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
+#ifndef OHOS_BUILD_EMULATOR
+    if (displayInfo->displayDirection == DIRECTION0) {
+        CalculateOffset(displayInfo->direction, offset);
+    }
+#endif // OHOS_BUILD_EMULATOR
     int32_t ret = RET_OK;
 
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER)) {
@@ -267,6 +274,23 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
+}
+
+void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
+{
+    std::negate<double> neg;
+    if (direction == DIRECTION90) {
+        double tmp = offset.dx;
+        offset.dx = offset.dy;
+        offset.dy = neg(tmp);
+    } else if (direction == DIRECTION180) {
+        offset.dx = neg(offset.dx);
+        offset.dy = neg(offset.dy);
+    } else if (direction == DIRECTION270) {
+        double tmp = offset.dx;
+        offset.dx = neg(offset.dy);
+        offset.dy = tmp;
+    }
 }
 
 void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -391,9 +415,9 @@ int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t temp;
-    int32_t pid;
-    int32_t windowId;
+    int32_t temp = 0;
+    int32_t pid = 0;
+    int32_t windowId = 0;
     pkt >> temp >> pid >> windowId;
     WindowArea area = static_cast<WindowArea>(temp);
     if (pkt.ChkRWError()) {
@@ -626,6 +650,9 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         if (!ret.second) {
             MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
         }
+        InjectNoticeInfo noticeInfo;
+        noticeInfo.pid = CurrentPID_;
+        AddInjectNotice(noticeInfo);
         MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
         if (InjectionType_ == InjectionType::KEYEVENT) {
             OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
@@ -668,7 +695,7 @@ void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
     info.pixelMap = transparentWins_[infoId].get();
 }
 
-int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void* pixelMap)
+int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
 {
     CALL_DEBUG_ENTER;
     if (infoId < 0 || pixelMap == nullptr) {
@@ -681,6 +708,69 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void* pixelMap)
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
     return RET_OK;
+}
+
+bool ServerMsgHandler::InitInjectNoticeSource()
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Init InjectNoticeSource enter");
+    if (injectNotice_ == nullptr) {
+        injectNotice_ = std::make_shared<InjectNoticeManager>();
+    }
+    MMI_HILOGD("Injectnotice StartNoticeAbility ok");
+    if (!injectNotice_->IsAbilityStart()) {
+        MMI_HILOGD("Injectnotice StartNoticeAbility begin");
+        bool isStart = injectNotice_->StartNoticeAbility();
+        if (!isStart) {
+            MMI_HILOGE("Injectnotice StartNoticeAbility isStart:%{public}d", isStart);
+            return false;
+        }
+        MMI_HILOGD("Injectnotice StartNoticeAbility ok");
+    }
+    auto connection = injectNotice_->GetConnection();
+    CHKPF(connection);
+    if (!connection->IsConnected()) {
+        MMI_HILOGD("Injectnotice ConnectNoticeSrv begin");
+        bool isConnect = injectNotice_->ConnectNoticeSrv();
+        if (!isConnect) {
+            MMI_HILOGD("Injectnotice ConnectNoticeSrv isConnect:%{public}d", isConnect);
+            return false;
+        }
+        MMI_HILOGD("Injectnotice ConnectNoticeSrv ok");
+    }
+    MMI_HILOGD("Injectnotice InitInjectNoticeSource ok");
+    return true;
+}
+
+bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
+{
+    CALL_DEBUG_ENTER;
+    bool isInit = InitInjectNoticeSource();
+    if (!isInit) {
+        MMI_HILOGE("InitinjectNotice_ Source error");
+        return false;
+    }
+    MMI_HILOGD("submit begin");
+    ffrt::submit([this, noticeInfo] {
+        MMI_HILOGD("submit enter");
+        CHKPV(injectNotice_);
+        auto pConnect = injectNotice_->GetConnection();
+        CHKPV(pConnect);
+        int32_t timeSecond = 0;
+        while (timeSecond <= SEND_NOTICE_OVERTIME) {
+            bool isConnect = pConnect->IsConnected();
+            MMI_HILOGD("SendNotice %{public}d", isConnect);
+            if (isConnect) {
+                MMI_HILOGD("SendNotice begin");
+                pConnect->SendNotice(noticeInfo);
+                break;
+            }
+            timeSecond += 1;
+            sleep(1);
+        }
+        MMI_HILOGD("submit leave");
+    });
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
