@@ -42,6 +42,7 @@ declare_args() {
   input_ext_feature_fingersense = true
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
+  input_feature_crown = false
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
 
@@ -209,6 +210,7 @@ declare_args() {
     "src/virtual_finger.cpp",
     "src/virtual_fingerprint_key.cpp",
     "src/virtual_fingerprint_mouse.cpp",
+    "src/virtual_crown.cpp",
     "src/virtual_gamepad.cpp",
     "src/virtual_joystick.cpp",
     "src/virtual_keyboard.cpp",
@@ -311,6 +313,10 @@ if (input_feature_short_key) {
 
 if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
+}
+
+if (input_feature_crown) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CROWN" ]
 }
 
 if (!defined(global_parts_info) ||
