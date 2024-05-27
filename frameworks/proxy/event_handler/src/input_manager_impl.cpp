@@ -44,8 +44,6 @@ constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
 constexpr int32_t ANR_DISPATCH = 0;
 constexpr uint8_t LOOP_COND = 2;
 constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
-constexpr int32_t POINTER_CHANGE_AREA_SIZE = 8;
-constexpr int32_t TRANSFORM_SIZE = 9;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -207,7 +205,8 @@ int32_t InputManagerImpl::GetDisplayMaxSize()
 int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
 {
     return sizeof(WindowInfo) + sizeof(Rect) * maxAreasCount * 2
-           + sizeof(int32_t) * POINTER_CHANGE_AREA_SIZE + sizeof(float) * TRANSFORM_SIZE;
+           + sizeof(int32_t) * WindowInfo::POINTER_CHANGEAREA_COUNT
+           + sizeof(float) * WindowInfo::WINDOW_TRANSFORM_SIZE;
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -577,7 +576,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode;
+            << item.windowInputType << item.privacyMode << item.windowType;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
