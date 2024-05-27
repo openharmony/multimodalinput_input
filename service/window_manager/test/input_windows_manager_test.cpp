@@ -105,10 +105,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestS
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     UDSServer udsServer;
-    WinMgr->Init(udsServer);
-    WinMgr->GetDisplayGroupInfo();
+    WIN_MGR->Init(udsServer);
+    WIN_MGR->GetDisplayGroupInfo();
     int32_t idNames = -1;
-    ASSERT_EQ(WinMgr->GetClientFd(pointerEvent), idNames);
+    ASSERT_EQ(WIN_MGR->GetClientFd(pointerEvent), idNames);
 }
 
 /**
