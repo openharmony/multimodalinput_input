@@ -1311,7 +1311,7 @@ bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunch
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
     bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
-    MMI_HILOGD("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    MMI_HILOGI("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
     std::string bundleName = sequence.ability.bundleName;
     std::string matchName = ".screenshot";
     if (bundleName.find(matchName) != std::string::npos) {
