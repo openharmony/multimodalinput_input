@@ -858,7 +858,8 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t pid, windowId;
+    int32_t pid = 0;
+    int32_t windowId = 0;
     READINT32(data, pid, RET_ERR);
     READINT32(data, windowId, RET_ERR);
     int32_t ret = ClearWindowPointerStyle(pid, windowId);
