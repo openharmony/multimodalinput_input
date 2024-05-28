@@ -119,7 +119,7 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
-    MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d, ratio: %{public}f", pointerStyle.id, scale_);
+    MMI_HILOGD("Pointer window move success");
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = false;
     cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
@@ -166,7 +166,6 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Pointer window move success, scale_: %{public}f", scale_);
     if (surfaceNode_ != nullptr) {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
         surfaceNode_->SetScale(scale_);
