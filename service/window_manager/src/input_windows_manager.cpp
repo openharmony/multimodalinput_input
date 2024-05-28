@@ -2400,12 +2400,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 
     pointerAction = pointerEvent->GetPointerAction();
-    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        (pointerAction != PointerEvent::POINTER_ACTION_CANCEL) &&
-        (pointerAction != PointerEvent::POINTER_ACTION_UP) &&
-        (pointerAction != PointerEvent::POINTER_ACTION_PULL_UP) &&
-        (pointerAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {
-        CancelLastTouchWindow(touchWindow, pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
+            CancelLastTouchWindow(touchWindow, pointerEvent);
+        } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+            ClearTouchCancelFlag(pointerEvent);
+        }
     }
 
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
@@ -2435,7 +2435,7 @@ void InputWindowsManager::CancelLastTouchWindow(const WindowInfo *currTouchWindo
     auto pointerId = pointerEvent->GetPointerId();
     std::set<int32_t> touchWindowsId;
     for (auto &item : touchItemDownInfos_) {
-        if (!item.second.flag) {
+        if ((!item.second.flag) || (pointerId == item.first)) {
             continue;
         }
 
@@ -2444,21 +2444,39 @@ void InputWindowsManager::CancelLastTouchWindow(const WindowInfo *currTouchWindo
             continue;
         }
 
+
         if (touchWindowsId.find(id) != touchWindowsId.end()) {
             item.second.flag = false;
             continue;
         }
 
         touchWindowsId.insert(id);
-        item.second.flag = false;
         lastTouchWindowInfo_ = item.second.window;
         lastTouchEvent_->SetPointerId(item.first);
-        MMI_HILOGI("cancel window: %{public}d", id);
+        MMI_HILOGI("cancel window, cancelWindowId:%{public}d, targetWindowId:%{public}d, Action:%{public}d, "
+                   "cancelPointerId:%{public}d, targetPointerId:%{public}d, cancelFlag:%{public}s", 
+                   id, currTouchWindow->id, pointerEvent->GetPointerAction(), 
+                   item.first, pointerId, item.second.flag ? "true" : "false");
+        item.second.flag = false;
         DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
     }
     touchWindowsId.clear();
     lastTouchEvent_ = lastTouchEvent;
     pointerEvent->SetPointerId(pointerId);
+}
+
+void InputWindowsManager::ClearTouchCancelFlag(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    auto pointerId = pointerEvent->GetPointerId();
+    auto item = touchItemDownInfos_.find(pointerId);
+    if (touchItemDownInfos_.count(pointerId) == 0) {
+        return;
+    }
+    auto &windowInfoEx = touchItemDownInfos_[pointerId];
+    MMI_HILOGI("Pointer action up:pointerId:%{public}d, targetWindowId:%{public}d, flag:%{public}s", 
+               pointerId, windowInfoEx.window.id, windowInfoEx.flag ? "true" : "false");
+    touchItemDownInfos_[pointerId].flag = false;
 }
 
 void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
@@ -2527,6 +2545,9 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
     currentPointerItem.SetPointerId(lastPointerId);
+    if (pointerAction == PointerEvent::POINTER_ACTION_CANCEL) {
+        currentPointerItem.SetPressed(false);
+    }
 
     pointerEvent->UpdateId();
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
