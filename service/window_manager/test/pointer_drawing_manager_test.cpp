@@ -401,7 +401,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_002, Tes
     manager.lastMouseStyle_.id = 2;
     ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
     manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));  
+    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
 }
 
 /**
