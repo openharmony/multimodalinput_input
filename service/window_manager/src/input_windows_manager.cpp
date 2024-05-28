@@ -2400,7 +2400,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 
     pointerAction = pointerEvent->GetPointerAction();
-    if ((pointerAction != PointerEvent::POINTER_ACTION_CANCEL) &&
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        (pointerAction != PointerEvent::POINTER_ACTION_CANCEL) &&
         (pointerAction != PointerEvent::POINTER_ACTION_UP) &&
         (pointerAction != PointerEvent::POINTER_ACTION_PULL_UP) &&
         (pointerAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {
