@@ -1795,11 +1795,23 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     int32_t secondXIndex = firstYIndex + 1;
     int32_t secondYIndex = secondXIndex + 1;
     if (argc == swipeUInputArgc) {
-        if (!StrToInt(optarg, fingerCount) ||
-        (!StrToInt(argv[optind], px1)) ||
-        (!StrToInt(argv[firstYIndex], py1)) ||
-        (!StrToInt(argv[secondXIndex], px2)) ||
-        (!StrToInt(argv[secondYIndex], py2))) {
+        if (!StrToInt(optarg, fingerCount)) {
+            std::cout << "invalid swip data" << std::endl;
+            return EVENT_REG_FAIL;
+        }
+        if (!StrToInt(argv[optind], px1)) {
+            std::cout << "invalid swip data" << std::endl;
+            return EVENT_REG_FAIL;
+        }
+        if (!StrToInt(argv[firstYIndex], py1)) {
+            std::cout << "invalid swip data" << std::endl;
+            return EVENT_REG_FAIL;
+        }
+        if (!StrToInt(argv[secondXIndex], px2)) {
+            std::cout << "invalid swip data" << std::endl;
+            return EVENT_REG_FAIL;
+        }
+        if (!StrToInt(argv[secondYIndex], py2)) {
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
@@ -1807,12 +1819,11 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
         std::cout << "wrong number of parameters:" << argc << std::endl;
         return EVENT_REG_FAIL;
     }
-
     if (fingerCount < MIN_SWIPE_FINGER || fingerCount > MAX_SWIPE_FINGER) {
         std::cout << "invalid finger count:" << fingerCount << std::endl;
         return EVENT_REG_FAIL;
     }
- 
+
     if ((px1 <= 0) || (py1 <= 0) || (px2 <= 0) || (py2 <= 0)) {
         std::cout << "Coordinate value must be greater than 0:" << std::endl;
         return RET_ERR;
@@ -1821,8 +1832,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::SwipeEvent(const int32_t fc, const int32_t px1, 
-                                        const int32_t py1, const int32_t px2, const int32_t py2)
+int32_t InputManagerCommand::SwipeEvent(const int32_t fc, const int32_t px1,
+    const int32_t py1, const int32_t px2, const int32_t py2)
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
