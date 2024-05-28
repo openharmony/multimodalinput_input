@@ -152,6 +152,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
+    float scale_ { 1.0 };
     isMagicCursor hasMagicCursor_;
 };
 } // namespace MMI

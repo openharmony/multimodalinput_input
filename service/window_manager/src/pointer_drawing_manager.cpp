@@ -118,7 +118,7 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {
-    MMI_HILOGD("Pointer window move success");
+    MMI_HILOGI("Pointer window move success");
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
