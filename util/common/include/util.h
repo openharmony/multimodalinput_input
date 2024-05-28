@@ -17,9 +17,11 @@
 #define UTIL_H
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
+#include "mmi_log.h"
 #include "define_multimodal.h"
 #include "struct_multimodal.h"
 

@@ -20,7 +20,7 @@
 #include "input_windows_manager.h"
 #include "libinput_wrapper.h"
 #include "mouse_event_normalize.h"
-#include "virtual_mouse.h"
+#include "general_mouse.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,7 +39,7 @@ public:
     void TearDown();
 
 private:
-    static VirtualMouse vMouse_;
+    static GeneralMouse vMouse_;
     static LibinputWrapper libinput_;
 
     int32_t prePointerSpeed_ { 5 };
@@ -52,7 +52,7 @@ private:
     bool preTapSwitch_ { true };
 };
 
-VirtualMouse MouseEventNormalizeTest::vMouse_;
+GeneralMouse MouseEventNormalizeTest::vMouse_;
 LibinputWrapper MouseEventNormalizeTest::libinput_;
 
 void MouseEventNormalizeTest::SetUpTestCase(void)
@@ -78,7 +78,7 @@ void MouseEventNormalizeTest::SetupMouse()
     ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
     struct libinput_device *device = libinput_event_get_device(event);
     ASSERT_TRUE(device != nullptr);
-    InputDevMgr->OnInputDeviceAdded(device);
+    INPUT_DEV_MGR->OnInputDeviceAdded(device);
 }
 
 void MouseEventNormalizeTest::CloseMouse()
@@ -102,7 +102,7 @@ void MouseEventNormalizeTest::UpdateDisplayInfo()
         .width = display->GetWidth(),
         .height = display->GetHeight(),
     });
-    WinMgr->UpdateDisplayInfo(displays);
+    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void MouseEventNormalizeTest::SetUp()
@@ -197,21 +197,21 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
 
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
     int32_t deviceId = iter->first;
     struct InputDeviceManager::InputDeviceInfo info = iter->second;
-    InputDevMgr->inputDevice_.erase(iter);
+    INPUT_DEV_MGR->inputDevice_.erase(iter);
 
     auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
     double angle = 0.5;
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
-    InputDevMgr->inputDevice_[deviceId] = info;
+    INPUT_DEV_MGR->inputDevice_[deviceId] = info;
 }
 
 /**
@@ -233,7 +233,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
 
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(dev);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(dev);
     auto iter = MouseEventHdr->processors_.find(deviceId);
     if (iter != MouseEventHdr->processors_.end()) {
         MouseEventHdr->processors_.erase(iter);
@@ -390,7 +390,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitc
     bool flag = true;
     MouseEventHdr->SetTouchpadScrollSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollSwitch(flag) == RET_OK);
+    MouseEventHdr->GetTouchpadScrollSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -417,7 +417,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirec
     bool state = true;
     MouseEventHdr->SetTouchpadScrollDirection(state);
     bool newState = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollDirection(state) == RET_OK);
+    MouseEventHdr->GetTouchpadScrollDirection(state);
     ASSERT_TRUE(state == newState);
 }
 
@@ -444,7 +444,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_0
     bool flag = true;
     MouseEventHdr->SetTouchpadTapSwitch(flag);
     bool newFlag = true;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadTapSwitch(flag) == RET_OK);
+    MouseEventHdr->GetTouchpadTapSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -471,7 +471,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t speed = 8;
     MouseEventHdr->SetTouchpadPointerSpeed(speed);
     int32_t newSpeed = 4;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -498,7 +498,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t speed = 8;
     MouseEventHdr->SetTouchpadPointerSpeed(speed);
     int32_t newSpeed = 4;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    MouseEventHdr->GetTouchpadPointerSpeed(newSpeed);
     ASSERT_TRUE(speed == newSpeed);
 }
 
@@ -525,7 +525,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     int32_t type = 1;
     MouseEventHdr->SetTouchpadRightClickType(type);
     int32_t newType = 2;
-    ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
+    MouseEventHdr->GetTouchpadRightClickType(newType);
     ASSERT_TRUE(type == newType);
 }
 
@@ -548,20 +548,20 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEve
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
 
-    auto it = InputDevMgr->inputDevice_.begin();
-    for (; it != InputDevMgr->inputDevice_.end(); ++it) {
+    auto it = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; it != INPUT_DEV_MGR->inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(it != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(it != INPUT_DEV_MGR->inputDevice_.end());
     int32_t deviceId = it->first;
     struct InputDeviceManager::InputDeviceInfo info = it->second;
-    InputDevMgr->inputDevice_.erase(it);
+    INPUT_DEV_MGR->inputDevice_.erase(it);
 
     MouseEventHdr->CheckAndPackageAxisEvent(event);
 
-    InputDevMgr->inputDevice_[deviceId] = info;
+    INPUT_DEV_MGR->inputDevice_[deviceId] = info;
 }
 
 /**

@@ -33,8 +33,8 @@ constexpr int32_t DEFAULT_LIFESPAN = -1;
 
 class KnuckleDivergentPoint {
 public:
-    explicit KnuckleDivergentPoint(const OHOS::Rosen::Drawing::Bitmap &bitmap);
-    ~KnuckleDivergentPoint();
+    explicit KnuckleDivergentPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap);
+    ~KnuckleDivergentPoint() = default;
     void Update();
     void Clear();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
@@ -47,7 +47,7 @@ private:
     double pointX_ { 0.0 };
     double pointY_ { 0.0 };
     int32_t lifespan_ { DEFAULT_LIFESPAN };
-    Rosen::Drawing::Bitmap traceShadow_;
+    std::shared_ptr<Rosen::Drawing::Bitmap> traceShadow_ { nullptr };
     Rosen::Drawing::Matrix traceMatrix_;
 };
 } // namespace MMI

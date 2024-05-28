@@ -17,11 +17,13 @@
 
 #include <linux/input.h>
 
+#include "aggregator.h"
 #include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
+#include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -51,7 +53,7 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     CHKPF(device);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
+    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -68,8 +70,6 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
-    int32_t toolType = GetTouchToolType(touch, device);
-    item.SetToolType(toolType);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -78,9 +78,11 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetPressed(true);
     UpdatePointerItemProperties(item, touchInfo);
     item.SetDeviceId(deviceId_);
+    int32_t toolType = GetTouchToolType(touch, device);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     NotifyFingersenseProcess(item, toolType);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    item.SetToolType(toolType);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
@@ -132,7 +134,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
+    if (!WIN_MGR->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
@@ -203,24 +205,15 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->SetSensorInputTime(sensorTime);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
-            if (!OnEventTouchDown(event)) {
-                MMI_HILOGE("Get OnEventTouchDown failed");
-                return nullptr;
-            }
+            CHKFR(OnEventTouchDown(event), nullptr, "Get OnEventTouchDown failed");
             break;
         }
         case LIBINPUT_EVENT_TOUCH_UP: {
-            if (!OnEventTouchUp(event)) {
-                MMI_HILOGE("Get OnEventTouchUp failed");
-                return nullptr;
-            }
+            CHKFR(OnEventTouchUp(event), nullptr, "Get OnEventTouchUp failed");
             break;
         }
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            if (!OnEventTouchMotion(event)) {
-                MMI_HILOGE("Get OnEventTouchMotion failed");
-                return nullptr;
-            }
+            CHKFR(OnEventTouchMotion(event), nullptr, "Get OnEventTouchMotion failed");
             break;
         }
         default: {
@@ -231,13 +224,16 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    WinMgr->UpdateTargetPointer(pointerEvent_);
-    MMI_HILOGI("created:%{public}s,winId:%{public}d", device->GetName().c_str(), pointerEvent_->GetTargetWindowId());
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
+    aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
+        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
+        std::to_string(pointerEvent_->GetId()));
+
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
-    WinMgr->DrawTouchGraphic(pointerEvent_);
+    WIN_MGR->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;
 }
 

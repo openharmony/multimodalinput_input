@@ -91,7 +91,7 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value *results, int32_t siz
         asyncContext->reserve >> temp;
         CHKRF(napi_get_boolean(env, temp, &results[1]), GET_BOOLEAN);
     } else if (resultType == ReturnType::NUMBER) {
-        int32_t temp;
+        int32_t temp = 0;
         asyncContext->reserve >> temp;
         CHKRF(napi_create_int32(env, temp, &results[1]), CREATE_INT32);
     } else {
@@ -687,7 +687,7 @@ napi_value JsPointerManager::GetMousePrimaryButton(napi_env env, napi_value hand
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    int32_t primaryButton;
+    int32_t primaryButton = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");

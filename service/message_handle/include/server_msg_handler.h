@@ -22,12 +22,14 @@
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"
+#include "mouse_event_normalize.h"
 #include "msg_handler.h"
 #include "pixel_map.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "window_info.h"
+#include "inject_notice_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -95,6 +97,8 @@ public:
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+    bool InitInjectNoticeSource();
+    bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
@@ -113,6 +117,7 @@ private:
     void LaunchAbility();
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void CalculateOffset(Direction direction, Offset &offset);
 
 private:
     UDSServer *udsServer_ { nullptr };
@@ -123,6 +128,7 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
+    std::shared_ptr<InjectNoticeManager> injectNotice_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

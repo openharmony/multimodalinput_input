@@ -27,7 +27,7 @@ namespace {
 constexpr float BASIC_DISTANCE_BETWEEN_POINTS = 5.0f;
 } // namespace
 
-KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, const OHOS::Rosen::Drawing::Bitmap &bitmap,
+KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, std::shared_ptr<Rosen::Drawing::Bitmap> bitmap,
     int32_t maxDivergenceNum) : maxDivergenceNum_(maxDivergenceNum)
 {
     CALL_DEBUG_ENTER;
@@ -36,8 +36,6 @@ KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, const OHOS::Ro
         glowPoints_.emplace_back(std::make_shared<KnuckleGlowPoint>(bitmap));
     }
 }
-
-KnuckleGlowTraceSystem::~KnuckleGlowTraceSystem() {}
 
 void KnuckleGlowTraceSystem::Clear()
 {
@@ -59,12 +57,12 @@ void KnuckleGlowTraceSystem::Update()
 void KnuckleGlowTraceSystem::Draw(Rosen::Drawing::RecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
-    for (auto divergentPoint : divergentPoints_) {
-        if (!divergentPoint->IsEnded()) {
+    for (size_t i = 0; i < glowPoints_.size(); ++i) {
+        std::shared_ptr<KnuckleDivergentPoint> divergentPoint = divergentPoints_[i];
+        std::shared_ptr<KnuckleGlowPoint> glowPoint = glowPoints_[i];
+        if (divergentPoint != nullptr) {
             divergentPoint->Draw(canvas);
         }
-    }
-    for (auto glowPoint : glowPoints_) {
         if (glowPoint != nullptr) {
             glowPoint->Draw(canvas);
         }
@@ -79,13 +77,12 @@ void KnuckleGlowTraceSystem::ResetDivergentPoints(double pointX, double pointY)
         CHKPC(divergentPoint);
         if (divergentPoint->IsEnded() && divergenceNum < maxDivergenceNum_) {
             divergenceNum++;
-            MMI_HILOGE("reset divergentPoint");
             divergentPoint->Reset(pointX, pointY);
         }
     }
 }
 
-void KnuckleGlowTraceSystem::AddGlowPoints(Rosen::Drawing::Path path, int64_t timeInterval)
+void KnuckleGlowTraceSystem::AddGlowPoints(const Rosen::Drawing::Path &path, int64_t timeInterval)
 {
     CALL_DEBUG_ENTER;
     double pathlength = path.GetLength(false);
@@ -95,7 +92,7 @@ void KnuckleGlowTraceSystem::AddGlowPoints(Rosen::Drawing::Path path, int64_t ti
     float lifespanOffset = timeInterval;
     float splitRatio = static_cast<float>(std::ceil(pathlength / BASIC_DISTANCE_BETWEEN_POINTS));
     float baseTime = timeInterval / splitRatio;
-    for (auto glowPoint : glowPoints_) {
+    for (const auto &glowPoint : glowPoints_) {
         if (glowPoint != nullptr && glowPoint->IsEnded() && distanceFromEnd <= pathlength) {
             if (path.GetPositionAndTangent(distanceFromEnd, pathPoints, tangent, true)) {
                 glowPoint->Reset(pathPoints.GetX(), pathPoints.GetY(), lifespanOffset);

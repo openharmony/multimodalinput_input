@@ -63,7 +63,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid,keyCode:%{public}d", keyState->keyCode);
+        MMI_HILOGE("keyCode is invalid, keyCode:%{public}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -108,7 +108,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid,keyCode:%{public}d", keyCode);
+        MMI_HILOGE("keyCode is invalid, keyCode:%{public}d", keyCode);
         return;
     }
     keyState->keyCode = keyCode;

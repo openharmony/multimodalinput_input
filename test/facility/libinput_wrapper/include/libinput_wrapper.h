@@ -32,6 +32,7 @@ public:
 
     bool Init();
     struct libinput_event* Dispatch();
+    void DrainEvents();
     bool AddPath(const std::string &path);
     void RemovePath(const std::string &path);
 

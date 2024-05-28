@@ -33,13 +33,14 @@ namespace OHOS {
 namespace MMI {
 class KnuckleGlowTraceSystem {
 public:
-    explicit KnuckleGlowTraceSystem(int32_t pointSize, const Rosen::Drawing::Bitmap &bitmap, int32_t maxDivergenceNum);
-    ~KnuckleGlowTraceSystem();
+    KnuckleGlowTraceSystem(int32_t pointSize, std::shared_ptr<Rosen::Drawing::Bitmap> bitmap,
+        int32_t maxDivergenceNum);
+    ~KnuckleGlowTraceSystem() = default;
     void Clear();
     void Update();
     void Draw(Rosen::Drawing::RecordingCanvas* canvas);
     void ResetDivergentPoints(double pointX, double pointY);
-    void AddGlowPoints(Rosen::Drawing::Path path, int64_t timeInterval);
+    void AddGlowPoints(const Rosen::Drawing::Path &path, int64_t timeInterval);
 
 private:
     std::vector<std::shared_ptr<KnuckleGlowPoint>> glowPoints_;
