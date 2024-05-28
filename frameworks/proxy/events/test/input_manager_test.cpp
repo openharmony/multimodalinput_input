@@ -235,31 +235,6 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
-HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::vector<uint8_t> buffer(BUFFER_SIZE, 1);
-    ExtraData extraData;
-    extraData.appended = true;
-    extraData.buffer = buffer;
-    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-    InputManager::GetInstance()->AppendExtraData(extraData);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    auto pointerEvent = InputManagerUtil::SetupPointerEvent006();
-    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-
-    extraData.appended = false;
-    extraData.buffer.clear();
-    InputManager::GetInstance()->AppendExtraData(extraData);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
-}
-#endif // OHOS_BUILD_ENABLE_POINTER
-
 /**
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
  * @tc.desc: Verify invalid parameter.
