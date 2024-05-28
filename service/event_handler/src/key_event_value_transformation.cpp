@@ -502,7 +502,7 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
 };
 } // namespace
 
-int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
+int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
 {
     if (items.size() < 1 || items.size() > 3) {
         return KeyEvent::INTENTION_UNKNOWN;
