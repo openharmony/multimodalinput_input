@@ -121,8 +121,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 {
     MMI_HILOGD("Pointer window move success");
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    bool cursorEnlarged = false;
-    cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
+    bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
     if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
         // 触发光标找回效果时恢复为默认光标
         MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered.");
