@@ -1111,13 +1111,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = InputDevMgr->inputDevice_.begin();
-    for (; iter != InputDevMgr->inputDevice_.end(); ++iter) {
+    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
         if (iter->second.inputDeviceOrigin == dev) {
             break;
         }
     }
-    ASSERT_TRUE(iter != InputDevMgr->inputDevice_.end());
+    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
     int32_t deviceId = iter->first;
     TouchPadTransformProcessor processor(deviceId);
 
