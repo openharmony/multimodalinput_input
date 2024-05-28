@@ -1062,7 +1062,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_001, T
     displayGroupInfo.focusWindowId = 0;
     displayGroupInfo.width = 0;
     displayGroupInfo.height = 0;
-    // pointerDrawingManager.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
