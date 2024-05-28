@@ -1828,7 +1828,13 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
         std::cout << "Coordinate value must be greater than 0:" << std::endl;
         return RET_ERR;
     }
-    
+    SwipeEvent(fingerCount, px1, py1, px2, py2);
+    return ERR_OK;
+}
+
+int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
+    int32_t py1, int32_t px2, int32_t py2)
+{
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t numberPoint = 10;
@@ -1837,14 +1843,13 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
 
     PointerEvent::PointerItem item;
-    item.SetPressed(true);
     item.SetDownTime(startTimeMs);
     item.SetPointerId(0);
     item.SetDeviceId(0);
     item.SetDisplayX(px1);
     item.SetDisplayY(py1);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetFingerCount(fc);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetActionStartTime(startTimeMs);
@@ -1881,9 +1886,9 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
     return ERR_OK;
 }
+ 
 
 void InputManagerCommand::PrintMouseUsage()
 {
