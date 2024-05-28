@@ -295,13 +295,13 @@ void PointerDrawingManager::UpdateStyleOptions()
 {
     CALL_DEBUG_ENTER;
     PointerStyle curPointerStyle;
-    int result = WinMgr->GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    int result = WIN_MGR->GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (result != RET_OK) {
         MMI_HILOGE("Get current pointer style failed");
         return;
     }
     curPointerStyle.options = HasMagicCursor() ? MAGIC_STYLE_OPT : MOUSE_STYLE_OPT;
-    int ret = WinMgr->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    int ret = WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
     }
