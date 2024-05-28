@@ -129,7 +129,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered.");
         pointerStyle.id = 0;
     }
-    surfaceNode_->SetScale(scale_);    
+    surfaceNode_->SetScale(scale_);
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
