@@ -120,16 +120,16 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     PointerStyle pointerStyle, Direction direction)
 {
     MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d, ratio: %{public}f", pointerStyle.id, scale_);
-    bool cursorEnlarged = false;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    bool cursorEnlarged = false;
     cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
         // 触发光标找回效果时恢复为默认光标
         MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered.");
         pointerStyle.id = 0;
     }
     surfaceNode_->SetScale(scale_);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
@@ -168,7 +168,9 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Pointer window move success, scale_: %{public}f", scale_);
     if (surfaceNode_ != nullptr) {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
         surfaceNode_->SetScale(scale_);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
