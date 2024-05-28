@@ -1363,6 +1363,7 @@ void InputManagerImpl::SendEnhanceConfig()
 void InputManagerImpl::ReAddInputEventFilter()
 {
     CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (eventFilterServices_.size() > MAX_FILTER_NUM) {
         MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
         return;

@@ -1832,7 +1832,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
             mprintf(fd, "keyCode: %d | keyAction: %s",
-                sequenceKey.keyCode, KeyActionToString(sequenceKey.keyAction).c_str());
+                sequenceKey.keyCode, ConvertKeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
@@ -1840,7 +1840,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
     mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
-        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, KeyActionToString(item.keyAction).c_str());
+        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str());
     }
     mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
     mprintf(fd, "RepeatKey: count = %zu", repeatKeys_.size());
@@ -1848,7 +1848,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd,
             "KeyCode: %d | KeyAction: %s | Times: %d"
             "| StatusConfig: %s | StatusConfigValue: %s | BundleName: %s | AbilityName: %s"
-            "| Action:%s \t", item.keyCode, KeyActionToString(item.keyAction).c_str(), item.times,
+            "| Action:%s \t", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str(), item.times,
             item.statusConfig.c_str(), item.statusConfigValue ? "true" : "false",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
     }
@@ -1881,7 +1881,7 @@ void KeyCommandHandler::PrintGestureInfo(int32_t fd)
         doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
         doubleKnuckleGesture_.ability.action.c_str());
 }
-std::string KeyCommandHandler::KeyActionToString(int32_t keyAction)
+std::string KeyCommandHandler::ConvertKeyActionToString(int32_t keyAction)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = {
         {0, "UNKNOWN"},
