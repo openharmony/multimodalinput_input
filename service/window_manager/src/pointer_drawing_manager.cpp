@@ -22,6 +22,7 @@
 #include "table_dump.h"
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_drawing_manager.h"
+#include "magic_pointer_velocity_tracker.h"
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #include "define_multimodal.h"
@@ -116,9 +117,19 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 }
 
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-    const PointerStyle pointerStyle, Direction direction)
+    PointerStyle pointerStyle, Direction direction)
 {
-    MMI_HILOGI("Pointer window move success");
+    MMI_HILOGE("Pointer window move success, pointerStyle id: %{public}d, ratio: %{public}f", pointerStyle.id, scale_);
+    bool cursorEnlarged = false;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
+        // 触发光标找回效果时恢复为默认光标
+        MMI_HILOGE("Restores to the default cursor when the cursor retrieval effect is triggered.");
+        pointerStyle.id = 0;
+    }
+    surfaceNode_->SetScale(scale_);    
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
@@ -155,13 +166,20 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGI("Pointer window move success, scale_: %{public}f", scale_);
     if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetScale(scale_);
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Move pointer, physicalX:%{public}d physicalY:%{public}d", physicalX, physicalY);
     }
+}
+
+void PointerDrawingManager::SetPointerScale(float scale)
+{
+    scale_ = scale;
 }
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
