@@ -1768,20 +1768,12 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
         }
         std::cout << "input rotateValue:"<<rotateValue << std::endl;
         pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, rotateValue);
-        //pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
         pointerEvent->SetPointerId(0);
         PointerEvent::PointerItem item;
         item.SetPointerId(0);
         pointerEvent->AddPointerItem(item);
-
         pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-        //pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, rotateValue);
-        //pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-        //pointerEvent->SetPointerId(0);
-        //PointerEvent::PointerItem item;
-        //item.SetPointerId(0);
-        //pointerEvent->AddPointerItem(item);
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     }
     return ERR_OK;
@@ -1806,7 +1798,7 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
 		(!StrToInt(argv[optind + 1], py1)) ||
 		(!StrToInt(argv[optind + 2], px2)) ||
 		(!StrToInt(argv[optind + 3], py2))) {
-            std::cout << "invalid swip  data" << std::endl;
+            std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
     } else {
@@ -1865,7 +1857,7 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fingerCount, const int32_t
         itemTemp.SetPointerId(i + 1);
         itemTemp.SetDeviceId(0);
         itemTemp.SetDisplayX(px1 + xDistance * (i + 1));
-        itemTemp.SetDisplayY(py1 + yDistance * (i + 1)  );
+        itemTemp.SetDisplayY(py1 + yDistance * (i + 1));
         pointerEvent->AddPointerItem(itemTemp);
     }
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
