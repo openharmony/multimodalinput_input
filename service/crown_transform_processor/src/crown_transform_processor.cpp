@@ -166,7 +166,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
     uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
     double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
         LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-    double degree = scrollValue * SCALE_RATIO;
+    double degree = -scrollValue * SCALE_RATIO;
     double velocity = VELOCITY_ZERO;
     
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
@@ -211,7 +211,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetRawDx(0);
     pointerItem.SetRawDy(0);
-    
+
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetVelocity(velocity);
