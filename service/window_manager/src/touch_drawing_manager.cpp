@@ -192,7 +192,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
     itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
     if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
-        rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP
+        rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
     } else {
         rectTopPosition_ = 0;
     }
