@@ -47,6 +47,7 @@ bool IsArray(const napi_env& env, const napi_value& value)
     bool isArray = false;
     napi_status ret = napi_is_array(env, value, &isArray);
     if (ret != napi_ok) {
+        MMI_HILOGE("napi_is_array failed");
         return false;
     }
     return isArray;
@@ -102,7 +103,7 @@ bool ParseTransmitInfraredJSParam(const napi_env& env, const napi_callback_info 
 {
     CALL_DEBUG_ENTER;
     size_t argc = NUMBER_PARAMETERS;
-    napi_value argv[NUMBER_PARAMETERS];
+    napi_value argv[NUMBER_PARAMETERS] = { 0 };
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != NUMBER_PARAMETERS) {
         MMI_HILOGE("ParseTransmitInfraredJSParam Parameter number error");

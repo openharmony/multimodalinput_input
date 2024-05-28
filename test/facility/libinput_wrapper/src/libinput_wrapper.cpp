@@ -103,6 +103,18 @@ struct libinput_event* LibinputWrapper::Dispatch()
     return libinput_get_event(input_);
 }
 
+void LibinputWrapper::DrainEvents()
+{
+    CHKPV(input_);
+    struct libinput_event *event;
+
+    libinput_dispatch(input_);
+    while ((event = libinput_get_event(input_))) {
+        libinput_event_destroy(event);
+        libinput_dispatch(input_);
+    }
+}
+
 bool LibinputWrapper::AddPath(const std::string &path)
 {
     CHKPF(input_);

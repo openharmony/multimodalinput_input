@@ -66,7 +66,7 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
-    WinMgr->UpdateTargetPointer(pointerEvent_);
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
     return pointerEvent_;
 }
 
@@ -144,7 +144,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     CHKPF(event);
     int32_t targetDisplayId = -1;
     PhysicalCoordinate tCoord;
-    if (!WinMgr->CalculateTipPoint(event, targetDisplayId, tCoord)) {
+    if (!WIN_MGR->CalculateTipPoint(event, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
@@ -195,7 +195,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
 
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
     PhysicalCoordinate tCoord;
-    if (!WinMgr->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
+    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }

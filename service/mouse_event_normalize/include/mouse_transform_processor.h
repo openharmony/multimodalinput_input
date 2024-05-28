@@ -21,8 +21,10 @@
 
 #include "libinput.h"
 #include "singleton.h"
-#include "define_multimodal.h"
 
+#include "aggregator.h"
+#include "define_multimodal.h"
+#include "timer_manager.h"
 #include "pointer_event.h"
 #include "window_info.h"
 
@@ -101,9 +103,9 @@ private:
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DumpInner();
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
-    static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
+    static void GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
-    static int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
+    static void GetConfigDataFromDatabase(std::string &key, int32_t &value);
 
 public:
     static void OnDisplayLost(int32_t displayId);
@@ -116,15 +118,15 @@ public:
     static int32_t GetPointerSpeed();
     static int32_t SetPointerLocation(int32_t x, int32_t y);
     static int32_t SetTouchpadScrollSwitch(bool switchFlag);
-    static int32_t GetTouchpadScrollSwitch(bool &switchFlag);
+    static void GetTouchpadScrollSwitch(bool &switchFlag);
     static int32_t SetTouchpadScrollDirection(bool state);
-    static int32_t GetTouchpadScrollDirection(bool &state);
+    static void GetTouchpadScrollDirection(bool &state);
     static int32_t SetTouchpadTapSwitch(bool switchFlag);
-    static int32_t GetTouchpadTapSwitch(bool &switchFlag);
+    static void GetTouchpadTapSwitch(bool &switchFlag);
     static int32_t SetTouchpadRightClickType(int32_t type);
-    static int32_t GetTouchpadRightClickType(int32_t &type);
+    static void GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
-    static int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    static void GetTouchpadPointerSpeed(int32_t &speed);
     static int32_t GetTouchpadSpeed();
 
 private:
@@ -136,6 +138,15 @@ private:
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
+    Aggregator aggregator_ {
+            [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+                return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
+            },
+            [](int32_t timerId) -> int32_t
+            {
+                return TimerMgr->ResetTimer(timerId);
+            }
+    };
 };
 } // namespace MMI
 } // namespace OHOS

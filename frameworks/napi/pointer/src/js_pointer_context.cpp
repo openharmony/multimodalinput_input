@@ -34,7 +34,6 @@ constexpr int32_t DEFAULT_POINTER_SIZE = 1;
 constexpr int32_t MIN_POINTER_SIZE = 1;
 constexpr int32_t MAX_POINTER_SIZE = 7;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
-constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t THREE_PARAMETERS = 3;
 constexpr int32_t INVALID_VALUE = -2;
 } // namespace
@@ -133,7 +132,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
@@ -165,7 +164,7 @@ napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_i
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
@@ -193,7 +192,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->IsPointerVisible(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -220,7 +219,7 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
         return nullptr;
@@ -232,11 +231,6 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
     }
     int32_t color = MIN_POINTER_COLOR;
     CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
-    if (color < MIN_POINTER_COLOR) {
-        color = MIN_POINTER_COLOR;
-    } else if (color > MAX_POINTER_COLOR) {
-        color = MAX_POINTER_COLOR;
-    }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -260,7 +254,7 @@ napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info in
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->GetPointerColor(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -278,7 +272,7 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
         return nullptr;
@@ -290,11 +284,6 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
     }
     int32_t color = MIN_POINTER_COLOR;
     CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
-    if (color < MIN_POINTER_COLOR) {
-        color = MIN_POINTER_COLOR;
-    } else if (color > MAX_POINTER_COLOR) {
-        color = MAX_POINTER_COLOR;
-    }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -316,7 +305,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
         return nullptr;
@@ -352,7 +341,7 @@ napi_value JsPointerContext::SetPointerSpeedSync(napi_env env, napi_callback_inf
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
         return nullptr;
@@ -383,7 +372,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->GetPointerSpeed(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -410,7 +399,7 @@ napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rows", "number");
         return nullptr;
@@ -450,7 +439,7 @@ napi_value JsPointerContext::GetMouseScrollRows(napi_env env, napi_callback_info
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->GetMouseScrollRows(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -660,7 +649,7 @@ napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info inf
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
         return nullptr;
@@ -700,7 +689,7 @@ napi_value JsPointerContext::GetPointerSize(napi_env env, napi_callback_info inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->GetPointerSize(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -718,7 +707,7 @@ napi_value JsPointerContext::SetPointerSizeSync(napi_env env, napi_callback_info
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
         return nullptr;
@@ -845,7 +834,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
@@ -881,7 +870,7 @@ napi_value JsPointerContext::GetPointerStyleSync(napi_env env, napi_callback_inf
     size_t argc = 1;
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
@@ -1172,7 +1161,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "primaryButton", "number");
         return nullptr;
@@ -1212,7 +1201,7 @@ napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->GetMousePrimaryButton(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -1229,7 +1218,7 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
         return nullptr;
@@ -1266,7 +1255,7 @@ napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_inf
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 0) {
+    if (argc < 1) {
         return jsPointerMgr->GetHoverScrollState(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
@@ -1318,7 +1307,7 @@ napi_value JsPointerContext::SetTouchpadInt32Data(napi_env env, napi_callback_in
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 0) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "data", "number");
         return nullptr;
@@ -1355,7 +1344,7 @@ napi_value JsPointerContext::GetTouchpadData(napi_env env, napi_callback_info in
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc == 0) {
+    if (argc < 1) {
         return func(env, nullptr);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {

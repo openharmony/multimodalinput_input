@@ -32,7 +32,7 @@ void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessDa
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("process state change app name = %{public}s, uid = %{public}d, state = %{public}d ",
+    MMI_HILOGD("process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
         processData.bundleName.c_str(),
         processData.uid,
         processData.state);

@@ -63,7 +63,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
         MMI_HILOGI("Can not read device config file");
         return RET_ERR;
     }
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {
         MMI_HILOGE("Find to device failed");
         return RET_ERR;
@@ -176,7 +176,7 @@ void KeyAutoRepeat::RemoveDeviceConfig(struct libinput_device *device)
 {
     CALL_DEBUG_ENTER;
     CHKPV(device);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     auto iter = deviceConfig_.find(deviceId);
     if (iter == deviceConfig_.end()) {
         MMI_HILOGI("Can not remove device config file");

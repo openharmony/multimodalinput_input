@@ -350,7 +350,6 @@ void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGI("surfaceNode is already.");
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -406,8 +405,7 @@ void TouchDrawingManager::DrawBubble()
     CHKPV(canvas);
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
-        if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+        if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
                 pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());

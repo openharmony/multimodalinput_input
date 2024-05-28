@@ -138,13 +138,17 @@ bool UDSSession::SendMsg(NetPacket &pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::ReportSocketBufferFull()
+void UDSSession::ReportSocketBufferFull() const
 {
     int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-                                  "INPUT_EVENT_SOCKET_TIMEOUT",
-                                  OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-                                  "MSG",
-                                  "remote client buffer full, cant send msg");
+        "INPUT_EVENT_SOCKET_TIMEOUT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "MSG",
+        "remote client buffer full, cant send msg",
+        "PROGRAM_NAME",
+        programName_,
+        "REMOTE_PID",
+        pid_);
     if (ret != 0) {
         MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
     }

@@ -48,14 +48,14 @@ void KeyMapManager::ParseDeviceConfigFile(struct libinput_device *device)
         MMI_HILOGE("Get fileName is empty");
         return;
     }
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     GetConfigKeyValue(fileName, deviceId);
 }
 
 void KeyMapManager::RemoveKeyValue(struct libinput_device *device)
 {
     CHKPV(device);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     auto iter = configKeyValue_.find(deviceId);
     if (iter == configKeyValue_.end()) {
         MMI_HILOGI("Device config file does not exist");
@@ -108,7 +108,7 @@ int32_t KeyMapManager::TransferDeviceKeyValue(struct libinput_device *device,
     if (device == nullptr) {
         return TransferDefaultKeyValue(inputKey);
     }
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (auto itr = configKeyValue_.find(deviceId); itr != configKeyValue_.end()) {
         if (auto devKey = itr->second.find(inputKey); devKey != itr->second.end()) {
             return devKey->second;
