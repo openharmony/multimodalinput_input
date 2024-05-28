@@ -436,6 +436,9 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
+    if (info.isTouchableDevice) {
+        DfxHisysevent::ReportLcdVendorInfo(inputDevice);
+    }
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
