@@ -1779,13 +1779,13 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadPinchSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
     return RET_OK;
 }
 
 int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadSwipeSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(switchFlag);
     return RET_OK;
 }
 
@@ -1797,7 +1797,7 @@ int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
 
 int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     return RET_OK;
 }
 
