@@ -1795,7 +1795,7 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     int32_t secondXIndex = firstYIndex + 1;
     int32_t secondYIndex = secondXIndex + 1;
     if (argc == swipeUInputArgc) {
-        if (!StrToInt(optarg, fingerCount)||
+        if (!StrToInt(optarg, fingerCount) ||
         (!StrToInt(argv[optind], px1)) ||
         (!StrToInt(argv[firstYIndex], py1)) ||
         (!StrToInt(argv[secondXIndex], px2)) ||
@@ -1821,7 +1821,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::SwipeEvent(const int32_t fingerCount, int32_t px1, int32_t py1, int32_t px2, int32_t py2)
+int32_t InputManagerCommand::SwipeEvent(const int32_t fc, const int32_t px1, 
+                                        const int32_t py1, const int32_t px2, const int32_t py2)
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -1838,7 +1839,7 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fingerCount, int32_t px1, 
     item.SetDisplayX(px1);
     item.SetDisplayY(py1);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetFingerCount(fc);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetActionStartTime(startTimeMs);
