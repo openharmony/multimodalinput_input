@@ -57,6 +57,7 @@ constexpr float MOVE_TOLERANCE = 3.0f;
 constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
 constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
+constexpr int32_t DEFAULT_DELAY = 0;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
 } // namespace
@@ -353,7 +354,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
         knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
-        LaunchAbility(knuckleGesture.ability, 0);
+        LaunchAbility(knuckleGesture.ability, DEFAULT_DELAY);
         BytraceAdapter::StopLaunchAbility();
         knuckleGesture.state = true;
         ReportKnuckleScreenCapture(touchEvent);
@@ -630,7 +631,7 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
     }
     ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
-    LaunchAbility(ability, 0);
+    LaunchAbility(ability, DEFAULT_DELAY);
 }
 
 void KeyCommandHandler::ResetKnuckleGesture()
@@ -1504,7 +1505,7 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
         MMI_HILOGI("The touchpad trip tap will launch ability");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, threeFingersTap_.ability.bundleName);
-        LaunchAbility(threeFingersTap_.ability, 0);
+        LaunchAbility(threeFingersTap_.ability, DEFAULT_DELAY);
         BytraceAdapter::StopLaunchAbility();
         return true;
     }
