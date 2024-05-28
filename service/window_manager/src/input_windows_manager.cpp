@@ -2444,7 +2444,6 @@ void InputWindowsManager::CancelLastTouchWindow(const WindowInfo *currTouchWindo
             continue;
         }
 
-
         if (touchWindowsId.find(id) != touchWindowsId.end()) {
             item.second.flag = false;
             continue;
@@ -2453,9 +2452,9 @@ void InputWindowsManager::CancelLastTouchWindow(const WindowInfo *currTouchWindo
         touchWindowsId.insert(id);
         lastTouchWindowInfo_ = item.second.window;
         lastTouchEvent_->SetPointerId(item.first);
-        MMI_HILOGI("cancel window, cancelWindowId:%{public}d, targetWindowId:%{public}d, Action:%{public}d, "
-                   "cancelPointerId:%{public}d, targetPointerId:%{public}d, cancelFlag:%{public}s", 
-                   id, currTouchWindow->id, pointerEvent->GetPointerAction(), 
+        MMI_HILOGI("cancel window, cancelWindowId:%{public}d, targetWindowId:%{public}d, Action:%{public}d,"
+                   "cancelPointerId:%{public}d, targetPointerId:%{public}d, cancelFlag:%{public}s",
+                   id, currTouchWindow->id, pointerEvent->GetPointerAction(),
                    item.first, pointerId, item.second.flag ? "true" : "false");
         item.second.flag = false;
         DispatchTouch(PointerEvent::POINTER_ACTION_CANCEL);
@@ -2474,7 +2473,7 @@ void InputWindowsManager::ClearTouchCancelFlag(std::shared_ptr<PointerEvent> poi
         return;
     }
     auto &windowInfoEx = touchItemDownInfos_[pointerId];
-    MMI_HILOGI("Pointer action up:pointerId:%{public}d, targetWindowId:%{public}d, flag:%{public}s", 
+    MMI_HILOGI("Pointer action up:pointerId:%{public}d, targetWindowId:%{public}d, flag:%{public}s",
                pointerId, windowInfoEx.window.id, windowInfoEx.flag ? "true" : "false");
     touchItemDownInfos_[pointerId].flag = false;
 }
