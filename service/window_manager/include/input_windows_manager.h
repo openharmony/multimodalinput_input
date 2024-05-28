@@ -178,6 +178,7 @@ public:
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
     void CancelLastTouchWindow(const WindowInfo *currTouchWindow, std::shared_ptr<PointerEvent> pointerEvent);
+    void ClearTouchCancelFlag(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
