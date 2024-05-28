@@ -63,7 +63,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 } // namespace MMI
 } // namespace OHOS
 
-int32_t main()
+int32_t main() __attribute__((no_sanitize("cfi")))
 {
     int sleepSeconds = 1;
     sleep(sleepSeconds);
@@ -94,6 +94,7 @@ int32_t main()
     MMI_HILOGI("notify_process_status execute end");
 
 nextStep:
+    MMI_HILOGI("start thread loop");
     static std::int32_t usleepTime = 1500000;
     while (true) {
         usleep(usleepTime);
