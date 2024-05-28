@@ -1429,6 +1429,7 @@ void InputWindowsManager::SetGlobalDefaultPointerStyle()
             } else if (item.second.id == CURSOR_CIRCLE_STYLE) {
                 item.second.id = globalStyle_.id;
             }
+            item.second.options = globalStyle_.options;
         }
     }
 }
@@ -1439,6 +1440,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         globalStyle_.id = pointerStyle.id;
+        globalStyle_.options = pointerStyle.options;
         SetGlobalDefaultPointerStyle();
         MMI_HILOG_CURSORD("Setting global pointer style");
         return RET_OK;
@@ -1496,6 +1498,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
     if (windowId == GLOBAL_WINDOW_ID) {
         MMI_HILOG_CURSORD("Getting global pointer style");
         pointerStyle.id = globalStyle_.id;
+        pointerStyle.options = globalStyle_.options;
         return RET_OK;
     }
     auto it = pointerStyle_.find(pid);
