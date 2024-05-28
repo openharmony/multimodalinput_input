@@ -71,6 +71,7 @@ void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     CHKPV(canvas);
     CHKPV(traceShadow_);
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
+        MMI_HILOGE("can not draw");
         return;
     }
     OHOS::Rosen::Drawing::Filter filter;
