@@ -524,7 +524,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-int32_t JsInputMonitor::TransformPinchEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+int32_t JsInputMonitor::TransformPinchEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetPinchAction(pointerEvent->GetPointerAction());
@@ -544,7 +544,7 @@ int32_t JsInputMonitor::TransformPinchEvent(const std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-int32_t JsInputMonitor::TransformRotateEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+int32_t JsInputMonitor::TransformRotateEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetRotateAction(pointerEvent->GetPointerAction());
@@ -602,7 +602,7 @@ int32_t JsInputMonitor::GetRotateAction(int32_t action) const
     }
 }
 
-int32_t JsInputMonitor::TransformSwipeEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+int32_t JsInputMonitor::TransformSwipeEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetSwipeAction(pointerEvent->GetPointerAction());
@@ -650,7 +650,7 @@ int32_t JsInputMonitor::GetSwipeAction(int32_t action) const
     }
 }
 
-int32_t JsInputMonitor::TransformMultiTapEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+int32_t JsInputMonitor::TransformMultiTapEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetMultiTapAction(pointerEvent->GetPointerAction());
@@ -1094,7 +1094,7 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
     }
 }
 
-int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+int32_t JsInputMonitor::TransformMousePointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -1128,7 +1128,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     return RET_OK;
 }
 
-int32_t JsInputMonitor::TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+int32_t JsInputMonitor::TransformJoystickPointerEvent(std::shared_ptr<PointerEvent> pointerEvent,
     napi_value result)
 {
     CALL_DEBUG_ENTER;
