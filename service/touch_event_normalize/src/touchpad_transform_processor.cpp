@@ -630,7 +630,7 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
     beginTime = 0;
     lastTime = 0;
     if (isAlldefault) {
-        multiFingersState = MulFingersTap::NOTAP;
+        multiFingersState = MulFingersTap::NO_TAP;
     }
     pointerMaps.clear();
 }
