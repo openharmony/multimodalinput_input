@@ -46,7 +46,7 @@ constexpr int32_t ANR_DISPATCH = 0;
 constexpr uint8_t LOOP_COND = 2;
 constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
 constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
-constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = (std::to_string(std::numeric_limits<uint64_t>::max()).size() + 7) * 2;
+constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = 27 * 2;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
