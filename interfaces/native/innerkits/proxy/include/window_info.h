@@ -318,7 +318,7 @@ struct WindowInfo {
 
     SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
 
-    uint32_t windowType;
+    int32_t windowType;
 };
 
 /**
