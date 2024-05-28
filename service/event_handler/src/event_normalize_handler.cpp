@@ -325,7 +325,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_CROWN
-    if (CROWNEVENT_HDR->IsCrownEvent(event)) {
+    if (CROWN_EVENT_HDR->IsCrownEvent(event)) {
         return CROWN_EVENT_HDR->NormalizeRotateEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_CROWN

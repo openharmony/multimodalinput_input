@@ -50,7 +50,7 @@ private:
     int32_t timerId_ { -1 };
     uint64_t lastTime_ { 0 };
 };
-#define CROWN_EVENT_HDR ::OHOS::DelayedSingleton<CrownTransformProcessor>::GetInstance() 
+#define CROWN_EVENT_HDR ::OHOS::DelayedSingleton<CrownTransformProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_CROWN
 } // namespace MMI
 } // namespace OHOS
