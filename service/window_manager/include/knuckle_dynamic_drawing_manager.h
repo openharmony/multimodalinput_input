@@ -73,6 +73,7 @@ private:
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
     bool isStop_ { false };
+    bool isRotate_ { false };
     int32_t lastDownX_ { 0 };
     int32_t lastDownY_ { 0 };
     int64_t lastUpTime_ { 0 };
