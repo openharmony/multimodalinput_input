@@ -423,7 +423,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
     EXPECT_EQ(ret2, "");
 }
 
-/** GetBindDisplayIdByInputDevice GetUnbindInfo
+/**
  * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_01
  * @tc.desc: Test AddLocalDisplay
  * @tc.type: FUNC
