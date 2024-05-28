@@ -1832,8 +1832,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::SwipeEvent(const int32_t fc, const int32_t px1,
-    const int32_t py1, const int32_t px2, const int32_t py2)
+int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
+    int32_t py1, int32_t px2, int32_t py2)
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
