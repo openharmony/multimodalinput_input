@@ -432,11 +432,11 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
 HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool IsStore;
+    bool isStore;
     int32_t id = 3;
     std::string name = "localDisplay";
     InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
-    IsStore = false;
+    isStore = false;
     ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(id, name));
 }
 } // namespace MMI
