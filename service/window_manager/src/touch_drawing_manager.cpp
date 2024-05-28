@@ -14,7 +14,7 @@
  */
 
 #include "touch_drawing_manager.h"
-
+#include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
 
