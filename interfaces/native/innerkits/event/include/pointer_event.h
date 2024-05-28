@@ -1420,7 +1420,7 @@ public:
     /**
      * @brief Obtains the axis value velocity.
      * @return Returns the axis value velocity.
-     * @since 9
+     * @since 12
      */
     double GetVelocity() const;
 
@@ -1428,7 +1428,7 @@ public:
      * @brief Sets the axis value velocity.
      * @param velocity Indicates the axis value velocity.
      * @return void
-     * @since 9
+     * @since 12
      */
     void SetVelocity(double velocity);
 

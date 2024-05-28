@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,8 @@ namespace MMI {
 namespace {
 const std::string CROWN_SOURCE = "rotary_crown";
 const std::string VIRTUAL_CROWN_SOURCE = "Virtual Crown";
+constexpr double DEGREE_ZERO = 0.0;
+constexpr double VELOCITY_ZERO = 0.0;
 constexpr double SCALE_RATIO = static_cast<double>(360) / 532;
 constexpr uint64_t MICROSECONDS_PER_SECOND = 1000 * 1000;
 }
@@ -104,6 +106,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
         } else {
             static constexpr int32_t timeout = 1000;
             std::weak_ptr<CrownTransformProcessor> weakPtr = shared_from_this();
+
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;
                 auto sharedProcessor = weakPtr.lock();
@@ -118,6 +121,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             });
+
             HandleCrownRotateBegin(rawPointerEvent);
             MMI_HILOGI("Wheel axis begin, crown rotate begin");
         }
@@ -149,7 +153,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateEnd()
 {
     CALL_DEBUG_ENTER;
     lastTime_ = 0;
-    HandleCrownRotatePostInner(0.0, 0.0, PointerEvent::POINTER_ACTION_AXIS_END);
+    HandleCrownRotatePostInner(VELOCITY_ZERO, DEGREE_ZERO, PointerEvent::POINTER_ACTION_AXIS_END);
     return RET_OK;
 }
 
@@ -163,7 +167,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
     double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
         LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
     double degree = scrollValue * SCALE_RATIO;
-    double velocity = 0.0;
+    double velocity = VELOCITY_ZERO;
     
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
         lastTime_ = currentTime;
@@ -172,7 +176,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
         if (intervalTime > 0) {
             velocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime;
         } else {
-            degree = 0.0;
+            degree = DEGREE_ZERO;
         }
         lastTime_ = currentTime;
     } else {
@@ -207,6 +211,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetRawDx(0);
     pointerItem.SetRawDy(0);
+    
     pointerEvent_->UpdateId();
     pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetVelocity(velocity);
