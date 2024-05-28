@@ -49,7 +49,7 @@ private:
     int32_t InjectPinchEvent(int32_t fingerCount, int32_t scaleNumberator);
     int32_t ProcessRotateGesture(int32_t argc, char *argv[]);
     int32_t ProcessTouchPadFingerSwipe(int32_t argc, char *argv[]);
-    int32_t SwipeEvent(const int32_t fingerCount, int32_t px1, int32_t py1, int32_t px2, int32_t py2);
+    int32_t SwipeEvent(const int32_t fc, const int32_t px1, const int32_t py1, const int32_t px2, const int32_t py2);
 };
 } // namespace MMI
 } // namespace OHOS
