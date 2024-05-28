@@ -608,7 +608,7 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     } else if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
         motionCnt++;
         if ((motionCnt >= FINGER_MOTION_MAX) || IsInvalidMulTapGesture(event)) {
-            MMI_HILOGD("the motion is too much");
+            MMI_HILOGD("The motion is too much");
             SetMULTI_FINGERTAP_HDRDefault();
             return RET_OK;
         }
