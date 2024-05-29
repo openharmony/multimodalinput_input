@@ -55,6 +55,8 @@ public:
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
     void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
+    std::string GetTypeName() const;
+    void SetTypeName(const std::string &typeName);
 private:
     bool IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
     void SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) const;
@@ -69,6 +71,7 @@ private:
     mutable bool consumed_ { false };
     mutable std::mutex mutex_;
     mutable int32_t flowCtrl_ { 0 };
+    std::string typeName_;
 };
 
 class JsInputMonitor final {
