@@ -1091,5 +1091,62 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchUpdate(event));
     ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchEnd(event));
 }
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_SetTouchPadPinchData
+ * @tc.desc: test SetTouchPadPinchData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchPadPinchData, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t action { PointerEvent::POINTER_ACTION_UNKNOWN };
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 666);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 770);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
+        if (iter->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
+    int32_t deviceId = iter->first;
+    TouchPadTransformProcessor processor(deviceId);
+
+    int32_t ret = processor.SetTouchPadPinchData(event, action);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_CanUnsetPointerItem_001
+ * @tc.desc: test CanUnsetPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_CanUnsetPointerItem_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 530);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 440);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
+
+    processor.IsInvalidMulTapGesture(touchpad);
+    bool ret = processor.CanUnsetPointerItem(touchpad);
+    EXPECT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
