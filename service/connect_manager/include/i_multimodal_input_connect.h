@@ -23,7 +23,7 @@
 #include "i_input_event_filter.h"
 #include "mmi_event_observer.h"
 #include "input_device.h"
-#include "input_handler_type.h"
+#include "../../../interfaces/native/innerkits/event/include/input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"

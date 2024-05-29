@@ -25,7 +25,7 @@
 
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
-#include "input_handler_type.h"
+#include "../../../interfaces/native/innerkits/event/include/input_handler_type.h"
 #include "uds_session.h"
 #include "nap_process.h"
 

@@ -20,7 +20,7 @@
 
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
-#include "input_handler_type.h"
+#include "../../../interfaces/native/innerkits/event/include/input_handler_type.h"
 #include "key_option.h"
 #include "mouse_event_normalize.h"
 #include "msg_handler.h"
