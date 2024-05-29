@@ -855,7 +855,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
         PointerStyle style;
         int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         if (ret != RET_OK) {
-            MMI_HILOG_CURSORE("Get global pointer style failed!");
+            MMI_HILOG_CURSORE("Get global pointer style failed");
             return;
         }
         lastPointerStyle_ = style;
