@@ -46,6 +46,7 @@ constexpr int32_t ANR_DISPATCH = 0;
 constexpr uint8_t LOOP_COND = 2;
 constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
 constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
+constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = 27 * 2;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -196,11 +197,7 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
 
 int32_t InputManagerImpl::GetDisplayMaxSize()
 {
-    return sizeof(DisplayInfo::id) + sizeof(DisplayInfo::x)+ sizeof(DisplayInfo::y)+ sizeof(DisplayInfo::width)
-           + sizeof(DisplayInfo::height)+ sizeof(DisplayInfo::dpi) + sizeof("display")
-           + std::to_string(std::numeric_limits<uint64_t>::max()).size() + sizeof("default")
-           + std::to_string(std::numeric_limits<uint64_t>::max()).size() + sizeof(DisplayInfo::direction)
-           + sizeof(DisplayInfo::displayDirection) + sizeof(DisplayInfo::displayMode);
+    return sizeof(DisplayInfo) + DISPLAY_STRINGS_MAX_SIZE;
 }
 
 int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)

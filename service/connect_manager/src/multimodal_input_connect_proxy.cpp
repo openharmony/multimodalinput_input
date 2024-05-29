@@ -758,6 +758,7 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerSt
     READINT32(reply, pointerStyle.size, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, pointerStyle.color, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(reply, pointerStyle.id, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, pointerStyle.options, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 

@@ -26,8 +26,8 @@ namespace HDI {
 namespace V1_0 {
 using namespace OHOS::HDI;
 struct ConsumerIrFreqRange {
-    int32_t max { 0 };
     int32_t min { 0 };
+    int32_t max { 0 };
 };
 class ConsumerIr : public HdiBase {
 public:

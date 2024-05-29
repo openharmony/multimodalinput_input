@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "audio_system_manager.h"
 #include "device_event_monitor.h"
 
 #include "mmi_log.h"
@@ -49,7 +48,6 @@ public:
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED) {
             int32_t callState = 0;
             DEVICE_MONITOR->SetCallState(eventData, callState);
-            MMI_HILOGI("state: %{public}d", callState);
         } else {
             MMI_HILOGW("Device changed receiver event: unknown");
             return;
@@ -77,15 +75,7 @@ void DeviceEventMonitor::SetCallState(const EventFwk::CommonEventData &eventData
     std::lock_guard<std::mutex> lock(stateMutex_);
     callState = eventData.GetWant().GetIntParam("state", -1);
     MMI_HILOGI("state %{public}d", callState);
-    if (hasHandleRingMute_ && callState_ == CALL_STATUS_INCOMING &&
-        (callState == CALL_STATUS_ACTIVE || callState == CALL_STATUS_DISCONNECTED
-        || callState == CALL_STATUS_DISCONNECTING)) {
-        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetMute(
-            AudioStandard::AudioVolumeType::STREAM_RING, false);
-        if (ret != ERR_OK) {
-            MMI_HILOGE("Mute reply fail, ret:%{public}d", ret);
-            return;
-        }
+    if (hasHandleRingMute_ && callState_ == CALL_STATUS_INCOMING && callState != CALL_STATUS_INCOMING) {
         MMI_HILOGI("Mute reply success");
         hasHandleRingMute_ = false;
     }
@@ -102,6 +92,11 @@ int32_t DeviceEventMonitor::GetCallState()
 void DeviceEventMonitor::SetHasHandleRingMute(bool hasHandleRingMute)
 {
     hasHandleRingMute_ = hasHandleRingMute;
+}
+
+bool DeviceEventMonitor::GetHasHandleRingMute()
+{
+    return hasHandleRingMute_;
 }
 } // namespace MMI
 } // namespace OHOS
