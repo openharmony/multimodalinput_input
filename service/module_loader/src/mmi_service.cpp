@@ -220,6 +220,7 @@ bool MMIService::InitService()
     if (!(Publish(this))) {
         state_ = ServiceRunningState::STATE_NOT_START;
         MMI_HILOGE("Service initialization failed");
+        EpollClose();
         return false;
     }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
