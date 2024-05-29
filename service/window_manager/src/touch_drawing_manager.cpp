@@ -100,8 +100,10 @@ void TouchDrawingManager::ConvertPointerEvent(const std::shared_ptr<PointerEvent
     for (auto item : items) {
         int32_t displayX = item.GetDisplayX();
         int32_t displayY = item.GetDisplayY();
-        GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
-            displayInfo_.height, displayX, displayY);
+        if (displayInfo_.displayDirection == DIRECTION0) {
+            GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+                displayInfo_.height, displayX, displayY);
+        }
         item.SetDisplayX(displayX);
         item.SetDisplayY(displayY);
         pointerEvent_->AddPointerItem(item);
@@ -350,6 +352,10 @@ void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
+        if ((displayInfo_.displayDirection) != DIRECTION0 && (displayInfo_.direction != DIRECTION90)) {
+            surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
+            surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+        }
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -405,7 +411,8 @@ void TouchDrawingManager::DrawBubble()
     CHKPV(canvas);
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
-        if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
+        if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
                 pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
@@ -427,11 +434,11 @@ void TouchDrawingManager::DrawBubble()
         canvas->AttachBrush(bubbleBrush_);
         canvas->DrawCircle(centerPt, bubble_.innerCircleRadius);
         canvas->DetachBrush();
-        if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+        if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
             pointerEvent_->GetPointerId() == pointerId) {
-            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d",
-                pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
+            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
+                " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
+                physicalX, physicalY);
         }
     }
     bubbleCanvasNode_->FinishRecording();
