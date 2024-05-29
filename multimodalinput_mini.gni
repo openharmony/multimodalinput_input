@@ -108,6 +108,7 @@ declare_args() {
     "event_handler/src/key_map_manager.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
     "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
+    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/authorization_dialog.cpp",
@@ -351,6 +352,10 @@ if (input_ext_feature_anco) {
   if (input_feature_product != "pc") {
     libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
   }
+}
+
+if (input_feature_product == "pc") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
 }
 
 if (input_ext_feature_magiccursor) {
