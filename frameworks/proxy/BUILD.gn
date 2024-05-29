@@ -69,6 +69,25 @@ ohos_source_set("libmmi-common") {
   subsystem_name = "multimodalinput"
 }
 
+if (is_arkui_x) {
+  ohos_source_set("libmmi-client-crossplatform") {
+    sources = libmmi_common_sources
+    public_configs = [ ":libmmi_public_client_config" ]
+    include_dirs = [ "${c_utils_root}/base/include" ]
+
+    if (target_os == "android") {
+      defines += [ "ANDROID_PLATFORM" ]
+    } else if (target_os == "ios") {
+      defines += [ "IOS_PLATFORM" ]
+    }
+
+    deps = [ "${hilog_root}/interfaces/native/innerkits:libhilog_${target_os}" ]
+
+    part_name = "input"
+    subsystem_name = "multimodalinput"
+  }
+}
+
 ohos_shared_library("libmmi-client") {
   sources = libmmi_client_sources
   version_script = "${mmi_path}/interfaces/native/innerkits/libmmi-client-map"

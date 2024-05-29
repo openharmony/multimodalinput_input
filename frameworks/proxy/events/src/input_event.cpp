@@ -317,6 +317,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
         extraDataLength_ = 0;
         return false;
     }
+#if !defined(ANDROID_PLATFORM)
     std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
     if (sp == nullptr) {
         extraDataLength_ = 0;
@@ -324,6 +325,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     }
     std::copy(buffer, buffer + extraDataLength_, sp.get());
     extraData_ = sp;
+#endif
     return true;
 }
 } // namespace MMI
