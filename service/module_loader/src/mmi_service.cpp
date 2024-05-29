@@ -75,6 +75,7 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t SUBSCRIBED = 1;
+constexpr int32_t REPEAT_COUNT = 1;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -1608,7 +1609,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 void MMIService::AddReloadDeviceTimer()
 {
     CALL_DEBUG_ENTER;
-    TimerMgr->AddTimer(RELOAD_DEVICE_TIME, 2, [this]() {
+    TimerMgr->AddTimer(RELOAD_DEVICE_TIME, REPEAT_COUNT, [this]() {
         auto deviceIds = INPUT_DEV_MGR->GetInputDeviceIds();
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();
