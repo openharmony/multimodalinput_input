@@ -21,7 +21,7 @@
 #include "input_event.h"
 #include "input_handler_type.h"
 #include "key_event.h"
-#include "key_option.h"s
+#include "key_option.h"
 #include "mmi_log.h"
 #include "pixel_map.h"
 #include "pointer_event.h"
