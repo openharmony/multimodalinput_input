@@ -850,13 +850,13 @@ int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, 
 {
     CALL_DEBUG_ENTER;
     int32_t ret = INPUT_DEV_MGR->SupportKeys(deviceId, keys, keystroke);
-    if (keystroke.size() > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Device exceeds the max range");
-        return RET_ERR;
-    }
     if (ret != RET_OK) {
         MMI_HILOGE("Device id not support");
         return ret;
+    }
+    if (keystroke.size() > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
     }
     return RET_OK;
 }
