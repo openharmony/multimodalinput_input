@@ -1447,21 +1447,42 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
     return true;
 }
 
+bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility)
+{
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    MMI_HILOGI("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    std::string bundleName = sequence.ability.bundleName;
+    std::string matchName = ".screenshot";
+    if (bundleName.find(matchName) != std::string::npos) {
+        bundleName = bundleName.substr(bundleName.size() - matchName.size());
+    }
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (bundleName == matchName) {
+            MMI_HILOGI("screen off, screenshot invalid");
+            return false;
+        }
+    } else {
+        if (bundleName == matchName && isScreenLocked) {
+            MMI_HILOGI("screen locked, screenshot delay 2000 milisecond");
+            return HandleScreenLocked(sequence, isLaunchAbility);
+        }
+    }
+    return HandleNormalSequence(sequence, isLaunchAbility);
+}
+
 bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility)
 {
     CALL_DEBUG_ENTER;
     size_t keysSize = keys_.size();
     size_t sequenceKeysSize = sequence.sequenceKeys.size();
-
     if (!sequence.statusConfigValue) {
         return false;
     }
-
     if (keysSize > sequenceKeysSize) {
         MMI_HILOGI("The save sequence not matching ability sequence");
         return false;
     }
-
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
             MMI_HILOGD("The keyCode or keyAction not matching");
@@ -1473,27 +1494,11 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             return false;
         }
     }
-
     std::ostringstream oss;
     oss << sequence;
     MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
     if (keysSize == sequenceKeysSize) {
-        std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-        MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
-        std::string bundleName = sequence.ability.bundleName;
-        std::string matchName = ".ohos.screenshot";
-        if (bundleName.find(matchName) != std::string::npos) {
-            bundleName = bundleName.substr(bundleName.size() - matchName.size());
-        }
-        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            MMI_HILOGI("screen off, com.ohos.screenshot invalid");
-            return false;
-        }
-        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-            MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond");
-            return HandleScreenLocked(sequence, isLaunchAbility);
-        }
-        return HandleNormalSequence(sequence, isLaunchAbility);
+        return HandleMatchedSequence(sequence, isLaunchAbility);
     }
     return true;
 }

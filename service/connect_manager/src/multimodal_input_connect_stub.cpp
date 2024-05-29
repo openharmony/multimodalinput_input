@@ -894,6 +894,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     WRITEINT32(reply, pointerStyle.size, RET_ERR);
     WRITEINT32(reply, pointerStyle.color, RET_ERR);
     WRITEINT32(reply, pointerStyle.id, RET_ERR);
+    WRITEINT32(reply, pointerStyle.options, RET_ERR);
     MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }

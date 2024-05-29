@@ -14,10 +14,14 @@
  */
 
 #include <gtest/gtest.h>
-#include <libinput.h>
 
 #include "dfx_hisysevent.h"
+#include "event_filter_handler.h"
 #include "event_normalize_handler.h"
+#include "general_touchpad.h"
+#include "input_device_manager.h"
+#include "input_windows_manager.h"
+#include "libinput_wrapper.h"
 
 #include "libinput-private.h"
 
@@ -29,10 +33,68 @@ using namespace testing::ext;
 
 class EventNormalizeHandlerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    static void SetUpTestCase(void);
+    static void TearDownTestCase(void);
+    static void UpdateDisplayInfo();
+
+private:
+    static void SetupTouchpad();
+    static void CloseTouchpad();
+    static GeneralTouchpad vTouchpad_;
+    static LibinputWrapper libinput_;
+    int32_t trackingID_ { 0 };
 };
 
+GeneralTouchpad EventNormalizeHandlerTest::vTouchpad_;
+LibinputWrapper EventNormalizeHandlerTest::libinput_;
+
+void EventNormalizeHandlerTest::SetUpTestCase(void)
+{
+    ASSERT_TRUE(libinput_.Init());
+    SetupTouchpad();
+    UpdateDisplayInfo();
+}
+
+void EventNormalizeHandlerTest::TearDownTestCase(void)
+{
+    CloseTouchpad();
+}
+
+void EventNormalizeHandlerTest::SetupTouchpad()
+{
+    ASSERT_TRUE(vTouchpad_.SetUp());
+    std::cout << "device node name: " << vTouchpad_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.AddPath(vTouchpad_.GetDevPath()));
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
+    struct libinput_device *device = libinput_event_get_device(event);
+    ASSERT_TRUE(device != nullptr);
+    INPUT_DEV_MGR->OnInputDeviceAdded(device);
+}
+
+void EventNormalizeHandlerTest::CloseTouchpad()
+{
+    libinput_.RemovePath(vTouchpad_.GetDevPath());
+    vTouchpad_.Close();
+}
+
+void EventNormalizeHandlerTest::UpdateDisplayInfo()
+{
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    ASSERT_TRUE(display != nullptr);
+    DisplayGroupInfo displays {
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+        .focusWindowId = -1,
+    };
+    displays.displaysInfo.push_back(DisplayInfo {
+        .name = "default display",
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+    });
+    WIN_MGR->UpdateDisplayInfo(displays);
+}
 /**
  * @tc.name: EventNormalizeHandlerTest_HandleEvent_002
  * @tc.desc: Test the function HandleEvent
@@ -191,6 +253,144 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_SetOriginPointerId
     int32_t ret = handler.SetOriginPointerId(pointerEvent);
     pointerEvent = nullptr;
     ASSERT_EQ(ret, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandlePalmEvent
+ * @tc.desc: Test the function HandlePalmEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePalmEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2220);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 727);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 715);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    EXPECT_NO_FATAL_FAILURE(handler.HandlePalmEvent(event, pointerEvent));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_GestureIdentify
+ * @tc.desc: Test the function GestureIdentify
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_GestureIdentify, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2100);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 690);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 713);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    ASSERT_EQ(handler.GestureIdentify(event), RET_ERR);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandleTouchEvent
+ * @tc.desc: Test the function HandleTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    int64_t frameTime = 10000;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 958);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 896);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 712);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+    handler.SetNext(handler.nextHandler_);
+    ASSERT_NE(handler.HandleTouchEvent(event, frameTime), RET_OK);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_ResetTouchUpEvent
+ * @tc.desc: Test the function ResetTouchUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ResetTouchUpEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 729);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 562);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 711);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, event));
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, event));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_TerminateAxis
+ * @tc.desc: Test the function TerminateAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_TerminateAxis, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 723);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 693);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 710);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+    handler.SetNext(handler.nextHandler_);
+    EXPECT_NO_FATAL_FAILURE(handler.TerminateAxis(event));
 }
 } // namespace MMI
 } // namespace OHOS
