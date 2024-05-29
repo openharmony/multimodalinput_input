@@ -17,7 +17,7 @@
 
 #include "key_command_handler.h"
 #include "event_log_helper.h"
-#include "../../../interfaces/native/innerkits/event/include/input_handler_type.h"
+#include "input_handler_type.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
