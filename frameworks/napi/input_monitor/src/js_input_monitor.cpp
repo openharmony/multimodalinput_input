@@ -229,6 +229,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
 
 void InputMonitor::SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) const
 {
+    CHKPV(pointerEvent);
     if (pointerEvent->GetPointerIds().size() == 1) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
             consumed_ = false;
@@ -238,6 +239,7 @@ void InputMonitor::SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) c
 
 bool InputMonitor::IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
+    CHKPF(pointerEvent);
     auto ret = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName();
     if (ret != "pinch" && ret != "threeFingersSwipe" &&
         ret != "fourFingersSwipe" && ret != "threeFingersTap") {
@@ -407,6 +409,7 @@ MapFun JsInputMonitor::GetInputEventFunc(const std::shared_ptr<InputEvent> input
 
 int32_t JsInputMonitor::SetInputEventProperty(const std::shared_ptr<InputEvent> inputEvent, napi_value result)
 {
+    CHKPR(inputEvent, ERROR_NULL_POINTER);
     auto mapFun = GetInputEventFunc(inputEvent);
     for (const auto &it : mapFun) {
         auto setProperty = "Set" + it.first;
@@ -725,6 +728,7 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
 bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
     const PointerEvent::PointerItem& item, napi_value result)
 {
+    CHKPF(pointerEvent);
     int32_t buttonId = pointerEvent->GetButtonId();
     if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
         buttonId = MIDDLE;
@@ -1325,6 +1329,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 
 bool JsInputMonitor::IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     bool res = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
@@ -1514,6 +1519,7 @@ bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
 void JsInputMonitor::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
     if (retValue) {
         auto eventId = pointerEvent->GetId();
         MarkConsumed(eventId);
@@ -1522,6 +1528,7 @@ void JsInputMonitor::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> 
 
 bool JsInputMonitor::IsPinch(std::shared_ptr<PointerEvent> pointerEvent, const int32_t fingers)
 {
+    CHKPF(pointerEvent);
     if ((fingers > 0 && ((pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE &&
         pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) ||
         pointerEvent->GetFingerCount() != fingers)) ||
@@ -1539,6 +1546,7 @@ bool JsInputMonitor::IsPinch(std::shared_ptr<PointerEvent> pointerEvent, const i
 
 bool JsInputMonitor::IsRotate(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_BEGIN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
@@ -1551,6 +1559,7 @@ bool JsInputMonitor::IsRotate(std::shared_ptr<PointerEvent> pointerEvent)
 
 bool JsInputMonitor::IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
         pointerEvent->GetFingerCount() != THREE_FINGERS ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
@@ -1563,6 +1572,7 @@ bool JsInputMonitor::IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEv
 
 bool JsInputMonitor::IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
         pointerEvent->GetFingerCount() != FOUR_FINGERS ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
@@ -1575,6 +1585,7 @@ bool JsInputMonitor::IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEve
 
 bool JsInputMonitor::IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
         pointerEvent->GetFingerCount() != THREE_FINGERS ||
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TRIPTAP)) {
