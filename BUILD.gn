@@ -183,6 +183,10 @@ group("mmi_tests") {
     "util:rust_mmi_key_config_test",
     "util:ut-mmi-util-out",
   ]
+
+  if (input_feature_switch) {
+    deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
+  }
 }
 
 group("examples_group") {
