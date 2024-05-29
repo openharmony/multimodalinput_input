@@ -23,12 +23,14 @@
 
 #include "net_packet.h"
 
-#include "window_info.h"
-#include "nap_process.h"
 #include "event_filter_service.h"
 #include "event_handler.h"
 #include "extra_data.h"
+#include "i_anr_observer.h"
+#include "i_input_service_watcher.h"
+#include "i_window_checker.h"
 #include "if_mmi_client.h"
+#include "infrared_frequency_info.h"
 #include "input_device_impl.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
@@ -36,15 +38,13 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
-#include "i_anr_observer.h"
-#include "i_input_service_watcher.h"
-#include "mmi_event_observer.h"
-#include "i_window_checker.h"
 #include "key_option.h"
+#include "mmi_event_observer.h"
+#include "nap_process.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "switch_event.h"
-#include "infrared_frequency_info.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
