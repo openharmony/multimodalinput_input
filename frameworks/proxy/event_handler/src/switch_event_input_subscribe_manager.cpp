@@ -47,7 +47,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(callback, INVALID_SUBSCRIBE_ID);
+    CHKPR(callback, ERROR_NULL_POINTER);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
         MMI_HILOGE("switch type error");
         return RET_ERR;
@@ -56,7 +56,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return INVALID_SUBSCRIBE_ID;
+        return EVENT_REG_FAIL;
     }
     if (SwitchEventInputSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
