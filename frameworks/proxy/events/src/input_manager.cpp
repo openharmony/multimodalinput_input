@@ -550,5 +550,17 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
 {
     return InputMgrImpl.SetCurrentUser(userId);
 }
+
+int32_t InputManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    return 1;
+    return InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    return 1;
+    return InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
+}
 } // namespace MMI
 } // namespace OHOS

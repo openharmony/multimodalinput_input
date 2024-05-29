@@ -2011,5 +2011,51 @@ int32_t MultimodalInputConnectProxy::SetCurrentUser(int32_t userId)
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEBOOL(data, switchFlag, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::SetTouchpadThreeFingersTapSwitch Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    READBOOL(reply, switchFlag);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

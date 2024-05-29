@@ -2191,5 +2191,27 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     }
     return RET_OK;
 }
+
+int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadThreeFingersTapSwitch,
+                                                        TouchEventHdr, switchFlag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+    }
+    return ret;    
+}
+
+int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::GetTouchpadThreeFingersTapSwitch,
+                                                        TouchEventHdr, std::ref(switchFlag)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
