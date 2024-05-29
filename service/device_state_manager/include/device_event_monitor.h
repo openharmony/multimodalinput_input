@@ -38,7 +38,8 @@ enum StateType {
     CALL_STATUS_WAITING = 5,
     CALL_STATUS_DISCONNECTED = 6,
     CALL_STATUS_DISCONNECTING = 7,
-    CALL_STATUS_IDLE = 8
+    CALL_STATUS_IDLE = 8,
+    CALL_STATUS_ANSWERED = 9
 };
 
 class DeviceEventMonitor final {
@@ -50,6 +51,7 @@ class DeviceEventMonitor final {
         void SetCallState(const EventFwk::CommonEventData &eventData, int32_t callState);
         int32_t GetCallState();
         void SetHasHandleRingMute(bool hasHandleRingMute);
+        bool GetHasHandleRingMute();
     private:
         bool hasInit_ { false };
         int32_t callState_ { -1 };
