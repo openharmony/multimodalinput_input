@@ -1480,6 +1480,7 @@ int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
 void MMIService::OnDelegateTask(epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
