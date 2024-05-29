@@ -24,6 +24,7 @@
 #include "util_napi_error.h"
 
 #include "define_multimodal.h"
+#include "image_source.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "server_msg_handler.h"
@@ -41,10 +42,11 @@ static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
 int32_t g_moduleType = 3;
 int32_t g_pid = 0;
 int32_t g_writeFd = -1;
-const int32_t NUM_LOCK_FUNCTION_KEY = 0;
-const int32_t CAPS_LOCK_FUNCTION_KEY = 1;
-const int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
+constexpr int32_t NUM_LOCK_FUNCTION_KEY = 0;
+constexpr int32_t CAPS_LOCK_FUNCTION_KEY = 1;
+constexpr int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
+constexpr int32_t MOUSE_ICON_SIZE = 64;
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
@@ -53,7 +55,28 @@ public:
     static void TearDownTestCase(void) {}
     void SetUp() {}
     void TearDown() {}
+    std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
 };
+
+std::unique_ptr<OHOS::Media::PixelMap> ServerMsgHandlerTest::SetMouseIconTest(const std::string iconPath)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Media::SourceOptions opts;
+    opts.formatHint = "image/svg+xml";
+    uint32_t ret = 0;
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iconPath, opts, ret);
+    CHKPP(imageSource);
+    std::set<std::string> formats;
+    ret = imageSource->GetSupportedFormats(formats);
+    MMI_HILOGD("Get supported format ret:%{public}u", ret);
+
+    OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {.width = MOUSE_ICON_SIZE, .height = MOUSE_ICON_SIZE};
+
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+    CHKPL(pixelMap);
+    return pixelMap;
+}
 
 /**
  * @tc.name: ServerMsgHandlerTest_SetPixelMapData
@@ -967,6 +990,171 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_005, TestS
     displayInfo.id = 1;
     bool result = handler.FixTargetWindowId(pointerEvent, action);
     ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnRemoveInputHandler_001
+ * @tc.desc: Test the function OnRemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnRemoveInputHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType =1;
+    int32_t priority = 2;
+    uint32_t deviceTags = 3;
+    int32_t ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, RET_OK);
+    handlerType = InputHandlerType::MONITOR;
+    ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, RET_OK);
+    handlerType = InputHandlerType::NONE;
+    ret = handler.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAddInputHandler_001
+ * @tc.desc: Test the function OnAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAddInputHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType =1;
+    int32_t priority = 2;
+    uint32_t deviceTags = 3;
+    int32_t ret = handler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ret = handler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, RET_OK);
+    handlerType = InputHandlerType::MONITOR;
+    ret = handler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, RET_OK);
+    handlerType = InputHandlerType::NONE;
+    ret = handler.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMoveMouse_001
+ * @tc.desc: Test the function OnMoveMouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t offsetX = 10;
+    int32_t offsetY = 20;
+    std::shared_ptr<PointerEvent> pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(pointerEvent_, nullptr);
+    int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_001
+ * @tc.desc: Test the function OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    bool isAuthorize = true;
+    InjectionType InjectionType_ = InjectionType::KEYEVENT;
+    int32_t ret = handler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(ret, ERR_OK);
+    InjectionType_ = InjectionType::POINTEREVENT;
+    ret = handler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(ret, ERR_OK);
+    InjectionType_ = InjectionType::UNKNOWN;
+    ret = handler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(ret, ERR_OK);
+    isAuthorize = false;
+    InjectionType_ = InjectionType::POINTEREVENT;
+    ret = handler.OnAuthorize(isAuthorize);
+    EXPECT_EQ(ret, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_001
+ * @tc.desc: Test the function OnCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.authorizationCollection_.insert(std::make_pair(12, AuthorizationStatus::AUTHORIZED));
+    int32_t CurrentPID_ = 12;
+    int32_t ret = handler.OnCancelInjection();
+    EXPECT_EQ(ret, ERR_OK);
+    CurrentPID_ = 1;
+    ret = handler.OnCancelInjection();
+    EXPECT_EQ(ret, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SetWindowInfo_001
+ * @tc.desc: Test the function SetWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t infoId = 1;
+    WindowInfo info;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    handler.transparentWins_.insert(std::make_pair(1, SetMouseIconTest(iconPath)));
+    EXPECT_NO_FATAL_FAILURE(handler.SetWindowInfo(infoId, info));
+    infoId = 2;
+    EXPECT_NO_FATAL_FAILURE(handler.SetWindowInfo(infoId, info));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnEnhanceConfig_002
+ * @tc.desc: Test the function OnEnhanceConfig
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnEnhanceConfig_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::ADD_INPUT_DEVICE_LISTENER;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    int32_t uid_ = 123;
+    ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+    uid_ = SECURITY_COMPONENT_SERVICE_ID;
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    EXPECT_NO_FATAL_FAILURE(handler.OnEnhanceConfig(sess, pkt));
 }
 } // namespace MMI
 } // namespace OHOS
