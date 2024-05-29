@@ -605,7 +605,7 @@ void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const
         auto firstTime = records_.front().timestamp;
         time_t firstTimeT = std::chrono::system_clock::to_time_t(firstTime);
         std::tm *bt = std::localtime(&firstTimeT);
-        if (!bt) {
+        if (bt == nullptr) {
             MMI_HILOGE("bt is nullptr, this is a invalid time");
             return;
         }
