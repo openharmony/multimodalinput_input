@@ -578,7 +578,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-    MULTI_FINGERTAP_HDR->multiFingersState = MulFingersTap::TRIPLETAP;
+    MULTI_FINGERTAP_HDR->multiFingersState_ = MulFingersTap::TRIPLETAP;
     int32_t ret = processor.OnEventTouchPadUp(event);
     ASSERT_EQ(ret, RET_ERR);
 }
