@@ -646,7 +646,7 @@ void KeyCommandHandler::ResetKnuckleGesture()
 
 std::string KeyCommandHandler::GesturePointsToStr() const
 {
-    int32_t count = gesturePoints_.size();
+    int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
         return {};
