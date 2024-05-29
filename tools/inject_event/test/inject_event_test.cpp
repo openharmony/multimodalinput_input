@@ -395,5 +395,23 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
     int32_t result = inputManagerCommand->ParseCommand(KNUCKLE_SIZE, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
+
+/**
+ * @tc.name:InjectEvent_InjectTouchPad_001
+ * @tc.desc: test touchpad rotate interface
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_001, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-P"};
+    char command3[] = {"-r"};
+    char command4[] = {"90"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
 } // namespace MMI
 } // namespace OHOS
