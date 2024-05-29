@@ -1404,11 +1404,7 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         return RET_OK;
     }
     iter->second = pointerStyle;
-    if (pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
-        SetMouseFlag(true);
-    } else {
-        SetMouseFlag(false);
-    }
+    SetMouseFlag(pointerActionFlag_ == PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     return RET_OK;
 }
 
