@@ -1774,6 +1774,9 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
         pointerEvent->AddPointerItem(item);
         pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    } else {
+        std::cout << "Invalid angle data" << std::endl;
+        return RET_ERR;
     }
     return ERR_OK;
 }
