@@ -420,6 +420,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
     std::string phys;
     std::map<std::string, std::string> typeDevice = {
         {"Virtual Mouse",                "mouse"},
+        {"Virtual Crown",                "mouse"},
         {"Virtual keyboard",             "keyboard"},
         {"Virtual KeyboardConsumerCtrl", "keyboard"},
         {"Virtual keyboardExt",          "keyboard"},

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -88,7 +88,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
 
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
         MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
         return RET_ERR;
@@ -102,28 +102,24 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
         if (TimerMgr->IsExist(timerId_)) {
             HandleCrownRotateUpdate(rawPointerEvent);
             TimerMgr->ResetTimer(timerId_);
-            MMI_HILOGD("Wheel axis update, crown rotate update");
         } else {
-            static constexpr int32_t timeout = 1000;
+            static constexpr int32_t timeout = 100;
             std::weak_ptr<CrownTransformProcessor> weakPtr = shared_from_this();
 
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;
                 auto sharedProcessor = weakPtr.lock();
                 CHKPV(sharedProcessor);
-                MMI_HILOGI("Timer:%{public}d", sharedProcessor->timerId_);
                 sharedProcessor->timerId_ = -1;
                 auto pointerEvent = sharedProcessor->GetPointerEvent();
                 CHKPV(pointerEvent);
                 sharedProcessor->HandleCrownRotateEnd();
-                MMI_HILOGI("Wheel axis end, crown rotate end");
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
                 CHKPV(inputEventNormalizeHandler);
                 inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             });
 
             HandleCrownRotateBegin(rawPointerEvent);
-            MMI_HILOGI("Wheel axis begin, crown rotate begin");
         }
 
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -164,7 +160,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
     CHKPR(rawPointerEvent, ERROR_NULL_POINTER);
 
     uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
-    double scrollValue = libinput_event_pointer_get_scroll_value_v120(rawPointerEvent,
+    double scrollValue = libinput_event_pointer_get_axis_value_discrete(rawPointerEvent,
         LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
     double degree = -scrollValue * SCALE_RATIO;
     double velocity = VELOCITY_ZERO;
@@ -172,9 +168,8 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
         lastTime_ = currentTime;
     } else if (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
-        uint64_t intervalTime = currentTime - lastTime_;
-        if (intervalTime > 0) {
-            velocity = (degree * MICROSECONDS_PER_SECOND) / intervalTime;
+        if (currentTime > lastTime_) {
+            velocity = (degree * MICROSECONDS_PER_SECOND) / (currentTime - lastTime_);
         } else {
             degree = DEGREE_ZERO;
         }
@@ -184,6 +179,8 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
         return RET_ERR;
     }
 
+    MMI_HILOGD("Crown scrollValue:%{public}f, degree:%{public}f, velocity:%{public}f, currentTime:%{public}" PRId64
+    " action:%{public}d", scrollValue, degree, velocity, currentTime, action);
     HandleCrownRotatePostInner(velocity, degree, action);
     return RET_OK;
 }
@@ -193,7 +190,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
 
-    auto mouseInfo = WinMgr->GetMouseInfo();
+    auto mouseInfo = WIN_MGR->GetMouseInfo();
 
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDisplayX(mouseInfo.physicalX);
@@ -232,7 +229,7 @@ void CrownTransformProcessor::HandleCrownRotatePostInner(double velocity, double
 void CrownTransformProcessor::DumpInner()
 {
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
     MMI_HILOGI("The crown device id: %{public}d, event created by: %{public}s", pointerEvent_->GetId(),
         device->GetName().c_str());
@@ -244,10 +241,11 @@ void CrownTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     CHKPV(pointerEvent_);
     mprintf(fd, "Crown device state information:\t");
     mprintf(fd,
-            "PointerId:%d | SourceType:%s | PointerAction:%s | ActionTime:%" PRId64 " | Velocity:%f "
-            "| AxisValue:%s | AgentWindowId:%d | TargetWindowId:%d\t", pointerEvent_->GetPointerId(),
-            pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(), pointerEvent_->GetActionTime(),
-            pointerEvent_->GetVelocity(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+            "PointerId:%{public}d | SourceType:%{public}s | PointerAction:%{public}s | ActionTime:%{public}" PRId64
+            " | Velocity:%{public}f | AxisValue:%{public}s | AgentWindowId:%{public}d | TargetWindowId:%{public}d\t",
+            pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
+            pointerEvent_->GetActionTime(), pointerEvent_->GetVelocity(),
+            pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId());
 }
 } // namespace MMI
