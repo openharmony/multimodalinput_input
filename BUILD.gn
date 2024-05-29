@@ -166,6 +166,7 @@ group("mmi_tests") {
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
+    "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",
     "service:SubscriberTest",
     "service:TimerManagerTest",
