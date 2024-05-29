@@ -1443,7 +1443,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                     }
                 }
                 if(closed) {                    
-                    napi_close_handle_scope(jsEnv_, scope);
+                    ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                     continue;
                 }
                 break;
