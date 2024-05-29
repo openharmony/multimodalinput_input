@@ -214,13 +214,13 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_INFO_TRACE;
     if (cfg == nullptr || cfgLen == 0) {
-        MMI_HILOGE("SecCompEnhance cfg info is empty!");
+        MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
     }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
     CHKPV(enhanceCfg_);
     if (memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen)) {
-        MMI_HILOGE("cfg memcpy failed!");
+        MMI_HILOGE("cfg memcpy failed");
         return;
     }
     enhanceCfgLen_ = cfgLen;
