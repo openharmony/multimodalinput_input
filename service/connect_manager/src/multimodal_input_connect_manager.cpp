@@ -132,7 +132,6 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 
 int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMouseScrollRows(rows);
 }
@@ -140,14 +139,12 @@ int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
 int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
     void* pixelMap)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMouseIcon(pid, windowId, pixelMap);
 }
@@ -155,147 +152,126 @@ int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t pid, int32_t windowI
 int32_t MultimodalInputConnectManager::SetMouseHotSpot(
     int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
 }
 
 int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetMouseScrollRows(rows);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerSize(size);
 }
 
 int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetNapStatus(pid, uid, bundleName, napStatus);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetPointerSize(size);
 }
 
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMousePrimaryButton(primaryButton);
 }
 
 int32_t MultimodalInputConnectManager::GetMousePrimaryButton(int32_t &primaryButton)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetMousePrimaryButton(primaryButton);
 }
 
 int32_t MultimodalInputConnectManager::SetHoverScrollState(bool state)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetHoverScrollState(state);
 }
 
 int32_t MultimodalInputConnectManager::GetHoverScrollState(bool &state)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetHoverScrollState(state);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible, int32_t priority)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerVisible(visible, priority);
 }
 
 int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
 int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t eventId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerColor(int32_t color)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerColor(color);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerColor(int32_t &color)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetPointerColor(color);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->ClearWindowPointerStyle(pid, windowId);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RegisterDevListener();
 }
 
 int32_t MultimodalInputConnectManager::UnregisterDevListener()
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->UnregisterDevListener();
 }
@@ -303,56 +279,48 @@ int32_t MultimodalInputConnectManager::UnregisterDevListener()
 int32_t MultimodalInputConnectManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
     std::vector<bool> &keystroke)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SupportKeys(deviceId, keys, keystroke);
 }
 
 int32_t MultimodalInputConnectManager::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetDeviceIds(ids);
 }
 
 int32_t MultimodalInputConnectManager::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetDevice(deviceId, inputDevice);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetKeyboardType(deviceId, keyboardType);
 }
 
 int32_t MultimodalInputConnectManager::SetKeyboardRepeatDelay(int32_t delay)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetKeyboardRepeatDelay(delay);
 }
 
 int32_t MultimodalInputConnectManager::SetKeyboardRepeatRate(int32_t rate)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetKeyboardRepeatRate(rate);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardRepeatDelay(int32_t &delay)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetKeyboardRepeatDelay(delay);
 }
 
 int32_t MultimodalInputConnectManager::GetKeyboardRepeatRate(int32_t &rate)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetKeyboardRepeatRate(rate);
 }
@@ -360,7 +328,6 @@ int32_t MultimodalInputConnectManager::GetKeyboardRepeatRate(int32_t &rate)
 int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority, deviceTags);
 }
@@ -368,56 +335,48 @@ int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerT
 int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
 }
 
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->MarkEventConsumed(eventId);
 }
 
 int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, option);
 }
 
 int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->UnsubscribeKeyEvent(subscribeId);
 }
 
 int32_t MultimodalInputConnectManager::SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SubscribeSwitchEvent(subscribeId, switchType);
 }
 
 int32_t MultimodalInputConnectManager::UnsubscribeSwitchEvent(int32_t subscribeId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->UnsubscribeSwitchEvent(subscribeId);
 }
 
 int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
 }
 
 int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event, bool isNativeInject)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->InjectKeyEvent(event, isNativeInject);
 }
@@ -425,35 +384,30 @@ int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyE
 int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
     bool isNativeInject)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->InjectPointerEvent(pointerEvent, isNativeInject);
 }
 
 int32_t MultimodalInputConnectManager::SetAnrObserver()
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetAnrObserver();
 }
 
 int32_t MultimodalInputConnectManager::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetFunctionKeyState(funcKey, state);
 }
 
 int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
 int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
@@ -529,7 +483,6 @@ void MultimodalInputConnectManager::NotifyServiceDeath()
 void MultimodalInputConnectManager::NotifyDeath()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(lock_);
     int32_t retryCount = 50;
     do {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -542,161 +495,138 @@ void MultimodalInputConnectManager::NotifyDeath()
 
 int32_t MultimodalInputConnectManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetMouseCaptureMode(windowId, isCaptureMode);
 }
 
 int32_t MultimodalInputConnectManager::AppendExtraData(const ExtraData &extraData)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AppendExtraData(extraData);
 }
 
 int32_t MultimodalInputConnectManager::EnableCombineKey(bool enable)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->EnableCombineKey(enable);
 }
 
 int32_t MultimodalInputConnectManager::EnableInputDevice(bool enable)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->EnableInputDevice(enable);
 }
 
 int32_t MultimodalInputConnectManager::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetKeyDownDuration(businessId, delay);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadScrollSwitch(bool switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadScrollSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadScrollSwitch(bool &switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadScrollSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadScrollDirection(bool state)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadScrollDirection(state);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadScrollDirection(bool &state)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadScrollDirection(state);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadTapSwitch(bool switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadTapSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadTapSwitch(bool &switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadTapSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadPointerSpeed(int32_t speed)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadPointerSpeed(int32_t &speed)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadPointerSpeed(speed);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadPinchSwitch(bool switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadPinchSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadPinchSwitch(bool &switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadPinchSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadSwipeSwitch(bool switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadSwipeSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadSwipeSwitch(bool &switchFlag)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadSwipeSwitch(switchFlag);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadRightClickType(int32_t type)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadRightClickType(type);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadRightClickType(type);
 }
 
 int32_t MultimodalInputConnectManager::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetTouchpadRotateSwitch(rotateSwitch);
 }
 
 int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadRotateSwitch(rotateSwitch);
 }
 
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetShieldStatus(shieldMode, isShield);
 }
 
 int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
 }
@@ -704,7 +634,6 @@ int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool 
 int32_t MultimodalInputConnectManager::GetKeyState(std::vector<int32_t> &pressedKeys,
     std::map<int32_t, int32_t> &specialKeysState)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetKeyState(pressedKeys, specialKeysState);
 }
@@ -724,49 +653,42 @@ void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputS
 
 int32_t MultimodalInputConnectManager::Authorize(bool isAuthorize)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->Authorize(isAuthorize);
 }
 
 int32_t MultimodalInputConnectManager::CancelInjection()
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->CancelInjection();
 }
 
 int32_t MultimodalInputConnectManager::HasIrEmitter(bool &hasIrEmitter)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->HasIrEmitter(hasIrEmitter);
 }
 
 int32_t MultimodalInputConnectManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetInfraredFrequencies(requencys);
 }
 
 int32_t MultimodalInputConnectManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->TransmitInfrared(number, pattern);
 }
 
 int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pixelMap)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
 {
-    std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
