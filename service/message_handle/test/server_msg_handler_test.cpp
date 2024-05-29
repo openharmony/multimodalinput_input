@@ -1141,7 +1141,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnEnhanceConfig_002, TestSiz
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     SessionPtr sess = nullptr;
-    MmiMessageId idMsg = MmiMessageId::NOTICE_ANR;
+    MmiMessageId idMsg = MmiMessageId::ADD_INPUT_DEVICE_LISTENER;
     NetPacket pkt(idMsg);
     int32_t ret = handler.OnEnhanceConfig(sess, pkt);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
