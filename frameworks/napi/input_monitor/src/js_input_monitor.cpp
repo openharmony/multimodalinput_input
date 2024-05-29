@@ -155,7 +155,8 @@ int32_t InputMonitor::Start()
     return monitorId_;
 }
 
-void InputMonitor::Stop() {
+void InputMonitor::Stop()
+{
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
