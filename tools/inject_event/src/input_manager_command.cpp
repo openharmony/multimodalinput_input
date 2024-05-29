@@ -1663,10 +1663,10 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
                 break;
             }
             case 's': {
-                int32_t ret = ProcessTouchPadFingerSwipe(argc, argv);
-                if (ret != ERR_OK) {
-                    return ret;
-                }
+                //int32_t ret = ProcessTouchPadFingerSwipe(argc, argv);
+                //if (ret != ERR_OK) {
+                //    return ret;
+                //}
                 break;
             }
             case 'p': {
@@ -1778,8 +1778,8 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv[])
-{
+//int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv[])
+//{
     int32_t swipeUInputArgc = 8;
     int32_t fingerCount = 0;
     int32_t px1 = 0;
@@ -1830,11 +1830,11 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     }
     SwipeEvent(fingerCount, px1, py1, px2, py2);
     return ERR_OK;
-}
-
-int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
-    int32_t py1, int32_t px2, int32_t py2)
-{
+//}
+//
+//int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
+//    int32_t py1, int32_t px2, int32_t py2)
+//{
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t numberPoint = 10;
@@ -1887,8 +1887,8 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     return ERR_OK;
-}
- 
+//}
+// 
 
 void InputManagerCommand::PrintMouseUsage()
 {
