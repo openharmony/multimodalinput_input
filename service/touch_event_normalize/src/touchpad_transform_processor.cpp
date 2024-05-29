@@ -685,7 +685,7 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
         return false;
     } else {
-        pointerMaps[seatSlot] = {-1.0, -1.0};
+        pointerMaps[seatSlot] = {-1.0F, -1.0F};
         return true;
     }
 }
