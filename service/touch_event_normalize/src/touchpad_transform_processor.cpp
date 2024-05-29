@@ -616,7 +616,6 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
         multiFingersState_ = static_cast<MulFingersTap>(upCnt);
         MMI_HILOGD("This is multifinger tap event, finger count:%{public}d", upCnt);
-        return RET_OK;
     }
     return RET_OK;
 }
