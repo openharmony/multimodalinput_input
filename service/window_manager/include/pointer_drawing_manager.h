@@ -109,7 +109,7 @@ private:
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
     void RotateDegree(Direction direction);
-    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         PointerStyle pointerStyle, Direction direction);
     void AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);

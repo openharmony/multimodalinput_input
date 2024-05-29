@@ -116,9 +116,12 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
     return lastMouseStyle_;
 }
 
-void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
+    if (surfaceNode_ == nullptr) {
+        return RET_ERR;
+    }
     MMI_HILOGD("Pointer window move success");
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
@@ -136,7 +139,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
             pointerStyle.id, pointerStyle.size);
-        return;
+        return RET_OK;
     }
     if (lastDirection_ != direction) {
         RotateDegree(direction);
@@ -148,7 +151,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     if (ret != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
-        return;
+        return RET_ERR;
     }
     surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
@@ -159,7 +162,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
     mouseIconUpdate_ = false;
     MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         displayId, physicalX, physicalY);
-    return;
+    return RET_OK;
 }
 
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
@@ -200,8 +203,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
             ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
     }
-    if (surfaceNode_ != nullptr) {
-        DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
+    if (DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction) == RET_OK) {
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
