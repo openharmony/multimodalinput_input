@@ -83,6 +83,7 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
+    void SetPointerScale(float scale) override;
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
@@ -108,8 +109,8 @@ private:
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
     void RotateDegree(Direction direction);
-    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        const PointerStyle pointerStyle, Direction direction);
+    int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        PointerStyle pointerStyle, Direction direction);
     void AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -153,6 +154,7 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
+    float scale_ { 1.0 };
     isMagicCursor hasMagicCursor_;
 };
 } // namespace MMI

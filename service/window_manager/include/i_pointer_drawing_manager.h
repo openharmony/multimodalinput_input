@@ -119,6 +119,7 @@ public:
     {
         return 0;
     }
+    virtual void SetPointerScale(float scale) {}
     virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
 public:
