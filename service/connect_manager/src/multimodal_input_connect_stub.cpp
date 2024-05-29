@@ -320,6 +320,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             return StubSetCurrentUser(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH):
+            return StubSetTouchpadThreeFingersTapSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH):
+            return StubGetTouchpadThreeFingersTapSwitch(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2206,6 +2212,40 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
         return ret;
     }
     WRITEINT32(reply, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    // if (!PerHelper->VerifySystemApp()) {
+    //     MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
+    //     return ERROR_NOT_SYSAPI;
+    // }
+    bool threeFingersTapSwitch = true;
+    READBOOL(data, threeFingersTapSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetTouchpadThreeFingersTapSwitch(threeFingersTapSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubSetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    // if (!PerHelper->VerifySystemApp()) {
+    //     MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
+    //     return ERROR_NOT_SYSAPI;
+    // }
+    bool switchFlag = true;
+    int32_t ret = GetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubGetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, switchFlag);
     return RET_OK;
 }
 } // namespace MMI

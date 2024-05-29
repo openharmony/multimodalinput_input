@@ -1402,7 +1402,19 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_SWIPE: {
+                bool closed = false;
                 if (!IsThreeFingersSwipe(pointerEvent)) {
+                    closed = true;
+                    MMI_HILOGE("This event is not three fingers swipeEvent");
+                } else {
+                    bool switchThreeFinger = true;
+                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
+                    if (!switchThreeFinger) {
+                        closed = true;
+                        MMI_HILOGE("THREE_FINGERS_SWIPE but three finger action is closed");
+                    }
+                }
+                if(closed) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1418,9 +1430,22 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
+                bool closed = false;
                 if (!IsThreeFingersTap(pointerEvent)) {
+                    closed = true;
+                    MMI_HILOGE("The event is not threeFingersTapEvent");
+                } else {
+                    bool switchThreeFinger = true;
+                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
+                    if (!switchThreeFinger) {
+                        closed = true;
+                        MMI_HILOGE("THREE_FINGERS_TAP but three finger action is closed");                   
+                    }
                 }
-                ret = TransformMultiTapEvent(pointerEvent, napiPointer);
+                if(closed) {                    
+                    napi_close_handle_scope(jsEnv_, scope);
+                    continue;
+                }
                 break;
             }
             case TypeName::JOYSTICK:{

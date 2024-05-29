@@ -770,5 +770,17 @@ int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
+
+int32_t MultimodalInputConnectManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -57,6 +57,7 @@ private:
     bool g_touchpadPinchSwitch { true };
     bool g_touchpadSwipeSwitch { true };
     bool g_hoverScrollState { true };
+    bool g_touchpadThreeFingerTapSwitch { true };
     int32_t g_pointerColor { -1 };
     int32_t g_pointerSize { 1 };
     int32_t g_pointerStyle { 0 };
@@ -76,6 +77,7 @@ private:
     const std::string pointerColor = "pointerColor";
     const std::string pointerSize = "pointerSize";
     const std::string pointerStyle = "pointerStyle";
+    const std::string touchpadThreeFingerTapSwitch = "touchpadThreeFingerTap";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t g_magicPointerColor { -1 };
     int32_t g_magicPointerSize { 3 };

@@ -125,6 +125,9 @@ protected:
     int32_t StubTransmitInfrared(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
+
 private:
     int32_t VerifyTouchPadSetting(void);
 };

@@ -689,5 +689,25 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
         return true;
     }
 }
+
+int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    std::string name = "touchpadThreeFingerTap";
+    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem.");
+        return RET_ERR;
+    }
+
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_PINCH_SETTING,
+        switchFlag);
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    std::string name = "touchpadThreeFingerTap";
+    GetConfigDataFromDatabase(name, switchFlag);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

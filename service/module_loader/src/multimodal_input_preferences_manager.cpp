@@ -84,6 +84,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     g_mouseScrollRows = mousePref->GetInt(mouseScrollRows, MOUSE_SCROLL_ROWS);
     g_hoverScrollState = mousePref->GetBool(hoverScrollState, BOOL_DEFAULT);
     g_mousePrimaryButton = mousePref->GetInt(mousePrimaryButton, PRIMARY_BUTTON);
+    g_touchpadThreeFingerTapSwitch = touchpadPref->GetBool(touchpadThreeFingerTapSwitch, BOOL_DEFAULT);
     g_touchpadTapSwitch = touchpadPref->GetBool(touchpadTapSwitch, BOOL_DEFAULT);
     g_keyboardRepeatRate = keyboardPref->GetInt(keyboardRepeatRate, KEYBOARD_REPEATRATE);
     g_keyboardRepeatDelay = keyboardPref->GetInt(keyboardRepeatDelay, KEYBOARD_REPEATDELAY);
@@ -121,6 +122,7 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap[touchpadScrollSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollSwitch)};
     preferencesMap[touchpadRightClickType] = {touchpadFileName, g_touchpadRightClickType};
     preferencesMap[touchpadScrollDirection] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollDirection)};
+    preferencesMap[touchpadThreeFingerTapSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadThreeFingerTapSwitch)};
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     preferencesMap[magicPointerSize] = {mouseFileName, g_magicPointerSize};
     preferencesMap[magicPointerColor] = {mouseFileName, g_magicPointerColor};

@@ -123,7 +123,9 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
-
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
+    
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
     int32_t SetTouchpadBoolData(bool date, int32_t type);
