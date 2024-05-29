@@ -553,14 +553,17 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
 
 int32_t InputManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
-    return 1;
     return InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
 }
 
 int32_t InputManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
-    return 1;
     return InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
+{
+    return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
 }
 } // namespace MMI
 } // namespace OHOS
