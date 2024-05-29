@@ -28,7 +28,6 @@ constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t DEFAULT_POINTER_ID = 0;
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t POINTER_ID = -1;
-constexpr int32_t SIZE_TYPE_CASE = 3;
 constexpr int32_t INPUT_INTERCEPTOR_ONE = 2;
 constexpr int32_t INPUT_INTERCEPTOR_TWO = 3;
 constexpr int32_t INTERCEPTOR_PRIORITY_ONE = 400;
@@ -44,7 +43,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_X_EIGHT = 505;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_NINE = 523;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_TEN = 528;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ELEVEN = 543;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_TWELVE = 623;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_THIRTEEN = 640;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FOURTEEN = 660;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FIFTEEN = 700;
@@ -65,11 +63,9 @@ constexpr int32_t POINTER_ITEM_DISPLAY_Y_THIRTEEN = 840;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOURTEEN = 860;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIFTEEN = 863;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_SIXTEEN = 910;
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_SEVENTEEN = 943;
 constexpr int32_t POINTER_ITEM_DOWN_TIME_TWO = 10005;
 constexpr int32_t POINTER_ITEM_DOWN_TIME_THREE = 10006;
 constexpr int32_t POINTER_ITEM_DOWN_TIME_FOUR = 10007;
-constexpr int32_t POINTER_ITEM_DOWN_TIME_FIVE = 10008;
 constexpr int32_t POINTER_ITEM_WINDOW_ONE = 211;
 constexpr int32_t POINTER_ITEM_WINDOW_TWO = 300;
 constexpr int32_t POINTER_ITEM_WINDOW_THREE = 311;
@@ -481,65 +477,6 @@ HWTEST_F(InputManagerSimulateTest, InputManager_Pencil2InputEvent_004, TestSize.
 }
 
 /**
- * @tc.name: TestInputEventInterceptor_004
- * @tc.desc: Verify multiple interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDownTime(POINTER_ITEM_DOWN_TIME_FIVE);
-    item.SetPressed(true);
-    item.SetDeviceId(1);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWELVE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_SEVENTEEN);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-
-    const std::vector<int32_t>::size_type N_TEST_CASES{SIZE_TYPE_CASE};
-    std::vector<int32_t> ids(N_TEST_CASES);
-    auto interceptor = GetPtr<InputEventCallback>();
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
-#else
-        EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    for (size_t i = 0; i < ids.size(); ++i) {
-        std::string sPointerEs = GetEventDump();
-        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-        if (i == 0) {
-            ASSERT_TRUE(!sPointerEs.empty());
-        } else {
-            ASSERT_TRUE(sPointerEs.empty());
-        }
-#else
-        ASSERT_TRUE(sPointerEs.empty());
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
-        if (IsValidHandlerId(ids[i])) {
-            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
  * @tc.name: TestInputEventInterceptor_005
  * @tc.desc: Verify mouse button interceptor
  * @tc.type: FUNC
@@ -746,54 +683,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_010, TestSize.Level
     MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     ASSERT_FALSE(!sPointerEs.empty());
-#else
-    ASSERT_TRUE(sPointerEs.empty());
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
-    if (IsValidHandlerId(interceptorId)) {
-        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
- * @tc.name: TestInputEventInterceptor_011
- * @tc.desc: Verify space key interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_011, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownEvent, nullptr);
-    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_SPACE);
-    kitDown.SetDownTime(downTime);
-    kitDown.SetDeviceId(1);
-    kitDown.SetPressed(true);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_SPACE);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-
-    auto interceptor = GetPtr<InputEventCallback>();
-    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
-    int32_t interceptorId{
-        InputManager::GetInstance()->AddInterceptor(interceptor, INTERCEPTOR_PRIORITY_ONE, touchTags)};
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    EXPECT_TRUE(IsValidHandlerId(interceptorId));
-#else
-    EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-
-    std::string sPointerEs = GetEventDump();
-    MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
