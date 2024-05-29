@@ -652,7 +652,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
         return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
-    for (auto i = 0; i < count; i += EVEN_NUMBER) {
+    for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
