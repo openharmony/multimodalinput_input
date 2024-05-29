@@ -150,11 +150,7 @@ int32_t InputMonitor::Start()
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        if (typeName_ == "fingerprint") {
-            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this(), HANDLE_EVENT_TYPE_FINGERPRINT);
-        } else {
-            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
-        }
+        monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
     }
     return monitorId_;
 }
