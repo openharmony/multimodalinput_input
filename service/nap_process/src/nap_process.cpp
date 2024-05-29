@@ -48,7 +48,7 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data, int32_t syncState)
 {
     CALL_DEBUG_ENTER;
     if (napClientPid_ < 0) {
-        MMI_HILOGE("Client pid is unavailable!");
+        MMI_HILOGE("Client pid is unavailable");
         return RET_ERR;
     }
     MMI_HILOGD("NotifyBundle info is : %{public}d, %{public}d, %{public}s, %{public}d",
