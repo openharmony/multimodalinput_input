@@ -525,6 +525,131 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInputHandler
 }
 
 /**
+ * @tc.name: EventInterceptorHandler_AddInputHandler_001
+ * @tc.desc: Test the function AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInputHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    SessionPtr sess = nullptr;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_NONE;
+    int32_t priority = 2;
+    uint32_t deviceTags = 3;
+    int32_t ret = handler.AddInputHandler(handlerType, eventType, priority, deviceTags, sess);
+    EXPECT_EQ(ret, RET_ERR);
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ret = handler.AddInputHandler(handlerType, eventType, priority, deviceTags, sess);
+    EXPECT_EQ(ret, RET_ERR);
+    eventType = HANDLE_EVENT_TYPE_KEY;
+    ret = handler.AddInputHandler(handlerType, eventType, priority, deviceTags, sess);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInputHandler_001
+ * @tc.desc: Test the function RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInputHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = 1;
+    int32_t priority = 2;
+    uint32_t deviceTags = 1;
+    SessionPtr session = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveInputHandler(handlerType, eventType, priority, deviceTags, session));
+    session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveInputHandler(handlerType, eventType, priority, deviceTags, session));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInputHandler_002
+ * @tc.desc: Test the function RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInputHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 1;
+    int32_t priority = 2;
+    uint32_t deviceTags = 1;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveInputHandler(handlerType, eventType, priority, deviceTags, session));
+    handlerType = InputHandlerType::MONITOR;
+    ASSERT_NO_FATAL_FAILURE(handler.RemoveInputHandler(handlerType, eventType, priority, deviceTags, session));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_InitSessionLostCallback_001
+ * @tc.desc: Test the function InitSessionLostCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_InitSessionLostCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler handler;
+    handler.sessionLostCallbackInitialized_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.InitSessionLostCallback());
+    handler.sessionLostCallbackInitialized_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.InitSessionLostCallback());
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_SendToClient_keyEvent_001
+ * @tc.desc: Test the function SendToClient,parameter is keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_SendToClient_keyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler sessionHandler { handlerType, eventType, priority, deviceTags, session };
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(keyEvent));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_SendToClient_pointerEvent_001
+ * @tc.desc: Test the function SendToClient,parameter is pointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_SendToClient_pointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0x01;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler sessionHandler { handlerType, eventType, priority, deviceTags, session };
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(pointerEvent));
+    pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(sessionHandler.SendToClient(pointerEvent));
+}
+
+/**
  * @tc.name: EventInterceptorHandler_OnSessionLost
  * @tc.desc: Test OnSessionLost
  * @tc.type: FUNC
