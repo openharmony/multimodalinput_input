@@ -34,7 +34,7 @@ constexpr double BASIC_LIFESPAN = 200.0f;
 constexpr int32_t TRACE_COLOR = 255;
 constexpr float BASIC_SIZE = 100.0f;
 constexpr int32_t ARGB_COLOR_ARRAY = 0x11c8ffff;
-constexpr int32_t HALF = 2;
+constexpr double HALF = 2.0;
 } // namespace
 
 KnuckleGlowPoint::KnuckleGlowPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap) : traceShadow_(bitmap) {}
