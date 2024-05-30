@@ -243,7 +243,7 @@ const std::vector<WindowInfo> &InputWindowsManager::GetWindowGroupInfoByDisplayI
     }
     auto iter = windowsPerDisplay_.find(displayId);
     if (iter == windowsPerDisplay_.end()) {
-        MMI_HILOGW("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
+        MMI_HILOGD("GetWindowInfo displayId:%{public}d is null from windowGroupInfo_", displayId);
         return displayGroupInfo_.windowsInfo;
     }
     if (iter->second.windowsInfo.empty()) {
@@ -1138,7 +1138,7 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
             return &it;
         }
     }
-    MMI_HILOGE("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
+    MMI_HILOGD("Failed to search for Physical,uniq:%{public}s", uniq.c_str());
     if (displayGroupInfo_.displaysInfo.size() > 0) {
         return &displayGroupInfo_.displaysInfo[0];
     }
