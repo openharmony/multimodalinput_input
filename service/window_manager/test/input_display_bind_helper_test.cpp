@@ -348,5 +348,96 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     std::string inputDevice = idh.GetInputDeviceById(1000);
     ASSERT_EQ(inputDevice, "");
 }
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_01
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId;
+    int32_t displayId;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    std::string msg = "deviceId";
+    deviceId = -1;
+    displayId = -1;
+    int32_t ret1 = idh.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_EQ(ret1, RET_ERR);
+
+    deviceId = 1;
+    displayId = 2;
+    int32_t ret2 = idh.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_EQ(ret2, RET_ERR);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_01
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    int32_t id = 3;
+    std::string ret1 = idh.GetInputDeviceById(id);
+    EXPECT_EQ(ret1, "");
+
+    id = 6;
+    std::string inputNodeName = "";
+    EXPECT_TRUE(inputNodeName.empty());
+    std::string ret2 = idh.GetInputDeviceById(id);
+    EXPECT_EQ(ret2, "");
+
+    id = 8;
+    std::string inputNode = "";
+    EXPECT_TRUE(inputNode.empty());
+    std::string ret3 = idh.GetInputDeviceById(id);
+    EXPECT_EQ(ret3, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputNodeNameByCfg_01
+ * @tc.desc: Test GetInputNodeNameByCfg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeNameByCfg_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t id = 3;
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    std::ifstream file(INPUT_DEVICE_NAME_CONFIG);
+    EXPECT_TRUE(file.is_open());
+    std::string ret1 = idh.GetInputNodeNameByCfg(id);
+    EXPECT_EQ(ret1, "");
+
+    id = 2;
+    std::string res = "abc";
+    res.back() = '\n';
+    std::string ret2 = idh.GetInputNodeNameByCfg(id);
+    EXPECT_EQ(ret2, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_01
+ * @tc.desc: Test AddLocalDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isStore;
+    int32_t id = 3;
+    std::string name = "localDisplay";
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    isStore = false;
+    ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(id, name));
+}
 } // namespace MMI
 } // namespace OHOS

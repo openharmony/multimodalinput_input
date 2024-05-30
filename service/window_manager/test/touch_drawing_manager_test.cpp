@@ -267,5 +267,445 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels_001, Test
     CALL_TEST_DEBUG;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateLabels());
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo_001
+ * @tc.desc: Test RecordLabelsInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 5;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RecordLabelsInfo(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo_002
+ * @tc.desc: Test RecordLabelsInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, item);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 0;
+    TOUCH_DRAWING_MGR->isFirstDownAction_ = true;
+    pointerEvent->SetPointerId(1);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RecordLabelsInfo(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo_003
+ * @tc.desc: Test RecordLabelsInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, item);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 0;
+    TOUCH_DRAWING_MGR->isFirstDownAction_ = true;
+    pointerEvent->SetPointerId(0);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RecordLabelsInfo(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo_004
+ * @tc.desc: Test RecordLabelsInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, item);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 0;
+    TOUCH_DRAWING_MGR->isFirstDownAction_ = true;
+    pointerEvent->SetPointerId(0);
+    TOUCH_DRAWING_MGR->lastPointerItem_.emplace_back(item);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RecordLabelsInfo(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo_005
+ * @tc.desc: Test RecordLabelsInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    pointerEvent->UpdatePointerItem(0, item);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 0;
+    TOUCH_DRAWING_MGR->isFirstDownAction_ = true;
+    pointerEvent->SetPointerId(0);
+    int64_t actionTime = pointerEvent->GetActionTime();
+    TOUCH_DRAWING_MGR->lastActionTime_ = actionTime;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RecordLabelsInfo(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_001
+ * @tc.desc: Test DrawBubbleHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_002
+ * @tc.desc: Test DrawBubbleHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_003
+ * @tc.desc: Test DrawBubbleHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubble_001
+ * @tc.desc: Test DrawBubble
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubble());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubble_002
+ * @tc.desc: Test DrawBubble
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubble());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_001
+ * @tc.desc: Test DrawPointerPositionHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_002
+ * @tc.desc: Test DrawPointerPositionHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawTracker_001
+ * @tc.desc: Test DrawTracker
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawTracker_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 10;
+    int32_t y = 10;
+    int32_t pointerId = 0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawTracker(x, y, pointerId));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawTracker_002
+ * @tc.desc: Test DrawTracker
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawTracker_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 11;
+    int32_t y = 11;
+    int32_t pointerId = 5;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawTracker(x, y, pointerId));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawCrosshairs_001
+ * @tc.desc: Test DrawCrosshairs
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 11;
+    int32_t y = 11;
+    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
+        (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
+        TOUCH_DRAWING_MGR->displayInfo_.height));
+    ASSERT_NE(canvas, nullptr);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawCrosshairs_002
+ * @tc.desc: Test DrawCrosshairs
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 11;
+    int32_t y = 11;
+    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
+        (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
+        TOUCH_DRAWING_MGR->displayInfo_.height));
+    ASSERT_NE(canvas, nullptr);
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawCrosshairs_003
+ * @tc.desc: Test DrawCrosshairs
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 11;
+    int32_t y = 11;
+    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
+        (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
+        TOUCH_DRAWING_MGR->displayInfo_.height));
+    ASSERT_NE(canvas, nullptr);
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_001
+ * @tc.desc: Test UpdatePointerPosition
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(5);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_002
+ * @tc.desc: Test UpdatePointerPosition
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(5);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 5;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_003
+ * @tc.desc: Test UpdatePointerPosition
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(0);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_004
+ * @tc.desc: Test UpdatePointerPosition
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_005
+ * @tc.desc: Test UpdatePointerPosition
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    TOUCH_DRAWING_MGR->lastPointerItem_.emplace_back(item);
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateVelocity_001
+ * @tc.desc: Test UpdateVelocity
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateVelocity_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateVelocity());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateVelocity_002
+ * @tc.desc: Test UpdateVelocity
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateVelocity_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t actionTime = TOUCH_DRAWING_MGR->pointerEvent_->GetActionTime();
+    TOUCH_DRAWING_MGR->lastActionTime_ = actionTime;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateVelocity());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateVelocity_003
+ * @tc.desc: Test UpdateVelocity
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateVelocity_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(5);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 5;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateVelocity());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateVelocity_004
+ * @tc.desc: Test UpdateVelocity
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateVelocity_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(0);
+    TOUCH_DRAWING_MGR->currentPointerId_ = 5;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdateVelocity());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ClearTracker_001
+ * @tc.desc: Test ClearTracker
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ClearTracker_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->ClearTracker());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ClearTracker_002
+ * @tc.desc: Test ClearTracker
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ClearTracker_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->lastPointerItem_.clear();
+    TOUCH_DRAWING_MGR->isDownAction_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->ClearTracker());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ClearTracker_003
+ * @tc.desc: Test ClearTracker
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ClearTracker_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isDownAction_ = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->ClearTracker());
+}
 } // namespace MMI
 } // namespace OHOS

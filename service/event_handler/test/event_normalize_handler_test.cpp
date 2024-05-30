@@ -18,6 +18,7 @@
 #include "dfx_hisysevent.h"
 #include "event_filter_handler.h"
 #include "event_normalize_handler.h"
+#include "event_resample.h"
 #include "general_touchpad.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
@@ -162,6 +163,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     EventNormalizeHandler handler;
     int64_t frameTime = 10000;
     libinput_event* event = nullptr;
+    EventResampleHdr->pointerEvent_ = PointerEvent::Create();
     bool ret = handler.ProcessNullEvent(event, frameTime);
     ASSERT_FALSE(ret);
     event = new (std::nothrow) libinput_event;
@@ -199,9 +201,15 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePointerEvent
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     EventNormalizeHandler handler;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->UpdatePointerItem(0, item);
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerEvent(pointerEvent));
 }
 
