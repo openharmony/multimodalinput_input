@@ -379,12 +379,12 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         for i in 0..3 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
                 return true;
             }
         }
         *gain = (item.slopes[2] * vin + item.diff_nums[2]) / vin;
-        debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[2])/ vin));
     }
     debug!(LOG_LABEL, "get_speed_gain leave");
     true
