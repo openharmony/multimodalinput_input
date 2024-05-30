@@ -129,7 +129,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
     if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
         // 触发光标找回效果时恢复为默认光标
-        MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered.");
+        MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered");
         pointerStyle.id = 0;
     }
     surfaceNode_->SetScale(scale_);
@@ -139,7 +139,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
+        MMI_HILOGD("The lastpointerStyle is equal with pointerStyle, id:%{public}d, size:%{public}d",
             pointerStyle.id, pointerStyle.size);
         return RET_OK;
     }
@@ -178,7 +178,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Move pointer, physicalX:%{public}d physicalY:%{public}d", physicalX, physicalY);
+        MMI_HILOGD("Move pointer, physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
     }
 }
 
