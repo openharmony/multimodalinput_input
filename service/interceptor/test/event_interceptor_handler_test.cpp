@@ -150,6 +150,327 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize
 }
 
 /**
+ * @tc.name: EventInterceptorHandler_Test_009
+ * @tc.desc: Test the function HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    bool ret = interceptorHandler.HandleEvent(pointerEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_Test_010
+ * @tc.desc: Test the function HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_010, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    interceptorHandler.interceptors_.push_back(interceptorFirst);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    bool ret = interceptorHandler.HandleEvent(pointerEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_AddInterceptor_01
+ * @tc.desc: Test AddInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInterceptor_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    
+    handlerType = InputHandlerType::NONE;
+    eventType = 0;
+    priority = 0;
+    deviceTags = 0;
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorSecond(handlerType, eventType, priority,
+        deviceTags, sessionSecond);
+    for (int32_t i = 0; i < 20; i++) {
+        interceptorHandler.interceptors_.push_back(interceptorSecond);
+    }
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.AddInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_AddInterceptor_02
+ * @tc.desc: Test AddInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInterceptor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    for (int32_t i = 0; i < 20; i++) {
+        interceptorHandler.interceptors_.push_back(interceptorFirst);
+    }
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.AddInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_AddInterceptor_03
+ * @tc.desc: Test AddInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInterceptor_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    
+    handlerType = InputHandlerType::NONE;
+    eventType = 0;
+    priority = 2;
+    deviceTags = 0;
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorSecond(handlerType, eventType, priority,
+        deviceTags, sessionSecond);
+    interceptorHandler.interceptors_.push_back(interceptorSecond);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.AddInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_AddInterceptor_04
+ * @tc.desc: Test AddInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_AddInterceptor_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    
+    handlerType = InputHandlerType::NONE;
+    eventType = 0;
+    priority = 0;
+    deviceTags = 0;
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorSecond(handlerType, eventType, priority,
+        deviceTags, sessionSecond);
+    interceptorHandler.interceptors_.push_back(interceptorSecond);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.AddInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInterceptor_01
+ * @tc.desc: Test RemoveInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInterceptor_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    
+    handlerType = InputHandlerType::NONE;
+    eventType = 0;
+    priority = 0;
+    deviceTags = 0;
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorSecond(handlerType, eventType, priority,
+        deviceTags, sessionSecond);
+    interceptorHandler.interceptors_.push_back(interceptorSecond);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.RemoveInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInterceptor_02
+ * @tc.desc: Test RemoveInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInterceptor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    interceptorHandler.interceptors_.push_back(interceptorFirst);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.RemoveInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInterceptor_03
+ * @tc.desc: Test RemoveInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInterceptor_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    
+    handlerType = InputHandlerType::NONE;
+    eventType = 1;
+    priority = 2;
+    deviceTags = 0;
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorSecond(handlerType, eventType, priority,
+        deviceTags, sessionSecond);
+    interceptorHandler.interceptors_.push_back(interceptorSecond);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.RemoveInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_RemoveInterceptor_04
+ * @tc.desc: Test RemoveInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_RemoveInterceptor_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 0;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorFirst(handlerType, eventType, priority,
+        deviceTags, sessionFirst);
+    
+    handlerType = InputHandlerType::NONE;
+    eventType = 1;
+    priority = 0;
+    deviceTags = 0;
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    EventInterceptorHandler::SessionHandler interceptorSecond(handlerType, eventType, priority,
+        deviceTags, sessionSecond);
+    interceptorHandler.interceptors_.push_back(interceptorSecond);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.RemoveInterceptor(interceptorFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnSessionLost_01
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnSessionLost_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    SessionPtr sessionSecond = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr session = sessionSecond;
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, session);
+    interceptorHandler.interceptors_.push_back(interceptor);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.OnSessionLost(sessionFirst));
+}
+
+/**
+ * @tc.name: EventInterceptorHandler_OnSessionLost_02
+ * @tc.desc: Test OnSessionLost
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_OnSessionLost_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventInterceptorHandler::InterceptorCollection interceptorHandler;
+    SessionPtr sessionFirst = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType,
+        g_writeFd, UID_ROOT, g_pid);
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = 0;
+    int32_t priority = 0;
+    uint32_t deviceTags = 0;
+    SessionPtr session = sessionFirst;
+    EventInterceptorHandler::SessionHandler interceptor(handlerType, eventType, priority,
+        deviceTags, session);
+    interceptorHandler.interceptors_.push_back(interceptor);
+    ASSERT_NO_FATAL_FAILURE(interceptorHandler.OnSessionLost(sessionFirst));
+}
+
+/**
  * @tc.name: EventInterceptorHandler_AddInputHandler_01
  * @tc.desc: Test AddInputHandler
  * @tc.type: FUNC
