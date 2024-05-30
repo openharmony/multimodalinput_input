@@ -40,6 +40,7 @@ struct CurveItemTouchpad {
     pub slopes: Vec<f64>,
     pub diff_nums: Vec<f64>,
 }
+
 struct AccelerateCurves {
     data: Vec<CurveItem>,
 }
