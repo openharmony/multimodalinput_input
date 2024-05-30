@@ -77,10 +77,10 @@
         "faultloggerd",
         "ffrt",
         "graphic_2d_ext",
-        "audio_framework",
         "hdf_core",
         "bounds_checking_function",
-        "qos_manager"
+        "qos_manager",
+        "call_manager"
       ],
       "third_party": [
         "cJSON",
