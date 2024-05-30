@@ -344,8 +344,8 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_Dump_001, Test
 {
     SessionPtr sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    auto subscriber =
-        std::make_shared<SwitchSubscriberHandler::Subscriber>(SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
+    auto subscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
+        SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
     std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
 
     switchSubscriberHandler->InsertSubScriber(subscriber);

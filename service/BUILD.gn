@@ -593,8 +593,7 @@ ohos_unittest("SubscriberTest") {
 
   sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
 
-  if (input_feature_switch)
-  {
+  if (input_feature_switch) {
     sources += [ "subscriber/test/switch_subscriber_handler_test.cpp" ]
   }
 
