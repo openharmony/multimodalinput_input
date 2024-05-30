@@ -432,7 +432,11 @@ ohos_unittest("EventFilterHandlerTest") {
 
   configs = [ ":libmmi_server_config" ]
 
-  cflags = [ "-DUNIT_TEST" ]
+  cflags = [
+    "-DUNIT_TEST",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 
   sources = [
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
