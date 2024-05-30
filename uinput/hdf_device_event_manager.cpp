@@ -15,6 +15,7 @@
 
 #include "hdf_device_event_manager.h"
 
+#include <dlfcn.h>
 #include <unistd.h>
 
 #include "hdf_device_event_dispatch.h"
@@ -26,6 +27,10 @@
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t INPUT_PARAM_FIRST { 2 };
+constexpr int32_t INPUT_PARAM_SECOND { 1 };
+} // namespace
 void HdfDeviceEventManager::ConnectHDFInit()
 {
     std::string name = "mmi-hdf";
@@ -58,12 +63,38 @@ void HdfDeviceEventManager::ConnectHDFInit()
 } // namespace MMI
 } // namespace OHOS
 
-int32_t main()
+int32_t main() __attribute__((no_sanitize("cfi")))
 {
     int sleepSeconds = 1;
     sleep(sleepSeconds);
     OHOS::MMI::HdfDeviceEventManager iHdfDeviceEventManager;
     iHdfDeviceEventManager.ConnectHDFInit();
+
+    int32_t pid = getpid();
+    MMI_HILOGI("Current pid:%{public}d", pid);
+    void *notifyProcessStatus = nullptr;
+    int32_t(* notifyProcessStatusFunc)(int32_t, int32_t, int32_t) = nullptr;
+    void *libMemMgrClientHandle = dlopen("libmemmgrclient.z.so", RTLD_NOW);
+    if (!libMemMgrClientHandle) {
+        MMI_HILOGE("%{public}s, dlopen libmemmgrclient failed.", __func__);
+        goto nextStep;
+    }
+
+    notifyProcessStatus = (dlsym(libMemMgrClientHandle, "notify_process_status"));
+    if (!notifyProcessStatus) {
+        MMI_HILOGE("%{public}s, dlsym notify_process_status failed.", __func__);
+        dlclose(libMemMgrClientHandle);
+        goto nextStep;
+    }
+    notifyProcessStatusFunc = reinterpret_cast<int32_t(*)(int32_t, int32_t, int32_t)>(notifyProcessStatus);
+    if (notifyProcessStatusFunc(pid, OHOS::MMI::INPUT_PARAM_FIRST, OHOS::MMI::INPUT_PARAM_SECOND) != 0) {
+        MMI_HILOGE("%{public}s, get device memory failed.", __func__);
+    }
+    dlclose(libMemMgrClientHandle);
+    MMI_HILOGI("notify_process_status execute end");
+
+nextStep:
+    MMI_HILOGI("start thread loop");
     static std::int32_t usleepTime = 1500000;
     while (true) {
         usleep(usleepTime);

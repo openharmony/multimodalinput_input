@@ -40,8 +40,13 @@ class DisplayEventMonitor final {
         {
             return screenStatus_;
         }
+        bool GetScreenLocked() const
+        {
+            return isScreenLocked_;
+        }
     private:
         std::string screenStatus_;
+        bool isScreenLocked_ { false };
 };
 #define DISPLAY_MONITOR DisplayEventMonitor::GetInstance()
 } // namespace MMI
