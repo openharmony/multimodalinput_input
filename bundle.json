@@ -34,7 +34,8 @@
       "input_feature_switch",
       "input_feature_touchscreen",
       "input_feature_short_key",
-      "input_feature_fingerprint"
+      "input_feature_fingerprint",
+      "input_feature_crown"
     ],
     "adapted_system_type": [
       "standard"
