@@ -32,10 +32,8 @@
 #include "key_event.h"
 #include "struct_multimodal.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 
 namespace OHOS {
 namespace MMI {
