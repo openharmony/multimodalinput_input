@@ -1755,8 +1755,8 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t rotateValue = 0;
     constexpr int32_t paramNum = 4;
-    constexpr int32_t rotateValue = 0;
     constexpr int32_t conversionValue = 360;
     if (argc == paramNum) {
         if (!StrToInt(optarg, rotateValue)) {
@@ -1841,7 +1841,7 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    /***** in order to simulate more actual, add some update update event, so adding some items to update , 
+    /***** in order to simulate more actual, add some update update event, so adding some items to update ,
     the data of points are simulated average in axis ********/
     int32_t numberPoint = 10;
     int32_t xDistance = (px2 - px1) / numberPoint;
