@@ -95,7 +95,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != 1) {
+        touchEvent->GetPointerIds().size() != 1 || isRotate_) {
         if (!pointerInfos_.empty()) {
             pointerInfos_.clear();
 #ifndef USE_ROSEN_DRAWING
@@ -111,6 +111,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
+        isRotate_ = false;
         return false;
     }
     MMI_HILOGI("touch tool type is single knuckle");
@@ -160,6 +161,10 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
 void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
+    if (displayInfo_.direction != displayInfo.direction) {
+        MMI_HILOGE("displayInfo direction change");
+        isRotate_ = true;
+    }
     displayInfo_ = displayInfo;
 }
 

@@ -59,6 +59,7 @@ private:
     bool isActionUp_ { false };
     PointerInfo lastDownPointer_ {};
     int64_t lastUpTime_ { 0 };
+    bool isRotate_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

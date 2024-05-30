@@ -193,7 +193,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
     touchEvent->GetPointerItem(id, item);
     auto itemToolType = item.GetToolType();
     if (itemToolType != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != 1) {
+        touchEvent->GetPointerIds().size() != 1 || isRotate_) {
         if (canvasNode_ != nullptr) {
             isStop_ = true;
             isDrawing_ = true;
@@ -213,6 +213,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
+        isRotate_ = false;
         return false;
     }
     return true;
@@ -381,6 +382,10 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
 void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
+    if (displayInfo_.direction != displayInfo.direction) {
+        MMI_HILOGE("displayInfo direction change");
+        isRotate_ = true;
+    }
     displayInfo_ = displayInfo;
 }
 
