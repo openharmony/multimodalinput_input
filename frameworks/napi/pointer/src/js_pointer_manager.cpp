@@ -52,7 +52,7 @@ AsyncContext::~AsyncContext()
     }
 }
 
-bool getResult(sptr<AsyncContext> asyncContext, napi_value *results, int32_t size)
+static bool GetResult(sptr<AsyncContext> asyncContext, napi_value *results, int32_t size)
 {
     CALL_DEBUG_ENTER;
     int32_t length = 2;
@@ -122,7 +122,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             asyncContext->DecStrongRef(nullptr);
             napi_value results[2] = { 0 };
             int32_t size = 2;
-            if (!getResult(asyncContext, results, size)) {
+            if (!GetResult(asyncContext, results, size)) {
                 MMI_HILOGE("Failed to create napi data");
                 return;
             }
