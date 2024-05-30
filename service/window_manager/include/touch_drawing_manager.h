@@ -38,6 +38,7 @@ namespace OHOS {
 namespace MMI {
 
 class TouchDrawingManager {
+private:
 struct Bubble {
     int32_t innerCircleRadius { 0 };
     int32_t outerCircleRadius { 0 };
