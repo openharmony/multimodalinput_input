@@ -322,7 +322,6 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-        MMI_HILOGE("vertical axisValue:%{public}f", axisValue);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
@@ -332,7 +331,6 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
-        MMI_HILOGE("horizontal axisValue:%{public}f", axisValue);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
