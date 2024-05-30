@@ -163,7 +163,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     // touch pad tap switch is disable
     if (type == LIBINPUT_EVENT_POINTER_TAP && !tpTapSwitch) {
-        MMI_HILOGD("Touch pad is disable.");
+        MMI_HILOGD("Touch pad is disable");
         return RET_ERR;
     }
 
@@ -223,7 +223,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
         } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
             buttonId = PointerEvent::MOUSE_BUTTON_LEFT;
         } else {
-            MMI_HILOGD("buttonId does not switch.");
+            MMI_HILOGD("buttonId does not switch");
         }
     }
 
@@ -277,7 +277,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
     HandleTouchPadAxisState(source, tpScrollDirection, tpScrollSwitch);
     if (!tpScrollSwitch && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGD("TouchPad axis event is disable.");
+        MMI_HILOGD("TouchPad axis event is disable");
         return RET_ERR;
     }
 
@@ -846,7 +846,7 @@ int32_t MouseTransformProcessor::SetTouchpadScrollDirection(bool state)
 {
     std::string name = "scrollDirection";
     if (PutConfigDataToDatabase(name, state) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem.");
+        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
         return RET_ERR;
     }
 
@@ -866,7 +866,7 @@ int32_t MouseTransformProcessor::SetTouchpadTapSwitch(bool switchFlag)
 {
     std::string name = "touchpadTap";
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem.");
+        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
         return RET_ERR;
     }
 
@@ -886,7 +886,7 @@ int32_t MouseTransformProcessor::SetTouchpadPointerSpeed(int32_t speed)
 {
     std::string name = "touchPadPointerSpeed";
     if (PutConfigDataToDatabase(name, speed) != RET_OK) {
-        MMI_HILOGE("Failed to set touch pad pointer speed to mem.");
+        MMI_HILOGE("Failed to set touch pad pointer speed to mem");
         return RET_ERR;
     }
 
@@ -909,7 +909,7 @@ int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 {
     std::string name = "rightMenuSwitch";
     if (PutConfigDataToDatabase(name, type) != RET_OK) {
-        MMI_HILOGE("Failed to set right click type to mem.");
+        MMI_HILOGE("Failed to set right click type to mem");
         return RET_ERR;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_RIGHT_CLICK_SETTING,
