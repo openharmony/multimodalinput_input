@@ -1745,7 +1745,8 @@ int32_t InputManagerCommand::InjectPinchEvent(int32_t fingerCount, int32_t scale
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    MMI_HILOGD("Inject fingerCount:%{public}d,scalePinch:%{public}f", fingerCount, scalePinch);
+    MMI_HILOGD("Inject fingerCount:%{public}d,scalePinch:%{public}f,PointerId:%{public}d,", fingerCount, scalePinch,
+        pointerEvent->GetPointerId());
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     return ERR_OK;
 }
@@ -1754,10 +1755,10 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t paramNum = 4;
-    int32_t rotateValue = 0;
-    int32_t conversionValue = 360;
-    if (argc >= paramNum) {
+    constexpr int32_t paramNum = 4;
+    constexpr int32_t rotateValue = 0;
+    constexpr int32_t conversionValue = 360;
+    if (argc == paramNum) {
         if (!StrToInt(optarg, rotateValue)) {
             std::cout << "Invalid angle data" << std::endl;
             return RET_ERR;
@@ -1840,6 +1841,8 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    /***** in order to simulate more actual, add some update update event, so adding some items to update , 
+    the data of points are simulated average in axis ********/
     int32_t numberPoint = 10;
     int32_t xDistance = (px2 - px1) / numberPoint;
     int32_t yDistance = (py2 - py1) / numberPoint;
@@ -1957,10 +1960,12 @@ void InputManagerCommand::PrintTouchPadUsage()
 {
     std::cout << "-p <finger count> <scale percent numerator>  --pinch <finger count> <scale percent numerator>";
     std::cout << std::endl;
-    std::cout << "-s <fc> <dx1> <dy1> <dx2> <dy2>  fc means finger count and its range is [2, 5], <dx1> <dy1> ";
-    std::cout << "-press down a position  dx1 dy1  <dx2> <dy2> -press up a position  dx2  dy2"      << std::endl;
+    std::cout << "  <finger count> finger count range is [2, 5]"                                     << std::endl;
     std::cout << "  <scale percent numerator> numerator of percent scale, divided by 100 is scale, it is an integer,";
     std::cout << "  range is (0, 500]"                                                               << std::endl;
+    std::cout << std::endl;
+    std::cout << "-s <fc> <dx1> <dy1> <dx2> <dy2>  fc means finger count and its range is [2, 5], <dx1> <dy1> ";
+    std::cout << "  -press down a position  dx1 dy1  <dx2> <dy2> -press up a position  dx2  dy2"      << std::endl;
     std::cout << std::endl;
     std::cout << "-r <rotate value> rotate value is an integer that"                                  << std::endl;
     std::cout << "  automatically converts to values within (-360,360)"                               << std::endl;

@@ -402,7 +402,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_001, TestSize.Level1)
+HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_013, TestSize.Level1)
 {
     std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
     char command1[] = {"uinput"};
