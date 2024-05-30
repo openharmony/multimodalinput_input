@@ -180,7 +180,9 @@ struct WindowInfo {
      *
      * @since 9
      */
-    static constexpr int32_t MAX_HOTAREA_COUNT = 10;
+    static constexpr int32_t MAX_HOTAREA_COUNT = 50;
+
+    static constexpr int32_t DEFAULT_HOTAREA_COUNT = 10;
 
     /**
      * The number of pointer change areas

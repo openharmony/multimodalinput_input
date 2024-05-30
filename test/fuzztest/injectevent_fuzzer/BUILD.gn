@@ -88,7 +88,6 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "audio_framework:audio_client",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",

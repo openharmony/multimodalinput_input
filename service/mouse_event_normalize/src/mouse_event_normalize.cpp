@@ -100,7 +100,7 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
@@ -149,7 +149,7 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {

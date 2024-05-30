@@ -200,9 +200,9 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NAME_NOT_FOUND;
     }
-    const int32_t INDEX = 0;
-    resultSet->GoToRow(INDEX);
-    int32_t ret = resultSet->GetString(INDEX, value);
+    const int32_t tmpRow = 0;
+    resultSet->GoToRow(tmpRow);
+    int32_t ret = resultSet->GetString(tmpRow, value);
     if (ret != NativeRdb::E_OK) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_VALUE;
