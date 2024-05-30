@@ -49,10 +49,19 @@ class DisplayEventMonitor final {
         {
             return screenStatus_;
         }
+        void SetScreenLocked(bool isLocked)
+        {
+            isScreenLocked_ = isLocked;
+        }
+        bool GetScreenLocked() const
+        {
+            return isScreenLocked_;
+        }
     private:
         int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
         std::string screenStatus_;
+        bool isScreenLocked_ { true };
 };
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()
 } // namespace MMI
