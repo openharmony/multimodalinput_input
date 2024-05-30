@@ -46,7 +46,7 @@ public:
     };
 
     int32_t HandleMulFingersTap(struct libinput_event_touch *event, int32_t type);
-    MulFingersTap GetMultiFingersState();
+    MulFingersTap GetMultiFingersState() const;
     void SetMULTI_FINGERTAP_HDRDefault(bool isAllDefault = true);
     bool ClearPointerItems(std::shared_ptr<PointerEvent> pointer);
     bool IsInvalidMulTapGesture(struct libinput_event_touch *event);
@@ -58,13 +58,13 @@ private:
     int32_t upCnt = 0;
     int32_t motionCnt = 0;
     TapTrends tapTrends_ = TapTrends::BEGIN;
-    MulFingersTap multiFingersState = MulFingersTap::NOTAP;
+    MulFingersTap multiFingersState_ = MulFingersTap::NOTAP;
     uint64_t lastTime = 0;
     uint64_t beginTime = 0;
     std::map<int32_t, std::pair<float, float>> pointerMaps;
     const uint64_t perTimeThreshold = 150 * 1e3;
     const uint64_t totalTimeThreshold = 500 * 1e3;
-    const float distanceThreshold = 0.15;
+    const float distanceThreshold = 0.15F;
 };
 #define MULTI_FINGERTAP_HDR ::OHOS::DelayedSingleton<MultiFingersTapHandler>::GetInstance()
 

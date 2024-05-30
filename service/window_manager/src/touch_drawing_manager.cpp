@@ -14,7 +14,7 @@
  */
 
 #include "touch_drawing_manager.h"
-
+#include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
 
@@ -43,7 +43,8 @@ constexpr int32_t MULTIPLE_FACTOR = 10;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t RECT_COUNT = 6;
-constexpr int32_t RECT_TOP = 118;
+constexpr int32_t PHONE_RECT_TOP = 118;
+constexpr int32_t PAD_RECT_TOP = 58;
 constexpr int32_t RECT_HEIGHT = 50;
 constexpr int32_t TEXT_TOP = 40;
 constexpr int32_t PEN_WIDTH = 1;
@@ -62,6 +63,8 @@ constexpr float CALCULATE_TEMP = 2.0f;
 
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_PHONE = "phone";
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
@@ -189,7 +192,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
     itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
     if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
-        rectTopPosition_ = RECT_TOP;
+        rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
     } else {
         rectTopPosition_ = 0;
     }

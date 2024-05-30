@@ -15,9 +15,9 @@
 
 #include "key_subscriber_handler.h"
 
-#include "audio_system_manager.h"
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#include "call_manager_client.h"
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -41,6 +41,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t ACTIVE_EVENT = 2;
+std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -279,10 +280,16 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     }
     int32_t ret = -1;
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
-        if (!AudioStandard::AudioSystemManager::GetInstance()->IsStreamMute(
-            AudioStandard::AudioVolumeType::STREAM_RING)) {
-            ret = AudioStandard::AudioSystemManager::GetInstance()->SetMute(
-                AudioStandard::AudioVolumeType::STREAM_RING, true);
+        if (callManagerClientPtr == nullptr) {
+            callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+            if (callManagerClientPtr == nullptr) {
+                MMI_HILOGE("CallManager init fail");
+                return false;
+            }
+            callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+        }
+        if (!DEVICE_MONITOR->GetHasHandleRingMute()) {
+            ret = callManagerClientPtr->MuteRinger();
             if (ret != ERR_OK) {
                 MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
                 return false;
