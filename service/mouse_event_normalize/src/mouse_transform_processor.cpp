@@ -351,10 +351,9 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
     int32_t ret =
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
     if (ret != RET_OK) {
-        MMI_HILOGE("Fail accelerate axis");
+        MMI_HILOGW("Fail accelerate axis");
         axisValue = GetMouseScrollRows() * (axisValue / initRows);
     }
-    MMI_HILOGE("MMIRustLib accelerated axisValue:%{public}f", axisValue);
     return axisValue;
 }
 
