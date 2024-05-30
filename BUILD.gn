@@ -160,6 +160,7 @@ group("mmi_tests") {
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
     "service:EventHandlerTest",
+    "service:InputWindowsManagerTest",
     "service:InterceptorTest",
     "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
