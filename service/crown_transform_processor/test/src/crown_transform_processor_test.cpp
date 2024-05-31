@@ -21,6 +21,7 @@
 #include "libinput_wrapper.h"
 #include "general_crown.h"
 #include "window_info.h"
+#include "input_event_handler.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "crown_transform_processor.h"
@@ -40,6 +41,8 @@ public:
     static void SetupCrown();
     static void CloseCrown();
     static void UpdateDisplayInfo();
+    static void InitHandler();
+    libinput_event *GetEvent();
     void SetUp();
     void TearDown();
 
@@ -56,6 +59,8 @@ void CrownTransformProcessorTest::SetUpTestCase(void)
     ASSERT_TRUE(libinput_.Init());
     SetupCrown();
     UpdateDisplayInfo();
+
+    InitHandler();
 }
 
 void CrownTransformProcessorTest::TearDownTestCase(void)
@@ -101,6 +106,27 @@ void CrownTransformProcessorTest::UpdateDisplayInfo()
     WIN_MGR->UpdateDisplayInfo(displays);
 }
 
+void CrownTransformProcessorTest::InitHandler()
+{
+    UDSServer udsServer;
+    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
+    ASSERT_NO_FATAL_FAILURE(inputHandler->Init(udsServer));
+}
+
+libinput_event *CrownTransformProcessorTest::GetEvent()
+{
+    libinput_event *event = nullptr;
+    libinput_event *evt = libinput_.Dispatch();
+    while (evt != nullptr) {
+        auto type = libinput_event_get_type(evt);
+        if (type == LIBINPUT_EVENT_POINTER_AXIS) {
+            event = evt;
+        }
+        evt = libinput_.Dispatch();
+    }
+    return event;
+}
+
 void CrownTransformProcessorTest::SetUp()
 {
 }
@@ -133,7 +159,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
     CALL_TEST_DEBUG;
     vCrown_.SendEvent(EV_REL, REL_WHEEL, 5);
     vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
+    libinput_event *event = GetEvent();
     ASSERT_TRUE(event != nullptr);
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
@@ -154,7 +180,8 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
     CALL_TEST_DEBUG;
     vCrown_.SendEvent(EV_REL, REL_WHEEL, 5);
     vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
+    uint32_t recvTotal = 2;
+    libinput_event *event = GetEvent();
     ASSERT_TRUE(event != nullptr);
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
@@ -175,7 +202,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     CALL_TEST_DEBUG;
     vCrown_.SendEvent(EV_REL, REL_WHEEL, 30);
     vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
+    libinput_event *event = GetEvent();
     ASSERT_TRUE(event != nullptr);
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
@@ -198,7 +225,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     CALL_TEST_DEBUG;
     vCrown_.SendEvent(EV_REL, REL_WHEEL, -30);
     vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
+    libinput_event *event = GetEvent();
     ASSERT_TRUE(event != nullptr);
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
@@ -233,7 +260,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     CALL_TEST_DEBUG;
     vCrown_.SendEvent(EV_REL, REL_WHEEL, 10);
     vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
+    libinput_event *event = GetEvent();
     ASSERT_TRUE(event != nullptr);
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
