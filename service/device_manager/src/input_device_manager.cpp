@@ -148,7 +148,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
         if (!item.second.enable) {
-            MMI_HILOGE("The current device has been disabled");
+            MMI_HILOGD("The current device has been disabled");
             continue;
         }
         ids.push_back(item.first);

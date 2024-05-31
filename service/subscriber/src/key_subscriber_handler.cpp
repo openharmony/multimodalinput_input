@@ -275,7 +275,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_DOWN &&
         keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_UP &&
         keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-        MMI_HILOGE("There is no need to set mute");
+        MMI_HILOGD("There is no need to set mute");
         return false;
     }
     int32_t ret = -1;
@@ -436,7 +436,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(keyOption);
-    MMI_HILOGI("notify key down subscribers size:%{public}zu", subscribers.size());
+    MMI_HILOGD("notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
         NotifyKeyDownRightNow(keyEvent, subscribers, handled);
     } else {

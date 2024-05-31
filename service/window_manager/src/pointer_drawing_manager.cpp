@@ -202,7 +202,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         physicalX, physicalY);
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
-        MMI_HILOGI("MagicCursor AdjustMouseFocus:%{public}d",
+        MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
             ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
     }
     if (DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction) == RET_OK) {
@@ -1285,13 +1285,14 @@ void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
-    MMI_HILOGI("mouseDisplayState_:%{public}s", mouseDisplayState_ ? "true" : "false");
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNode_->SetVisible(true);
-        MMI_HILOGI("Pointer window show success");
+        MMI_HILOGI("Pointer window show success, mouseDisplayState_:%{public}s",
+            mouseDisplayState_ ? "true" : "false");
     } else {
         surfaceNode_->SetVisible(false);
-        MMI_HILOGI("Pointer window hide success");
+        MMI_HILOGI("Pointer window hide success, mouseDisplayState_:%{public}s",
+            mouseDisplayState_ ? "true" : "false");
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
