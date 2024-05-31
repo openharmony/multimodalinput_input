@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+
 #include <fstream>
+#include <gtest/gtest.h>
 
 #include "input_event_handler.h"
-#include "switch_subscriber_handler.h"
 #include "mmi_log.h"
+#include "switch_subscriber_handler.h"
 #include "uds_server.h"
 
 #undef MMI_LOG_TAG
@@ -51,9 +52,13 @@ public:
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleKeyEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
-    std::shared_ptr<SwitchSubscriberHandler> nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
+    auto nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(nextSwitchSubscriberHandler, nullptr);
+
     switchSubscriberHandler->HandleKeyEvent(nullptr);
     switchSubscriberHandler->HandleKeyEvent(keyEvent);
     switchSubscriberHandler->nextHandler_ = nextSwitchSubscriberHandler;
@@ -68,9 +73,13 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleKeyEvent
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandlePointerEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(POINTER_EVENT_TYPE);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
-    std::shared_ptr<SwitchSubscriberHandler> nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    auto pointerEvent = std::make_shared<PointerEvent>(POINTER_EVENT_TYPE);
+    ASSERT_NE(pointerEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
+    auto nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(nextSwitchSubscriberHandler, nullptr);
+
     switchSubscriberHandler->HandlePointerEvent(nullptr);
     switchSubscriberHandler->HandlePointerEvent(pointerEvent);
     switchSubscriberHandler->nextHandler_ = nextSwitchSubscriberHandler;
@@ -85,9 +94,13 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandlePointerE
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleTouchEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<PointerEvent> pointerEvent = std::make_shared<PointerEvent>(POINTER_EVENT_TYPE);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
-    std::shared_ptr<SwitchSubscriberHandler> nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    auto pointerEvent = std::make_shared<PointerEvent>(POINTER_EVENT_TYPE);
+    ASSERT_NE(pointerEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
+    auto nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(nextSwitchSubscriberHandler, nullptr);
+
     switchSubscriberHandler->HandleTouchEvent(nullptr);
     switchSubscriberHandler->HandleTouchEvent(pointerEvent);
     switchSubscriberHandler->nextHandler_ = nextSwitchSubscriberHandler;
@@ -102,9 +115,13 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleTouchEve
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleSwitchEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(INVAID_VALUE);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
-    std::shared_ptr<SwitchSubscriberHandler> nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    auto switchEvent = std::make_shared<SwitchEvent>(INVAID_VALUE);
+    ASSERT_NE(switchEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
+    auto nextSwitchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(nextSwitchSubscriberHandler, nullptr);
+
     switchSubscriberHandler->HandleSwitchEvent(nullptr);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_PRIVACY);
     switchEvent->SetSwitchValue(SwitchEvent::SWITCH_ON);
@@ -112,10 +129,12 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleSwitchEv
     switchSubscriberHandler->nextHandler_ = nextSwitchSubscriberHandler;
     switchSubscriberHandler->HandleSwitchEvent(switchEvent);
 
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
+    ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
+    ASSERT_NE(subscriber, nullptr);
 
     switchSubscriberHandler->InsertSubScriber(subscriber);
     switchSubscriberHandler->HandleSwitchEvent(switchEvent);
@@ -129,14 +148,18 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_HandleSwitchEv
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_SubscribeSwitchEvent_001, TestSize.Level1)
 {
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
+
     ASSERT_EQ(switchSubscriberHandler->SubscribeSwitchEvent(
         nullptr, INVAID_VALUE, SwitchEvent::SwitchType::SWITCH_DEFAULT), RET_ERR);
     ASSERT_EQ(switchSubscriberHandler->SubscribeSwitchEvent(nullptr, SUBSCRIBER_ID, INVAID_VALUE), RET_ERR);
     ASSERT_EQ(switchSubscriberHandler->SubscribeSwitchEvent(
         nullptr, SUBSCRIBER_ID, SwitchEvent::SwitchType::SWITCH_DEFAULT), ERROR_NULL_POINTER);
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
+    ASSERT_NE(sess, nullptr);
+
     ASSERT_EQ(switchSubscriberHandler->SubscribeSwitchEvent(
         sess, SUBSCRIBER_ID, SwitchEvent::SwitchType::SWITCH_PRIVACY), RET_OK);
 }
@@ -149,12 +172,16 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_SubscribeSwitc
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_UnsubscribeSwitchEvent_001, TestSize.Level1)
 {
-    SessionPtr firstSess = std::make_shared<UDSSession>(
+    auto firstSess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    SessionPtr secondSess = std::make_shared<UDSSession>(
+    ASSERT_NE(firstSess, nullptr);
+    auto secondSess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(secondSess, nullptr);
+    auto switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
+    ASSERT_NE(switchEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_LID);
     switchEvent->SetSwitchValue(SwitchEvent::SWITCH_ON);
@@ -176,12 +203,14 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_UnsubscribeSwi
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSubscribeSwitchEvent_001, TestSize.Level1)
 {
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(sess, nullptr);
+    auto switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
+    ASSERT_NE(switchEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
-    CHKPV(switchEvent);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_PRIVACY);
     switchEvent->SetSwitchValue(SwitchEvent::SWITCH_ON);
     switchEvent->SetSwitchMask(INVAID_VALUE);
@@ -202,12 +231,14 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSubscribeSwi
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSubscribeSwitchEvent_002, TestSize.Level1)
 {
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(sess, nullptr);
+    auto switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
+    ASSERT_NE(switchEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
-    CHKPV(switchEvent);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_LID);
     switchEvent->SetSwitchValue(SwitchEvent::SWITCH_ON);
 
@@ -225,12 +256,14 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSubscribeSwi
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSubscribeSwitchEvent_003, TestSize.Level1)
 {
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(sess, nullptr);
+    auto switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
+    ASSERT_NE(switchEvent, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
-    CHKPV(switchEvent);
     switchEvent->SetSwitchType(SwitchEvent::SwitchType::SWITCH_PRIVACY);
     switchEvent->SetSwitchValue(SwitchEvent::SWITCH_ON);
 
@@ -248,13 +281,17 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSubscribeSwi
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_InsertSubScriber_001, TestSize.Level1)
 {
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(sess, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
     auto subscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
+    ASSERT_NE(subscriber, nullptr);
     auto repeatSubscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
+    ASSERT_NE(repeatSubscriber, nullptr);
 
     switchSubscriberHandler->InsertSubScriber(nullptr);
     switchSubscriberHandler->InsertSubScriber(subscriber);
@@ -271,15 +308,20 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_InsertSubScrib
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSessionDelete_001, TestSize.Level1)
 {
-    SessionPtr firstSess = std::make_shared<UDSSession>(
+    auto firstSess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    SessionPtr secondSess = std::make_shared<UDSSession>(
+    ASSERT_NE(firstSess, nullptr);
+    auto secondSess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(secondSess, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
     auto firstSubscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, firstSess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
+    ASSERT_NE(firstSubscriber, nullptr);
     auto secondSubscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, secondSess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
+    ASSERT_NE(secondSubscriber, nullptr);
 
     switchSubscriberHandler->OnSessionDelete(firstSess);
     switchSubscriberHandler->InsertSubScriber(firstSubscriber);
@@ -296,12 +338,16 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_OnSessionDelet
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_NotifySubscriber_001, TestSize.Level1)
 {
-    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto switchEvent = std::make_shared<SwitchEvent>(SwitchEvent::SwitchType::SWITCH_DEFAULT);
+    ASSERT_NE(switchEvent, nullptr);
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
+    ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(subscriber, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
     switchSubscriberHandler->NotifySubscriber(nullptr, subscriber);
     switchSubscriberHandler->NotifySubscriber(switchEvent, nullptr);
@@ -323,7 +369,8 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_NotifySubscrib
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_InitSessionDeleteCallback_001, TestSize.Level1)
 {
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
     ASSERT_EQ(switchSubscriberHandler->InitSessionDeleteCallback(), false);
 
@@ -342,11 +389,14 @@ HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_InitSessionDel
  */
 HWTEST_F(SwitchSubscriberHandlerTest, SwitchSubscriberHandlerTest_Dump_001, TestSize.Level1)
 {
-    SessionPtr sess = std::make_shared<UDSSession>(
+    auto sess = std::make_shared<UDSSession>(
         "switch_subscriber_handler_test", SESSION_MODULE_TYPE, SESSION_FD, SESSION_UID, SESSION_PID);
+    ASSERT_NE(sess, nullptr);
     auto subscriber = std::make_shared<SwitchSubscriberHandler::Subscriber>(
         SUBSCRIBER_ID, sess, SwitchEvent::SwitchType::SWITCH_PRIVACY);
-    std::shared_ptr<SwitchSubscriberHandler> switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(subscriber, nullptr);
+    auto switchSubscriberHandler = std::make_shared<SwitchSubscriberHandler>();
+    ASSERT_NE(switchSubscriberHandler, nullptr);
 
     switchSubscriberHandler->InsertSubScriber(subscriber);
 

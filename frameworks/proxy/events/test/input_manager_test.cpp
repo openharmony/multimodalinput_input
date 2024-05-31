@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1612,7 +1612,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_001, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.Level1)
 {
     auto fun = [](std::shared_ptr<SwitchEvent> event) {
-        MMI_HILOGD("Subscribe SwitchEvent success, type:%{public}d, value:%{public}d",
+        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
             event->GetSwitchType(), event->GetSwitchValue());
     };
     int32_t subscribeId = InputManager::GetInstance()->SubscribeSwitchEvent(fun, SwitchEvent::SwitchType::SWITCH_LID);
@@ -1640,7 +1640,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.Level1)
 {
     auto fun = [](std::shared_ptr<SwitchEvent> event) {
-        MMI_HILOGD("Subscribe SwitchEvent success");
+        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
+            event->GetSwitchType(), event->GetSwitchValue());
     };
     ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
         fun, SwitchEvent::SwitchType(INVAID_VALUE)), INVAID_VALUE);
