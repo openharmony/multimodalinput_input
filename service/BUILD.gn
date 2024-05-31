@@ -968,7 +968,10 @@ ohos_unittest("ServerMsgHandlerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "message_handle/test/server_msg_handler_test.cpp" ]
+  sources = [
+    "message_handle/test/inject_notice_manager_test.cpp",
+    "message_handle/test/server_msg_handler_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
@@ -980,6 +983,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "ffrt:libffrt",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -1043,6 +1047,7 @@ ohos_unittest("DisplayStateManagerTest") {
   external_deps = [
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
