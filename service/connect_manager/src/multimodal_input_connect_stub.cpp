@@ -319,6 +319,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             return StubSetCurrentUser(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS):
+            return StubEnableHardwareCursorStats(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
+            return StubGetHardwareCursorStats(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2197,6 +2203,37 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
         return ret;
     }
     WRITEINT32(reply, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool enable = false;
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableHardwareCursorStats(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success enable:%{public}d,pid:%{public}d", enable, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    int32_t ret = GetHardwareCursorStats(frameCount, vsyncCount);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
+        vsyncCount, GetCallingPid());
+    WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 } // namespace MMI

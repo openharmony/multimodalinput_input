@@ -134,7 +134,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"mouse", no_argument, nullptr, 'M'},
         {"keyboard", no_argument, nullptr, 'K'},
         {"touch", no_argument, nullptr, 'T'},
-        {"touchpad", no_argument, nullptr, 'P'},
         {"joystick", no_argument, nullptr, 'J'},
         {"help", no_argument, nullptr, '?'},
         {nullptr, 0, nullptr, 0}
