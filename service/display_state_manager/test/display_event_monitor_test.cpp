@@ -35,7 +35,7 @@ public:
 
 /**
  * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber
- * @tc.desc: Test 
+ * @tc.desc: Test InitCommonEventSubscriber
  * @tc.type: FUNC
  * @tc.require:
  */
