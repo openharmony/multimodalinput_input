@@ -146,6 +146,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     CHKRP(napi_get_value_bool(env, argv[0], &visible), GET_VALUE_BOOL);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->SetPointerVisible(env, visible);
@@ -191,6 +192,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc < 1) {
         return jsPointerMgr->IsPointerVisible(env);
@@ -323,6 +325,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         pointerSpeed = MAX_SPEED;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->SetPointerSpeed(env, pointerSpeed);
@@ -371,6 +374,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc < 1) {
         return jsPointerMgr->GetPointerSpeed(env);
@@ -775,6 +779,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle);
@@ -852,6 +857,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->GetPointerStyle(env, windowid);
