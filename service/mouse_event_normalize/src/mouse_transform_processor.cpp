@@ -64,7 +64,7 @@ constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH = 3120;
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT = 2080;
 const std::string DEVICE_TYPE_HARDEN = "HAD";
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-const std::string mouseFileName = "mouse_settings.xml";
+const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -240,7 +240,7 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
         rows = MAX_ROWS;
     }
     std::string name = "rows";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, rows);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, rows);
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
     return ret;
 }
@@ -676,7 +676,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     std::string name = "primaryButton";
-    PREFERENCES_MGR->SetIntValue(name, mouseFileName, primaryButton);
+    PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, primaryButton);
     return RET_OK;
 }
 
@@ -699,7 +699,7 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
     }
     globalPointerSpeed_ = speed;
     std::string name = "speed";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, speed);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, speed);
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
     return ret;
 }
@@ -953,7 +953,7 @@ void MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PREFERENCES_MGR->SetBoolValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetBoolValue(key, MOUSE_FILE_NAME, value);
 }
 
 void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
@@ -963,7 +963,7 @@ void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PREFERENCES_MGR->SetIntValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetIntValue(key, MOUSE_FILE_NAME, value);
 }
 
 void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)
