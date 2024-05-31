@@ -59,6 +59,8 @@ constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
+const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
+const std::string SCREENSHOT_ABILITY_NAME = "com.hmos.screenshot.ServiceExtAbility";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -620,16 +622,19 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp()
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
 {
     Ability ability;
-    ability.abilityName = WAKEUP_ABILITY_NAME;
-    ability.bundleName = AIBASE_BUNDLE_NAME;
     ability.abilityType = EXTENSION_ABILITY;
     if (type == NotifyType::REGIONGESTURE) {
+        ability.abilityName = WAKEUP_ABILITY_NAME;
+        ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
         ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
+        ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     } else if (type == NotifyType::LETTERGESTURE) {
+        ability.abilityName = SCREENSHOT_ABILITY_NAME;
+        ability.bundleName = SCREENSHOT_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
+        ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
     }
-    ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     LaunchAbility(ability, 0);
 }
 
