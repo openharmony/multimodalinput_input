@@ -146,7 +146,6 @@ public:
 
     static udev_device *NewFromSyspath(const std::string &syspathParam)
     {
-        CALL_DEBUG_ENTER;
         // path starts in sys
         if (!StartsWith(syspathParam, "/sys/") || syspathParam.back() == '/') {
             errno = EINVAL;
@@ -174,7 +173,6 @@ public:
 
     static udev_device *NewFromDevnum(char type, dev_t devnum)
     {
-        CALL_DEBUG_ENTER;
         const char *typeStr = nullptr;
 
         if (type == 'b') {
@@ -238,7 +236,6 @@ public:
 
     udev_device *GetParentWithSubsystem(const std::string &subsystem)
     {
-        CALL_DEBUG_ENTER;
         udev_device *parent = GetParent();
         while (parent != nullptr) {
             auto parentSubsystem = parent->GetSubsystem();
@@ -282,7 +279,6 @@ private:
 
     static udev_device *NewFromChild(udev_device *child)
     {
-        CALL_DEBUG_ENTER;
         std::string_view path = child->GetSyspath();
 
         while (true) {
@@ -300,7 +296,6 @@ private:
 
     void SetSyspath(std::string newSyspath)
     {
-        CALL_DEBUG_ENTER;
         syspath = std::move(newSyspath);
 
         AddProperty("DEVPATH", syspath.substr(0, "/sys"sv.size()));
@@ -335,7 +330,6 @@ private:
 
     void ReadUeventFile()
     {
-        CALL_DEBUG_ENTER;
         if (ueventLoaded) {
             return;
         }
@@ -552,7 +546,6 @@ private:
 
     void CheckInputProperties()
     {
-        CALL_DEBUG_ENTER;
         BitVector ev{ GetProperty("EV") };
         BitVector abs{ GetProperty("ABS") };
         BitVector key{ GetProperty("KEY") };
@@ -585,7 +578,6 @@ private:
 
     std::optional<std::string> GetSubsystem()
     {
-        CALL_DEBUG_ENTER;
         if (!subsystem_.has_value()) {
             auto res = GetLinkValue("subsystem", syspath);
             // read "subsystem" link
