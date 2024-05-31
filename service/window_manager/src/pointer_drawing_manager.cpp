@@ -1042,11 +1042,8 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         }
     }
     MMI_HILOGI("PointerColor:%{public}x", color);
-    // 负数就是最高位（符号位）是1的数。
-    // 在color中，原本颜色范围是限制在RGB三信道中（0x000000-0xffffff）,现在color放开到int32_t整数范围。
-    // 其中，每8位代表一个通道值，分别是alpha和RGB，总共32位，所以选择int32_t这个数据结构。
-    // 我们把高8位当作alpha值处理，取值范围0x00-0xff，最高位可能为1，也就是0x80-0xff这个范围的数都是负数。
-    // 这个范围的color数整体看没什么含义。因此下面的&运算也不会有什么问题。
+    // color为负数就是最高位是1的数，把高8位当作alpha值处理，取值范围0x00-0xff，那么最高位可能为1，
+    // 就是0x80-0xff这个范围的数都是负数。这个color每8位代表一个通道值，分别是alpha和rgb，总共32位，所以选择了int这个数据结构。
     color &= MAX_POINTER_COLOR;
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
