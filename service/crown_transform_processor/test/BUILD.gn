@@ -29,9 +29,7 @@ ohos_unittest("CrownTransformProcessorTest") {
     "-Dprotected=public",
   ]
 
-  sources = [
-    "src/crown_transform_processor_test.cpp",
-  ]
+  sources = [ "src/crown_transform_processor_test.cpp" ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
