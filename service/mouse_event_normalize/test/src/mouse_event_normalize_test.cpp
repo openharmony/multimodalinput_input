@@ -585,5 +585,35 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_CheckAndPackageAxisEve
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     MouseEventHdr->CheckAndPackageAxisEvent(event);
 }
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetPointerEvent01
+ * @tc.desc: Test the funcation GetPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseEventNormalize mouseEventNormalize;
+    int32_t deviceId = 1;
+    mouseEventNormalize.processors_.insert(std::make_pair(1, std::make_shared<OHOS::MMI::MouseTransformProcessor>(1)));
+    EXPECT_NO_FATAL_FAILURE(mouseEventNormalize.GetPointerEvent(deviceId));
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetPointerEvent02
+ * @tc.desc: Test the funcation GetPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MouseEventNormalize mouseEventNormalize;
+    int32_t deviceId = 1;
+    mouseEventNormalize.processors_.insert(std::make_pair(2, std::make_shared<OHOS::MMI::MouseTransformProcessor>(2)));
+    EXPECT_NO_FATAL_FAILURE(mouseEventNormalize.GetPointerEvent(deviceId));
+}
 }
 }
