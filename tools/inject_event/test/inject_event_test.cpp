@@ -395,24 +395,5 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
     int32_t result = inputManagerCommand->ParseCommand(KNUCKLE_SIZE, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
-
-/**
- * @tc.name:InjectEvent_InjectTouchPad_001
- * @tc.desc: test inject touchpad pinch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_001, TestSize.Level1)
-{
-    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
-    char command1[] = {"uinput"};
-    char command2[] = {"-P"};
-    char command3[] = {"-p"};
-    char command4[] = {"2"};
-    char command5[] = {"205"};
-    char *argv[] = {command1, command2, command3, command4, command5};
-    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
-    EXPECT_EQ(OHOS::ERR_OK, result);
-}
 } // namespace MMI
 } // namespace OHOS

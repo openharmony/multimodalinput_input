@@ -1570,6 +1570,46 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least one parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
+        MMI_HILOGE("Enable parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    bool enable = true;
+    CHKRP(napi_get_value_bool(env, argv[0], &enable), GET_VALUE_BOOL);
+
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->EnableHardwareCursorStats(env, enable);
+}
+
+napi_value JsPointerContext::GetHardwareCursorStats(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetHardwareCursorStats(env);
+    }
+    return nullptr;
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1626,6 +1666,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),
+        DECLARE_NAPI_STATIC_FUNCTION("enableHardwareCursorStats", EnableHardwareCursorStats),
+        DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

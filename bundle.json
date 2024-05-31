@@ -60,6 +60,7 @@
         "image_framework",
         "graphic_2d",
         "drivers_interface_input",
+        "drivers_interface_display",
         "safwk",
         "ability_runtime",
         "access_token",
