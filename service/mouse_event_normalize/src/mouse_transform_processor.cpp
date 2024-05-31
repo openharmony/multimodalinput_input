@@ -322,15 +322,39 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-        axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+        } else {
+            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
-        axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+        } else {
+            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;
+}
+
+double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
+{
+    const int32_t initRows = 3;
+    DeviceType deviceType = DeviceType::DEVICE_KLV;
+    if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
+        deviceType = DeviceType::DEVICE_SOFT_HARDEN;
+    }
+    int32_t ret =
+        HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
+    if (ret != RET_OK) {
+        MMI_HILOGW("Fail accelerate axis");
+        axisValue = GetMouseScrollRows() * (axisValue / initRows);
+    }
+    return axisValue;
 }
 
 int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *event)
