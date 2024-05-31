@@ -1352,7 +1352,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (filterSequences_.empty()) {
-        MMI_HILOGW("no sequences matched");
+        MMI_HILOGD("no sequences matched");
         keys_.clear();
         return false;
     }
