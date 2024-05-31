@@ -657,6 +657,7 @@ int32_t MultimodalInputConnectProxy::NotifyNapOnline()
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE),
         data, reply, option);
     if (ret != RET_OK) {
@@ -676,6 +677,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputEventObserver()
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         RMV_INPUT_EVENT_OBSERVER), data, reply, option);
     if (ret != RET_OK) {
