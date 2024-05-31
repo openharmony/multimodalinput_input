@@ -21,7 +21,7 @@ namespace MMI {
 void GeneralCrown::Close()
 {
     GeneralDevice::Close();
-    vMouse_.Close();
+    vCrown_.Close();
 }
 
 bool GeneralCrown::SetUp()
