@@ -78,7 +78,7 @@ constexpr float RUNNING_Y_RATIO = 0.675f;
 constexpr float INCREASE_RATIO = 1.22;
 constexpr float ROTATION_ANGLE90 = 90.f;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
-constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
+constexpr int32_t MAX_POINTER_COLOR = 0x00ffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
 constexpr uint32_t RGB_CHANNEL_BITS_LENGTH = 24;
 constexpr float MAX_ALPHA_VALUE = 255.f;
@@ -1031,10 +1031,6 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
-    if (color < 0) {
-        MMI_HILOGE("color is invalid, color:%{public}d", color);
-        return RET_ERR;
-    }
     if (surfaceNode_ != nullptr) {
         float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
         if (alphaRatio > 1) {
@@ -1044,7 +1040,10 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         }
     }
     MMI_HILOGI("PointerColor:%{public}x", color);
-    color = static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR);
+    // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
+    // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
+    // 这个color每8位代表一个通道值，分别是alpha和rgb，总共32位。
+    color &= MAX_POINTER_COLOR;
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
