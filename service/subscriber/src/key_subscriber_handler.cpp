@@ -771,7 +771,7 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
             keyAction = KeyEvent::KEY_ACTION_DOWN;
         }
         if (keyCode == keyOption->GetFinalKey() && trrigerType == keyAction && subscribers.size() > 0) {
-            MMI_HILOGD("current key event is subscribed.");
+            MMI_HILOGD("Current key event is subscribed");
             return true;
         }
     }
