@@ -18,7 +18,7 @@
 #include <cinttypes>
 #include <functional>
 
-#include "input-event-codes.h"
+#include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"
@@ -29,10 +29,8 @@
 #include "mouse_device_state.h"
 #include "parameters.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 #include "timer_manager.h"
 #include "dfx_hisysevent.h"
 #include "util_ex.h"
