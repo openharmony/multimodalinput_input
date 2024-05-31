@@ -1076,11 +1076,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
         }
         isParseConfig_ = true;
     }
-    bool isHandled = HandleMulFingersTap(pointer);
-    if (isHandled) {
-        return true;
-    }
-    return false;
+    return HandleMulFingersTap(pointer);
 }
 
 bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
