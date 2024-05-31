@@ -40,6 +40,11 @@ struct CurveItemTouchpad {
     pub slopes: Vec<f64>,
     pub diff_nums: Vec<f64>,
 }
+struct AxisCurveItemTouchpad {
+    pub speeds: Vec<f64>,
+    pub slopes: Vec<f64>,
+    pub diff_nums: Vec<f64>,
+}
 struct AccelerateCurves {
     data: Vec<CurveItem>,
 }
@@ -51,6 +56,9 @@ struct AccelerateCurvesSoftHarden {
 }
 struct AccelerateCurvesHardHarden {
     data: Vec<CurveItemTouchpad>,
+}
+struct AxisAccelerateCurvesTouchpad {
+    data: Vec<AxisCurveItemTouchpad>,
 }
 impl AccelerateCurves {
     fn get_curve_by_speed(&self, speed: usize) -> &CurveItem {
@@ -70,6 +78,11 @@ impl AccelerateCurvesSoftHarden {
 impl AccelerateCurvesHardHarden {
     fn get_curve_by_speed_hard_harden(&self, speed: usize) -> &CurveItemTouchpad {
         &self.data[speed - 1]
+    }
+}
+impl AxisAccelerateCurvesTouchpad {
+    fn get_axis_curve_by_speed_touchpad(&self, device_type: usize) -> &AxisCurveItemTouchpad {
+        &self.data[device_type - 1]
     }
 }
 impl AccelerateCurves {
@@ -352,6 +365,31 @@ impl AccelerateCurvesHardHarden {
     }
 }
 
+impl AxisAccelerateCurvesTouchpad {
+    fn get_instance() -> &'static AxisAccelerateCurvesTouchpad {
+        static mut GLOBAL_CURVES: Option<AxisAccelerateCurvesTouchpad> = None;
+        static ONCE: Once = Once::new();
+ 
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(AxisAccelerateCurvesTouchpad {
+                data: vec![
+                    AxisCurveItemTouchpad {
+                        speeds: vec![3.0, 5.0, 6.0, 8.0, 10.0, 41.0],
+                        slopes: vec![1.07, 0.80, 0.65, 0.55, 0.52, 0.81],
+                        diff_nums: vec![0.0, 0.81, 1.56, 2.16, 2.4, -0.5]
+                    },
+                    AxisCurveItemTouchpad {
+                        speeds: vec![3.0, 5.0, 7.0, 9.0, 11.0, 41.0],
+                        slopes: vec![1.0, 0.75, 0.61, 0.51, 0.48, 0.75],
+                        diff_nums: vec![0.0, 0.75, 1.45, 2.15, 2.42, -0.55]
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
 // 这个 extern 代码块链接到 libm 库
 #[link(name = "m")]
 extern {
@@ -423,6 +461,30 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[3])/ vin));
     }
     debug!(LOG_LABEL, "get_speed_gain_touchpad leave");
+    true
+}
+
+fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> bool {
+    debug!(LOG_LABEL, "get_axis_gain_touchpad enter axis_speed is set to {}, device_type {}",
+        @public(axis_speed), @public(device_type));
+    let valid_device_type = match device_type {
+        1..=2 => device_type,
+        _ => 1,
+    };
+    let item = AxisAccelerateCurvesTouchpad::get_instance().get_axis_curve_by_speed_touchpad(valid_device_type as usize);
+    unsafe {
+        let num: f64 = fabs(axis_speed);
+        for i in 0..6 {
+            if num <= item.speeds[i] {
+                *gain = item.slopes[i] * num + item.diff_nums[i];
+                debug!(LOG_LABEL, "gain is set to {}, i is {}", @public(*gain), @public(i));
+                return true;
+            }
+        }
+        *gain = item.slopes[5] * num + item.diff_nums[5];
+        debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+    }
+    debug!(LOG_LABEL, "get_axis_gain_touchpad leave");
     true
 }
 
@@ -538,6 +600,39 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
     RET_OK
 }
 
+/// # Safety
+/// HandleAxisAccelerateTouchpad is the origin C++ function name
+/// C++ will call for rust realization using this name
+#[no_mangle]
+pub unsafe extern "C" fn HandleAxisAccelerateTouchpad (
+    mode: bool,
+    abs_axis: *mut f64,
+    device_type: i32
+) -> i32 {
+    let mut gain = 0.0;
+    unsafe {
+        debug!(
+            LOG_LABEL,
+            "input the abs_axis {} and captureMode {} gain {}",
+            @public(*abs_axis),
+            @public(mode),
+            @public(gain)
+        );
+        if !get_axis_gain_touchpad(&mut gain as *mut f64, *abs_axis, device_type) {
+            error!(LOG_LABEL, "{} getAxisGain failed!", @public(*abs_axis));
+            return RET_ERR;
+        }
+        if !mode {
+            *abs_axis = if *abs_axis >= 0.0 { gain } else { -gain };
+        }
+        info!(
+            LOG_LABEL,
+            "output the abs_axis {}", @public(*abs_axis)
+        );
+    }
+    RET_OK
+}
+
 #[test]
 fn test_handle_motion_accelerate_normal()
 {
@@ -619,4 +714,27 @@ fn test_handle_motion_accelerate_capture_mode_false_touchpad()
     assert_eq!(ret, RET_OK);
     assert_eq!(abs_x, 0.0);
     assert_eq!(abs_y, 0.0);
+}
+
+/* test touchpad axis */
+#[test]
+fn test_handle_axis_accelerate_normal_touchpad()
+{
+    let mut abs_axis: f64 = 19.29931034482759;
+    let ret: i32;
+    unsafe {
+        ret = HandleAxisAccelerateTouchpad(false, &mut abs_axis as *mut f64, 1);
+    }
+    assert_eq!(ret, RET_OK);
+}
+ 
+#[test]
+fn test_handle_axis_accelerate_capture_mode_false_touchpad()
+{
+    let mut abs_axis: f64 = 19.29931034482759;
+    let ret: i32;
+    unsafe {
+        ret = HandleAxisAccelerateTouchpad(true, &mut abs_axis as *mut f64, 1);
+    }
+    assert_eq!(ret, RET_OK);
 }
