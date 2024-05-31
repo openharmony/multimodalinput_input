@@ -396,10 +396,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     if (windowInfo == nullptr) {
         MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         return INVALID_FD;
-    } else {
-        MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
-        return udsServer_->GetClientFd(windowInfo->pid);
     }
+    MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
+    return udsServer_->GetClientFd(windowInfo->pid);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2691,10 +2690,7 @@ void InputWindowsManager::CreateAntiMisTakeObserver(T& item)
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
         .CreateObserver(item.switchName, updateFunc);
-    if (statusObserver == nullptr) {
-        MMI_HILOGE("Create observer failed");
-        return;
-    }
+    CHKPV(statusObserver);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret: %{public}d", ret);
