@@ -180,7 +180,6 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
     CALL_TEST_DEBUG;
     vCrown_.SendEvent(EV_REL, REL_WHEEL, 5);
     vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    uint32_t recvTotal = 2;
     libinput_event *event = GetEvent();
     ASSERT_TRUE(event != nullptr);
     struct libinput_device *dev = libinput_event_get_device(event);
