@@ -111,7 +111,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
-    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
