@@ -241,7 +241,8 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_HandleCrownRot
     MMI_HILOGD("pointer device: %{public}s", name.c_str());
     struct libinput_event_pointer *rawPointerEvent = libinput_event_get_pointer_event(event);
     ASSERT_TRUE(rawPointerEvent != nullptr);
-    int32_t result = CROWN_EVENT_HDR->HandleCrownRotateBeginAndUpdate(rawPointerEvent);
+    int32_t result = CROWN_EVENT_HDR->HandleCrownRotateBeginAndUpdate(rawPointerEvent,
+        PointerEvent::POINTER_ACTION_AXIS_BEGIN);
     EXPECT_EQ(result, RET_OK);
 }
 
