@@ -779,6 +779,7 @@ void DfxHisysevent::ReportKnuckleDrawSSuccessTimes(int32_t successTimes)
 
 void DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTime)
 {
+    intervalTime /= CONVERSION_US_TO_MS;
     if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
         return;
     }
@@ -794,6 +795,7 @@ void DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTi
 
 void DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime)
 {
+    intervalTime /= CONVERSION_US_TO_MS;
     if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
         return;
     }
