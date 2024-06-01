@@ -15,8 +15,10 @@
 
 #include <cstdio>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "libinput.h"
+#include "libinput_interface.h"
 #include "define_multimodal.h"
 #include "tablet_tool_tranform_processor.h"
 
@@ -25,9 +27,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
+using namespace testing;
 using namespace testing::ext;
-}
 
 class LibinputInterfaceMock : public LibinputInterface {
 public:
