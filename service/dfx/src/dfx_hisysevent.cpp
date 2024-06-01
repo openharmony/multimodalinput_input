@@ -25,18 +25,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID = -1;
-constexpr uint32_t REPORT_DISPATCH_TIMES = 100;
-constexpr uint32_t REPORT_COMBO_START_TIMES = 100;
-constexpr uint32_t POINTER_CLEAR_TIMES = 10;
-constexpr int32_t CONVERSION_US_TO_MS = 1000;
-constexpr int32_t TIMES_LEVEL1 = 10;
-constexpr int32_t TIMES_LEVEL2 = 25;
-constexpr int32_t TIMES_LEVEL3 = 30;
-constexpr int32_t TIMES_LEVEL4 = 50;
-constexpr int32_t FINGERSENSE_EVENT_TIMES = 1;
-constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
-constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
+constexpr int32_t INVALID_DEVICE_ID { -1 };
+constexpr uint32_t REPORT_DISPATCH_TIMES { 100 };
+constexpr uint32_t REPORT_COMBO_START_TIMES { 100 };
+constexpr uint32_t POINTER_CLEAR_TIMES { 10 };
+constexpr int32_t CONVERSION_US_TO_MS { 1000 };
+constexpr int32_t TIMES_LEVEL1 { 10 };
+constexpr int32_t TIMES_LEVEL2 { 25 };
+constexpr int32_t TIMES_LEVEL3 { 30 };
+constexpr int32_t TIMES_LEVEL4 { 50 };
+constexpr int32_t FINGERSENSE_EVENT_TIMES { 1 };
+constexpr size_t SINGLE_KNUCKLE_SIZE { 1 };
+constexpr size_t DOUBLE_KNUCKLE_SIZE { 2 };
 const std::string EMPTY_STRING { "" };
 } // namespace
 
