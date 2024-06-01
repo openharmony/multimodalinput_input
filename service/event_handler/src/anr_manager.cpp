@@ -33,9 +33,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string FOUNDATION = "foundation";
-constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
-constexpr int32_t TIME_CONVERT_RATIO = 1000;
+const std::string FOUNDATION { "foundation" };
+constexpr int32_t MAX_ANR_TIMER_COUNT { 50 };
+constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 } // namespace
 
 ANRManager::ANRManager() {}
