@@ -23,19 +23,19 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t STANDARD_SPEED = 5;
-constexpr int32_t MAX_SPEED = 11;
-constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t DEFAULT_ROWS = 3;
-constexpr int32_t MIN_ROWS = 1;
-constexpr int32_t MAX_ROWS = 100;
-constexpr size_t INPUT_PARAMETER = 2;
-constexpr int32_t DEFAULT_POINTER_SIZE = 1;
-constexpr int32_t MIN_POINTER_SIZE = 1;
-constexpr int32_t MAX_POINTER_SIZE = 7;
-constexpr int32_t MIN_POINTER_COLOR = 0x000000;
-constexpr int32_t THREE_PARAMETERS = 3;
-constexpr int32_t INVALID_VALUE = -2;
+constexpr int32_t STANDARD_SPEED { 5 };
+constexpr int32_t MAX_SPEED { 11 };
+constexpr int32_t MIN_SPEED { 1 };
+constexpr int32_t DEFAULT_ROWS { 3 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr size_t INPUT_PARAMETER { 2 };
+constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+constexpr int32_t MIN_POINTER_SIZE { 1 };
+constexpr int32_t MAX_POINTER_SIZE { 7 };
+constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
+constexpr int32_t THREE_PARAMETERS { 3 };
+constexpr int32_t INVALID_VALUE { -2 };
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
