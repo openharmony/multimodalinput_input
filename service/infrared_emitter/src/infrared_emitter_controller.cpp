@@ -86,7 +86,7 @@ void InfraredEmitterController::InitInfraredEmitter()
     }
 }
 
-bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_t> pattern)
+bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();
