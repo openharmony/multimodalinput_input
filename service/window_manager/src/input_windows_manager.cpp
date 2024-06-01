@@ -212,7 +212,10 @@ void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStat
         MMI_HILOG_HANDLERD("No need to set foldStatus");
         return;
     }
-    CHKPV(WIN_MGR->lastPointerEventForFold_);
+    if (WIN_MGR->lastPointerEventForFold_ == nullptr) {
+        MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
+        return;
+    }
     auto pointerEvent = std::make_shared<PointerEvent>(*(WIN_MGR->lastPointerEventForFold_));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
@@ -402,7 +405,10 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    CHKPR(windowInfo, INVALID_FD);
+    if (windowInfo == nullptr) {
+        MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        return INVALID_FD;
+    }
     MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
     return udsServer_->GetClientFd(windowInfo->pid);
 }
@@ -732,7 +738,10 @@ void InputWindowsManager::UpdateDisplayMode()
         return;
     }
     displayMode_ = mode;
-    CHKPV(FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_);
+    if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
+        MMI_HILOGD("send fingersense display mode is nullptr");
+        return;
+    }
     MMI_HILOGI("update fingersense display mode, displayMode:%{public}d", displayMode_);
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
 }
@@ -1025,7 +1034,10 @@ void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_DEBUG_ENTER;
     std::optional<WindowInfo> windowInfo;
-    CHKPV(lastPointerEvent_);
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOGD("lastPointerEvent_ is nullptr");
+        return;
+    }
     windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
@@ -2549,7 +2561,10 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
     auto fd = udsServer_->GetClientFd(lastTouchWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
