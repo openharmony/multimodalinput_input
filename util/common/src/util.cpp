@@ -571,12 +571,12 @@ bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::
 {
     constexpr int32_t maxRecordCount = 20;
     constexpr int32_t oneSecond = 1000;
-    if (timerId != -1) {
-        resetTimer_(timerId);
+    if (timerId_ != -1) {
+        resetTimer_(timerId_);
     } else {
-        timerId = addTimer_(oneSecond, 1, [this, lh]() {
+        timerId_ = addTimer_(oneSecond, 1, [this, lh]() {
             FlushRecords(lh);
-            timerId = -1;
+            timerId_ = -1;
         });
     }
     if (key == key_) {
