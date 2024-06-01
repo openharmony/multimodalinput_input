@@ -38,15 +38,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr size_t MAX_FILTER_NUM = 4;
-constexpr int32_t MAX_DELAY = 4000;
-constexpr int32_t MIN_DELAY = 0;
-constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
-constexpr int32_t ANR_DISPATCH = 0;
-constexpr uint8_t LOOP_COND = 2;
-constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
-constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
-constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = 27 * 2;
+constexpr size_t MAX_FILTER_NUM { 4 };
+constexpr int32_t MAX_DELAY { 4000 };
+constexpr int32_t MIN_DELAY { 0 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
+constexpr int32_t EVENT_TYPE { 0 };
+constexpr uint8_t LOOP_COND { 2 };
+constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
+constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
+constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -2055,7 +2055,7 @@ void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher
 int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    ANRHDL->SetLastProcessedEventId(EVENT_TYPE, eventId, actionTime);
     return RET_OK;
 }
 
