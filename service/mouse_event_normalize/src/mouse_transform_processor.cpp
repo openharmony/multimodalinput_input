@@ -18,7 +18,7 @@
 #include <cinttypes>
 #include <functional>
 
-#include "input-event-codes.h"
+#include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"
@@ -29,10 +29,8 @@
 #include "mouse_device_state.h"
 #include "parameters.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 #include "timer_manager.h"
 #include "dfx_hisysevent.h"
 #include "util_ex.h"
@@ -64,7 +62,7 @@ constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH = 3120;
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT = 2080;
 const std::string DEVICE_TYPE_HARDEN = "HAD";
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-const std::string mouseFileName = "mouse_settings.xml";
+const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -240,7 +238,7 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
         rows = MAX_ROWS;
     }
     std::string name = "rows";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, rows);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, rows);
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
     return ret;
 }
@@ -322,15 +320,39 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-        axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+        } else {
+            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
-        axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
+        } else {
+            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+        }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;
+}
+
+double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
+{
+    const int32_t initRows = 3;
+    DeviceType deviceType = DeviceType::DEVICE_KLV;
+    if (PRODUCT_TYPE == DEVICE_TYPE_HARDEN) {
+        deviceType = DeviceType::DEVICE_SOFT_HARDEN;
+    }
+    int32_t ret =
+        HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
+    if (ret != RET_OK) {
+        MMI_HILOGW("Fail accelerate axis");
+        axisValue = GetMouseScrollRows() * (axisValue / initRows);
+    }
+    return axisValue;
 }
 
 int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *event)
@@ -652,7 +674,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     std::string name = "primaryButton";
-    PREFERENCES_MGR->SetIntValue(name, mouseFileName, primaryButton);
+    PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, primaryButton);
     return RET_OK;
 }
 
@@ -675,7 +697,7 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
     }
     globalPointerSpeed_ = speed;
     std::string name = "speed";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, mouseFileName, speed);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, speed);
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
     return ret;
 }
@@ -929,7 +951,7 @@ void MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PREFERENCES_MGR->SetBoolValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetBoolValue(key, MOUSE_FILE_NAME, value);
 }
 
 void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
@@ -939,7 +961,7 @@ void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PREFERENCES_MGR->SetIntValue(key, mouseFileName, value);
+    return PREFERENCES_MGR->SetIntValue(key, MOUSE_FILE_NAME, value);
 }
 
 void MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)

@@ -107,12 +107,12 @@ private:
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
     int32_t TransformTsActionValue(int32_t pointerAction);
-    int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t TransformPinchEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t TransformSwipeEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t TransformRotateEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t TransformMultiTapEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformMousePointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformPinchEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformSwipeEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformRotateEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformMultiTapEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformJoystickPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT

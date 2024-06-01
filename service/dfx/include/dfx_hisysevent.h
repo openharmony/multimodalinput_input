@@ -109,16 +109,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     static void ReportSmartShotSuccTimes(int32_t smartShotSuccTimes);
     static void ReportKnuckleGestureTrackLength(int32_t knuckleGestureTrackLength);
-    static void ReportKnuckleGestureTrackTime(int64_t knuckleGestureTrackTime);
-    static void ReportLcdVendorInfo(struct libinput_device *inputDevice);
-    static void ReportDoubleKnuckleScreenRecordingErrorTimes(int32_t errorTimes);
-    static void ReportDoubleKnuckleScreenRecordingSuccessTimes(int32_t successTimes);
-    static void ReportDoubleKnuckleFailIfInvalidTime(int32_t intervalTime);
-    static void ReportDoubleKnuckleSuccIfInvalidTime(int32_t intervalTime);
+    static void ReportKnuckleGestureTrackTime(const std::vector<int64_t> &gestureTimeStamps);
     static void ReportKnuckleGestureFaildTimes(int32_t failedTimes);
     static void ReportKnuckleDrawSSuccessTimes(int32_t successTimes);
     static void ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTime);
     static void ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime);
+    static void ReportScreenRecorderGesture(int32_t successTimes, int32_t intervalTime);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };

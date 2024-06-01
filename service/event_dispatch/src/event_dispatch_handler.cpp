@@ -17,6 +17,8 @@
 
 #include <cinttypes>
 
+#include <linux/input-event-codes.h>
+
 #include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
 
@@ -27,7 +29,6 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
-#include "input-event-codes.h"
 #include "mouse_device_state.h"
 #include "napi_constants.h"
 #include "proto.h"

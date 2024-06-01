@@ -148,7 +148,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
         if (!item.second.enable) {
-            MMI_HILOGE("The current device has been disabled");
+            MMI_HILOGD("The current device has been disabled");
             continue;
         }
         ids.push_back(item.first);
@@ -436,9 +436,6 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
     info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
-    if (info.isTouchableDevice) {
-        DfxHisysevent::ReportLcdVendorInfo(inputDevice);
-    }
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)

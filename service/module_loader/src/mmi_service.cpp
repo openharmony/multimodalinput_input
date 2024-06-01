@@ -221,6 +221,7 @@ bool MMIService::InitService()
     if (!(Publish(this))) {
         state_ = ServiceRunningState::STATE_NOT_START;
         MMI_HILOGE("Service initialization failed");
+        EpollClose();
         return false;
     }
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, epollFd_);
@@ -850,13 +851,13 @@ int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, 
 {
     CALL_DEBUG_ENTER;
     int32_t ret = INPUT_DEV_MGR->SupportKeys(deviceId, keys, keystroke);
-    if (keystroke.size() > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Device exceeds the max range");
-        return RET_ERR;
-    }
     if (ret != RET_OK) {
         MMI_HILOGE("Device id not support");
         return ret;
+    }
+    if (keystroke.size() > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -1480,6 +1481,7 @@ int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
 void MMIService::OnDelegateTask(epoll_event &ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
@@ -2136,7 +2138,7 @@ int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &requencys)
+int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &frequencies)
 {
     MMI_HILOGI("start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
@@ -2145,13 +2147,13 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &req
         InfraredFrequency info;
         info.min_ = item.min_;
         info.max_ = item.max_;
-        requencys.push_back(info);
+        frequencies.push_back(info);
     }
     std::string context = "";
-    int32_t size = static_cast<int32_t>(requencys.size());
+    int32_t size = static_cast<int32_t>(frequencies.size());
     for (int32_t i = 0; i < size; i++) {
-        context = context + "requencys[" + std::to_string(i) + "]. max=" + std::to_string(requencys[i].max_) +
-        ",min=" + std::to_string(requencys[i].min_) + ";";
+        context = context + "frequencies[" + std::to_string(i) + "]. max=" + std::to_string(frequencies[i].max_) +
+        ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
     return RET_OK;
@@ -2190,6 +2192,36 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+int32_t MMIService::EnableHardwareCursorStats(bool enable)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::EnableHardwareCursorStats,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), enable));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enable hardware cursor stats failed,ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetHardwareCursorStats,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), std::ref(frameCount), std::ref(vsyncCount)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get hardware cursor stats failed,ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("GetHardwareCursorStats frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
+        vsyncCount, GetCallingPid());
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
 } // namespace MMI

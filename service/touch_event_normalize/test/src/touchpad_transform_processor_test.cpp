@@ -15,6 +15,7 @@
 
 #include <cstdio>
 #include <gtest/gtest.h>
+#include <libinput.h>
 
 #include "define_multimodal.h"
 #include "general_touchpad.h"
@@ -578,7 +579,7 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     TouchPadTransformProcessor processor(deviceId);
     processor.pointerEvent_ = PointerEvent::Create();
     ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-    MULTI_FINGERTAP_HDR->multiFingersState = MulFingersTap::TRIPLETAP;
+    MULTI_FINGERTAP_HDR->multiFingersState_ = MulFingersTap::TRIPLETAP;
     int32_t ret = processor.OnEventTouchPadUp(event);
     ASSERT_EQ(ret, RET_ERR);
 }
@@ -1090,6 +1091,165 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventT
     ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchBegin(event));
     ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchUpdate(event));
     ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchEnd(event));
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_SetTouchPadPinchData_001
+ * @tc.desc: test SetTouchPadPinchData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchPadPinchData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 166);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 155);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
+        if (iter->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
+    int32_t deviceId = iter->first;
+    TouchPadTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    processor.SetTouchpadSwipeSwitch(false);
+    int32_t action = PointerEvent::POINTER_ACTION_SWIPE_BEGIN;
+    ASSERT_NO_FATAL_FAILURE(processor.SetTouchPadPinchData(event, action));
+    ASSERT_NO_FATAL_FAILURE(processor.SetPinchPointerItem(111222));
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_HandleMulFingersTap_002
+ * @tc.desc: Verify if the multi-touch gesture handling is correct
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMulFingersTap_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 266);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 255);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::NOMULTAP;
+    int32_t type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
+    auto ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
+
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::BEGIN;
+    ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
+
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::DOWNING;
+    auto time = libinput_event_touchpad_get_time_usec(touchpad);
+    processor.lastTime = time - 150 * 1e3 - 1;
+    ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
+
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::UPING;
+    processor.lastTime = time;
+    processor.beginTime = time;
+    ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_HandleMulFingersTap_003
+ * @tc.desc: Verify if the multi-touch gesture handling is correct
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMulFingersTap_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 299);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 260);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::UPING;
+    auto time = libinput_event_touchpad_get_time_usec(touchpad);
+    processor.lastTime = time;
+    processor.beginTime = time;
+    int32_t type = LIBINPUT_EVENT_TOUCHPAD_UP;
+    processor.CanUnsetPointerItem(touchpad);
+    auto ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_HandleMulFingersTap_004
+ * @tc.desc: Verify if the multi-touch gesture handling is correct
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMulFingersTap_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 311);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 270);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::UPING;
+    auto time = libinput_event_touchpad_get_time_usec(touchpad);
+    processor.lastTime = time;
+    processor.beginTime = time;
+    int32_t type = LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    auto ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_HandleMulFingersTap_005
+ * @tc.desc: Verify if the multi-touch gesture handling is correct
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMulFingersTap_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 299);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 260);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    ASSERT_TRUE(touchpad != nullptr);
+    MultiFingersTapHandler processor;
+    processor.tapTrends_ = MultiFingersTapHandler::TapTrends::UPING;
+    auto time = libinput_event_touchpad_get_time_usec(touchpad);
+    processor.lastTime = time;
+    processor.beginTime = time;
+    int32_t type = LIBINPUT_EVENT_TOUCHPAD_UP;
+    processor.CanUnsetPointerItem(touchpad);
+    processor.downCnt = 3;
+    processor.upCnt = 2;
+    auto ret = processor.HandleMulFingersTap(touchpad, type);
+    ASSERT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
