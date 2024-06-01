@@ -108,6 +108,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
         if (windowInfo == std::nullopt) {
             MMI_HILOGE("WindowInfo id nullptr");
+            continue;
         }
         auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
         auto pointerEvent = std::make_shared<PointerEvent>(*point);
