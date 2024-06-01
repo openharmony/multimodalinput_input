@@ -188,7 +188,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
         return;
     }
     if (twoFingerGesture_.timerId == -1) {
-        MMI_HILOGD("Two finger gesture timer id is -1.");
+        MMI_HILOGD("Two finger gesture timer id is -1");
         return;
     }
     auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
@@ -1777,7 +1777,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         return COMMON_PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
-        MMI_HILOGE("delay is not in valid range.");
+        MMI_HILOGE("Delay is not in valid range");
         return COMMON_PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
