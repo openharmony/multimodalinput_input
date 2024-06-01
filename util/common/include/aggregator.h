@@ -50,6 +50,6 @@ private:
 
     void FlushRecords(const LogHeader &lh, const std::string &key = "", const std::string &extraRecord = "");
 };
-}
-}
-#endif //INPUT_AGGREGATOR_H
+} // namespace MMI
+} // namespace OHOS
+#endif // INPUT_AGGREGATOR_H
