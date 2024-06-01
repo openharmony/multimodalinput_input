@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
+constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
 } // namespace
 int32_t SwitchEventInputSubscribeManager::subscribeManagerId_ = 0;
 
