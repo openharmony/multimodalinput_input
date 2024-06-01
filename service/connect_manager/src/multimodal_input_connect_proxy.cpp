@@ -38,7 +38,6 @@ constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
 constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
-constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -1280,10 +1279,6 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
-    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("infos size is invalid");
-        return RET_ERR;
-    }
     infos.reserve(size);
     for (int32_t i = 0; i < size; ++i) {
         DisplayBindInfo info;
@@ -1317,10 +1312,6 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tup
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
-    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("datas size is invalid");
-        return RET_ERR;
-    }
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
         int32_t syncState = 0;
