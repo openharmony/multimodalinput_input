@@ -25,8 +25,8 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr size_t extraCharactersCount = 3;
-constexpr int32_t elementSpaceCount = 2;
+constexpr size_t extraCharactersCount { 3 };
+constexpr int32_t elementSpaceCount { 2 };
 
 template<typename T>
 inline size_t getElementLength(const T &element)
