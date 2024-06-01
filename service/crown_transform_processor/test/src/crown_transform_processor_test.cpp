@@ -44,8 +44,6 @@ public:
     static void UpdateDisplayInfo();
     static void InitHandler();
     libinput_event *GetEvent();
-    void SetUp();
-    void TearDown();
 
 private:
     static GeneralCrown vCrown_;
