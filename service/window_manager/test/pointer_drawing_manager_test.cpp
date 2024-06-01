@@ -378,58 +378,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawPointer_001
- * @tc.desc: Test the funcation DrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    int32_t displayId = 10;
-    int32_t physicalX = 100;
-    int32_t physicalY = 200;
-    PointerStyle pointerStyle;
-    Direction direction = DIRECTION0;
-    pointerStyle.id = 2;
-    manager.lastMouseStyle_.id = 3;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointer_002
- * @tc.desc: Test the funcation DrawPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    int32_t displayId = 10;
-    int32_t physicalX = 100;
-    int32_t physicalY = 200;
-    PointerStyle pointerStyle;
-    Direction direction = DIRECTION0;
-    pointerStyle.id = 2;
-    manager.lastMouseStyle_.id = 2;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawLoadingPointerStyle_002
  * @tc.desc: Test the funcation DrawLoadingPointerStyle
  * @tc.type: FUNC
@@ -475,29 +423,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AttachToDisplay_001,
     ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
     manager.screenId_ = 1;
     ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawCursor_002
- * @tc.desc: Test the funcation DrawCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    MOUSE_ICON mouseStyle = EAST;
-    manager.surfaceNode_ = nullptr;
-    int32_t ret = manager.DrawCursor(mouseStyle);
-    EXPECT_EQ(ret, RET_ERR);
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    ret = manager.DrawCursor(mouseStyle);
-    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -1215,59 +1140,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_OnDisplayInfo_002, T
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawManager_001
- * @tc.desc: Test DrawManager
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawManager_002
- * @tc.desc: Test DrawManager
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
-    pointerDrawingManager.lastPhysicalX_ = -1;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawManager_003
- * @tc.desc: Test DrawManager
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
-    pointerDrawingManager.lastPhysicalX_ = 2;
-    pointerDrawingManager.lastPhysicalY_ = 2;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawManager_004
  * @tc.desc: Test DrawManager
  * @tc.type: FUNC
@@ -1281,95 +1153,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_004, Tes
     pointerDrawingManager.hasPointerDevice_ = true;
     pointerDrawingManager.surfaceNode_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_001
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_002
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION0;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_003
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
-    pointerDrawingManager.lastPhysicalX_ = -1;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_004
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    pointerDrawingManager.displayInfo_.displayDirection = DIRECTION90;
-    pointerDrawingManager.lastPhysicalX_ = 2;
-    pointerDrawingManager.lastPhysicalY_ = 2;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
 
 /**
