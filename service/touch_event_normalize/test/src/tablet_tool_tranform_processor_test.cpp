@@ -28,6 +28,25 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 }
+
+class LibinputInterfaceMock : public LibinputInterface {
+public:
+    LibinputInterfaceMock() = default;
+    ~LibinputInterfaceMock() override = default;
+
+    MOCK_METHOD1(GetEventType, enum libinput_event_type (struct libinput_event *event));
+    MOCK_METHOD1(GetTipState, enum libinput_tip_state (struct libinput_event_tablet_tool *event));
+    MOCK_METHOD1(TabletToolGetType, enum libinput_tablet_tool_type (struct libinput_tablet_tool *tool));
+    MOCK_METHOD1(GetGestureEvent, struct libinput_event_gesture* (struct libinput_event *event));
+    MOCK_METHOD1(GetTabletToolEvent, struct libinput_event_tablet_tool* (struct libinput_event *event));
+    MOCK_METHOD1(GestureEventGetTime, uint32_t (struct libinput_event_gesture *event));
+    MOCK_METHOD1(GestureEventGetFingerCount, int (struct libinput_event_gesture *event));
+    MOCK_METHOD1(TabletToolGetTool, struct libinput_tablet_tool* (struct libinput_event_tablet_tool *event));
+    MOCK_METHOD2(GestureEventGetDevCoordsX, int (struct libinput_event_gesture *, uint32_t));
+    MOCK_METHOD2(GestureEventGetDevCoordsY, int (struct libinput_event_gesture *, uint32_t));
+
+};
+
 class TabletToolTranformProcessorTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -79,9 +98,13 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_
     CALL_TEST_DEBUG;
     int32_t deviceId = 6;
     TabletToolTransformProcessor processor(deviceId);
-    libinput_event *event = nullptr;
-    bool ret = processor.OnTip(event);
-    ASSERT_FALSE(ret);
+    libinput_event_tablet_tool event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&event));
+    EXPECT_CALL(libinputMock, GetTipState).WillOnce(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
+    bool ret1 = processor.OnTip(&event.base);
+    EXPECT_FALSE(ret1);
 }
 
 /**
