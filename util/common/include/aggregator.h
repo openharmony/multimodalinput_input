@@ -46,7 +46,7 @@ private:
     std::vector<RecordInfo> records_;
     std::function<int32_t(int32_t, int32_t, std::function<void()>)> addTimer_;
     std::function<int32_t(int32_t)> resetTimer_;
-    int32_t timerId {-1};
+    int32_t timerId_ { -1 };
 
     void FlushRecords(const LogHeader &lh, const std::string &key = "", const std::string &extraRecord = "");
 };
