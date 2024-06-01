@@ -1107,7 +1107,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     int32_t ret = SetPointerStyle(pid, windowId, style);
     if (ret == RET_ERR) {
-        MMI_HILOGE("SetPointerStyle return RET_ERR here!");
+        MMI_HILOGE("SetPointerStyle return RET_ERR here");
     }
     return ret;
 }
@@ -1562,7 +1562,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
     PointerStyle style;
     int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get global pointer style failed!");
+        MMI_HILOGE("Get global pointer style failed");
         return RET_ERR;
     }
     if (pointerStyle.id != style.id) {
