@@ -36,11 +36,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-constexpr size_t MAX_EVENTIDS_SIZE = 1000;
+constexpr size_t MAX_EVENTIDS_SIZE { 1000 };
 #endif // OHOS_BUILD_ENABLE_TOUCH
-constexpr int32_t ACTIVE_EVENT = 2;
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t UNOBSERVED = -1;
+constexpr int32_t ACTIVE_EVENT { 2 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t UNOBSERVED { -1 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
