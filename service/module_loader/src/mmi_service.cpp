@@ -70,7 +70,9 @@ const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
+constexpr int32_t RELOAD_DEVICE_TIME = 2000;
 constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t REPEAT_COUNT = 2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t SUBSCRIBED = 1;
@@ -1609,7 +1611,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 void MMIService::AddReloadDeviceTimer()
 {
     CALL_DEBUG_ENTER;
-    TimerMgr->AddTimer(2000, 2, [this]() {
+    TimerMgr->AddTimer(RELOAD_DEVICE_TIME, REPEAT_COUNT, [this]() {
         auto deviceIds = INPUT_DEV_MGR->GetInputDeviceIds();
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();
