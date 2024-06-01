@@ -604,8 +604,12 @@ void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const
         oss << ", first: " << records_.front().record << "-(";
         auto firstTime = records_.front().timestamp;
         time_t firstTimeT = std::chrono::system_clock::to_time_t(firstTime);
-        std::tm bt = *std::localtime(&firstTimeT);
-        oss << std::put_time(&bt, "%Y-%m-%d %H:%M:%S");
+        std::tm *bt = std::localtime(&firstTimeT);
+        if (bt == nullptr) {
+            MMI_HILOGE("bt is nullptr, this is a invalid time");
+            return;
+        }
+        oss << std::put_time(bt, "%Y-%m-%d %H:%M:%S");
         auto since_epoch = firstTime.time_since_epoch();
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch).count() % microToMilli;
         oss << '.' << std::setfill('0') << std::setw(milliSecondWidth) << millis << "ms)";

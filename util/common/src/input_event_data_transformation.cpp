@@ -216,6 +216,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
             pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
         }
     }
+    pkt << event->GetVelocity();
     std::set<int32_t> pressedBtns { event->GetPressedButtons() };
     pkt << pressedBtns.size();
     for (int32_t btnId : pressedBtns) {
@@ -374,6 +375,9 @@ void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<P
             event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
         }
     }
+    double velocity;
+    pkt >> velocity;
+    event->SetVelocity(velocity);
 }
 
 int32_t InputEventDataTransformation::SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)
@@ -424,7 +428,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         pkt << 0;
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
-        MMI_HILOGD("GetPointerEventEnhanceData failed!");
+        MMI_HILOGD("GetPointerEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;
@@ -482,7 +486,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Key
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
         pkt << 0;
-        MMI_HILOGD("GetKeyEventEnhanceData failed!");
+        MMI_HILOGD("GetKeyEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;

@@ -52,7 +52,7 @@ AsyncContext::~AsyncContext()
     }
 }
 
-bool getResult(sptr<AsyncContext> asyncContext, napi_value *results, int32_t size)
+static bool GetResult(sptr<AsyncContext> asyncContext, napi_value *results, int32_t size)
 {
     CALL_DEBUG_ENTER;
     int32_t length = 2;
@@ -122,7 +122,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             asyncContext->DecStrongRef(nullptr);
             napi_value results[2] = { 0 };
             int32_t size = 2;
-            if (!getResult(asyncContext, results, size)) {
+            if (!GetResult(asyncContext, results, size)) {
                 MMI_HILOGE("Failed to create napi data");
                 return;
             }
@@ -961,6 +961,49 @@ napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value ha
     bool rotateSwitch = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadRotateSwitch(rotateSwitch);
     return GetTouchpadBoolData(env, handle, rotateSwitch, ret);
+}
+
+napi_value JsPointerManager::EnableHardwareCursorStats(napi_env env, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->EnableHardwareCursorStats(enable);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value JsPointerManager::GetHardwareCursorStats(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    uint32_t frameCount = 0;
+    uint32_t vsyncCount = 0;
+    InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+    napi_value result = nullptr;
+    napi_status status = napi_create_object(env, &result);
+    if (status != napi_ok) {
+        MMI_HILOGE("Napi create object is failed");
+        return nullptr;
+    }
+    MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d",
+        frameCount, vsyncCount);
+    napi_value frameNapiCount;
+    NAPI_CALL(env, napi_create_uint32(env, frameCount, &frameNapiCount));
+    napi_value vsyncNapiCount;
+    NAPI_CALL(env, napi_create_uint32(env, vsyncCount, &vsyncNapiCount));
+    status = napi_set_named_property(env, result, "frameCount", frameNapiCount);
+    if (status != napi_ok) {
+        MMI_HILOGE("Napi set frameCount named property is failed");
+        return nullptr;
+    }
+    status = napi_set_named_property(env, result, "vsyncCount", vsyncNapiCount);
+    if (status != napi_ok) {
+        MMI_HILOGE("Napi set vsyncCount named property is failed");
+        return nullptr;
+    }
+    return result;
 }
 } // namespace MMI
 } // namespace OHOS

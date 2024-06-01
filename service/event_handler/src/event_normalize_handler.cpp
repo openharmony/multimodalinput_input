@@ -38,6 +38,9 @@
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_CROWN
+#include "crown_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_CROWN
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -321,6 +324,11 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+#ifdef OHOS_BUILD_ENABLE_CROWN
+    if (CROWN_EVENT_HDR->IsCrownEvent(event)) {
+        return CROWN_EVENT_HDR->NormalizeRotateEvent(event);
+    }
+#endif // OHOS_BUILD_ENABLE_CROWN
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     BytraceAdapter::StartPackageEvent("package mouseEvent");

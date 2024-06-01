@@ -58,9 +58,10 @@ constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
 constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 constexpr int64_t NO_DELAY = 0;
-constexpr int32_t TIME_CONVERSION_UNIT = 1000;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
+const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
+const std::string SCREENSHOT_ABILITY_NAME = "com.hmos.screenshot.ServiceExtAbility";
 const std::string SCREENRECORDER_BUNDLE_NAME = "com.hmos.screenrecorder";
 } // namespace
 
@@ -332,28 +333,6 @@ void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<Poin
     KnuckleGestureProcessor(touchEvent, doubleKnuckleGesture_);
 }
 
-void KeyCommandHandler::KnuckleGestureLaunchAbility(std::shared_ptr<PointerEvent> touchEvent,
-    int64_t intervalTime, KnuckleGesture &knuckleGesture, bool &isScreenRecorderFailed)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    knuckleCount_ = 0;
-    DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
-    int32_t ret = LaunchAbility(knuckleGesture.ability, NO_DELAY);
-    knuckleGesture.state = true;
-    if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
-        DfxHisysevent::ReportDoubleKnuckleSuccIfInvalidTime(intervalTime);
-        if (ret != RET_OK) {
-            screenRecordingErrorCount_++;
-            isScreenRecorderFailed = true;
-        } else {
-            screenRecordingSuccessCount_++;
-            DfxHisysevent::ReportDoubleKnuckleScreenRecordingSuccessTimes(screenRecordingSuccessCount_);
-        }
-    }
-    ReportKnuckleScreenCapture(touchEvent);
-}
-
 void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
     KnuckleGesture &knuckleGesture)
 {
@@ -373,10 +352,18 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     knuckleGesture.downToPrevUpTime = intervalTime;
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
-
-    bool isScreenRecorderFailed = false;
     if (isTimeIntervalReady && isDistanceReady) {
-        KnuckleGestureLaunchAbility(touchEvent, intervalTime, knuckleGesture, isScreenRecorderFailed);
+        MMI_HILOGI("knuckle gesture start launch ability");
+        knuckleCount_ = 0;
+        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
+        LaunchAbility(knuckleGesture.ability, NO_DELAY);
+        BytraceAdapter::StopLaunchAbility();
+        knuckleGesture.state = true;
+        if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
+            DfxHisysevent::ReportScreenRecorderGesture(++screenRecordingSuccessCount_, intervalTime);
+        }
+        ReportKnuckleScreenCapture(touchEvent);
     } else {
         if (knuckleCount_ > KNUCKLE_KNOCKS) {
             knuckleCount_ = 0;
@@ -388,14 +375,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
                 DfxHisysevent::ReportFailIfInvalidDistance(touchEvent, downToPrevDownDistance);
             }
         }
-        if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
-            screenRecordingErrorCount_++;
-            isScreenRecorderFailed = true;
-        }
-    }
-    if (isScreenRecorderFailed) {
-        DfxHisysevent::ReportDoubleKnuckleScreenRecordingErrorTimes(screenRecordingErrorCount_);
-        DfxHisysevent::ReportDoubleKnuckleFailIfInvalidTime(intervalTime);
     }
     AdjustTimeIntervalConfigIfNeed(intervalTime);
     AdjustDistanceConfigIfNeed(downToPrevDownDistance);
@@ -611,8 +590,6 @@ void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEve
             gestureTrackLength_ += sqrt(dx * dx + dy * dy);
             if (gestureTrackLength_ > MIN_GESTURE_STROKE_LENGTH) {
                 isGesturing_ = true;
-                DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
-                DfxHisysevent::ReportKnuckleGestureTrackTime(touchEvent->GetActionTime());
             }
         }
         if (isGesturing_ && !isLetterGesturing_) {
@@ -637,26 +614,22 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
     switch (notifyType) {
         case NotifyType::REGIONGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
+            smartShotSuccTimes_++;
             drawOSuccTimestamp_ = touchEvent->GetActionTime();
-            if (drawOSuccTimestamp_ > drawOFailTimestamp_ && drawOFailTimestamp_ > 0) {
-                int64_t intervalTime = (drawOSuccTimestamp_ - drawOFailTimestamp_) / TIME_CONVERSION_UNIT;
-                DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(intervalTime);
-            }
+            ReportRegionGesture();
             break;
         }
         case NotifyType::LETTERGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
+            drawSSuccessCount_++;
+            ReportLetterGesture();
             break;
         }
         default: {
             MMI_HILOGW("Not a region gesture or letter gesture, notifyType:%{public}d", notifyType);
             gestureFailCount_++;
-            DfxHisysevent::ReportKnuckleGestureFaildTimes(gestureFailCount_);
             drawOFailTimestamp_ = touchEvent->GetActionTime();
-            if (drawOFailTimestamp_ > drawOSuccTimestamp_ && drawOSuccTimestamp_ > 0) {
-                int64_t intervalTime = (drawOFailTimestamp_ - drawOSuccTimestamp_) / TIME_CONVERSION_UNIT;
-                DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(intervalTime);
-            }
+            ReportIfNeed();
             break;
         }
     }
@@ -666,22 +639,20 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
 {
     Ability ability;
-    ability.abilityName = WAKEUP_ABILITY_NAME;
-    ability.bundleName = AIBASE_BUNDLE_NAME;
     ability.abilityType = EXTENSION_ABILITY;
     if (type == NotifyType::REGIONGESTURE) {
+        ability.abilityName = WAKEUP_ABILITY_NAME;
+        ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
         ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
+        ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     } else if (type == NotifyType::LETTERGESTURE) {
+        ability.abilityName = SCREENSHOT_ABILITY_NAME;
+        ability.bundleName = SCREENSHOT_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
-        DfxHisysevent::ReportKnuckleDrawSSuccessTimes(++drawSSuccessCount_);
+        ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
     }
-    ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
-    int32_t ret = LaunchAbility(ability, NO_DELAY);
-    if (ret == RET_OK && type == NotifyType::REGIONGESTURE) {
-        smartShotSuccTimes_++;
-        DfxHisysevent::ReportSmartShotSuccTimes(smartShotSuccTimes_);
-    }
+    LaunchAbility(ability, NO_DELAY);
 }
 
 void KeyCommandHandler::ResetKnuckleGesture()
@@ -697,13 +668,13 @@ void KeyCommandHandler::ResetKnuckleGesture()
 
 std::string KeyCommandHandler::GesturePointsToStr() const
 {
-    auto count = gesturePoints_.size();
+    int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
         return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
-    for (auto i = 0; i < count; i += EVEN_NUMBER) {
+    for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
@@ -714,6 +685,39 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     cJSON_Delete(jsonArray);
     cJSON_free(jsonString);
     return result;
+}
+
+void KeyCommandHandler::ReportIfNeed()
+{
+    DfxHisysevent::ReportKnuckleGestureFaildTimes(gestureFailCount_);
+    DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
+    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
+    if (isLastGestureSucceed_) {
+        DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(drawOFailTimestamp_ - drawOSuccTimestamp_);
+    }
+    isLastGestureSucceed_ = false;
+}
+
+void KeyCommandHandler::ReportRegionGesture()
+{
+    DfxHisysevent::ReportSmartShotSuccTimes(smartShotSuccTimes_);
+    ReportGestureInfo();
+}
+
+void KeyCommandHandler::ReportLetterGesture()
+{
+    DfxHisysevent::ReportKnuckleDrawSSuccessTimes(drawSSuccessCount_);
+    ReportGestureInfo();
+}
+
+void KeyCommandHandler::ReportGestureInfo()
+{
+    DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
+    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
+    if (!isLastGestureSucceed_) {
+        DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(drawOSuccTimestamp_ - drawOFailTimestamp_);
+    }
+    isLastGestureSucceed_ = true;
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
@@ -1127,11 +1131,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
         }
         isParseConfig_ = true;
     }
-    bool isHandled = HandleMulFingersTap(pointer);
-    if (isHandled) {
-        return true;
-    }
-    return false;
+    return HandleMulFingersTap(pointer);
 }
 
 bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
@@ -1403,7 +1403,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (filterSequences_.empty()) {
-        MMI_HILOGW("no sequences matched");
+        MMI_HILOGD("no sequences matched");
         keys_.clear();
         return false;
     }
@@ -1498,21 +1498,42 @@ bool KeyCommandHandler::HandleNormalSequence(Sequence& sequence, bool &isLaunchA
     return true;
 }
 
+bool KeyCommandHandler::HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility)
+{
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    MMI_HILOGI("screenStatus: %{public}s, isScreenLocked: %{public}d", screenStatus.c_str(), isScreenLocked);
+    std::string bundleName = sequence.ability.bundleName;
+    std::string matchName = ".screenshot";
+    if (bundleName.find(matchName) != std::string::npos) {
+        bundleName = bundleName.substr(bundleName.size() - matchName.size());
+    }
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
+        if (bundleName == matchName) {
+            MMI_HILOGI("screen off, screenshot invalid");
+            return false;
+        }
+    } else {
+        if (bundleName == matchName && isScreenLocked) {
+            MMI_HILOGI("screen locked, screenshot delay 2000 milisecond");
+            return HandleScreenLocked(sequence, isLaunchAbility);
+        }
+    }
+    return HandleNormalSequence(sequence, isLaunchAbility);
+}
+
 bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility)
 {
     CALL_DEBUG_ENTER;
     size_t keysSize = keys_.size();
     size_t sequenceKeysSize = sequence.sequenceKeys.size();
-
     if (!sequence.statusConfigValue) {
         return false;
     }
-
     if (keysSize > sequenceKeysSize) {
         MMI_HILOGI("The save sequence not matching ability sequence");
         return false;
     }
-
     for (size_t i = 0; i < keysSize; ++i) {
         if (keys_[i] != sequence.sequenceKeys[i]) {
             MMI_HILOGD("The keyCode or keyAction not matching");
@@ -1524,27 +1545,11 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             return false;
         }
     }
-
     std::ostringstream oss;
     oss << sequence;
     MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
     if (keysSize == sequenceKeysSize) {
-        std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-        MMI_HILOGD("screenStatus: %{public}s", screenStatus.c_str());
-        std::string bundleName = sequence.ability.bundleName;
-        std::string matchName = ".ohos.screenshot";
-        if (bundleName.find(matchName) != std::string::npos) {
-            bundleName = bundleName.substr(bundleName.size() - matchName.size());
-        }
-        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            MMI_HILOGI("screen off, com.ohos.screenshot invalid");
-            return false;
-        }
-        if (bundleName == matchName && screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-            MMI_HILOGI("screen locked, com.ohos.screenshot delay 2000 milisecond");
-            return HandleScreenLocked(sequence, isLaunchAbility);
-        }
-        return HandleNormalSequence(sequence, isLaunchAbility);
+        return HandleMatchedSequence(sequence, isLaunchAbility);
     }
     return true;
 }
@@ -1671,12 +1676,12 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     return false;
 }
 
-int32_t KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
+void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
 {
     CALL_DEBUG_ENTER;
     if (ability.bundleName.empty()) {
         MMI_HILOGW("BundleName is empty");
-        return RET_ERR;
+        return;
     }
     AAFwk::Want want;
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
@@ -1695,12 +1700,12 @@ int32_t KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
-        return err;
+        return;
     }
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER) {
         MMI_HILOGW("nap client status:%{public}d", state);
-        return RET_ERR;
+        return;
     }
     OHOS::MMI::NapProcess::NapStatusData napData;
     napData.pid = -1;
@@ -1710,7 +1715,7 @@ int32_t KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
     NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
     MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
-    return RET_OK;
+    return;
 }
 
 void KeyCommandHandler::LaunchAbility(const Ability &ability)
@@ -1885,7 +1890,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
             mprintf(fd, "keyCode: %d | keyAction: %s",
-                sequenceKey.keyCode, KeyActionToString(sequenceKey.keyAction).c_str());
+                sequenceKey.keyCode, ConvertKeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
@@ -1893,7 +1898,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
     mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
-        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, KeyActionToString(item.keyAction).c_str());
+        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str());
     }
     mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
     mprintf(fd, "RepeatKey: count = %zu", repeatKeys_.size());
@@ -1901,7 +1906,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd,
             "KeyCode: %d | KeyAction: %s | Times: %d"
             "| StatusConfig: %s | StatusConfigValue: %s | BundleName: %s | AbilityName: %s"
-            "| Action:%s \t", item.keyCode, KeyActionToString(item.keyAction).c_str(), item.times,
+            "| Action:%s \t", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str(), item.times,
             item.statusConfig.c_str(), item.statusConfigValue ? "true" : "false",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
     }
@@ -1934,7 +1939,7 @@ void KeyCommandHandler::PrintGestureInfo(int32_t fd)
         doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
         doubleKnuckleGesture_.ability.action.c_str());
 }
-std::string KeyCommandHandler::KeyActionToString(int32_t keyAction)
+std::string KeyCommandHandler::ConvertKeyActionToString(int32_t keyAction)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = {
         {0, "UNKNOWN"},

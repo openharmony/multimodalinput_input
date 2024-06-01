@@ -54,77 +54,40 @@ static bool IsDualDisplayFoldDevice()
     return (!FOLD_SCREEN_FLAG.empty() && FOLD_SCREEN_FLAG[0] == '2');
 }
 
-class BindInfo {
-public:
-    int32_t GetInputDeviceId() const
-    {
-        return inputDeviceId_;
-    }
-    std::string GetInputDeviceName() const
-    {
-        return inputDeviceName_;
-    }
-    int32_t GetDisplayId() const
-    {
-        return displayId_;
-    }
-    std::string GetDisplayName() const
-    {
-        return displayName_;
-    }
-    bool IsUnbind() const
-    {
-        return ((inputDeviceId_ == -1) || (displayId_ == -1));
-    }
-    bool InputDeviceNotBind() const
-    {
-        return (inputDeviceId_ == -1);
-    }
-    bool DisplayNotBind() const
-    {
-        return (displayId_ == -1);
-    }
-    bool AddInputDevice(int32_t deviceId, const std::string &deviceName);
-    void RemoveInputDevice();
-    bool AddDisplay(int32_t id, const std::string &name);
-    void RemoveDisplay();
-    std::string GetDesc() const;
-    friend bool operator < (const BindInfo &l, const BindInfo &r);
-    friend std::ostream &operator << (std::ostream &os, const BindInfo &r);
-    friend std::istream &operator >> (std::istream &is, BindInfo &r);
+int32_t BindInfo::GetInputDeviceId() const
+{
+    return inputDeviceId_;
+}
 
-private:
-    int32_t inputDeviceId_ { -1 };
-    std::string inputDeviceName_;
-    int32_t displayId_ { -1 };
-    std::string displayName_;
-};
+std::string BindInfo::GetInputDeviceName() const
+{
+    return inputDeviceName_;
+}
 
-class BindInfos {
-public:
-    bool Add(const BindInfo &info);
-    void UnbindInputDevice(int32_t deviceId);
-    void UnbindDisplay(int32_t displayId);
-    BindInfo GetUnbindInputDevice(const std::string &displayName);
-    BindInfo GetUnbindDisplay(const std::string &inputDeviceName);
-    std::string GetDisplayNameByInputDevice(const std::string &name) const;
-    int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
-    std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
-    std::string GetInputDeviceByDisplayName(const std::string &name) const;
-    std::string GetDesc() const;
-    const std::list<BindInfo> &GetInfos() const
-    {
-        return infos_;
-    }
-    friend std::ostream &operator << (std::ostream &os, const BindInfos &r);
-    friend std::istream &operator >> (std::istream &is, BindInfos &r);
+int32_t BindInfo::GetDisplayId() const
+{
+    return displayId_;
+}
 
-private:
-    BindInfo GetUnbindInputDevice();
-    BindInfo GetUnbindInfo();
-    BindInfo GetUnbindDisplay();
-    std::list<BindInfo> infos_;
-};
+std::string BindInfo::GetDisplayName() const
+{
+    return displayName_;
+}
+
+bool BindInfo::IsUnbind() const
+{
+    return ((inputDeviceId_ == -1) || (displayId_ == -1));
+}
+
+bool BindInfo::InputDeviceNotBind() const
+{
+    return (inputDeviceId_ == -1);
+}
+
+bool BindInfo::DisplayNotBind() const
+{
+    return (displayId_ == -1);
+}
 
 bool BindInfo::AddInputDevice(int32_t deviceId, const std::string &deviceName)
 {
@@ -141,6 +104,7 @@ void BindInfo::RemoveInputDevice()
     inputDeviceId_ = -1;
     inputDeviceName_.clear();
 }
+
 bool BindInfo::AddDisplay(int32_t id, const std::string &name)
 {
     if ((displayId_ != -1) || !displayName_.empty()) {
@@ -150,11 +114,13 @@ bool BindInfo::AddDisplay(int32_t id, const std::string &name)
     displayName_ = name;
     return true;
 }
+
 void BindInfo::RemoveDisplay()
 {
     displayId_ = -1;
     displayName_.clear();
 }
+
 std::string BindInfo::GetDesc() const
 {
     std::ostringstream oss;
@@ -201,6 +167,11 @@ std::string BindInfos::GetDesc() const
         oss << "index:" << index << "," << info.GetDesc() << std::endl;
     }
     return oss.str();
+}
+
+const std::list<BindInfo> &BindInfos::GetInfos() const
+{
+    return infos_;
 }
 
 int32_t BindInfos::GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const
@@ -268,9 +239,7 @@ void BindInfos::UnbindInputDevice(int32_t deviceId)
     for (; it != infos_.end(); ++it) {
         if (it->GetInputDeviceId() == deviceId) {
             it->RemoveInputDevice();
-            if (it->IsUnbind()) {
-                infos_.erase(it);
-            }
+            infos_.erase(it);
             return;
         }
     }
@@ -282,26 +251,10 @@ void BindInfos::UnbindDisplay(int32_t displayId)
     for (; it != infos_.end(); ++it) {
         if (it->GetDisplayId() == displayId) {
             it->RemoveDisplay();
-            if (it->IsUnbind()) {
-                infos_.erase(it);
-            }
+            infos_.erase(it);
             return;
         }
     }
-}
-
-BindInfo BindInfos::GetUnbindInfo()
-{
-    auto it = infos_.begin();
-    while (it != infos_.end()) {
-        if (it->IsUnbind()) {
-            auto info = std::move(*it);
-            infos_.erase(it);
-            return info;
-        }
-        ++it;
-    }
-    return BindInfo();
 }
 
 BindInfo BindInfos::GetUnbindInputDevice(const std::string &displayName)

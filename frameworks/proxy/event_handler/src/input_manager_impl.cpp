@@ -44,6 +44,9 @@ constexpr int32_t MIN_DELAY = 0;
 constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
 constexpr int32_t ANR_DISPATCH = 0;
 constexpr uint8_t LOOP_COND = 2;
+constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
+constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
+constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = 27 * 2;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -194,6 +197,18 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
     return true;
 }
 
+int32_t InputManagerImpl::GetDisplayMaxSize()
+{
+    return sizeof(DisplayInfo) + DISPLAY_STRINGS_MAX_SIZE;
+}
+
+int32_t InputManagerImpl::GetWindowMaxSize(int32_t maxAreasCount)
+{
+    return sizeof(WindowInfo) + sizeof(Rect) * maxAreasCount * WINDOWINFO_RECT_COUNT
+           + sizeof(int32_t) * WindowInfo::POINTER_CHANGEAREA_COUNT
+           + sizeof(float) * WindowInfo::WINDOW_TRANSFORM_SIZE;
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
@@ -264,15 +279,13 @@ int32_t InputManagerImpl::RemoveInputEventObserver(std::shared_ptr<MMIEventObser
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
     eventObserver_ = nullptr;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputEventObserver();
-    return ret;
+    return MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputEventObserver();
 }
 
 int32_t InputManagerImpl::NotifyNapOnline()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->NotifyNapOnline();
-    return ret;
+    return MULTIMODAL_INPUT_CONNECT_MGR->NotifyNapOnline();
 }
 
 int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
@@ -1665,7 +1678,7 @@ int32_t InputManagerImpl::GetTouchpadScrollSwitch(bool &switchFlag)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollSwitch(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touchpad scroll switch failed");
+        MMI_HILOGE("Get the touchpad scroll switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1697,7 +1710,7 @@ int32_t InputManagerImpl::GetTouchpadScrollDirection(bool &state)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollDirection(state);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touchpad scroll direction switch failed");
+        MMI_HILOGE("Get the touchpad scroll direction switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1898,6 +1911,39 @@ int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &rotateSwitch)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::EnableHardwareCursorStats(bool enable)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->EnableHardwareCursorStats(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enable hardware cursor stats stats failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetHardwareCursorStats(frameCount, vsyncCount);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the hardware cursor stats failed");
+    }
+    MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
 {
     CALL_INFO_TRACE;
@@ -2084,6 +2130,11 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
+{
+    return (MAX_PKT_SIZE - GetDisplayMaxSize() * displayCount) / GetWindowMaxSize(maxAreasCount);
 }
 } // namespace MMI
 } // namespace OHOS
