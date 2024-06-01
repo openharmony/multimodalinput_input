@@ -1783,13 +1783,13 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadPinchSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
     return RET_OK;
 }
 
 int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadSwipeSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(switchFlag);
     return RET_OK;
 }
 
@@ -1801,7 +1801,7 @@ int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
 
 int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     return RET_OK;
 }
 
@@ -1924,7 +1924,7 @@ int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadPinchSwitch,
-        TouchEventHdr, switchFlag));
+        TOUCH_EVENT_HDR, switchFlag));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touch pad pinch switch failed, return %{public}d", ret);
         return ret;
@@ -1952,7 +1952,7 @@ int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadSwipeSwitch,
-        TouchEventHdr, switchFlag));
+        TOUCH_EVENT_HDR, switchFlag));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad swipe switch failed, return %{public}d", ret);
         return ret;
@@ -2008,7 +2008,7 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadRotateSwitch,
-        TouchEventHdr, rotateSwitch));
+        TOUCH_EVENT_HDR, rotateSwitch));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
