@@ -119,6 +119,6 @@ inline void DumpFullTable(std::ostream &os, const std::string &tableName, const 
         PrintLine(os, widths);
     }
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
 #endif //INPUT_TABLE_DUMP_H
