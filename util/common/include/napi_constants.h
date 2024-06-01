@@ -67,8 +67,8 @@ inline constexpr size_t MAX_STRING_LEN { 1024 };
 
 inline constexpr int SUCCESS { 0 };
 inline constexpr int FAILED { -1 };
-inline constexpr int32_t ANR_DISPATCH { 0 };
-inline constexpr int32_t ANR_MONITOR { 1 };
+inline constexpr int32_t ANR_DISPATCH = 0;
+inline constexpr int32_t ANR_MONITOR = 1;
 
 inline constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
 inline constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
