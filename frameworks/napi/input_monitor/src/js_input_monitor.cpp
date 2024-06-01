@@ -32,31 +32,31 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL = 0;
-constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL = 1;
-constexpr int32_t AXIS_TYPE_PINCH = 2;
-constexpr int32_t NAPI_ERR = 3;
-constexpr int32_t CANCEL = 0;
-constexpr int32_t MOVE = 1;
-constexpr int32_t BUTTON_DOWN = 2;
-constexpr int32_t BUTTON_UP = 3;
-constexpr int32_t AXIS_BEGIN = 4;
-constexpr int32_t AXIS_UPDATE = 5;
-constexpr int32_t AXIS_END = 6;
-constexpr int32_t MIDDLE = 1;
-constexpr int32_t RIGHT = 2;
-constexpr int32_t MOUSE_FLOW = 10;
-constexpr int32_t THREE_FINGERS = 3;
-constexpr int32_t FOUR_FINGERS = 4;
-constexpr int32_t GESTURE_BEGIN = 1;
-constexpr int32_t GESTURE_UPDATE = 2;
-constexpr int32_t GESTURE_END = 3;
+constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL { 0 };
+constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL { 1 };
+constexpr int32_t AXIS_TYPE_PINCH { 2 };
+constexpr int32_t NAPI_ERR { 3 };
+constexpr int32_t CANCEL { 0 };
+constexpr int32_t MOVE { 1 };
+constexpr int32_t BUTTON_DOWN { 2 };
+constexpr int32_t BUTTON_UP { 3 };
+constexpr int32_t AXIS_BEGIN { 4 };
+constexpr int32_t AXIS_UPDATE { 5 };
+constexpr int32_t AXIS_END { 6 };
+constexpr int32_t MIDDLE { 1 };
+constexpr int32_t RIGHT { 2 };
+constexpr int32_t MOUSE_FLOW { 10 };
+constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t FOUR_FINGERS { 4 };
+constexpr int32_t GESTURE_BEGIN { 1 };
+constexpr int32_t GESTURE_UPDATE { 2 };
+constexpr int32_t GESTURE_END { 3 };
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-constexpr int32_t FINGERPRINT_DOWN = 0;
-constexpr int32_t FINGERPRINT_UP = 1;
-constexpr int32_t FINGERPRINT_SLIDE = 2;
-constexpr int32_t FINGERPRINT_RETOUCH = 3;
-constexpr int32_t FINGERPRINT_CLICK = 4;
+constexpr int32_t FINGERPRINT_DOWN { 0 };
+constexpr int32_t FINGERPRINT_UP { 1 };
+constexpr int32_t FINGERPRINT_SLIDE { 2 };
+constexpr int32_t FINGERPRINT_RETOUCH { 3 };
+constexpr int32_t FINGERPRINT_CLICK { 4 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
