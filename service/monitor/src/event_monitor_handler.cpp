@@ -76,6 +76,14 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
         MMI_HILOGD("Monitor is succeeded");
         return;
     }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    if (pointerEvent->GetPointerItem(pointerId, item)) {
+        if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+            MMI_HILOGD("Knuckle event, skip");
+            return;
+        }
+    }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }

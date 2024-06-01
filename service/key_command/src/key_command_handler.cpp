@@ -94,10 +94,6 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnHandleTouchEvent(pointerEvent);
-    if (isKnuckleState_) {
-        MMI_HILOGD("current pointer event is knuckle");
-        return;
-    }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
@@ -271,6 +267,10 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     CHKPV(touchEvent);
     if (!singleKnuckleGesture_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
+    if (touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        MMI_HILOGD("Inject knuckle event, skip");
         return;
     }
     int32_t id = touchEvent->GetPointerId();
