@@ -511,7 +511,7 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     napi_value argv[4] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
-        MMI_HILOGE("At least 2 parameter is required.");
+        MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
     }
@@ -527,7 +527,7 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, argv[1]);
     if (pixelMap == nullptr) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid.");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
