@@ -29,8 +29,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
-constexpr size_t PRE_KEYS_NUM = 4;
+constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
+constexpr size_t PRE_KEYS_NUM { 4 };
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
