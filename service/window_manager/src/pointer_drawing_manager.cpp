@@ -124,7 +124,7 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
+    CHKPF(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
     if (hardwareCursorPointerManager_->IsSupported()) {
         if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
@@ -1789,7 +1789,7 @@ int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enabl
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
+    CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
     if ((hardwareCursorPointerManager_->EnableStats(enable)) != RET_OK) {
         MMI_HILOGE("Enable stats failed");
         return RET_ERR;
@@ -1803,7 +1803,7 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
+    CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
     if ((hardwareCursorPointerManager_->GetCursorStats(frameCount, vsyncCount)) != RET_OK) {
         MMI_HILOGE("Query stats failed");
         return RET_ERR;
