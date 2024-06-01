@@ -371,7 +371,7 @@ if (input_ext_feature_magiccursor) {
   surface_path = "//foundation/graphic/graphic_surface"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
   libmmi_service_sources += [
-    "${mmi_ext_path}/magic_cursor/src/least_squares_velocity_tracker.cpp",
+    "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
