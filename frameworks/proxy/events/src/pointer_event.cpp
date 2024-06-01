@@ -29,7 +29,7 @@ namespace {
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
-constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
