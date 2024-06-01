@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string THREAD_NAME = "mmi_service";
+const std::string THREAD_NAME { "mmi_service" };
 } // namespace
 
 WatchdogTask::WatchdogTask() {}
