@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t PRE_KEYS_MAX_SIZE = 4;
+constexpr int32_t PRE_KEYS_MAX_SIZE { 4 };
 }
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
