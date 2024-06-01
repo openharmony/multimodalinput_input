@@ -14,17 +14,18 @@
  */
 
 #include <cstdio>
+
 #include <gtest/gtest.h>
 
 #include "mmi_log.h"
 #include "libinput.h"
 #include "libinput_wrapper.h"
-#include "general_crown.h"
 #include "window_info.h"
 #include "input_event_handler.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "crown_transform_processor.h"
+#include "general_crown.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "CrownTransformProcessorTest"
@@ -125,14 +126,6 @@ libinput_event *CrownTransformProcessorTest::GetEvent()
         evt = libinput_.Dispatch();
     }
     return event;
-}
-
-void CrownTransformProcessorTest::SetUp()
-{
-}
-
-void CrownTransformProcessorTest::TearDown()
-{
 }
 
 /**
