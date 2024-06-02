@@ -326,7 +326,7 @@ void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<Poin
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     singleKnuckleGesture_.state = false;
-    KnuckleGestureProcessor(touchEvent, singleKnuckleGesture_);
+    KnuckleGestureProcessor(touchEvent, singleKnuckleGesture_, KnuckleType::KNUCKLE_TYPE_SINGLE);
 }
 
 void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
@@ -334,11 +334,11 @@ void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<Poin
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     doubleKnuckleGesture_.state = false;
-    KnuckleGestureProcessor(touchEvent, doubleKnuckleGesture_);
+    KnuckleGestureProcessor(touchEvent, doubleKnuckleGesture_, KnuckleType::KNUCKLE_TYPE_DOUBLE);
 }
 
 void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
-    KnuckleGesture &knuckleGesture)
+    KnuckleGesture &knuckleGesture, KnuckleType type)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -356,7 +356,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     knuckleGesture.downToPrevUpTime = intervalTime;
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
-    if (isTimeIntervalReady && isDistanceReady) {
+    if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
         MMI_HILOGI("knuckle gesture start launch ability");
         knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
