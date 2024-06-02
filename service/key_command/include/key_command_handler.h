@@ -266,7 +266,8 @@ private:
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
-    void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture, KnuckleType type);
+    void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
+        KnuckleGesture &knuckleGesture, KnuckleType type);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
