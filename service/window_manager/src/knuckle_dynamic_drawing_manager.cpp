@@ -435,8 +435,6 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
-    nodeWidth_ = displayInfo_.width;
-    nodeHeight_ = displayInfo_.height;
 
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
@@ -461,6 +459,8 @@ void KnuckleDynamicDrawingManager::CreateCanvasNode()
     CHKPV(canvasNode_);
     canvasNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     canvasNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    nodeWidth_ = displayInfo_.width;
+    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
