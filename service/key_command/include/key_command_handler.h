@@ -125,7 +125,7 @@ struct KnuckleGesture {
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
     std::string statusConfig;
-    bool statusConfigValue { true };
+    bool statusConfigValue { false };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -251,6 +251,7 @@ private:
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
+    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
