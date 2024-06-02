@@ -77,6 +77,8 @@ private:
     int32_t lastDownX_ { 0 };
     int32_t lastDownY_ { 0 };
     int64_t lastUpTime_ { 0 };
+    int32_t nodeWidth_ { 0 };
+    int32_t nodeHeight_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

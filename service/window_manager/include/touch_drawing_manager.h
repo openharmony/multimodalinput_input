@@ -135,6 +135,8 @@ private:
     std::list<PointerEvent::PointerItem> lastPointerItem_;
     PointerEvent::PointerItem firstPointerItem_;
     RosenCanvas *trackerCanvas_ { nullptr };
+    int32_t nodeWidth_ { 0 };
+    int32_t nodeHeight_ { 0 };
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI

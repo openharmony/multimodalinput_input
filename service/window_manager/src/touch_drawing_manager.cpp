@@ -343,6 +343,8 @@ void TouchDrawingManager::InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& c
     CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     canvasNode->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    nodeWidth_ = displayInfo_.width;
+    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -712,7 +714,7 @@ void TouchDrawingManager::ClearTracker()
     if (lastPointerItem_.empty() && isDownAction_) {
         MMI_HILOGD("ClearTracker isDownAction_ and empty");
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(trackerCanvasNode_.get());
-        canvasNode->ResetSurface();
+        canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     }
 }
 
