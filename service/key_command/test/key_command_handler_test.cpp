@@ -1879,7 +1879,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = true;
 
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
 }
 
 /**
@@ -1900,7 +1900,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = true;
 
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
 }
 
 /**
@@ -1921,7 +1921,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
     handler.isGesturing_ = true;
     handler.isLetterGesturing_ = true;
 
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
 }
 
 /**
