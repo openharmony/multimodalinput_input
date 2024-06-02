@@ -44,6 +44,11 @@ enum KeyCommandType : int32_t {
     TYPE_MULTI_FINGERS = 4,
 };
 
+enum class KnuckleType : int32_t {
+    KNUCKLE_TYPE_SINGLE = 0,
+    KNUCKLE_TYPE_DOUBLE = 1,
+};
+
 enum class NotifyType : int32_t {
     CANCEL,
     INCONSISTENTGESTURE,
@@ -261,7 +266,8 @@ private:
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
-    void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
+        KnuckleGesture &knuckleGesture, KnuckleType type);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);

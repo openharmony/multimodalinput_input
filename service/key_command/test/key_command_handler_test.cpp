@@ -522,7 +522,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleGestureProcessor, T
     knuckleGesture.lastPointerUpTime = 10;
     touchEvent->SetActionTime(5);
     handler.knuckleCount_ = 2;
-    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureProcessor(touchEvent, knuckleGesture));
+    ASSERT_NO_FATAL_FAILURE(handler.KnuckleGestureProcessor(touchEvent,
+        knuckleGesture, KnuckleType::KNUCKLE_TYPE_SINGLE));
 }
 
 /**
