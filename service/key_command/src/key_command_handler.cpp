@@ -57,10 +57,12 @@ constexpr float MOVE_TOLERANCE = 3.0f;
 constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
 constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
+constexpr int64_t NO_DELAY = 0;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
 const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
 const std::string SCREENSHOT_ABILITY_NAME = "com.hmos.screenshot.ServiceExtAbility";
+const std::string SCREENRECORDER_BUNDLE_NAME = "com.hmos.screenrecorder";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -306,7 +308,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-        HandleKnuckleGestureTouchUp();
+        HandleKnuckleGestureTouchUp(touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
@@ -331,7 +333,7 @@ void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<Poin
     KnuckleGestureProcessor(touchEvent, doubleKnuckleGesture_);
 }
 
-void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent,
+void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
     KnuckleGesture &knuckleGesture)
 {
     CALL_DEBUG_ENTER;
@@ -355,9 +357,12 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
         knuckleCount_ = 0;
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
-        LaunchAbility(knuckleGesture.ability, 0);
+        LaunchAbility(knuckleGesture.ability, NO_DELAY);
         BytraceAdapter::StopLaunchAbility();
         knuckleGesture.state = true;
+        if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
+            DfxHisysevent::ReportScreenRecorderGesture(++screenRecordingSuccessCount_, intervalTime);
+        }
         ReportKnuckleScreenCapture(touchEvent);
     } else {
         if (knuckleCount_ > KNUCKLE_KNOCKS) {
@@ -598,21 +603,33 @@ void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEve
     }
 }
 
-void KeyCommandHandler::HandleKnuckleGestureTouchUp()
+void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
     auto touchUp = GESTURESENSE_WRAPPER->touchUp_;
     CHKPV(touchUp);
     NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
         isGesturing_, isLetterGesturing_));
     switch (notifyType) {
-        case NotifyType::REGIONGESTURE:
+        case NotifyType::REGIONGESTURE: {
+            ProcessKnuckleGestureTouchUp(notifyType);
+            smartShotSuccTimes_++;
+            drawOSuccTimestamp_ = touchEvent->GetActionTime();
+            ReportRegionGesture();
+            break;
+        }
         case NotifyType::LETTERGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
+            drawSSuccessCount_++;
+            ReportLetterGesture();
             break;
         }
         default: {
             MMI_HILOGW("Not a region gesture or letter gesture, notifyType:%{public}d", notifyType);
+            gestureFailCount_++;
+            drawOFailTimestamp_ = touchEvent->GetActionTime();
+            ReportIfNeed();
             break;
         }
     }
@@ -635,7 +652,7 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
         ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
     }
-    LaunchAbility(ability, 0);
+    LaunchAbility(ability, NO_DELAY);
 }
 
 void KeyCommandHandler::ResetKnuckleGesture()
@@ -668,6 +685,39 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     cJSON_Delete(jsonArray);
     cJSON_free(jsonString);
     return result;
+}
+
+void KeyCommandHandler::ReportIfNeed()
+{
+    DfxHisysevent::ReportKnuckleGestureFaildTimes(gestureFailCount_);
+    DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
+    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
+    if (isLastGestureSucceed_) {
+        DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(drawOFailTimestamp_ - drawOSuccTimestamp_);
+    }
+    isLastGestureSucceed_ = false;
+}
+
+void KeyCommandHandler::ReportRegionGesture()
+{
+    DfxHisysevent::ReportSmartShotSuccTimes(smartShotSuccTimes_);
+    ReportGestureInfo();
+}
+
+void KeyCommandHandler::ReportLetterGesture()
+{
+    DfxHisysevent::ReportKnuckleDrawSSuccessTimes(drawSSuccessCount_);
+    ReportGestureInfo();
+}
+
+void KeyCommandHandler::ReportGestureInfo()
+{
+    DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
+    DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
+    if (!isLastGestureSucceed_) {
+        DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(drawOSuccTimestamp_ - drawOFailTimestamp_);
+    }
+    isLastGestureSucceed_ = true;
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
@@ -1650,6 +1700,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
+        return;
     }
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER) {
@@ -1664,6 +1715,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
     NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
     MMI_HILOGI("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    return;
 }
 
 void KeyCommandHandler::LaunchAbility(const Ability &ability)
