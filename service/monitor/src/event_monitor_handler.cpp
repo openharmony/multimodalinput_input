@@ -190,22 +190,9 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     auto currentTime = GetSysClockTime();
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        if (ANRMgr->TriggerANR(ANR_MONITOR, currentTime, session_)) {
-            MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
-                "application not response. TouchEvent(deviceid:%{public}d, action:%{public}s)",
-                pointerEvent->GetId(), pointerEvent->GetDeviceId(), pointerEvent->DumpPointerAction());
-            return;
-        }
-    }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        session_->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
-        MMI_HILOGD("session pid : %{public}d", session_->GetPid());
-        ANRMgr->AddTimer(ANR_MONITOR, pointerEvent->GetId(), currentTime, session_);
     }
 }
 
