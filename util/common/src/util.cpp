@@ -569,7 +569,6 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
 
 bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::string &record)
 {
-    constexpr int32_t maxRecordCount = 20;
     constexpr int32_t oneSecond = 1000;
     if (timerId_ != -1) {
         resetTimer_(timerId_);
@@ -582,7 +581,7 @@ bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::
     if (key == key_) {
         auto now = std::chrono::system_clock::now();
         records_.push_back({record, now});
-        if (records_.size() >= maxRecordCount) {
+        if (records_.size() >= maxRecordCount_) {
             FlushRecords(lh);
         }
         return true;
