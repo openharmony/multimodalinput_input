@@ -35,7 +35,7 @@ static constexpr std::string_view InfoTrackingDict =
         " DY-DisplayY, DYP-DisplayYPos, ET-EventType, GU-GetUnicode, I-id, IP-IsPressed, IR-IsRepeat, SI-IsSimulate,"
         " KA-KeyAction, KC-KeyCode, KIC-keyItemsCount, LA-LongAxis, NL-NumLock, OPI-OriginPointerId, PA-PointerAction,"
         " PI-pointerId, P-Pressure, SA-ShortAxis, SL-ScrollLock, ST-SourceType, WI-WindowId, WXP-WindowXPos, "
-        "WYP-WindowYPos, PBZ-PressedButtonsSize";
+        "WYP-WindowYPos, PBS-PressedButtonsSize";
 
 static constexpr std::string_view DebugTrackingDict =
         "Debug-InputTracking-Dict: "
@@ -81,13 +81,14 @@ private:
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
         MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{public}d, AT:%{public}" PRId64
             ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%{public}zu, "
-            "DI:%{public}d, IR:%{public}s, SI:%{public}s",
+            "DI:%{public}d, IR:%{public}s, SI:%{public}s, PBS:%{public}zu",
             event->GetId(), event->GetKeyCode(), event->GetActionTime(),
             InputEvent::EventTypeToString(event->GetEventType()),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
-            event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
+            event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str(),
+            event->GetPressedButtons().size());
         for (const auto &item : eventItems) {
             MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{public}d, DT:%{public}" PRId64
             ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
@@ -147,7 +148,7 @@ private:
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
             ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d,
-            SI:%{public}s, PBZ:%{public}zu",
+            SI:%{public}s, PBS:%{public}zu",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetTargetDisplayId(),
             event->GetTargetWindowId(), event->GetDispatchTimes(), isSimulate.c_str(),
