@@ -480,5 +480,156 @@ HWTEST_F(InputNativeTest, InputNativeTest_TouchEventActionTime_001, TestSize.Lev
     OH_Input_DestroyTouchEvent(&touchEvent);
     EXPECT_EQ(touchEvent, nullptr);
 }
+
+/**
+ * @tc.name: InputNativeTest_InjectKeyEvent_002
+ * @tc.desc: Verify the InjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_002, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_VOLUME_DOWN);
+    std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
+    g_keyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectKeyEvent_003
+ * @tc.desc: Verify the InjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_003, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_VOLUME_DOWN);
+    std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
+    g_keyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    OH_Input_SetKeyEventActionTime(keyEvent, -1);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectKeyEvent_004
+ * @tc.desc: Verify the InjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_004, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_VOLUME_DOWN);
+    std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
+    g_keyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    OH_Input_SetKeyEventActionTime(keyEvent, 2);
+    OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_DOWN);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectKeyEvent_005
+ * @tc.desc: Verify the InjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_005, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_VOLUME_DOWN);
+    std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
+    g_keyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    OH_Input_SetKeyEventActionTime(keyEvent, 2);
+    OH_Input_SetKeyEventAction(keyEvent, KEY_ACTION_UP);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectKeyEvent_006
+ * @tc.desc: Verify the InjectKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectKeyEvent_006, TestSize.Level1)
+{
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    ASSERT_NE(keyEvent, nullptr);
+    OH_Input_SetKeyEventKeyCode(keyEvent, KEYCODE_VOLUME_DOWN);
+    std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
+    g_keyEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    OH_Input_SetKeyEventActionTime(keyEvent, 2);
+    OH_Input_SetKeyEventAction(keyEvent, KeyEvent::KEY_ACTION_UNKNOWN);
+    int32_t retResult = OH_Input_InjectKeyEvent(keyEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectMouseEvent_003
+ * @tc.desc: Verify the InjectMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_003, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_BEGIN);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
+    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
+    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
+    OH_Input_SetMouseEventButton(mouseEvent, 3);
+    OH_Input_SetMouseEventActionTime(mouseEvent, -1);
+    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectTouchEvent_002
+ * @tc.desc: Verify the InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_002, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_UP);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 671);
+    OH_Input_SetTouchEventDisplayY(touchEvent, 10);
+    OH_Input_SetTouchEventActionTime(touchEvent, -1);
+    int32_t retResult = OH_Input_InjectTouchEvent(touchEvent);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectTouchEvent_003
+ * @tc.desc: Verify the InjectTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_003, TestSize.Level1)
+{
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    ASSERT_NE(touchEvent, nullptr);
+    OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_DOWN);
+    OH_Input_SetTouchEventFingerId(touchEvent, 0);
+    OH_Input_SetTouchEventDisplayX(touchEvent, 671);
+    OH_Input_SetTouchEventDisplayY(touchEvent, 10);
+    OH_Input_SetTouchEventActionTime(touchEvent, -1);
+    int32_t retResult = OH_Input_InjectTouchEvent(touchEvent);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
 } // namespace MMI
 } // namespace OHOS
