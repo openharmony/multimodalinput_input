@@ -39,7 +39,6 @@ private:
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
         bool enable { false };
-        bool isVirtual { false };
         std::string dhid;
         std::string sysUid;
         VendorConfig vendorConfig;
