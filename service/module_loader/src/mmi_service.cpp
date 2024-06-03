@@ -47,6 +47,7 @@
 #include "display_event_monitor.h"
 #include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
+#include "gesturesense_wrapper.h"
 #include "infrared_emitter_controller.h"
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"

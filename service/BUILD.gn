@@ -1190,6 +1190,32 @@ ohos_unittest("EventDumpTest") {
   ]
 }
 
+ohos_unittest("DfxHisysEventTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${mmi_path}/test/unittest/common/include" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "dfx/test/dfx_hisysevent_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [ "hilog:libhilog" ]
+}
+
 group("mmi-service-tests") {
   testonly = true
   deps = [ "libinput_adapter/test" ]

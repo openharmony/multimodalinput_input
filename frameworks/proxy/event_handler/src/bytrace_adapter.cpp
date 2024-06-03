@@ -39,9 +39,9 @@ const std::string keyEventIntercept { "KeyEventIntercept" };
 const std::string startEvent { "StartEvent" };
 const std::string launchEvent { "LaunchEvent" };
 const std::string stopEvent { "StopEvent" };
-constexpr int32_t START_ID = 1;
-constexpr int32_t LAUNCH_ID = 2;
-constexpr int32_t STOP_ID = 3;
+constexpr int32_t START_ID { 1 };
+constexpr int32_t LAUNCH_ID { 2 };
+constexpr int32_t STOP_ID { 3 };
 } // namespace
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
