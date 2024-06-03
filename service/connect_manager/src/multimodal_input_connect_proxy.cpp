@@ -38,6 +38,7 @@ constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
 constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
+constexpr int32_t MAX_AXIS_INFO { 64 };
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -2061,6 +2062,10 @@ int32_t MultimodalInputConnectProxy::AddVirtualInputDevice(std::shared_ptr<Input
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
+    auto axisInfo = device->GetAxisInfo();
+    if (axisInfo.size() > MAX_AXIS_INFO) {
+        return RET_ERR;
+    }
     WRITEINT32(data, device->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITEINT32(data, device->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITESTRING(data, device->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
@@ -2071,8 +2076,8 @@ int32_t MultimodalInputConnectProxy::AddVirtualInputDevice(std::shared_ptr<Input
     WRITESTRING(data, device->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITESTRING(data, device->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITEUINT64(data, static_cast<uint64_t>(device->GetCapabilities()), IPC_STUB_WRITE_PARCEL_ERR);
-    WRITEUINT32(data, static_cast<uint32_t>(device->GetAxisInfo().size()), IPC_STUB_WRITE_PARCEL_ERR);
-    for (const auto &item : device->GetAxisInfo()) {
+    WRITEUINT32(data, static_cast<uint32_t>(axisInfo.size()), IPC_STUB_WRITE_PARCEL_ERR);
+    for (const auto &item : axisInfo) {
         WRITEINT32(data, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
         WRITEINT32(data, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
         WRITEINT32(data, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);

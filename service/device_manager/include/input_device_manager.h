@@ -53,8 +53,6 @@ public:
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
-    int32_t MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo);
-    int32_t GenerateVirtualDeviceId(int32_t &deviceId);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id, bool checked = true) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
@@ -101,6 +99,8 @@ private:
     int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
+    int32_t MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo);
+    int32_t GenerateVirtualDeviceId(int32_t &deviceId);
     bool IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const;
     bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
@@ -110,7 +110,7 @@ private:
     std::map<int32_t, std::shared_ptr<InputDevice>> virtualInputDevices_;
     std::map<std::string, std::string> inputDeviceScreens_;
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
-    std::list<SessionPtr> devListener_;
+    std::list<SessionPtr> devListeners_;
     inputDeviceCallback devCallbacks_ { nullptr };
     std::map<int32_t, std::string> displayInputBindInfos_;
     DeviceConfigManagement configManagement_;

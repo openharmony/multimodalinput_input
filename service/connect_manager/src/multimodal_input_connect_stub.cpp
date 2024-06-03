@@ -38,6 +38,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t MAX_AXIS_INFO { 64 };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 
 int32_t ParseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
@@ -71,6 +72,9 @@ int32_t ParseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inpu
 
     uint32_t size = 0;
     READUINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (axisInfo.size() > MAX_AXIS_INFO) {
+        return RET_ERR;
+    }
     InputDevice::AxisInfo axis;
     for (uint32_t i = 0; i < size; ++i) {
         int32_t val = 0;
