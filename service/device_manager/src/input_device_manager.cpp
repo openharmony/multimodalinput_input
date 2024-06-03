@@ -311,13 +311,13 @@ void InputDeviceManager::AddDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     InitSessionLostCallback();
-    devListener_.push_back(sess);
+    devListeners_.push_back(sess);
 }
 
 void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    devListener_.remove(sess);
+    devListeners_.remove(sess);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -424,8 +424,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[deviceId] = info;
     if (info.enable) {
-        for (const auto& item : devListener_) {
-            CHKPV(item);
+        for (const auto& item : devListeners_) {
+            CHKPC(item);
             NotifyMessage(item, deviceId, "add");
         }
     }
@@ -480,6 +480,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
     std::string sysUid = GetInputIdentification(inputDevice);
     if (!sysUid.empty()) {
+        CHKPV(devCallbacks_);
         devCallbacks_(deviceId, sysUid, "remove");
         MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
             deviceId, sysUid.c_str());
@@ -494,7 +495,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (enable) {
-        for (const auto& item : devListener_) {
+        for (const auto& item : devListeners_) {
             CHKPV(item);
             NotifyMessage(item, deviceId, "remove");
         }
@@ -700,8 +701,8 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
             if (keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
                 continue;
             }
-            for (const auto& listener : devListener_) {
-                CHKPR(listener, ERROR_NULL_POINTER);
+            for (const auto& listener : devListeners_) {
+                CHKPC(listener, ERROR_NULL_POINTER);
                 NotifyMessage(listener, item.first, enable ? "add" : "remove");
             }
         }
@@ -719,18 +720,16 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
 {
     CALL_INFO_TRACE;
     CHKPR(device, RET_ERR);
-    int32_t tempDeviceId { -1 };
-    if (GenerateVirtualDeviceId(tempDeviceId) != RET_OK) {
+    if (GenerateVirtualDeviceId(deviceId) != RET_OK) {
         MMI_HILOGE("GenerateVirtualDeviceId failed");
+        deviceId = INVALID_DEVICE_ID;
         return RET_ERR;
     }
-    MMI_HILOGI("GenerateVirtualDeviceId successfully, tempDeviceId:%{public}d", tempDeviceId);
-    deviceId = tempDeviceId;
     device->SetId(deviceId);
     virtualInputDevices_[deviceId] = device;
     MMI_HILOGI("AddVirtualInputDevice successfully, deivceId:%{public}d", deviceId);
-    for (const auto& item : devListener_) {
-        CHKPR(item, ERROR_NULL_POINTER);
+    for (const auto& item : devListeners_) {
+        CHKPC(item, ERROR_NULL_POINTER);
         NotifyMessage(item, deviceId, "add");
     }
     InputDeviceInfo deviceInfo;
@@ -746,20 +745,21 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
 int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 {
     CALL_INFO_TRACE;
-    if (virtualInputDevices_.find(deviceId) == virtualInputDevices_.end()) {
+    auto iter = virtualInputDevices_.find(deviceId);
+    if (iter == virtualInputDevices_.end()) {
         MMI_HILOGE("No virtual deviceId:%{public}d existed", deviceId);
         return RET_ERR;
     }
     InputDeviceInfo deviceInfo;
-    if (MakeVirtualDeviceInfo(virtualInputDevices_[deviceId], deviceInfo) != RET_OK) {
-        MMI_HILOGE("MakeVirtualDeviceInfo FAILED");
+    if (MakeVirtualDeviceInfo(iter->second, deviceInfo) != RET_OK) {
+        MMI_HILOGE("MakeVirtualDeviceInfo failed");
         return RET_ERR;
     }
     NotifyDevRemoveCallback(deviceId, deviceInfo);
     virtualInputDevices_.erase(deviceId);
     MMI_HILOGI("RemoveVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
-    for (const auto& item : devListener_) {
-        CHKPR(item, ERROR_NULL_POINTER);
+    for (const auto& item : devListeners_) {
+        CHKPC(item, ERROR_NULL_POINTER);
         NotifyMessage(item, deviceId, "remove");
     }
     DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
@@ -784,19 +784,19 @@ int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
     CALL_INFO_TRACE;
     static int32_t virtualDeviceId { MIN_VIRTUAL_INPUT_DEVICE_ID };
     if (virtualInputDevices_.size() >= MAX_VIRTUAL_INPUT_DEVICE_NUM) {
-        MMI_HILOGE("virtual device num exceeds limit:%{public}d", MAX_VIRTUAL_INPUT_DEVICE_NUM);
+        MMI_HILOGE("Virtual device num exceeds limit:%{public}d", MAX_VIRTUAL_INPUT_DEVICE_NUM);
         return RET_ERR;
     }
     if (virtualDeviceId == std::numeric_limits<int32_t>::max()) {
         MMI_HILOGW("Request ID exceeds the maximum");
         virtualDeviceId = MIN_VIRTUAL_INPUT_DEVICE_ID;
     }
-    int32_t tempDeviceId = virtualDeviceId++;
-    if (virtualInputDevices_.find(tempDeviceId) != virtualInputDevices_.end()) {
-        MMI_HILOGE("Repeated deviceId:%{public}d", tempDeviceId);
+    deviceId = virtualDeviceId++;
+    if (virtualInputDevices_.find(deviceId) != virtualInputDevices_.end()) {
+        MMI_HILOGE("Repeated deviceId:%{public}d", deviceId);
+        deviceId = INVALID_DEVICE_ID;
         return RET_ERR;
     }
-    deviceId = tempDeviceId;
     return RET_OK;
 }
 
@@ -805,8 +805,7 @@ void InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDe
     CALL_DEBUG_ENTER;
     if (auto sysUid = deviceInfo.sysUid; !sysUid.empty()) {
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("send device info to window manager, deivceId:%{public}d, sysUid:%{public}s, status:remove",
-            deviceId, sysUid.c_str());
+        MMI_HILOGI("send device info to window manager, deivceId:%{public}d, status:remove", deviceId);
     }
 }
 
@@ -843,7 +842,7 @@ void InputDeviceManager::InitSessionLostCallback()
 void InputDeviceManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    devListener_.remove(session);
+    devListeners_.remove(session);
 }
 
 std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
