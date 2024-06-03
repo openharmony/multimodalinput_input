@@ -325,6 +325,12 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         targetWindowIds_[pointerId] = targetWindowId;
     }
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
+        int32_t pointerId = pointerEvent->GetPointerId();
+        targetWindowIds_.erase(pointerId);
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
