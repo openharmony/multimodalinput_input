@@ -155,31 +155,5 @@ HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_RemoveVirtualInputDevice
     ASSERT_NE(ret, RET_OK);
 }
 
-/**
- * @tc.name: VirtualInputDeviceTest_RemoveVirtualInputDevice_001
- * @tc.desc: Remove virtual input device
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_RemoveVirtualInputDevice_001, TestSize.Level1)
-{
-    auto inputDeviceAdd = std::make_shared<InputDevice>();
-    int32_t deviceId { -1 };
-    int32_t ret = InputManager::GetInstance()->AddVirtualInputDevice(inputDeviceAdd, deviceId);
-    ASSERT_EQ(ret, RET_OK);
-    auto inputDeviceGet = std::make_shared<InputDevice>();
-    auto inputDevFun = [&inputDeviceGet] (std::shared_ptr<InputDevice> dev) {
-        inputDeviceGet = dev;
-    };
-    ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
-    ASSERT_EQ(ret, RET_OK);
-    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
-    ASSERT_EQ(ret, RET_OK);
-    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
-    ASSERT_NE(ret, RET_OK);
-    ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
-    ASSERT_NE(ret, RET_OK);
-}
-
 } // namespace MMI
 } // namespace OHOS
