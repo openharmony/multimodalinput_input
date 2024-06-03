@@ -170,6 +170,7 @@ group("mmi_tests") {
     "service:NapProcessTest",
     "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",
+    "service:StylusKeyTest",
     "service:SubscriberTest",
     "service:TimerManagerTest",
     "service:TwoFingerLongTouchTest",
