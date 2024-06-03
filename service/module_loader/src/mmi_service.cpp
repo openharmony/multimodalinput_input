@@ -2202,7 +2202,7 @@ int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, i
     CALL_DEBUG_ENTER;
     CHKPR(device, ERROR_NULL_POINTER);
     int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::AddVirtualInputDevice, INPUT_DEV_MGR, device, 
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::AddVirtualInputDevice, INPUT_DEV_MGR, device,
             std::ref(deviceId)));
     if (ret != RET_OK) {
         MMI_HILOGE("AddVirtualInputDevice failed:%{public}d", ret);
