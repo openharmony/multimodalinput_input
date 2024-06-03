@@ -23,6 +23,7 @@
 #include "draw/canvas.h"
 #include "include/core/SkPath.h"
 #include "include/core/SkPaint.h"
+#include "knuckle_drawing_manager.h"
 #include "knuckle_glow_trace_system.h"
 #include "pointer_event.h"
 #include "window_info.h"
@@ -65,17 +66,22 @@ private:
     std::vector<Rosen::Drawing::Point> traceControlPoints_;
 
     int32_t pointCounter_ { 0 };
-    bool isDrawing_ { false };
-    std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_;
+    bool isDrawing_ { true };
+    std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_ { nullptr };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     Rosen::Drawing::Path pointerPath_;
     SkPaint pointerPathPaint_;
     int64_t lastUpdateTimeMillis_ { 0 };
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
     bool isStop_ { false };
+    bool isRotate_ { false };
     int32_t lastDownX_ { 0 };
     int32_t lastDownY_ { 0 };
     int64_t lastUpTime_ { 0 };
+    int32_t nodeWidth_ { 0 };
+    int32_t nodeHeight_ { 0 };
+    int64_t firstDownTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

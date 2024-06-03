@@ -17,10 +17,8 @@
 #define MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 
 #include "singleton.h"
 

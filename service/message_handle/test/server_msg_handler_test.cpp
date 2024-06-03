@@ -1156,5 +1156,228 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnEnhanceConfig_002, TestSiz
     rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
     EXPECT_NO_FATAL_FAILURE(handler.OnEnhanceConfig(sess, pkt));
 }
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMsgHandler
+ * @tc.desc: Test if (callback == nullptr) branch success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    EXPECT_NO_FATAL_FAILURE(msgHandler.OnMsgHandler(sess, pkt));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent
+ * @tc.desc: Test if (iter == authorizationCollection_.end()) branch success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = true;
+    keyEvent->SetId(1);
+    keyEvent->eventType_ = 1;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    msgHandler.authorizationCollection_.insert(std::make_pair(10, AuthorizationStatus::UNKNOWN));
+    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_001
+ * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = true;
+    keyEvent->SetId(1);
+    keyEvent->eventType_ = 1;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNAUTHORIZED));
+    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_002
+ * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = true;
+    keyEvent->SetId(1);
+    keyEvent->eventType_ = 1;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_003
+ * @tc.desc: Test if (isNativeInject) branch failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = false;
+    keyEvent->SetId(1);
+    keyEvent->eventType_ = 1;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_001
+ * @tc.desc: Test if (iter == authorizationCollection_.end()) branch success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = true;
+    pointerEvent->SetId(1);
+    pointerEvent->eventType_ = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    msgHandler.authorizationCollection_.insert(std::make_pair(10, AuthorizationStatus::UNKNOWN));
+    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject), COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_002
+ * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = true;
+    pointerEvent->SetId(1);
+    pointerEvent->eventType_ = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNAUTHORIZED));
+    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject), COMMON_PERMISSION_CHECK_ERROR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_003
+ * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = true;
+    pointerEvent->SetId(1);
+    pointerEvent->eventType_ = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_004
+ * @tc.desc: Test if (isNativeInject) branch failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t pid = 15;
+    bool isNativeInject = false;
+    pointerEvent->SetId(1);
+    pointerEvent->eventType_ = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnInjectPointerEventExt
+ * @tc.desc: Test OnInjectPointerEventExt
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
+    pointerEvent->SetId(1);
+    pointerEvent->eventType_ = 1;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    msgHandler.targetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_ERR);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_ERR);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
+    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -48,7 +48,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_UNKNOWN);
 }
 
@@ -66,7 +66,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_DPAD_UP);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_UP);
 }
 
@@ -84,7 +84,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_DPAD_DOWN);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_DOWN);
 }
 
@@ -102,7 +102,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_DPAD_LEFT);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_LEFT);
 }
 
@@ -120,7 +120,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_DPAD_RIGHT);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_RIGHT);
 }
 
@@ -138,7 +138,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_SPACE);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_SELECT);
 }
 
@@ -156,7 +156,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_ESCAPE);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ESCAPE);
 }
 
@@ -176,7 +176,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_DPAD_LEFT);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_BACK);
 }
 
@@ -196,7 +196,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_DPAD_LEFT);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_BACK);
 }
 
@@ -216,7 +216,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_DPAD_RIGHT);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_FORWARD);
 }
 
@@ -236,7 +236,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_DPAD_RIGHT);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_FORWARD);
 }
 
@@ -256,7 +256,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_F10);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_MENU);
 }
 
@@ -276,7 +276,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_F10);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_MENU);
 }
 
@@ -294,7 +294,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_PAGE_UP);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_PAGE_UP);
 }
 
@@ -312,7 +312,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_PAGE_DOWN);
     KeyEvent->AddKeyItem(item);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_PAGE_DOWN);
 }
 
@@ -332,7 +332,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_PLUS);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_OUT);
 }
 
@@ -352,7 +352,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_PLUS);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_OUT);
 }
 
@@ -372,7 +372,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_NUMPAD_ADD);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_OUT);
 }
 
@@ -392,7 +392,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_NUMPAD_ADD);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_OUT);
 }
 
@@ -412,7 +412,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_MINUS);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_IN);
 }
 
@@ -432,7 +432,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_MINUS);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_IN);
 }
 
@@ -452,7 +452,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_NUMPAD_SUBTRACT);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_IN);
 }
 
@@ -472,7 +472,7 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_KeyInt
     KeyEvent->AddKeyItem(item[0]);
     item[1].SetKeyCode(KeyEvent::KEYCODE_NUMPAD_SUBTRACT);
     KeyEvent->AddKeyItem(item[1]);
-    int32_t keyIntention = keyItemsTransKeyIntention(KeyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(KeyEvent->GetKeyItems());
     ASSERT_EQ(keyIntention, KeyEvent::INTENTION_ZOOM_IN);
 }
 
