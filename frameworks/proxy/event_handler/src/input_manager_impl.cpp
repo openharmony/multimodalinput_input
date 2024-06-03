@@ -181,8 +181,6 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
             continue;
         }
         if (window.defaultHotAreas.empty() || window.pointerHotAreas.empty() ||
-            (window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            (window.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (!window.pointerChangeAreas.empty() &&
             window.pointerChangeAreas.size() != WindowInfo::POINTER_CHANGEAREA_COUNT) ||
             (!window.transform.empty() && window.transform.size() != WindowInfo::WINDOW_TRANSFORM_SIZE)) {
