@@ -1708,5 +1708,57 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisInne
     int32_t ret = processor.HandleAxisInner(data);
     EXPECT_EQ(ret, ERROR_NULL_POINTER);
 }
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_00
+ * @tc.desc: Test the funcation SetPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpeed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = -1;
+    ASSERT_EQ(processor.SetPointerSpeed(speed), 0);
+    speed = 15;
+    ASSERT_EQ(processor.SetPointerSpeed(speed), 0);
+    speed = 5;
+    EXPECT_NO_FATAL_FAILURE(processor.SetPointerSpeed(speed));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisBeginEndInner_002
+ * @tc.desc: Test the funcation HandleAxisBeginEndInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisBeginEndInner_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    vMouse_.SendEvent(EV_REL, REL_X, 5);
+    vMouse_.SendEvent(EV_REL, REL_Y, -10);
+    vMouse_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    processor.buttonId_ = PointerEvent::BUTTON_NONE;
+    processor.isAxisBegin_ = false;
+    processor.isPressed_ = true;
+    int32_t ret = processor.HandleAxisBeginEndInner(event);
+    EXPECT_EQ(ret, RET_ERR);
+    processor.isAxisBegin_ = true;
+    ret = processor.HandleAxisBeginEndInner(event);
+    EXPECT_EQ(ret, RET_OK);
+    processor.isPressed_ = false;
+    ret = processor.HandleAxisBeginEndInner(event);
+    EXPECT_EQ(ret, RET_ERR);
+}
 }
 }

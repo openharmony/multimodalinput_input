@@ -334,6 +334,13 @@ public:
     static constexpr int32_t SOURCE_TYPE_FINGERPRINT = 5;
 
     /**
+     * Indicates that the input source generates a crown event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_CROWN = 6;
+
+    /**
      * Indicates an invalid button ID.
      *
      * @since 9
@@ -1411,6 +1418,21 @@ public:
     uint32_t GetAxes() const;
 
     /**
+     * @brief Obtains the axis value velocity.
+     * @return Returns the axis value velocity.
+     * @since 12
+     */
+    double GetVelocity() const;
+
+    /**
+     * @brief Sets the axis value velocity.
+     * @param velocity Indicates the axis value velocity.
+     * @return void
+     * @since 12
+     */
+    void SetVelocity(double velocity);
+
+    /**
      * @brief Set the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
      * @return void.
@@ -1579,6 +1601,7 @@ private:
     float zOrder_ { -1.0f };
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
+    double velocity_ { 0.0 };
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT

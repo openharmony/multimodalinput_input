@@ -23,10 +23,8 @@
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 #include "dfx_hisysevent.h"
 #include "multimodal_input_preferences_manager.h"
 
@@ -629,7 +627,7 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
     beginTime = 0;
     lastTime = 0;
     if (isAlldefault) {
-        multiFingersState_ = MulFingersTap::NOTAP;
+        multiFingersState_ = MulFingersTap::NO_TAP;
     }
     pointerMaps.clear();
 }

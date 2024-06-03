@@ -47,6 +47,7 @@
 #include "display_event_monitor.h"
 #include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
+#include "gesturesense_wrapper.h"
 #include "infrared_emitter_controller.h"
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
@@ -70,7 +71,9 @@ const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
+constexpr int32_t RELOAD_DEVICE_TIME = 2000;
 constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t REPEAT_COUNT = 2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t SUBSCRIBED = 1;
@@ -1609,7 +1612,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 void MMIService::AddReloadDeviceTimer()
 {
     CALL_DEBUG_ENTER;
-    TimerMgr->AddTimer(2000, 2, [this]() {
+    TimerMgr->AddTimer(RELOAD_DEVICE_TIME, REPEAT_COUNT, [this]() {
         auto deviceIds = INPUT_DEV_MGR->GetInputDeviceIds();
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();
@@ -1781,13 +1784,13 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadPinchSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
     return RET_OK;
 }
 
 int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadSwipeSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(switchFlag);
     return RET_OK;
 }
 
@@ -1799,7 +1802,7 @@ int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
 
 int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     return RET_OK;
 }
 
@@ -1922,7 +1925,7 @@ int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadPinchSwitch,
-        TouchEventHdr, switchFlag));
+        TOUCH_EVENT_HDR, switchFlag));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touch pad pinch switch failed, return %{public}d", ret);
         return ret;
@@ -1950,7 +1953,7 @@ int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadSwipeSwitch,
-        TouchEventHdr, switchFlag));
+        TOUCH_EVENT_HDR, switchFlag));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad swipe switch failed, return %{public}d", ret);
         return ret;
@@ -2006,7 +2009,7 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadRotateSwitch,
-        TouchEventHdr, rotateSwitch));
+        TOUCH_EVENT_HDR, rotateSwitch));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
@@ -2191,6 +2194,36 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+int32_t MMIService::EnableHardwareCursorStats(bool enable)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::EnableHardwareCursorStats,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), enable));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enable hardware cursor stats failed,ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetHardwareCursorStats,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), std::ref(frameCount), std::ref(vsyncCount)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get hardware cursor stats failed,ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("GetHardwareCursorStats frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
+        vsyncCount, GetCallingPid());
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
 } // namespace MMI
