@@ -54,7 +54,7 @@ public:
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
-    int32_t MakeInputDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo);
+    int32_t MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo);
     int32_t GenerateVirtualDeviceId(int32_t &deviceId);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id, bool checked = true) const;
@@ -98,7 +98,7 @@ private:
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
-    void NotifyDevRemoveCallback(int32_t deviceId,  struct InputDeviceInfo &deviceInfo);
+    void NotifyDevRemoveCallback(int32_t deviceId,  const InputDeviceInfo &deviceInfo);
     int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);

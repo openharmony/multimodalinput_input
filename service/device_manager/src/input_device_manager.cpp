@@ -727,15 +727,15 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     MMI_HILOGI("GenerateVirtualDeviceId successfully, tempDeviceId:%{public}d", tempDeviceId);
     deviceId = tempDeviceId;
     device->SetId(deviceId);
-    virtualInputDevices_[deivceId] = device;
+    virtualInputDevices_[deviceId] = device;
     MMI_HILOGI("AddVirtualInputDevice successfully, deivceId:%{public}d", deviceId);
     for (const auto& item : devListener_) {
         CHKPR(item, ERROR_NULL_POINTER);
-        NotifyMessage(item, device, "add");
+        NotifyMessage(item, deviceId, "add");
     }
     InputDeviceInfo deviceInfo;
-    if (MakeInputDeviceInfo(device, deviceInfo) != RET_OK) {
-        MMI_HILOGE("MakeInputDeviceInfo failed");
+    if (MakeVirtualDeviceInfo(device, deviceInfo) != RET_OK) {
+        MMI_HILOGE("MakeVirtualDeviceInfo failed");
         return RET_ERR;
     }
     NotifyDevCallback(deviceId, deviceInfo);
@@ -746,7 +746,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
 int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
 {
     CALL_INFO_TRACE;
-    if (virtualInputDevice_.find(deviceId) == virtualInputDevice_.end()) {
+    if (virtualInputDevices_.find(deviceId) == virtualInputDevices_.end()) {
         MMI_HILOGE("No virtual deviceId:%{public}d existed", deviceId);
         return RET_ERR;
     }
@@ -766,7 +766,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     return RET_OK;
 }
 
-int32_t InputDeviceManager::MakeInputDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
+int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
 {
     CALL_INFO_TRACE;
     CHKPR(device, ERROR_NULL_POINTER);
@@ -774,7 +774,7 @@ int32_t InputDeviceManager::MakeInputDeviceInfo(std::shared_ptr<InputDevice> dev
         .isRemote = false,
         .isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER),
         .isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH),
-        .enable = true;
+        .enable = true,
         .isVirtual = true,
     };
     return RET_OK;
@@ -802,12 +802,12 @@ int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
     return RET_OK;
 }
 
-int32_t InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDeviceInfo &deviceInfo)
+void InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDeviceInfo &deviceInfo)
 {
     CALL_DEBUG_ENTER;
     if (auto sysUid = deviceInfo.sysUid; !sysUid.empty()) {
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("send device info to window manager, deivceId:%{public}d, sysUid:%{public}d, status:remove",
+        MMI_HILOGI("send device info to window manager, deivceId:%{public}d, sysUid:%{public}s, status:remove",
             deviceId, sysUid.c_str());
     }
 }
@@ -861,21 +861,21 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
     return ids;
 }
 
-void InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
+bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPR(InputDevice, false);
+    CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
 }
 
-void InputDeviceManager::IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const
+bool InputDeviceManager::IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPR(InputDevice, false);
+    CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
 }
 
-void InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const
+bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
-    CHKPR(InputDevice, false);
+    CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
 }
 } // namespace MMI
