@@ -72,7 +72,7 @@ int32_t ParseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inpu
 
     uint32_t size = 0;
     READUINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (axisInfo.size() > MAX_AXIS_INFO) {
+    if (size > MAX_AXIS_INFO) {
         return RET_ERR;
     }
     InputDevice::AxisInfo axis;
