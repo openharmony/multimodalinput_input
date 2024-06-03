@@ -2977,5 +2977,49 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
     int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
     EXPECT_TRUE(ret == RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_HasIrEmitter
+ * @tc.desc: Test HasIrEmitter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
+{
+    bool hasIrEmitter = false;
+    int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetInfraredFrequencies
+ * @tc.desc: Test GetInfraredFrequencies
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Level1)
+{
+    InfraredFrequency infraredFrequency;
+    infraredFrequency.max_ = 30;
+    infraredFrequency.min_ = 10;
+    std::vector<InfraredFrequency> requencys;
+    requencys.push_back(infraredFrequency);
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TransmitInfrared
+ * @tc.desc: Test TransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
+{
+    int64_t number = 10;
+    std::vector<int64_t> pattern = { 10, 20, 30 };
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
+    EXPECT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

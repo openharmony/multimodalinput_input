@@ -44,6 +44,7 @@ extern "C" {
     int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
     int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
+    int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType);
 }
 
 namespace MMI {
@@ -95,6 +96,7 @@ private:
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
     void CalculateOffset(Direction direction, Offset &offset);
+    double HandleAxisAccelateTouchPad(double axisValue);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);

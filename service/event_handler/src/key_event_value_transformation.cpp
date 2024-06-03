@@ -28,7 +28,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t BIT_SET_INDEX = 16;
 constexpr int32_t INVALID_KEY_CODE = -1;
+constexpr int32_t MAX_KEY_SIZE = 3;
+constexpr int32_t MIN_KEY_SIZE = 1;
 } // namespace
 
 const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
@@ -502,15 +505,15 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
 };
 } // namespace
 
-int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
+int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
 {
-    if (items.size() < 1 || items.size() > 3) {
+    if (items.size() < MIN_KEY_SIZE || items.size() > MAX_KEY_SIZE) {
         return KeyEvent::INTENTION_UNKNOWN;
     }
 
     int64_t keyCodes = 0;
     for (const auto &item : items) {
-        keyCodes = (keyCodes << 16) + item.GetKeyCode();
+        keyCodes = (keyCodes << BIT_SET_INDEX) + item.GetKeyCode();
     }
     auto iter = MAP_KEY_INTENTION.find(keyCodes);
     if (iter == MAP_KEY_INTENTION.end()) {

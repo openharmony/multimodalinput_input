@@ -42,6 +42,7 @@ declare_args() {
   input_ext_feature_fingersense = true
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
+  input_feature_crown = true
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
 
@@ -108,6 +109,7 @@ declare_args() {
     "event_handler/src/key_map_manager.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
     "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
+    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/authorization_dialog.cpp",
@@ -205,6 +207,7 @@ declare_args() {
   ]
 
   libmmi_virtual_device_sources = [
+    "src/virtual_crown.cpp",
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
     "src/virtual_fingerprint_key.cpp",
@@ -313,6 +316,10 @@ if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 }
 
+if (input_feature_crown) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CROWN" ]
+}
+
 if (!defined(global_parts_info) ||
     defined(global_parts_info.security_security_component_manager)) {
   security_component_enable = true
@@ -353,6 +360,10 @@ if (input_ext_feature_anco) {
   }
 }
 
+if (input_feature_product == "pc") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
+}
+
 if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
@@ -360,7 +371,9 @@ if (input_ext_feature_magiccursor) {
   surface_path = "//foundation/graphic/graphic_surface"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
   libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
 }

@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INPUT_PARAMETER_MIDDLE = 2;
+constexpr int32_t INPUT_PARAMETER_MIDDLE { 2 };
 
 std::mutex mutex_;
 const std::string ADD_EVENT = "add";
