@@ -212,7 +212,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             traceControlPoints_.clear();
             pointerPath_.Reset();
             auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-            canvasNode->ResetSurface();
+            canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
@@ -290,7 +290,7 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
     glowTraceSystem_->Clear();
     CHKPV(canvasNode_);
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-    canvasNode->ResetSurface();
+    canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     Rosen::RSTransaction::FlushImplicitTransaction();
     isDrawing_ = true;
 }
@@ -414,7 +414,7 @@ int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> 
         glowTraceSystem_->Draw(canvas);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-    canvasNode->ResetSurface();
+    canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     canvasNode_->FinishRecording();
     return RET_OK;
 }
@@ -459,6 +459,8 @@ void KnuckleDynamicDrawingManager::CreateCanvasNode()
     CHKPV(canvasNode_);
     canvasNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     canvasNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    nodeWidth_ = displayInfo_.width;
+    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
