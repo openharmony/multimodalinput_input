@@ -41,6 +41,7 @@ public:
     MOCK_METHOD1(GestureEventGetTime, uint32_t (struct libinput_event_gesture *event));
     MOCK_METHOD1(GestureEventGetFingerCount, int (struct libinput_event_gesture *event));
     MOCK_METHOD1(TabletToolGetTool, struct libinput_tablet_tool* (struct libinput_event_tablet_tool *event));
+    MOCK_METHOD1(TabletToolGetToolType, int32_t (struct libinput_event_tablet_tool *event));
     MOCK_METHOD2(GestureEventGetDevCoordsX, int (struct libinput_event_gesture *, uint32_t));
     MOCK_METHOD2(GestureEventGetDevCoordsY, int (struct libinput_event_gesture *, uint32_t));
 };
