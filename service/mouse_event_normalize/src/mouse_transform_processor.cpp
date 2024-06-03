@@ -55,6 +55,7 @@ constexpr int32_t MAX_ROWS = 100;
 constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
 constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
 constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
+constexpr int32_t TP_CLICK_FINGER_ONE = 1;
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
 constexpr int32_t HARD_HARDEN_DEVICE_WIDTH = 2880;
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
@@ -808,7 +809,9 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
-        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+        auto state = libinput_event_pointer_get_button_state(data);
+        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT ||
+            (state == LIBINPUT_BUTTON_STATE_RELEASED && fingerCount == TP_CLICK_FINGER_ONE)) {
             button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
         }
         return;
