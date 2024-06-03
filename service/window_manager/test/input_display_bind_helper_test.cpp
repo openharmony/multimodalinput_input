@@ -450,7 +450,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
 {
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
-    bindInfo.AddInputDevice(1, "mouse");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
 }
 
 /**
@@ -464,7 +464,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.inputDeviceName_ = "mouse";
-    bindInfo.AddInputDevice(1, "mouse");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
 }
 
 /**
@@ -478,7 +478,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.inputDeviceId_ = 1;
-    bindInfo.AddInputDevice(1, "mouse");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
 }
 
 /**
@@ -493,7 +493,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_0
     BindInfo bindInfo;
     bindInfo.inputDeviceId_ = 1;
     bindInfo.inputDeviceName_ = "mouse";
-    bindInfo.AddInputDevice(1, "mouse");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
 }
 
 /**
@@ -506,7 +506,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_01, T
 {
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
-    bindInfo.AddDisplay(0, "hp 223");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
 }
 
 /**
@@ -520,7 +520,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_02, T
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.displayName_ = "hp 223";
-    bindInfo.AddDisplay(0, "hp 223");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
 }
 
 /**
@@ -534,7 +534,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_03, T
     CALL_TEST_DEBUG;
     BindInfo bindInfo;
     bindInfo.displayId_ = 0;
-    bindInfo.AddDisplay(0, "hp 223");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
 }
 
 /**
@@ -549,7 +549,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_04, T
     BindInfo bindInfo;
     bindInfo.displayId_ = 0;
     bindInfo.displayName_ = "hp 223";
-    bindInfo.AddDisplay(0, "hp 223");
+    EXPECT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
 }
 
 /**
@@ -566,7 +566,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDesc_01, Test
     bindInfo.inputDeviceName_ = "mouse";
     bindInfo.displayId_ = 0;
     bindInfo.displayName_ = "hp 223";
-    bindInfo.GetDesc();
+    EXPECT_NO_FATAL_FAILURE(bindInfo.GetDesc());
 }
 
 /**
@@ -585,7 +585,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDesc_02, Test
     bindInfo.displayId_ = 0;
     bindInfo.displayName_ = "hp 223";
     bindInfos.infos_.push_back(bindInfo);
-    bindInfos.GetDesc();
+    EXPECT_NO_FATAL_FAILURE(bindInfos.GetDesc());
 }
 
 /**
@@ -604,7 +604,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayId
     bindInfo.displayId_ = 0;
     bindInfo.displayName_ = "hp 223";
     bindInfos.infos_.push_back(bindInfo);
-    bindInfos.GetBindDisplayIdByInputDevice(1);
+    EXPECT_NO_FATAL_FAILURE(bindInfos.GetBindDisplayIdByInputDevice(1));
 }
 
 /**
@@ -623,7 +623,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayId
     bindInfo.displayId_ = -1;
     bindInfo.displayName_ = "hp 223";
     bindInfos.infos_.push_back(bindInfo);
-    bindInfos.GetBindDisplayIdByInputDevice(1);
+    EXPECT_NO_FATAL_FAILURE(bindInfos.GetBindDisplayIdByInputDevice(1));
 }
 
 /**
@@ -642,7 +642,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayId
     bindInfo.displayId_ = -1;
     bindInfo.displayName_ = "hp 223";
     bindInfos.infos_.push_back(bindInfo);
-    bindInfos.GetBindDisplayIdByInputDevice(2);
+    EXPECT_NO_FATAL_FAILURE(bindInfos.GetBindDisplayIdByInputDevice(2));
 }
 
 /**
@@ -661,7 +661,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     bindInfo.displayId_ = -1;
     bindInfo.displayName_ = "hp 223";
     bindInfos.infos_.push_back(bindInfo);
-    bindInfos.GetBindDisplayNameByInputDevice(1);
+    EXPECT_NO_FATAL_FAILURE(bindInfos.GetBindDisplayNameByInputDevice(1));
 }
 
 /**
@@ -681,7 +681,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     bindInfo.displayId_ = -1;
     bindInfo.displayName_ = "hp 223";
     inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
-    inputDisplayBindHelper.GetDisplayIdNames();
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetDisplayIdNames());
 }
 
 /**
@@ -701,7 +701,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_
     bindInfo.displayId_ = -1;
     bindInfo.displayName_ = "hp 223";
     inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
-    inputDisplayBindHelper.AddLocalDisplay(0, "hp 223");
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddLocalDisplay(0, "hp 223"));
 }
 
 /**
@@ -721,7 +721,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_
     bindInfo.displayId_ = 0;
     bindInfo.displayName_ = "hp 223";
     inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
-    inputDisplayBindHelper.AddLocalDisplay(0, "hp 223");
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddLocalDisplay(0, "hp 223"));
 }
 
 /**
@@ -735,7 +735,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    inputDisplayBindHelper.GetInputDeviceById(1);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputDeviceById(1));
 }
 
 /**
@@ -749,7 +749,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    inputDisplayBindHelper.GetInputDeviceById(1);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputDeviceById(1));
 }
 
 /**
@@ -763,7 +763,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    inputDisplayBindHelper.GetInputDeviceById(0);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputDeviceById(0));
 }
 
 /**
@@ -777,7 +777,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    inputDisplayBindHelper.GetInputNodeNameByCfg(0);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputNodeNameByCfg(0));
 }
 
 /**
@@ -792,7 +792,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNode_01,
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
     std::string inputNodeName = "input5";
-    inputDisplayBindHelper.GetInputNode(inputNodeName);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputNode(inputNodeName));
 }
 
 /**
@@ -807,7 +807,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNode_02,
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
     std::string inputNodeName = "wrapper";
-    inputDisplayBindHelper.GetInputNode(inputNodeName);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputNode(inputNodeName));
 }
 
 /**
@@ -821,7 +821,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Store_01, TestSi
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
-    inputDisplayBindHelper.Store();
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.Store());
 }
 
 /**
@@ -835,7 +835,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Store_02, TestSi
     CALL_TEST_DEBUG;
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper("input_display_bind_helper_tmp.cfg");
-    inputDisplayBindHelper.Store();
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.Store());
 }
 
 /**
@@ -852,7 +852,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = -1;
     int32_t displayId = -1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -869,7 +869,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = -1;
     int32_t displayId = 0;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -886,7 +886,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = 1;
     int32_t displayId = -1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -903,7 +903,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = 1;
     int32_t displayId = 0;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -921,7 +921,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t displayId = 0;
     std::string msg = "touch";
     inputDisplayBindHelper.infos_ = nullptr;
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -944,7 +944,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = 1;
     int32_t displayId = 0;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -967,7 +967,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = 2;
     int32_t displayId = 1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -990,7 +990,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_0
     int32_t deviceId = 1;
     int32_t displayId = 0;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -1018,7 +1018,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     int32_t deviceId = 1;
     int32_t displayId = 1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -1046,7 +1046,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     int32_t deviceId = 1;
     int32_t displayId = 1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -1074,7 +1074,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     int32_t deviceId = 1;
     int32_t displayId = 1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 
 /**
@@ -1102,7 +1102,7 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     int32_t deviceId = 1;
     int32_t displayId = 1;
     std::string msg = "touch";
-    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+    EXPECT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
 }
 } // namespace MMI
 } // namespace OHOS

@@ -150,6 +150,7 @@ group("mmi_tests") {
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
     "service:ApplicationStateObserverTest",
+    "service:ConnectManagerEXTest",
     "service:ConnectManagerTest",
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",
