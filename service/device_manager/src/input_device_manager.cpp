@@ -775,7 +775,6 @@ int32_t InputDeviceManager::MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> d
         .isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER),
         .isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH),
         .enable = true,
-        .isVirtual = true,
     };
     return RET_OK;
 }

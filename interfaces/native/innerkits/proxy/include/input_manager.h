@@ -872,15 +872,15 @@ public:
      * @param device 输入设备信息
      * @param deviceId 出参，所创建的虚拟输入设备对应的设备Id
      * @return 返回0表示接口调用成功，否则，表示接口调用失败。
-     * @since 9
+     * @since 12
      */
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
 
     /**
      * @brief 移除虚拟输入设备
-     * @param enable 输入设备信息
+     * @param deviceId 要移除的虚拟输入设备对应的设备Id
      * @return 返回0表示接口调用成功，否则，表示接口调用失败。
-     * @since 9
+     * @since 12
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
