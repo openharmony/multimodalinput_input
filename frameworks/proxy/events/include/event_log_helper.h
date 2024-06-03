@@ -53,22 +53,22 @@ public:
     template<class T> static void PrintEventData(std::shared_ptr<T> event, const LogHeader &lh);
 
 private:
-    static int32_t infoDictCount;
-    static int32_t debugDictCount;
-    static constexpr int32_t printRate = 50;
+    static int32_t infoDictCount_;
+    static int32_t debugDictCount_;
+    static constexpr int32_t printRate_ = 50;
 
     static void PrintInfoDict()
     {
-        if ((++infoDictCount) % printRate == 0) {
-            infoDictCount = 0;
+        if ((++infoDictCount_) % printRate_ == 0) {
+            infoDictCount_ = 0;
             MMI_HILOGI("%{public}s", InfoTrackingDict.data());
         }
     }
 
     static void PrintDebugDict()
     {
-        if ((++debugDictCount) % printRate == 0) {
-            debugDictCount = 0;
+        if ((++debugDictCount_) % printRate_ == 0) {
+            debugDictCount_ = 0;
             MMI_HILOGD("%{public}s", DebugTrackingDict.data());
         }
     }
