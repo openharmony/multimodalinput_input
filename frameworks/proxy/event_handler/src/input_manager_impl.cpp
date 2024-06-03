@@ -181,8 +181,6 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
             continue;
         }
         if (window.defaultHotAreas.empty() || window.pointerHotAreas.empty() ||
-            (window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            (window.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (!window.pointerChangeAreas.empty() &&
             window.pointerChangeAreas.size() != WindowInfo::POINTER_CHANGEAREA_COUNT) ||
             (!window.transform.empty() && window.transform.size() != WindowInfo::WINDOW_TRANSFORM_SIZE)) {
@@ -537,7 +535,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform << item.windowInputType << item.privacyMode;
+            << item.transform << item.windowInputType << item.privacyMode << item.windowType;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -573,7 +571,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode;
+            << item.windowInputType << item.privacyMode << item.windowType;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
