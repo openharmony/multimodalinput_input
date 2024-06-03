@@ -34,9 +34,14 @@ public:
     ~LibinputInterfaceMock() override = default;
 
     MOCK_METHOD1(GetEventType, enum libinput_event_type (struct libinput_event *event));
+    MOCK_METHOD1(GetTipState, enum libinput_tablet_tool_tip_state (struct libinput_event_tablet_tool *event));
+    MOCK_METHOD1(TabletToolGetType, enum libinput_tablet_tool_type (struct libinput_tablet_tool *tool));
     MOCK_METHOD1(GetGestureEvent, struct libinput_event_gesture* (struct libinput_event *event));
+    MOCK_METHOD1(GetTabletToolEvent, struct libinput_event_tablet_tool* (struct libinput_event *event));
     MOCK_METHOD1(GestureEventGetTime, uint32_t (struct libinput_event_gesture *event));
     MOCK_METHOD1(GestureEventGetFingerCount, int (struct libinput_event_gesture *event));
+    MOCK_METHOD1(TabletToolGetTool, struct libinput_tablet_tool* (struct libinput_event_tablet_tool *event));
+    MOCK_METHOD1(TabletToolGetToolType, int32_t (struct libinput_event_tablet_tool *event));
     MOCK_METHOD2(GestureEventGetDevCoordsX, int (struct libinput_event_gesture *, uint32_t));
     MOCK_METHOD2(GestureEventGetDevCoordsY, int (struct libinput_event_gesture *, uint32_t));
 };

@@ -36,6 +36,26 @@ enum libinput_event_type libinput_event_get_type(struct libinput_event *event)
     return g_instance->GetEventType(event);
 }
 
+enum libinput_tablet_tool_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->GetTipState(event);
+}
+
+int32_t libinput_event_tablet_tool_get_tool_type(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetToolType(event);
+}
+
+enum libinput_tablet_tool_type libinput_tablet_tool_get_type(struct libinput_tablet_tool *tool)
+{
+    return g_instance->TabletToolGetType(tool);
+}
+
+struct libinput_tablet_tool* libinput_event_tablet_tool_get_tool(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetTool(event);
+}
+
 struct libinput_device* libinput_event_get_device(struct libinput_event *event)
 {
     return (event != nullptr ? &event->dev : nullptr);
@@ -59,6 +79,11 @@ struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_e
 struct libinput_event_gesture* libinput_event_get_gesture_event(struct libinput_event *event)
 {
     return g_instance->GetGestureEvent(event);
+}
+
+struct libinput_event_tablet_tool* libinput_event_get_tablet_tool_event(struct libinput_event *event)
+{
+    return g_instance->GetTabletToolEvent(event);
 }
 
 uint64_t libinput_event_keyboard_get_time_usec(struct libinput_event_keyboard *event)

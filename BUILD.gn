@@ -180,6 +180,7 @@ group("mmi_tests") {
     "service:rust_mmi_test",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
+    "service/touch_event_normalize/test:TabletToolTranformTest",
     "service/touch_event_normalize/test:TouchEventNormalizeTest",
     "service/touch_event_normalize/test:TouchpadGestureTest",
     "service/touch_event_normalize/test:TransformPointTest",
