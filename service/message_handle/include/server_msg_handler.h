@@ -118,6 +118,7 @@ private:
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void CalculateOffset(Direction direction, Offset &offset);
+    bool CloseInjectNotice(int32_t pid);
 
 private:
     UDSServer *udsServer_ { nullptr };
