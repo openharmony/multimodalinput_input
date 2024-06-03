@@ -419,7 +419,7 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         return;
     }
     for (const auto &monitor : monitors_) {
-        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
+        if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
             monitor.SendToClient(pointerEvent, pkt);
         }
     }
