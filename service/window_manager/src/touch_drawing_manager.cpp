@@ -14,7 +14,7 @@
  */
 
 #include "touch_drawing_manager.h"
-
+#include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
 
@@ -43,7 +43,8 @@ constexpr int32_t MULTIPLE_FACTOR = 10;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t RECT_COUNT = 6;
-constexpr int32_t RECT_TOP = 118;
+constexpr int32_t PHONE_RECT_TOP = 118;
+constexpr int32_t PAD_RECT_TOP = 58;
 constexpr int32_t RECT_HEIGHT = 50;
 constexpr int32_t TEXT_TOP = 40;
 constexpr int32_t PEN_WIDTH = 1;
@@ -55,6 +56,8 @@ constexpr int32_t ONE_PRECISION = 1;
 constexpr int32_t ROTATION_ANGLE_90 = 90;
 constexpr int32_t ROTATION_ANGLE_180 = 180;
 constexpr int32_t ROTATION_ANGLE_270 = 270;
+constexpr uint64_t FOLD_SCREEN_MAIN_ID = 5;
+constexpr uint64_t FOLD_SCREEN_FULL_ID = 0;
 constexpr float TEXT_SIZE = 40.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
@@ -62,6 +65,8 @@ constexpr float CALCULATE_TEMP = 2.0f;
 
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_PHONE = "phone";
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
@@ -189,7 +194,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
     itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
     if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
-        rectTopPosition_ = RECT_TOP;
+        rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
     } else {
         rectTopPosition_ = 0;
     }
@@ -352,9 +357,10 @@ void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        if ((displayInfo_.displayDirection) != DIRECTION0 && (displayInfo_.direction != DIRECTION90)) {
+        if ((displayInfo_.displayDirection != DIRECTION0) && (displayInfo_.direction != direction_)) {
             surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
             surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+            direction_ = displayInfo_.direction;
         }
         return;
     }
@@ -367,6 +373,7 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    direction_ = displayInfo_.direction;
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -389,7 +396,14 @@ void TouchDrawingManager::CreateTouchWindow()
         MMI_HILOGD("Add child labels canvas node");
         surfaceNode_->AddChild(labelsCanvasNode_, DEFAULT_VALUE);
     }
-    surfaceNode_->AttachToDisplay(static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId()));
+    uint64_t screenId = static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId());
+    if (displayInfo_.displayMode == DisplayMode::MAIN) {
+        screenId = FOLD_SCREEN_MAIN_ID;
+    } else if (displayInfo_.displayMode == DisplayMode::FULL) {
+        screenId = FOLD_SCREEN_FULL_ID;
+    }
+    surfaceNode_->AttachToDisplay(screenId);
+    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId, surfaceNode_->GetId());
 }
 
 void TouchDrawingManager::DrawBubbleHandler()

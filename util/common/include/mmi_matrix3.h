@@ -26,7 +26,7 @@
 // column-major order
 namespace OHOS {
 namespace MMI {
-inline constexpr int32_t MATRIX3_SIZE = 9;
+inline constexpr int32_t MATRIX3_SIZE { 9 };
 template<typename T>
 class Matrix3 {
 public:
