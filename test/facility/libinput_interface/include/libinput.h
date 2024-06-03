@@ -54,9 +54,9 @@ enum libinput_key_state {
     LIBINPUT_KEY_STATE_PRESSED = 1
 };
 
-enum libinput_tip_state {
-    LIBINPUT_TABLET_TOOL_TIP_DOWN = 0,
-    LIBINPUT_TABLET_TOOL_TIP_UP = 1
+enum libinput_tablet_tool_tip_state {
+	LIBINPUT_TABLET_TOOL_TIP_UP = 0,
+	LIBINPUT_TABLET_TOOL_TIP_DOWN = 1,
 };
 
 enum libinput_button_state {
@@ -126,7 +126,7 @@ struct libinput_tablet_tool* libinput_event_tablet_tool_get_tool(struct libinput
 
 enum libinput_tablet_tool_type libinput_tablet_tool_get_type(struct libinput_tablet_tool *tool);
 
-enum libinput_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event);
+enum libinput_tablet_tool_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event);
 
 double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *event);
 

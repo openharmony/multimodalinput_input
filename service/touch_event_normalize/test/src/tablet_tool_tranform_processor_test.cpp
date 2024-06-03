@@ -36,7 +36,7 @@ public:
     ~LibinputInterfaceMock() override = default;
 
     MOCK_METHOD1(GetEventType, enum libinput_event_type (struct libinput_event *event));
-    MOCK_METHOD1(GetTipState, enum libinput_tip_state (struct libinput_event_tablet_tool *event));
+    MOCK_METHOD1(GetTipState, enum libinput_tablet_tool_tip_state (struct libinput_event_tablet_tool *event));
     MOCK_METHOD1(TabletToolGetType, enum libinput_tablet_tool_type (struct libinput_tablet_tool *tool));
     MOCK_METHOD1(GetGestureEvent, struct libinput_event_gesture* (struct libinput_event *event));
     MOCK_METHOD1(GetTabletToolEvent, struct libinput_event_tablet_tool* (struct libinput_event *event));
@@ -161,8 +161,9 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&event));
     EXPECT_CALL(libinputMock, GetTipState).WillOnce(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
-    bool ret1 = processor.OnTip(&event.base);
-    EXPECT_FALSE(ret1);
+
+    bool ret = processor.OnTip(&event.base);
+    EXPECT_FALSE(ret);
 }
 
 /**
