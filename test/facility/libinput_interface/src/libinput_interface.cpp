@@ -36,7 +36,7 @@ enum libinput_event_type libinput_event_get_type(struct libinput_event *event)
     return g_instance->GetEventType(event);
 }
 
-enum libinput_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event)
+enum libinput_tablet_tool_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event)
 {
     return g_instance->GetTipState(event);
 }

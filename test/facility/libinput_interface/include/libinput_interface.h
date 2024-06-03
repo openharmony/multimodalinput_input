@@ -53,7 +53,7 @@ struct libinput_event_keyboard {
 
 struct libinput_event_tablet_tool {
     struct libinput_event base;
-    enum libinput_tip_state tipState;
+    enum libinput_tablet_tool_tip_state tipState;
 };
 
 struct libinput_tablet_tool {
@@ -99,7 +99,7 @@ public:
     virtual ~LibinputInterface() = default;
 
     virtual enum libinput_event_type GetEventType(struct libinput_event *event) = 0;
-    virtual enum libinput_tip_state GetTipState(struct libinput_event_tablet_tool *event) = 0;
+    virtual enum libinput_tablet_tool_tip_state GetTipState(struct libinput_event_tablet_tool *event) = 0;
     virtual enum libinput_tablet_tool_type TabletToolGetType(struct libinput_tablet_tool *tool) = 0;
     virtual struct libinput_event_gesture* GetGestureEvent(struct libinput_event *event) = 0;
     virtual struct libinput_tablet_tool* TabletToolGetTool(struct libinput_event_tablet_tool *event) = 0;
