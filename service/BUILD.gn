@@ -880,8 +880,8 @@ ohos_unittest("InfraredEmitterTest") {
 
   external_deps = [
     "hdf_core:libhdi",
-    "hilog:libhilog"
- ]
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("InterceptorTest") {
