@@ -18,6 +18,7 @@
 #include "error_multimodal.h"
 #include "input_manager_impl.h"
 #include "define_multimodal.h"
+#include "input_handler_type.h"
 #include "multimodal_event_handler.h"
 
 #undef MMI_LOG_TAG
@@ -126,9 +127,9 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent
     return InputMgrImpl.AddMonitor(monitor);
 }
 
-int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
+int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType)
 {
-    return InputMgrImpl.AddMonitor(monitor);
+    return InputMgrImpl.AddMonitor(monitor, eventType);
 }
 
 void InputManager::RemoveMonitor(int32_t monitorId)
@@ -472,6 +473,16 @@ int32_t InputManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
     return InputMgrImpl.GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t InputManager::EnableHardwareCursorStats(bool enable)
+{
+    return InputMgrImpl.EnableHardwareCursorStats(enable);
+}
+
+int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
@@ -549,6 +560,11 @@ int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pat
 int32_t InputManager::SetCurrentUser(int32_t userId)
 {
     return InputMgrImpl.SetCurrentUser(userId);
+}
+
+int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
+{
+    return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
 }
 } // namespace MMI
 } // namespace OHOS

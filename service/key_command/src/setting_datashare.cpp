@@ -120,7 +120,8 @@ bool SettingDataShare::IsValidKey(const std::string& key)
 
 sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, SettingObserver::UpdateFunc& func)
 {
-    sptr<SettingObserver> observer = new SettingObserver();
+    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver();
+    CHKPP(observer);
     observer->SetKey(key);
     observer->SetUpdateFunc(func);
     return observer;
@@ -200,9 +201,9 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NAME_NOT_FOUND;
     }
-    const int32_t INDEX = 0;
-    resultSet->GoToRow(INDEX);
-    int32_t ret = resultSet->GetString(INDEX, value);
+    const int32_t tmpRow = 0;
+    resultSet->GoToRow(tmpRow);
+    int32_t ret = resultSet->GetString(tmpRow, value);
     if (ret != NativeRdb::E_OK) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_VALUE;
