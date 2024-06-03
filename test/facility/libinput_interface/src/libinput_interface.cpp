@@ -41,6 +41,11 @@ enum libinput_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput
     return g_instance->GetTipState(event);
 }
 
+int32_t libinput_event_tablet_tool_get_tool_type(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetToolType(event);
+}
+
 enum libinput_tablet_tool_type libinput_tablet_tool_get_type(struct libinput_tablet_tool *tool)
 {
     return g_instance->TabletToolGetType(tool);
