@@ -62,6 +62,8 @@ private:
     PointerInfo lastDownPointer_ {};
     int64_t lastUpTime_ { 0 };
     bool isRotate_ { false };
+    int32_t nodeWidth_ { 0 };
+    int32_t nodeHeight_ { 0 };
     int64_t firstDownTime_ { 0 };
 };
 } // namespace MMI

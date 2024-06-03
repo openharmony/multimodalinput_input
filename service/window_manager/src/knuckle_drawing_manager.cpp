@@ -107,7 +107,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
 #endif // USE_ROSEN_DRAWING
             canvas->Clear();
             auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-            canvasNode->ResetSurface();
+            canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
@@ -259,6 +259,8 @@ void KnuckleDrawingManager::CreateCanvasNode()
     CHKPV(canvasNode_);
     canvasNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     canvasNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    nodeWidth_ = displayInfo_.width;
+    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -342,7 +344,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         isActionUp_ = false;
         pointerInfos_.clear();
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-        canvasNode->ResetSurface();
+        canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     }
     path_.Reset();
     canvasNode_->FinishRecording();
