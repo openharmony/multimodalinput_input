@@ -702,7 +702,7 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
                 continue;
             }
             for (const auto& listener : devListeners_) {
-                CHKPC(listener, ERROR_NULL_POINTER);
+                CHKPC(listener);
                 NotifyMessage(listener, item.first, enable ? "add" : "remove");
             }
         }
@@ -729,7 +729,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     virtualInputDevices_[deviceId] = device;
     MMI_HILOGI("AddVirtualInputDevice successfully, deivceId:%{public}d", deviceId);
     for (const auto& item : devListeners_) {
-        CHKPC(item, ERROR_NULL_POINTER);
+        CHKPC(item);
         NotifyMessage(item, deviceId, "add");
     }
     InputDeviceInfo deviceInfo;
@@ -759,7 +759,7 @@ int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
     virtualInputDevices_.erase(deviceId);
     MMI_HILOGI("RemoveVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
     for (const auto& item : devListeners_) {
-        CHKPC(item, ERROR_NULL_POINTER);
+        CHKPC(item);
         NotifyMessage(item, deviceId, "remove");
     }
     DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
