@@ -93,7 +93,7 @@ public:
      */
     static const std::string COMMON_EVENT_SCREEN_ON;
 
-	/**
+    /**
      * Indicates the action of a common event that the screen lock.
      * This is a protected common event that can only be sent by system.
      */
