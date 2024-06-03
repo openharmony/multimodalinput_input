@@ -133,6 +133,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     struct option headOptions[] = {
         {"mouse", no_argument, nullptr, 'M'},
         {"keyboard", no_argument, nullptr, 'K'},
+        {"stylus", no_argument, nullptr, 'S'},
         {"touch", no_argument, nullptr, 'T'},
         {"joystick", no_argument, nullptr, 'J'},
         {"help", no_argument, nullptr, '?'},
@@ -179,7 +180,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
-    if ((c = getopt_long(argc, argv, "MKTJP?", headOptions, &optionIndex)) != -1) {
+    if ((c = getopt_long(argc, argv, "JKMPST?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
                 int32_t px = 0;
@@ -927,6 +928,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 break;
             }
+            case 'S':
             case 'T': {
                 int32_t px1 = 0;
                 int32_t py1 = 0;
@@ -934,6 +936,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
+                int32_t firstOpt = c;
                 while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:k", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
@@ -1253,6 +1256,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             break;
                         }
                         case 'k': {
+                            if (firstOpt == 'S') {
+                                std::cout << "invalid argument k" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
                             KnuckleGestureInputProcess(argc, argv, c, optionIndex);
                             break;
                         }
@@ -1784,14 +1791,38 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << std::endl;
 }
 
-void InputManagerCommand::PrintTouchUsage()
+void InputManagerCommand::PrintStylusUsage()
 {
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
+    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
+    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
+    std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
+}
+
+void InputManagerCommand::PrintTouchUsage()
+{
+    std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
+    std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
+    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
+    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
+    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
+    std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
+    std::cout << "-k --knuckle                                                  " << std::endl;
+    std::cout << "commands for knucle:                                          " << std::endl;
+    PrintKnuckleUsage();
+    std::cout << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
+    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
+    std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
 }
 
 void InputManagerCommand::PrintKnuckleUsage()
@@ -1814,33 +1845,29 @@ void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
     std::cout << "The option are:                                " << std::endl;
-    std::cout << "-M  --mouse                                    " << std::endl;
-    std::cout << "commands for mouse:                            " << std::endl;
-    PrintMouseUsage();
-    std::cout << std::endl;
-
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
     PrintKeyboardUsage();
     std::cout << std::endl;
 
-    std::cout << "-T  --touch                                                   " << std::endl;
-    std::cout << "commands for touch:                                           " << std::endl;
-    PrintTouchUsage();
-
-    std::cout << "-k --knuckle                                                  " << std::endl;
-    std::cout << "commands for knucle:                                          " << std::endl;
-    PrintKnuckleUsage();
-    std::cout << std::endl;
-
-    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
-    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
-    std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
+    std::cout << "-M  --mouse                                    " << std::endl;
+    std::cout << "commands for mouse:                            " << std::endl;
+    PrintMouseUsage();
     std::cout << std::endl;
 
     std::cout << "-P  --touchpad                                                " << std::endl;
     std::cout << "commands for touchpad:                                        " << std::endl;
     PrintTouchPadUsage();
+
+    std::cout << "-S  --stylus                                                   " << std::endl;
+    std::cout << "commands for stylus:                                           " << std::endl;
+    PrintStylusUsage();
+    std::cout << std::endl;
+
+    std::cout << "-T  --touch                                                   " << std::endl;
+    std::cout << "commands for touch:                                           " << std::endl;
+    PrintTouchUsage();
+    std::cout << std::endl;
 
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
