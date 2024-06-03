@@ -25,16 +25,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr uint32_t MIN_N_SIZE = 1;
-constexpr uint32_t MAX_N_SIZE = 5;
-constexpr int32_t STANDARD_KEY_REPEAT_DELAY = 500;
-constexpr int32_t MIN_KEY_REPEAT_DELAY = 300;
-constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
-constexpr int32_t STANDARD_KEY_REPEAT_RATE = 50;
-constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
-constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
-constexpr int32_t ARGC_NUM = 2;
-constexpr size_t INPUT_PARAMETER = 2;
+constexpr uint32_t MIN_N_SIZE { 1 };
+constexpr uint32_t MAX_N_SIZE { 5 };
+constexpr int32_t STANDARD_KEY_REPEAT_DELAY { 500 };
+constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
+constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
+constexpr int32_t STANDARD_KEY_REPEAT_RATE { 50 };
+constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
+constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
+constexpr int32_t ARGC_NUM { 2 };
+constexpr size_t INPUT_PARAMETER { 2 };
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()

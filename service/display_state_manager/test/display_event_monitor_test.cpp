@@ -16,6 +16,10 @@
 #include <gtest/gtest.h>
 
 #include "display_event_monitor.h"
+#include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DisplayEventMonitorTest"
 
 namespace OHOS {
 namespace MMI {
@@ -28,5 +32,22 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
+
+/**
+ * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber
+ * @tc.desc: Test InitCommonEventSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.hasInit_ = true;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+
+    displayEventMonitor.hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+}
 } // namespace MMI
 } // namespace OHOS

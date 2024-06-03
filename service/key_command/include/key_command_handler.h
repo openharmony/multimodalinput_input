@@ -27,15 +27,12 @@
 #include <vector>
 
 #include "nocopyable.h"
-#include "gesturesense_wrapper.h"
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 
 namespace OHOS {
 namespace MMI {
@@ -45,6 +42,11 @@ enum KeyCommandType : int32_t {
     TYPE_FINGERSCENE = 2,
     TYPE_REPEAT_KEY = 3,
     TYPE_MULTI_FINGERS = 4,
+};
+
+enum class KnuckleType : int32_t {
+    KNUCKLE_TYPE_SINGLE = 0,
+    KNUCKLE_TYPE_DOUBLE = 1,
 };
 
 enum class NotifyType : int32_t {
@@ -128,7 +130,7 @@ struct KnuckleGesture {
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
     std::string statusConfig;
-    bool statusConfigValue { true };
+    bool statusConfigValue { false };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -254,6 +256,7 @@ private:
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
+    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -263,7 +266,8 @@ private:
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
-    void KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
+        KnuckleGesture &knuckleGesture, KnuckleType type);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
@@ -272,10 +276,14 @@ private:
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent);
-    void HandleKnuckleGestureTouchUp();
+    void HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent> touchEvent);
     void ProcessKnuckleGestureTouchUp(NotifyType type);
     void ResetKnuckleGesture();
     std::string GesturePointsToStr() const;
+    void ReportIfNeed();
+    void ReportRegionGesture();
+    void ReportLetterGesture();
+    void ReportGestureInfo();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
 private:
@@ -322,14 +330,21 @@ private:
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
+    int32_t screenRecordingSuccessCount_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
     bool isLetterGesturing_ { false };
+    bool isLastGestureSucceed_ { false };
     float gestureLastX_ { 0.0f };
     float gestureLastY_ { 0.0f };
     float gestureTrackLength_ { 0.0f };
     std::vector<float> gesturePoints_;
     std::vector<int64_t> gestureTimeStamps_;
+    int32_t smartShotSuccTimes_ { 0 };
+    int32_t gestureFailCount_ { 0 };
+    int32_t drawSSuccessCount_ { 0 };
+    int64_t drawOFailTimestamp_ { 0 };
+    int64_t drawOSuccTimestamp_ { 0 };
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 };
 } // namespace MMI

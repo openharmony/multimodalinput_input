@@ -666,6 +666,9 @@ const char* PointerEvent::DumpSourceType() const
         case PointerEvent::SOURCE_TYPE_FINGERPRINT: {
             return "fingerprint";
         }
+        case PointerEvent::SOURCE_TYPE_CROWN: {
+            return "crown";
+        }
         default: {
             break;
         }
@@ -733,6 +736,16 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
         ret = static_cast<bool>(static_cast<uint32_t>(axes) & (1 << static_cast<uint32_t>(axis)));
     }
     return ret;
+}
+
+double PointerEvent::GetVelocity() const
+{
+    return velocity_;
+}
+
+void PointerEvent::SetVelocity(double velocity)
+{
+    velocity_ = velocity;
 }
 
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)

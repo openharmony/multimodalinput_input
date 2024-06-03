@@ -404,7 +404,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
  */
 HWTEST_F(InjectEventTest, InjectEvent_InjectStylus_001, TestSize.Level1)
 {
-    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
     char command1[] = {"uinput"};
     char command2[] = {"-S"};
     char command3[] = {"-m"};
@@ -426,7 +426,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectStylus_001, TestSize.Level1)
  */
 HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_001, TestSize.Level1)
 {
-    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
     char command1[] = {"uinput"};
     char command2[] = {"-P"};
     char command3[] = {"-p"};

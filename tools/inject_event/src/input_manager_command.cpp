@@ -135,7 +135,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"keyboard", no_argument, nullptr, 'K'},
         {"stylus", no_argument, nullptr, 'S'},
         {"touch", no_argument, nullptr, 'T'},
-        {"touchpad", no_argument, nullptr, 'P'},
         {"joystick", no_argument, nullptr, 'J'},
         {"help", no_argument, nullptr, '?'},
         {nullptr, 0, nullptr, 0}

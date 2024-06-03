@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 enum class MulFingersTap : int32_t {
-    NOTAP = 0,
+    NO_TAP = 0,
     TRIPLETAP = 3,
     QUADTAP = 4,
     QUINTTAP = 5,
@@ -58,7 +58,7 @@ private:
     int32_t upCnt = 0;
     int32_t motionCnt = 0;
     TapTrends tapTrends_ = TapTrends::BEGIN;
-    MulFingersTap multiFingersState_ = MulFingersTap::NOTAP;
+    MulFingersTap multiFingersState_ = MulFingersTap::NO_TAP;
     uint64_t lastTime = 0;
     uint64_t beginTime = 0;
     std::map<int32_t, std::pair<float, float>> pointerMaps;

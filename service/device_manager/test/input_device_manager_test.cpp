@@ -24,6 +24,7 @@
 #include "uds_session.h"
 
 #include "input_device_manager.h"
+#include "key_auto_repeat.h"
 #include "libinput-private.h"
 
 namespace OHOS {
@@ -656,6 +657,170 @@ HWTEST_F(InputDeviceManagerTest, OnInputDeviceRemoved_Test_001, TestSize.Level1)
     InputDeviceManager inputDevice;
     libinput_device* inputDevices = nullptr;
     ASSERT_NO_FATAL_FAILURE(inputDevice.OnInputDeviceRemoved(inputDevices));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsRemote
+ * @tc.desc: Test Cover the else branch of if (device != inputDevice_.end())
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsRemote, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t id = 30;
+    ASSERT_FALSE(inputDevice.IsRemote(id));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsRemote_001
+ * @tc.desc: Test Cover the if (device != inputDevice_.end()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsRemote_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inputDeviceInfo;
+    int32_t id = 30;
+    inputDeviceInfo.isRemote = true;
+    inputDevice.inputDevice_.insert(std::make_pair(id, inputDeviceInfo));
+    ASSERT_TRUE(inputDevice.IsRemote(id));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_NotifyDevCallback
+ * @tc.desc: Test Cover the if (!inDevice.isTouchableDevice || (deviceId < 0)) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyDevCallback, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceid = -1;
+    inDevice.isTouchableDevice = false;
+    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceid, inDevice));
+    inDevice.isTouchableDevice = true;
+    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceid, inDevice));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_NotifyDevCallback_001
+ * @tc.desc: Test Cover the if (!inDevice.sysUid.empty()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyDevCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceid = 1;
+    inDevice.isTouchableDevice = true;
+    inDevice.sysUid = "123456";
+    using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
+    inputDeviceCallback callback = [](int32_t deviceId, std::string devName, std::string devStatus) {};
+    inputDevice.SetInputStatusChangeCallback(callback);
+    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceid, inDevice));
+    inDevice.sysUid.clear();
+    ASSERT_NO_FATAL_FAILURE(inputDevice.NotifyDevCallback(deviceid, inDevice));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ScanPointerDevice
+ * @tc.desc: Test Cover the if (it->second.isPointerDevice && it->second.enable) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ScanPointerDevice, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceId = 10;
+    inDevice.isPointerDevice = false;
+    inDevice.enable = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    deviceId = 15;
+    inDevice.isPointerDevice = true;
+    inDevice.enable = true;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(inputDevice.ScanPointerDevice());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_ScanPointerDevice_001
+ * @tc.desc: Test Cover the if (!hasPointerDevice) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_ScanPointerDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceId = 10;
+    inDevice.isPointerDevice = false;
+    inDevice.enable = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(inputDevice.ScanPointerDevice());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice
+ * @tc.desc: Test Cover the if (enable) and if (keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD) and
+ * <br> if (item.second.isPointerDevice && item.second.enable) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    DeviceConfig deviceConfig;
+    deviceConfig.keyboardType = KEYBOARD_TYPE_NONE;
+    bool enable = true;
+    int32_t deviceId = 10;
+    inDevice.isRemote = true;
+    inDevice.enable = false;
+    inDevice.isPointerDevice = true;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    KeyRepeat->deviceConfig_.insert(std::make_pair(deviceId, deviceConfig));
+    ASSERT_EQ(INPUT_DEV_MGR->OnEnableInputDevice(enable), RET_OK);
+    INPUT_DEV_MGR->inputDevice_.clear();
+    KeyRepeat->deviceConfig_.clear();
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_001
+ * @tc.desc: Test Cover the else branch of the OnEnableInputDevice function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    DeviceConfig deviceConfig;
+    deviceConfig.keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
+    bool enable = false;
+    int32_t deviceId = 20;
+    inDevice.isRemote = true;
+    inDevice.enable = true;
+    inDevice.isPointerDevice = false;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    KeyRepeat->deviceConfig_.insert(std::make_pair(deviceId, deviceConfig));
+    deviceId = 30;
+    inDevice.isRemote = false;
+    inDevice.enable = false;
+    INPUT_DEV_MGR->inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    ASSERT_EQ(INPUT_DEV_MGR->OnEnableInputDevice(enable), RET_OK);
+    INPUT_DEV_MGR->inputDevice_.clear();
+    KeyRepeat->deviceConfig_.clear();
 }
 } // namespace MMI
 } // namespace OHOS
