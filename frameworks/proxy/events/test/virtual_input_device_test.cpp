@@ -16,8 +16,8 @@
 #include <cinttypes>
 
 #include "event_util_test.h"
-#include "input_manager_util.h"
 #include "input_manager.h"
+#include "input_manager_util.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "VirtualInputDeviceTest"
@@ -154,6 +154,17 @@ HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_RemoveVirtualInputDevice
     ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
     ASSERT_NE(ret, RET_OK);
 }
-
+/**
+ * @tc.name: VirtualInputDeviceTest_TestHotPlug
+ * @tc.desc: Test virtual input hot plug
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_TestHotPlug, TestSize.Level1)
+{
+    auto listener = std::make_shared<VirtualInputDeviceListener>();
+    int32_t ret = InputManager::GetInstance()->RegisterDevListener("change", listener);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

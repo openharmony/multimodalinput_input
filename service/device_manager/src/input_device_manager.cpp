@@ -720,7 +720,7 @@ int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> d
     CALL_INFO_TRACE;
     CHKPR(device, RET_ERR);
     int32_t tempDeviceId { -1 };
-    if (GenerateVirtualDeviceId(deviceId) != RET_OK) {
+    if (GenerateVirtualDeviceId(tempDeviceId) != RET_OK) {
         MMI_HILOGE("GenerateVirtualDeviceId failed");
         return RET_ERR;
     }
