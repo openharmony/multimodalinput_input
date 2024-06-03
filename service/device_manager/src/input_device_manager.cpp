@@ -165,7 +165,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
         }
         ids.push_back(item.first);
     }
-    for (const ayto &item : virtualInputDevices_) {
+    for (const auto &item : virtualInputDevices_) {
         ids.push_back(item.first);
     }
     return ids;
