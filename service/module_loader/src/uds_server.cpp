@@ -214,7 +214,7 @@ void UDSServer::OnDisconnected(SessionPtr sess)
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
 {
-    MMI_HILOGE("This information should not exist. Subclasses should implement this function.");
+    MMI_HILOGE("This information should not exist. Subclasses should implement this function");
     return RET_ERR;
 }
 
@@ -309,13 +309,13 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
 
 void UDSServer::AddEpollEvent(int32_t fd, std::shared_ptr<mmi_epoll_event> epollEvent)
 {
-    MMI_HILOGI("add %{public}d in epollEvent map", fd);
+    MMI_HILOGI("Add %{public}d in epollEvent map", fd);
     epollEventMap_[fd] = epollEvent;
 }
 
 void UDSServer::RemoveEpollEvent(int32_t fd)
 {
-    MMI_HILOGI("remove %{public}d in epollEvent map", fd);
+    MMI_HILOGI("Remove %{public}d in epollEvent map", fd);
     epollEventMap_.erase(fd);
 }
 
@@ -354,7 +354,7 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
 bool UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_HILOGI("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
+    MMI_HILOGI("pid:%{public}d, fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     if (fd < 0) {
         MMI_HILOGE("The fd is less than 0");
@@ -369,7 +369,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     sessionsMap_[fd] = ses;
     DumpSession("AddSession");
     if (sessionsMap_.size() > MAX_SESSON_ALARM) {
-        MMI_HILOGW("Too many clients. Warning Value:%{public}d,Current Value:%{public}zd",
+        MMI_HILOGW("Too many clients. Warning Value:%{public}d, Current Value:%{public}zd",
                    MAX_SESSON_ALARM, sessionsMap_.size());
     }
     MMI_HILOGI("AddSession end");
