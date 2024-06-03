@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,24 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef MMI_FUNC_CALLBACK_H
-#define MMI_FUNC_CALLBACK_H
+#ifndef GENERAL_CROWN_H
+#define GENERAL_CROWN_H
 
-#include <functional>
+#include "general_device.h"
+#include "virtual_crown.h"
+#include "v_input_device.h"
 
 namespace OHOS {
 namespace MMI {
-template<class MemberFunType, class ClassType>
-auto MsgCallbackBind1(MemberFunType func, ClassType* obj)
-{
-    return std::bind(func, obj, std::placeholders::_1);
-}
+class GeneralCrown final : public GeneralDevice {
+public:
+    GeneralCrown() = default;
+    ~GeneralCrown() = default;
+    DISALLOW_COPY_AND_MOVE(GeneralCrown);
 
-template<class MemberFunType, class ClassType>
-auto MsgCallbackBind2(MemberFunType func, ClassType* obj)
-{
-    return std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
-}
+    bool SetUp() override;
+    void Close() override;
+
+private:
+    VirtualCrown vCrown_;
+};
 } // namespace MMI
 } // namespace OHOS
-#endif // MMI_FUNC_CALLBACK_H
+#endif // GENERAL_CROWN_H
