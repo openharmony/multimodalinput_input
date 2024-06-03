@@ -2305,7 +2305,7 @@ int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& dat
     int32_t deviceId { -1 };
     int32_t ret = AddVirtualInputDevice(device, deviceId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);
+        MMI_HILOGE("AddVirtualInputDevice failed");
         return ret;
     }
     WRITEINT32(reply, deviceId);
