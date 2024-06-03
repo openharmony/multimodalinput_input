@@ -104,6 +104,7 @@ public:
     virtual struct libinput_event_gesture* GetGestureEvent(struct libinput_event *event) = 0;
     virtual struct libinput_tablet_tool* TabletToolGetTool(struct libinput_event_tablet_tool *event) = 0;
     virtual struct libinput_event_tablet_tool* GetTabletToolEvent(struct libinput_event *event) = 0;
+    virtual int32_t TabletToolGetToolType(struct libinput_event_tablet_tool *event) = 0;
     virtual uint32_t GestureEventGetTime(struct libinput_event_gesture *event) = 0;
     virtual int GestureEventGetFingerCount(struct libinput_event_gesture *event) = 0;
     virtual int GestureEventGetDevCoordsX(struct libinput_event_gesture *event, uint32_t idx) = 0;
