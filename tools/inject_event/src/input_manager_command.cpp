@@ -1843,8 +1843,8 @@ int32_t InputManagerCommand::SwipeEvent(int32_t fingerCount, int32_t positionX1,
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    /***** in order to simulate more actual, add some update update event, so adding some items to update ,
-    the data of points are simulated average in axis ********/
+    // in order to simulate more actual, add some update update event, so adding some items to update ,
+    // the data of points are simulated average in axis
     constexpr int32_t pointNum = 2;
     int32_t numberPoint = 0;
     int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
