@@ -429,7 +429,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_013, TestSize.Level1)
     char command3[] = {"-r"};
     char command4[] = {"90"};
     char *argv[] = {command1, command2, command3, command4};
-    int32_t result = inputManagerCommand->ParseCommand(4, argv);
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
 } // namespace MMI

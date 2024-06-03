@@ -1765,11 +1765,12 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
             return RET_ERR;
         }
         if ((rotateValue >= conversionValue) || (rotateValue <= -(conversionValue))) {
-            rotateValue = rotateValue % conversionValue;
+            std::cout << "Rotate value must be within (-360,360)" << std::endl;
+            return RET_ERR;
         }
-        std::cout << "input rotateValue:"<<rotateValue << std::endl;
+        std::cout << "Input rotate value:"<<rotateValue << std::endl;
         pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, rotateValue);
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_END);
         pointerEvent->SetPointerId(0);
         PointerEvent::PointerItem item;
         item.SetPointerId(0);
@@ -1777,7 +1778,7 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
         pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     } else {
-        std::cout << "Invalid angle data" << std::endl;
+        std::cout << "Invalid angle data,Input parameter example: uinput - P - r 45" << std::endl;
         return RET_ERR;
     }
     return ERR_OK;
@@ -1785,12 +1786,12 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
 
 int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv[])
 {
-    int32_t swipeUInputArgc = 8;
+    constexpr int32_t swipeUInputArgc = 8;
     int32_t fingerCount = 0;
-    int32_t px1 = 0;
-    int32_t py1 = 0;
-    int32_t px2 = 0;
-    int32_t py2 = 0;
+    int32_t positionX1 = 0;
+    int32_t positionY1 = 0;
+    int32_t positionX2 = 0;
+    int32_t positionY2 = 0;
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
         return EVENT_REG_FAIL;
@@ -1804,19 +1805,19 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
-        if (!StrToInt(argv[optind], px1)) {
+        if (!StrToInt(argv[optind], positionX1)) {
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
-        if (!StrToInt(argv[firstYIndex], py1)) {
+        if (!StrToInt(argv[firstYIndex], positionY1)) {
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
-        if (!StrToInt(argv[secondXIndex], px2)) {
+        if (!StrToInt(argv[secondXIndex], positionX2)) {
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
-        if (!StrToInt(argv[secondYIndex], py2)) {
+        if (!StrToInt(argv[secondYIndex], positionY2)) {
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
@@ -1829,34 +1830,32 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
         return EVENT_REG_FAIL;
     }
 
-    if ((px1 <= 0) || (py1 <= 0) || (px2 <= 0) || (py2 <= 0)) {
+    if ((positionX1 <= 0) || (positionY1 <= 0) || (positionX2 <= 0) || (positionY2 <= 0)) {
         std::cout << "Coordinate value must be greater than 0:" << std::endl;
         return RET_ERR;
     }
-    SwipeEvent(fingerCount, px1, py1, px2, py2);
+    SwipeEvent(fingerCount, positionX1, positionY1, positionX2, positionY2);
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
-    int32_t py1, int32_t px2, int32_t py2)
+int32_t InputManagerCommand::SwipeEvent(int32_t fingerCount, int32_t positionX1,
+    int32_t positionY1, int32_t positionX2, int32_t positionY2)
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     /***** in order to simulate more actual, add some update update event, so adding some items to update ,
     the data of points are simulated average in axis ********/
-    int32_t numberPoint = 10;
-    int32_t xDistance = (px2 - px1) / numberPoint;
-    int32_t yDistance = (py2 - py1) / numberPoint;
+    int32_t numberPoint = 0;
     int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
 
     PointerEvent::PointerItem item;
     item.SetDownTime(startTimeMs);
-    item.SetPointerId(0);
+    item.SetPointerId(numberPoint);
     item.SetDeviceId(0);
-    item.SetDisplayX(px1);
-    item.SetDisplayY(py1);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetFingerCount(fc);
+    item.SetDisplayX(positionX1);
+    item.SetDisplayY(positionY1);
+    pointerEvent->SetPointerId(numberPoint);
+    pointerEvent->SetFingerCount(fingerCount);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetActionStartTime(startTimeMs);
@@ -1864,22 +1863,21 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetDeviceId(0);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    numberPoint++;
 
     auto ids_ = pointerEvent->GetPointerIds();
     for (const auto &id : ids_) {
         pointerEvent->RemovePointerItem(id);
     }
-
-    for (int32_t i = 0; i < numberPoint; i++) {
-        PointerEvent::PointerItem itemTemp;
-        itemTemp.SetPressed(true);
-        itemTemp.SetDownTime(startTimeMs);
-        itemTemp.SetPointerId(i + 1);
-        itemTemp.SetDeviceId(0);
-        itemTemp.SetDisplayX(px1 + xDistance * (i + 1));
-        itemTemp.SetDisplayY(py1 + yDistance * (i + 1));
-        pointerEvent->AddPointerItem(itemTemp);
-    }
+    PointerEvent::PointerItem itemTemp;
+    itemTemp.SetPressed(true);
+    itemTemp.SetDownTime(startTimeMs);
+    itemTemp.SetPointerId(numberPoint);
+    itemTemp.SetDeviceId(0);
+    itemTemp.SetDisplayX((positionX1 + positionX2 ) / 2);
+    itemTemp.SetDisplayY((positionY1 + positionY2 ) / 2);
+    pointerEvent->AddPointerItem(itemTemp);
+     
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
@@ -1887,9 +1885,10 @@ int32_t InputManagerCommand::SwipeEvent(const int32_t fc, int32_t px1,
     for (const auto &id : ids_) {
         pointerEvent->RemovePointerItem(id);
     }
-    item.SetPointerId(numberPoint + 1);
-    item.SetDisplayX(px1 + xDistance * numberPoint);
-    item.SetDisplayY(py1 + yDistance * numberPoint);
+    numberPoint++;
+    item.SetPointerId(numberPoint);
+    item.SetDisplayX(positionX2 );
+    item.SetDisplayY(positionY2);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1968,8 +1967,7 @@ void InputManagerCommand::PrintTouchPadUsage()
     std::cout << "-s <fc> <dx1> <dy1> <dx2> <dy2>  fc means finger count and its range is [2, 5], <dx1> <dy1> ";
     std::cout << "  -press down a position  dx1 dy1  <dx2> <dy2> -press up a position  dx2  dy2"      << std::endl;
     std::cout << std::endl;
-    std::cout << "-r <rotate value> rotate value is an integer that"                                  << std::endl;
-    std::cout << "  automatically converts to values within (-360,360)"                               << std::endl;
+    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                               << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()
