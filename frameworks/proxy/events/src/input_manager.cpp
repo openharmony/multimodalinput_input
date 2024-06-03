@@ -472,6 +472,16 @@ int32_t InputManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
     return InputMgrImpl.GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t InputManager::EnableHardwareCursorStats(bool enable)
+{
+    return InputMgrImpl.EnableHardwareCursorStats(enable);
+}
+
+int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);

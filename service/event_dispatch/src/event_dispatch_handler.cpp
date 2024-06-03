@@ -17,6 +17,8 @@
 
 #include <cinttypes>
 
+#include <linux/input-event-codes.h>
+
 #include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
 
@@ -27,7 +29,6 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
-#include "input-event-codes.h"
 #include "mouse_device_state.h"
 #include "napi_constants.h"
 #include "proto.h"
@@ -107,6 +108,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
         if (windowInfo == std::nullopt) {
             MMI_HILOGE("WindowInfo id nullptr");
+            continue;
         }
         auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
         auto pointerEvent = std::make_shared<PointerEvent>(*point);

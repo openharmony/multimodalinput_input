@@ -23,19 +23,19 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t STANDARD_SPEED = 5;
-constexpr int32_t MAX_SPEED = 11;
-constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t DEFAULT_ROWS = 3;
-constexpr int32_t MIN_ROWS = 1;
-constexpr int32_t MAX_ROWS = 100;
-constexpr size_t INPUT_PARAMETER = 2;
-constexpr int32_t DEFAULT_POINTER_SIZE = 1;
-constexpr int32_t MIN_POINTER_SIZE = 1;
-constexpr int32_t MAX_POINTER_SIZE = 7;
-constexpr int32_t MIN_POINTER_COLOR = 0x000000;
-constexpr int32_t THREE_PARAMETERS = 3;
-constexpr int32_t INVALID_VALUE = -2;
+constexpr int32_t STANDARD_SPEED { 5 };
+constexpr int32_t MAX_SPEED { 11 };
+constexpr int32_t MIN_SPEED { 1 };
+constexpr int32_t DEFAULT_ROWS { 3 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr size_t INPUT_PARAMETER { 2 };
+constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+constexpr int32_t MIN_POINTER_SIZE { 1 };
+constexpr int32_t MAX_POINTER_SIZE { 7 };
+constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
+constexpr int32_t THREE_PARAMETERS { 3 };
+constexpr int32_t INVALID_VALUE { -2 };
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -146,6 +146,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     CHKRP(napi_get_value_bool(env, argv[0], &visible), GET_VALUE_BOOL);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->SetPointerVisible(env, visible);
@@ -191,6 +192,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc < 1) {
         return jsPointerMgr->IsPointerVisible(env);
@@ -323,6 +325,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         pointerSpeed = MAX_SPEED;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->SetPointerSpeed(env, pointerSpeed);
@@ -371,6 +374,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc < 1) {
         return jsPointerMgr->GetPointerSpeed(env);
@@ -507,7 +511,7 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     napi_value argv[4] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER) {
-        MMI_HILOGE("At least 2 parameter is required.");
+        MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
     }
@@ -523,7 +527,7 @@ napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info in
     }
     std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, argv[1]);
     if (pixelMap == nullptr) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid.");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -775,6 +779,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle);
@@ -852,6 +857,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->GetPointerStyle(env, windowid);
@@ -1564,6 +1570,46 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least one parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
+        MMI_HILOGE("Enable parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
+        return nullptr;
+    }
+    bool enable = true;
+    CHKRP(napi_get_value_bool(env, argv[0], &enable), GET_VALUE_BOOL);
+
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->EnableHardwareCursorStats(env, enable);
+}
+
+napi_value JsPointerContext::GetHardwareCursorStats(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetHardwareCursorStats(env);
+    }
+    return nullptr;
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1620,6 +1666,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),
+        DECLARE_NAPI_STATIC_FUNCTION("enableHardwareCursorStats", EnableHardwareCursorStats),
+        DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {
