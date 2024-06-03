@@ -122,12 +122,12 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
     "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
-    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
-    "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_windows_manager.cpp",
+    "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
     "src/tablet_tool_tranform_processor_test.cpp",
   ]
 
@@ -152,9 +152,9 @@ ohos_unittest("TabletToolTranformTest") {
 
   deps = [
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
