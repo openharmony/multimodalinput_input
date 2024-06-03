@@ -46,7 +46,7 @@ constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
-constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID = 100;
+constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID = 1000;
 constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 10;
 
 std::unordered_map<int32_t, std::string> axisType{
@@ -789,9 +789,8 @@ int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
         return RET_ERR;
     }
     if (virtualDeviceId == std::numeric_limits<int32_t>::max()) {
-        MMI_HILOGE("Request ID exceeds the maximum");
-        deviceId = MIN_VIRTUAL_INPUT_DEVICE_ID;
-        return RET_ERR;
+        MMI_HILOGW("Request ID exceeds the maximum");
+        virtualDeviceId = MIN_VIRTUAL_INPUT_DEVICE_ID;
     }
     int32_t tempDeviceId = virtualDeviceId++;
     if (virtualInputDevices_.find(tempDeviceId) != virtualInputDevices_.end()) {
