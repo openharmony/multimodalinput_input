@@ -26,10 +26,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t NAP_EVENT = 0;
-constexpr int32_t SUBSCRIBED = 1;
-constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t NAP_EVENT { 0 };
+constexpr int32_t SUBSCRIBED { 1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 } // namespace
 
 NapProcess *NapProcess::instance_ = new (std::nothrow) NapProcess();
