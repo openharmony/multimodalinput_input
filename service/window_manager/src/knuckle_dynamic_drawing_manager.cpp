@@ -177,11 +177,11 @@ void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<Poi
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    CreateTouchWindow(displayId);
     if (!IsSingleKnuckle(pointerEvent)) {
         return;
     }
-    auto displayId = pointerEvent->GetTargetDisplayId();
-    CreateTouchWindow(displayId);
     if (CheckPointerAction(pointerEvent)) {
         StartTouchDraw(pointerEvent);
     }
@@ -215,6 +215,9 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
+        } else {
+            isRotate_ = false;
+            return true;
         }
         isRotate_ = false;
         return false;
