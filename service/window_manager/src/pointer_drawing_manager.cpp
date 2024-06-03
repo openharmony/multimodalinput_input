@@ -124,7 +124,7 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
 bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
+    CHKPF(hardwareCursorPointerManager_);
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
     if (hardwareCursorPointerManager_->IsSupported()) {
         if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
@@ -150,7 +150,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
     if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
         // 触发光标找回效果时恢复为默认光标
-        MMI_HILOGI("Restores to the default cursor when the cursor retrieval effect is triggered");
+        MMI_HILOGI("Restores to the default cursor");
         pointerStyle.id = 0;
     }
     surfaceNode_->SetScale(scale_);
@@ -231,7 +231,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
-        MMI_HILOGI("magicCursor DrawPointer enter CreatePointerWindow");
+        MMI_HILOGD("magicCursor DrawPointer enter CreatePointerWindow");
         MAGIC_CURSOR->CreatePointerWindow(displayId, physicalX, physicalY, direction, surfaceNode_);
     } else {
         CreatePointerWindow(displayId, physicalX, physicalY, direction);
@@ -370,7 +370,7 @@ void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
             CHKPV(surfaceNode_);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-            MMI_HILOGI("switch pointer style");
+            MMI_HILOGD("switch pointer style");
             int64_t nodeId = surfaceNode_->GetId();
             if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
                 surfaceNode_->DetachToDisplay(screenId_);
@@ -1107,7 +1107,7 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     int32_t ret = SetPointerStyle(pid, windowId, style);
     if (ret == RET_ERR) {
-        MMI_HILOGE("SetPointerStyle return RET_ERR here!");
+        MMI_HILOGE("SetPointerStyle return RET_ERR here");
     }
     return ret;
 }
@@ -1562,7 +1562,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
     PointerStyle style;
     int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get global pointer style failed!");
+        MMI_HILOGE("Get global pointer style failed");
         return RET_ERR;
     }
     if (pointerStyle.id != style.id) {
@@ -1789,7 +1789,7 @@ int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enabl
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
+    CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
     if ((hardwareCursorPointerManager_->EnableStats(enable)) != RET_OK) {
         MMI_HILOGE("Enable stats failed");
         return RET_ERR;
@@ -1803,7 +1803,7 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    CHKPV(hardwareCursorPointerManager_);
+    CHKPR(hardwareCursorPointerManager_, ERROR_NULL_POINTER);
     if ((hardwareCursorPointerManager_->GetCursorStats(frameCount, vsyncCount)) != RET_OK) {
         MMI_HILOGE("Query stats failed");
         return RET_ERR;
