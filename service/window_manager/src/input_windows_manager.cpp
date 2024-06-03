@@ -2414,17 +2414,20 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
     int32_t pointerAction = pointerEvent->GetPointerAction();
+    // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
+    // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
+    // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
     if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
-        MMI_HILOG_DISPATCHI("pointerAction:%{public}s,pid:%{public}d,targetWindowId:%{public}d,"
-            "foucsWindowId:%{public}d,eventId:%{public}d,logicalX:%{public}f,logicalY:%{public}f,"
-            "displayX:%{public}f,displayY:%{public}f,windowX:%{public}f,windowY:%{public}f,"
-            "width:%{public}d,height:%{public}d,area.x:%{public}d,area.y:%{public}d,"
-            "flags:%{public}d,displayId:%{public}d,TargetWindowId:%{public}d,"
-            "AgentWindowId:%{public}d,zOrder:%{public}f",
+        MMI_HILOG_DISPATCHI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+            "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
+            "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
+            "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+            "flags:%{public}d,DID:%{public}d"
+            "AWI:%{public}d,zOrder:%{public}1f",
             pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
             displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
             physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-            touchWindow->area.y, touchWindow->flags, displayId, pointerEvent->GetTargetWindowId(),
+            touchWindow->area.y, touchWindow->flags, displayId,
             pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
     }
     bool gestureInject = false;
