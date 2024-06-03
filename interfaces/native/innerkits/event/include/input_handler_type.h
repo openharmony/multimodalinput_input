@@ -22,6 +22,7 @@ inline constexpr size_t MAX_N_INPUT_HANDLERS { 16 };
 inline constexpr size_t MAX_N_INPUT_MONITORS { MAX_N_INPUT_HANDLERS };
 inline constexpr size_t MAX_N_INPUT_INTERCEPTORS { MAX_N_INPUT_HANDLERS };
 inline constexpr int32_t MIN_HANDLER_ID { 1 };
+inline constexpr int32_t MAX_HANDLER_ID { 100000 };
 inline constexpr int32_t INVALID_HANDLER_ID { -1 };
 inline constexpr int32_t ERROR_EXCEED_MAX_COUNT { -4100001 };
 inline constexpr int32_t DEFUALT_INTERCEPTOR_PRIORITY { 500 };
@@ -47,7 +48,7 @@ inline bool IsValidHandlerType(InputHandlerType handlerType)
 
 inline bool IsValidHandlerId(int32_t handlerId)
 {
-    return ((handlerId >= MIN_HANDLER_ID) && (handlerId < std::numeric_limits<int32_t>::max()));
+    return ((handlerId >= MIN_HANDLER_ID) && (handlerId < MAX_HANDLER_ID));
 }
 } // namespace MMI
 } // namespace OHOS
