@@ -55,7 +55,10 @@ void InfraredEmitterController::InitInfraredEmitter()
     }
     if (soIrHandle_ == nullptr) {
         soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
-        CHKPV(soIrHandle_);
+        if (soIrHandle_ == nullptr) {
+            MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
+            return;
+        }
     }
     typedef ConsumerIr* (*funCreate_ptr) (void);
     funCreate_ptr fnCreate = nullptr;
@@ -83,7 +86,7 @@ void InfraredEmitterController::InitInfraredEmitter()
     }
 }
 
-bool InfraredEmitterController::Transmit(int64_t carrierFreq, std::vector<int64_t> pattern)
+bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();

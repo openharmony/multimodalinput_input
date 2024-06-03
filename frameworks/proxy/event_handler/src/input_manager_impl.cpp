@@ -38,15 +38,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr size_t MAX_FILTER_NUM = 4;
-constexpr int32_t MAX_DELAY = 4000;
-constexpr int32_t MIN_DELAY = 0;
-constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
-constexpr int32_t ANR_DISPATCH = 0;
-constexpr uint8_t LOOP_COND = 2;
-constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
-constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
-constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = 27 * 2;
+constexpr size_t MAX_FILTER_NUM { 4 };
+constexpr int32_t MAX_DELAY { 4000 };
+constexpr int32_t MIN_DELAY { 0 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
+constexpr int32_t EVENT_TYPE { 0 };
+constexpr uint8_t LOOP_COND { 2 };
+constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
+constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
+constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -181,8 +181,6 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
             continue;
         }
         if (window.defaultHotAreas.empty() || window.pointerHotAreas.empty() ||
-            (window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            (window.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (!window.pointerChangeAreas.empty() &&
             window.pointerChangeAreas.size() != WindowInfo::POINTER_CHANGEAREA_COUNT) ||
             (!window.transform.empty() && window.transform.size() != WindowInfo::WINDOW_TRANSFORM_SIZE)) {
@@ -214,13 +212,13 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_INFO_TRACE;
     if (cfg == nullptr || cfgLen == 0) {
-        MMI_HILOGE("SecCompEnhance cfg info is empty!");
+        MMI_HILOGE("SecCompEnhance cfg info is empty");
         return;
     }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
     CHKPV(enhanceCfg_);
     if (memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen)) {
-        MMI_HILOGE("cfg memcpy failed!");
+        MMI_HILOGE("cfg memcpy failed");
         return;
     }
     enhanceCfgLen_ = cfgLen;
@@ -537,7 +535,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform << item.windowInputType << item.privacyMode;
+            << item.transform << item.windowInputType << item.privacyMode << item.windowType;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -573,7 +571,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode;
+            << item.windowInputType << item.privacyMode << item.windowType;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
@@ -1911,6 +1909,39 @@ int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &rotateSwitch)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::EnableHardwareCursorStats(bool enable)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->EnableHardwareCursorStats(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enable hardware cursor stats stats failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetHardwareCursorStats(frameCount, vsyncCount);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the hardware cursor stats failed");
+    }
+    MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
 {
     CALL_INFO_TRACE;
@@ -2022,7 +2053,7 @@ void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher
 int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    ANRHDL->SetLastProcessedEventId(EVENT_TYPE, eventId, actionTime);
     return RET_OK;
 }
 

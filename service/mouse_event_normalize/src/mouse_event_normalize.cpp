@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 
-#include "input-event-codes.h"
+#include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"

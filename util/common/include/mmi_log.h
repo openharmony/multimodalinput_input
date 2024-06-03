@@ -272,11 +272,11 @@ void ResetLogTrace();
 
 namespace OHOS {
 namespace MMI {
-inline constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
-inline constexpr int32_t TIMEOUT = 100000;
-inline constexpr int32_t POINTER_ACTION_UP = 4;
-inline constexpr int32_t POINTER_ACTION_MOVE = 3;
-inline constexpr int32_t FINAL_FINGER = 1;
+inline constexpr int32_t EVENT_TYPE_POINTER { 0X00020000 };
+inline constexpr int32_t TIMEOUT { 100000 };
+inline constexpr int32_t POINTER_ACTION_UP { 4 };
+inline constexpr int32_t POINTER_ACTION_MOVE { 3 };
+inline constexpr int32_t FINAL_FINGER { 1 };
 
 class InnerFunctionTracer {
 public:

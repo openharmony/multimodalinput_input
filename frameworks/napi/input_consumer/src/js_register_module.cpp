@@ -30,10 +30,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr size_t EVENT_NAME_LEN = 64;
-constexpr size_t PRE_KEYS_SIZE = 4;
-constexpr size_t INPUT_PARAMETER_MIDDLE = 2;
-constexpr size_t INPUT_PARAMETER_MAX = 3;
+constexpr size_t EVENT_NAME_LEN { 64 };
+constexpr size_t PRE_KEYS_SIZE { 4 };
+constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
+constexpr size_t INPUT_PARAMETER_MAX { 3 };
 } // namespace
 
 static Callbacks callbacks = {};
