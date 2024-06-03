@@ -42,7 +42,7 @@ public:
     }
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override
-    {std::cout << "programName:" << programName << "." << std::endl;
+    {
         if (programName == "fail") {
             return -1;
         }
