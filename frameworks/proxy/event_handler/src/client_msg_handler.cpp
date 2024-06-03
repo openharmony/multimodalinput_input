@@ -174,6 +174,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_DISPATCHI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
+    std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
+    aggregator_.Record({MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__}, logInfo.c_str(),
+        std::to_string(pointerEvent->GetId()));
     EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");

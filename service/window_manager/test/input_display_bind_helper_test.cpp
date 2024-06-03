@@ -663,5 +663,446 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     bindInfos.infos_.push_back(bindInfo);
     bindInfos.GetBindDisplayNameByInputDevice(1);
 }
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetDisplayIdNames_01
+ * @tc.desc: Test GetDisplayIdNames
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdNames_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    inputDisplayBindHelper.GetDisplayIdNames();
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_02
+ * @tc.desc: Test AddLocalDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    inputDisplayBindHelper.AddLocalDisplay(0, "hp 223");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_03
+ * @tc.desc: Test AddLocalDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    inputDisplayBindHelper.AddLocalDisplay(0, "hp 223");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_02
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    inputDisplayBindHelper.GetInputDeviceById(1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_03
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    inputDisplayBindHelper.GetInputDeviceById(1);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_04
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    inputDisplayBindHelper.GetInputDeviceById(0);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputNodeNameByCfg_02
+ * @tc.desc: Test GetInputNodeNameByCfg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeNameByCfg_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    inputDisplayBindHelper.GetInputNodeNameByCfg(0);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputNode_01
+ * @tc.desc: Test GetInputNode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNode_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    std::string inputNodeName = "input5";
+    inputDisplayBindHelper.GetInputNode(inputNodeName);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputNode_02
+ * @tc.desc: Test GetInputNode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNode_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    std::string inputNodeName = "wrapper";
+    inputDisplayBindHelper.GetInputNode(inputNodeName);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_Store_01
+ * @tc.desc: Test Store
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Store_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    inputDisplayBindHelper.Store();
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_Store_02
+ * @tc.desc: Test Store
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_Store_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper("input_display_bind_helper_tmp.cfg");
+    inputDisplayBindHelper.Store();
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_02
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t deviceId = -1;
+    int32_t displayId = -1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_03
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t deviceId = -1;
+    int32_t displayId = 0;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_04
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t deviceId = 1;
+    int32_t displayId = -1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_05
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_06
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    std::string msg = "touch";
+    inputDisplayBindHelper.infos_ = nullptr;
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_07
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_08
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 2;
+    int32_t displayId = 1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_09
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_09, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 1;
+    int32_t displayId = 0;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_10
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_10, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    bindInfo.inputDeviceId_ = 2;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 1;
+    int32_t displayId = 1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_11
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_11, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 0;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    bindInfo.inputDeviceId_ = -1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 1;
+    int32_t displayId = 1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_12
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_12, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    bindInfo.inputDeviceId_ = 2;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 1;
+    int32_t displayId = 1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_SetDisplayBind_13
+ * @tc.desc: Test SetDisplayBind
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_13, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+    BindInfo bindInfo;
+    bindInfo.inputDeviceId_ = 1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    bindInfo.inputDeviceId_ = -1;
+    bindInfo.inputDeviceName_ = "mouse";
+    bindInfo.displayId_ = 1;
+    bindInfo.displayName_ = "hp 223";
+    inputDisplayBindHelper.infos_->infos_.push_back(bindInfo);
+    int32_t deviceId = 1;
+    int32_t displayId = 1;
+    std::string msg = "touch";
+    inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg);
+}
 } // namespace MMI
 } // namespace OHOS

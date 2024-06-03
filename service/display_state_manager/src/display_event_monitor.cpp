@@ -47,11 +47,11 @@ public:
         }
         MMI_HILOGD("receivedScreenStatus: %{public}s", action.c_str());
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            MMI_HILOGD("display screen on");
+            MMI_HILOGI("display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
             STYLUS_HANDLER->IsLaunchAbility();
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
-                MMI_HILOGD("start enable fingersense");
+                MMI_HILOGI("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();

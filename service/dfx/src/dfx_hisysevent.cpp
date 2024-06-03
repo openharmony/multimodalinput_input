@@ -15,6 +15,8 @@
 
 #include "dfx_hisysevent.h"
 
+#include <fstream>
+
 #include "input_windows_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -37,8 +39,26 @@ constexpr int32_t TIMES_LEVEL4 = 50;
 constexpr int32_t FINGERSENSE_EVENT_TIMES = 1;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
+constexpr int32_t FAIL_SUCC_TIME_DIFF = 3 * 60 * 1000;
+constexpr int32_t MIN_GESTURE_TIMESTAMPS_SIZE = 2;
 const std::string EMPTY_STRING { "" };
+const std::string LCD_PATH = "/sys/class/graphics/fb0/lcd_model";
+const std::string ACC_PATH = "/sys/devices/platform/_sensor/acc_info";
+const std::string TP_PATH = "/sys/touchscreen/touch_chip_info";
 } // namespace
+
+static std::string GetVendorInfo(const std::string &nodePath)
+{
+    std::ifstream file(nodePath);
+    if (!file.is_open()) {
+        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath.c_str(), errno);
+        return "";
+    }
+    std::string vendorInfo;
+    file >> vendorInfo;
+    file.close();
+    return vendorInfo;
+}
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
@@ -528,7 +548,10 @@ void DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime)
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "SK_S_T", FINGERSENSE_EVENT_TIMES,
-        "SKS_T_I", intervalTime);
+        "SKS_T_I", intervalTime,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
@@ -556,7 +579,10 @@ void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> 
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         knuckleFailCount, FINGERSENSE_EVENT_TIMES,
         "SKF_T_I", intervalTime,
-        invalidTimeFailCount, FINGERSENSE_EVENT_TIMES);
+        invalidTimeFailCount, FINGERSENSE_EVENT_TIMES,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
@@ -571,7 +597,10 @@ void DfxHisysevent::ReportFailIfInvalidDistance(const std::shared_ptr<PointerEve
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "SK_F_T", FINGERSENSE_EVENT_TIMES,
         "DKF_D_I", distance,
-        "FSF_D_C", FINGERSENSE_EVENT_TIMES);
+        "FSF_D_C", FINGERSENSE_EVENT_TIMES,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
@@ -656,5 +685,128 @@ void DfxHisysevent::ReportMagicCursorFault(std::string error_Code, std::string e
     }
 }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+void DfxHisysevent::ReportSmartShotSuccTimes(int32_t smartShotSuccTimes)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_S_T", smartShotSuccTimes,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
 }
+
+void DfxHisysevent::ReportKnuckleGestureTrackLength(int32_t knuckleGestureTrackLength)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_TRACK_LENGTH", knuckleGestureTrackLength);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
 }
+
+void DfxHisysevent::ReportKnuckleGestureTrackTime(const std::vector<int64_t> &gestureTimeStamps)
+{
+    size_t size = gestureTimeStamps.size();
+    if (size < MIN_GESTURE_TIMESTAMPS_SIZE) {
+        MMI_HILOGE("HiviewDFX Report knuckle gesture track time error, knuckle timestamps size:%{public}zu", size);
+        return;
+    }
+    int32_t knuckleGestureTrackTime = (gestureTimeStamps[size - 1] - gestureTimeStamps[0]) / CONVERSION_US_TO_MS;
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_TRACK_TIME", knuckleGestureTrackTime);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportScreenRecorderGesture(int32_t successTimes, int32_t intervalTime)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "DK_S_T", successTimes,
+        "DKS_T_I", intervalTime,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureFaildTimes(int32_t failedTimes)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "LG_F_T", failedTimes,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleDrawSSuccessTimes(int32_t successTimes)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "L_S_S_T", successTimes,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTime)
+{
+    intervalTime /= CONVERSION_US_TO_MS;
+    if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
+        return;
+    }
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_S_F_TIME_DIFF", intervalTime / CONVERSION_US_TO_MS);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime)
+{
+    intervalTime /= CONVERSION_US_TO_MS;
+    if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
+        return;
+    }
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_F_S_TIME_DIFF", intervalTime / CONVERSION_US_TO_MS);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+} // namespace MMI
+} // namespace OHOS
