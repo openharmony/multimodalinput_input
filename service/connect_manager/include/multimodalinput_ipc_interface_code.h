@@ -109,6 +109,8 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_CURRENT_USERID = 87,
     ENABLE_HARDWARE_CURSOR_STATS = 88,
     GET_HARDWARE_CURSOR_STATS = 89,
+    ADD_VIRTUAL_INPUT_DEVICE = 90,
+    REMOVE_VIRTUAL_INPUT_DEVICE = 91,
 };
 
 enum class MultimodalinputEventObserverCode {

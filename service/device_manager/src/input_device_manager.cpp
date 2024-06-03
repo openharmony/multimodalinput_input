@@ -46,6 +46,9 @@ constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
+constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID = 100;
+constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 10;
+
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
     { ABS_MT_POSITION_X, "POSITION_X" },   { ABS_MT_POSITION_Y, "POSITION_Y" },   { ABS_MT_PRESSURE, "PRESSURE" },
@@ -84,6 +87,13 @@ std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool checked) const
 {
     CALL_DEBUG_ENTER;
+    if (virtualInputDevices_.find(id) != virtualInputDevices_.end()) {
+        MMI_HILOGI("Virtual device with id:%{public}d", id);
+        std::shared_ptr<InputDevice> dev = virtualInputDevices_.at(id);
+        CHKPP(dev);
+        MMI_HILOGI("DeviceId:%{public}d, name:%{public}s", dev->GetId(), dev->GetName().c_str());
+        return dev;
+    }
     auto iter = inputDevice_.find(id);
     if (iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the device");
@@ -123,6 +133,8 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool
 
 void InputDeviceManager::FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const
 {
+    CHKPV(inputDevice);
+    CHKPV(deviceOrigin);
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(deviceOrigin)));
     const char *name = libinput_device_get_name(deviceOrigin);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
@@ -151,6 +163,9 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
             MMI_HILOGD("The current device has been disabled");
             continue;
         }
+        ids.push_back(item.first);
+    }
+    for (const ayto &item : virtualInputDevices_) {
         ids.push_back(item.first);
     }
     return ids;
@@ -259,6 +274,16 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
 int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
+    if (virtualInputDevices_.find(deviceId) != virtualInputDevices_.end()) {
+        if (!IsKeyboardDevice(virtualInputDevices_.at(deviceId))) {
+            MMI_HILOGW("Virtual device with id:%{public}d is not keyboard", deviceId);
+            keyboardType = KEYBOARD_TYPE_NONE;
+            return RET_OK;
+        }
+        MMI_HILOGI("Virtual device with id:%{public}d, only KEYBOARD_TYPE_ALPHABETICKEYBOARD supported", deviceId);
+        keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
+        return RET_OK;
+    }
     int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
@@ -690,6 +715,103 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
     return RET_OK;
 }
 
+int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    CALL_INFO_TRACE;
+    CHKPR(device, RET_ERR);
+    int32_t tempDeviceId { -1 };
+    if (GenerateVirtualDeviceId(deviceId) != RET_OK) {
+        MMI_HILOGE("GenerateVirtualDeviceId failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("GenerateVirtualDeviceId successfully, tempDeviceId:%{public}d", tempDeviceId);
+    deviceId = tempDeviceId;
+    device->SetId(deviceId);
+    virtualInputDevices_[deivceId] = device;
+    MMI_HILOGI("AddVirtualInputDevice successfully, deivceId:%{public}d", deviceId);
+    for (const auto& item : devListener_) {
+        CHKPR(item, ERROR_NULL_POINTER);
+        NotifyMessage(item, device, "add");
+    }
+    InputDeviceInfo deviceInfo;
+    if (MakeInputDeviceInfo(device, deviceInfo) != RET_OK) {
+        MMI_HILOGE("MakeInputDeviceInfo failed");
+        return RET_ERR;
+    }
+    NotifyDevCallback(deviceId, deviceInfo);
+    DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    CALL_INFO_TRACE;
+    if (virtualInputDevice_.find(deviceId) == virtualInputDevice_.end()) {
+        MMI_HILOGE("No virtual deviceId:%{public}d existed", deviceId);
+        return RET_ERR;
+    }
+    InputDeviceInfo deviceInfo;
+    if (MakeVirtualDeviceInfo(virtualInputDevices_[deviceId], deviceInfo) != RET_OK) {
+        MMI_HILOGE("MakeVirtualDeviceInfo FAILED");
+        return RET_ERR;
+    }
+    NotifyDevRemoveCallback(deviceId, deviceInfo);
+    virtualInputDevices_.erase(deviceId);
+    MMI_HILOGI("RemoveVirtualInputDevice successfully, deviceId:%{public}d", deviceId);
+    for (const auto& item : devListener_) {
+        CHKPR(item, ERROR_NULL_POINTER);
+        NotifyMessage(item, deviceId, "remove");
+    }
+    DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::MakeInputDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
+{
+    CALL_INFO_TRACE;
+    CHKPR(device, ERROR_NULL_POINTER);
+    deviceInfo = {
+        .isRemote = false,
+        .isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER),
+        .isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH),
+        .enable = true;
+        .isVirtual = true,
+    };
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
+{
+    CALL_INFO_TRACE;
+    static int32_t virtualDeviceId { MIN_VIRTUAL_INPUT_DEVICE_ID };
+    if (virtualInputDevices_.size() >= MAX_VIRTUAL_INPUT_DEVICE_NUM) {
+        MMI_HILOGE("virtual device num exceeds limit:%{public}d", MAX_VIRTUAL_INPUT_DEVICE_NUM);
+        return RET_ERR;
+    }
+    if (virtualDeviceId == std::numeric_limits<int32_t>::max()) {
+        MMI_HILOGE("Request ID exceeds the maximum");
+        deviceId = MIN_VIRTUAL_INPUT_DEVICE_ID;
+        return RET_ERR;
+    }
+    int32_t tempDeviceId = virtualDeviceId++;
+    if (virtualInputDevices_.find(tempDeviceId) != virtualInputDevices_.end()) {
+        MMI_HILOGE("Repeated deviceId:%{public}d", tempDeviceId);
+        return RET_ERR;
+    }
+    deviceId = tempDeviceId;
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDeviceInfo &deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    if (auto sysUid = deviceInfo.sysUid; !sysUid.empty()) {
+        devCallbacks_(deviceId, sysUid, "remove");
+        MMI_HILOGI("send device info to window manager, deivceId:%{public}d, sysUid:%{public}d, status:remove",
+            deviceId, sysUid.c_str());
+    }
+}
+
 int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std::string &type)
 {
     CALL_DEBUG_ENTER;
@@ -737,6 +859,24 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
         }
     }
     return ids;
+}
+
+void InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
+{
+    CHKPR(InputDevice, false);
+    return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+}
+
+void InputDeviceManager::IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const
+{
+    CHKPR(InputDevice, false);
+    return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
+}
+
+void InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const
+{
+    CHKPR(InputDevice, false);
+    return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
 }
 } // namespace MMI
 } // namespace OHOS

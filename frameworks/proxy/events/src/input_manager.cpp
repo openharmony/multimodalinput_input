@@ -363,6 +363,16 @@ int32_t InputManager::EnableInputDevice(bool enable)
     return InputMgrImpl.EnableInputDevice(enable);
 }
 
+int32_t InputManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    return InputMgrImpl.AddVirtualInputDevice(device, deviceId);
+}
+
+int32_t InputManager::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    return InputMgrImpl.RemoveVirtualInputDevice(deviceId);
+}
+
 int32_t InputManager::SetKeyDownDuration(const std::string& businessId, int32_t delay)
 {
     return InputMgrImpl.SetKeyDownDuration(businessId, delay);
