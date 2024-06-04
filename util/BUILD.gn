@@ -24,6 +24,14 @@ config("libmmi_util_public_config") {
     "common/include",
     "network/include",
     "socket/include",
+  ]
+}
+
+config("libmmi_util_config") {
+  include_dirs = [
+    "common/include",
+    "network/include",
+    "socket/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -66,16 +74,20 @@ ohos_rust_unittest("rust_mmi_key_config_test") {
 
 ohos_shared_library("libmmi-util") {
   sources = libmmi_util_sources
-  public_configs = [ "${mmi_path}:coverage_flags" ]
-  configs = [ ":libmmi_util_public_config" ]
+  public_configs = [
+    ":libmmi_util_public_config",
+    "${mmi_path}:coverage_flags",
+  ]
+
+  configs = [ ":libmmi_util_config" ]
   branch_protector_ret = "pac_ret"
   deps = [ ":mmi_rust_key_config" ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "napi:ace_napi",
     "hisysevent:libhisysevent",
+    "napi:ace_napi",
   ]
   public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 

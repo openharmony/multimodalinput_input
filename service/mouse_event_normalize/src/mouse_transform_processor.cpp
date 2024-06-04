@@ -25,7 +25,7 @@
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "parameters.h"
 #include "preferences.h"
@@ -35,7 +35,7 @@
 #include "dfx_hisysevent.h"
 #include "util_ex.h"
 #include "util.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -45,24 +45,25 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 11;
-constexpr int32_t DEFAULT_SPEED = 7;
-constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 6;
-constexpr int32_t DEFAULT_ROWS = 3;
-constexpr int32_t MIN_ROWS = 1;
-constexpr int32_t MAX_ROWS = 100;
-constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
-constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
-constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
-constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
-constexpr int32_t HARD_HARDEN_DEVICE_WIDTH = 2880;
-constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
-constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH = 3120;
-constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT = 2080;
-const std::string DEVICE_TYPE_HARDEN = "HAD";
+constexpr int32_t MIN_SPEED { 1 };
+constexpr int32_t MAX_SPEED { 11 };
+constexpr int32_t DEFAULT_SPEED { 7 };
+constexpr int32_t DEFAULT_TOUCHPAD_SPEED { 6 };
+constexpr int32_t DEFAULT_ROWS { 3 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
+constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
+constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
+constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
+constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
+constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
+constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
+constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
+constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
+const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
+const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -161,7 +162,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     // touch pad tap switch is disable
     if (type == LIBINPUT_EVENT_POINTER_TAP && !tpTapSwitch) {
-        MMI_HILOGD("Touch pad is disable.");
+        MMI_HILOGD("Touch pad is disable");
         return RET_ERR;
     }
 
@@ -221,7 +222,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
         } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
             buttonId = PointerEvent::MOUSE_BUTTON_LEFT;
         } else {
-            MMI_HILOGD("buttonId does not switch.");
+            MMI_HILOGD("buttonId does not switch");
         }
     }
 
@@ -275,7 +276,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     libinput_pointer_axis_source source = libinput_event_pointer_get_axis_source(data);
     HandleTouchPadAxisState(source, tpScrollDirection, tpScrollSwitch);
     if (!tpScrollSwitch && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGD("TouchPad axis event is disable.");
+        MMI_HILOGD("TouchPad axis event is disable");
         return RET_ERR;
     }
 
@@ -808,7 +809,9 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
-        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+        auto state = libinput_event_pointer_get_button_state(data);
+        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT ||
+            (state == LIBINPUT_BUTTON_STATE_RELEASED && fingerCount == TP_CLICK_FINGER_ONE)) {
             button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
         }
         return;
@@ -868,7 +871,7 @@ int32_t MouseTransformProcessor::SetTouchpadScrollDirection(bool state)
 {
     std::string name = "scrollDirection";
     if (PutConfigDataToDatabase(name, state) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem.");
+        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
         return RET_ERR;
     }
 
@@ -888,7 +891,7 @@ int32_t MouseTransformProcessor::SetTouchpadTapSwitch(bool switchFlag)
 {
     std::string name = "touchpadTap";
     if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
-        MMI_HILOGE("Failed to set scroll direct switch flag to mem.");
+        MMI_HILOGE("Failed to set scroll direct switch flag to mem");
         return RET_ERR;
     }
 
@@ -908,7 +911,7 @@ int32_t MouseTransformProcessor::SetTouchpadPointerSpeed(int32_t speed)
 {
     std::string name = "touchPadPointerSpeed";
     if (PutConfigDataToDatabase(name, speed) != RET_OK) {
-        MMI_HILOGE("Failed to set touch pad pointer speed to mem.");
+        MMI_HILOGE("Failed to set touch pad pointer speed to mem");
         return RET_ERR;
     }
 
@@ -931,7 +934,7 @@ int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
 {
     std::string name = "rightMenuSwitch";
     if (PutConfigDataToDatabase(name, type) != RET_OK) {
-        MMI_HILOGE("Failed to set right click type to mem.");
+        MMI_HILOGE("Failed to set right click type to mem");
         return RET_ERR;
     }
     DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_RIGHT_CLICK_SETTING,

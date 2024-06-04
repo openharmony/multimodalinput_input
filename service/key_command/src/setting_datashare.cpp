@@ -120,7 +120,8 @@ bool SettingDataShare::IsValidKey(const std::string& key)
 
 sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, SettingObserver::UpdateFunc& func)
 {
-    sptr<SettingObserver> observer = new SettingObserver();
+    sptr<SettingObserver> observer = new (std::nothrow) SettingObserver();
+    CHKPP(observer);
     observer->SetKey(key);
     observer->SetUpdateFunc(func);
     return observer;

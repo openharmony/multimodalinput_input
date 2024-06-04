@@ -484,8 +484,8 @@ LogTracer &LogTracer::operator=(LogTracer &&other) noexcept
     return *this;
 }
 
-int32_t OHOS::MMI::EventLogHelper::infoDictCount = 0;
-int32_t OHOS::MMI::EventLogHelper::debugDictCount = 0;
+int32_t OHOS::MMI::EventLogHelper::infoDictCount_ = 0;
+int32_t OHOS::MMI::EventLogHelper::debugDictCount_ = 0;
 
 } // namespace MMI
 } // namespace OHOS

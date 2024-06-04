@@ -118,6 +118,7 @@ private:
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };
     int32_t rectTopPosition_ { 0 };
+    int32_t direction_ { 0 };
     int64_t lastActionTime_ { 0 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
@@ -134,6 +135,8 @@ private:
     std::list<PointerEvent::PointerItem> lastPointerItem_;
     PointerEvent::PointerItem firstPointerItem_;
     RosenCanvas *trackerCanvas_ { nullptr };
+    int32_t nodeWidth_ { 0 };
+    int32_t nodeHeight_ { 0 };
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI

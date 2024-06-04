@@ -18,7 +18,7 @@
 
 #include "key_auto_repeat.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "timer_manager.h"
 
 #undef MMI_LOG_TAG

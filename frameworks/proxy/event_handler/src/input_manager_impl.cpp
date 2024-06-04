@@ -38,15 +38,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr size_t MAX_FILTER_NUM = 4;
-constexpr int32_t MAX_DELAY = 4000;
-constexpr int32_t MIN_DELAY = 0;
-constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
-constexpr int32_t ANR_DISPATCH = 0;
-constexpr uint8_t LOOP_COND = 2;
-constexpr int32_t MAX_PKT_SIZE = 8 * 1024;
-constexpr int32_t WINDOWINFO_RECT_COUNT = 2;
-constexpr int32_t DISPLAY_STRINGS_MAX_SIZE = 27 * 2;
+constexpr size_t MAX_FILTER_NUM { 4 };
+constexpr int32_t MAX_DELAY { 4000 };
+constexpr int32_t MIN_DELAY { 0 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
+constexpr int32_t EVENT_TYPE { 0 };
+constexpr uint8_t LOOP_COND { 2 };
+constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
+constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
+constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -181,8 +181,6 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
             continue;
         }
         if (window.defaultHotAreas.empty() || window.pointerHotAreas.empty() ||
-            (window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            (window.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (!window.pointerChangeAreas.empty() &&
             window.pointerChangeAreas.size() != WindowInfo::POINTER_CHANGEAREA_COUNT) ||
             (!window.transform.empty() && window.transform.size() != WindowInfo::WINDOW_TRANSFORM_SIZE)) {
@@ -537,7 +535,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
-            << item.transform << item.windowInputType << item.privacyMode;
+            << item.transform << item.windowInputType << item.privacyMode << item.windowType;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -573,7 +571,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         pkt << item.id << item.pid << item.uid << item.area << item.defaultHotAreas
             << item.pointerHotAreas << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas << item.transform
-            << item.windowInputType << item.privacyMode;
+            << item.windowInputType << item.privacyMode << item.windowType;
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
@@ -2055,7 +2053,7 @@ void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher
 int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    ANRHDL->SetLastProcessedEventId(EVENT_TYPE, eventId, actionTime);
     return RET_OK;
 }
 
@@ -2135,6 +2133,16 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
 int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
 {
     return (MAX_PKT_SIZE - GetDisplayMaxSize() * displayCount) / GetWindowMaxSize(maxAreasCount);
+}
+
+int32_t InputManagerImpl::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->AddVirtualInputDevice(device, deviceId);
+}
+
+int32_t InputManagerImpl::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->RemoveVirtualInputDevice(deviceId);
 }
 } // namespace MMI
 } // namespace OHOS

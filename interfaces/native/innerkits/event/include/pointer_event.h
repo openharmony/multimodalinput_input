@@ -27,6 +27,7 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1539,6 +1540,20 @@ public:
      */
     void SetDispatchTimes(int32_t dispatchTimes);
 
+    /**
+    * @brief Set the handlerEventType for pointerEvent
+    * @return void
+    * @since 12
+    */
+    void SetHandlerEventType(HandleEventType eventType);
+
+    /**
+     * @brief Get the handlerEventType for pointerEvent
+     * @return handlerEventType
+     * @since 12
+     */
+    HandleEventType GetHandlerEventType() const;
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1612,6 +1627,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

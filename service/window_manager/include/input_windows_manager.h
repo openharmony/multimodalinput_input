@@ -18,58 +18,31 @@
 
 #include <vector>
 
-#include "libinput.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
-#include "singleton.h"
 
 #include "display_manager.h"
-#include "extra_data.h"
+#include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
-#include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"
-#include "pointer_event.h"
-#include "pointer_style.h"
-#include "window_info.h"
 #include "window_manager_lite.h"
-#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
-struct MouseLocation {
-    int32_t displayId { -1 };
-    int32_t physicalX { 0 };
-    int32_t physicalY { 0 };
-};
-
-struct Coordinate2D {
-    double x;
-    double y;
-};
-
-struct CursorPosition {
-    int32_t displayId { -1 };
-    Coordinate2D cursorPos {};
-};
-
 struct WindowInfoEX {
     WindowInfo window;
     bool flag { false };
 };
 
-class InputWindowsManager final {
-public:
-    class FoldStatusLisener : public Rosen::DisplayManager::IFoldStatusListener {
+class InputWindowsManager final : public IInputWindowsManager {
+private:
+    class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
     public:
-        FoldStatusLisener() = default;
-        virtual ~FoldStatusLisener() = default;
-
-        FoldStatusLisener(const FoldStatusLisener& foldStatusLisener) = delete;
-        FoldStatusLisener& operator=(const FoldStatusLisener& foldStatusLisener) = delete;
-        FoldStatusLisener(FoldStatusLisener&& foldStatusLisener) = delete;
-        FoldStatusLisener& operator=(FoldStatusLisener&& foldStatusLisener) = delete;
+        FoldStatusLisener(InputWindowsManager &winMgr) : winMgr_(winMgr) {}
+        ~FoldStatusLisener() = default;
+        DISALLOW_COPY_AND_MOVE(FoldStatusLisener);
 
         /**
         * @param FoldStatus; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
@@ -78,11 +51,14 @@ public:
 
     private:
         Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
+        InputWindowsManager &winMgr_;
     };
 
+public:
     InputWindowsManager();
     ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
+
     void Init(UDSServer& udsServer);
     void SetMouseFlag(bool state);
     bool GetMouseFlag();
@@ -178,10 +154,11 @@ public:
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
-
-    static std::shared_ptr<InputWindowsManager> GetInstance();
+    void CancelLastTouchWindow(const WindowInfo *currTouchWindow, std::shared_ptr<PointerEvent> pointerEvent);
+    void ClearTouchCancelFlag(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
@@ -329,13 +306,8 @@ private:
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
-
-    static std::shared_ptr<InputWindowsManager> instance_;
-    static std::mutex mutex_;
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
 };
-
-#define WIN_MGR ::OHOS::MMI::InputWindowsManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_WINDOWS_MANAGER_H

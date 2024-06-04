@@ -30,13 +30,14 @@ ohos_unittest("TouchEventNormalizeTest") {
   ]
 
   sources = [
-    "src/tablet_tool_tranform_processor_test.cpp",
+    "src/joystick_transform_processor_test.cpp",
     "src/touch_event_normalize_test.cpp",
     "src/touch_transform_processor_test.cpp",
     "src/touchpad_transform_processor_test.cpp",
   ]
 
   deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
@@ -50,6 +51,150 @@ ohos_unittest("TouchEventNormalizeTest") {
     "window_manager:libdm",
     "window_manager:libwm",
   ]
+}
+
+ohos_unittest("TabletToolTranformTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/service:libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/app_state_manager/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_state_manager/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/display_state_manager/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/gesturesense_wrapper/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
+  ]
+
+  sources = [
+    "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
+    "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
+    "${mmi_path}/service/device_state_manager/src/device_event_monitor.cpp",
+    "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
+    "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
+    "${mmi_path}/service/event_dispatch/src/event_dispatch_handler.cpp",
+    "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
+    "${mmi_path}/service/filter/src/event_filter_handler.cpp",
+    "${mmi_path}/service/fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "${mmi_path}/service/interceptor/src/event_interceptor_handler.cpp",
+    "${mmi_path}/service/key_command/src/key_command_handler.cpp",
+    "${mmi_path}/service/key_command/src/setting_datashare.cpp",
+    "${mmi_path}/service/key_command/src/setting_observer.cpp",
+    "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
+    "${mmi_path}/service/module_loader/src/uds_server.cpp",
+    "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
+    "${mmi_path}/service/nap_process/src/nap_process.cpp",
+    "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
+    "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
+    "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
+    "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
+    "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
+    "src/tablet_tool_tranform_processor_test.cpp",
+  ]
+
+  if (input_ext_feature_magiccursor) {
+    include_dirs += [
+      "${mmi_ext_path}/magic_cursor/include",
+      "${g2d_ext_path}/sdf/include",
+      "${surface_path}/interfaces/inner_api/surface",
+      "${g2d_path}/rosen/modules/render_service_base/src",
+    ]
+
+    sources += [
+      "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+      "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
+      "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
+    ]
+  }
+
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines = [ "USE_ROSEN_DRAWING" ]
+  }
+
+  deps = [
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "call_manager:tel_call_manager_api",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "ffrt:libffrt",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "init:libbeget_proxy",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "preferences:native_preferences",
+    "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libdm",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+
+  if (input_ext_feature_magiccursor) {
+    external_deps += [
+      "eventhandler:libeventhandler",
+      "graphic_2d_ext:libsdf",
+    ]
+  }
 }
 
 ohos_unittest("TransformPointTest") {
@@ -79,6 +224,146 @@ ohos_unittest("TransformPointTest") {
     "c_utils:utils",
     "hilog:libhilog",
   ]
+}
+
+ohos_unittest("TouchTransformProcessorTestWithMock") {
+  module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  include_dirs = [
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/app_state_manager/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_state_manager/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/display_state_manager/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/gesturesense_wrapper/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/timer_manager/include",
+    "${mmi_path}/service/touch_event_normalize/include",
+    "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
+  ]
+
+  sources = [
+    "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
+    "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
+    "${mmi_path}/service/device_state_manager/src/device_event_monitor.cpp",
+    "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
+    "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
+    "${mmi_path}/service/event_dispatch/src/event_dispatch_handler.cpp",
+    "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
+    "${mmi_path}/service/filter/src/event_filter_handler.cpp",
+    "${mmi_path}/service/fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "${mmi_path}/service/interceptor/src/event_interceptor_handler.cpp",
+    "${mmi_path}/service/key_command/src/key_command_handler.cpp",
+    "${mmi_path}/service/key_command/src/setting_datashare.cpp",
+    "${mmi_path}/service/key_command/src/setting_observer.cpp",
+    "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
+    "${mmi_path}/service/module_loader/src/uds_server.cpp",
+    "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
+    "${mmi_path}/service/nap_process/src/nap_process.cpp",
+    "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
+    "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
+    "${mmi_path}/service/touch_event_normalize/src/touch_transform_processor.cpp",
+    "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
+    "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
+    "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
+    "src/touch_transform_processor_test_with_mock.cpp",
+  ]
+
+  if (input_ext_feature_magiccursor) {
+    include_dirs += [
+      "${mmi_ext_path}/magic_cursor/include",
+      "${g2d_ext_path}/sdf/include",
+      "${surface_path}/interfaces/inner_api/surface",
+      "${g2d_path}/rosen/modules/render_service_base/src",
+    ]
+
+    sources += [
+      "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+      "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
+      "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
+    ]
+  }
+
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines = [ "USE_ROSEN_DRAWING" ]
+  }
+
+  deps = [
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "call_manager:tel_call_manager_api",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "ffrt:libffrt",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "init:libbeget_proxy",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "preferences:native_preferences",
+    "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libdm",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+
+  if (input_ext_feature_magiccursor) {
+    external_deps += [
+      "eventhandler:libeventhandler",
+      "graphic_2d_ext:libsdf",
+    ]
+  }
 }
 
 ohos_unittest("TouchpadGestureTest") {
@@ -133,14 +418,11 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
     "${mmi_path}/service/fingersense_wrapper/src/fingersense_wrapper.cpp",
-
-    #   "${mmi_path}/service/gesturesense_wrapper/src/gesturesense_wrapper.cpp",
     "${mmi_path}/service/interceptor/src/event_interceptor_handler.cpp",
     "${mmi_path}/service/key_command/src/key_command_handler.cpp",
     "${mmi_path}/service/key_command/src/setting_datashare.cpp",
     "${mmi_path}/service/key_command/src/setting_observer.cpp",
     "${mmi_path}/service/key_event_normalize/src/key_event_normalize.cpp",
-    "${mmi_path}/service/module_loader/src/multimodal_input_preferences_manager.cpp",
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
@@ -150,7 +432,6 @@ ohos_unittest("TouchpadGestureTest") {
     "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
-    "${mmi_path}/service/window_manager/src/input_windows_manager.cpp",
     "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
     "src/touchpad_gesture_test.cpp",
   ]
@@ -175,7 +456,7 @@ ohos_unittest("TouchpadGestureTest") {
   }
 
   deps = [
-    "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -223,4 +504,16 @@ ohos_unittest("TouchpadGestureTest") {
       "graphic_2d_ext:libsdf",
     ]
   }
+}
+
+group("TouchEventNormalizeTests") {
+  testonly = true
+
+  deps = [
+    ":TabletToolTranformTest",
+    ":TouchEventNormalizeTest",
+    ":TouchTransformProcessorTestWithMock",
+    ":TouchpadGestureTest",
+    ":TransformPointTest",
+  ]
 }
