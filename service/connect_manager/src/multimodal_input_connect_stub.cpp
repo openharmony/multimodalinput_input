@@ -416,6 +416,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
 
     if (!reply.WriteFileDescriptor(clientFd)) {
         MMI_HILOGE("Write file descriptor failed");
+        close(clientFd);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
