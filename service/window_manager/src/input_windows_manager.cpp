@@ -1735,7 +1735,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
-                    if ((item.windowInputType == WindowInputType::TRANSMIT_MOUSE_MOVE) &&
+                    if ((item.windowInputType == item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
                         ((pointerEvent->GetPressedButtons().empty()) ||
                         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
@@ -1750,7 +1750,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
-                if ((item.windowInputType == WindowInputType::TRANSMIT_MOUSE_MOVE) &&
+                if ((item.windowInputType == item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
                     ((pointerEvent->GetPressedButtons().empty()) ||
                     (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
@@ -2237,10 +2237,10 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
             toolType == PointerEvent::TOOL_TYPE_FINGER);
 }
 
-bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
+bool InputWindowsManager::SkipNavigationWindow(const WindowInfo &windowInfo, int32_t toolType)
 {
-    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowType), toolType);
-    if (windowType != WindowInputType::ANTI_MISTAKE_TOUCH || toolType != PointerEvent::TOOL_TYPE_PEN) {
+    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowInfo.windowInputTypeFlag), toolType);
+    if (windowType != windowInfo.HasFlag(WindowInfo::FLAG_ANTI_MISTAKE_TOUCH) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
@@ -2323,7 +2323,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             continue;
         }
-        if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
+        if (SkipNavigationWindow(item, pointerItem.GetToolType())) {
             continue;
         }
 
@@ -3191,26 +3191,23 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     return true;
 }
 
-bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent)
+bool InputWindowsManager::HandleWindowInputType(const WindowInfo &windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    switch (window.windowInputType)
-    {
-        case WindowInputType::NORMAL:
-            return false;
-        case WindowInputType::TRANSMIT_ALL:
-            return true;
-        case WindowInputType::TRANSMIT_EXCEPT_MOVE: {
-            auto pointerAction = pointerEvent->GetPointerAction();
-            return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-                pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
-        }
-        case WindowInputType::ANTI_MISTAKE_TOUCH:
-            return true;
-        case WindowInputType::TRANSMIT_MOUSE_MOVE:
-            return false;
-        default:
-            return true;
+    if (windowInfo.HasFlag(WindowInfo::FLAG_NORMAL)) {
+        return false;
+    } else if (windowInfo.HasFlag(WindowInfo::FLAG_TRANSMIT_ALL)) {
+        return true;
+    } else if (windowInfo.HasFlag(WindowInfo::FLAG_TRANSMIT_EXCEPT_MOVE)) {
+        auto pointerAction = pointerEvent->GetPointerAction();
+        return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+            pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
+    } else if (windowInfo.HasFlag(WindowInfo::FLAG_ANTI_MISTAKE_TOUCH)) {
+        return true;
+    } else if (windowInfo.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) {
+        return false;
+    } else {
+        return true;
     }
 }
 
