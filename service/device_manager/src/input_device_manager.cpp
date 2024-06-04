@@ -88,13 +88,13 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId
 {
     CALL_DEBUG_ENTER;
     if (virtualInputDevices_.find(deviceId) != virtualInputDevices_.end()) {
-        MMI_HILOGI("Virtual device with id:%{public}d", id);
-        std::shared_ptr<InputDevice> dev = virtualInputDevices_.at(id);
+        MMI_HILOGI("Virtual device with id:%{public}d", deviceId);
+        std::shared_ptr<InputDevice> dev = virtualInputDevices_.at(deviceId);
         CHKPP(dev);
         MMI_HILOGI("DeviceId:%{public}d, name:%{public}s", dev->GetId(), dev->GetName().c_str());
         return dev;
     }
-    auto iter = inputDevice_.find(id);
+    auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the device");
         return nullptr;
@@ -274,9 +274,9 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
 int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
-    auto iter = virtualInputDevices_.find(deviceId);
-    if (iter != virtualInputDevices_.end()) {
-        if (!IsKeyboardDevice(*iter)) {
+    auto item = virtualInputDevices_.find(deviceId);
+    if (item != virtualInputDevices_.end()) {
+        if (!IsKeyboardDevice(item->second)) {
             MMI_HILOGW("Virtual device with id:%{public}d is not keyboard", deviceId);
             keyboardType = KEYBOARD_TYPE_NONE;
             return RET_OK;
