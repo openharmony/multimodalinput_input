@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr float BASIC_DISTANCE_BETWEEN_POINTS = 5.0f;
+constexpr float BASIC_DISTANCE_BETWEEN_POINTS { 5.0f };
 } // namespace
 
 KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, std::shared_ptr<Rosen::Drawing::Bitmap> bitmap,
