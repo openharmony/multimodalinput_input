@@ -42,14 +42,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t FILE_SIZE_MAX = 0x6C445;
-constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
-constexpr int32_t INVALID_FILE_SIZE = -1;
-constexpr int32_t MIN_INTERVALTIME = 36;
-constexpr int32_t MAX_INTERVALTIME = 100;
-constexpr int32_t MIN_DELAYTIME = 300;
-constexpr int32_t MAX_DELAYTIME = 1000;
-constexpr int32_t COMMENT_SUBSCRIPT = 0;
+constexpr int32_t FILE_SIZE_MAX { 0x6C445 };
+constexpr int32_t MAX_PRO_FILE_SIZE { 128000 };
+constexpr int32_t INVALID_FILE_SIZE { -1 };
+constexpr int32_t MIN_INTERVALTIME { 36 };
+constexpr int32_t MAX_INTERVALTIME { 100 };
+constexpr int32_t MIN_DELAYTIME { 300 };
+constexpr int32_t MAX_DELAYTIME { 1000 };
+constexpr int32_t COMMENT_SUBSCRIPT { 0 };
 const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
@@ -58,10 +58,10 @@ const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
-constexpr size_t BUF_TID_SIZE = 10;
-constexpr size_t BUF_CMD_SIZE = 512;
-constexpr size_t PROGRAM_NAME_SIZE = 256;
-constexpr int32_t TIME_CONVERSION_UNIT = 1000;
+constexpr size_t BUF_TID_SIZE { 10 };
+constexpr size_t BUF_CMD_SIZE { 512 };
+constexpr size_t PROGRAM_NAME_SIZE { 256 };
+constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 } // namespace
 
 int64_t GetSysClockTime()
@@ -569,20 +569,19 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
 
 bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::string &record)
 {
-    constexpr int32_t maxRecordCount = 20;
     constexpr int32_t oneSecond = 1000;
-    if (timerId != -1) {
-        resetTimer_(timerId);
+    if (timerId_ != -1) {
+        resetTimer_(timerId_);
     } else {
-        timerId = addTimer_(oneSecond, 1, [this, lh]() {
+        timerId_ = addTimer_(oneSecond, 1, [this, lh]() {
             FlushRecords(lh);
-            timerId = -1;
+            timerId_ = -1;
         });
     }
     if (key == key_) {
         auto now = std::chrono::system_clock::now();
         records_.push_back({record, now});
-        if (records_.size() >= maxRecordCount) {
+        if (records_.size() >= maxRecordCount_) {
             FlushRecords(lh);
         }
         return true;

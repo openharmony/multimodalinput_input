@@ -317,6 +317,8 @@ struct WindowInfo {
     WindowInputType windowInputType { WindowInputType::NORMAL };
 
     SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
+
+    int32_t windowType;
 };
 
 /**

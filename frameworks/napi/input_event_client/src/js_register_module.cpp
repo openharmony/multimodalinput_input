@@ -29,8 +29,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE = 1;
-constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT = 2;
+constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE { 1 };
+constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT { 2 };
 
 std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> g_joystickAxisType = {
     { JsJoystickEvent::Axis::ABS_X, PointerEvent::AXIS_TYPE_ABS_X },
