@@ -59,30 +59,29 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-constexpr int32_t DEFAULT_POINTER_STYLE = 0;
-constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
+constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
+constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 #endif // OHOS_BUILD_ENABLE_POINTER
-constexpr int32_t OUTWINDOW_HOT_AREA = 20;
-constexpr int32_t SCALE_X = 0;
-constexpr int32_t SCALE_Y = 4;
-constexpr int32_t TOP_LEFT_AREA = 0;
-constexpr int32_t TOP_AREA = 1;
-constexpr int32_t TOP_RIGHT_AREA = 2;
-constexpr int32_t RIGHT_AREA = 3;
-constexpr int32_t BOTTOM_RIGHT_AREA = 4;
-constexpr int32_t BOTTOM_AREA = 5;
-constexpr int32_t BOTTOM_LEFT_AREA = 6;
-constexpr int32_t LEFT_AREA = 7;
-constexpr int32_t WAIT_TIME_FOR_REGISTER = 2000;
+constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
+constexpr int32_t SCALE_X { 0 };
+constexpr int32_t SCALE_Y { 4 };
+constexpr int32_t TOP_LEFT_AREA { 0 };
+constexpr int32_t TOP_AREA { 1 };
+constexpr int32_t TOP_RIGHT_AREA { 2 };
+constexpr int32_t RIGHT_AREA { 3 };
+constexpr int32_t BOTTOM_RIGHT_AREA { 4 };
+constexpr int32_t BOTTOM_AREA { 5 };
+constexpr int32_t BOTTOM_LEFT_AREA { 6 };
+constexpr int32_t LEFT_AREA { 7 };
+constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
-constexpr int32_t SHELL_WINDOW_COUNT = 1;
+constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
-constexpr double HALF_RATIO = 0.5;
-constexpr int32_t TWOFOLD = 2;
+constexpr double HALF_RATIO { 0.5 };
+constexpr int32_t TWOFOLD { 2 };
 const std::string BIND_CFG_FILE_NAME = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 const std::string DEFAULT_ICON_PATH = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-
 const std::string navigationSwitchName = "settings.input.stylus_navigation_hint";
 } // namespace
 
