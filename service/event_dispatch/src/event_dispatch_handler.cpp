@@ -28,7 +28,7 @@
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "napi_constants.h"
 #include "proto.h"
