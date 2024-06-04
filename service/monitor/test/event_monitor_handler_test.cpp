@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include "event_monitor_handler.h"
+#include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
 

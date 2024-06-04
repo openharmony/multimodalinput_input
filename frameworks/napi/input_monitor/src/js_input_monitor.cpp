@@ -168,6 +168,16 @@ void InputMonitor::Stop()
     return;
 }
 
+std::string InputMonitor::GetTypeName() const
+{
+    return typeName_;
+}
+
+void InputMonitor::SetTypeName(const std::string &typeName)
+{
+    typeName_ = typeName;
+}
+
 void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
     std::lock_guard<std::mutex> guard(mutex_);
@@ -314,6 +324,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std:
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
+    monitor_->SetTypeName(typeName_);
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
     if (rectTotal != 0) {
@@ -335,6 +346,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
+    monitor_->SetTypeName(typeName_);
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
 }
