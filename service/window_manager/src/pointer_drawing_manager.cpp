@@ -849,7 +849,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
-    isRsRemoteDied = true;
+    g_isRsRemoteDied = true;
 }
 
 void PointerDrawingManager::AttachToDisplay()
@@ -867,7 +867,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
-    isRsRemoteDied = false;
+    g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -1472,9 +1472,9 @@ bool PointerDrawingManager::IsPointerVisible()
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("isRsRemoteDied:%{public}d", isRsRemoteDied ? 1 : 0);
-    if (isRsRemoteDied && surfaceNode_ != nullptr) {
-        isRsRemoteDied = false;
+    MMI_HILOGI("g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
+    if (g_isRsRemoteDied && surfaceNode_ != nullptr) {
+        g_isRsRemoteDied = false;
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
