@@ -67,16 +67,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string DEF_INPUT_SEAT = "seat0";
-const std::string THREAD_NAME = "mmi-service";
-constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
-constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
-constexpr int32_t RELOAD_DEVICE_TIME = 2000;
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t REPEAT_COUNT = 2;
-constexpr int32_t UNSUBSCRIBED = -1;
-constexpr int32_t UNOBSERVED = -1;
-constexpr int32_t SUBSCRIBED = 1;
+const std::string DEF_INPUT_SEAT { "seat0" };
+const std::string THREAD_NAME { "mmi-service" };
+constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
+constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
+constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t REPEAT_COUNT { 2 };
+constexpr int32_t UNSUBSCRIBED { -1 };
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t SUBSCRIBED { 1 };
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
