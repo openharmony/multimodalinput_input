@@ -59,7 +59,6 @@ private:
     const std::string& GetErrorStr(ErrCode code) const;
     void OnConnected() override;
     void OnDisconnected() override;
-    void SetThreadQosLevel(std::shared_ptr<AppExecFwk::EventHandler> handler);
 
 private:
     ClientMsgHandler msgHandler_;
