@@ -47,7 +47,7 @@ constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
 constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID = 1000;
-constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 10;
+constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 128;
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
@@ -84,10 +84,10 @@ std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
     return instance_;
 }
 
-std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool checked) const
+std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
     CALL_DEBUG_ENTER;
-    if (virtualInputDevices_.find(id) != virtualInputDevices_.end()) {
+    if (virtualInputDevices_.find(deviceId) != virtualInputDevices_.end()) {
         MMI_HILOGI("Virtual device with id:%{public}d", id);
         std::shared_ptr<InputDevice> dev = virtualInputDevices_.at(id);
         CHKPP(dev);
@@ -274,8 +274,9 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
 int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
-    if (virtualInputDevices_.find(deviceId) != virtualInputDevices_.end()) {
-        if (!IsKeyboardDevice(virtualInputDevices_.at(deviceId))) {
+    auto iter = virtualInputDevices_.find(deviceId);
+    if (iter != virtualInputDevices_.end()) {
+        if (!IsKeyboardDevice(*iter)) {
             MMI_HILOGW("Virtual device with id:%{public}d is not keyboard", deviceId);
             keyboardType = KEYBOARD_TYPE_NONE;
             return RET_OK;
@@ -605,8 +606,10 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
     CALL_DEBUG_ENTER;
     mprintf(fd, "Device information:\t");
     mprintf(fd, "Input devices: count=%d", inputDevice_.size());
-    for (const auto &item : inputDevice_) {
-        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
+    mprintf(fd, "Virtual input devices: count=%d", virtualInputDevices_.size());
+    std::vector<int32_t> deviceIds = GetInputDeviceIds();
+    for (auto deviceId : deviceIds) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(deviceId, false);
         CHKPV(inputDevice);
         mprintf(fd,
             "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
@@ -788,7 +791,7 @@ int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
         return RET_ERR;
     }
     if (virtualDeviceId == std::numeric_limits<int32_t>::max()) {
-        MMI_HILOGW("Request ID exceeds the maximum");
+        MMI_HILOGW("Request id exceeds the maximum");
         virtualDeviceId = MIN_VIRTUAL_INPUT_DEVICE_ID;
     }
     deviceId = virtualDeviceId++;
