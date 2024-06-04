@@ -36,13 +36,19 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
 using namespace testing::ext;
+namespace {
+InputWindowsManager *g_instance;
 } // namespace
+
+#ifdef WIN_MGR
+#undef WIN_MGR
+#endif
+#define WIN_MGR g_instance
 
 class InputWindowsManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
+    static void SetUpTestCase(void);
     static void TearDownTestCase(void) {};
     void SetUp(void)
     {
@@ -91,6 +97,11 @@ public:
 private:
     bool preHoverScrollState_ { true };
 };
+
+void InputWindowsManagerTest::SetUpTestCase(void)
+{
+    g_instance = static_cast<InputWindowsManager *>(IInputWindowsManager::GetInstance().get());
+}
 
 void FingersenseWrapperTest(int32_t num) {}
 
@@ -4219,7 +4230,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager::FoldStatusLisener foldStatusLisener;
+    InputWindowsManager::FoldStatusLisener foldStatusLisener(*g_instance);
     Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
     EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
     foldStatus = Rosen::FoldStatus::EXPAND;
@@ -4241,7 +4252,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UnregisterFoldStatusLi
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.foldStatusListener_ = new (std::nothrow) InputWindowsManager::FoldStatusLisener();
+    inputWindowsManager.foldStatusListener_ = new (std::nothrow) InputWindowsManager::FoldStatusLisener(*g_instance);
     ASSERT_NE(inputWindowsManager.foldStatusListener_, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UnregisterFoldStatusListener());
 }

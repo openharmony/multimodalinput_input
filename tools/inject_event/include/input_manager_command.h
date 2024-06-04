@@ -34,6 +34,7 @@ private:
     void SleepAndUpdateTime(int64_t &currentTimeMs);
     void PrintMouseUsage();
     void PrintKeyboardUsage();
+    void PrintStylusUsage();
     void PrintTouchUsage();
     void PrintKnuckleUsage();
     void PrintTouchPadUsage();

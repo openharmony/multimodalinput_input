@@ -36,9 +36,54 @@ enum libinput_event_type libinput_event_get_type(struct libinput_event *event)
     return g_instance->GetEventType(event);
 }
 
+enum libinput_tablet_tool_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetTipState(event);
+}
+
+double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetTiltX(event);
+}
+
+double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetTiltY(event);
+}
+
+uint64_t libinput_event_tablet_tool_get_time_usec(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetTimeUsec(event);
+}
+
+double libinput_event_tablet_tool_get_pressure(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetPressure(event);
+}
+
+int32_t libinput_event_tablet_tool_get_tool_type(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetToolType(event);
+}
+
+enum libinput_tablet_tool_type libinput_tablet_tool_get_type(struct libinput_tablet_tool *tool)
+{
+    return g_instance->TabletToolGetType(tool);
+}
+
+struct libinput_tablet_tool* libinput_event_tablet_tool_get_tool(struct libinput_event_tablet_tool *event)
+{
+    return g_instance->TabletToolGetTool(event);
+}
+
 struct libinput_device* libinput_event_get_device(struct libinput_event *event)
 {
-    return (event != nullptr ? &event->dev : nullptr);
+    return g_instance->GetDevice(event);
+}
+
+uint64_t libinput_event_get_sensortime(struct libinput_event *event)
+{
+    return g_instance->GetSensorTime(event);
 }
 
 struct libinput_event_keyboard* libinput_event_get_keyboard_event(struct libinput_event *event)
@@ -51,6 +96,11 @@ struct libinput_event_pointer* libinput_event_get_pointer_event(struct libinput_
     return (event != nullptr ? reinterpret_cast<libinput_event_pointer *>(event) : nullptr);
 }
 
+struct libinput_event_touch* libinput_event_get_touch_event(struct libinput_event *event)
+{
+    return g_instance->GetTouchEvent(event);
+}
+
 struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_event *event)
 {
     return (event != nullptr ? reinterpret_cast<libinput_event_touch *>(event) : nullptr);
@@ -59,6 +109,11 @@ struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_e
 struct libinput_event_gesture* libinput_event_get_gesture_event(struct libinput_event *event)
 {
     return g_instance->GetGestureEvent(event);
+}
+
+struct libinput_event_tablet_tool* libinput_event_get_tablet_tool_event(struct libinput_event *event)
+{
+    return g_instance->GetTabletToolEvent(event);
 }
 
 uint64_t libinput_event_keyboard_get_time_usec(struct libinput_event_keyboard *event)
@@ -84,6 +139,41 @@ enum libinput_key_state libinput_event_keyboard_get_key_state(struct libinput_ev
 enum libinput_button_state libinput_event_pointer_get_button_state(struct libinput_event_pointer *event)
 {
     return (event != nullptr ? event->buttonState : LIBINPUT_BUTTON_STATE_RELEASED);
+}
+
+uint64_t libinput_event_touch_get_time_usec(struct libinput_event_touch *event)
+{
+    return g_instance->TouchEventGetTime(event);
+}
+
+int32_t libinput_event_touch_get_seat_slot(struct libinput_event_touch *event)
+{
+    return g_instance->TouchEventGetSeatSlot(event);
+}
+
+double libinput_event_touch_get_pressure(struct libinput_event_touch* event)
+{
+    return g_instance->TouchEventGetPressure(event);
+}
+
+int32_t libinput_event_get_touch_contact_long_axis(struct libinput_event_touch *event)
+{
+    return g_instance->TouchEventGetContactLongAxis(event);
+}
+
+int32_t libinput_event_get_touch_contact_short_axis(struct libinput_event_touch *event)
+{
+    return g_instance->TouchEventGetContactShortAxis(event);
+}
+
+int32_t libinput_event_touch_get_tool_type(struct libinput_event_touch *event)
+{
+    return g_instance->TouchEventGetToolType(event);
+}
+
+int libinput_device_touch_btn_tool_type_down(struct libinput_device *device, int32_t btnToolType)
+{
+    return g_instance->TouchEventGetBtnToolTypeDown(device, btnToolType);
 }
 
 double libinput_event_touch_get_x_transformed(struct libinput_event_touch *event, uint32_t width)

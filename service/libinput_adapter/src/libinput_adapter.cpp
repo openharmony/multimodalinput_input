@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 #include "define_multimodal.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "util.h"
 
 #undef MMI_LOG_DOMAIN
