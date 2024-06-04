@@ -335,12 +335,12 @@ struct WindowInfo {
         return windowInputTypeFlag;
     }
 
-    bool InputEvent::HasFlag(uint32_t flag)
+    bool InputEvent::HasFlag(uint32_t flag) const
     {
         return (windowInputTypeFlag & flag) != 0;
     }
 
-    void InputEvent::AddFlag(uint32_t flag) const
+    void InputEvent::AddFlag(uint32_t flag)
     {
         windowInputTypeFlag |= flag;
     }
