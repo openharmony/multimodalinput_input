@@ -670,9 +670,26 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_004, TestSize.Level1)
     OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_FORWARD);
     retResult = OH_Input_InjectMouseEvent(mouseEvent);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_InjectMouseEvent_005
+ * @tc.desc: Verify the InjectMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_InjectMouseEvent_005, TestSize.Level1)
+{
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    ASSERT_NE(mouseEvent, nullptr);
+    OH_Input_SetMouseEventDisplayX(mouseEvent, 350);
+    OH_Input_SetMouseEventDisplayY(mouseEvent, 350);
+    OH_Input_SetMouseEventAxisType(mouseEvent, MOUSE_AXIS_SCROLL_VERTICAL);
+    OH_Input_SetMouseEventAxisValue(mouseEvent, 1.1);
+    OH_Input_SetMouseEventActionTime(mouseEvent, 2);
     OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_END);
     OH_Input_SetMouseEventButton(mouseEvent, MOUSE_BUTTON_BACK);
-    retResult = OH_Input_InjectMouseEvent(mouseEvent);
+    int32_t retResult = OH_Input_InjectMouseEvent(mouseEvent);
     OH_Input_SetMouseEventAction(mouseEvent, MOUSE_ACTION_AXIS_END);
     OH_Input_SetMouseEventButton(mouseEvent, 7);
     retResult = OH_Input_InjectMouseEvent(mouseEvent);
