@@ -16,8 +16,10 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
 #include "mouse_event_normalize.h"
 #include "general_mouse.h"

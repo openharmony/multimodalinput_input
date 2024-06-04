@@ -23,7 +23,7 @@
 #include "dfx_hisysevent.h"
 #include "event_dispatch_handler.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"

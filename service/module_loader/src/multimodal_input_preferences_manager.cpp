@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "multimodal_input_preferences_manager.h"
 
 #include "mmi_log.h"
@@ -47,9 +47,19 @@ const std::string keyboarFileName = "keyboard_settings.xml";
 const std::string touchpadFileName = "touchpad_settings.xml";
 } // namespace
 
-MultiModalInputPreferencesManager::MultiModalInputPreferencesManager() {}
+std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
+std::mutex IPreferenceManager::mutex_;
 
-MultiModalInputPreferencesManager::~MultiModalInputPreferencesManager() {}
+std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<MultiModalInputPreferencesManager>();
+        }
+    }
+    return instance_;
+}
 
 int32_t MultiModalInputPreferencesManager::InitPreferences()
 {
