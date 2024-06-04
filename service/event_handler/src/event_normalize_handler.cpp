@@ -15,6 +15,8 @@
 
 #include "event_normalize_handler.h"
 
+#include "display_manager.h"
+
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
@@ -50,8 +52,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t FINGER_NUM = 2;
-constexpr int32_t MT_TOOL_PALM = 2;
+constexpr int32_t FINGER_NUM { 2 };
+constexpr int32_t MT_TOOL_PALM { 2 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)

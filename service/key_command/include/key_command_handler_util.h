@@ -29,7 +29,7 @@
 #include "input_event_handler.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"

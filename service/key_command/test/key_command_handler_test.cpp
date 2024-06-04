@@ -21,7 +21,7 @@
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "system_info.h"
 #include "util.h"
 #include "cJSON.h"

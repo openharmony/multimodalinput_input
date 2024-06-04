@@ -29,7 +29,7 @@ namespace {
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
-constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -429,7 +429,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
-      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
+      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
@@ -460,6 +460,7 @@ void PointerEvent::Reset()
     dispatchTimes_ = 0;
     axes_ = 0U;
     axisValues_.fill(0.0);
+    velocity_ = 0.0;
     pressedKeys_.clear();
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     fingerprintDistanceX_ = 0.0;
@@ -817,6 +818,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
+    WRITEDOUBLE(out, velocity_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -878,6 +880,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
+
+    READDOUBLE(in, velocity_);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
@@ -1174,6 +1178,16 @@ int32_t PointerEvent::GetDispatchTimes() const
 void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
 {
     dispatchTimes_ = dispatchTimes;
+}
+
+void PointerEvent::SetHandlerEventType(HandleEventType eventType)
+{
+    handleEventType_ = eventType;
+}
+
+HandleEventType PointerEvent::GetHandlerEventType() const
+{
+    return handleEventType_;
 }
 
 std::string_view PointerEvent::ActionToShortStr(int32_t action)

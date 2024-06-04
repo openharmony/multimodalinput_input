@@ -38,7 +38,59 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t MAX_AXIS_INFO { 64 };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
+
+int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
+{
+    CHKPR(inputDevice, RET_ERR);
+    int32_t value = 0;
+    READINT32(data, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetId(value);
+    READINT32(data, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetType(value);
+    std::string element;
+    READSTRING(data, element, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetName(element);
+    READINT32(data, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetBus(value);
+    READINT32(data, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetVersion(value);
+    READINT32(data, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetProduct(value);
+    READINT32(data, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetVendor(value);
+    READSTRING(data, element, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetPhys(element);
+    READSTRING(data, element, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetUniq(element);
+    uint64_t caps;
+    READUINT64(data, caps, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetCapabilities(static_cast<unsigned long>(caps));
+    uint32_t size = 0;
+    READUINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size > MAX_AXIS_INFO) {
+        return RET_ERR;
+    }
+    InputDevice::AxisInfo axis;
+    for (uint32_t i = 0; i < size; ++i) {
+        int32_t val = 0;
+        READINT32(data, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetMinimum(val);
+        READINT32(data, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetMaximum(val);
+        READINT32(data, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetAxisType(val);
+        READINT32(data, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetFuzz(val);
+        READINT32(data, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetFlat(val);
+        READINT32(data, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetResolution(val);
+        inputDevice->AddAxisInfo(axis);
+    }
+    return RET_OK;
+}
 } // namespace
 const int32_t TUPLE_PID = 0;
 const int32_t TUPLE_UID = 1;
@@ -325,6 +377,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
             return StubGetHardwareCursorStats(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
+            return StubAddVirtualInputDevice(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
+            return StubRemoveVirtualInputDevice(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -358,6 +416,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
 
     if (!reply.WriteFileDescriptor(clientFd)) {
         MMI_HILOGE("Write file descriptor failed");
+        close(clientFd);
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
 
@@ -2234,6 +2293,38 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    auto device = std::make_shared<InputDevice>();
+    if (g_parseInputDevice(data, device) != RET_OK) {
+        MMI_HILOGE("ParseInputDevice failed");
+        return RET_ERR;
+    }
+    int32_t deviceId { -1 };
+    int32_t ret = AddVirtualInputDevice(device, deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddVirtualInputDevice failed");
+        return ret;
+    }
+    WRITEINT32(reply, deviceId);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t deviceId { -1 };
+    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveVirtualInputDevice(deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("RemoveVirtualInputDevice failed");
+        return ret;
+    }
+    WRITEINT32(reply, ret);
     return RET_OK;
 }
 } // namespace MMI

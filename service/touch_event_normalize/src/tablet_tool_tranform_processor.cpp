@@ -14,7 +14,7 @@
  */
 
 #include "tablet_tool_tranform_processor.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN

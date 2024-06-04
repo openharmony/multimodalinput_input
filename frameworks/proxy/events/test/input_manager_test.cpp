@@ -119,6 +119,20 @@ std::string InputManagerTest::GetEventDump()
 }
 
 /**
+ * @tc.name: InputManagerTest_GetWinSyncBatchSize
+ * @tc.desc: Test GetWinSyncBatchSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetWinSyncBatchSize, TestSize.Level1)
+{
+    int32_t maxAreasCount = 1;
+    int32_t displayCount = 2;
+    int32_t ret = InputManager::GetInstance()->GetWinSyncBatchSize(maxAreasCount, displayCount);
+    EXPECT_EQ(ret, 38);
+}
+
+/**
  * @tc.name: InputManager_NotResponse_001
  * @tc.desc: detection of not response
  * @tc.type: FUNC
