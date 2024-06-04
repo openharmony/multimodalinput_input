@@ -75,12 +75,12 @@ void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> tou
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-
+    int32_t displayId = touchEvent->GetTargetDisplayId();
+    CreateTouchWindow(displayId);
+    
     if (!IsSingleKnuckle(touchEvent)) {
         return;
     }
-    int32_t displayId = touchEvent->GetTargetDisplayId();
-    CreateTouchWindow(displayId);
     int32_t touchAction = touchEvent->GetPointerAction();
     if (IsValidAction(touchAction) && IsSingleKnuckleDoubleClick(touchEvent)) {
         StartTouchDraw(touchEvent);
@@ -96,6 +96,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
         touchEvent->GetPointerIds().size() != 1 || isRotate_) {
+        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         if (!pointerInfos_.empty()) {
             pointerInfos_.clear();
 #ifndef USE_ROSEN_DRAWING
@@ -110,6 +111,9 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
+        } else {
+            isRotate_ = false;
+            return true;
         }
         isRotate_ = false;
         return false;

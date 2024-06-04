@@ -120,8 +120,6 @@ ohos_shared_library("libmmi-client") {
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "qos_manager:concurrent_task_client",
-    "qos_manager:qos",
   ]
 }
 
@@ -200,6 +198,7 @@ ohos_unittest("InputManagerTest") {
     "events/src/input_manager_util.cpp",
     "events/test/input_manager_simulate_test.cpp",
     "events/test/input_manager_test.cpp",
+    "events/test/virtual_input_device_test.cpp",
   ]
 
   configs = [

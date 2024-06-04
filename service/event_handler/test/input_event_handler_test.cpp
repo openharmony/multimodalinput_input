@@ -24,10 +24,12 @@
 #include <unistd.h>
 #include <vector>
 
+#include "display_manager.h"
+
 #include "general_touchpad.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
 #include "mmi_log.h"
 #include "key_command_handler.h"

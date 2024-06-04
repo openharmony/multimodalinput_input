@@ -29,7 +29,7 @@
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
@@ -324,6 +324,12 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
         }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         targetWindowIds_[pointerId] = targetWindowId;
+    }
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
+        int32_t pointerId = pointerEvent->GetPointerId();
+        targetWindowIds_.erase(pointerId);
     }
     return RET_OK;
 }

@@ -18,7 +18,7 @@
 
 #include "singleton.h"
 
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "key_event.h"
 #include "util.h"
 
