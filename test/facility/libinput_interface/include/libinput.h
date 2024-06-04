@@ -43,11 +43,20 @@ enum libinput_event_type {
     LIBINPUT_EVENT_GESTURE_PINCH_BEGIN,
     LIBINPUT_EVENT_GESTURE_PINCH_UPDATE,
     LIBINPUT_EVENT_GESTURE_PINCH_END,
+
+    LIBINPUT_EVENT_TABLET_TOOL_AXIS,
+    LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY,
+    LIBINPUT_EVENT_TABLET_TOOL_TIP,
 };
 
 enum libinput_key_state {
     LIBINPUT_KEY_STATE_RELEASED = 0,
     LIBINPUT_KEY_STATE_PRESSED = 1
+};
+
+enum libinput_tablet_tool_tip_state {
+	LIBINPUT_TABLET_TOOL_TIP_UP = 0,
+	LIBINPUT_TABLET_TOOL_TIP_DOWN = 1,
 };
 
 enum libinput_button_state {
@@ -88,6 +97,17 @@ enum evdev_device_udev_tags {
     EVDEV_UDEV_TAG_SWITCH = 1 << 11,
 };
 
+enum libinput_tablet_tool_type {
+    LIBINPUT_TABLET_TOOL_TYPE_PEN = 1,
+    LIBINPUT_TABLET_TOOL_TYPE_ERASER,
+    LIBINPUT_TABLET_TOOL_TYPE_BRUSH,
+    LIBINPUT_TABLET_TOOL_TYPE_PENCIL,
+    LIBINPUT_TABLET_TOOL_TYPE_AIRBRUSH,
+    LIBINPUT_TABLET_TOOL_TYPE_MOUSE,
+    LIBINPUT_TABLET_TOOL_TYPE_LENS,
+    LIBINPUT_TABLET_TOOL_TYPE_TOTEM,
+};
+
 struct udev_device;
 struct libinput_device;
 struct libinput_event;
@@ -96,8 +116,29 @@ struct libinput_event_pointer;
 struct libinput_event_touch;
 struct libinput_event_tablet_tool;
 struct libinput_event_gesture;
+struct libinput_tablet_tool;
 
 enum libinput_event_type libinput_event_get_type(struct libinput_event *event);
+
+int32_t libinput_event_tablet_tool_get_tool_type(struct libinput_event_tablet_tool *event);
+
+struct libinput_tablet_tool* libinput_event_tablet_tool_get_tool(struct libinput_event_tablet_tool *event);
+
+enum libinput_tablet_tool_type libinput_tablet_tool_get_type(struct libinput_tablet_tool *tool);
+
+enum libinput_tablet_tool_tip_state libinput_event_tablet_tool_get_tip_state(struct libinput_event_tablet_tool *event);
+
+double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *event);
+
+double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *event);
+
+uint64_t libinput_event_tablet_tool_get_time_usec(struct libinput_event_tablet_tool *event);
+
+double libinput_event_tablet_tool_get_pressure(struct libinput_event_tablet_tool *event);
+
+double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *event);
+
+double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *event);
 
 struct libinput_device* libinput_event_get_device(struct libinput_event *event);
 
@@ -108,6 +149,8 @@ struct libinput_event_pointer* libinput_event_get_pointer_event(struct libinput_
 struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_event *event);
 
 struct libinput_event_gesture* libinput_event_get_gesture_event(struct libinput_event *event);
+
+struct libinput_event_tablet_tool* libinput_event_get_tablet_tool_event(struct libinput_event *event);
 
 uint64_t libinput_event_keyboard_get_time_usec(struct libinput_event_keyboard *event);
 
