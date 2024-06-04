@@ -17,7 +17,7 @@
 
 #include <fstream>
 
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
