@@ -1176,6 +1176,16 @@ void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
     dispatchTimes_ = dispatchTimes;
 }
 
+void PointerEvent::SetHandlerEventType(HandleEventType eventType)
+{
+    handleEventType_ = eventType;
+}
+
+HandleEventType PointerEvent::GetHandlerEventType() const
+{
+    return handleEventType_;
+}
+
 std::string_view PointerEvent::ActionToShortStr(int32_t action)
 {
     // 该函数逻辑简单，功能单一，考虑性能影响，使用switch-case而不是表驱动实现。
