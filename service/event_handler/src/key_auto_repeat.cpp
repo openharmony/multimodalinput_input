@@ -23,7 +23,7 @@
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -33,15 +33,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID = -1;
-constexpr int32_t OPEN_AUTO_REPEAT = 1;
-constexpr int32_t DEFAULT_KEY_REPEAT_DELAY = 500;
-constexpr int32_t MIN_KEY_REPEAT_DELAY = 300;
-constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
-constexpr int32_t DEFAULT_KEY_REPEAT_RATE = 50;
-constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
-constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
-const std::string KEYBOARD_FILE_NAME = "keyboard_settings.xml";
+constexpr int32_t INVALID_DEVICE_ID { -1 };
+constexpr int32_t OPEN_AUTO_REPEAT { 1 };
+constexpr int32_t DEFAULT_KEY_REPEAT_DELAY { 500 };
+constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
+constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
+constexpr int32_t DEFAULT_KEY_REPEAT_RATE { 50 };
+constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
+constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
+const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 } // namespace
 
 KeyAutoRepeat::KeyAutoRepeat() {}

@@ -16,13 +16,15 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "general_mouse.h"
 #include "general_touchpad.h"
 #include "mouse_transform_processor.h"
 #include "window_info.h"
 #include "mouse_device_state.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
 
 namespace OHOS {

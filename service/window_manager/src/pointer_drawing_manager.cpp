@@ -28,10 +28,10 @@
 #include "define_multimodal.h"
 #include "i_multimodal_input_connect.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "pipeline/rs_recording_canvas.h"
 #include "preferences.h"
 #include "preferences_errno.h"
@@ -52,43 +52,43 @@ namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
-const std::string POINTER_COLOR = "pointerColor";
-const std::string POINTER_SIZE = "pointerSize";
-const std::string MAGIC_POINTER_COLOR = "magicPointerColor";
-const std::string MAGIC_POINTER_SIZE = "magicPointerSize";
-constexpr int32_t BASELINE_DENSITY = 160;
-constexpr int32_t CALCULATE_MIDDLE = 2;
-constexpr int32_t MAGIC_INDEPENDENT_PIXELS = 25;
-constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
-constexpr int32_t POINTER_WINDOW_INIT_SIZE = 64;
-constexpr int32_t DEFAULT_POINTER_SIZE = 1;
-constexpr int32_t MIN_POINTER_SIZE = 1;
-constexpr int32_t MAX_POINTER_SIZE = 7;
-constexpr int32_t DEFAULT_VALUE = -1;
-constexpr int32_t ANIMATION_DURATION = 500;
-constexpr int32_t DEFAULT_POINTER_STYLE = 0;
-constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
-constexpr int32_t MOUSE_ICON_BAIS = 5;
-constexpr int32_t VISIBLE_LIST_MAX_SIZE = 100;
-constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR = 4000;
-constexpr float ROTATION_ANGLE = 360.f;
-constexpr float LOADING_CENTER_RATIO = 0.5f;
-constexpr float RUNNING_X_RATIO = 0.3f;
-constexpr float RUNNING_Y_RATIO = 0.675f;
-constexpr float INCREASE_RATIO = 1.22;
-constexpr float ROTATION_ANGLE90 = 90.f;
-constexpr int32_t MIN_POINTER_COLOR = 0x000000;
-constexpr int32_t MAX_POINTER_COLOR = 0x00ffffff;
-constexpr int32_t MIN_CURSOR_SIZE = 64;
-constexpr uint32_t RGB_CHANNEL_BITS_LENGTH = 24;
-constexpr float MAX_ALPHA_VALUE = 255.f;
-constexpr int32_t MOUSE_STYLE_OPT = 0;
-constexpr int32_t MAGIC_STYLE_OPT = 1;
-const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
-bool isRsRemoteDied = false;
-constexpr uint64_t FOLD_SCREEN_ID {5};
-constexpr int32_t CANVAS_SIZE = 256;
-constexpr float IMAGE_PIXEL = 0.0f;
+const std::string POINTER_COLOR { "pointerColor" };
+const std::string POINTER_SIZE { "pointerSize" };
+const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
+const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
+constexpr int32_t BASELINE_DENSITY { 160 };
+constexpr int32_t CALCULATE_MIDDLE { 2 };
+constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 25 };
+constexpr int32_t DEVICE_INDEPENDENT_PIXELS { 40 };
+constexpr int32_t POINTER_WINDOW_INIT_SIZE { 64 };
+constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+constexpr int32_t MIN_POINTER_SIZE { 1 };
+constexpr int32_t MAX_POINTER_SIZE { 7 };
+constexpr int32_t DEFAULT_VALUE { -1 };
+constexpr int32_t ANIMATION_DURATION { 500 };
+constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
+constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
+constexpr int32_t MOUSE_ICON_BAIS { 5 };
+constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
+constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 4000 };
+constexpr float ROTATION_ANGLE { 360.f };
+constexpr float LOADING_CENTER_RATIO { 0.5f };
+constexpr float RUNNING_X_RATIO { 0.3f };
+constexpr float RUNNING_Y_RATIO { 0.675f };
+constexpr float INCREASE_RATIO { 1.22f };
+constexpr float ROTATION_ANGLE90 { 90.f };
+constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
+constexpr int32_t MAX_POINTER_COLOR { 0x00ffffff };
+constexpr int32_t MIN_CURSOR_SIZE { 64 };
+constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
+constexpr float MAX_ALPHA_VALUE { 255.f };
+constexpr int32_t MOUSE_STYLE_OPT { 0 };
+constexpr int32_t MAGIC_STYLE_OPT { 1 };
+const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+bool g_isRsRemoteDied { false };
+constexpr uint64_t FOLD_SCREEN_ID { 5 };
+constexpr int32_t CANVAS_SIZE { 256 };
+constexpr float IMAGE_PIXEL { 0.0f };
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -849,7 +849,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
-    isRsRemoteDied = true;
+    g_isRsRemoteDied = true;
 }
 
 void PointerDrawingManager::AttachToDisplay()
@@ -867,7 +867,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
-    isRsRemoteDied = false;
+    g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -1472,9 +1472,9 @@ bool PointerDrawingManager::IsPointerVisible()
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("isRsRemoteDied:%{public}d", isRsRemoteDied ? 1 : 0);
-    if (isRsRemoteDied && surfaceNode_ != nullptr) {
-        isRsRemoteDied = false;
+    MMI_HILOGI("g_isRsRemoteDied:%{public}d", g_isRsRemoteDied ? 1 : 0);
+    if (g_isRsRemoteDied && surfaceNode_ != nullptr) {
+        g_isRsRemoteDied = false;
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();

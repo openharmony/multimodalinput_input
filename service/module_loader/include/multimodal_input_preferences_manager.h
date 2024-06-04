@@ -16,19 +16,21 @@
 #ifndef MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 #define MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 
+#include "nocopyable.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 
-#include "singleton.h"
+#include "i_preference_manager.h"
 
 namespace OHOS {
 namespace MMI {
-class MultiModalInputPreferencesManager {
-    DECLARE_DELAYED_SINGLETON(MultiModalInputPreferencesManager);
-
+class MultiModalInputPreferencesManager : public IPreferenceManager {
 public:
+    MultiModalInputPreferencesManager() = default;
+    ~MultiModalInputPreferencesManager() = default;
     DISALLOW_COPY_AND_MOVE(MultiModalInputPreferencesManager);
+
     int32_t InitPreferences();
     int32_t GetPreferencesSettings();
     int32_t InitPreferencesMap();
@@ -81,8 +83,6 @@ private:
     const std::string magicPointerSize = "magicPointerSize";
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 };
-
-#define PREFERENCES_MGR ::OHOS::DelayedSingleton<MultiModalInputPreferencesManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MULTIMODAL_INPUT_PREFERENCES_MANAGER_H

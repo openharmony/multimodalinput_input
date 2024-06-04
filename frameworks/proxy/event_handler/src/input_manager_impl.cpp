@@ -2134,5 +2134,15 @@ int32_t InputManagerImpl::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t dis
 {
     return (MAX_PKT_SIZE - GetDisplayMaxSize() * displayCount) / GetWindowMaxSize(maxAreasCount);
 }
+
+int32_t InputManagerImpl::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->AddVirtualInputDevice(device, deviceId);
+}
+
+int32_t InputManagerImpl::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->RemoveVirtualInputDevice(deviceId);
+}
 } // namespace MMI
 } // namespace OHOS

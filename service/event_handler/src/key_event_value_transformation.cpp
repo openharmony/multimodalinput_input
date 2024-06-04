@@ -28,10 +28,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t BIT_SET_INDEX = 16;
-constexpr int32_t INVALID_KEY_CODE = -1;
-constexpr int32_t MAX_KEY_SIZE = 3;
-constexpr int32_t MIN_KEY_SIZE = 1;
+constexpr int32_t BIT_SET_INDEX { 16 };
+constexpr int32_t INVALID_KEY_CODE { -1 };
+constexpr int32_t MAX_KEY_SIZE { 3 };
+constexpr int32_t MIN_KEY_SIZE { 1 };
 } // namespace
 
 const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {

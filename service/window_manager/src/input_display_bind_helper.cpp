@@ -43,8 +43,8 @@ const std::string SUFFIX = "0000:0000";
 const std::string INPUT = "input";
 const std::string EVENT = "event";
 const std::string NAME = "name";
-const int32_t DISPLAY_ID_MAIN = 0;
-const int32_t DISPLAY_ID_SUB = 5;
+const int32_t DISPLAY_ID_MAIN { 0 };
+const int32_t DISPLAY_ID_SUB { 5 };
 }
 
 namespace fs = std::filesystem;
