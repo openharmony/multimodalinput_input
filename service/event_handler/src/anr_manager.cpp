@@ -110,7 +110,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         return;
     }
     if (anrTimerCount_ >= MAX_TIMER_COUNT) {
-        MMI_HILOGD("Add anr timer failed, anrtimer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
+        MMI_HILOGD("Add timer failed, timer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
         return;
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
