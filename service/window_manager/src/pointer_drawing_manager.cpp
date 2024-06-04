@@ -85,7 +85,7 @@ constexpr float MAX_ALPHA_VALUE { 255.f };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-bool isRsRemoteDied { false };
+bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
