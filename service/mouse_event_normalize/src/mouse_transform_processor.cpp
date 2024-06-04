@@ -45,25 +45,25 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 11;
-constexpr int32_t DEFAULT_SPEED = 7;
-constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 6;
-constexpr int32_t DEFAULT_ROWS = 3;
-constexpr int32_t MIN_ROWS = 1;
-constexpr int32_t MAX_ROWS = 100;
-constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
-constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
-constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
-constexpr int32_t TP_CLICK_FINGER_ONE = 1;
-constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
-constexpr int32_t HARD_HARDEN_DEVICE_WIDTH = 2880;
-constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT = 1920;
-constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH = 3120;
-constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT = 2080;
-const std::string DEVICE_TYPE_HARDEN = "HAD";
+constexpr int32_t MIN_SPEED { 1 };
+constexpr int32_t MAX_SPEED { 11 };
+constexpr int32_t DEFAULT_SPEED { 7 };
+constexpr int32_t DEFAULT_TOUCHPAD_SPEED { 6 };
+constexpr int32_t DEFAULT_ROWS { 3 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
+constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
+constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
+constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
+constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
+constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
+constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
+constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
+constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
+const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
-const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
+const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
