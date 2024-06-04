@@ -80,7 +80,6 @@
         "graphic_2d_ext",
         "hdf_core",
         "bounds_checking_function",
-        "qos_manager",
         "call_manager"
       ],
       "third_party": [
