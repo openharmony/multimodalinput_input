@@ -37,28 +37,28 @@ namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
-constexpr int32_t DENSITY_BASELINE = 160;
-constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
-constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
-constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
-constexpr int32_t CALCULATE_MIDDLE = 2;
-constexpr int32_t DEFAULT_VALUE = -1;
-constexpr int32_t MAX_POINTER_COLOR = 0x00ffff;
-constexpr int32_t TIME_DIMENSION = 1000;
-constexpr int32_t PATH_COLOR = 0xFFCCCCCC;
-constexpr int32_t MIN_POINT_SIZE = 1;
-constexpr float PAINT_STROKE_WIDTH = 10.0f;
-constexpr float DOUBLE = 2.0f;
-constexpr int32_t POINT_TOTAL_SIZE = 5;
-constexpr int32_t POINT_SYSTEM_SIZE = 200;
-constexpr int32_t MAX_DIVERGENCE_NUM = 10;
-constexpr int32_t DEFAULT_POINTER_SIZE = 1;
-constexpr int32_t DESIRED_SIZE = 80;
-constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
-constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME = 100000;
-constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
-constexpr float VPR_CONFIG = 3.25f;
-constexpr int32_t POW_SQUARE = 2;
+constexpr int32_t DENSITY_BASELINE { 160 };
+constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
+constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
+constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
+constexpr int32_t CALCULATE_MIDDLE { 2 };
+constexpr int32_t DEFAULT_VALUE { -1 };
+constexpr int32_t MAX_POINTER_COLOR { 0x00ffff };
+constexpr int32_t TIME_DIMENSION { 1000 };
+constexpr int32_t PATH_COLOR { 0xFFCCCCCC };
+constexpr int32_t MIN_POINT_SIZE { 1 };
+constexpr float PAINT_STROKE_WIDTH { 10.0f };
+constexpr float DOUBLE { 2.0f };
+constexpr int32_t POINT_TOTAL_SIZE { 5 };
+constexpr int32_t POINT_SYSTEM_SIZE { 200 };
+constexpr int32_t MAX_DIVERGENCE_NUM { 10 };
+constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+constexpr int32_t DESIRED_SIZE { 80 };
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW { 450000 };
+constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
+constexpr float VPR_CONFIG { 3.25f };
+constexpr int32_t POW_SQUARE { 2 };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
