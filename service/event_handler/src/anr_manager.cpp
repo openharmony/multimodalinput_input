@@ -33,9 +33,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string FOUNDATION = "foundation";
-constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
-constexpr int32_t TIME_CONVERT_RATIO = 1000;
+const std::string FOUNDATION { "foundation" };
+constexpr int32_t MAX_TIMER_COUNT { 50 };
+constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -109,8 +109,8 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
     }
-    if (anrTimerCount_ >= MAX_ANR_TIMER_COUNT) {
-        MMI_HILOGD("Add anr timer failed, anrtimer count reached the maximum number:%{public}d", MAX_ANR_TIMER_COUNT);
+    if (anrTimerCount_ >= MAX_TIMER_COUNT) {
+        MMI_HILOGD("Add timer failed, timer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
         return;
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {

@@ -37,7 +37,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MT_TOOL_PALM = 2;
+constexpr int32_t MT_TOOL_PALM { 2 };
 } // namespace
 
 InputEventHandler::InputEventHandler()
