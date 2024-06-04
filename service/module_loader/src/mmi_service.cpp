@@ -2197,6 +2197,30 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     return RET_OK;
 }
 
+int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(device, ERROR_NULL_POINTER);
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::AddVirtualInputDevice, INPUT_DEV_MGR, device,
+            std::ref(deviceId)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddVirtualInputDevice failed:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::RemoveVirtualInputDevice, INPUT_DEV_MGR, deviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("RemoveVirtualInputDevice failed:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MMIService::EnableHardwareCursorStats(bool enable)
 {
     CALL_DEBUG_ENTER;
