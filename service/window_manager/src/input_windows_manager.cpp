@@ -1730,6 +1730,13 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
+                    if ((item.windowInputType == WindowInputType::TRANSMIT_MOUSE_MOVE) &&
+                        ((pointerEvent->GetPressedButtons().empty()) ||
+                        (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
+                        (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
+                        (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE))) {
+                        continue;
+                    }
                     firstBtnDownWindowId_ = item.id;
                     MMI_HILOG_DISPATCHD("Mouse event select pull window, window:%{public}d, pid:%{public}d",
                         firstBtnDownWindowId_, item.pid);
@@ -1738,6 +1745,13 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
+                if ((item.windowInputType == WindowInputType::TRANSMIT_MOUSE_MOVE) &&
+                    ((pointerEvent->GetPressedButtons().empty()) ||
+                    (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
+                    (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
+                    (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE))) {
+                    continue;
+                }
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOG_DISPATCHD("Find out the dispatch window of this pointer event when the targetWindowId "
                     "hasn't been set up yet, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
@@ -3188,6 +3202,8 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
         }
         case WindowInputType::ANTI_MISTAKE_TOUCH:
             return true;
+        case WindowInputType::TRANSMIT_MOUSE_MOVE:
+            return false;
         default:
             return true;
     }

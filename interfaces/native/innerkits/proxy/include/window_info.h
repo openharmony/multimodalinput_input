@@ -171,7 +171,8 @@ enum class WindowInputType : uint8_t {
     NORMAL = 0,
     TRANSMIT_ALL = 1,
     TRANSMIT_EXCEPT_MOVE = 2,
-    ANTI_MISTAKE_TOUCH = 3
+    ANTI_MISTAKE_TOUCH = 3,
+    TRANSMIT_MOUSE_MOVE = 4
 };
 
 struct WindowInfo {
