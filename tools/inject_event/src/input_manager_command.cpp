@@ -1965,10 +1965,12 @@ void InputManagerCommand::PrintTouchPadUsage()
     std::cout << "  <scale percent numerator> numerator of percent scale, divided by 100 is scale, it is an integer,";
     std::cout << "  range is (0, 500]"                                                               << std::endl;
     std::cout << std::endl;
-    std::cout << "-s <fc> <dx1> <dy1> <dx2> <dy2>  fc means finger count and its range is [2, 5], <dx1> <dy1> ";
-    std::cout << "  -press down a position  dx1 dy1  <dx2> <dy2> -press up a position  dx2  dy2"      << std::endl;
+    std::cout << "-s <fingerCount> <positionX1> <positionY1> <positionX2> <positionY2>  fc means"    << std::endl;
+    std::cout << "  finger count and its range is [2, 5], <positionX1> <positionY1> "                << std::endl;
+    std::cout << "  -press down a position  dx1 dy1  <positionX2> <positionY2> -press"               << std::endl;
+    std::cout << "  up a position  positionX2  positionY2"                                           << std::endl;
     std::cout << std::endl;
-    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                               << std::endl;
+    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                          << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()
