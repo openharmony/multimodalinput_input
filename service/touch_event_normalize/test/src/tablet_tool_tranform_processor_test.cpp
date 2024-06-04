@@ -17,8 +17,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "libinput.h"
-#include "libinput_interface.h"
+#include "libinput_mock.h"
 #include "define_multimodal.h"
 #include "tablet_tool_tranform_processor.h"
 
@@ -29,24 +28,6 @@ namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
-
-class LibinputInterfaceMock : public LibinputInterface {
-public:
-    LibinputInterfaceMock() = default;
-    ~LibinputInterfaceMock() override = default;
-
-    MOCK_METHOD1(GetEventType, enum libinput_event_type (struct libinput_event *event));
-    MOCK_METHOD1(GetTipState, enum libinput_tablet_tool_tip_state (struct libinput_event_tablet_tool *event));
-    MOCK_METHOD1(TabletToolGetType, enum libinput_tablet_tool_type (struct libinput_tablet_tool *tool));
-    MOCK_METHOD1(GetGestureEvent, struct libinput_event_gesture* (struct libinput_event *event));
-    MOCK_METHOD1(GetTabletToolEvent, struct libinput_event_tablet_tool* (struct libinput_event *event));
-    MOCK_METHOD1(GestureEventGetTime, uint32_t (struct libinput_event_gesture *event));
-    MOCK_METHOD1(GestureEventGetFingerCount, int (struct libinput_event_gesture *event));
-    MOCK_METHOD1(TabletToolGetTool, struct libinput_tablet_tool* (struct libinput_event_tablet_tool *event));
-    MOCK_METHOD1(TabletToolGetToolType, int32_t (struct libinput_event_tablet_tool *event));
-    MOCK_METHOD2(GestureEventGetDevCoordsX, int (struct libinput_event_gesture *, uint32_t));
-    MOCK_METHOD2(GestureEventGetDevCoordsY, int (struct libinput_event_gesture *, uint32_t));
-};
 
 class TabletToolTranformProcessorTest : public testing::Test {
 public:
@@ -160,7 +141,7 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnTip_
 
     NiceMock<LibinputInterfaceMock> libinputMock;
     EXPECT_CALL(libinputMock, GetTabletToolEvent).WillOnce(Return(&event));
-    EXPECT_CALL(libinputMock, GetTipState).WillOnce(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
+    EXPECT_CALL(libinputMock, TabletToolGetTipState).WillOnce(Return(LIBINPUT_TABLET_TOOL_TIP_DOWN));
 
     bool ret = processor.OnTip(&event.base);
     EXPECT_FALSE(ret);

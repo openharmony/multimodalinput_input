@@ -37,7 +37,7 @@
 #include "util_napi_error.h"
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "timer_manager.h"
@@ -97,10 +97,10 @@ enum PointerHotArea : int32_t {
     BOTTOM_RIGHT = 7,
 };
 
-std::shared_ptr<InputWindowsManager> InputWindowsManager::instance_;
-std::mutex InputWindowsManager::mutex_;
+std::shared_ptr<IInputWindowsManager> IInputWindowsManager::instance_;
+std::mutex IInputWindowsManager::mutex_;
 
-std::shared_ptr<InputWindowsManager> InputWindowsManager::GetInstance()
+std::shared_ptr<IInputWindowsManager> IInputWindowsManager::GetInstance()
 {
     if (instance_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -183,7 +183,7 @@ void InputWindowsManager::RegisterFoldStatusListener()
         MMI_HILOG_HANDLERD("The device is not foldable");
         return;
     }
-    foldStatusListener_ = new (std::nothrow) FoldStatusLisener();
+    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(*this);
     CHKPV(foldStatusListener_);
     auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
@@ -212,17 +212,23 @@ void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStat
         MMI_HILOG_HANDLERD("No need to set foldStatus");
         return;
     }
-    if (WIN_MGR->lastPointerEventForFold_ == nullptr) {
+    lastFoldStatus_ = foldStatus;
+    winMgr_.OnFoldStatusChanged(foldStatus);
+}
+
+void InputWindowsManager::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
+{
+    if (lastPointerEventForFold_ == nullptr) {
         MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
         return;
     }
-    auto items = WIN_MGR->lastPointerEventForFold_->GetAllPointerItems();
+    auto items = lastPointerEventForFold_->GetAllPointerItems();
     for (const auto &item : items) {
         if (!item.IsPressed()) {
             continue;
         }
         int32_t pointerId = item.GetPointerId();
-        auto pointerEvent = std::make_shared<PointerEvent>(*(WIN_MGR->lastPointerEventForFold_));
+        auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEventForFold_);
         pointerEvent->SetPointerId(pointerId);
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         pointerEvent->SetActionTime(GetSysClockTime());

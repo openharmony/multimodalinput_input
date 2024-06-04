@@ -25,7 +25,7 @@
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "parameters.h"
 #include "preferences.h"
@@ -35,7 +35,7 @@
 #include "dfx_hisysevent.h"
 #include "util_ex.h"
 #include "util.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

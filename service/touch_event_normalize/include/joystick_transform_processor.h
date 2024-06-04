@@ -16,7 +16,7 @@
 #ifndef JOYSTICK_TRANSFORM_PROCESSOR_H
 #define JOYSTICK_TRANSFORM_PROCESSOR_H
 
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "transform_processor.h"
 
 namespace OHOS {

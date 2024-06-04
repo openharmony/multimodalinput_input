@@ -17,7 +17,7 @@
 
 #include "define_multimodal.h"
 #include "event_dispatch_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 
 namespace OHOS {
 namespace MMI {
