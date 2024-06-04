@@ -1183,6 +1183,46 @@ ohos_unittest("ConnectManagerTest") {
   ]
 }
 
+ohos_unittest("ConnectManagerEXTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "connect_manager/test" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "connect_manager/test/message_parcel_mock.cpp",
+    "connect_manager/test/multimodal_input_connect_stub_ex_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_single",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
 ohos_unittest("EventDumpTest") {
   module_out_path = module_output_path
 
