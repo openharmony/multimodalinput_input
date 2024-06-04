@@ -33,6 +33,12 @@ enum libinput_event_type {
     LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD,
     LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD,
 
+    LIBINPUT_EVENT_TOUCH_DOWN = 500,
+    LIBINPUT_EVENT_TOUCH_UP,
+    LIBINPUT_EVENT_TOUCH_MOTION,
+    LIBINPUT_EVENT_TOUCH_CANCEL,
+    LIBINPUT_EVENT_TOUCH_FRAME,
+
     LIBINPUT_EVENT_TOUCHPAD_DOWN = 550,
     LIBINPUT_EVENT_TOUCHPAD_UP,
     LIBINPUT_EVENT_TOUCHPAD_MOTION,
@@ -55,8 +61,8 @@ enum libinput_key_state {
 };
 
 enum libinput_tablet_tool_tip_state {
-	LIBINPUT_TABLET_TOOL_TIP_UP = 0,
-	LIBINPUT_TABLET_TOOL_TIP_DOWN = 1,
+    LIBINPUT_TABLET_TOOL_TIP_UP = 0,
+    LIBINPUT_TABLET_TOOL_TIP_DOWN = 1,
 };
 
 enum libinput_button_state {
@@ -136,15 +142,15 @@ uint64_t libinput_event_tablet_tool_get_time_usec(struct libinput_event_tablet_t
 
 double libinput_event_tablet_tool_get_pressure(struct libinput_event_tablet_tool *event);
 
-double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *event);
-
-double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *event);
-
 struct libinput_device* libinput_event_get_device(struct libinput_event *event);
+
+uint64_t libinput_event_get_sensortime(struct libinput_event *event);
 
 struct libinput_event_keyboard* libinput_event_get_keyboard_event(struct libinput_event *event);
 
 struct libinput_event_pointer* libinput_event_get_pointer_event(struct libinput_event *event);
+
+struct libinput_event_touch* libinput_event_get_touch_event(struct libinput_event *event);
 
 struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_event *event);
 
@@ -161,6 +167,20 @@ int libinput_device_keyboard_has_key(struct libinput_device *device, uint32_t co
 enum libinput_key_state libinput_event_keyboard_get_key_state(struct libinput_event_keyboard *event);
 
 enum libinput_button_state libinput_event_pointer_get_button_state(struct libinput_event_pointer *event);
+
+uint64_t libinput_event_touch_get_time_usec(struct libinput_event_touch *event);
+
+int32_t libinput_event_touch_get_seat_slot(struct libinput_event_touch *event);
+
+double libinput_event_touch_get_pressure(struct libinput_event_touch* event);
+
+int32_t libinput_event_get_touch_contact_long_axis(struct libinput_event_touch *event);
+
+int32_t libinput_event_get_touch_contact_short_axis(struct libinput_event_touch *event);
+
+int32_t libinput_event_touch_get_tool_type(struct libinput_event_touch *event);
+
+int libinput_device_touch_btn_tool_type_down(struct libinput_device *device, int32_t btnToolType);
 
 double libinput_event_touch_get_x_transformed(struct libinput_event_touch *event, uint32_t width);
 
