@@ -36,8 +36,6 @@ class KnuckleDrawingManager {
 public:
     void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
-    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
-        int32_t &physicalX, int32_t &physicalY);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
 private:
