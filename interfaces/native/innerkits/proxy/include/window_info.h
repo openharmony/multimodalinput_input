@@ -330,27 +330,27 @@ struct WindowInfo {
 
     int32_t windowType;
 
-    uint32_t InputEvent::GetFlag() const
+    uint32_t GetFlag() const
     {
         return windowInputTypeFlag;
     }
 
-    bool InputEvent::HasFlag(uint32_t flag) const
+    bool HasFlag(uint32_t flag) const
     {
         return (windowInputTypeFlag & flag) != 0;
     }
 
-    void InputEvent::AddFlag(uint32_t flag)
+    void AddFlag(uint32_t flag)
     {
         windowInputTypeFlag |= flag;
     }
 
-    void InputEvent::ClearFlag()
+    void ClearFlag()
     {
         windowInputTypeFlag = FLAG_NORMAL;
     }
 
-    void InputEvent::ClearFlag(uint32_t flag)
+    void ClearFlag(uint32_t flag)
     {
         windowInputTypeFlag &= (~flag);
     }
