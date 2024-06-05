@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include <libudev.h>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <libudev.h>
 
 #include "test_device.h"
 
