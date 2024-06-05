@@ -44,6 +44,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
+constexpr int32_t INTERVAL_DURATION = 10;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -139,8 +140,16 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
 {
-    if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-        enableMark_ = !enableMark_;
+    auto currentEventTime = std::chrono::high_resolution_clock::now();
+    int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - LasteventBeginTime_).count();
+
+    if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
+        || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        enableMark_ = (tm64Cost > INTERVAL_DURATION) ? true : false;
+        if (enableMark_) {
+            LasteventBeginTime_ = currentEventTime;
+        }
         MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
         return enableMark_;
     }
