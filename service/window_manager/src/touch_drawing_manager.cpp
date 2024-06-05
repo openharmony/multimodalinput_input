@@ -684,7 +684,7 @@ void TouchDrawingManager::ClearTracker()
     if (lastPointerItem_.empty() && isDownAction_) {
         MMI_HILOGD("ClearTracker isDownAction_ and empty");
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(trackerCanvasNode_.get());
-        canvasNode->ResetSurface();
+        canvasNode->ResetSurface(scaleW_, scaleH_);
     }
 }
 
