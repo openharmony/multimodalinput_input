@@ -277,6 +277,9 @@ void InputEvent::GetExtraData(std::shared_ptr<const uint8_t[]> &data, uint32_t &
 
 bool InputEvent::WriteToParcel(Parcel &out) const
 {
+#if defined(ANDROID_PLATFORM) || defined(IOS_PLATFORM)
+    return false;
+#endif
     WRITEINT32(out, eventType_);
     WRITEINT32(out, id_);
     WRITEINT64(out, actionTime_);
@@ -300,6 +303,9 @@ bool InputEvent::WriteToParcel(Parcel &out) const
 
 bool InputEvent::ReadFromParcel(Parcel &in)
 {
+#if defined(ANDROID_PLATFORM) || defined(IOS_PLATFORM)
+    return false;
+#endif
     READINT32(in, eventType_);
     READINT32(in, id_);
     READINT64(in, actionTime_);
