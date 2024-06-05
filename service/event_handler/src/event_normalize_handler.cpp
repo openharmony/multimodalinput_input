@@ -23,6 +23,7 @@
 
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#include "event_resample.h"
 #include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -32,10 +33,10 @@
 #include "key_event_value_transformation.h"
 #include "libinput_adapter.h"
 #include "mmi_log.h"
+#include "multimodal_input_preferences_manager.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
-#include "event_resample.h"
 #include "touchpad_transform_processor.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
@@ -54,6 +55,9 @@ namespace MMI {
 namespace {
 constexpr int32_t FINGER_NUM { 2 };
 constexpr int32_t MT_TOOL_PALM { 2 };
+constexpr double TOUCH_SLOP = 1.0;
+constexpr int32_t SQUARE = 2;
+constexpr double DENSITY_BASELINE = 160.0;
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -508,6 +512,10 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
+    if (HandleTouchEventWithFlag(pointerEvent)) {
+        MMI_HILOGD("Touch event is filtered with flag");
+        return RET_OK;
+    }
     if (MMISceneBoardJudgement::IsSceneBoardEnabled() && MMISceneBoardJudgement::IsResampleEnabled()) {
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
@@ -519,15 +527,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    if (KeyEventHdr != nullptr) {
-        const auto &keyEvent = KeyEventHdr->GetKeyEvent();
-        if (keyEvent != nullptr && pointerEvent != nullptr) {
-            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-            pointerEvent->SetPressedKeys(pressedKeys);
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    TouchEventSetPressedKeys(pointerEvent);
+
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     if (SetOriginPointerId(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to set origin pointerId");
@@ -541,6 +542,19 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     MMI_HILOGW("Touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
+}
+
+void EventNormalizeHandler::TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    if (KeyEventHdr != nullptr) {
+        const auto &keyEvent = KeyEventHdr->GetKeyEvent();
+        if (keyEvent != nullptr && pointerEvent != nullptr) {
+            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+            pointerEvent->SetPressedKeys(pressedKeys);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
@@ -638,6 +652,74 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     });
     return timerId_;
+}
+
+int32_t EventNormalizeHandler::SetMoveEventFilters(bool flag)
+{
+    moveEventFilterFlag_ = flag;
+
+    int32_t ret = PREFERENCES_MGR->SetBoolValue("moveEventFilterFlag", "mouse_settings.xml", moveEventFilterFlag_);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to save moveEventFilterFlag, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+bool EventNormalizeHandler::HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (!moveEventFilterFlag_) {
+        return false;
+    }
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return false;
+    }
+    static bool isFirstMoveEvent = false;
+    int32_t action = pointerEvent->GetPointerAction();
+    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+        isFirstMoveEvent = false;
+        lastTouchDownItems_ = pointerEvent->GetAllPointerItems();
+    } else if (action == PointerEvent::POINTER_ACTION_MOVE) {
+        if (isFirstMoveEvent) {
+            return false;
+        }
+        double offset = CalcTouchOffset(pointerEvent);
+        bool isMoveEventFiltered = MMI_LNE(offset, TOUCH_SLOP);
+        MMI_HILOGD("Touch move event, offset:%{public}f, isMoveEventFiltered:%{public}s",
+            offset, isMoveEventFiltered ? "true" : "false");
+        isFirstMoveEvent = !isMoveEventFiltered;
+        return isMoveEventFiltered;
+    } else if (action == PointerEvent::POINTER_ACTION_UP) {
+        lastTouchDownItems_.clear();
+    }
+    return false;
+}
+
+double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent> touchMoveEvent)
+{
+    CHKPR(touchMoveEvent, ERROR_NULL_POINTER);
+    auto moveItems = touchMoveEvent->GetAllPointerItems();
+    if (moveItems.empty() || lastTouchDownItems_.empty()) {
+        MMI_HILOGE("moveItems or lastTouchDownItems_ is empty");
+        return 0.f;
+    }
+    PointerEvent::PointerItem itemMove = moveItems.front();
+    PointerEvent::PointerItem itemDown = lastTouchDownItems_.front();
+    MMI_HILOGD("Move item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
+        itemMove.GetPointerId(), itemMove.GetDisplayX(), itemMove.GetDisplayY());
+    MMI_HILOGD("Down item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
+        itemDown.GetPointerId(), itemDown.GetDisplayX(), itemDown.GetDisplayY());
+
+    double offset = sqrt(pow(itemMove.GetDisplayX() - itemDown.GetDisplayX(), SQUARE) +
+        pow(itemMove.GetDisplayY() - itemDown.GetDisplayY(), SQUARE));
+    auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());
+    if (displayInfo != nullptr) {
+        double scale = static_cast<double>(displayInfo->dpi) / DENSITY_BASELINE;
+        if (!MMI_EQ(static_cast<float>(scale), 0.f)) {
+            offset /= scale;
+        }
+    }
+    return offset;
 }
 
 int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent)

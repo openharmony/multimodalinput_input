@@ -43,6 +43,7 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event, int64_t frameTime);
     UDSServer *GetUDSServer() const;
+    int32_t SetMoveEventFilters(bool flag);
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;

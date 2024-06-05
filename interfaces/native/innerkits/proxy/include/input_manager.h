@@ -838,6 +838,7 @@ public:
      */
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
+    int32_t SetMoveEventFilters(bool flag);
     /**
      * @brief Get whether System has IrEmitter.
      * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not.

@@ -42,6 +42,7 @@ group("test") {
     "setkeydownduration_fuzzer:fuzztest",
     "setmouseprimarybutton_fuzzer:fuzztest",
     "setmousescrollrows_fuzzer:fuzztest",
+    "setmoveeventfilters_fuzzer:fuzztest",
     "setpointerlocation_fuzzer:fuzztest",
     "setpointervisible_fuzzer:fuzztest",
     "setwindowinputeventconsumer_fuzzer:fuzztest",
