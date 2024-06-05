@@ -1735,11 +1735,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
-                    if ((item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
+                    if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) &&
                         ((pointerEvent->GetPressedButtons().empty()) ||
                         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
-                        (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE))) {
+                        (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
+                        (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
                         continue;
                     }
                     firstBtnDownWindowId_ = item.id;
@@ -1750,11 +1751,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
-                if ((item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
+                if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) &&
                     ((pointerEvent->GetPressedButtons().empty()) ||
                     (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
-                    (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE))) {
+                    (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
+                    (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
                     continue;
                 }
                 firstBtnDownWindowId_ = item.id;
@@ -2241,7 +2243,8 @@ bool InputWindowsManager::SkipNavigationWindow(const WindowInfo &windowInfo, int
 {
     MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowInfo.windowInputTypeFlag),
         toolType);
-    if (!windowInfo.HasFlag(WindowInfo::FLAG_ANTI_MISTAKE_TOUCH) || toolType != PointerEvent::TOOL_TYPE_PEN) {
+    if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+        windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
@@ -3192,24 +3195,50 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     return true;
 }
 
-bool InputWindowsManager::HandleWindowInputType(const WindowInfo &windowInfo,
-std::shared_ptr<PointerEvent> pointerEvent)
+bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    if (windowInfo.HasFlag(WindowInfo::FLAG_NORMAL)) {
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerId, item)) {
+        MMI_HILOG_WINDOWE("Invalid pointer:%{public}d", pointerId);
         return false;
-    } else if (windowInfo.HasFlag(WindowInfo::FLAG_TRANSMIT_ALL)) {
-        return true;
-    } else if (windowInfo.HasFlag(WindowInfo::FLAG_TRANSMIT_EXCEPT_MOVE)) {
-        auto pointerAction = pointerEvent->GetPointerAction();
-        return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-            pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
-    } else if (windowInfo.HasFlag(WindowInfo::FLAG_ANTI_MISTAKE_TOUCH)) {
-        return true;
-    } else if (windowInfo.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) {
-        return false;
-    } else {
-        return true;
+    }
+    int32_t toolType = item.GetToolType();
+    int32_t sourceType = pointerEvent->GetSourceType();
+    switch (window.windowInputType)
+    {
+        case WindowInputType::NORMAL:
+            return false;
+        case WindowInputType::TRANSMIT_ALL:
+            return true;
+        case WindowInputType::TRANSMIT_EXCEPT_MOVE: {
+            auto pointerAction = pointerEvent->GetPointerAction();
+            return (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+                pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
+        }
+        case WindowInputType::ANTI_MISTAKE_TOUCH:
+            return true;
+        case WindowInputType::TRANSMIT_AXIS_MOVE:
+            return false;
+        case WindowInputType::TRANSMIT_MOUSE_MOVE:
+            return false;
+        case WindowInputType::TRANSMIT_LEFT_RIGHT:
+            return false;
+        case WindowInputType::TRANSMIT_BUTTOM:
+            return false;
+        case WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE:
+            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
+                return true;
+            }
+            return false;
+        case WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE:
+            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
+                return true;
+            }
+            return false;
+        default:
+            return false;
     }
 }
 

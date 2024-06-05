@@ -65,7 +65,7 @@ public:
     void JudgMouseIsDownOrUp(bool dragState);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent, int32_t windowId);
-    bool HandleWindowInputType(const WindowInfo &windowInfo, std::shared_ptr<PointerEvent> pointerEvent);
+    bool HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
