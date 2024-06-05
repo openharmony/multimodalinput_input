@@ -141,7 +141,7 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
 {
     auto currentEventTime = std::chrono::high_resolution_clock::now();
-    int64_t tm64Cost = currentEventTime - LasteventBeginTime;
+    int64_t tm64Cost = currentEventTime - LasteventBeginTime_;
 
     if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
         || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
