@@ -12,15 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DFS_SERVICE_MESSAGE_PARCEL_MOCK_H
-#define OHOS_DFS_SERVICE_MESSAGE_PARCEL_MOCK_H
+#ifndef MESSAGE_PARCEL_MOCK_H
+#define MESSAGE_PARCEL_MOCK_H
 
 #include <memory>
 #include <string>
 #include <gmock/gmock.h>
 
-#include "message_parcel.h"
 #include "iremote_broker.h"
+#include "message_parcel.h"
+#include "permission_helper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,7 +31,6 @@ public:
 public:
     virtual bool WriteInterfaceToken(std::u16string name) = 0;
     virtual std::u16string ReadInterfaceToken() = 0;
-    virtual bool WriteParcelable(const Parcelable *object) = 0;
     virtual bool WriteInt32(int32_t value) = 0;
     virtual int32_t ReadInt32() = 0;
     virtual bool ReadInt32(int32_t &value) = 0;
@@ -43,6 +43,7 @@ public:
     virtual bool WriteString(const std::string &value) = 0;
     virtual bool WriteCString(const char *value) = 0;
     virtual bool WriteFileDescriptor(int fd) = 0;
+    virtual std::string ReadString() = 0;
     virtual bool ReadString(std::string &value) = 0;
     virtual int ReadFileDescriptor() = 0;
     virtual bool ReadStringVector(std::vector<std::string> *value) = 0;
@@ -51,6 +52,7 @@ public:
     virtual bool WriteUint16(uint16_t value) = 0;
     virtual bool WriteUint32(uint32_t value) = 0;
     virtual bool ReadUint64(uint64_t &value) = 0;
+    virtual bool VerifySystemApp() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -59,7 +61,6 @@ class MessageParcelMock : public DfsMessageParcel {
 public:
     MOCK_METHOD1(WriteInterfaceToken, bool(std::u16string name));
     MOCK_METHOD0(ReadInterfaceToken, std::u16string());
-    MOCK_METHOD1(WriteParcelable, bool(const Parcelable *object));
     MOCK_METHOD1(WriteInt32, bool(int32_t value));
     MOCK_METHOD0(ReadInt32, int32_t());
     MOCK_METHOD1(ReadInt32, bool(int32_t &value));
@@ -72,6 +73,7 @@ public:
     MOCK_METHOD1(WriteString, bool(const std::string &value));
     MOCK_METHOD1(WriteCString, bool(const char *value));
     MOCK_METHOD1(WriteFileDescriptor, bool(int fd));
+    MOCK_METHOD0(ReadString, std::string());
     MOCK_METHOD1(ReadString, bool(std::string &value));
     MOCK_METHOD0(ReadFileDescriptor, int());
     MOCK_METHOD1(ReadStringVector, bool(std::vector<std::string> *value));
@@ -80,6 +82,7 @@ public:
     MOCK_METHOD1(WriteUint16, bool(uint16_t value));
     MOCK_METHOD1(WriteUint32, bool(uint32_t value));
     MOCK_METHOD1(ReadUint64, bool(uint64_t &value));
+    MOCK_METHOD0(VerifySystemApp, bool());
 };
 } // namespace MMI
 } // namespace OHOS

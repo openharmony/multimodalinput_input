@@ -1224,6 +1224,7 @@ ohos_unittest("ConnectManagerEXTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
