@@ -38,6 +38,7 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddHandleTimer(int32_t timeout = 300);
+    int32_t SetMoveEventFilters(bool flag);
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -53,12 +54,18 @@ private:
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GestureIdentify(libinput_event* event);
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent);
+    double CalcTouchOffset(const std::shared_ptr<PointerEvent> touchMoveEvent);
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
+    void TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t timerId_ { -1 };
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
+    bool moveEventFilterFlag_ { false };
+    std::list<PointerEvent::PointerItem> lastTouchDownItems_;
+
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
     void RestoreTouchPadStatus();

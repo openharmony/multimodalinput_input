@@ -102,6 +102,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     g_touchpadPinchSwitch = touchpadPref->GetBool(touchpadPinchSwitch, BOOL_DEFAULT);
     g_touchpadSwipeSwitch = touchpadPref->GetBool(touchpadSwipeSwitch, BOOL_DEFAULT);
     g_touchpadPointerSpeed = touchpadPref->GetInt(touchpadPointerSpeed, TOUCHPAD_POINTER_SPEED);
+    g_moveEventFilterFlag = mousePref->GetBool(moveEventFilterFlag, BOOL_DEFAULT);
     g_touchpadScrollSwitch = touchpadPref->GetBool(touchpadScrollSwitch, BOOL_DEFAULT);
     g_touchpadRightClickType = touchpadPref->GetInt(touchpadRightClickType, RIGHT_CLICK_TYPE);
     g_touchpadScrollDirection = touchpadPref->GetBool(touchpadScrollDirection, BOOL_DEFAULT);
@@ -129,6 +130,7 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap[keyboardRepeatDelay] = {keyboarFileName, g_keyboardRepeatDelay};
     preferencesMap[touchpadPinchSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadPinchSwitch)};
     preferencesMap[touchpadSwipeSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadSwipeSwitch)};
+    preferencesMap[moveEventFilterFlag] = {mouseFileName, static_cast<int32_t>(g_moveEventFilterFlag)};
     preferencesMap[touchpadPointerSpeed] = {touchpadFileName, g_touchpadPointerSpeed};
     preferencesMap[touchpadScrollSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollSwitch)};
     preferencesMap[touchpadRightClickType] = {touchpadFileName, g_touchpadRightClickType};

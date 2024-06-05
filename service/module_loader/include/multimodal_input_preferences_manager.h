@@ -57,6 +57,7 @@ private:
     bool g_touchpadPinchSwitch { true };
     bool g_touchpadSwipeSwitch { true };
     bool g_hoverScrollState { true };
+    bool g_moveEventFilterFlag { false };
     int32_t g_pointerColor { -1 };
     int32_t g_pointerSize { 1 };
     int32_t g_pointerStyle { 0 };
@@ -73,6 +74,7 @@ private:
     const std::string touchpadPinchSwitch = "touchpadPinch";
     const std::string touchpadSwipeSwitch = "touchpadSwipe";
     const std::string hoverScrollState = "isEnableHoverScroll";
+    const std::string moveEventFilterFlag = "moveEventFilterFlag";
     const std::string pointerColor = "pointerColor";
     const std::string pointerSize = "pointerSize";
     const std::string pointerStyle = "pointerStyle";
