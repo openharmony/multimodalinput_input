@@ -405,7 +405,7 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
-        eturn RET_ERR;
+        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
     return RET_OK;
