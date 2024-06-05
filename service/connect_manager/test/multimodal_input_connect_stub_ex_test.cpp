@@ -18,10 +18,10 @@
 #include <libinput.h>
 
 #include "message_parcel_mock.h"
-#include "multimodal_input_connect_def_parcel.h"
-#include "multimodal_input_connect_stub.h"
 #include "mmi_log.h"
 #include "mmi_service.h"
+#include "multimodal_input_connect_def_parcel.h"
+#include "multimodal_input_connect_stub.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MultimodalInputConnectStubTest"
