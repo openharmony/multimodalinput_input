@@ -138,21 +138,16 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
     OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 
-void EventDispatchHandler::EventBeginTime()
-{
-    eventBeginTime = std::chrono::high_resolution_clock::now();
-    eventBeginTime_ = eventBeginTime;
-}
-
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
 {
-    EventBeginTime();
+    auto currentEventTime = std::chrono::high_resolution_clock::now();
     if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
-        ||event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
         int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - eventBeginTime_).count();
+        std::chrono::high_resolution_clock::now() - LasteventBeginTime).count();
         
         enableMark_ = (tm64Cost > INTERVAL_DURATION) ? true : false;
+        LasteventBeginTime = currentEventTime;
         MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
         return enableMark_;
     }
