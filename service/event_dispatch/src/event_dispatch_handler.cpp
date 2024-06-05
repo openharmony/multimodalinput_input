@@ -141,11 +141,11 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
 {
     auto currentEventTime = std::chrono::high_resolution_clock::now();
+    int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+        currentEventTime - LasteventBeginTime).count();
+
     if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
         || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-        int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - LasteventBeginTime).count();
-        
         enableMark_ = (tm64Cost > INTERVAL_DURATION) ? true : false;
         LasteventBeginTime = currentEventTime;
         MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
