@@ -1735,7 +1735,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
-                    if ((item.windowInputType == item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
+                    if ((item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
                         ((pointerEvent->GetPressedButtons().empty()) ||
                         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
@@ -1750,7 +1750,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
-                if ((item.windowInputType == item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
+                if ((item.HasFlag(WindowInfo::FLAG_TRANSMIT_MOUSE_MOVE)) &&
                     ((pointerEvent->GetPressedButtons().empty()) ||
                     (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                     (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
@@ -2239,8 +2239,9 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 
 bool InputWindowsManager::SkipNavigationWindow(const WindowInfo &windowInfo, int32_t toolType)
 {
-    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowInfo.windowInputTypeFlag), toolType);
-    if (windowType != windowInfo.HasFlag(WindowInfo::FLAG_ANTI_MISTAKE_TOUCH) || toolType != PointerEvent::TOOL_TYPE_PEN) {
+    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowInfo.windowInputTypeFlag),
+        toolType);
+    if (!windowInfo.HasFlag(WindowInfo::FLAG_ANTI_MISTAKE_TOUCH) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
@@ -3191,7 +3192,8 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     return true;
 }
 
-bool InputWindowsManager::HandleWindowInputType(const WindowInfo &windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
+bool InputWindowsManager::HandleWindowInputType(const WindowInfo &windowInfo,
+std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     if (windowInfo.HasFlag(WindowInfo::FLAG_NORMAL)) {
