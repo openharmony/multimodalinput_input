@@ -57,6 +57,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     std::chrono::time_point<std::chrono::high_resolution_clock> LasteventBeginTime_ =
     std::chrono::high_resolution_clock::now();
+    
 private:
     void DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd);
     void HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
