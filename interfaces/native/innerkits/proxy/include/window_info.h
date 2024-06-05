@@ -171,7 +171,13 @@ enum class WindowInputType : uint8_t {
     NORMAL = 0,
     TRANSMIT_ALL = 1,
     TRANSMIT_EXCEPT_MOVE = 2,
-    ANTI_MISTAKE_TOUCH = 3
+    ANTI_MISTAKE_TOUCH = 3,
+    TRANSMIT_AXIS_MOVE = 4,
+    TRANSMIT_MOUSE_MOVE = 5,
+    TRANSMIT_LEFT_RIGHT = 6,
+    TRANSMIT_BUTTOM = 7,
+    MIX_LEFT_RIGHT_ANTI_AXIS_MOVE = 18;
+    MIX_BUTTOM_ANTI_AXIS_MOVE = 19
 };
 
 struct WindowInfo {
@@ -211,16 +217,6 @@ struct WindowInfo {
      * @since 12
      */
     static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
-
-    static constexpr uint32_t FLAG_NORMAL = 0x00000000;
-
-    static constexpr uint32_t FLAG_TRANSMIT_ALL = 0x000000001;
-
-    static constexpr uint32_t FLAG_TRANSMIT_EXCEPT_MOVE = 0x00000002;
-
-    static constexpr uint32_t FLAG_ANTI_MISTAKE_TOUCH = 0x00000004;
-
-    static constexpr uint32_t FLAG_TRANSMIT_MOUSE_MOVE = 0x00000008;
 
     /**
      * Globally unique identifier of the window
@@ -329,33 +325,6 @@ struct WindowInfo {
     SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
 
     int32_t windowType;
-
-    uint32_t GetFlag() const
-    {
-        return windowInputTypeFlag;
-    }
-
-    bool HasFlag(uint32_t flag) const
-    {
-        return (windowInputTypeFlag & flag) != 0;
-    }
-
-    void AddFlag(uint32_t flag)
-    {
-        windowInputTypeFlag |= flag;
-    }
-
-    void ClearFlag()
-    {
-        windowInputTypeFlag = FLAG_NORMAL;
-    }
-
-    void ClearFlag(uint32_t flag)
-    {
-        windowInputTypeFlag &= (~flag);
-    }
-
-    uint32_t windowInputTypeFlag { FLAG_NORMAL };
 };
 
 /**
