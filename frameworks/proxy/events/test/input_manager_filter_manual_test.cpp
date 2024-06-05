@@ -13,27 +13,22 @@
  * limitations under the License.
  */
 
-#include <csignal>
-#include <cstdio>
-#include <gtest/gtest.h>
-#include <iostream>
-#include <regex>
 #include <semaphore.h>
-#include <sstream>
 #include <sys/types.h>
 
+#include <csignal>
 #include <cstdio>
+#include <iostream>
+#include <gtest/gtest.h>
+#include <regex>
 #include <set>
 #include <sstream>
-#include <iostream>
-#include <regex>
 
 #include "accesstoken_kit.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_handler_manager.h"
 #include "input_manager.h"
-#include "multimodal_event_handler.h"
 #include "multimodal_event_handler.h"
 #include "nativetoken_kit.h"
 #include "pointer_event.h"
