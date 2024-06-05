@@ -13,19 +13,18 @@
  * limitations under the License.
  */
 
-#include <fstream>
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "libinput-private.h"
 
-#include "mmi_log.h"
-#include "uds_server.h"
-#include "uds_session.h"
+#include <fstream>
+
+#include "libinput-private.h"
 
 #include "input_device_manager.h"
 #include "key_auto_repeat.h"
-#include "libinput-private.h"
+#include "mmi_log.h"
+#include "uds_server.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
