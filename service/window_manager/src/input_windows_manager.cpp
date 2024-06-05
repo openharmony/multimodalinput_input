@@ -1735,6 +1735,14 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
+                    if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) &&
+                        ((pointerEvent->GetPressedButtons().empty()) ||
+                        (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
+                        (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
+                        (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
+                        (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
+                        continue;
+                    }
                     firstBtnDownWindowId_ = item.id;
                     MMI_HILOG_DISPATCHD("Mouse event select pull window, window:%{public}d, pid:%{public}d",
                         firstBtnDownWindowId_, item.pid);
@@ -1743,6 +1751,14 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
+                if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) &&
+                    ((pointerEvent->GetPressedButtons().empty()) ||
+                    (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
+                    (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
+                    (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
+                    (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
+                    continue;
+                }
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOG_DISPATCHD("Find out the dispatch window of this pointer event when the targetWindowId "
                     "hasn't been set up yet, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
@@ -2226,7 +2242,8 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
 {
     MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowType), toolType);
-    if (windowType != WindowInputType::ANTI_MISTAKE_TOUCH || toolType != PointerEvent::TOOL_TYPE_PEN) {
+    if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
+        windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
@@ -3180,6 +3197,14 @@ bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
 bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    if (!pointerEvent->GetPointerItem(pointerId, item)) {
+        MMI_HILOG_WINDOWE("Invalid pointer:%{public}d", pointerId);
+        return false;
+    }
+    int32_t toolType = item.GetToolType();
+    int32_t sourceType = pointerEvent->GetSourceType();
     switch (window.windowInputType)
     {
         case WindowInputType::NORMAL:
@@ -3193,8 +3218,26 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
         }
         case WindowInputType::ANTI_MISTAKE_TOUCH:
             return true;
+        case WindowInputType::TRANSMIT_AXIS_MOVE:
+            return false;
+        case WindowInputType::TRANSMIT_MOUSE_MOVE:
+            return false;
+        case WindowInputType::TRANSMIT_LEFT_RIGHT:
+            return false;
+        case WindowInputType::TRANSMIT_BUTTOM:
+            return false;
+        case WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE:
+            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
+                return true;
+            }
+            return false;
+        case WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE:
+            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
+                return true;
+            }
+            return false;
         default:
-            return true;
+            return false;
     }
 }
 
