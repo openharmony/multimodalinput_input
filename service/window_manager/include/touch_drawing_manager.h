@@ -136,7 +136,8 @@ private:
     PointerEvent::PointerItem firstPointerItem_;
     RosenCanvas *trackerCanvas_ { nullptr };
     int32_t scaleW_ { 0 };
-    int32_t scaleH_ { 0 };};
+    int32_t scaleH_ { 0 };
+};
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
