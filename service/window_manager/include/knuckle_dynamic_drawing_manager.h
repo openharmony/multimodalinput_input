@@ -23,7 +23,6 @@
 #include "draw/canvas.h"
 #include "include/core/SkPath.h"
 #include "include/core/SkPaint.h"
-#include "knuckle_drawing_manager.h"
 #include "knuckle_glow_trace_system.h"
 #include "pointer_event.h"
 #include "window_info.h"
@@ -68,7 +67,6 @@ private:
     int32_t pointCounter_ { 0 };
     bool isDrawing_ { true };
     std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_ { nullptr };
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     Rosen::Drawing::Path pointerPath_;
     SkPaint pointerPathPaint_;
     int64_t lastUpdateTimeMillis_ { 0 };
