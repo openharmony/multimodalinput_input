@@ -142,7 +142,7 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
 {
     auto currentEventTime = std::chrono::high_resolution_clock::now();
     int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::high_resolution_clock::now() - LasteventBeginTime).count();
+        std::chrono::high_resolution_clock::now() - LasteventBeginTime_).count();
 
     if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
         || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
