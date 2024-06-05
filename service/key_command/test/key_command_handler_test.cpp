@@ -15,17 +15,19 @@
 
 #include <gtest/gtest.h>
 
-#include "key_command_handler.h"
+#include "cJSON.h"
+#include "util.h"
+
+#include "display_event_monitor.h"
 #include "event_log_helper.h"
-#include "input_handler_type.h"
 #include "input_event_handler.h"
+#include "input_handler_type.h"
+#include "i_preference_manager.h"
+#include "key_command_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "i_preference_manager.h"
-#include "stylus_key_handler.h"
 #include "system_info.h"
-#include "util.h"
-#include "cJSON.h"
+#include "stylus_key_handler.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -2199,5 +2201,296 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GesturePointsToStr_003, Te
     ASSERT_EQ(handler.gesturePoints_.size(), 1);
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_001
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business1";
+    key.statusConfig = "config1";
+    key.statusConfigValue = true;
+    key.finalKey = 4;
+    key.keyDownDuration = 5;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    key.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName1";
+    ability_temp.abilityName = "abilityName1";
+    key.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key1", key));
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = 1;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = -1;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    std::string businessId = "power";
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_002
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_0012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business2";
+    key.statusConfig = "config2";
+    key.statusConfigValue = true;
+    key.finalKey = 5;
+    key.keyDownDuration = 6;
+    key.triggerType = KeyEvent::KEY_ACTION_UP;
+    key.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName2";
+    ability_temp.abilityName = "abilityName2";
+    key.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key2", key));
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = -1;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    std::string businessId = "power";
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_003
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business3";
+    key.statusConfig = "config3";
+    key.statusConfigValue = true;
+    key.finalKey = 7;
+    key.keyDownDuration = 8;
+    key.triggerType = KeyEvent::KEY_ACTION_CANCEL;
+    key.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName3";
+    ability_temp.abilityName = "abilityName3";
+    key.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key3", key));
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = -1;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    std::string businessId = "power";
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AddSequenceKey_001
+ * @tc.desc: Test the funcation AddSequenceKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    sequenceKey.keyAction = 2;
+    sequenceKey.actionTime = 3;
+    sequenceKey.delay = 4;
+    handler.keys_.push_back(sequenceKey);
+    bool ret = handler.AddSequenceKey(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AddSequenceKey_002
+ * @tc.desc: Test the funcation AddSequenceKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    sequenceKey.keyAction = 2;
+    sequenceKey.actionTime = 15;
+    sequenceKey.delay = 16;
+    handler.keys_.push_back(sequenceKey);
+    bool ret = handler.AddSequenceKey(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_AddSequenceKey_003
+ * @tc.desc: Test the funcation AddSequenceKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    sequenceKey.keyAction = 2;
+    sequenceKey.actionTime = -2;
+    sequenceKey.delay = -3;
+    handler.keys_.push_back(sequenceKey);
+    bool ret = handler.AddSequenceKey(keyEvent);
+    ASSERT_TRUE(ret);
+    handler.keys_.clear();
+    ret = handler.AddSequenceKey(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleNormalSequence_001
+ * @tc.desc: Test the funcation HandleNormalSequence
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleNormalSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    bool isLaunchAbility = true;
+    sequence.abilityStartDelay = 0;
+    bool ret = handler.HandleNormalSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    sequence.abilityStartDelay = 1;
+    sequence.timerId = -1;
+    ret = handler.HandleNormalSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    sequence.timerId = 1;
+    ret = handler.HandleNormalSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleMatchedSequence_001
+ * @tc.desc: Test the funcation HandleMatchedSequence
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMatchedSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    bool isLaunchAbility = true;
+    sequence.ability.bundleName = ".screenshot";
+    bool ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    sequence.ability.bundleName = "abc";
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.screenStatus_ = "usual.event.SCREEN_OFF";
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    displayEventMonitor.screenStatus_ = "usual.event.SCREEN_ON";
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    displayEventMonitor.isScreenLocked_ = true;
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    displayEventMonitor.isScreenLocked_ = false;
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleSequence_001
+ * @tc.desc: Test the funcation HandleSequence
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequence_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    SequenceKey sequenceKey;
+    bool isLaunchAbility = true;
+    sequence.statusConfigValue = false;
+    bool ret = handler.HandleSequence(sequence, isLaunchAbility);
+    ASSERT_FALSE(ret);
+    sequence.statusConfigValue = true;
+    sequenceKey.keyCode = 10;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    sequenceKey.actionTime = 10;
+    sequenceKey.delay = 10;
+    handler.keys_.push_back(sequenceKey);
+    sequence.sequenceKeys.push_back(sequenceKey);
+    ret = handler.HandleSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertKeyActionToString_001
+ * @tc.desc: Test the funcation ConvertKeyActionToString
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertKeyActionToString_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t keyAction = 0;
+    std::string ret = handler.ConvertKeyActionToString(keyAction);
+    ASSERT_EQ(ret, "UNKNOWN");
+    keyAction = 1;
+    ret = handler.ConvertKeyActionToString(keyAction);
+    ASSERT_EQ(ret, "CANCEL");
+    keyAction = 2;
+    ret = handler.ConvertKeyActionToString(keyAction);
+    ASSERT_EQ(ret, "DOWN");
+    keyAction = 3;
+    ret = handler.ConvertKeyActionToString(keyAction);
+    ASSERT_EQ(ret, "UP");
+    keyAction = 4;
+    ret = handler.ConvertKeyActionToString(keyAction);
+    ASSERT_EQ(ret, "UNKNOWN_ACTION");
+}
 } // namespace MMI
 } // namespace OHOS
