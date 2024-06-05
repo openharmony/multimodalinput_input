@@ -17,7 +17,6 @@
 #include <libinput.h>
 
 #include "anr_manager.h"
-
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
 #include "i_input_windows_manager.h"
