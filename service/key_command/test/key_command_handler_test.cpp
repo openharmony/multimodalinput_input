@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "i_preference_manager.h"
+#include "stylus_key_handler.h"
 #include "system_info.h"
 #include "util.h"
 #include "cJSON.h"
@@ -40,6 +41,7 @@ constexpr int32_t INTERVAL_TIME = 100;
 constexpr int32_t INTERVAL_TIME_OUT = 500000;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
+constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 const std::string EXTENSION_ABILITY = "extensionAbility";
@@ -679,6 +681,200 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_004, TestSize.Level1)
     KeyCommandHandler eventKeyCommandHandler;
     ASSERT_FALSE(eventKeyCommandHandler.OnHandleEvent(keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_01
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    KeyCommandHandler eventKeyCommandHandler;
+
+    bool preHandleEvent = eventKeyCommandHandler.PreHandleEvent(keyEvent);
+    EXPECT_TRUE(preHandleEvent);
+    bool ret = eventKeyCommandHandler.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_02
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    KeyCommandHandler eventKeyCommandHandler;
+
+    bool stylusKey = STYLUS_HANDLER->HandleStylusKey(keyEvent);
+    EXPECT_FALSE(stylusKey);
+    bool ret = eventKeyCommandHandler.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_03
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    KeyCommandHandler eventKeyCommandHandler;
+
+    bool isHandled = eventKeyCommandHandler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(isHandled);
+    bool ret = eventKeyCommandHandler.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_04
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = SetupKeyEvent();
+    ASSERT_TRUE(keyEvent != nullptr);
+    KeyCommandHandler eventKeyCommandHandler;
+
+    eventKeyCommandHandler.isDownStart_ = true;
+    bool isRepeatKeyHandle = eventKeyCommandHandler.HandleRepeatKeys(keyEvent);
+    EXPECT_FALSE(isRepeatKeyHandle);
+    bool ret = eventKeyCommandHandler.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_01
+ * @tc.desc: Test ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string configFile = "abc";
+    std::string jsonStr = ReadJsonFile(configFile);
+    KeyCommandHandler eventKeyCommandHandler;
+
+    jsonStr = "";
+    bool ret = eventKeyCommandHandler.ParseJson(configFile);
+    EXPECT_TRUE(jsonStr.empty());
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_02
+ * @tc.desc: Test ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string configFile = "config";
+    std::string jsonStr = ReadJsonFile(configFile);
+    KeyCommandHandler eventKeyCommandHandler;
+
+    jsonStr = "abc";
+    bool ret = eventKeyCommandHandler.ParseJson(configFile);
+    EXPECT_FALSE(jsonStr.empty());
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ProcessKnuckleGestureTouchUp_01
+ * @tc.desc: Test ProcessKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ProcessKnuckleGestureTouchUp_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NotifyType type;
+    KeyCommandHandler eventKeyCommandHandler;
+    type = NotifyType::REGIONGESTURE;
+    ASSERT_NO_FATAL_FAILURE(eventKeyCommandHandler.ProcessKnuckleGestureTouchUp(type));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ProcessKnuckleGestureTouchUp_02
+ * @tc.desc: Test ProcessKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ProcessKnuckleGestureTouchUp_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    NotifyType type;
+    KeyCommandHandler eventKeyCommandHandler;
+    type = NotifyType::LETTERGESTURE;
+    ASSERT_NO_FATAL_FAILURE(eventKeyCommandHandler.ProcessKnuckleGestureTouchUp(type));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_01
+ * @tc.desc: Test CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler eventKeyCommandHandler;
+    bool isActive = eventKeyCommandHandler.twoFingerGesture_.active;
+    EXPECT_FALSE(isActive);
+    bool ret = eventKeyCommandHandler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_02
+ * @tc.desc: Test CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler eventKeyCommandHandler;
+    auto pressTimeInterval = fabs(200000 - 40000);
+    EXPECT_TRUE(pressTimeInterval > TWO_FINGERS_TIME_LIMIT);
+    bool ret = eventKeyCommandHandler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_03
+ * @tc.desc: Test CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler eventKeyCommandHandler;
+    auto pressTimeInterval = fabs(200000 - 60000);
+    EXPECT_FALSE(pressTimeInterval > TWO_FINGERS_TIME_LIMIT);
+    bool ret = eventKeyCommandHandler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
  * @tc.name: KeyCommandHandlerTest_TouchTest_001
