@@ -2239,10 +2239,9 @@ bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
             toolType == PointerEvent::TOOL_TYPE_FINGER);
 }
 
-bool InputWindowsManager::SkipNavigationWindow(const WindowInfo &windowInfo, int32_t toolType)
+bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32_t toolType)
 {
-    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowInfo.windowInputTypeFlag),
-        toolType);
+    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(windowTypeg), toolType);
     if ((windowType != WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE &&
         windowType != WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) || toolType != PointerEvent::TOOL_TYPE_PEN) {
         return false;
@@ -2327,7 +2326,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             continue;
         }
-        if (SkipNavigationWindow(item, pointerItem.GetToolType())) {
+        if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
             continue;
         }
 
