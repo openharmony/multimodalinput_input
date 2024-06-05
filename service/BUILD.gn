@@ -642,6 +642,10 @@ ohos_unittest("SubscriberTest") {
 
   sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
 
+  if (input_feature_switch) {
+    sources += [ "subscriber/test/switch_subscriber_handler_test.cpp" ]
+  }
+
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
@@ -655,6 +659,14 @@ ohos_unittest("SubscriberTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
   ]
+
+  if (input_feature_switch) {
+    external_deps += [
+      "graphic_2d:2d_graphics",
+      "graphic_2d:librender_service_client",
+      "window_manager:libwm",
+    ]
+  }
 }
 
 ohos_unittest("NapProcessTest") {
