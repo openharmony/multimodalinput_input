@@ -146,7 +146,7 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
     if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
         || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
         enableMark_ = (tm64Cost > INTERVAL_DURATION) ? true : false;
-        if(enableMark_) {
+        if (enableMark_) {
             LasteventBeginTime_ = currentEventTime;
         }
         MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
