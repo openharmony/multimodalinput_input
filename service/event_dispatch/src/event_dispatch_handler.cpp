@@ -149,11 +149,10 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
     EventBeginTime();
     if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
         ||event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-           int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::high_resolution_clock::now() - eventBeginTime_
-                            ).count();
+        int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - eventBeginTime_).count();
+        
         enableMark_ = (tm64Cost > INTERVAL_DURATION) ? true : false;
-        enableMark_ = !enableMark_;
         MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
         return enableMark_;
     }
