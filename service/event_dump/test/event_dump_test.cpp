@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 
-#include <cerrno>
-#include <cstdio>
 #include <fcntl.h>
 #include <gtest/gtest.h>
 
+#include <cerrno>
+#include <cstdio>
+
 #include "event_dump.h"
 #include "event_log_helper.h"
+#include "i_input_windows_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_manager.h"
 #include "input_manager_util.h"
-#include "i_input_windows_manager.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
