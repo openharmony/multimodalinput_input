@@ -128,7 +128,7 @@ bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physi
     hardwareCursorPointerManager_->SetTargetDevice(displayId);
     if (hardwareCursorPointerManager_->IsSupported()) {
         if (hardwareCursorPointerManager_->SetPosition(physicalX, physicalY) != RET_OK) {
-            MMI_HILOGE("Set hardware cursor position error.");
+            MMI_HILOGE("Set hardware cursor position error");
             return false;
         }
     }
