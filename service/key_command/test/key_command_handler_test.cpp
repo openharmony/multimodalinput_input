@@ -2453,7 +2453,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequence_001, TestSi
     SequenceKey sequenceKey;
     bool isLaunchAbility = true;
     sequence.statusConfigValue = false;
-    bool ret = handler.HandleSequence(sequence,isLaunchAbility);
+    bool ret = handler.HandleSequence(sequence, isLaunchAbility);
     ASSERT_FALSE(ret);
     sequence.statusConfigValue = true;
     sequenceKey.keyCode = 10;
@@ -2462,7 +2462,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequence_001, TestSi
     sequenceKey.delay = 10;
     handler.keys_.push_back(sequenceKey);
     sequence.sequenceKeys.push_back(sequenceKey);
-    ret = handler.HandleSequence(sequence,isLaunchAbility);
+    ret = handler.HandleSequence(sequence, isLaunchAbility);
     ASSERT_TRUE(ret);
 }
 
