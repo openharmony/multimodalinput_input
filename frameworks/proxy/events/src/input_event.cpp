@@ -13,16 +13,15 @@
  * limitations under the License.
  */
 
+#include <cassert>
+#include <chrono>
+
 #include "axis_event.h"
 #include "event_log_helper.h"
 #include "input_event.h"
 #include "key_event.h"
-#include "pointer_event.h"
-
-#include <cassert>
-#include <chrono>
-
 #include "mmi_log.h"
+#include "pointer_event.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputEvent"
@@ -31,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 int64_t g_nextEventId = 1;
-constexpr uint32_t DATA_LENGTH_LIMIT = 1024; // 1024: max length
+constexpr uint32_t DATA_LENGTH_LIMIT { 1024 }; // 1024: max length
 } // namespace
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
