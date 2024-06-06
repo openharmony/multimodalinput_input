@@ -47,6 +47,87 @@ public:
 };
 
 /**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_001
+ * @tc.desc: Test the function OnEnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    bool enable = true;
+    int32_t keyboardType = KEYBOARD_TYPE_NONE;
+    EXPECT_TRUE(keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD);
+    int32_t ret = inputDevice.OnEnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetKeyboardDevice_Test_001
+ * @tc.desc: Test the function GetKeyboardDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardDevice_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    struct libinput_device *device = nullptr;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+
+    bool ret1 = inputDevice.IsMatchKeys(device, keyCodes);
+    EXPECT_FALSE(ret1);
+    auto ret2 = inputDevice.GetKeyboardDevice();
+    EXPECT_EQ(ret2, nullptr);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnInputDeviceAdded_Test_001
+ * @tc.desc: Test the function OnInputDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceAdded_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId;
+    struct libinput_device *device = nullptr;
+    deviceId = 2;
+    ASSERT_NO_FATAL_FAILURE(inputDevice.OnInputDeviceAdded(device));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceSupportKey_Test_001
+ * @tc.desc: Test the function GetDeviceSupportKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceSupportKey_Test_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> keyCodes;
+    int32_t deviceId = 1;
+    int32_t keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
+    std::map<int32_t, bool> determineKbType;
+    int32_t returnCode1 = 401;
+    int32_t returnCode2 = 65142786;
+    InputDeviceManager inputDevice;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_HOME);
+    keyCodes.push_back(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyCodes.push_back(KeyEvent::KEYCODE_F2);
+
+    int32_t ret1 = inputDevice.GetKeyboardBusMode(deviceId);
+    EXPECT_EQ(ret1, returnCode2);
+    int32_t ret2 = inputDevice.GetDeviceSupportKey(deviceId, keyboardType);
+    EXPECT_EQ(ret2, returnCode1);
+}
+
+/**
  * @tc.name: GetInputDevice_Test_001
  * @tc.desc: Test the function GetInputDevice
  * @tc.type: FUNC
