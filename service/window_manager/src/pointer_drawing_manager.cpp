@@ -71,7 +71,6 @@ constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
 constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 1000 };
-constexpr int32_t SLEEP_TIME_FOR_MAGIC_CURSOR { 2 };
 constexpr float ROTATION_ANGLE { 360.f };
 constexpr float LOADING_CENTER_RATIO { 0.5f };
 constexpr float RUNNING_X_RATIO { 0.3f };
@@ -85,7 +84,7 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
-constexpr int32_t MAX_TRY_TIMES { 5 };
+constexpr int32_t MAX_TRY_TIMES { 10 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
@@ -104,25 +103,22 @@ PointerDrawingManager::PointerDrawingManager()
     hasMagicCursor_.name = "isMagicCursor";
     while (counter_ != MAX_TRY_TIMES) {
         int32_t ret = RET_ERR;
-        TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this, &ret]() {
+        int32_t result = TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this, &ret]() {
             MMI_HILOGD("Timer callback");
             ret = CreatePointerSwitchObserver(hasMagicCursor_);
             if (ret != RET_OK) {
                 MMI_HILOGE("Get value from setting date fail");
-                return;
             }
+            return ret;
         });
-        if (ret == RET_OK) {
+        if(result == RET_OK){
             MMI_HILOGI("CreatePointerSwitchObserver success.");
             break;
         }
         if (++counter_ == MAX_TRY_TIMES) {
             MMI_HILOGI("SubscribeServiceEvent failed.");
         }
-        sleep(SLEEP_TIME_FOR_MAGIC_CURSOR);
     }
-
-
     MAGIC_CURSOR->InitStyle();
     InitStyle();
 #else
