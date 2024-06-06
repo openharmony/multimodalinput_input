@@ -316,19 +316,6 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
     return RET_OK;
 }
 
-EventHandlerPtr InputManagerImpl::GetEventHandler() const
-{
-    CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    if (eventHandler_ == nullptr) {
-        MMI_HILOGD("eventHandler_ is nullptr");
-        auto MMIClient = MMIEventHdl.GetMMIClient();
-        CHKPP(MMIClient);
-        return MMIClient->GetEventHandler();
-    }
-    return eventHandler_;
-}
-
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
