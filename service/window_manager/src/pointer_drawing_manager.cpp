@@ -111,7 +111,7 @@ PointerDrawingManager::PointerDrawingManager()
             }
             return ret;
         });
-        if(result == RET_OK){
+        if (result == RET_OK) {
             MMI_HILOGI("CreatePointerSwitchObserver success.");
             break;
         }
@@ -123,10 +123,10 @@ PointerDrawingManager::PointerDrawingManager()
     InitStyle();
 #else
     InitStyle();
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#endif  // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
