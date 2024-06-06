@@ -208,8 +208,9 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 
     SerializeFingerprint(event, pkt);
 
-    pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetFingerCount() << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
+    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
+        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
+        << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
 
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
@@ -269,6 +270,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     int32_t tField;
     pkt >> tField;
     event->SetPointerAction(tField);
+    pkt >> tField;
+    event->SetOriginPointerAction(tField);
     pkt >> tField;
     event->SetPointerId(tField);
     pkt >> tField;
