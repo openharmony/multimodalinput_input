@@ -99,6 +99,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         if (!pointerInfos_.empty()) {
             pointerInfos_.clear();
+            CHKPF(canvasNode_);
 #ifndef USE_ROSEN_DRAWING
             auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
@@ -106,6 +107,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
 #endif // USE_ROSEN_DRAWING
+            CHKPF(canvas);
             canvas->Clear();
             auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
             canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
