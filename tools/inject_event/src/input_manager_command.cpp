@@ -74,8 +74,8 @@ constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
 constexpr int32_t INTERVAL_TIME_MS = 100;
 constexpr int32_t MIN_PINCH_FINGER = 2;
 constexpr int32_t MAX_PINCH_FINGER = 5;
-constexpr int32_t MIN_SWIPE_FINGER = 2;
-constexpr int32_t MAX_SWIPE_FINGER = 5;
+constexpr int32_t MIN_ACTION_FINGER = 2;
+constexpr int32_t MAX_ACTION_FINGER = 5;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -1656,7 +1656,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
 {
     struct option touchPadSensorOptions[] = {
         {"rotate", required_argument, nullptr, 'r'},
-        {"swipe", required_argument, nullptr, 's'},
+        {"action", required_argument, nullptr, 's'},
         {"pinch", required_argument, nullptr, 'p'},
         {nullptr, 0, nullptr, 0}
     };
@@ -1671,7 +1671,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
                 break;
             }
             case 's': {
-                int32_t ret = ProcessTouchPadFingerSwipe(argc, argv);
+                int32_t ret = ProcessTouchPadFingerAction(argc, argv);
                 if (ret != ERR_OK) {
                     return ret;
                 }
@@ -1791,40 +1791,17 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv[])
+int32_t InputManagerCommand::ProcessTouchPadFingerAction(int32_t argc, char *argv[])
 {
-    constexpr int32_t swipeUInputArgc = 8;
+    constexpr int32_t actionUInputArgc = 4;
     int32_t fingerCount = 0;
-    int32_t positionX1 = 0;
-    int32_t positionY1 = 0;
-    int32_t positionX2 = 0;
-    int32_t positionY2 = 0;
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
         return EVENT_REG_FAIL;
     }
     // optarg is the first return argument in argv that call the function getopt_long with the current option
-    int32_t firstYIndex = optind + 1;
-    int32_t secondXIndex = firstYIndex + 1;
-    int32_t secondYIndex = secondXIndex + 1;
-    if (argc == swipeUInputArgc) {
+    if (argc == actionUInputArgc) {
         if (!StrToInt(optarg, fingerCount)) {
-            std::cout << "invalid swip data" << std::endl;
-            return EVENT_REG_FAIL;
-        }
-        if (!StrToInt(argv[optind], positionX1)) {
-            std::cout << "invalid swip data" << std::endl;
-            return EVENT_REG_FAIL;
-        }
-        if (!StrToInt(argv[firstYIndex], positionY1)) {
-            std::cout << "invalid swip data" << std::endl;
-            return EVENT_REG_FAIL;
-        }
-        if (!StrToInt(argv[secondXIndex], positionX2)) {
-            std::cout << "invalid swip data" << std::endl;
-            return EVENT_REG_FAIL;
-        }
-        if (!StrToInt(argv[secondYIndex], positionY2)) {
             std::cout << "invalid swip data" << std::endl;
             return EVENT_REG_FAIL;
         }
@@ -1832,72 +1809,36 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
         std::cout << "wrong number of parameters:" << argc << std::endl;
         return EVENT_REG_FAIL;
     }
-    if (fingerCount < MIN_SWIPE_FINGER || fingerCount > MAX_SWIPE_FINGER) {
+    if (fingerCount < MIN_ACTION_FINGER || fingerCount > MAX_ACTION_FINGER) {
         std::cout << "invalid finger count:" << fingerCount << std::endl;
         return EVENT_REG_FAIL;
     }
-
-    if ((positionX1 <= 0) || (positionY1 <= 0) || (positionX2 <= 0) || (positionY2 <= 0)) {
-        std::cout << "Coordinate value must be greater than 0:" << std::endl;
-        return RET_ERR;
-    }
-    SwipeEvent(fingerCount, positionX1, positionY1, positionX2, positionY2);
+    ActionEvent(fingerCount);
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::SwipeEvent(int32_t fingerCount, int32_t positionX1,
-    int32_t positionY1, int32_t positionX2, int32_t positionY2)
+int32_t InputManagerCommand::ActionEvent(int32_t fingerCount)
 {
+    MMI_HILOGI("InputManagerCommand::ActionEventInputManagerCommand::ActionEventInputManagerCommand::ActionEvent*****");
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     // in order to simulate more actual, add some update update event, so adding some items to update ,
     // the data of points are simulated average in axis
-    constexpr int32_t pointNum = 2;
-    int32_t numberPoint = 0;
+    int32_t numberPoint = 10010;
+    int32_t widthOfFinger = 30;
     int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
 
     PointerEvent::PointerItem item;
     item.SetDownTime(startTimeMs);
     item.SetPointerId(numberPoint);
-    item.SetDeviceId(0);
-    item.SetDisplayX(positionX1);
-    item.SetDisplayY(positionY1);
+    item.SetDisplayX(widthOfFinger);
+    item.SetDisplayY(widthOfFinger);    
     pointerEvent->SetPointerId(numberPoint);
     pointerEvent->SetFingerCount(fingerCount);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetActionStartTime(startTimeMs);
     pointerEvent->SetActionTime(startTimeMs);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetDeviceId(0);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    numberPoint++;
-
-    auto ids_ = pointerEvent->GetPointerIds();
-    for (const auto &id : ids_) {
-        pointerEvent->RemovePointerItem(id);
-    }
-    PointerEvent::PointerItem itemTemp;
-    itemTemp.SetPressed(true);
-    itemTemp.SetDownTime(startTimeMs);
-    itemTemp.SetPointerId(numberPoint);
-    itemTemp.SetDeviceId(0);
-    itemTemp.SetDisplayX((positionX1 + positionX2) / pointNum);
-    itemTemp.SetDisplayY((positionY1 + positionY2) / pointNum);
-    pointerEvent->AddPointerItem(itemTemp);
-     
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    ids_ = pointerEvent->GetPointerIds();
-    for (const auto &id : ids_) {
-        pointerEvent->RemovePointerItem(id);
-    }
-    numberPoint++;
-    item.SetPointerId(numberPoint);
-    item.SetDisplayX(positionX2);
-    item.SetDisplayY(positionY2);
-    pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     return ERR_OK;
