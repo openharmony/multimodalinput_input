@@ -146,4 +146,34 @@ bool PermissionHelper::VerifySystemApp()
 {
     return DfsMessageParcel::messageParcel->VerifySystemApp();
 }
+
+bool PermissionHelper::CheckInterceptor()
+{
+    return DfsMessageParcel::messageParcel->CheckInterceptor();
+}
+
+bool PermissionHelper::CheckMonitor()
+{
+    return DfsMessageParcel::messageParcel->CheckMonitor();
+}
+
+bool PermissionHelper::CheckDispatchControl()
+{
+    return DfsMessageParcel::messageParcel->CheckDispatchControl();
+}
+
+bool PermissionHelper::CheckInfraredEmmit()
+{
+    return DfsMessageParcel::messageParcel->CheckInfraredEmmit();
+}
+
+bool Parcel::WriteBoolVector(const std::vector<bool> &val)
+{
+    return DfsMessageParcel::messageParcel->WriteBoolVector(val);
+}
+
+bool Parcel::WriteInt32Vector(const std::vector<int32_t> &val)
+{
+    return DfsMessageParcel::messageParcel->WriteInt32Vector(val);
+}
 } // namespace OHOS

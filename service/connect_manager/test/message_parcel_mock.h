@@ -53,6 +53,12 @@ public:
     virtual bool WriteUint32(uint32_t value) = 0;
     virtual bool ReadUint64(uint64_t &value) = 0;
     virtual bool VerifySystemApp() = 0;
+    virtual bool CheckInterceptor() = 0;
+    virtual bool CheckMonitor() = 0;
+    virtual bool CheckDispatchControl() = 0;
+    virtual bool CheckInfraredEmmit() = 0;
+    virtual bool WriteBoolVector(const std::vector<bool> &val) = 0;
+    virtual bool WriteInt32Vector(const std::vector<int32_t> &val) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -83,6 +89,12 @@ public:
     MOCK_METHOD1(WriteUint32, bool(uint32_t value));
     MOCK_METHOD1(ReadUint64, bool(uint64_t &value));
     MOCK_METHOD0(VerifySystemApp, bool());
+    MOCK_METHOD0(CheckInterceptor, bool());
+    MOCK_METHOD0(CheckMonitor, bool());
+    MOCK_METHOD0(CheckDispatchControl, bool());
+    MOCK_METHOD0(CheckInfraredEmmit, bool());
+    MOCK_METHOD1(WriteBoolVector, bool(const std::vector<bool> &val));
+    MOCK_METHOD1(WriteInt32Vector, bool(const std::vector<int32_t> &val));
 };
 } // namespace MMI
 } // namespace OHOS

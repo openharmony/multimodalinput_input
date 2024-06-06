@@ -786,6 +786,7 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
     }
     int32_t eventType;
     READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
