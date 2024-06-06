@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
+#include "axis_event.h"
 #include "define_multimodal.h"
 #include "event_util_test.h"
+#include "input_device.h"
+#include "input_event.h"
 #include "proto.h"
 #include "util.h"
 
@@ -1111,6 +1114,210 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level1)
     PointerEvent::PointerItem item;
     ASSERT_NO_FATAL_FAILURE(item.SetWindowYPos(y));
     ASSERT_EQ(item.GetWindowYPos(), y);
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_001
+ * @tc.desc: Verify ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventType = 1;
+    AxisEvent axisevent(eventType);
+    int32_t action = AxisEvent::AXIS_ACTION_CANCEL;
+    auto ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:C:");
+    action = AxisEvent::AXIS_ACTION_START;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:S:");
+    action = AxisEvent::AXIS_ACTION_UPDATE;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:U:");
+    action = AxisEvent::AXIS_ACTION_END;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:E:");
+    action = AxisEvent::AXIS_ACTION_UNKNOWN;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:UK:");
+    action = 10;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:?:");
+}
+
+/**
+ * @tc.name: PointerEventTest_AddCapability_001
+ * @tc.desc: Verify AddCapability
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_AddCapability_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDevice device;
+    InputDeviceCapability cap;
+    cap = INPUT_DEV_CAP_TOUCH;
+    ASSERT_NO_FATAL_FAILURE(device.AddCapability(cap));
+    cap = INPUT_DEV_CAP_MAX;
+    ASSERT_NO_FATAL_FAILURE(device.AddCapability(cap));
+}
+
+/**
+ * @tc.name: PointerEventTest_HasCapability_001
+ * @tc.desc: Verify HasCapability
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDevice device;
+    InputDeviceCapability cap;
+    cap = INPUT_DEV_CAP_TOUCH;
+    bool ret = device.HasCapability(cap);
+    ASSERT_FALSE(ret);
+    cap = INPUT_DEV_CAP_MAX;
+    ret = device.HasCapability(cap);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_HasCapability_002
+ * @tc.desc: Verify HasCapability
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDevice device;
+    device.capabilities_.set(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    device.capabilities_.set(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_KEYBOARD));
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_POINTER));
+    EXPECT_FALSE(device.HasCapability(INPUT_DEV_CAP_TOUCH));
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_KEYBOARD | INPUT_DEV_CAP_POINTER | INPUT_DEV_CAP_TOUCH));
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_KEYBOARD | INPUT_DEV_CAP_POINTER));
+}
+
+/**
+ * @tc.name: PointerEventTest_MarkProcessed_001
+ * @tc.desc: Verify MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(int32_t, int64_t)> processedCallback_;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    inputEvent->markEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->MarkProcessed());
+    inputEvent->markEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->MarkProcessed());
+}
+
+/**
+ * @tc.name: PointerEventTest_SetExtraData_002
+ * @tc.desc: Verify SetExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    std::shared_ptr<const uint8_t[]> data;
+    uint32_t length = 10;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(data, length));
+}
+
+/**
+ * @tc.name: PointerEventTest_GetExtraData_002
+ * @tc.desc: Verify GetExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    std::shared_ptr<const uint8_t[]> data;
+    uint32_t length = 10;
+    inputEvent->extraDataLength_ = 5;
+    std::shared_ptr<const uint8_t[]> extraData;
+    inputEvent->extraData_ = extraData;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
+}
+
+/**
+ * @tc.name: PointerEventTest_WriteToParcel_001
+ * @tc.desc: Verify WriteToParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    Parcel out;
+    inputEvent->extraDataLength_ = 5;
+    std::shared_ptr<const uint8_t[]> extraData;
+    inputEvent->extraData_ = extraData;
+    bool ret = inputEvent->WriteToParcel(out);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_001
+ * @tc.desc: Verify ReadFromParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    Parcel in;
+    inputEvent->extraDataLength_ = 1088;
+    bool ret = inputEvent->ReadFromParcel(in);
+    ASSERT_FALSE(ret);
+    inputEvent->extraDataLength_ = 10;
+    ret = inputEvent->ReadFromParcel(in);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_002
+ * @tc.desc: Verify ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    int32_t action = InputEvent::ACTION_CANCEL;
+    auto ret = inputEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "B:C:");
+    action = InputEvent::ACTION_UNKNOWN;
+    ret = inputEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "B:UK:");
+    action = InputEvent::EVENT_FLAG_HIDE_POINTER;
+    ret = inputEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "B:?:");
 }
 
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
