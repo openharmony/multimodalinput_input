@@ -44,20 +44,20 @@ void GesturesenseWrapper::InitGestureSenseWrapper()
     CALL_INFO_TRACE;
     gesturesenseWrapperHandle_ = dlopen(GESTURESENSE_WRAPPER_PATH.c_str(), RTLD_NOW);
     if (gesturesenseWrapperHandle_ == nullptr) {
-        MMI_HILOGE("libgesture.z.so was not loaded, path:%{public}s, error: %{public}s",
+        MMI_HILOGE("libgesture.z.so was not loaded, path:%{public}s, error:%{public}s",
             GESTURESENSE_WRAPPER_PATH.c_str(), dlerror());
         goto fail;
         return;
     }
     touchUp_ = (TOUCH_UP)dlsym(gesturesenseWrapperHandle_, "TouchUp");
     if (touchUp_ == nullptr) {
-        MMI_HILOGE("gesturesense wrapper symbol failed, error: %{public}s", dlerror());
+        MMI_HILOGE("gesturesense wrapper symbol failed, touchUp_ error:%{public}s", dlerror());
         goto fail;
         return;
     }
     getBoundingSquareness_ = (GET_BOUNDING_SQUARENESS)dlsym(gesturesenseWrapperHandle_, "GetBoundingSquareness");
     if (getBoundingSquareness_ == nullptr) {
-        MMI_HILOGE("gesturesense wrapper symbol failed, error: %{public}s", dlerror());
+        MMI_HILOGE("gesturesense wrapper symbol failed, getBoundingSquareness_ error:%{public}s", dlerror());
         goto fail;
         return;
     }
