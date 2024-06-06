@@ -259,8 +259,6 @@ void KnuckleDrawingManager::CreateCanvasNode()
         default:
             break;
     }
-    nodeWidth_ = displayInfo_.width;
-    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
