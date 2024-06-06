@@ -195,6 +195,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             isStop_ = true;
             isDrawing_ = true;
             glowTraceSystem_->Clear();
+            CHKPF(canvasNode_);
 #ifndef USE_ROSEN_DRAWING
             auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
@@ -202,6 +203,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
 #endif // USE_ROSEN_DRAWING
+            CHKPF(canvas);
             canvas->Clear();
             traceControlPoints_.clear();
             pointerPath_.Reset();
