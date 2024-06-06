@@ -1832,7 +1832,7 @@ int32_t InputManagerCommand::ActionEvent(int32_t fingerCount)
     item.SetDownTime(startTimeMs);
     item.SetPointerId(numberPoint);
     item.SetDisplayX(widthOfFinger);
-    item.SetDisplayY(widthOfFinger);    
+    item.SetDisplayY(widthOfFinger);
     pointerEvent->SetPointerId(numberPoint);
     pointerEvent->SetFingerCount(fingerCount);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
