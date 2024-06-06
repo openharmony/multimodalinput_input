@@ -35,7 +35,7 @@ int32_t EventFilterStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("code:%{public}d", code);
+    MMI_HILOGD("code:%{public}u", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventFilter::GetDescriptor()) {
