@@ -478,19 +478,21 @@ void KnuckleDynamicDrawingManager::CreateCanvasNode()
         case DIRECTION180: {
             canvasNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
             canvasNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+            nodeWidth_ = displayInfo_.width;
+            nodeHeight_ = displayInfo_.height;
         }
             break;
         case DIRECTION90:
         case DIRECTION270: {
             canvasNode_->SetBounds(0, 0, displayInfo_.height, displayInfo_.width);
             canvasNode_->SetFrame(0, 0, displayInfo_.height, displayInfo_.width);
+            nodeWidth_ = displayInfo_.height;
+            nodeHeight_ = displayInfo_.width;
         }
             break;
         default:
             break;
     }
-    nodeWidth_ = displayInfo_.width;
-    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
