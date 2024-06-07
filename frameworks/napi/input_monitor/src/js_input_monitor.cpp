@@ -1304,7 +1304,6 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             }
         }
         evQueue_.push(pointerEvent);
-        jsTaskNum_ = 1;
     }
 
     if (!evQueue_.empty()) {
@@ -1314,10 +1313,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         if (monitorInfo == nullptr) {
             MMI_HILOGE("monitorInfo is nullptr");
             delete work;
-            {
-                std::lock_guard<std::mutex> guard(mutex_);
-                jsTaskNum_ = 0;
-            }
+            work = nullptr;
             return;
         }
         monitorInfo->monitorId = monitorId_;
@@ -1327,11 +1323,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         auto status = napi_get_uv_event_loop(jsEnv_, &loop);
         if (status != napi_ok) {
             THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
-            delete work;
-            {
-                std::lock_guard<std::mutex> guard(mutex_);
-                jsTaskNum_ = 0;
-            }
+            CleanData(&monitorInfo, &work);
             return;
         }
         int32_t ret = uv_queue_work_with_qos(
@@ -1371,7 +1363,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    jsTaskNum_ = 0;
     if (!isMonitoring_) {
         MMI_HILOGE("Js monitor stop");
         return;
