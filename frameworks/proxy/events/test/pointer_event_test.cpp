@@ -1353,5 +1353,21 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSiz
     ASSERT_EQ(pointerEvent->GetFingerprintDistanceY(), y);
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
+/**
+ * @tc.name: PointerEventTest_SetHandlerEventType
+ * @tc.desc: Verify SetHandlerEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetHandlerEventType(0);
+    ASSERT_EQ(pointerEvent->GetHandlerEventType(), 0);
+}
 } // namespace MMI
 } // namespace OHOS
