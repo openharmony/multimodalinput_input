@@ -1355,13 +1355,13 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSiz
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 /**
- * @tc.name: PointerEventTest_SetHandlerEventType_001
+ * @tc.name: PointerEventTest_SetHandlerEventType
  * @tc.desc: Verify SetHandlerEventType
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType_001, TestSize.Level1)
+HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
