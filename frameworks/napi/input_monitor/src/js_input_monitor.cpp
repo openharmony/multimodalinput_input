@@ -1311,7 +1311,15 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
-        CHKPV(monitorInfo);
+        if (monitorInfo == nullptr) {
+            MMI_HILOGE("monitorInfo is nullptr");
+            delete work;
+            {
+                std::lock_guard<std::mutex> guard(mutex_);
+                jsTaskNum_ = 0;
+            }
+            return;
+        }
         monitorInfo->monitorId = monitorId_;
         monitorInfo->fingers = fingers_;
         work->data = monitorInfo;
