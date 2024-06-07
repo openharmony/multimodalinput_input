@@ -352,7 +352,9 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     } else {
         if (physicDisplayInfo->direction != lastDirection_) {
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+                int32_t pointerAction = pointerEvent->GetPointerAction();
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+                pointerEvent->SetOriginPointerAction(pointerAction);
                 MMI_HILOG_DISPATCHI("touch event send cancel");
                 iter->second.flag = false;
             }
@@ -2031,7 +2033,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             return RET_ERR;
         }
         touchWindow = std::make_optional(mouseDownInfo_);
+        int32_t pointerAction = pointerEvent->GetPointerAction();
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        pointerEvent->SetOriginPointerAction(pointerAction);
         MMI_HILOGI("mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
     }
 
