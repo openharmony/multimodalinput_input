@@ -652,9 +652,9 @@ group("TouchEventNormalizeTests") {
   deps = [
     ":TabletToolTranformTest",
     ":TouchEventNormalizeTest",
+    ":TouchPadTransformProcessorMockTest",
+    ":TouchTransformProcessorTestWithMock",
     ":TouchpadGestureTest",
     ":TransformPointTest",
-    ":TouchTransformProcessorTestWithMock",
-    ":TouchPadTransformProcessorMockTest",
   ]
 }
