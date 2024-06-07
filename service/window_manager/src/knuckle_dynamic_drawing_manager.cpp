@@ -35,6 +35,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
 constexpr int32_t DENSITY_BASELINE { 160 };
 constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
