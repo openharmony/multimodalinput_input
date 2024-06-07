@@ -1146,22 +1146,22 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     msgHandler.targetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
-    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_ERR);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_ERR);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
+    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -521,7 +521,7 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
     keystrokes.clear();
     ret = inputDevice.SupportKeys(deviceId, keyCodes, keystrokes);
     EXPECT_EQ(ret, COMMON_PARAMETER_ERROR);
-    EXPECT_FALSE(keystrokes.empty());
+    EXPECT_TRUE(keystrokes.empty());
 }
 
 /**

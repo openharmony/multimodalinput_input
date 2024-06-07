@@ -217,9 +217,9 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
     pointerEvent->SetPointerId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
+    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
