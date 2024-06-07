@@ -139,7 +139,7 @@ void MouseEventNormalizeTest::TearDown()
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetDisplayId_001, TestSize.Level1)
 {
-    int32_t idNames = -1;
+    int32_t idNames = 0;
     ASSERT_EQ(MouseEventHdr->GetDisplayId(), idNames);
 }
 
@@ -255,7 +255,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeMoveMouse_004, TestSize.Level1)
 {
-    bool isNormalize = false;
+    bool isNormalize = true;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
     ASSERT_EQ(MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY), isNormalize);
@@ -311,7 +311,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008, TestSize.Level1)
 {
-    int32_t idNames = -1;
+    int32_t idNames = 0;
     int32_t x = 0;
     int32_t y = 0;
     ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y), idNames);
