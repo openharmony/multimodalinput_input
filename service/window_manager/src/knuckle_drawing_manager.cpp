@@ -190,7 +190,8 @@ void KnuckleDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> touchEv
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void KnuckleDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, DisplayInfo displayInfo)
+void KnuckleDrawingManager::RotationCanvasNode(
+    std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, DisplayInfo displayInfo)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvasNode);
@@ -214,7 +215,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        if (isRotate_ && displayInfo_.displayDirection == DIRECTION0 ) {
+        if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
             isRotate_ = false;
             RotationCanvasNode(canvasNode_, displayInfo_);
             Rosen::RSTransaction::FlushImplicitTransaction();
