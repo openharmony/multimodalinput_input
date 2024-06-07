@@ -36,10 +36,9 @@ class KnuckleDrawingManager {
 public:
     void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
-    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
-        int32_t &physicalX, int32_t &physicalY);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
+    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, DisplayInfo displayInfo);
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);
@@ -62,8 +61,8 @@ private:
     PointerInfo lastDownPointer_ {};
     int64_t lastUpTime_ { 0 };
     bool isRotate_ { false };
-    int32_t nodeWidth_ { 0 };
-    int32_t nodeHeight_ { 0 };
+    int32_t scaleW_ { 0 };
+    int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
 };
 } // namespace MMI
