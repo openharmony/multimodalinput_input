@@ -176,4 +176,34 @@ bool Parcel::WriteInt32Vector(const std::vector<int32_t> &val)
 {
     return DfsMessageParcel::messageParcel->WriteInt32Vector(val);
 }
+
+int64_t Parcel::ReadInt64()
+{
+    return DfsMessageParcel::messageParcel->ReadInt64();
+}
+
+bool Parcel::ReadInt64(int64_t &value)
+{
+    return DfsMessageParcel::messageParcel->ReadInt64(value);
+}
+
+float Parcel::ReadFloat()
+{
+    return DfsMessageParcel::messageParcel->ReadFloat();
+}
+
+bool Parcel::ReadFloat(float &value)
+{
+    return DfsMessageParcel::messageParcel->ReadFloat(value);
+}
+
+double Parcel::ReadDouble()
+{
+    return DfsMessageParcel::messageParcel->ReadDouble();
+}
+
+bool Parcel::ReadDouble(double &value)
+{
+    return DfsMessageParcel::messageParcel->ReadDouble(value);
+}
 } // namespace OHOS
