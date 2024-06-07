@@ -59,6 +59,12 @@ public:
     virtual bool CheckInfraredEmmit() = 0;
     virtual bool WriteBoolVector(const std::vector<bool> &val) = 0;
     virtual bool WriteInt32Vector(const std::vector<int32_t> &val) = 0;
+    virtual int64_t ReadInt64() = 0;
+    virtual bool ReadInt64(int64_t &value) = 0;
+    virtual float ReadFloat() = 0;
+    virtual bool ReadFloat(float &value) = 0;
+    virtual double ReadDouble() = 0;
+    virtual bool ReadDouble(double &value) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -95,6 +101,12 @@ public:
     MOCK_METHOD0(CheckInfraredEmmit, bool());
     MOCK_METHOD1(WriteBoolVector, bool(const std::vector<bool> &val));
     MOCK_METHOD1(WriteInt32Vector, bool(const std::vector<int32_t> &val));
+    MOCK_METHOD0(ReadInt64, int64_t());
+    MOCK_METHOD1(ReadInt64, bool(int64_t &value));
+    MOCK_METHOD0(ReadFloat, float());
+    MOCK_METHOD1(ReadFloat, bool(float &value));
+    MOCK_METHOD0(ReadDouble, double());
+    MOCK_METHOD1(ReadDouble, bool(double &value));
 };
 } // namespace MMI
 } // namespace OHOS
