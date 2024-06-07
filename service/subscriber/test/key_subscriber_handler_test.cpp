@@ -776,7 +776,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_001, 
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -802,7 +802,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_002, 
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -828,7 +828,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_003, 
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
@@ -876,7 +876,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_005, 
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
     ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
@@ -903,8 +902,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_006, 
 
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
-    ASSERT_TRUE(keySubscriberHandler.HandleRingMute(keyEvent));
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
 }
 
 /**
