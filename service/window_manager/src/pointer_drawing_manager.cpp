@@ -1647,9 +1647,8 @@ std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIcons()
 
 void PointerDrawingManager::UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath)
 {
-    std::map<MOUSE_ICON, IconStyle> mouseIcons = GetMouseIcons();
-    auto iter = mouseIcons.find(mouseStyle);
-    if (iter == mouseIcons.end()) {
+    auto iter = mouseIcons_.find(mouseStyle);
+    if (iter == mouseIcons_.end()) {
         MMI_HILOGE("Cannot find the mouseStyle:%{public}d", static_cast<int32_t>(mouseStyle));
         return;
     }
