@@ -137,6 +137,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     displayGroupInfo_.focusWindowId = -1;
     displayGroupInfo_.width = 0;
     displayGroupInfo_.height = 0;
+    mouseDownInfo_.windowType = 0;
 }
 
 InputWindowsManager::~InputWindowsManager()
