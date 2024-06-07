@@ -441,7 +441,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
 #endif // USE_ROSEN_DRAWING
 
     screenId_ = static_cast<uint64_t>(displayId);
-    MMI_HILOGI("ScreenId: %{public}zu", screenId_);
+    MMI_HILOGI("ScreenId: %{public}llu", screenId_);
     surfaceNode_->SetRotation(0);
 
     CreateCanvasNode();
