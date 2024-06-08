@@ -167,6 +167,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         MMI_HILOGD("Restores to the default cursor when the cursor retrieval effect is triggered");
         MAGIC_POINTER_VELOCITY_TRACKER->SetLastPointerStyle(pointerStyle);
         MAGIC_POINTER_VELOCITY_TRACKER->SetDirection(direction);
+        pointerStyle.id = MOUSE_ICON::DEFAULT;
     }
     surfaceNode_->SetScale(scale_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
