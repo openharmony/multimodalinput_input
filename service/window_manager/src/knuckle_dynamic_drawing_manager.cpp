@@ -59,6 +59,7 @@ constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
 constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
+constexpr int32_t IN_DRAWING_TIME { 23000 };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -89,70 +90,13 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
     return pixelMap;
 }
 
-Rosen::Drawing::AlphaType KnuckleDynamicDrawingManager::AlphaTypeToAlphaType(Media::AlphaType alphaType)
-{
-    CALL_DEBUG_ENTER;
-    switch (alphaType) {
-        case Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN:
-            return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
-        case Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE:
-            return Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
-        case Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL:
-            return Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
-        case Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL:
-            return Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
-        default:
-            return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
-    }
-}
-
-Rosen::Drawing::ColorType KnuckleDynamicDrawingManager::PixelFormatToColorType(Media::PixelFormat pixelFormat)
-{
-    switch (pixelFormat) {
-        case Media::PixelFormat::RGB_565:
-            return Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
-        case Media::PixelFormat::RGBA_8888:
-            return Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
-        case Media::PixelFormat::BGRA_8888:
-            return Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
-        case Media::PixelFormat::ALPHA_8:
-            return Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
-        case Media::PixelFormat::RGBA_F16:
-            return Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
-        case Media::PixelFormat::UNKNOWN:
-        case Media::PixelFormat::ARGB_8888:
-        case Media::PixelFormat::RGB_888:
-        case Media::PixelFormat::NV21:
-        case Media::PixelFormat::NV12:
-        case Media::PixelFormat::CMYK:
-        default:
-            return Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
-    }
-}
-
-std::shared_ptr<Rosen::Drawing::Bitmap> KnuckleDynamicDrawingManager::PixelMapToBitmap(
-    std::shared_ptr<Media::PixelMap>& pixelMap)
-{
-    CALL_DEBUG_ENTER;
-    auto data = pixelMap->GetPixels();
-    Rosen::Drawing::Bitmap bitmap;
-    Rosen::Drawing::ColorType colorType = PixelFormatToColorType(pixelMap->GetPixelFormat());
-    Rosen::Drawing::AlphaType alphaType = AlphaTypeToAlphaType(pixelMap->GetAlphaType());
-    Rosen::Drawing::ImageInfo imageInfo(pixelMap->GetWidth(), pixelMap->GetHeight(), colorType, alphaType);
-    bitmap.Build(imageInfo);
-    bitmap.SetPixels(const_cast<uint8_t*>(data));
-    return std::make_shared<Rosen::Drawing::Bitmap>(bitmap);
-}
-
 void KnuckleDynamicDrawingManager::InitPointerPathPaint()
 {
     CALL_DEBUG_ENTER;
     pixelMap_ = DecodeImageToPixelMap(PENT_ICON_PATH);
     CHKPV(pixelMap_);
-    auto bitmap = PixelMapToBitmap(pixelMap_);
-    CHKPV(bitmap);
     if (glowTraceSystem_ == nullptr) {
-        glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+        glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap_, MAX_DIVERGENCE_NUM);
     }
     if (knuckleDrawMgr_ == nullptr) {
         knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
@@ -203,7 +147,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
                 BeginRecording(scaleW_, scaleH_));
 #else
-            auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
+            auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->
                 BeginRecording(scaleW_, scaleH_));
 #endif // USE_ROSEN_DRAWING
             CHKPF(canvas);
@@ -285,7 +229,13 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
         int32_t physicalY = pointerItem.GetDisplayY();
         glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
     }
-
+#ifndef USE_ROSEN_DRAWING
+            auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
+                BeginRecording(scaleW_, scaleH_));
+#else
+            auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->
+                BeginRecording(scaleW_, scaleH_));
+#endif // USE_ROSEN_DRAWING
     traceControlPoints_.clear();
     pointerPath_.Reset();
     glowTraceSystem_->Clear();
@@ -393,16 +343,22 @@ int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, RET_ERR);
     CHKPR(canvasNode_, RET_ERR);
+    glowTraceSystem_->Update();
+    if ((pointerEvent->GetActionTime() - isInDrawingTime_) > IN_DRAWING_TIME) {
+        isInDrawingTime_ = pointerEvent->GetActionTime();
+    } else {
+        return RET_ERR;
+    }
 #ifndef USE_ROSEN_DRAWING
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
         BeginRecording(scaleW_, scaleH_));
 #else
-    auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
+    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->
         BeginRecording(scaleW_, scaleH_));
 #endif // USE_ROSEN_DRAWING
 
     CHKPR(canvas, RET_ERR);
-    glowTraceSystem_->Update();
+
     if (!isDrawing_) {
         glowTraceSystem_->Draw(canvas);
     }
