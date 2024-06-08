@@ -1369,5 +1369,169 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1
     pointerEvent->SetHandlerEventType(0);
     ASSERT_EQ(pointerEvent->GetHandlerEventType(), 0);
 }
+
+/**
+ * @tc.name: PointerEventTest_GetAxisValue_001
+ * @tc.desc: Test the funcation GetAxisValue
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
+    axis = PointerEvent::AXIS_TYPE_UNKNOWN;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
+    axis = PointerEvent::AXIS_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
+}
+
+/**
+ * @tc.name: PointerEventTest_SetAxisValue_001
+ * @tc.desc: Test the funcation SetAxisValue
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    double axisValue = 1.0;
+    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetAxisValue(axis, axisValue));
+    axis = PointerEvent::AXIS_TYPE_UNKNOWN;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetAxisValue(axis, axisValue));
+    axis = PointerEvent::AXIS_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetAxisValue(axis, axisValue));
+}
+
+/**
+ * @tc.name: PointerEventTest_HasAxis_001
+ * @tc.desc: Test the funcation HasAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    uint32_t axes = 1;
+    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
+    bool ret = pointerEvent->HasAxis(axes, axis);
+    ASSERT_FALSE(ret);
+    axis = PointerEvent::AXIS_TYPE_UNKNOWN;
+    ret = pointerEvent->HasAxis(axes, axis);
+    ASSERT_TRUE(ret);
+    axis = PointerEvent::AXIS_TYPE_PINCH;
+    ret = pointerEvent->HasAxis(axes, axis);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetPressure_001
+ * @tc.desc: Test the funcation SetPressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double pressure = -1.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetPressure(pressure));
+    pressure = 1.0;
+    ASSERT_NO_FATAL_FAILURE(item.SetPressure(pressure));
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_003
+ * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_PULL_UP;
+    auto ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:PU:");
+    action = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:PI:");
+    action = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:PO:");
+    action = PointerEvent::POINTER_ACTION_SWIPE_BEGIN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:SB:");
+    action = PointerEvent::POINTER_ACTION_SWIPE_UPDATE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:SU:");
+    action = PointerEvent::POINTER_ACTION_SWIPE_END;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:SE:");
+    action = PointerEvent::POINTER_ACTION_ROTATE_BEGIN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:RB:");
+    action = PointerEvent::POINTER_ACTION_ROTATE_UPDATE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:RU:");
+    action = PointerEvent::POINTER_ACTION_ROTATE_END;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:RE:");
+    action = PointerEvent::POINTER_ACTION_TRIPTAP;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:TT:");
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_004
+ * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_QUADTAP;
+    auto ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:Q:");
+    action = PointerEvent::POINTER_ACTION_HOVER_MOVE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:HM:");
+    action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:HE:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FD:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_UP;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FU:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FS:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FR:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FC:");
+    action = PointerEvent::POINTER_ACTION_UNKNOWN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:UK:");
+    action = 100;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:?:");
+}
 } // namespace MMI
 } // namespace OHOS
