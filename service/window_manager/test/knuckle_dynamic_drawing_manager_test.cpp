@@ -15,6 +15,10 @@
 
 #include <gtest/gtest.h>
 
+#include "image_source.h"
+#include "image_type.h"
+#include "image_utils.h"
+
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "knuckle_dynamic_drawing_manager.h"
@@ -28,6 +32,7 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t POINT_SYSTEM_SIZE = 50;
 constexpr int32_t MAX_DIVERGENCE_NUM = 10;
+constexpr int32_t MAX_POINTER_COLOR = 0xff00ff;
 } // namespace
 
 class KnuckleDynamicDrawingManagerTest : public testing::Test {
@@ -43,66 +48,35 @@ public:
         }
         knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
     }
+
+    std::shared_ptr<Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
 private:
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingMgr { nullptr };
 };
 
-/**
- * @tc.name: KnuckleDrawingManagerTest_AlphaTypeToAlphaType
- * @tc.desc: Test Overrides AlphaTypeToAlphaType function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_AlphaTypeToAlphaType, TestSize.Level1)
+std::shared_ptr<Media::PixelMap> KnuckleDynamicDrawingManagerTest::DecodeImageToPixelMap(const std::string &imagePath)
 {
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
-    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
-    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
-    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
-    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL);
-    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
-    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL);
-    alphaType = static_cast<Media::AlphaType>(5);
-    ASSERT_EQ(knuckleDynamicDrawMgr.AlphaTypeToAlphaType(alphaType), Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
-}
+    CALL_DEBUG_ENTER;
+    OHOS::Media::SourceOptions opts;
+    uint32_t ret = 0;
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
+    CHKPP(imageSource);
+    std::set<std::string> formats;
+    ret = imageSource->GetSupportedFormats(formats);
+    OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {
+        .width = 80,
+        .height = 80
+    };
 
-/**
- * @tc.name: KnuckleDrawingManagerTest_PixelFormatToColorType
- * @tc.desc: Test Overrides PixelFormatToColorType function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_PixelFormatToColorType, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    Media::PixelFormat pixelFmt = Media::PixelFormat::RGB_565;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGB_565);
-    pixelFmt = Media::PixelFormat::RGBA_8888;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888);
-    pixelFmt = Media::PixelFormat::BGRA_8888;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888);
-    pixelFmt = Media::PixelFormat::ALPHA_8;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8);
-    pixelFmt = Media::PixelFormat::RGBA_F16;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16);
-    pixelFmt = Media::PixelFormat::UNKNOWN;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
-    pixelFmt = Media::PixelFormat::ARGB_8888;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
-    pixelFmt = Media::PixelFormat::RGB_888;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
-    pixelFmt = Media::PixelFormat::NV21;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
-    pixelFmt = Media::PixelFormat::NV12;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
-    pixelFmt = Media::PixelFormat::CMYK;
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
-    pixelFmt = static_cast<Media::PixelFormat>(100);
-    ASSERT_EQ(knuckleDynamicDrawMgr.PixelFormatToColorType(pixelFmt), Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    decodeOpts.SVGOpts.fillColor = {.isValidColor = false, .color = MAX_POINTER_COLOR};
+    decodeOpts.SVGOpts.strokeColor = {.isValidColor = false, .color = MAX_POINTER_COLOR};
+
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("The pixelMap is nullptr");
+    }
+    return pixelMap;
 }
 
 /**
@@ -163,9 +137,10 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Init
     KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
     knuckleDynamicDrawMgr.glowTraceSystem_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
-    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
     knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
 }
 
@@ -234,9 +209,10 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
     item.SetPointerId(2);
     pointerEvent->SetPointerId(2);
     pointerEvent->AddPointerItem(item);
-    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
     knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
     ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
 }
 
@@ -259,9 +235,10 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
     knuckleDynamicDrawMgr.displayInfo_.width = 200;
     knuckleDynamicDrawMgr.displayInfo_.height = 200;
-    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
     knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
     knuckleDynamicDrawMgr.isDrawing_ = true;
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent));
 }
@@ -281,9 +258,10 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Proc
     knuckleDynamicDrawMgr.pointCounter_ = 6;
     ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
 
-    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
     knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
     PointerEvent::PointerItem item;
     item.SetDisplayX(200);
     item.SetDisplayY(200);
@@ -327,9 +305,10 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Draw
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
     knuckleDynamicDrawMgr.displayInfo_.width = 200;
     knuckleDynamicDrawMgr.displayInfo_.height = 200;
-    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
     knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
     knuckleDynamicDrawMgr.isDrawing_ = false;
     ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_OK);
     knuckleDynamicDrawMgr.isDrawing_ = true;

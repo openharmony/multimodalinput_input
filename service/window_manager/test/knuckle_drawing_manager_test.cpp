@@ -18,6 +18,10 @@
 
 #include <gtest/gtest.h>
 
+#include "image_source.h"
+#include "image_type.h"
+#include "image_utils.h"
+
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "knuckle_drawing_manager.h"
