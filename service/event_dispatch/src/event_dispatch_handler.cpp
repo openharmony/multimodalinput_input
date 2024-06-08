@@ -104,8 +104,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     std::vector<int32_t> windowIds;
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     int32_t count = 0;
+    int32_t pointerId = point->GetPointerId();
     for (auto windowId : windowIds) {
-        int32_t pointerId = point->GetPointerId();
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
         if (windowInfo == std::nullopt) {
             MMI_HILOGE("WindowInfo id nullptr");
@@ -129,6 +129,11 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
         DispatchPointerEventInner(pointerEvent, fd);
+    }
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        WIN_MGR->ClearTargetWindowId(pointerId);
     }
 }
 

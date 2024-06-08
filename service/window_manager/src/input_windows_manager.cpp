@@ -1721,9 +1721,6 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
-        if (targetWindowId <= 1) {
-            ClearTargetWindowIds();
-        }
         bool isHotArea = false;
         for (const auto &item : windowsInfo) {
             if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
@@ -2310,9 +2307,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     double logicalY = physicalY + physicDisplayInfo->y;
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
-    if (targetWindowId <= 1) {
-        ClearTargetWindowIds();
-    }
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     bool isFirstSpecialWindow = false;
@@ -3279,10 +3273,14 @@ void InputWindowsManager::AddTargetWindowIds(int32_t pointerItemId, int32_t wind
     }
 }
 
-void InputWindowsManager::ClearTargetWindowIds()
+void InputWindowsManager::ClearTargetWindowId(int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
-    targetWindowIds_.clear();
+    if (targetWindowIds_.find(pointerId) == targetWindowIds_.end()) {
+        MMI_HILOGD("Clear target windowId fail, pointerId:%{public}d", pointerId);
+        return;
+    }
+    targetWindowIds_.erase(pointerId);
 }
 
 void InputWindowsManager::SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event)
