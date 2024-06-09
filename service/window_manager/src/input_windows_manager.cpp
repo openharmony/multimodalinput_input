@@ -2380,7 +2380,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (it->second.flag) {
             it->second.flag = false;
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            MMI_HILOG_DISPATCHI("touch event send cancel, window:%{public}d", touchWindow->id);
+            MMI_HILOG_DISPATCHI("touch event send cancel, window:%{public}d, pointerId:%{public}d", touchWindow->id,
+                pointerId);
         }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
