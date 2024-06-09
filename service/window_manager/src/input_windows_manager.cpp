@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <linux/input.h>
+#include <unordered_map>
 
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
@@ -2310,22 +2311,27 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     bool isFirstSpecialWindow = false;
+    static std::unordered_map<int32_t, int32_t> winMap;
     for (auto &item : windowsInfo) {
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            winMap.insert({item.id, item.zOrder});
             continue;
         }
         if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
             MMI_HILOG_DISPATCHE("It's an abnormal window and touchscreen find the next window");
+            winMap.insert({item.id, item.zOrder});
             continue;
         }
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
+            winMap.insert({item.id, item.zOrder});
             continue;
         }
         if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
+            winMap.insert({item.id, item.zOrder});
             continue;
         }
 
@@ -2340,6 +2346,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 touchWindow = &item;
                 break;
             } else {
+                winMap.insert({item.id, item.zOrder});
                 continue;
             }
         }
@@ -2366,9 +2373,15 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             } else {
                 break;
             }
+        } else {
+            winMap.insert({item.id, item.zOrder});
         }
     }
     if (touchWindow == nullptr) {
+        for (auto iter = winMap.begin(); iter != winMap.end(); iter++) {
+            MMI_HILOG_DISPATCHE("id:%{public}d, zOrder:%{public}d", iter->first, iter->second);
+        }
+        winMap.clear();
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
