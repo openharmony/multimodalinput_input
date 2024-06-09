@@ -1502,6 +1502,10 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
 int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetPointerLocation Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -2256,6 +2260,10 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetCurrentUser Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetCurrentUser(userId);
