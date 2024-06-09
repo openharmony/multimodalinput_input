@@ -2381,7 +2381,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         for (auto iter = winMap.begin(); iter != winMap.end(); iter++) {
             MMI_HILOG_DISPATCHE("id:%{public}d, zOrder:%{public}d", iter->first, iter->second);
         }
-        winMap.clear();
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
@@ -2397,6 +2396,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 pointerId);
         }
     }
+    winMap.clear();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
