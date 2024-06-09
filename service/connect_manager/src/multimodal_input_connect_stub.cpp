@@ -112,284 +112,285 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         return ERR_INVALID_STATE;
     }
     BytraceAdapter::StartIpcServer(code);
+    int32_t ret = RET_ERR;
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
-            return StubHandleAllocSocketFd(data, reply);
+            ret =  StubHandleAllocSocketFd(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_EVENT_FILTER):
-            return StubAddInputEventFilter(data, reply);
+            ret = StubAddInputEventFilter(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_FILTER):
-            return StubRemoveInputEventFilter(data, reply);
+            ret = StubRemoveInputEventFilter(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_SCROLL_ROWS):
-            return StubSetMouseScrollRows(data, reply);
+            ret = StubSetMouseScrollRows(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_SCROLL_ROWS):
-            return StubGetMouseScrollRows(data, reply);
+            ret = StubGetMouseScrollRows(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SIZE):
-            return StubSetPointerSize(data, reply);
+            ret = StubSetPointerSize(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SIZE):
-            return StubGetPointerSize(data, reply);
+            ret = StubGetPointerSize(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_CURSOR):
-            return StubSetCustomCursor(data, reply);
+            ret = StubSetCustomCursor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_ICON):
-            return StubSetMouseIcon(data, reply);
+            ret = StubSetMouseIcon(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_PRIMARY_BUTTON):
-            return StubSetMousePrimaryButton(data, reply);
+            ret = StubSetMousePrimaryButton(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_PRIMARY_BUTTON):
-            return StubGetMousePrimaryButton(data, reply);
+            ret = StubGetMousePrimaryButton(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_HOVER_SCROLL_STATE):
-            return StubSetHoverScrollState(data, reply);
+            ret = StubSetHoverScrollState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HOVER_SCROLL_STATE):
-            return StubGetHoverScrollState(data, reply);
+            ret = StubGetHoverScrollState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_VISIBLE):
-            return StubSetPointerVisible(data, reply);
+            ret = StubSetPointerVisible(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE):
-            return StubSetPointerStyle(data, reply);
+            ret = StubSetPointerStyle(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE):
-            return StubNotifyNapOnline(data, reply);
+            ret = StubNotifyNapOnline(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_OBSERVER):
-            return StubRemoveInputEventObserver(data, reply);
+            ret = StubRemoveInputEventObserver(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_NAP_STATUS):
-            return StubSetNapStatus(data, reply);
+            ret = StubSetNapStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CLEAN_WIDNOW_STYLE):
-            return StubClearWindowPointerStyle(data, reply);
+            ret = StubClearWindowPointerStyle(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_STYLE):
-            return StubGetPointerStyle(data, reply);
+            ret = StubGetPointerStyle(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::IS_POINTER_VISIBLE):
-            return StubIsPointerVisible(data, reply);
+            ret = StubIsPointerVisible(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REGISTER_DEV_MONITOR):
-            return StubRegisterInputDeviceMonitor(data, reply);
+            ret = StubRegisterInputDeviceMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNREGISTER_DEV_MONITOR):
-            return StubUnregisterInputDeviceMonitor(data, reply);
+            ret = StubUnregisterInputDeviceMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE_IDS):
-            return StubGetDeviceIds(data, reply);
+            ret = StubGetDeviceIds(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE):
-            return StubGetDevice(data, reply);
+            ret = StubGetDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUPPORT_KEYS):
-            return StubSupportKeys(data, reply);
+            ret = StubSupportKeys(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE):
-            return StubGetKeyboardType(data, reply);
+            ret = StubGetKeyboardType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_COLOR):
-            return StubSetPointerColor(data, reply);
+            ret = StubSetPointerColor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_COLOR):
-            return StubGetPointerColor(data, reply);
+            ret = StubGetPointerColor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED):
-            return StubSetPointerSpeed(data, reply);
+            ret = StubSetPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SPEED):
-            return StubGetPointerSpeed(data, reply);
+            ret = StubGetPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_EVENT):
-            return StubSubscribeKeyEvent(data, reply);
+            ret = StubSubscribeKeyEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT):
-            return StubUnsubscribeKeyEvent(data, reply);
+            ret = StubUnsubscribeKeyEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_SWITCH_EVENT):
-            return StubSubscribeSwitchEvent(data, reply);
+            ret = StubSubscribeSwitchEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_SWITCH_EVENT):
-            return StubUnsubscribeSwitchEvent(data, reply);
+            ret = StubUnsubscribeSwitchEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED):
-            return StubMarkProcessed(data, reply);
+            ret = StubMarkProcessed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_HANDLER):
-            return StubAddInputHandler(data, reply);
+            ret = StubAddInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
-            return StubRemoveInputHandler(data, reply);
+            ret = StubRemoveInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
-            return StubMarkEventConsumed(data, reply);
+            ret = StubMarkEventConsumed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE):
-            return StubMoveMouseEvent(data, reply);
+            ret = StubMoveMouseEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_KEY_EVENT):
-            return StubInjectKeyEvent(data, reply);
+            ret = StubInjectKeyEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_POINTER_EVENT):
-            return StubInjectPointerEvent(data, reply);
+            ret = StubInjectPointerEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_ANR_OBSERVER):
-            return StubSetAnrListener(data, reply);
+            ret = StubSetAnrListener(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DISPLAY_BIND_INFO):
-            return StubGetDisplayBindInfo(data, reply);
+            ret = StubGetDisplayBindInfo(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_NAPSTATUS_DATA):
-            return StubGetAllMmiSubscribedEvents(data, reply);
+            ret = StubGetAllMmiSubscribedEvents(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND):
-            return StubSetDisplayBind(data, reply);
+            ret = StubSetDisplayBind(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_FUNCTION_KEY_STATE):
-            return StubGetFunctionKeyState(data, reply);
+            ret = StubGetFunctionKeyState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_FUNCTION_KEY_STATE):
-            return StubSetFunctionKeyState(data, reply);
+            ret = StubSetFunctionKeyState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_LOCATION):
-            return StubSetPointerLocation(data, reply);
+            ret = StubSetPointerLocation(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CAPTURE_MODE):
-            return StubSetMouseCaptureMode(data, reply);
+            ret = StubSetMouseCaptureMode(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_WINDOW_PID):
-            return StubGetWindowPid(data, reply);
+            ret = StubGetWindowPid(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::APPEND_EXTRA_DATA):
-            return StubAppendExtraData(data, reply);
+            ret = StubAppendExtraData(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_INPUT_DEVICE):
-            return StubEnableInputDevice(data, reply);
+            ret = StubEnableInputDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_COMBINE_KEY):
-            return StubEnableCombineKey(data, reply);
+            ret = StubEnableCombineKey(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEY_DOWN_DURATION):
-            return StubSetKeyDownDuration(data, reply);
+            ret = StubSetKeyDownDuration(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_SWITCH):
-            return StubSetTouchpadScrollSwitch(data, reply);
+            ret = StubSetTouchpadScrollSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_SWITCH):
-            return StubGetTouchpadScrollSwitch(data, reply);
+            ret = StubGetTouchpadScrollSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_DIRECT_SWITCH):
-            return StubSetTouchpadScrollDirection(data, reply);
+            ret = StubSetTouchpadScrollDirection(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_DIRECT_SWITCH):
-            return StubGetTouchpadScrollDirection(data, reply);
+            ret = StubGetTouchpadScrollDirection(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_TAP_SWITCH):
-            return StubSetTouchpadTapSwitch(data, reply);
+            ret = StubSetTouchpadTapSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_TAP_SWITCH):
-            return StubGetTouchpadTapSwitch(data, reply);
+            ret = StubGetTouchpadTapSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_POINTER_SPEED):
-            return StubSetTouchpadPointerSpeed(data, reply);
+            ret = StubSetTouchpadPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_POINTER_SPEED):
-            return StubGetTouchpadPointerSpeed(data, reply);
+            ret = StubGetTouchpadPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_DELAY):
-            return StubSetKeyboardRepeatDelay(data, reply);
+            ret = StubSetKeyboardRepeatDelay(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_RATE):
-            return StubSetKeyboardRepeatRate(data, reply);
+            ret = StubSetKeyboardRepeatRate(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_PINCH_SWITCH):
-            return StubSetTouchpadPinchSwitch(data, reply);
+            ret = StubSetTouchpadPinchSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_PINCH_SWITCH):
-            return StubGetTouchpadPinchSwitch(data, reply);
+            ret = StubGetTouchpadPinchSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SWIPE_SWITCH):
-            return StubSetTouchpadSwipeSwitch(data, reply);
+            ret = StubSetTouchpadSwipeSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SWIPE_SWITCH):
-            return StubGetTouchpadSwipeSwitch(data, reply);
+            ret = StubGetTouchpadSwipeSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_RIGHT_CLICK_TYPE):
-            return StubSetTouchpadRightClickType(data, reply);
+            ret = StubSetTouchpadRightClickType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_RIGHT_CLICK_TYPE):
-            return StubGetTouchpadRightClickType(data, reply);
+            ret = StubGetTouchpadRightClickType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_ROTATE_SWITCH):
-            return StubSetTouchpadRotateSwitch(data, reply);
+            ret = StubSetTouchpadRotateSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_ROTATE_SWITCH):
-            return StubGetTouchpadRotateSwitch(data, reply);
+            ret = StubGetTouchpadRotateSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_DELAY):
-            return StubGetKeyboardRepeatDelay(data, reply);
+            ret = StubGetKeyboardRepeatDelay(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_RATE):
-            return StubGetKeyboardRepeatRate(data, reply);
+            ret = StubGetKeyboardRepeatRate(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_HOT_SPOT):
-            return StubSetMouseHotSpot(data, reply);
+            ret = StubSetMouseHotSpot(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_SHIELD_STATUS):
-            return StubSetShieldStatus(data, reply);
+            ret = StubSetShieldStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SHIELD_STATUS):
-            return StubGetShieldStatus(data, reply);
+            ret = StubGetShieldStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEY_STATE):
-            return StubGetKeyState(data, reply);
+            ret = StubGetKeyState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_AUTHORIZE):
-            return StubAuthorize(data, reply);
+            ret = StubAuthorize(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION):
-            return StubCancelInjection(data, reply);
+            ret = StubCancelInjection(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN):
-            return StubHasIrEmitter(data, reply);
+            ret = StubHasIrEmitter(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY):
-            return StubGetInfraredFrequencies(data, reply);
+            ret = StubGetInfraredFrequencies(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
-            return StubTransmitInfrared(data, reply);
+            ret = StubTransmitInfrared(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
-            return StubSetPixelMapData(data, reply);
+            ret = StubSetPixelMapData(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
-            return StubSetCurrentUser(data, reply);
+            ret = StubSetCurrentUser(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS):
-            return StubEnableHardwareCursorStats(data, reply);
+            ret = StubEnableHardwareCursorStats(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
-            return StubGetHardwareCursorStats(data, reply);
+            ret = StubGetHardwareCursorStats(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
-            return StubAddVirtualInputDevice(data, reply);
+            ret = StubAddVirtualInputDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
-            return StubRemoveVirtualInputDevice(data, reply);
+            ret = StubRemoveVirtualInputDevice(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+            ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
     BytraceAdapter::StopIpcServer();
-    return RET_ERR;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)

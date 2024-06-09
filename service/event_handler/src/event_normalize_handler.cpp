@@ -282,10 +282,12 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
+        BytraceAdapter::StopPackageEvent();
         return RET_OK;
     }
     if (packageResult != RET_OK) {
         MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        BytraceAdapter::StopPackageEvent();
         return KEY_EVENT_PKG_FAIL;
     }
     BytraceAdapter::StopPackageEvent();
@@ -341,6 +343,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
+        BytraceAdapter::StopPackageEvent();
         return RET_ERR;
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
