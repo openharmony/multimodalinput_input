@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <linux/input.h>
+#include <unordered_map>
 
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
@@ -1721,14 +1722,17 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        static std::unordered_map<int32_t, int32_t> winId2ZorderMap;
         bool isHotArea = false;
         for (const auto &item : windowsInfo) {
             if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
+                winId2ZorderMap.insert({item.id, item.zOrder});
                 MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window");
                 continue;
             }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
+                winId2ZorderMap.insert({item.id, item.zOrder});
                 MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching, "
                     "window:%{public}d, flags:%{public}d, pid:%{public}d", item.id, item.flags, item.pid);
                 continue;
@@ -1741,6 +1745,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
+                        winId2ZorderMap.insert({item.id, item.zOrder});
                         continue;
                     }
                     firstBtnDownWindowId_ = item.id;
@@ -1748,6 +1753,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                         firstBtnDownWindowId_, item.pid);
                     break;
                 } else {
+                    winId2ZorderMap.insert({item.id, item.zOrder});
                     continue;
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item))) {
@@ -1780,9 +1786,17 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     "has been set up already, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
                 break;
             } else {
+                winId2ZorderMap.insert({item.id, item.zOrder});
                 MMI_HILOG_DISPATCHD("Continue searching for the dispatch window of this pointer event");
             }
         }
+        if ((firstBtnDownWindowId_ < 0) && (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) &&
+            (pointerEvent->GetPressedButtons().size() == 1)) {
+            for (auto iter = winId2ZorderMap.begin(); iter != winId2ZorderMap.end(); iter++) {
+                MMI_HILOG_DISPATCHI("%{public}d, %{public}d", iter->first, iter->second);
+            }
+        }
+        winId2ZorderMap.clear();
     }
     MMI_HILOG_DISPATCHD("firstBtnDownWindowId_:%{public}d", firstBtnDownWindowId_);
     for (const auto &item : windowsInfo) {
