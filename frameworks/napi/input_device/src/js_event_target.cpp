@@ -319,15 +319,13 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallDevListPromiseWork, uv_qos_user_initiated);
+                }, CallDevListPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallDevListAsyncWork, uv_qos_user_initiated);
+                }, CallDevListAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
@@ -335,15 +333,13 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallIdsPromiseWork, uv_qos_user_initiated);
+                }, CallIdsPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallIdsAsyncWork, uv_qos_user_initiated);
+                }, CallIdsAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
@@ -433,15 +429,13 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallDevInfoPromiseWork, uv_qos_user_initiated);
+                }, CallDevInfoPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallDevInfoAsyncWork, uv_qos_user_initiated);
+                }, CallDevInfoAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
@@ -449,15 +443,13 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallDevPromiseWork, uv_qos_user_initiated);
+                }, CallDevPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
                 loop, work,
                 [](uv_work_t *work) {
                     MMI_HILOGD("uv_queue_work callback function is called");
-                },
-                CallDevAsyncWork, uv_qos_user_initiated);
+                }, CallDevAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
