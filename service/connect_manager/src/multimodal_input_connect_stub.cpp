@@ -112,7 +112,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         return ERR_INVALID_STATE;
     }
     BytraceAdapter::StartIpcServer(code);
-    int32_t ret = -1;
+    int32_t ret = RET_ERR;
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
             ret =  StubHandleAllocSocketFd(data, reply);
