@@ -96,6 +96,53 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
+std::shared_ptr<WindowInfo> EventDispatchHandler::SearchCancelList (int32_t pointerId, int32_t windowId)
+{
+    if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
+        return nullptr;
+    }
+    auto windowList = cancelEventList_[pointerId];
+    for (auto &info : windowList) {
+        if (info->id == windowId) {
+            return info;
+        }
+    }
+    return nullptr;
+}
+
+bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, int32_t windowId,
+    std::optional<WindowInfo> &windowInfo)
+{
+    int32_t pointerId = point->GetPointerId();
+    if (windowInfo == std::nullopt) {
+        std::shared_ptr<WindowInfo> curInfo = SearchCancelList(pointerId, windowId);
+        if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            windowInfo = std::make_optional(*curInfo);
+            MMI_HILOG_DISPATCHI("touch event send cancel");
+        } else {
+            MMI_HILOGE("WindowInfo id nullptr");
+            return false;
+        }
+    }
+    std::shared_ptr<WindowInfo> curWindowInfo = std::make_shared<WindowInfo>(*windowInfo);
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
+            cancelEventList_[pointerId] = std::set<std::shared_ptr<WindowInfo>, EventDispatchHandler::CancelCmp>();
+        }
+        cancelEventList_[pointerId].insert(curWindowInfo);
+    } else if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end() &&
+            cancelEventList_[pointerId].find(curWindowInfo) != cancelEventList_[pointerId].end()) {
+            cancelEventList_[pointerId].erase(curWindowInfo);
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
     PointerEvent::PointerItem pointerItem)
 {
@@ -105,10 +152,14 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     int32_t count = 0;
     int32_t pointerId = point->GetPointerId();
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end()) {
+            cancelEventList_.erase(pointerId);
+        }
+    }
     for (auto windowId : windowIds) {
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
-        if (windowInfo == std::nullopt) {
-            MMI_HILOGE("WindowInfo id nullptr");
+        if (!ReissueEvent(point, windowId, windowInfo)) {
             continue;
         }
         auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
