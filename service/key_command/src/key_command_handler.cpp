@@ -1829,7 +1829,6 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
         MMI_HILOGI("force make pointer visible");
         IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
-        return;
     }
     lastKeyEventCode_ = keyEvent->GetKeyCode();
 }
