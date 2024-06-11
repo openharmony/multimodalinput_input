@@ -18,11 +18,17 @@
 #include "display_manager.h"
 
 #include "bytrace_adapter.h"
+#ifdef OHOS_BUILD_ENABLE_CROWN
+#include "crown_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_CROWN
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
-
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#include "event_resample.h"
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+#include "fingerprint_event_processor.h"
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -35,14 +41,7 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
-#include "event_resample.h"
 #include "touchpad_transform_processor.h"
-#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-#include "fingerprint_event_processor.h"
-#endif // OHOS_BUILD_ENABLE_FINGERPRINT
-#ifdef OHOS_BUILD_ENABLE_CROWN
-#include "crown_transform_processor.h"
-#endif // OHOS_BUILD_ENABLE_CROWN
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -283,10 +282,12 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
+        BytraceAdapter::StopPackageEvent();
         return RET_OK;
     }
     if (packageResult != RET_OK) {
         MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        BytraceAdapter::StopPackageEvent();
         return KEY_EVENT_PKG_FAIL;
     }
     BytraceAdapter::StopPackageEvent();
@@ -342,6 +343,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
+        BytraceAdapter::StopPackageEvent();
         return RET_ERR;
     }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();

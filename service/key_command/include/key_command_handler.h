@@ -227,6 +227,7 @@ private:
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
+    void HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent);
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
     template <class T>
@@ -331,6 +332,7 @@ private:
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
     int32_t screenRecordingSuccessCount_ { 0 };
+    int32_t lastKeyEventCode_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
     bool isLetterGesturing_ { false };

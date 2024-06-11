@@ -56,7 +56,7 @@ void InfraredEmitterController::InitInfraredEmitter()
     if (soIrHandle_ == nullptr) {
         soIrHandle_ = dlopen(IR_WRAPPER_PATH.c_str(), RTLD_NOW);
         if (soIrHandle_ == nullptr) {
-            MMI_HILOGE("so %{public}s was not loaded, error: %{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
+            MMI_HILOGE("Loaded %{public}s failed:%{public}s", IR_WRAPPER_PATH.c_str(), dlerror());
             return;
         }
     }
@@ -65,21 +65,21 @@ void InfraredEmitterController::InitInfraredEmitter()
     fnCreate = (funCreate_ptr)dlsym(soIrHandle_, "ConsumerIrImplGetInstance");
     const char *dlsymError = dlerror();
     if (dlsymError != nullptr) {
-        MMI_HILOGE("load ConsumerIrImplGetInstance, error: %{public}s", dlsymError);
+        MMI_HILOGE("Loaded ConsumerIrImplGetInstance failed:%{public}s", dlsymError);
         dlclose(soIrHandle_);
         soIrHandle_ = nullptr;
         return;
     }
     if (fnCreate == nullptr) {
-        MMI_HILOGE("loaded ConsumerIrImplGetInstance is null");
+        MMI_HILOGE("Loaded ConsumerIrImplGetInstance is null");
         dlclose(soIrHandle_);
         soIrHandle_ = nullptr;
         return;
     }
-    MMI_HILOGI("infrared emitter call ConsumerIr:fnCreate begin");
+    MMI_HILOGI("Infrared emitter call ConsumerIr:fnCreate begin");
     irInterface_ = (ConsumerIr *)fnCreate();
     if (irInterface_ == nullptr) {
-        MMI_HILOGE("infrared emitter init fail irInterface_ is nullptr");
+        MMI_HILOGE("Infrared emitter init fail irInterface_ is nullptr");
         dlclose(soIrHandle_);
         soIrHandle_ = nullptr;
         return;
@@ -104,11 +104,11 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
     int32_t ret = irInterface_->Transmit(tempCarrierFreq, tempPattern, outRet);
     MMI_HILOGI("irInterface_->Transmit ret:%{public}d", ret);
     if (ret < 0) {
-        MMI_HILOGE("infrared emitter transmit %{public}d", ret);
+        MMI_HILOGE("Infrared emitter transmit failed:%{public}d", ret);
         return false;
     }
     if (!outRet) {
-        MMI_HILOGE("infrared emitter transmit out false");
+        MMI_HILOGE("Infrared emitter transmit out false");
         return false;
     }
     return true;
@@ -119,7 +119,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     CALL_DEBUG_ENTER;
     InitInfraredEmitter();
     if (!irInterface_) {
-        MMI_HILOGE("infrared emitter not init");
+        MMI_HILOGE("Infrared emitter not init");
         return false;
     }
     bool outRet = false;
@@ -128,11 +128,11 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
     int32_t ret = irInterface_->GetCarrierFreqs(outRet, outRange);
     MMI_HILOGI("irInterface_->GetCarrierFreqs ret:%{public}d", ret);
     if (ret < 0) {
-        MMI_HILOGE("infrared emitter GetCarrierFreqs %{public}d", ret);
+        MMI_HILOGE("Infrared emitter GetCarrierFreqs failed:%{public}d", ret);
         return false;
     }
     if (!outRet) {
-        MMI_HILOGE("infrared emitter GetCarrierFreqs out false");
+        MMI_HILOGE("Infrared emitter GetCarrierFreqs out false");
         return false;
     }
     std::string context = "size:" + std::to_string(outRange.size()) + ";";
@@ -144,7 +144,7 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
         item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);
     }
-    MMI_HILOGI("data from hdf: %{public}s", context.c_str());
+    MMI_HILOGI("Data from hdf:%{public}s", context.c_str());
     return true;
 }
 } // namespace MMI

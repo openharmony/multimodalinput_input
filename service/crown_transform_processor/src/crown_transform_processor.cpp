@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "crown_transform_processor.h"
+
 #include <cinttypes>
 #include <functional>
 
@@ -22,8 +24,6 @@
 #include "input_event_handler.h"
 #include "timer_manager.h"
 #include "util_ex.h"
-
-#include "crown_transform_processor.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -67,17 +67,17 @@ bool CrownTransformProcessor::IsCrownEvent(struct libinput_event *event)
             CHKPF(pointerEvent);
             auto source = libinput_event_pointer_get_axis_source(pointerEvent);
             if (source != LIBINPUT_POINTER_AXIS_SOURCE_WHEEL) {
-                MMI_HILOGD("Not crown event, axis source: %{public}d", source);
+                MMI_HILOGD("Not crown event, axis source:%{public}d", source);
                 return false;
             }
             return true;
         } else {
-            MMI_HILOGD("Not crown event, type: %{public}d", type);
+            MMI_HILOGD("Not crown event, type:%{public}d", type);
             return false;
         }
     }
     
-    MMI_HILOGD("Not crown event, device name: %{public}s", name.c_str());
+    MMI_HILOGD("Not crown event, device name:%{public}s", name.c_str());
     return false;
 }
 
@@ -90,7 +90,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     CHKPR(device, ERROR_NULL_POINTER);
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
-        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
+        MMI_HILOGE("The deviceId is invalid, deviceId:%{public}d", deviceId);
         return RET_ERR;
     }
     deviceId_ = deviceId;
@@ -128,7 +128,7 @@ int32_t CrownTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
         DumpInner();
         return RET_OK;
     } else {
-        MMI_HILOGE("The source is invalid, source: %{public}d", source);
+        MMI_HILOGE("The source is invalid, source:%{public}d", source);
         return RET_ERR;
     }
 }
@@ -175,7 +175,7 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
         }
         lastTime_ = currentTime;
     } else {
-        MMI_HILOGE("The action is invalid, action: %{public}d", action);
+        MMI_HILOGE("The action is invalid, action:%{public}d", action);
         return RET_ERR;
     }
 
@@ -231,7 +231,7 @@ void CrownTransformProcessor::DumpInner()
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    MMI_HILOGI("The crown device id: %{public}d, event created by: %{public}s", pointerEvent_->GetId(),
+    MMI_HILOGI("The crown device id:%{public}d, event created by:%{public}s", pointerEvent_->GetId(),
         device->GetName().c_str());
 }
 

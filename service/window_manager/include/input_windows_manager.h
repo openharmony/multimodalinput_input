@@ -150,12 +150,10 @@ public:
     std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId);
     void GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
-    void ClearTargetWindowIds();
+    void ClearTargetWindowId(int32_t pointerId);
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
-    void CancelLastTouchWindow(const WindowInfo *currTouchWindow, std::shared_ptr<PointerEvent> pointerEvent);
-    void ClearTouchCancelFlag(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
