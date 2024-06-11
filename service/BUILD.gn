@@ -1222,13 +1222,14 @@ ohos_unittest("ConnectManagerEXTest") {
   ]
 
   sources = [
+    "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
+    "connect_manager/src/multimodal_input_connect_stub.cpp",
     "connect_manager/test/message_parcel_mock.cpp",
     "connect_manager/test/multimodal_input_connect_stub_ex_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]
