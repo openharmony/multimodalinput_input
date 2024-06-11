@@ -358,7 +358,9 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "${graphics_path}/2d_graphics/include",
   ]
 
-  sources = [ "fingerprint_event_processor/test/fingerprint_event_processor_test.cpp" ]
+  sources = [
+    "fingerprint_event_processor/test/fingerprint_event_processor_test.cpp",
+  ]
 
   configs = [ ":libmmi_server_config" ]
 
