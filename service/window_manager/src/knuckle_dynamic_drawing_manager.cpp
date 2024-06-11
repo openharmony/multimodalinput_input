@@ -449,8 +449,9 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
     surfaceNode_->AttachToDisplay(screenId_);
     if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
+        CHKPV(knuckleDrawMgr_);
         isRotate_ = false;
-        RotationCanvasNode(canvasNode_, displayInfo_);
+        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
     canvasNode->ResetSurface(scaleW_, scaleH_);
