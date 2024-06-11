@@ -194,12 +194,12 @@ protected:
         int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();

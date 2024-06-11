@@ -1180,14 +1180,18 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, boo
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
 {
     auto keyEvent = KeyEventHdr->GetKeyEvent();
@@ -1203,15 +1207,19 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
     bool isNativeInject)
 {
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
