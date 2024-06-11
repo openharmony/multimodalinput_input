@@ -70,7 +70,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
-constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 1000 };
+constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
 constexpr float ROTATION_ANGLE { 360.f };
 constexpr float LOADING_CENTER_RATIO { 0.5f };
 constexpr float RUNNING_X_RATIO { 0.3f };
@@ -84,7 +84,6 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
-constexpr int32_t MAX_TRY_TIMES { 10 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
@@ -101,32 +100,16 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
-    while (counter_ != MAX_TRY_TIMES) {
-        int32_t ret = RET_ERR;
-        int32_t result = TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this, &ret]() {
-            MMI_HILOGD("Timer callback");
-            ret = CreatePointerSwitchObserver(hasMagicCursor_);
-            if (ret != RET_OK) {
-                MMI_HILOGE("Get value from setting date fail");
-            }
-            return ret;
-        });
-        if (result == RET_OK) {
-            MMI_HILOGI("CreatePointerSwitchObserver success.");
-            break;
-        }
-        if (++counter_ == MAX_TRY_TIMES) {
-            MMI_HILOGI("SubscribeServiceEvent failed.");
-        }
-    }
+    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
+        MMI_HILOGD("Timer callback");
+        CreatePointerSwitchObserver(hasMagicCursor_);
+    });
     MAGIC_CURSOR->InitStyle();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
-#else
-    InitStyle();
-#endif  // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
-#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -371,7 +354,7 @@ void PointerDrawingManager::UpdateStyleOptions()
     }
 }
 
-int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
+void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
@@ -410,10 +393,8 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
-        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
-    return RET_OK;
 }
 
 bool PointerDrawingManager::HasMagicCursor()
