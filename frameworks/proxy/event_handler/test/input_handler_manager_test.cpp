@@ -37,14 +37,15 @@ public:
     ~MyInputHandlerManager() override = default;
 
 protected:
-    InputHandlerType GetHandlerType() const override {
+    InputHandlerType GetHandlerType() const override
+    {
         return InputHandlerType::INTERCEPTOR;
     }
 };
 
 /**
  * @tc.name: InputHandlerManagerTest_FindHandler_001
- * @tc.desc: 
+ * @tc.desc:
  * @tc.type: FUNC
  * @tc.require:
  */
