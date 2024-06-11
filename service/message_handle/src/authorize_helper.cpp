@@ -127,7 +127,7 @@ void AuthorizeHelper::CancelAuthorize(int32_t pid)
     }
     std::lock_guard<std::mutex> lock(mutex_);
     if (pid != pid_) {
-        MMI_HILOGI("Cancel pid isn't the authorized process id, cancel pid:%{public}d, authorize pid:%{public}d", 
+        MMI_HILOGI("Cancel pid isn't the authorized process id, cancel pid:%{public}d, authorize pid:%{public}d",
             pid, pid_);
     }
     state_ = AuthorizeState::STATE_UNAUTHORIZE;
