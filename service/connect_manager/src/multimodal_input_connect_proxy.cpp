@@ -34,10 +34,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t SPECIAL_KEY_SIZE = 3;
-constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
-constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
-constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
+constexpr int32_t SPECIAL_KEY_SIZE { 3 };
+constexpr int32_t SPECIAL_ARRAY_INDEX0 { 0 };
+constexpr int32_t SPECIAL_ARRAY_INDEX1 { 1 };
+constexpr int32_t SPECIAL_ARRAY_INDEX2 { 2 };
 constexpr int32_t MAX_AXIS_INFO { 64 };
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
