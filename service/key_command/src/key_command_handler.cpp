@@ -98,9 +98,9 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnHandleTouchEvent(pointerEvent);
-    int32_t id = touchEvent->GetPointerId();
+    int32_t id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
+    pointerEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     if (toolType == PointerEvent::TOOL_TYPE_KNUCKLE) {
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
