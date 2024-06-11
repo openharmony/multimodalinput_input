@@ -111,6 +111,8 @@ declare_args() {
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
     "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
     "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
+    "key_command/src/setting_datashare.cpp",
+    "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/authorization_dialog.cpp",
@@ -126,8 +128,6 @@ declare_args() {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
-    "key_command/src/setting_datashare.cpp",
-    "key_command/src/setting_observer.cpp",
   ]
 
   infraredemitter_sources = [ "src/js_register_module.cpp" ]

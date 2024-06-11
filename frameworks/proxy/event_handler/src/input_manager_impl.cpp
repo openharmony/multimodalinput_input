@@ -1309,7 +1309,7 @@ void InputManagerImpl::OnDisconnected()
         MMI_HILOGE("Pull up event for service exception re-sending");
         return;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH    
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::SendDisplayInfo()
