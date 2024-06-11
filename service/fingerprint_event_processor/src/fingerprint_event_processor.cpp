@@ -69,7 +69,7 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
     } else if (name == FINGERPRINT_SOURCE_POINT) {
         return AnalysePointEvent(event);
     } else {
-        MMI_HILOGI("input device failed, name is %{public}s", name.c_str());
+        MMI_HILOGI("Unknown input device name:%{public}s", name.c_str());
         return PARAM_INPUT_INVALID;
     }
 }
@@ -83,7 +83,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     auto key = libinput_event_keyboard_get_key(keyEvent);
     enum libinput_key_state state = libinput_event_keyboard_get_key_state(keyEvent);
     if (state == LIBINPUT_KEY_STATE_PRESSED) {
-        MMI_HILOGI("dont analyse the press status for %{public}d", key);
+        MMI_HILOGI("Dont analyse the press status for %{public}d", key);
         return ERR_OK;
     }
     auto pointerEvent = PointerEvent::Create();
@@ -106,7 +106,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
             break;
         }
         default:
-            MMI_HILOGW("unknown key event : %{public}d", key);
+            MMI_HILOGW("Unknown key event:%{public}d", key);
             return UNKNOWN_EVENT;
     }
     int64_t time = GetSysClockTime();
@@ -114,7 +114,7 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+    MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;
 }
@@ -136,7 +136,7 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("fingerprint key:%{public}d, ux:%{public}f, uy:%{public}f", pointerEvent->GetPointerAction(), ux, uy);
+    MMI_HILOGD("Fingerprint key:%{public}d, ux:%{public}f, uy:%{public}f", pointerEvent->GetPointerAction(), ux, uy);
     InputHandler->GetMonitorHandler()->OnHandleEvent(pointerEvent);
     return RET_OK;
 }

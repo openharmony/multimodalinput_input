@@ -185,7 +185,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Dump_002, Test
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveMouse_003, TestSize.Level1)
 {
-    bool isNormalize = false;
+    bool isNormalize = true;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     int32_t offsetX = 0;
@@ -201,7 +201,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveM
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_004, TestSize.Level1)
 {
-    int32_t idNames = -1;
+    int32_t idNames = 0;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     ASSERT_EQ(processor.GetDisplayId(), idNames);
@@ -246,7 +246,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLocation_008, TestSize.Level1)
 {
-    int32_t idNames = -1;
+    int32_t idNames = 0;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     int32_t x = 0;

@@ -1554,6 +1554,20 @@ public:
      */
     HandleEventType GetHandlerEventType() const;
 
+    /**
+     * @brief Get the originPointerAction for pointerEvent
+     * @return originPointerAction
+     * @since 12
+     */
+    int32_t GetOriginPointerAction() const;
+
+    /**
+     * @brief Set the originPointerAction for pointerEvent
+     * @return void
+     * @since 12
+     */
+    void SetOriginPointerAction(int32_t pointerAction);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1611,6 +1625,7 @@ private:
     std::set<int32_t> pressedButtons_;
     int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
+    int32_t originPointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
     float zOrder_ { -1.0f };

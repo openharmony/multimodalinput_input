@@ -29,7 +29,7 @@ namespace MMI {
 class Aggregator {
 public:
     Aggregator(std::function<int32_t(int32_t, int32_t, std::function<void()>)> addTimer,
-               std::function<int32_t(int32_t)> resetTimer, int32_t maxRecordCount = 20)
+               std::function<int32_t(int32_t)> resetTimer, uint32_t maxRecordCount = 20)
         : addTimer_(std::move(addTimer)), resetTimer_(std::move(resetTimer)), maxRecordCount_(maxRecordCount)
     {}
 
@@ -47,7 +47,7 @@ private:
     std::function<int32_t(int32_t, int32_t, std::function<void()>)> addTimer_;
     std::function<int32_t(int32_t)> resetTimer_;
     int32_t timerId_ { -1 };
-    int32_t maxRecordCount_ { 0 };
+    uint32_t maxRecordCount_ { 0 };
 
     void FlushRecords(const LogHeader &lh, const std::string &key = "", const std::string &extraRecord = "");
 };
