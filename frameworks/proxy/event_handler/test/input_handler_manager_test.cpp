@@ -60,7 +60,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_001, TestS
 
 /**
  * @tc.name: InputHandlerManagerTest_AddMouseEventId_001
- * @tc.desc: 
+ * @tc.desc:
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -79,7 +79,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddMouseEventId_001, T
 
 /**
  * @tc.name: InputHandlerManagerTest_HasHandler_001
- * @tc.desc: 
+ * @tc.desc:
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -94,7 +94,7 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_HasHandler_001, TestSi
 
 /**
  * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_001
- * @tc.desc: 
+ * @tc.desc:
  * @tc.type: FUNC
  * @tc.require:
  */
