@@ -205,10 +205,10 @@ public:
     int32_t GetTouchpadPinchSwitch(bool &switchFlag) override { return static_cast<int32_t>(pinchSwitchFlag_); }
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) override
     {
-        SwipeSwitchFlag_ = switchFlag;
-        return static_cast<int32_t>(SwipeSwitchFlag_);
+        swipeSwitchFlag_ = switchFlag;
+        return static_cast<int32_t>(swipeSwitchFlag_);
     }
-    int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override { return static_cast<int32_t>(SwipeSwitchFlag_); }
+    int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override { return static_cast<int32_t>(swipeSwitchFlag_); }
     int32_t SetTouchpadRightClickType(int32_t type) override
     {
         type_ = type;
@@ -258,7 +258,7 @@ public:
     int32_t delay_ = 0;
     int32_t rate_ = 0;
     bool pinchSwitchFlag_ = false;
-    bool SwipeSwitchFlag_ = false;
+    bool swipeSwitchFlag_ = false;
     int32_t type_ = 0;
     bool rotateSwitch_ = false;
 };
