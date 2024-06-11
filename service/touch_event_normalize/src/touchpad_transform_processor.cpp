@@ -40,7 +40,7 @@ constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
-constexpr int32_t FINGER_MOTION_MAX { 9 };
+constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 
