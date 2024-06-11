@@ -211,7 +211,6 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
         << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
         << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
-
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
             pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
