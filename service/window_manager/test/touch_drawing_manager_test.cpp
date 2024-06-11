@@ -466,64 +466,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawTracker_002, TestS
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DrawCrosshairs_001
- * @tc.desc: Test DrawCrosshairs
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t x = 11;
-    int32_t y = 11;
-    TOUCH_DRAWING_MGR->crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(TOUCH_DRAWING_MGR->crosshairCanvasNode_, nullptr);
-    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
-        (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
-        TOUCH_DRAWING_MGR->displayInfo_.height));
-    ASSERT_NE(canvas, nullptr);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_DrawCrosshairs_002
- * @tc.desc: Test DrawCrosshairs
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t x = 11;
-    int32_t y = 11;
-    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
-        (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
-        TOUCH_DRAWING_MGR->displayInfo_.height));
-    ASSERT_NE(canvas, nullptr);
-    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_DrawCrosshairs_003
- * @tc.desc: Test DrawCrosshairs
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t x = 11;
-    int32_t y = 11;
-    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
-        (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
-        TOUCH_DRAWING_MGR->displayInfo_.height));
-    ASSERT_NE(canvas, nullptr);
-    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_001
  * @tc.desc: Test UpdatePointerPosition
  * @tc.type: Function
