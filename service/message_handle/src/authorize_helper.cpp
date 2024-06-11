@@ -76,6 +76,8 @@ void AuthorizeHelper::OnSessionLost(SessionPtr session)
     CHKPV(session);
     int32_t pid = session->GetPid();
     if (pid != pid_) {
+        MMI_HILOGD("Cancel process is inconsistent with authorize, cancel pid:%{public}d, authorize pid:%{public}d",
+            pid, pid_);
         return;
     }
     AuthorizeProcessExit();
@@ -87,6 +89,7 @@ void AuthorizeHelper::AuthorizeProcessExit()
     std::lock_guard<std::mutex> lock(mutex_);
     state_ = AuthorizeState::STATE_UNAUTHORIZE;
     if (exitCallback_ != nullptr) {
+        MMI_HILOGI("Exit callback function will be called, authorize pid:%{public}d", pid_);
         exitCallback_(pid_);
     }
 }
@@ -111,6 +114,7 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
     }
     pid_ = pid;
     exitCallback_ = exitCallback;
+    MMI_HILOGI("A process will be authorized, authorize pid:%{public}d", pid_);
     return RET_OK;
 }
 
@@ -127,6 +131,7 @@ void AuthorizeHelper::CancelAuthorize(int32_t pid)
             pid, pid_);
     }
     state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    exitCallback_ = nullptr;
 }
 
 bool AuthorizeHelper::IsAuthorizing()
