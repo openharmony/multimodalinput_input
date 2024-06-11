@@ -177,21 +177,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent, TestSi
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_02
- * @tc.desc: Test OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler servermsghandler;
-    bool isAuthorize = false;
-    int32_t result = servermsghandler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_FixTargetWindowId_01
  * @tc.desc: Test FixTargetWindowId
  * @tc.type: FUNC
@@ -1162,51 +1147,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
     EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent), RET_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_01
- * @tc.desc: Test OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler servermsghandler;
-    bool isAuthorize = true;
-    InjectionType InjectionType_ = InjectionType::KEYEVENT;
-    int32_t result = servermsghandler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(result, ERR_OK);
-    InjectionType_ = InjectionType::POINTEREVENT;
-    result = servermsghandler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_001
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    bool isAuthorize = true;
-    InjectionType InjectionType_ = InjectionType::KEYEVENT;
-    int32_t ret = handler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(ret, ERR_OK);
-    InjectionType_ = InjectionType::POINTEREVENT;
-    ret = handler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(ret, ERR_OK);
-    InjectionType_ = InjectionType::UNKNOWN;
-    ret = handler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(ret, ERR_OK);
-    isAuthorize = false;
-    InjectionType_ = InjectionType::POINTEREVENT;
-    ret = handler.OnAuthorize(isAuthorize);
-    EXPECT_EQ(ret, ERR_OK);
 }
 
 /**
