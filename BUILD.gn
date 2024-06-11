@@ -142,6 +142,7 @@ group("mmi_tests") {
   testonly = true
   deps = [
     "frameworks/proxy:InputManagerFilterManualTest",
+    "frameworks/proxy:InputManagerImplTest",
     "frameworks/proxy:InputManagerInjectTest",
     "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:InputManagerTest",
