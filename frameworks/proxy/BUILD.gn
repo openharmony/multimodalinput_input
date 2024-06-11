@@ -264,7 +264,13 @@ ohos_unittest("InputHandlerManagerTest") {
 
 ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   module_out_path = module_output_path
-  include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
+  include_dirs = [
+    "$root_out_dir/diff_libinput_mmi/export_include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/module_loader//include",
+    "${mmi_path}/service/connect_manager/include",
+  ]
 
   sources = [
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
@@ -274,6 +280,11 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_test_util",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   deps = [
