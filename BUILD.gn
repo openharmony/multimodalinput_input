@@ -175,6 +175,7 @@ group("mmi_tests") {
     "service:StylusKeyTest",
     "service:SubscriberTest",
     "service:TimerManagerTest",
+    "service:FingerprintEventProcessorTest",
     "service:TwoFingerLongTouchTest",
     "service:WindowManagerTest",
     "service:event_resample_test",
