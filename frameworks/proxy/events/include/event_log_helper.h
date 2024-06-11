@@ -81,14 +81,13 @@ private:
         std::string isRepeat = event->IsRepeat() ? "true" : "false";
         MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{public}d, AT:%{public}" PRId64
             ", ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d, KIC:%{public}zu, "
-            "DI:%{public}d, IR:%{public}s, SI:%{public}s, PBS:%{public}zu",
+            "DI:%{public}d, IR:%{public}s, SI:%{public}s",
             event->GetId(), event->GetKeyCode(), event->GetActionTime(),
             InputEvent::EventTypeToString(event->GetEventType()),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size(),
-            event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str(),
-            event->GetPressedButtons().size());
+            event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
         for (const auto &item : eventItems) {
             MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{public}d, DT:%{public}" PRId64
             ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
