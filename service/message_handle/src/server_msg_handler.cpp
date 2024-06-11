@@ -799,7 +799,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
 
 bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
 {
-     CALL_DEBUG_ENTER;
+    CALL_DEBUG_ENTER;
     bool isInit = InitInjectNoticeSource();
     if (!isInit) {
         MMI_HILOGE("InitinjectNotice_ Source error");
@@ -816,9 +816,9 @@ bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
         int32_t timeSecond = 0;
         while (timeSecond <= SEND_NOTICE_OVERTIME) {
             bool isConnect = pConnect->IsConnected();
-            MMI_HILOGD("SendNotice %{public}d", isConnect);
+            MMI_HILOGD("CloseNotice %{public}d", isConnect);
             if (isConnect) {
-                MMI_HILOGD("SendNotice begin");
+                MMI_HILOGD("CloseNotice begin");
                 pConnect->CancelNotice(noticeInfo);
                 break;
             }
