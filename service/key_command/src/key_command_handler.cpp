@@ -1075,6 +1075,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
@@ -1122,7 +1123,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointer)
 {
     CALL_DEBUG_ENTER;
@@ -1137,6 +1140,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
     }
     return HandleMulFingersTap(pointer);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
 {

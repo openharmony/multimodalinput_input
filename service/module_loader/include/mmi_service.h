@@ -213,10 +213,14 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     void AddAppDebugListener();
     void RemoveAppDebugListener();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t UpdateCombineKeyState(bool enable);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
 

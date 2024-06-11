@@ -99,7 +99,6 @@ declare_args() {
     "device_manager/src/input_device_manager.cpp",
     "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
-    "display_state_manager/src/display_event_monitor.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/anr_manager.cpp",
@@ -127,6 +126,8 @@ declare_args() {
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
+    "key_command/src/setting_datashare.cpp",
+    "key_command/src/setting_observer.cpp",
   ]
 
   infraredemitter_sources = [ "src/js_register_module.cpp" ]
