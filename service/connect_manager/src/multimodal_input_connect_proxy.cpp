@@ -15,16 +15,16 @@
 
 #include <unistd.h>
 
-#include "multimodal_input_connect_proxy.h"
-#include "pixel_map.h"
-#include "message_option.h"
-#include "mmi_log.h"
-#include "multimodal_input_connect_def_parcel.h"
-#include "multimodal_input_connect_define.h"
-#include "string_ex.h"
-#include "multimodalinput_ipc_interface_code.h"
 #include "input_scene_board_judgement.h"
 #include "infrared_frequency_info.h"
+#include "message_option.h"
+#include "mmi_log.h"
+#include "multimodalinput_ipc_interface_code.h"
+#include "multimodal_input_connect_def_parcel.h"
+#include "multimodal_input_connect_define.h"
+#include "multimodal_input_connect_proxy.h"
+#include "pixel_map.h"
+#include "string_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -133,11 +133,11 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
     socketFd = reply.ReadFileDescriptor();
     if (socketFd < RET_OK) {
-        MMI_HILOGE("Read file descriptor failed, fd: %{public}d", socketFd);
+        MMI_HILOGE("Read file descriptor failed, fd:%{public}d", socketFd);
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
+    MMI_HILOGD("socketFd:%{public}d, tokenType:%{public}d", socketFd, tokenType);
     return RET_OK;
 }
 
@@ -265,7 +265,7 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId,
     }
     pixelMapPtr->Marshalling(data);
     WRITEINT32(data, pid, ERR_INVALID_VALUE);
-    MMI_HILOGD("windowId being sent is %{public}d", windowId);
+    MMI_HILOGD("Send windowId:%{public}d", windowId);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
 
     MessageParcel reply;
