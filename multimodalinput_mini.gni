@@ -32,7 +32,7 @@ declare_args() {
   input_feature_pointer_drawing = true
   input_feature_interceptor = true
   input_feature_monitor = true
-  input_feature_keyboard = true
+  input_feature_keyboard = false
   input_feature_switch = true
   input_feature_mouse = true
   input_feature_joystick = true
