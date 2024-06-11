@@ -182,7 +182,6 @@ public:
     // 快捷键拉起Ability
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
-    EventHandlerPtr GetEventHandler() const;
     void AppendExtraData(const ExtraData& extraData);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
@@ -249,6 +248,7 @@ private:
     WindowGroupInfo windowGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
+    mutable std::mutex resourceMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };

@@ -173,7 +173,11 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         reportData->IncStrongRef(nullptr);
         work->data = reportData.GetRefPtr();
         int32_t ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            EmitAddedDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
             MMI_HILOGE("uv_queue_work_with_qos failed");
             JsUtil::DeletePtr<uv_work_t *>(work);
@@ -210,7 +214,11 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         reportData->IncStrongRef(nullptr);
         work->data = reportData.GetRefPtr();
         int32_t ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            EmitRemoveDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
             MMI_HILOGE("uv_queue_work_with_qos failed");
             JsUtil::DeletePtr<uv_work_t *>(work);
@@ -308,18 +316,30 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallDevListPromiseWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallDevListPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallDevListAsyncWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallDevListAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallIdsPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallIdsAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
@@ -406,18 +426,30 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallDevInfoPromiseWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallDevInfoPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallDevInfoAsyncWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallDevInfoAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallDevPromiseWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallDevPromiseWork, uv_qos_user_initiated);
         } else {
             ret = uv_queue_work_with_qos(
-                loop, work, [](uv_work_t *work) {}, CallDevAsyncWork, uv_qos_user_initiated);
+                loop, work,
+                [](uv_work_t *work) {
+                    MMI_HILOGD("uv_queue_work callback function is called");
+                }, CallDevAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
@@ -551,10 +583,18 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
     int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeystrokeAbilityPromise, uv_qos_user_initiated);
     } else {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeystrokeAbilityAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
@@ -579,10 +619,18 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardTypePromise, uv_qos_user_initiated);
     } else {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardTypeAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
@@ -905,10 +953,18 @@ void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, 
     int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
     } else {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
@@ -933,10 +989,18 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
     int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
     } else {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
@@ -1060,10 +1124,18 @@ void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, i
     int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
     } else {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
@@ -1088,10 +1160,18 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
     int32_t ret = 0;
     if (cb->ref == nullptr) {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
     } else {
         ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
