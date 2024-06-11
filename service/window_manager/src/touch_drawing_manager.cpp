@@ -601,6 +601,7 @@ void TouchDrawingManager::DrawRectItem(RosenCanvas* canvas, const std::string &t
 
     std::shared_ptr<Rosen::Drawing::TextBlob> textBlob = Rosen::Drawing::TextBlob::MakeFromString(text.c_str(),
         Rosen::Drawing::Font(nullptr, TEXT_SIZE, TEXT_SCALE, TEXT_SKEW), Rosen::Drawing::TextEncoding::UTF8);
+    CHKPV(textBlob);
     brush.SetColor(Rosen::Drawing::Color::COLOR_BLACK);
     canvas->AttachBrush(brush);
     canvas->DrawTextBlob(textBlob.get(), rect.left_, rectTopPosition_ + TEXT_TOP);
