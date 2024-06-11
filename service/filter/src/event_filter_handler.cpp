@@ -72,7 +72,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPR(filter, ERROR_NULL_POINTER);
-    MMI_HILOGI("Add filter,filterId:%{public}d,priority:%{public}d,clientPid:%{public}d,filters_ size:%{public}zu",
+    MMI_HILOGI("Add filter, filterId:%{public}d, priority:%{public}d, clientPid:%{public}d, filters_ size:%{public}zu",
         filterId, priority, clientPid, filters_.size());
     std::weak_ptr<EventFilterHandler> weakPtr = shared_from_this();
     auto deathCallback = [weakPtr, filterId, clientPid](const wptr<IRemoteObject> &object) {
@@ -80,10 +80,10 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
         if (sharedPtr != nullptr) {
             auto ret = sharedPtr->RemoveInputEventFilter(filterId, clientPid);
             if (ret != RET_OK) {
-                MMI_HILOGW("Remove filter on dead return:%{public}d, filterId:%{public}d,clientPid:%{public}d",
+                MMI_HILOGW("Remove filter on dead return:%{public}d, filterId:%{public}d, clientPid:%{public}d",
                     ret, filterId, clientPid);
             } else {
-                MMI_HILOGW("Remove filter on dead success, filterId:%{public}d,clientPid:%{public}d",
+                MMI_HILOGW("Remove filter on dead success, filterId:%{public}d, clientPid:%{public}d",
                     filterId, clientPid);
             }
         }
@@ -120,7 +120,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
             if (it->clientPid == clientPid) {
                 auto id = it->filterId;
                 filters_.erase(it++);
-                MMI_HILOGI("Filter remove success, filterId:%{public}d,clientPid:%{public}d", id, clientPid);
+                MMI_HILOGI("Filter remove success, filterId:%{public}d, clientPid:%{public}d", id, clientPid);
                 continue;
             }
             ++it;
@@ -128,7 +128,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
         }
         if (it->IsSameClient(filterId, clientPid)) {
             filters_.erase(it++);
-            MMI_HILOGI("Filter remove success, filterId:%{public}d,clientPid:%{public}d", filterId, clientPid);
+            MMI_HILOGI("Filter remove success, filterId:%{public}d, clientPid:%{public}d", filterId, clientPid);
             return RET_OK;
         }
         ++it;
@@ -136,7 +136,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
     if (filterId == -1) {
         return RET_OK;
     }
-    MMI_HILOGI("Filter not found, filterId:%{public}d,clientPid:%{public}d", filterId, clientPid);
+    MMI_HILOGI("Filter not found, filterId:%{public}d, clientPid:%{public}d", filterId, clientPid);
     return RET_OK;
 }
 
