@@ -92,10 +92,10 @@ int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &in
     return RET_OK;
 }
 } // namespace
-const int32_t TUPLE_PID = 0;
-const int32_t TUPLE_UID = 1;
-const int32_t TUPLE_NAME = 2;
-const int32_t DEFAULT_POINTER_COLOR = 0x000000;
+const int32_t TUPLE_PID { 0 };
+const int32_t TUPLE_UID { 1 };
+const int32_t TUPLE_NAME { 2 };
+const int32_t DEFAULT_POINTER_COLOR { 0x000000 };
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
