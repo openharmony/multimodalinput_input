@@ -14,7 +14,9 @@
  */
 
 #include "display_event_monitor.h"
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -49,7 +51,9 @@ public:
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
             MMI_HILOGI("display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
             STYLUS_HANDLER->IsLaunchAbility();
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGI("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
@@ -77,22 +81,30 @@ public:
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
     } else {
         MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
+#else
+    MMI_HILOGW("Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     shieldModeBeforeSreenOff_ = KeyEventHdr->GetCurrentShieldMode();
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
     } else {
         MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
+#else
+    MMI_HILOGW("Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void DisplayEventMonitor::InitCommonEventSubscriber()

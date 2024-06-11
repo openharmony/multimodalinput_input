@@ -52,7 +52,9 @@ private:
     int32_t HandleJoystickEvent(libinput_event* event);
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GestureIdentify(libinput_event* event);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
