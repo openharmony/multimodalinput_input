@@ -150,6 +150,13 @@ bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physi
     return true;
 }
 
+void PointerDrawingManager::ForceClearPointerVisiableStatus()
+{
+    MMI_HILOGI("force clear all pointer visiable status");
+    pidInfos_.clear();
+    UpdatePointerVisible();
+}
+
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
@@ -1495,6 +1502,9 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
         surfaceNode_->DetachToDisplay(screenId_);
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+    if (pidInfos_.empty()) {
+        return;
     }
     auto it = pidInfos_.begin();
     for (; it != pidInfos_.end(); ++it) {

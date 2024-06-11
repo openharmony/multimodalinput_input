@@ -40,6 +40,7 @@
 #include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "pointer_drawing_manager.h"
 #include "stylus_key_handler.h"
 #include "table_dump.h"
 #include "timer_manager.h"
@@ -1079,7 +1080,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
-
+    HandlePointerVisibleKeys(key);
     bool handleEventStatus = HandleEvent(key);
     if (handleEventStatus) {
         return true;
@@ -1820,6 +1821,18 @@ void KeyCommandHandler::InterruptTimers()
         }
     }
 }
+
+void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
+        MMI_HILOGI("force make pointer visible");
+        IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
+    }
+    lastKeyEventCode_ = keyEvent->GetKeyCode();
+}
+
 
 int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
