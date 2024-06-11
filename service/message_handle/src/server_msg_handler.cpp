@@ -102,7 +102,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
-        if (iter == authorizationCollection_.end()) {
+        if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             if (AUTHORIZE_HELPER->IsAuthorizing()) {
                 MMI_HILOGI("There has a process been authorizing, authorize pid:%{public}d, inject pid:%{public}d",
                     AUTHORIZE_HELPER->GetAuthorizePid(), pid);
@@ -170,7 +170,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
-        if (iter == authorizationCollection_.end()) {
+        if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             if (AUTHORIZE_HELPER->IsAuthorizing()) {
                 MMI_HILOGI("There has a process been authorizing, authorize pid:%{public}d, inject pid:%{public}d",
                     AUTHORIZE_HELPER->GetAuthorizePid(), pid);
@@ -680,9 +680,8 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
         }
         return ERR_OK;
-    } else {
-        AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
     }
+    AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
     auto ret = authorizationCollection_.insert(std::make_pair(CurrentPID_, AuthorizationStatus::UNAUTHORIZED));
     if (!ret.second) {
         MMI_HILOGE("pid:%{public}d has already triggered authorization", CurrentPID_);
@@ -697,6 +696,10 @@ int32_t ServerMsgHandler::OnCancelInjection()
     auto iter = authorizationCollection_.find(CurrentPID_);
     if (iter != authorizationCollection_.end()) {
         authorizationCollection_.erase(iter);
+        AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
+        if (AUTHORIZE_HELPER->IsAuthorizing()) {
+            CloseInjectNotice(CurrentPID_);
+        }
         MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
         CurrentPID_ = -1;
         InjectionType_ = InjectionType::UNKNOWN;
