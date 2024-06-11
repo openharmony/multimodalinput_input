@@ -1379,7 +1379,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGD("Remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
+        MMI_HILOGI("screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
         matchedSequence_.timerId = -1;
     }
@@ -1549,10 +1549,10 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             return false;
         }
     }
-    std::ostringstream oss;
-    oss << sequence;
-    MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
     if (keysSize == sequenceKeysSize) {
+        std::ostringstream oss;
+        oss << sequence;
+        MMI_HILOGI("SequenceKey matched: %{public}s", oss.str().c_str());
         return HandleMatchedSequence(sequence, isLaunchAbility);
     }
     return true;
@@ -1995,7 +1995,7 @@ std::ostream& operator<<(std::ostream& os, const Sequence& seq)
 {
     os << "keys: [";
     for (const SequenceKey &singleKey: seq.sequenceKeys) {
-        os << "(kc:" << singleKey.keyCode << ",ka:" << singleKey.keyAction << "d:" << singleKey.delay << "),";
+        os << "(kc:" << singleKey.keyCode << ",ka:" << singleKey.keyAction << ",d:" << singleKey.delay << "),";
     }
     os << "]: " << seq.ability.bundleName << ":" << seq.ability.abilityName;
     return os;

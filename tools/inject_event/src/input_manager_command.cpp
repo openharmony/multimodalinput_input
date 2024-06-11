@@ -74,6 +74,8 @@ constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
 constexpr int32_t INTERVAL_TIME_MS = 100;
 constexpr int32_t MIN_PINCH_FINGER = 2;
 constexpr int32_t MAX_PINCH_FINGER = 5;
+constexpr int32_t MIN_ACTION_FINGER = 2;
+constexpr int32_t MAX_ACTION_FINGER = 5;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -135,6 +137,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"keyboard", no_argument, nullptr, 'K'},
         {"stylus", no_argument, nullptr, 'S'},
         {"touch", no_argument, nullptr, 'T'},
+        {"touchpad", no_argument, nullptr, 'P'},
         {"joystick", no_argument, nullptr, 'J'},
         {"help", no_argument, nullptr, '?'},
         {nullptr, 0, nullptr, 0}
@@ -1653,7 +1656,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
 {
     struct option touchPadSensorOptions[] = {
         {"rotate", required_argument, nullptr, 'r'},
-        {"swipe", required_argument, nullptr, 's'},
+        {"action", required_argument, nullptr, 's'},
         {"pinch", required_argument, nullptr, 'p'},
         {nullptr, 0, nullptr, 0}
     };
@@ -1661,9 +1664,17 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
     if ((opt = getopt_long(argc, argv, "r:s:p:", touchPadSensorOptions, &optionIndex)) != -1) {
         switch (opt) {
             case 'r': {
+                int32_t ret = ProcessRotateGesture(argc, argv);
+                if (ret != ERR_OK) {
+                    return ret;
+                }
                 break;
             }
             case 's': {
+                int32_t ret = ProcessTouchPadFingerAction(argc, argv);
+                if (ret != ERR_OK) {
+                    return ret;
+                }
                 break;
             }
             case 'p': {
@@ -1747,6 +1758,92 @@ int32_t InputManagerCommand::InjectPinchEvent(int32_t fingerCount, int32_t scale
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     return ERR_OK;
 }
+
+int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t rotateValue = 0;
+    constexpr int32_t paramNum = 4;
+    constexpr int32_t conversionValue = 360;
+    if (argc == paramNum) {
+        if (!StrToInt(optarg, rotateValue)) {
+            std::cout << "Invalid angle data" << std::endl;
+            return RET_ERR;
+        }
+        if ((rotateValue >= conversionValue) || (rotateValue <= -(conversionValue))) {
+            std::cout << "Rotate value must be within (-360,360)" << std::endl;
+            return RET_ERR;
+        }
+        std::cout << "Input rotate value:"<<rotateValue << std::endl;
+        pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, rotateValue);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_END);
+        pointerEvent->SetPointerId(0);
+        PointerEvent::PointerItem item;
+        item.SetPointerId(0);
+        pointerEvent->AddPointerItem(item);
+        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    } else {
+        std::cout << "Invalid angle data,Input parameter example: uinput - P - r 45" << std::endl;
+        return RET_ERR;
+    }
+    return ERR_OK;
+}
+
+int32_t InputManagerCommand::ProcessTouchPadFingerAction(int32_t argc, char *argv[])
+{
+    constexpr int32_t actionUInputArgc = 4;
+    int32_t fingerCount = 0;
+    if (optind < 0 || optind > argc) {
+        std::cout << "wrong optind pointer index" << std::endl;
+        return EVENT_REG_FAIL;
+    }
+    // optarg is the first return argument in argv that call the function getopt_long with the current option
+    if (argc == actionUInputArgc) {
+        if (!StrToInt(optarg, fingerCount)) {
+            std::cout << "invalid swip data" << std::endl;
+            return EVENT_REG_FAIL;
+        }
+    } else {
+        std::cout << "wrong number of parameters:" << argc << std::endl;
+        return EVENT_REG_FAIL;
+    }
+    if (fingerCount < MIN_ACTION_FINGER || fingerCount > MAX_ACTION_FINGER) {
+        std::cout << "invalid finger count:" << fingerCount << std::endl;
+        return EVENT_REG_FAIL;
+    }
+    ActionEvent(fingerCount);
+    return ERR_OK;
+}
+
+int32_t InputManagerCommand::ActionEvent(int32_t fingerCount)
+{
+    MMI_HILOGI("InputManagerCommand::ActionEventInputManagerCommand::ActionEventInputManagerCommand::ActionEvent*****");
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    // in order to simulate more actual, add some update update event, so adding some items to update ,
+    // the data of points are simulated average in axis
+    int32_t numberPoint = 10010;
+    int32_t widthOfFinger = 30;
+    int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
+
+    PointerEvent::PointerItem item;
+    item.SetDownTime(startTimeMs);
+    item.SetPointerId(numberPoint);
+    item.SetDisplayX(widthOfFinger);
+    item.SetDisplayY(widthOfFinger);
+    pointerEvent->SetPointerId(numberPoint);
+    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetActionStartTime(startTimeMs);
+    pointerEvent->SetActionTime(startTimeMs);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    return ERR_OK;
+}
+ 
 
 void InputManagerCommand::PrintMouseUsage()
 {
@@ -1839,6 +1936,13 @@ void InputManagerCommand::PrintTouchPadUsage()
     std::cout << "  <finger count> finger count range is [2, 5]"                                     << std::endl;
     std::cout << "  <scale percent numerator> numerator of percent scale, divided by 100 is scale, it is an integer,";
     std::cout << "  range is (0, 500]"                                                               << std::endl;
+    std::cout << std::endl;
+    std::cout << "-s <fingerCount> <positionX1> <positionY1> <positionX2> <positionY2>  fc means"    << std::endl;
+    std::cout << "  finger count and its range is [2, 5], <positionX1> <positionY1> "                << std::endl;
+    std::cout << "  -press down a position  dx1 dy1  <positionX2> <positionY2> -press"               << std::endl;
+    std::cout << "  up a position  positionX2  positionY2"                                           << std::endl;
+    std::cout << std::endl;
+    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                          << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()

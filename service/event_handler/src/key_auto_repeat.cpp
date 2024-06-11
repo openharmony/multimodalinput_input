@@ -21,9 +21,9 @@
 #include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
-#include "i_preference_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -58,8 +58,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     CHKPR(device, ERROR_NULL_POINTER);
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
-    auto ret = ReadTomlFile(GetTomlFilePath(fileName), devConf);
-    if (ret == RET_ERR) {
+    if (ReadTomlFile(GetTomlFilePath(fileName), devConf) != RET_OK) {
         MMI_HILOGI("Can not read device config file");
         return RET_ERR;
     }
@@ -77,7 +76,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
-    MMI_HILOGD("AutoRepeatSwitch::%{public}d, keyEvent flag:%{public}x", devConf.autoSwitch, keyEvent->GetFlag());
+    MMI_HILOGD("AutoRepeatSwitch:%{public}d, keyEvent flag:%{public}x", devConf.autoSwitch, keyEvent->GetFlag());
     if (devConf.autoSwitch != OPEN_AUTO_REPEAT && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
         MMI_HILOGI("AutoRepeatSwitch not open and is not simulate event");
         return;

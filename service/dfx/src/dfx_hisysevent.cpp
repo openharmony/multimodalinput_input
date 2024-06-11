@@ -49,7 +49,12 @@ const std::string TP_PATH { "/sys/touchscreen/touch_chip_info" };
 
 static std::string GetVendorInfo(const std::string &nodePath)
 {
-    std::ifstream file(nodePath);
+    char realPath[PATH_MAX] = {};
+    if (realpath(nodePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("The realpath return nullptr");
+        return "";
+    }
+    std::ifstream file(realPath);
     if (!file.is_open()) {
         MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath.c_str(), errno);
         return "";

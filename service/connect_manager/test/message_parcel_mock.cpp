@@ -37,11 +37,6 @@ std::u16string MessageParcel::ReadInterfaceToken()
     return DfsMessageParcel::messageParcel->ReadInterfaceToken();
 }
 
-bool Parcel::WriteParcelable(const Parcelable *object)
-{
-    return DfsMessageParcel::messageParcel->WriteParcelable(object);
-}
-
 bool Parcel::WriteInt32(int32_t value)
 {
     return DfsMessageParcel::messageParcel->WriteInt32(value);
@@ -97,6 +92,11 @@ bool Parcel::WriteCString(const char *value)
     return DfsMessageParcel::messageParcel->WriteCString(value);
 }
 
+const std::string Parcel::ReadString()
+{
+    return DfsMessageParcel::messageParcel->ReadString();
+}
+
 bool Parcel::ReadString(std::string &value)
 {
     return DfsMessageParcel::messageParcel->ReadString(value);
@@ -140,5 +140,70 @@ bool Parcel::WriteUint32(uint32_t value)
 bool Parcel::ReadUint64(uint64_t &value)
 {
     return DfsMessageParcel::messageParcel->ReadUint64(value);
+}
+
+bool PermissionHelper::VerifySystemApp()
+{
+    return DfsMessageParcel::messageParcel->VerifySystemApp();
+}
+
+bool PermissionHelper::CheckInterceptor()
+{
+    return DfsMessageParcel::messageParcel->CheckInterceptor();
+}
+
+bool PermissionHelper::CheckMonitor()
+{
+    return DfsMessageParcel::messageParcel->CheckMonitor();
+}
+
+bool PermissionHelper::CheckDispatchControl()
+{
+    return DfsMessageParcel::messageParcel->CheckDispatchControl();
+}
+
+bool PermissionHelper::CheckInfraredEmmit()
+{
+    return DfsMessageParcel::messageParcel->CheckInfraredEmmit();
+}
+
+bool Parcel::WriteBoolVector(const std::vector<bool> &val)
+{
+    return DfsMessageParcel::messageParcel->WriteBoolVector(val);
+}
+
+bool Parcel::WriteInt32Vector(const std::vector<int32_t> &val)
+{
+    return DfsMessageParcel::messageParcel->WriteInt32Vector(val);
+}
+
+int64_t Parcel::ReadInt64()
+{
+    return DfsMessageParcel::messageParcel->ReadInt64();
+}
+
+bool Parcel::ReadInt64(int64_t &value)
+{
+    return DfsMessageParcel::messageParcel->ReadInt64(value);
+}
+
+float Parcel::ReadFloat()
+{
+    return DfsMessageParcel::messageParcel->ReadFloat();
+}
+
+bool Parcel::ReadFloat(float &value)
+{
+    return DfsMessageParcel::messageParcel->ReadFloat(value);
+}
+
+double Parcel::ReadDouble()
+{
+    return DfsMessageParcel::messageParcel->ReadDouble();
+}
+
+bool Parcel::ReadDouble(double &value)
+{
+    return DfsMessageParcel::messageParcel->ReadDouble(value);
 }
 } // namespace OHOS
