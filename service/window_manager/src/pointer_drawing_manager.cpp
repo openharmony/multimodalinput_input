@@ -354,7 +354,7 @@ void PointerDrawingManager::UpdateStyleOptions()
     }
 }
 
-int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
+void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
@@ -393,10 +393,8 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
-        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
-    return RET_OK;
 }
 
 bool PointerDrawingManager::HasMagicCursor()
