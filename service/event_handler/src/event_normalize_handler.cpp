@@ -53,6 +53,36 @@ namespace MMI {
 namespace {
 constexpr int32_t FINGER_NUM { 2 };
 constexpr int32_t MT_TOOL_PALM { 2 };
+const std::vector<int32_t> ALL_EVENT_TYPES = {
+    static_cast<int32_t>(LIBINPUT_EVENT_DEVICE_ADDED),
+    static_cast<int32_t>(LIBINPUT_EVENT_DEVICE_REMOVED),
+    static_cast<int32_t>(LIBINPUT_EVENT_KEYBOARD_KEY),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_MOTION),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_BUTTON),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_AXIS),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_TAP),
+    static_cast<int32_t>(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_DOWN),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_UP),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCHPAD_MOTION),
+    static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN),
+    static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE),
+    static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_SWIPE_END),
+    static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_PINCH_BEGIN),
+    static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_PINCH_UPDATE),
+    static_cast<int32_t>(LIBINPUT_EVENT_GESTURE_PINCH_END),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_DOWN),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_UP),
+    static_cast<int32_t>(LIBINPUT_EVENT_TOUCH_MOTION),
+    static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_AXIS),
+    static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY),
+    static_cast<int32_t>(LIBINPUT_EVENT_TABLET_TOOL_TIP),
+    static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_BUTTON),
+    static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_AXIS),
+    static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
+};
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -79,7 +109,10 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         return;
     }
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+        auto iter = std::find(ALL_EVENT_TYPES.begin(), ALL_EVENT_TYPES.end(), static_cast<int32_t>(type));
+        if (iter != ALL_EVENT_TYPES.end()) {
+            MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+        }
     }
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
     switch (type) {
