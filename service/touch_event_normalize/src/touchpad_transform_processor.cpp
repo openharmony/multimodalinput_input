@@ -15,18 +15,19 @@
 
 #include "touchpad_transform_processor.h"
 
-#include <sstream>
 #include <linux/input.h>
 
+#include <sstream>
+
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
+#include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "dfx_hisysevent.h"
-#include "i_preference_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
