@@ -1313,6 +1313,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     }
     ResetLastMatchedKey();
     bool result = false;
+    std::vector<ShortcutKey> upAbilities;
     for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!shortcutKey.statusConfigValue) {
@@ -1331,10 +1332,25 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             result = HandleKeyDown(shortcutKey) || result;
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
-            result = HandleKeyUp(keyEvent, shortcutKey) || result;
+            bool handleResult = HandleKeyUp(keyEvent, shortcutKey);
+            result = handleResult || result;
+            if (handleResult) {
+                upAbilities.push_back(shortcutKey);
+            }
         } else {
             result = HandleKeyCancel(shortcutKey) || result;
         }
+    }
+    if (!upAbilities.empty()) {
+        std::sort(upAbilities.begin(), upAbilities.end(),
+            [](const ShortcutKey &lShortcutKey, const ShortcutKey &rShortcutKey) -> bool {
+            return lShortcutKey.keyDownDuration > rShortcutKey.keyDownDuration;
+        });
+        ShortcutKey tmpShorteKey = upAbilities.front();
+        MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, tmpShorteKey.ability.bundleName);
+        LaunchAbility(tmpShorteKey);
+        BytraceAdapter::StopLaunchAbility();
     }
     if (result) {
         return result;
@@ -1657,14 +1673,10 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
-    if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
-        MMI_HILOGI("Skip, upTime - downTime >= duration");
+    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
+        MMI_HILOGI("Skip, upTime - downTime <= duration");
         return false;
     }
-    MMI_HILOGI("Start launch ability immediately");
-    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
-    LaunchAbility(shortcutKey);
-    BytraceAdapter::StopLaunchAbility();
     return true;
 }
 
