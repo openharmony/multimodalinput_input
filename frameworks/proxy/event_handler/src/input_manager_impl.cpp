@@ -316,18 +316,6 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
     return RET_OK;
 }
 
-EventHandlerPtr InputManagerImpl::GetEventHandler() const
-{
-    CALL_INFO_TRACE;
-    if (eventHandler_ == nullptr) {
-        MMI_HILOGD("eventHandler_ is nullptr");
-        auto MMIClient = MMIEventHdl.GetMMIClient();
-        CHKPP(MMIClient);
-        return MMIClient->GetEventHandler();
-    }
-    return eventHandler_;
-}
-
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
@@ -335,7 +323,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::lock_guard<std::mutex> guard(resourceMtx_);
     if (!MMIEventHdl.InitClient(eventHandler)) {
         MMI_HILOGE("Client init failed");
         return;
@@ -424,7 +412,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(resourceMtx_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
@@ -475,7 +463,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
-        std::lock_guard<std::mutex> guard(mtx_);
+        std::lock_guard<std::mutex> guard(resourceMtx_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
