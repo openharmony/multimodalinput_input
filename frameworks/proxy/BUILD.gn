@@ -390,6 +390,11 @@ ohos_unittest("PointerEventTest") {
     ":libmmi_test_util",
   ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",

@@ -478,6 +478,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_001, Te
     if (TOUCH_DRAWING_MGR->crosshairCanvasNode_ == nullptr) {
         TOUCH_DRAWING_MGR->crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
     }
+    ASSERT_NE(TOUCH_DRAWING_MGR->crosshairCanvasNode_, nullptr);
     auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
         (TOUCH_DRAWING_MGR->crosshairCanvasNode_->BeginRecording(TOUCH_DRAWING_MGR->displayInfo_.width,
         TOUCH_DRAWING_MGR->displayInfo_.height));

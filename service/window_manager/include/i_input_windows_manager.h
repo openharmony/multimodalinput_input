@@ -71,6 +71,7 @@ public:
     virtual ExtraData GetExtraData() const = 0;
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
+    virtual void ClearTargetWindowId(int32_t pointerId) = 0;
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;

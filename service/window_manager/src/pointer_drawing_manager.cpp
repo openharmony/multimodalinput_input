@@ -70,7 +70,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
-constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 4000 };
+constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 1000 };
 constexpr float ROTATION_ANGLE { 360.f };
 constexpr float LOADING_CENTER_RATIO { 0.5f };
 constexpr float RUNNING_X_RATIO { 0.3f };
@@ -84,6 +84,7 @@ constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
 constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
+constexpr int32_t MAX_TRY_TIMES { 10 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
@@ -100,19 +101,32 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
-    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
-        MMI_HILOGD("Timer callback");
-        CreatePointerSwitchObserver(hasMagicCursor_);
-    });
-
+    while (counter_ != MAX_TRY_TIMES) {
+        int32_t ret = RET_ERR;
+        int32_t result = TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this, &ret]() {
+            MMI_HILOGD("Timer callback");
+            ret = CreatePointerSwitchObserver(hasMagicCursor_);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Get value from setting date fail");
+            }
+            return ret;
+        });
+        if (result == RET_OK) {
+            MMI_HILOGI("CreatePointerSwitchObserver success.");
+            break;
+        }
+        if (++counter_ == MAX_TRY_TIMES) {
+            MMI_HILOGI("SubscribeServiceEvent failed.");
+        }
+    }
     MAGIC_CURSOR->InitStyle();
     InitStyle();
 #else
     InitStyle();
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#endif  // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif  // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -136,6 +150,13 @@ bool PointerDrawingManager::SetHardWareLocation(int32_t displayId, int32_t physi
     return true;
 }
 
+void PointerDrawingManager::ForceClearPointerVisiableStatus()
+{
+    MMI_HILOGI("force clear all pointer visiable status");
+    pidInfos_.clear();
+    UpdatePointerVisible();
+}
+
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
@@ -148,10 +169,12 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     MMI_HILOGD("Pointer window move success");
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
-    if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT) {
+    if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::CROSS) {
         // 触发光标找回效果时恢复为默认光标
-        MMI_HILOGI("Restores to the default cursor");
-        pointerStyle.id = 0;
+        MMI_HILOGD("Restores to the default cursor when the cursor retrieval effect is triggered");
+        MAGIC_POINTER_VELOCITY_TRACKER->SetLastPointerStyle(pointerStyle);
+        MAGIC_POINTER_VELOCITY_TRACKER->SetDirection(direction);
+        pointerStyle.id = MOUSE_ICON::DEFAULT;
     }
     surfaceNode_->SetScale(scale_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -348,7 +371,7 @@ void PointerDrawingManager::UpdateStyleOptions()
     }
 }
 
-void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
+int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
@@ -387,8 +410,10 @@ void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
+        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
+    return RET_OK;
 }
 
 bool PointerDrawingManager::HasMagicCursor()
@@ -1201,6 +1226,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
     // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
     // 这个color每8位代表一个通道值，分别是alpha和rgb，总共32位。
+    color = static_cast<int32_t>(static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR));
     color &= MAX_POINTER_COLOR;
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
@@ -1479,6 +1505,9 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
         surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    if (pidInfos_.empty()) {
+        return;
+    }
     auto it = pidInfos_.begin();
     for (; it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
@@ -1630,9 +1659,8 @@ std::map<MOUSE_ICON, IconStyle>& PointerDrawingManager::GetMouseIcons()
 
 void PointerDrawingManager::UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath)
 {
-    std::map<MOUSE_ICON, IconStyle> mouseIcons = GetMouseIcons();
-    auto iter = mouseIcons.find(mouseStyle);
-    if (iter == mouseIcons.end()) {
+    auto iter = mouseIcons_.find(mouseStyle);
+    if (iter == mouseIcons_.end()) {
         MMI_HILOGE("Cannot find the mouseStyle:%{public}d", static_cast<int32_t>(mouseStyle));
         return;
     }

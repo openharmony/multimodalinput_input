@@ -109,7 +109,11 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     napi_value resource = nullptr;
     CHKRV(napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
-    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
+    napi_status status = napi_create_async_work(
+        env, nullptr, resource,
+        [](napi_env env, void* data) {
+            MMI_HILOGD("async_work callback function is called");
+        },
         [](napi_env env, napi_status status, void* data) {
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
             /**

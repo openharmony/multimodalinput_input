@@ -428,8 +428,9 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
-      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
+      pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
+      buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), zOrder_(other.zOrder_),
+      axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
@@ -454,6 +455,7 @@ void PointerEvent::Reset()
     pressedButtons_.clear();
     sourceType_ = SOURCE_TYPE_UNKNOWN;
     pointerAction_ = POINTER_ACTION_UNKNOWN;
+    originPointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
     fingerCount_ = 0;
     zOrder_ = -1.0f;
@@ -476,6 +478,17 @@ int32_t PointerEvent::GetPointerAction() const
 void PointerEvent::SetPointerAction(int32_t pointerAction)
 {
     pointerAction_ = pointerAction;
+    originPointerAction_ = pointerAction;
+}
+
+int32_t PointerEvent::GetOriginPointerAction() const
+{
+    return originPointerAction_;
+}
+
+void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
+{
+    originPointerAction_ = pointerAction;
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
@@ -803,6 +816,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, pointerAction_);
 
+    WRITEINT32(out, originPointerAction_);
+
     WRITEINT32(out, buttonId_);
 
     WRITEINT32(out, fingerCount_);
@@ -873,6 +888,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READINT32(in, sourceType_);
     READINT32(in, pointerAction_);
+    READINT32(in, originPointerAction_);
     READINT32(in, buttonId_);
     READINT32(in, fingerCount_);
     READFLOAT(in, zOrder_);

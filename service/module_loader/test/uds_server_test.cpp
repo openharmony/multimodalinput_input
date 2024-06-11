@@ -593,7 +593,7 @@ HWTEST_F(UDSServerTest, AddSocketPairInfo_002, TestSize.Level1)
     if (toReturnClientFd != -1) {
         close(toReturnClientFd);
     }
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**

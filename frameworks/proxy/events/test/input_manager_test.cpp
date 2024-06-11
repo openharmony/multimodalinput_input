@@ -18,10 +18,10 @@
 
 #include "event_log_helper.h"
 #include "event_util_test.h"
+#include "input_manager.h"
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
-#include "input_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerTest"

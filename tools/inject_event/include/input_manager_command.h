@@ -48,6 +48,9 @@ private:
     int32_t ProcessTouchPadGestureInput(int32_t argc, char *argv[], int32_t optionIndex);
     int32_t ProcessPinchGesture(int32_t argc, char *argv[], int32_t indexPercent);
     int32_t InjectPinchEvent(int32_t fingerCount, int32_t scaleNumberator);
+    int32_t ProcessRotateGesture(int32_t argc, char *argv[]);
+    int32_t ProcessTouchPadFingerAction(int32_t argc, char *argv[]);
+    int32_t ActionEvent(int32_t fingerCount);
 };
 } // namespace MMI
 } // namespace OHOS
