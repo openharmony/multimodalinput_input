@@ -676,7 +676,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
-        return {};
+        return "";
     }
     cJSON *jsonArray = cJSON_CreateArray();
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
