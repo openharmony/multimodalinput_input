@@ -1411,7 +1411,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
                     if (!switchThreeFinger) {
                         closed = true;
-                        MMI_HILOGE("THREE_FINGERS_SWIPE but three finger action is closed");
+                        MMI_HILOGD("THREE_FINGERS_TAP but three finger action is closed");
                     }
                 }
                 if(closed) {
@@ -1439,10 +1439,10 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
                     if (!switchThreeFinger) {
                         closed = true;
-                        MMI_HILOGE("THREE_FINGERS_TAP but three finger action is closed");                   
+                        MMI_HILOGD("THREE_FINGERS_TAP but three finger action is closed");                  
                     }
                 }
-                if(closed) {                    
+                if(closed) {
                     ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                     continue;
                 }
