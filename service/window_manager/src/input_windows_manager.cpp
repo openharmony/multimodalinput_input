@@ -132,6 +132,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastTouchWindowInfo_.agentWindowId = -1;
     lastTouchWindowInfo_.area = { 0, 0, 0, 0 };
     lastTouchWindowInfo_.flags = -1;
+    lastTouchWindowInfo_.windowType = 0;
     displayGroupInfoTmp_.focusWindowId = -1;
     displayGroupInfoTmp_.width = 0;
     displayGroupInfoTmp_.height = 0;
