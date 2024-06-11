@@ -503,12 +503,12 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_001
+ * @tc.name: InputWindowsManagerTest_DrawPointerStyle_002
  * @tc.desc: Test DrawPointerStyle
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001, TestSize.Level1)
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
