@@ -419,7 +419,12 @@ napi_value JsPointerManager::SetPointerLocation(napi_env env, int32_t x, int32_t
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    InputManager::GetInstance()->SetPointerLocation(x, y);
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerLocation(x, y);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {

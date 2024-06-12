@@ -17,11 +17,11 @@
 
 #include <cinttypes>
 
-#include "define_multimodal.h"
+#include "ffrt.h"
 
+#include "define_multimodal.h"
 #include "input_manager_impl.h"
 #include "multimodal_input_connect_manager.h"
-#include "ffrt.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_ANRDETECT

@@ -311,6 +311,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Proc
 
 /**
  * @tc.name: KnuckleDynamicDrawingManagerTest_DrawGraphic
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
  * @tc.desc: Test Overrides DrawGraphic function branches
  * @tc.type: Function
  * @tc.require:
