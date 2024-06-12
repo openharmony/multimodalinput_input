@@ -80,10 +80,10 @@ constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 constexpr double HALF_RATIO { 0.5 };
 constexpr int32_t TWOFOLD { 2 };
-const std::string BIND_CFG_FILE_NAME = "/data/service/el1/public/multimodalinput/display_bind.cfg";
-const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
-const std::string DEFAULT_ICON_PATH = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-const std::string navigationSwitchName = "settings.input.stylus_navigation_hint";
+const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput/display_bind.cfg" };
+const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
+const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -2267,11 +2267,11 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
-        antiMistake_.switchName = navigationSwitchName;
+        antiMistake_.switchName = NAVIGATION_SWITCH_NAME;
         CreateAntiMisTakeObserver(antiMistake_);
         isOpenAntiMisTakeObserver_ = true;
         MMI_HILOGI("Get anti mistake touch switch start");
-        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName,
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
             antiMistake_.isOpen);
         MMI_HILOGI("Get anti mistake touch switch end");
     }
