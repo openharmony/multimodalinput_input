@@ -103,6 +103,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
     DeviceType CheckDeviceType(int32_t width, int32_t height);
+    void DeletePressedButton(uint32_t originButton);
     void DumpInner();
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static void GetConfigDataFromDatabase(std::string &key, bool &value);
@@ -140,6 +141,7 @@ private:
     int32_t deviceId_ { -1 };
     bool isAxisBegin_ { false };
     Movement unaccelerated_ {};
+    std::map<int32_t, int32_t> buttonMapping_;
     Aggregator aggregator_ {
             [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
                 return TimerMgr->AddTimer(intervalMs, repeatCount, std::move(callback));
