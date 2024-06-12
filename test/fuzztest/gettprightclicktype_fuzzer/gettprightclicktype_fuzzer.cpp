@@ -29,7 +29,6 @@ const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectMa
 
 bool GetTpRightClickTypeFuzzTest(const uint8_t* data, size_t size)
 {
-    
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
         return false;
