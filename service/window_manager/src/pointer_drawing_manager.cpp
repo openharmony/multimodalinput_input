@@ -856,6 +856,7 @@ void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
     g_isRsRemoteDied = true;
+    MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 }
 
 void PointerDrawingManager::AttachToDisplay()
