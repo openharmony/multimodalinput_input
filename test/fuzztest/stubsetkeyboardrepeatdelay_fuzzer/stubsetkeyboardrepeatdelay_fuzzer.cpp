@@ -37,7 +37,7 @@ bool StubSetKeyboardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_DELAY), datas, reply, option);
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_DELAY), datas, reply, option);
     return true;
 }
 } // namespace OHOS
