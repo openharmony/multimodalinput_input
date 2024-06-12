@@ -20,7 +20,8 @@ module_output_path = "input/input"
 ##############################fuzztest##########################################
 ohos_fuzztest("StubSetTouchpadPinchSwitchFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/stubsettouchpadpinchswitch_fuzzer"
+  fuzz_config_file =
+      "${mmi_path}/test/fuzztest/stubsettouchpadpinchswitch_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
