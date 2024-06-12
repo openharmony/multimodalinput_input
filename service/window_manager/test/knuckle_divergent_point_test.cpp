@@ -24,6 +24,7 @@
 
 #include "mmi_log.h"
 #include "pointer_event.h"
+#include "ui/rs_canvas_drawing_node.h"
 #include "knuckle_divergent_point.h"
 
 #undef MMI_LOG_TAG
@@ -48,6 +49,7 @@ public:
             knuckleDivergentPoint = std::make_shared<KnuckleDivergentPoint>(pixelMap);
         }
     }
+    void TearDown(void) {}
 private:
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath)
     {
@@ -78,6 +80,31 @@ private:
 };
 
 /**
+ * @tc.name: KnuckleDivergentPointTest_IsEnded_001
+ * @tc.desc: Test IsEnded
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_FALSE(knuckleDivergentPoint->IsEnded());
+}
+
+/**
+ * @tc.name: KnuckleDivergentPointTest_IsEnded_002
+ * @tc.desc: Test IsEnded
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDivergentPoint->lifespan_ = 1;
+    EXPECT_TRUE(knuckleDivergentPoint->IsEnded());
+}
+
+/**
  * @tc.name: KnuckleDivergentPointTest_Update_001
  * @tc.desc: Test Update
  * @tc.type: Function
@@ -98,7 +125,7 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_001, TestSi
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    knuckleDivergentPoint.lifespan_ = 1;
+    knuckleDivergentPoint->lifespan_ = 1;
     EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Update());
 }
 
@@ -123,8 +150,7 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Clear_001, TestSiz
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    Rosen::Drawing::RecordingCanvas* canvas = nullptr;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
+    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(nullptr));
 }
 
 /**
@@ -150,9 +176,9 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_002, TestSize
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    knuckleDivergentPoint.lifespan_ = 1;
-    knuckleDivergentPoint.pointX_ = 1;
-    knuckleDivergentPoint.pointY_ = 1;
+    knuckleDivergentPoint->lifespan_ = 1;
+    knuckleDivergentPoint->pointX_ = 1;
+    knuckleDivergentPoint->pointY_ = 1;
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
     EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
@@ -185,18 +211,5 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_002, TestSiz
     double pointY = 1.0;
     EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
 }
-
-/**
- * @tc.name: KnuckleDivergentPointTest_IsEnded_001
- * @tc.desc: Test IsEnded
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->IsEnded());
-}
-
 } // namespace MMI
 } // namespace OHOS

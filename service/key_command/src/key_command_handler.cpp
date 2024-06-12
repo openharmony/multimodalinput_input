@@ -99,6 +99,13 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnHandleTouchEvent(pointerEvent);
+    int32_t id = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(id, item);
+    int32_t toolType = item.GetToolType();
+    if (toolType == PointerEvent::TOOL_TYPE_KNUCKLE) {
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
@@ -270,10 +277,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-        MMI_HILOGD("Inject knuckle event, skip");
-        return;
-    }
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -676,7 +679,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
-        return "";
+        return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
