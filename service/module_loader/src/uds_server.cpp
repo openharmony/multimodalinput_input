@@ -22,8 +22,8 @@
 
 #include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
-#include "multimodalinput_ipc_interface_code.h"
 #include "mmi_log.h"
+#include "multimodalinput_ipc_interface_code.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -125,7 +125,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
-        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
+        MMI_HILOGE("make_shared fail. programName:%{public}s, pid:%{public}d, errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         goto CLOSE_SOCK;
     }
@@ -156,29 +156,29 @@ int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t&
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &serverBufferSize, sizeof(bufferSize)) != 0) {
-        MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        MMI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
         return RET_ERR;
     }
     if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &serverBufferSize, sizeof(bufferSize)) != 0) {
-        MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        MMI_HILOGE("setsockopt serverFd failed, errno:%{public}d", errno);
         return RET_ERR;
     }
     if (tokenType == TokenType::TOKEN_NATIVE) {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
     } else {
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
         if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno:%{public}d", errno);
             return RET_ERR;
         }
     }
@@ -274,7 +274,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu, errno:%{public}d",
                     size, errno);
                 continue;
             }
@@ -300,7 +300,7 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGI("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        MMI_HILOGI("EPOLLERR or EPOLLHUP fd:%{public}d, ev.events:0x%{public}x", fd, ev.events);
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
         OnEpollRecv(fd, ev);
@@ -334,7 +334,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_HILOGE("Session not found.fd:%{public}d", fd);
+        MMI_HILOGE("Session not found. fd:%{public}d", fd);
         return nullptr;
     }
     CHKPP(it->second);
@@ -345,7 +345,7 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
 {
     int32_t fd = GetClientFd(pid);
     if (fd <= 0) {
-        MMI_HILOGE("Session not found.pid:%{public}d", pid);
+        MMI_HILOGE("Session not found. pid:%{public}d", pid);
         return nullptr;
     }
     return GetSession(fd);
