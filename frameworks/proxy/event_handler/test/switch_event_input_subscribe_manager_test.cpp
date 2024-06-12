@@ -17,6 +17,7 @@
 
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#include "input_manager_impl.h"
 #include "switch_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
@@ -142,7 +143,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
     SwitchEventInputSubscribeManagerTest_OnDisconnected_001, TestSize.Level1)
 {
-    InputMgrImpl inputManager;
+    InputManagerImpl inputManager;
     EXPECT_NO_FATAL_FAILURE(inputManager.OnDisconnected());
 }
 
@@ -155,7 +156,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
     SwitchEventInputSubscribeManagerTest_ReAddInputEventFilter_001, TestSize.Level1)
 {
-    InputMgrImpl inputManager;
+    InputManagerImpl inputManager;
     EXPECT_NO_FATAL_FAILURE(inputManager.ReAddInputEventFilter());
 }
 
@@ -168,7 +169,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
     SwitchEventInputSubscribeManagerTest_SetTouchpadScrollSwitch_001, TestSize.Level1)
 {
-    InputMgrImpl inputManager;
+    InputManagerImpl inputManager;
     bool switchFlag = true;
     int32_t ret = inputManager.SetTouchpadScrollSwitch(switchFlag);
     ASSERT_EQ(ret, RET_OK);
@@ -186,7 +187,7 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
 HWTEST_F(SwitchEventInputSubscribeManagerTest,
     SwitchEventInputSubscribeManagerTest_GetTouchpadScrollSwitch_001, TestSize.Level1)
 {
-    InputMgrImpl inputManager;
+    InputManagerImpl inputManager;
     bool switchFlag = true;
     int32_t ret = inputManager.GetTouchpadScrollSwitch(switchFlag);
     ASSERT_EQ(ret, RET_OK);
