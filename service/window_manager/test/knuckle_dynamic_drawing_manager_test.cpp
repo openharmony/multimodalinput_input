@@ -80,7 +80,7 @@ std::shared_ptr<Media::PixelMap> KnuckleDynamicDrawingManagerTest::DecodeImageTo
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_KnuckleDynamicDrawHandler
+ * @tc.name: KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_Normal
  * @tc.desc: Test Normal branch of covering KnuckleDynamicDrawHandler function
  * @tc.type: Function
  * @tc.require:
@@ -101,7 +101,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_KnuckleDynamicDrawHandler_001
+ * @tc.name: KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_Abnormal
  * @tc.desc: Test Abnormal branch of covering KnuckleDynamicDrawHandler function
  * @tc.type: Function
  * @tc.require:
@@ -126,7 +126,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_InitPointerPathPaint
+ * @tc.name: KnuckleDynamicDrawingManagerTest_InitPointerPathPaint
  * @tc.desc: Test Overrides InitPointerPathPaint function branches
  * @tc.type: Function
  * @tc.require:
@@ -145,7 +145,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Init
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
+ * @tc.name: KnuckleDynamicDrawingManagerTest_IsSingleKnuckle
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
  * @tc.require:
@@ -203,6 +203,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
 }
 
 /**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DrawGraphic
  * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
  * @tc.desc: Test Overrides DrawGraphic function branches
  * @tc.type: Function
@@ -231,7 +232,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Draw
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow
+ * @tc.name: KnuckleDynamicDrawingManagerTest_CreateTouchWindow
  * @tc.desc: Test Overrides CreateTouchWindow function branches
  * @tc.type: Function
  * @tc.require:

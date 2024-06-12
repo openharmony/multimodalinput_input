@@ -596,7 +596,47 @@ ohos_unittest("WindowManagerTest") {
   ]
 }
 
-ohos_unittest("KnuckleManagerTest") {
+ohos_unittest("KnuckleDrawingManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  sources = [ "window_manager/test/knuckle_drawing_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libdm",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
+ohos_unittest("KnuckleDynamicDrawingManagerTest") {
   module_out_path = module_output_path
 
   configs = [
@@ -617,7 +657,7 @@ ohos_unittest("KnuckleManagerTest") {
   }
 
   sources = [
-    "window_manager/test/knuckle_drawing_manager_test.cpp",
+    "window_manager/test/knuckle_divergent_point_test.cpp",
     "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
     "window_manager/test/knuckle_glow_point_test.cpp",
     "window_manager/test/knuckle_glow_trace_system_test.cpp",
