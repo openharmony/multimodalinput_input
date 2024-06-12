@@ -70,10 +70,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        if (scope == nullptr) {
-            MMI_HILOGE("scope is nullptr");
-            return;
-        }
+        CHKPV(scope);
         napi_value eventType = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
             CREATE_STRING_UTF8, scope);
@@ -120,10 +117,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        if (scope == nullptr) {
-            MMI_HILOGE("scope is nullptr");
-            return;
-        }
+        CHKPV(scope);
         napi_value eventType = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
             &eventType), CREATE_STRING_UTF8, scope);
@@ -243,10 +237,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value arr[2];
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &arr[0]), GET_UNDEFINED, scope);
     CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr[1]), CREATE_ARRAY, scope);
@@ -282,10 +273,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value arr = nullptr;
     CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY, scope);
     uint32_t index = 0;
@@ -363,10 +351,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value object[2];
     CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &object[0]), GET_UNDEFINED, scope);
     object[1] = JsUtil::GetDeviceInfo(cb);
@@ -394,10 +379,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value object = JsUtil::GetDeviceInfo(cb);
     if (object == nullptr) {
         MMI_HILOGE("Check object is nullptr");
@@ -851,10 +833,7 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("scope is nullptr");
-        return;
-    }
+    CHKPV(scope);
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
