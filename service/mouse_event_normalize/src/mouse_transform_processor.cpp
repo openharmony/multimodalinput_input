@@ -156,6 +156,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     uint32_t button = libinput_event_pointer_get_button(data);
+    uint32_t originButton = button;
     const int32_t type = libinput_event_get_type(event);
     bool tpTapSwitch = true;
     GetTouchpadTapSwitch(tpTapSwitch);
@@ -185,6 +186,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->DeleteReleaseButton(buttonId);
+        DeletePressedButton(originButton);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
@@ -192,6 +194,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->SetButtonPressed(buttonId);
+        buttonMapping_[originButton] = buttonId;
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
     } else {
@@ -199,6 +202,15 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         return RET_ERR;
     }
     return RET_OK;
+}
+
+void MouseTransformProcessor::DeletePressedButton(uint32_t originButton)
+{
+    auto iter = buttonMapping_.find(originButton);
+    if (iter != buttonMapping_.end()) {
+        pointerEvent_->DeleteReleaseButton(iter->second);
+        buttonMapping_.erase(iter);
+    }
 }
 
 int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button,
@@ -809,9 +821,7 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
-        auto state = libinput_event_pointer_get_button_state(data);
-        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT ||
-            (state == LIBINPUT_BUTTON_STATE_RELEASED && fingerCount == TP_CLICK_FINGER_ONE)) {
+        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
             button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
         }
         return;
