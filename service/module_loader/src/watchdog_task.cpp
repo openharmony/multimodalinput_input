@@ -42,7 +42,7 @@ std::string WatchdogTask::GetFirstLine(const std::string& path)
 {
     char checkPath[PATH_MAX] = { 0 };
     if (realpath(path.c_str(), checkPath) == nullptr) {
-        MMI_HILOGE("canonicalize failed. path is %{public}s", path.c_str());
+        MMI_HILOGE("Canonicalize failed. path:%{public}s", path.c_str());
         return "";
     }
     std::ifstream inFile(checkPath);
@@ -141,7 +141,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
 {
     int32_t pid = getpid();
     if (IsProcessDebug(pid)) {
-        MMI_HILOGI("heap dump for %{public}d, don't report", pid);
+        MMI_HILOGI("Heap dump for %{public}d, don't report", pid);
         return;
     }
     uint32_t gid = getgid();
@@ -158,7 +158,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
         "PROCESS_NAME", GetSelfProcName(),
         "MSG", sendMsg,
         "STACK", OHOS::HiviewDFX::GetProcessStacktrace());
-    MMI_HILOGI("send event [FRAMEWORK,%{public}s], msg=%{public}s", eventName.c_str(), msg.c_str());
+    MMI_HILOGI("Send event, eventName:%{public}s, msg:%{public}s", eventName.c_str(), msg.c_str());
 }
 } // namespace MMI
 } // namespace OHOS
