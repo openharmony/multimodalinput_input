@@ -141,6 +141,7 @@ group("ut_mmi_debug_tools") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerImplTest",
     "frameworks/proxy:InputManagerInjectTest",
