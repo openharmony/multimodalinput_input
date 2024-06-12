@@ -18,10 +18,10 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("StubSetTouchpadPinchSwitchFuzzTest") {
+ohos_fuzztest("StubGetTouchpadPinchSwitchFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "${mmi_path}/test/fuzztest/stubsettouchpadpinchswitch_fuzzer"
+      "${mmi_path}/test/fuzztest/stubgettouchpadpinchswitch_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -48,7 +48,7 @@ ohos_fuzztest("StubSetTouchpadPinchSwitchFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "stubsettouchpadpinchswitch_fuzzer.cpp" ]
+  sources = [ "stubgettouchpadpinchswitch_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -78,7 +78,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":StubSetTouchpadPinchSwitchFuzzTest",
+    ":StubGetTouchpadPinchSwitchFuzzTest",
   ]
 }
 ###############################################################################
