@@ -109,7 +109,11 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     napi_value resource = nullptr;
     CHKRV(napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
-    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
+    napi_status status = napi_create_async_work(
+        env, nullptr, resource,
+        [](napi_env env, void* data) {
+            MMI_HILOGD("async_work callback function is called");
+        },
         [](napi_env env, napi_status status, void* data) {
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
             /**
@@ -415,7 +419,12 @@ napi_value JsPointerManager::SetPointerLocation(napi_env env, int32_t x, int32_t
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    InputManager::GetInstance()->SetPointerLocation(x, y);
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerLocation(x, y);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {

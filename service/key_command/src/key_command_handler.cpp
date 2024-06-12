@@ -40,6 +40,7 @@
 #include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "pointer_drawing_manager.h"
 #include "stylus_key_handler.h"
 #include "table_dump.h"
 #include "timer_manager.h"
@@ -675,7 +676,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
-        return {};
+        return "";
     }
     cJSON *jsonArray = cJSON_CreateArray();
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
@@ -1079,7 +1080,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
-
+    HandlePointerVisibleKeys(key);
     bool handleEventStatus = HandleEvent(key);
     if (handleEventStatus) {
         return true;
@@ -1312,6 +1313,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     }
     ResetLastMatchedKey();
     bool result = false;
+    std::vector<ShortcutKey> upAbilities;
     for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!shortcutKey.statusConfigValue) {
@@ -1330,10 +1332,25 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             result = HandleKeyDown(shortcutKey) || result;
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
-            result = HandleKeyUp(keyEvent, shortcutKey) || result;
+            bool handleResult = HandleKeyUp(keyEvent, shortcutKey);
+            result = handleResult || result;
+            if (handleResult) {
+                upAbilities.push_back(shortcutKey);
+            }
         } else {
             result = HandleKeyCancel(shortcutKey) || result;
         }
+    }
+    if (!upAbilities.empty()) {
+        std::sort(upAbilities.begin(), upAbilities.end(),
+            [](const ShortcutKey &lShortcutKey, const ShortcutKey &rShortcutKey) -> bool {
+            return lShortcutKey.keyDownDuration > rShortcutKey.keyDownDuration;
+        });
+        ShortcutKey tmpShorteKey = upAbilities.front();
+        MMI_HILOGI("Start launch ability immediately");
+        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, tmpShorteKey.ability.bundleName);
+        LaunchAbility(tmpShorteKey);
+        BytraceAdapter::StopLaunchAbility();
     }
     if (result) {
         return result;
@@ -1656,14 +1673,10 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
-    if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
-        MMI_HILOGI("Skip, upTime - downTime >= duration");
+    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
+        MMI_HILOGI("Skip, upTime - downTime <= duration");
         return false;
     }
-    MMI_HILOGI("Start launch ability immediately");
-    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
-    LaunchAbility(shortcutKey);
-    BytraceAdapter::StopLaunchAbility();
     return true;
 }
 
@@ -1820,6 +1833,18 @@ void KeyCommandHandler::InterruptTimers()
         }
     }
 }
+
+void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
+        MMI_HILOGI("force make pointer visible");
+        IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
+    }
+    lastKeyEventCode_ = keyEvent->GetKeyCode();
+}
+
 
 int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
