@@ -608,7 +608,7 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGr
     auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
     CHKPV(physicDisplayInfo);
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
-    TOUCH_DRAWING_MGR->UpdateLabels();
+    TOUCH_DRAWING_MGR->RotationScreen();
 }
 
 void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window,

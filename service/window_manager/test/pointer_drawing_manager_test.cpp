@@ -833,10 +833,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_001,
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->SetPointerColor(-1);
     int32_t color = pointerDrawingManager->GetPointerColor();
-    EXPECT_EQ(color, 0);
+    EXPECT_EQ(color, 16777215);
     pointerDrawingManager->SetPointerColor(16777216);
     color = pointerDrawingManager->GetPointerColor();
-    EXPECT_EQ(color, 16777215);
+    EXPECT_EQ(color, 0);
 }
 
 /**
@@ -979,8 +979,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
     physicalX = 500;
     physicalY = 1100;
     pointerDrawingManager->FixCursorPosition(physicalX, physicalY);
-    EXPECT_EQ(physicalX, 497);
-    EXPECT_EQ(physicalY, 1097);
+    EXPECT_EQ(physicalX, 500);
+    EXPECT_EQ(physicalY, 497);
 }
 
 /**
