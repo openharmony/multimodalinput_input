@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "iremote_broker.h"
 #include "message_parcel_mock.h"
+
+#include "iremote_broker.h"
+
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 using namespace OHOS::MMI;
@@ -26,6 +29,19 @@ Parcelable::Parcelable(bool asRemote)
     asRemote_ = asRemote;
     behavior_ = 0;
 }
+
+PermissionHelper::PermissionHelper() {}
+
+PermissionHelper::~PermissionHelper() {}
+
+int32_t PermissionHelper::GetTokenType()
+{
+    return 0;
+}
+
+void BytraceAdapter::StartIpcServer(uint32_t code) {}
+
+void BytraceAdapter::StopIpcServer() {}
 
 bool MessageParcel::WriteInterfaceToken(std::u16string name)
 {

@@ -235,6 +235,48 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   ]
 }
 
+ohos_unittest("InputManagerImplTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/nap_process/include",
+  ]
+
+  sources = [
+    "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/input_manager_impl.cpp",
+    "event_handler/src/key_event_input_subscribe_manager.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
+    "event_handler/src/switch_event_input_subscribe_manager.cpp",
+    "event_handler/test/input_manager_impl_test.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [ "${mmi_path}/util:libmmi-util" ]
+
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("InputManagerTest") {
   module_out_path = module_output_path
   include_dirs = [

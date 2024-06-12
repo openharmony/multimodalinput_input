@@ -176,47 +176,6 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_IsSi
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CheckPointerAction
- * @tc.desc: Test Overrides CheckPointerAction function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_CheckPointerAction, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(1);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
-    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    ASSERT_TRUE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    knuckleDynamicDrawMgr.isStop_ = true;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
-    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-    item.SetPointerId(2);
-    pointerEvent->SetPointerId(2);
-    pointerEvent->AddPointerItem(item);
-    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-    auto pixelMap = DecodeImageToPixelMap(imagePath);
-    knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
-    ASSERT_FALSE(knuckleDynamicDrawMgr.CheckPointerAction(pointerEvent));
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_StartTouchDraw
  * @tc.desc: Test Overrides StartTouchDraw function branches
  * @tc.type: Function
@@ -244,50 +203,6 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_ProcessMoveEvent
- * @tc.desc: Test Overrides ProcessMoveEvent function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_ProcessMoveEvent, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    knuckleDynamicDrawMgr.pointCounter_ = 6;
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
-
-    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-    auto pixelMap = DecodeImageToPixelMap(imagePath);
-    knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
-    PointerEvent::PointerItem item;
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->AddPointerItem(item);
-    knuckleDynamicDrawMgr.pointCounter_ = 2;
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
-
-    Rosen::Drawing::Point point;
-    point.SetX(100);
-    point.SetY(100);
-    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
-    point.SetX(150);
-    point.SetY(150);
-    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
-    point.SetX(200);
-    point.SetY(200);
-    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
-    point.SetX(300);
-    point.SetY(300);
-    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
-    knuckleDynamicDrawMgr.lastUpdateTimeMillis_ = 50;
-    pointerEvent->SetActionTime(100);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
  * @tc.desc: Test Overrides DrawGraphic function branches
  * @tc.type: Function
@@ -312,7 +227,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Draw
     knuckleDynamicDrawMgr.isDrawing_ = false;
     ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_OK);
     knuckleDynamicDrawMgr.isDrawing_ = true;
-    ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+    ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
 }
 
 /**

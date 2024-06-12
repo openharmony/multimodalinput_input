@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
