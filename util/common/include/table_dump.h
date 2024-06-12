@@ -25,8 +25,8 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr size_t extraCharactersCount { 3 };
-constexpr int32_t elementSpaceCount { 2 };
+constexpr size_t EXTRA_CHARACTERS_COUNT { 3 };
+constexpr int32_t ELEMENT_SPACE_COUNT { 2 };
 
 template<typename T>
 inline size_t getElementLength(const T &element)
@@ -51,7 +51,7 @@ inline std::vector<size_t> CalculateColumnWidths(const std::tuple<Titles...> &ti
         std::apply(updateWidths, row);
     }
     std::for_each(widths.begin(), widths.end(),
-                  [&lineWidth](size_t width) { lineWidth += width + extraCharactersCount; });
+                  [&lineWidth](size_t width) { lineWidth += width + EXTRA_CHARACTERS_COUNT; });
     lineWidth += 1;
     return widths;
 }
@@ -60,7 +60,8 @@ inline void PrintLine(std::ostream &os, const std::vector<size_t> &widths)
 {
     os << "+";
     for (const size_t &width: widths) {
-        os << std::setw(static_cast<int32_t>(width) + elementSpaceCount) << std::left << std::setfill('-') << "" << "+";
+        os << std::setw(static_cast<int32_t>(width) + ELEMENT_SPACE_COUNT) << std::left << std::setfill('-')
+           << "" << "+";
     }
     os << std::setfill(' ') << std::endl;
 }
