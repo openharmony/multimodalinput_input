@@ -1069,8 +1069,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         HandleRepeatKeys(key);
         return false;
     } else {
-        bool isRepeatKeyHandle = HandleRepeatKeys(key);
-        if (isRepeatKeyHandle) {
+        if (HandleRepeatKeys(key)) {
             return true;
         }
     }
@@ -1084,8 +1083,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     CALL_DEBUG_ENTER;
     CHKPF(key);
     HandlePointerVisibleKeys(key);
-    bool handleEventStatus = HandleEvent(key);
-    if (handleEventStatus) {
+    if (HandleEvent(key)) {
         return true;
     }
 
