@@ -146,8 +146,8 @@ private:
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
-            ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d,
-            SI:%{public}s, PBS:%{public}zu",
+            ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d"
+            ", SI:%{public}s, PBS:%{public}zu",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetTargetDisplayId(),
             event->GetTargetWindowId(), event->GetDispatchTimes(), isSimulate.c_str(),
