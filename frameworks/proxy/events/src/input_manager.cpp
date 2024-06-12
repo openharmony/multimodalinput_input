@@ -15,10 +15,10 @@
 
 #include "input_manager.h"
 
-#include "error_multimodal.h"
-#include "input_manager_impl.h"
 #include "define_multimodal.h"
+#include "error_multimodal.h"
 #include "input_handler_type.h"
+#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 
 #undef MMI_LOG_TAG
