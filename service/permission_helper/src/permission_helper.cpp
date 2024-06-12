@@ -123,8 +123,9 @@ bool PermissionHelper::CheckInjectPermission()
 {
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGD("called tokenType is shell verify success");
+    MMI_HILOGD("Token type is %{public}d", static_cast<int32_t>(tokenType));
+    if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        MMI_HILOGD("called tokenType is shell, verify success");
         return true;
     }
     std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
