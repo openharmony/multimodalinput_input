@@ -65,6 +65,7 @@ public:
     virtual bool ReadFloat(float &value) = 0;
     virtual double ReadDouble() = 0;
     virtual bool ReadDouble(double &value) = 0;
+    virtual bool CheckInjectPermission() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -95,6 +96,7 @@ public:
     MOCK_METHOD1(WriteUint32, bool(uint32_t value));
     MOCK_METHOD1(ReadUint64, bool(uint64_t &value));
     MOCK_METHOD0(VerifySystemApp, bool());
+    MOCK_METHOD0(CheckInjectPermission, bool());
     MOCK_METHOD0(CheckInterceptor, bool());
     MOCK_METHOD0(CheckMonitor, bool());
     MOCK_METHOD0(CheckDispatchControl, bool());
