@@ -14,19 +14,19 @@
  */
 
 #include <cstdio>
-
 #include <gtest/gtest.h>
+
 #include "display_manager.h"
 
-#include "mmi_log.h"
-#include "libinput.h"
-#include "libinput_wrapper.h"
-#include "window_info.h"
-#include "input_event_handler.h"
-#include "input_device_manager.h"
-#include "i_input_windows_manager.h"
 #include "crown_transform_processor.h"
 #include "general_crown.h"
+#include "i_input_windows_manager.h"
+#include "input_device_manager.h"
+#include "input_event_handler.h"
+#include "libinput.h"
+#include "libinput_wrapper.h"
+#include "mmi_log.h"
+#include "window_info.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "CrownTransformProcessorTest"
