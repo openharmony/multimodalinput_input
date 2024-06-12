@@ -18,6 +18,8 @@ graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 security_component_path = "//base/security"
+c_utils_root = "//commonlibrary/c_utils"
+hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
   resource_schedule_service_enabled = false
