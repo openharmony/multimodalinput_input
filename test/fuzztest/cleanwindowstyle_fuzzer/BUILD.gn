@@ -78,6 +78,6 @@ group("fuzztest") {
   deps += [
     # deps file
     ":CleanWindowStyleFuzzTest",
-  ]
+]
 }
 ###############################################################################
