@@ -15,10 +15,12 @@
 
 #include "mmi_service.h"
 
-#include <cinttypes>
-#include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
+
+#include <cinttypes>
+#include <csignal>
+#include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif // OHOS_RSS_CLIENT
@@ -27,38 +29,37 @@
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "app_state_observer.h"
-#include "dfx_hisysevent.h"
-#include "event_dump.h"
-#include "input_device_manager.h"
-#include "i_input_windows_manager.h"
-#include "i_pointer_drawing_manager.h"
-#include "ipc_skeleton.h"
-#include "key_map_manager.h"
-#include "multimodal_input_connect_def_parcel.h"
-#include "permission_helper.h"
-#ifdef OHOS_RSS_CLIENT
-#include "res_sched_client.h"
-#include "res_type.h"
-#include "system_ability_definition.h"
-#endif // OHOS_RSS_CLIENT
-#include "string_ex.h"
-#include "watchdog_task.h"
-
-#include "display_event_monitor.h"
 #include "device_event_monitor.h"
+#include "dfx_hisysevent.h"
+#include "display_event_monitor.h"
+#include "event_dump.h"
 #include "fingersense_wrapper.h"
 #include "gesturesense_wrapper.h"
 #include "infrared_emitter_controller.h"
+#include "input_device_manager.h"
+#include "ipc_skeleton.h"
+#include "i_input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
+#include "i_preference_manager.h"
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
+#include "key_map_manager.h"
 #include "mmi_log.h"
-#include "i_preference_manager.h"
+#include "multimodal_input_connect_def_parcel.h"
+#include "permission_helper.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
+#include "watchdog_task.h"
 #include "xcollie/watchdog.h"
+#ifdef OHOS_RSS_CLIENT
+#include "res_sched_client.h"
+#include "res_type.h"
+#include "system_ability_definition.h"
+#endif // OHOS_RSS_CLIENT
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
