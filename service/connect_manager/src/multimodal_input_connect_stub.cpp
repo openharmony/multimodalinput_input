@@ -1309,7 +1309,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     LogTracer lt(event->GetId(), event->GetEventType(), event->GetKeyAction());
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -1339,7 +1339,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     }
     bool isNativeInject { false };
     READBOOL(data, isNativeInject, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (!isNativeInject && !PER_HELPER->VerifySystemApp()) {
+    if (!isNativeInject && !PER_HELPER->CheckInjectPermission()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
