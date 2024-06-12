@@ -677,7 +677,7 @@ void InputManagerUtil::PrintPointerEventId(std::shared_ptr<PointerEvent> pointer
     auto it = pointerItems.begin();
     int32_t count = 1;
     for (pointerItems.begin(); it != pointerItems.end(); ++it) {
-        MMI_HILOGI("PointerItem%{public}d : pointerId = %{public}d", count, it->GetPointerId());
+        MMI_HILOGI("PointerItem:%{public}d, pointerId:%{public}d", count, it->GetPointerId());
         count++;
     }
 }
@@ -873,7 +873,7 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerUtil::SetMouseIconTest(const 
     CHKPP(imageSource);
     std::set<std::string> formats;
     ret = imageSource->GetSupportedFormats(formats);
-    MMI_HILOGD("Get supported format ret:%{public}u", ret);
+    MMI_HILOGD("Get supported format:%{public}u", ret);
 
     OHOS::Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {.width = MOUSE_ICON_SIZE, .height = MOUSE_ICON_SIZE};

@@ -28,7 +28,7 @@ using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INPUT_PARAM_FIRST { 2 };
+constexpr int32_t INPUT_PARAM_FIRST { 0 };
 constexpr int32_t INPUT_PARAM_SECOND { 1 };
 } // namespace
 void HdfDeviceEventManager::ConnectHDFInit()
