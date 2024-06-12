@@ -27,7 +27,7 @@ namespace MMI {
 namespace OHOS {
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
-bool GetTpRightClickTypeFuzzTest(const uint8_t* data, size_t size)
+bool GetTpRightClickTypeFuzzTest(const uint8_t* data, size_t size)aaa
 {
     MessageParcel datas;
     if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) || !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
