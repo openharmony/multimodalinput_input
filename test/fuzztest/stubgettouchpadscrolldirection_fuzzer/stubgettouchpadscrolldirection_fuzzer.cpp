@@ -37,7 +37,7 @@ bool StubGetTouchpadScrollDirectionFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
-        static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_DIRECT_SWITCH), datas, reply, option);
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_DIRECT_SWITCH), datas, reply, option);
     return true;
 }
 } // namespace OHOS
