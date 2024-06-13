@@ -1265,6 +1265,7 @@ void InputManagerImpl::OnConnected()
     }
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 template<typename T>
 bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
@@ -1289,10 +1290,12 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InputManagerImpl::OnDisconnected()
 {
     CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_MOVE,
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
@@ -1306,6 +1309,7 @@ void InputManagerImpl::OnDisconnected()
         MMI_HILOGE("Pull up event for service exception re-sending");
         return;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::SendDisplayInfo()
@@ -2008,22 +2012,32 @@ int32_t InputManagerImpl::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetShieldStatus(shieldMode, isShield);
     if (ret != RET_OK) {
         MMI_HILOGE("Set shield event interception status failed, ret:%{public}d", ret);
     }
     return ret;
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 int32_t InputManagerImpl::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetShieldStatus(shieldMode, isShield);
     if (ret != RET_OK) {
         MMI_HILOGE("Get shield event interception status failed, ret:%{public}d", ret);
     }
     return ret;
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void InputManagerImpl::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
@@ -2075,19 +2089,34 @@ int32_t InputManagerImpl::CancelInjection()
 int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return MULTIMODAL_INPUT_CONNECT_MGR->HasIrEmitter(hasIrEmitter);
+#else
+    MMI_HILOGW("Infrared emitter device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return MULTIMODAL_INPUT_CONNECT_MGR->GetInfraredFrequencies(requencys);
+#else
+    MMI_HILOGW("Infrared emitter device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return MULTIMODAL_INPUT_CONNECT_MGR->TransmitInfrared(number, pattern);
+#else
+    MMI_HILOGW("Infrared emitter device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
