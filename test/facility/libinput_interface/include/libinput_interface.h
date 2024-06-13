@@ -109,7 +109,6 @@ public:
     virtual enum libinput_tablet_tool_type TabletToolGetType(struct libinput_tablet_tool *tool) = 0;
     virtual enum libinput_pointer_axis_source GetAxisSource(struct libinput_event_pointer *event) = 0;
     virtual struct libinput_event_pointer* LibinputGetPointerEvent(struct libinput_event *event) = 0;
-    virtual enum libinput_finger_count PointerEventGetFingerCount(struct libinput_event_pointer *event) = 0;
     virtual int32_t TabletToolGetToolType(struct libinput_event_tablet_tool *event) = 0;
     virtual double TabletToolGetTiltX(struct libinput_event_tablet_tool *event) = 0;
     virtual double TabletToolGetTiltY(struct libinput_event_tablet_tool *event) = 0;
