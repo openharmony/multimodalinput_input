@@ -80,10 +80,10 @@ constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 constexpr double HALF_RATIO { 0.5 };
 constexpr int32_t TWOFOLD { 2 };
-const std::string BIND_CFG_FILE_NAME = "/data/service/el1/public/multimodalinput/display_bind.cfg";
-const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
-const std::string DEFAULT_ICON_PATH = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-const std::string navigationSwitchName = "settings.input.stylus_navigation_hint";
+const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput/display_bind.cfg" };
+const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
+const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -120,6 +120,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastWindowInfo_.agentWindowId = -1;
     lastWindowInfo_.area = { 0, 0, 0, 0 };
     lastWindowInfo_.flags = -1;
+    lastWindowInfo_.windowType = 0;
     mouseDownInfo_.id = -1;
     mouseDownInfo_.pid = -1;
     mouseDownInfo_.uid = -1;
@@ -132,6 +133,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastTouchWindowInfo_.agentWindowId = -1;
     lastTouchWindowInfo_.area = { 0, 0, 0, 0 };
     lastTouchWindowInfo_.flags = -1;
+    lastTouchWindowInfo_.windowType = 0;
     displayGroupInfoTmp_.focusWindowId = -1;
     displayGroupInfoTmp_.width = 0;
     displayGroupInfoTmp_.height = 0;
@@ -607,7 +609,7 @@ void InputWindowsManager::UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGr
     auto physicDisplayInfo = GetPhysicalDisplay(displayGroupInfo.displaysInfo[0].id);
     CHKPV(physicDisplayInfo);
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
-    TOUCH_DRAWING_MGR->UpdateLabels();
+    TOUCH_DRAWING_MGR->RotationScreen();
 }
 
 void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window,
@@ -2266,11 +2268,11 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
         return false;
     }
     if (!isOpenAntiMisTakeObserver_) {
-        antiMistake_.switchName = navigationSwitchName;
+        antiMistake_.switchName = NAVIGATION_SWITCH_NAME;
         CreateAntiMisTakeObserver(antiMistake_);
         isOpenAntiMisTakeObserver_ = true;
         MMI_HILOGI("Get anti mistake touch switch start");
-        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(navigationSwitchName,
+        SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(NAVIGATION_SWITCH_NAME,
             antiMistake_.isOpen);
         MMI_HILOGI("Get anti mistake touch switch end");
     }
@@ -3297,14 +3299,10 @@ int32_t InputWindowsManager::SetCurrentUser(int32_t userId)
 void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo)
 {
     auto iter = lastMatchedWindow_.find(eventType);
-    if (iter == lastMatchedWindow_.end()) {
-        WindowInfo info;
-        lastMatchedWindow_[eventType] = info;
-    }
-    if (iter->second.id != newWindowInfo.id) {
-        MMI_HILOGI("Target window changed %{public}d %{public}d %{public}d %{public}f %{public}d %{public}d %{public}f",
-        eventType, iter->second.id, iter->second.pid, iter->second.zOrder, newWindowInfo.id,
-        newWindowInfo.pid, newWindowInfo.zOrder);
+    if (iter != lastMatchedWindow_.end() && iter->second.id != newWindowInfo.id) {
+        MMI_HILOGI("Target window changed %{public}d %{public}d %{public}d %{public}f "
+            "%{public}d %{public}d %{public}f", eventType, iter->second.id, iter->second.pid,
+            iter->second.zOrder, newWindowInfo.id, newWindowInfo.pid, newWindowInfo.zOrder);
     }
     lastMatchedWindow_[eventType] = newWindowInfo;
 }

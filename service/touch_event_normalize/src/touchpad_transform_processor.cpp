@@ -15,18 +15,19 @@
 
 #include "touchpad_transform_processor.h"
 
-#include <sstream>
 #include <linux/input.h>
 
+#include <sstream>
+
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "i_input_windows_manager.h"
+#include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "dfx_hisysevent.h"
-#include "i_preference_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -40,7 +41,7 @@ constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
-constexpr int32_t FINGER_MOTION_MAX { 9 };
+constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 

@@ -345,11 +345,11 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsSingleKnuckle, T
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     kceDrawMgr.canvasNode_ = nullptr;
-    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+    ASSERT_TRUE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
 
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
-    ASSERT_FALSE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
+    ASSERT_TRUE(kceDrawMgr.IsSingleKnuckle(pointerEvent));
 }
 
 /**

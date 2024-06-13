@@ -241,12 +241,18 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 #endif // USE_ROSEN_DRAWING
 
     screenId_ = static_cast<uint64_t>(displayId);
-    MMI_HILOGI("ScreenId: %{public}llu", screenId_);
+    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->SetRotation(0);
 
     CreateCanvasNode();
     surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
     surfaceNode_->AttachToDisplay(screenId_);
+    if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
+        isRotate_ = false;
+        RotationCanvasNode(canvasNode_, displayInfo_);
+    }
+    auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+    canvasNode->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -323,8 +329,8 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,
             pointerInfos_[POINT_INDEX3].x, pointerInfos_[POINT_INDEX3].y);
         canvas->AttachPaint(paint_);
-        bool starDraw = (touchEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
-        if (starDraw) {
+        bool startDraw = (touchEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
+        if (startDraw) {
             canvas->DrawPath(path_);
         }
         canvas->DetachPaint();
