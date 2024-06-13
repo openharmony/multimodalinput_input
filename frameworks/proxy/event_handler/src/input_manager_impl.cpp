@@ -323,11 +323,14 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
-    std::lock_guard<std::mutex> guard(resourceMtx_);
-    if (!MMIEventHdl.InitClient(eventHandler)) {
-        MMI_HILOGE("Client init failed");
-        return;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        if (!MMIEventHdl.InitClient(eventHandler)) {
+            MMI_HILOGE("Client init failed");
+            return;
+        }
     }
+    std::lock_guard<std::mutex> guard(resourceMtx_);
     consumer_ = inputEventConsumer;
     eventHandler_ = eventHandler;
 }
