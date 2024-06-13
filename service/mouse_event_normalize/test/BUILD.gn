@@ -144,9 +144,9 @@ ohos_unittest("MouseTransformProcessorMockTest") {
   }
 
   deps = [
+    "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/service:libmmi-server",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
