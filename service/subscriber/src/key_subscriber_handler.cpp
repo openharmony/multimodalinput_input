@@ -55,6 +55,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
+    InputHandler->shortcut_.UpdateShortcutConsumed(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -660,6 +661,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
             ClearSubscriberTimer(subscribers);
             continue;
         }
+        InputHandler->shortcut_.MarkShortcutConsumed(*keyOption);
         NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled);
     }
     MMI_HILOGD("Handle key down:%{public}s", handled ? "true" : "false");
@@ -691,8 +693,9 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
 
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    CALL_DEBUG_ENTER;
-    CHKPF(keyEvent);
+    if (InputHandler->shortcut_.HaveShortcutConsumed(keyEvent)) {
+        return false;
+    }
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -728,12 +731,11 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
         CHK_KEY_ITEM(keyItem);
-        auto upTime = keyEvent->GetActionTime();
-        auto downTime = keyItem->GetDownTime();
-        if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
+        if (keyEvent->GetActionTime() - keyItem->GetDownTime() >= MS2US(duration)) {
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
+        InputHandler->shortcut_.MarkShortcutConsumed(*keyOption);
         NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
     }
     MMI_HILOGD("Handle key up:%{public}s", handled ? "true" : "false");
