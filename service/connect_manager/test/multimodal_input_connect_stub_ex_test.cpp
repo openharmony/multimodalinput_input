@@ -64,9 +64,9 @@ public:
     int32_t GetMouseScrollRows(int32_t &rows) override { return rows_; }
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override
     {
-        return 0;
+        return pid;
     }
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override { return 0; }
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override { return pid; }
     int32_t SetPointerSize(int32_t size) override
     {
         size_ = size;
@@ -222,21 +222,24 @@ public:
     }
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override { return static_cast<int32_t>(rotateSwitch_); }
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override { return shieldMode; }
-    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override { return 0; }
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override { return shieldMode; }
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override
     {
         return retKeyState_;
     }
-    int32_t Authorize(bool isAuthorize) override { return 0; }
-    int32_t CancelInjection() override { return 0; }
-    int32_t HasIrEmitter(bool &hasIrEmitter) override { return 0; }
+    int32_t Authorize(bool isAuthorize) override { return static_cast<int32_t>(isAuthorize); }
+    int32_t CancelInjection() override { return retCancelInjection_; }
+    int32_t HasIrEmitter(bool &hasIrEmitter) override { return static_cast<int32_t>(hasIrEmitter_); }
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override { return retFrequencies_; }
-    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override { return 0; }
-    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override { return 0; }
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override { return number; }
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override { return retSetPixelMapData_; }
     int32_t SetCurrentUser(int32_t userId) override { return userId; }
-    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) { return 0; }
-    int32_t RemoveVirtualInputDevice(int32_t deviceId) { return 0; }
-    int32_t EnableHardwareCursorStats(bool enable) override { return 0; }
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override
+    {
+        return retAddVirtualInputDevice_;
+    }
+    int32_t RemoveVirtualInputDevice(int32_t deviceId) override { return deviceId; }
+    int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -264,6 +267,10 @@ public:
     bool swipeSwitchFlag_ = false;
     int32_t type_ = 0;
     bool rotateSwitch_ = false;
+    int32_t retCancelInjection_ = 0;
+    bool hasIrEmitter_ = false;
+    int32_t retAddVirtualInputDevice_ = 0;
+    int32_t retSetPixelMapData_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -466,7 +473,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_020, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -486,13 +493,54 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_021, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE);
+    EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
+}
+
+/**
+ * @tc.name: OnRemoteRequest_022
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_022, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS);
+    EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
+}
+
+/**
+ * @tc.name: OnRemoteRequest_023
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_023, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInterfaceToken()).WillOnce(Return(IMultimodalInputConnect::GetDescriptor()));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retCursorStats_ = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS);
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
 
@@ -841,24 +889,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
         .WillOnce(Return(true))
         .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32())
-        .WillOnce(Return(4))
-        .WillOnce(Return(3))
-        .WillOnce(Return(5))
-        .WillOnce(Return(2))
-        .WillOnce(Return(0))
-        .WillOnce(Return(0))
-        .WillOnce(Return(2))
-        .WillOnce(Return(-1))
-        .WillOnce(Return(12))
-        .WillOnce(Return(36));
-    EXPECT_CALL(*messageParcelMock_, ReadBool())
-        .WillOnce(Return(false))
-        .WillOnce(Return(false));
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -866,6 +902,35 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_003, TestSize.Level
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetCustomCursor(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
+}
+
+/**
+ * @tc.name: StubSetCustomCursor_004
+ * @tc.desc: Test the function StubSetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetCustomCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
+        .WillOnce(Return(true))
+        .WillOnce(Return(true));
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetCustomCursor(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
 }
 
 /**
@@ -893,20 +958,11 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_001, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32())
-        .WillOnce(Return(4))
-        .WillOnce(Return(3))
-        .WillOnce(Return(5))
-        .WillOnce(Return(2))
-        .WillOnce(Return(0))
-        .WillOnce(Return(0))
-        .WillOnce(Return(2))
-        .WillOnce(Return(-1))
-        .WillOnce(Return(12))
-        .WillOnce(Return(36));
-    EXPECT_CALL(*messageParcelMock_, ReadBool())
-        .WillOnce(Return(false))
-        .WillOnce(Return(false));
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(Return(true))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -914,6 +970,58 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_002, TestSize.Level1)
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseIcon(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
+}
+
+/**
+ * @tc.name: StubSetMouseIcon_003
+ * @tc.desc: Test the function StubSetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseIcon(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
+}
+
+/**
+ * @tc.name: StubSetMouseIcon_004
+ * @tc.desc: Test the function StubSetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseIcon(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
 }
 
 /**
@@ -925,6 +1033,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseIcon_002, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -941,13 +1050,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(Return(true))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseHotSpot(data, reply));
@@ -962,11 +1067,10 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_002, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
         .WillOnce(Return(true))
-        .WillOnce(Return(true));
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -985,6 +1089,31 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_003, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
+        .WillOnce(Return(true))
+        .WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseHotSpot(data, reply));
+}
+
+/**
+ * @tc.name: StubSetMouseHotSpot_005
+ * @tc.desc: Test the function StubSetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseHotSpot_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
         .WillOnce(DoAll(SetArgReferee<0>(1), Return(true)))
@@ -1161,6 +1290,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_004, TestSize.Level1
 HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -1177,6 +1307,24 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_001, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetNapStatus(data, reply));
+}
+
+/**
+ * @tc.name: StubSetNapStatus_003
+ * @tc.desc: Test the function StubSetNapStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
         .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
         .WillOnce(Return(true))
@@ -1193,14 +1341,15 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: StubSetNapStatus_003
+ * @tc.name: StubSetNapStatus_004
  * @tc.desc: Test the function StubSetNapStatus
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_003, TestSize.Level1)
+HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
         .WillOnce(Return(true))
@@ -1932,6 +2081,24 @@ HWTEST_F(MultimodalInputConnectStubTest, StubNotifyNapOnline_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubRemoveInputEventObserver(data, reply));
+}
+
+/**
+ * @tc.name: StubRemoveInputEventObserver_002
+ * @tc.desc: Test the function StubRemoveInputEventObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -1992,9 +2159,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerStyle_002, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
-        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -2011,6 +2176,27 @@ HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_001, TestSi
 HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubClearWindowPointerStyle(data, reply));
+}
+
+/**
+ * @tc.name: StubClearWindowPointerStyle_003
+ * @tc.desc: Test the function StubClearWindowPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
         .WillOnce(Return(true));
@@ -4041,8 +4227,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_004, TestSize.Le
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4059,6 +4244,26 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_001, TestSize.L
 HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetMouseCaptureMode(data, reply));
+}
+
+/**
+ * @tc.name: StubSetMouseCaptureMode_003
+ * @tc.desc: Test the function StubSetMouseCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetMouseCaptureMode_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
@@ -4133,6 +4338,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetWindowPid_003, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4149,13 +4355,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>((ExtraData::MAX_BUFFER_SIZE + 1)), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubAppendExtraData(data, reply));
@@ -4170,11 +4372,10 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_002, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+        .WillOnce(DoAll(SetArgReferee<0>((ExtraData::MAX_BUFFER_SIZE + 1)), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -4193,6 +4394,31 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_003, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAppendExtraData(data, reply));
+}
+
+/**
+ * @tc.name: StubAppendExtraData_005
+ * @tc.desc: Test the function StubAppendExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
@@ -4216,6 +4442,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAppendExtraData_004, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableCombineKey_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4232,11 +4459,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubEnableCombineKey_001, TestSize.Leve
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableCombineKey_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubEnableCombineKey(data, reply));
@@ -4251,6 +4476,27 @@ HWTEST_F(MultimodalInputConnectStubTest, StubEnableCombineKey_002, TestSize.Leve
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableCombineKey_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubEnableCombineKey(data, reply));
+}
+
+/**
+ * @tc.name: StubEnableCombineKey_004
+ * @tc.desc: Test the function StubEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubEnableCombineKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
@@ -4505,12 +4751,11 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetShieldStatus_004, TestSize.Level
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, CheckDispatchControl()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
     service->state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubGetShieldStatus(data, reply));
@@ -4527,11 +4772,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetShieldStatus_005, TestSize.Level
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, CheckDispatchControl()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
     service->state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubGetShieldStatus(data, reply));
@@ -4601,6 +4847,26 @@ HWTEST_F(MultimodalInputConnectStubTest, StubCancelInjection_001, TestSize.Level
     CALL_TEST_DEBUG;
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retCancelInjection_ = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubCancelInjection(data, reply));
+}
+
+/**
+ * @tc.name: StubCancelInjection_002
+ * @tc.desc: Test the function StubCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubCancelInjection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retCancelInjection_ = 0;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubCancelInjection(data, reply));
@@ -4633,10 +4899,10 @@ HWTEST_F(MultimodalInputConnectStubTest, StubHasIrEmitter_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->hasIrEmitter_ = true;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubHasIrEmitter(data, reply));
@@ -4652,11 +4918,11 @@ HWTEST_F(MultimodalInputConnectStubTest, StubHasIrEmitter_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->hasIrEmitter_ = false;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubHasIrEmitter(data, reply));
@@ -4763,8 +5029,93 @@ HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_001, TestSize.Leve
 HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, CheckInfraredEmmit()).WillRepeatedly(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubTransmitInfrared(data, reply));
+}
+
+/**
+ * @tc.name: StubTransmitInfrared_003
+ * @tc.desc: Test the function StubTransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInfraredEmmit()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt64(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(501), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubTransmitInfrared(data, reply));
+}
+
+/**
+ * @tc.name: StubTransmitInfrared_004
+ * @tc.desc: Test the function StubTransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInfraredEmmit()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt64(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubTransmitInfrared(data, reply));
+}
+
+/**
+ * @tc.name: StubTransmitInfrared_005
+ * @tc.desc: Test the function StubTransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInfraredEmmit()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
+        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
+        .WillOnce(Return(true));;
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubTransmitInfrared(data, reply));
+}
+
+/**
+ * @tc.name: StubTransmitInfrared_006
+ * @tc.desc: Test the function StubTransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, CheckInfraredEmmit()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt64(_))
+        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
+        .WillOnce(Return(true));;
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4781,11 +5132,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubTransmitInfrared_002, TestSize.Leve
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetWindowPid(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPixelMapData(data, reply));
 }
 
 /**
@@ -4797,14 +5149,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetWindowPid(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPixelMapData(data, reply));
 }
 
 /**
@@ -4816,14 +5166,65 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_002, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetWindowPid(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPixelMapData(data, reply));
+}
+
+/**
+ * @tc.name: StubSetPixelMapData_004
+ * @tc.desc: Test the function StubSetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(true)));
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    service->retSetPixelMapData_ = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPixelMapData(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
+}
+
+/**
+ * @tc.name: StubSetPixelMapData_005
+ * @tc.desc: Test the function StubSetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetPixelMapData_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(true)));
+    Media::PixelMap *pixelMap = new (std::nothrow) Media::PixelMap();
+    EXPECT_CALL(*messageParcelMock_, Unmarshalling(_)).WillOnce(Return(pixelMap));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    service->retSetPixelMapData_ = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPixelMapData(data, reply));
+    delete pixelMap;
+    pixelMap = nullptr;
 }
 
 /**
@@ -4872,6 +5273,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_003, TestSize.Level1
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4888,7 +5290,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_003, TestSize.Level1
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableHardwareCursorStats_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4905,7 +5307,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubEnableHardwareCursorStats_001, Test
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableHardwareCursorStats_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -4925,8 +5327,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveVirtualInputDevice_001, TestS
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubRemoveVirtualInputDevice(data, reply));
@@ -4942,10 +5342,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveVirtualInputDevice_002, TestS
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
-    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
-    service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubRemoveVirtualInputDevice(data, reply));
@@ -4978,6 +5377,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_001, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInt32Vector(_)).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -4996,7 +5396,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_002, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, WriteInt32Vector(_)) .WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32Vector(_))
+        .WillOnce(Return(true))
+        .WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -5015,7 +5417,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_003, TestSize.Level1)
 HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyState_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, WriteInt32Vector(_)) .WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32Vector(_))
+        .WillOnce(Return(true))
+        .WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -5052,6 +5456,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetHardwareCursorStats_001, TestSiz
 HWTEST_F(MultimodalInputConnectStubTest, StubGetHardwareCursorStats_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteUint32(_)).WillOnce(Return(true)).WillOnce(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -6382,6 +6787,106 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetShieldStatus_005, TestSize.Level
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetShieldStatus(data, reply));
+}
+
+/**
+ * @tc.name: StubAddVirtualInputDevice_001
+ * @tc.desc: Test the function StubAddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddVirtualInputDevice(data, reply));
+}
+
+/**
+ * @tc.name: StubAddVirtualInputDevice_002
+ * @tc.desc: Test the function StubAddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadString(_))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint32(_)).WillOnce(DoAll(SetArgReferee<0>(65), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddVirtualInputDevice(data, reply));
+}
+
+/**
+ * @tc.name: StubAddVirtualInputDevice_003
+ * @tc.desc: Test the function StubAddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadString(_))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retAddVirtualInputDevice_ = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddVirtualInputDevice(data, reply));
+}
+
+/**
+ * @tc.name: StubAddVirtualInputDevice_004
+ * @tc.desc: Test the function StubAddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadString(_))
+        .WillOnce(Return(true)).WillOnce(Return(true))
+        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint64(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadUint32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retAddVirtualInputDevice_ = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAddVirtualInputDevice(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS
