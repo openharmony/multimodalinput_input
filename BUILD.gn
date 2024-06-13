@@ -187,6 +187,7 @@ group("mmi_tests") {
     "service:rust_mmi_test",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
+    "service/mouse_event_normalize/test:MouseTransformProcessorMockTest",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
     "test/fuzztest:test",
     "test/unittest/interfaces:InputNativeTest",
