@@ -350,6 +350,48 @@ ohos_unittest("event_resample_test") {
   ]
 }
 
+ohos_unittest("FingerprintEventProcessorTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/service/fingerprint_event_processor/include",
+    "${graphics_path}/2d_graphics/include",
+  ]
+
+  sources = [
+    "fingerprint_event_processor/test/fingerprint_event_processor_test.cpp",
+  ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "preferences:native_preferences",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
 ohos_unittest("TwoFingerLongTouchTest") {
   module_out_path = module_output_path
   include_dirs = [
@@ -568,10 +610,6 @@ ohos_unittest("WindowManagerTest") {
 
   sources = [
     "window_manager/test/input_display_bind_helper_test.cpp",
-    "window_manager/test/knuckle_drawing_manager_test.cpp",
-    "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
-    "window_manager/test/knuckle_glow_point_test.cpp",
-    "window_manager/test/knuckle_glow_trace_system_test.cpp",
     "window_manager/test/pointer_drawing_manager_test.cpp",
     "window_manager/test/touch_drawing_manager_test.cpp",
   ]
@@ -590,6 +628,90 @@ ohos_unittest("WindowManagerTest") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libdm",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
+ohos_unittest("KnuckleDrawingManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  sources = [ "window_manager/test/knuckle_drawing_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libdm",
+    "window_manager:libwm",
+    "window_manager:libwsutils",
+  ]
+}
+
+ohos_unittest("KnuckleDynamicDrawingManagerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  sources = [
+    "window_manager/test/knuckle_dynamic_drawing_manager_test.cpp",
+    "window_manager/test/knuckle_glow_point_test.cpp",
+    "window_manager/test/knuckle_glow_trace_system_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -1221,13 +1343,14 @@ ohos_unittest("ConnectManagerEXTest") {
   ]
 
   sources = [
+    "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
+    "connect_manager/src/multimodal_input_connect_stub.cpp",
     "connect_manager/test/message_parcel_mock.cpp",
     "connect_manager/test/multimodal_input_connect_stub_ex_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]

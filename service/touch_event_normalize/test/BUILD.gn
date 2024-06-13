@@ -653,8 +653,6 @@ group("TouchEventNormalizeTests") {
     ":TabletToolTranformTest",
     ":TouchEventNormalizeTest",
     ":TouchPadTransformProcessorMockTest",
-    ":TouchTransformProcessorTestWithMock",
-    ":TouchpadGestureTest",
     ":TransformPointTest",
   ]
 }
