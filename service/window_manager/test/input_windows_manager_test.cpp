@@ -4256,5 +4256,85 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UnregisterFoldStatusLi
     ASSERT_NE(inputWindowsManager.foldStatusListener_, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UnregisterFoldStatusListener());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
+ * @tc.desc: Test UpdateAndAdjustMouseLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
+    inputWindowsManager.lastPointerEventForFold_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEventForFold_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPressed(false);
+    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
+    item.SetPressed(true);
+    item.SetPointerId(1);
+    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnFoldStatusChanged(foldStatus));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation
+ * @tc.desc: Test FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(5);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    WindowInfoEX windowInfoEX;
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    DisplayInfo displayInfo;
+    displayInfo.id = 5;
+    displayInfo.displayDirection = DIRECTION0;
+    displayInfo.direction = DIRECTION90;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].displayDirection = DIRECTION270;
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetWindowPointerStyle_002
+ * @tc.desc: Test SetWindowPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pid = 10;
+    int32_t windowId = 50;
+    WindowArea area = WindowArea::FOCUS_ON_BOTTOM_RIGHT;
+    inputWindowsManager.lastPointerStyle_.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetWindowPointerStyle(area, pid, windowId));
+
+    windowId = -1;
+    inputWindowsManager.lastPointerStyle_.id = MOUSE_ICON::EAST;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetWindowPointerStyle(area, pid, windowId));
+}
 } // namespace MMI
 } // namespace OHOS
