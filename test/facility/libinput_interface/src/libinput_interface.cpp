@@ -51,11 +51,6 @@ enum libinput_pointer_axis_source libinput_event_pointer_get_axis_source(struct 
     return g_instance->GetAxisSource(event);
 }
 
-enum libinput_finger_count libinput_event_pointer_get_finger_count(struct libinput_event_pointer *event)
-{
-    return g_instance->PointerEventGetFingerCount(event);
-}
-
 double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *event)
 {
     return g_instance->TabletToolGetTiltY(event);
