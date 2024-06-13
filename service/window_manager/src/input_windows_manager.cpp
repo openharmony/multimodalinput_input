@@ -3300,9 +3300,8 @@ void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const Win
     auto iter = lastMatchedWindow_.find(eventType);
     if (iter != lastMatchedWindow_.end() && iter->second.id != newWindowInfo.id) {
         MMI_HILOGI("Target window changed %{public}d %{public}d %{public}d %{public}f"
-            "%{public}d %{public}d %{public}f",
-            eventType, iter->second.id, iter->second.pid, iter->second.zOrder,
-            newWindowInfo.id, newWindowInfo.pid, newWindowInfo.zOrder);
+            "%{public}d %{public}d %{public}f", eventType, iter->second.id, iter->second.pid,
+            iter->second.zOrder, newWindowInfo.id, newWindowInfo.pid, newWindowInfo.zOrder);
     }
     lastMatchedWindow_[eventType] = newWindowInfo;
 }
