@@ -46,6 +46,11 @@ double libinput_event_tablet_tool_get_tilt_x(struct libinput_event_tablet_tool *
     return g_instance->TabletToolGetTiltX(event);
 }
 
+enum libinput_pointer_axis_source libinput_event_pointer_get_axis_source(struct libinput_event_pointer *event)
+{
+    return g_instance->GetAxisSource(event);
+}
+
 double libinput_event_tablet_tool_get_tilt_y(struct libinput_event_tablet_tool *event)
 {
     return g_instance->TabletToolGetTiltY(event);
@@ -93,7 +98,7 @@ struct libinput_event_keyboard* libinput_event_get_keyboard_event(struct libinpu
 
 struct libinput_event_pointer* libinput_event_get_pointer_event(struct libinput_event *event)
 {
-    return (event != nullptr ? reinterpret_cast<libinput_event_pointer *>(event) : nullptr);
+    return g_instance->LibinputGetPointerEvent(event);
 }
 
 struct libinput_event_touch* libinput_event_get_touch_event(struct libinput_event *event)
