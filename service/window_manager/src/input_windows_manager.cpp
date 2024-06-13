@@ -120,6 +120,7 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
     lastWindowInfo_.agentWindowId = -1;
     lastWindowInfo_.area = { 0, 0, 0, 0 };
     lastWindowInfo_.flags = -1;
+    lastWindowInfo_.windowType = 0;
     mouseDownInfo_.id = -1;
     mouseDownInfo_.pid = -1;
     mouseDownInfo_.uid = -1;
