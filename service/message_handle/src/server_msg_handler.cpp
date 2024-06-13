@@ -645,6 +645,7 @@ int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filt
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     return KeyEventHdr->SetShieldStatus(shieldMode, isShield);
@@ -654,6 +655,7 @@ int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     return KeyEventHdr->GetShieldStatus(shieldMode, isShield);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 void ServerMsgHandler::LaunchAbility()
 {
@@ -679,12 +681,16 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
             MMI_HILOGI("Authorize process failed, pid:%{public}d", CurrentPID_);
         }
         MMI_HILOGD("Agree to apply injection,pid:%{public}d", CurrentPID_);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         if (InjectionType_ == InjectionType::KEYEVENT) {
             OnInjectKeyEvent(keyEvent_, CurrentPID_, true);
         }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         if (InjectionType_ == InjectionType::POINTEREVENT) {
             OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
         }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         return ERR_OK;
     }
     AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);

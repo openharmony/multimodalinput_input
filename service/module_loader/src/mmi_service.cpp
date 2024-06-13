@@ -31,11 +31,19 @@
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #include "fingersense_wrapper.h"
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #include "gesturesense_wrapper.h"
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "input_device_manager.h"
 #include "ipc_skeleton.h"
 #include "i_input_windows_manager.h"
@@ -306,13 +314,13 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif // OHOS_RSS_CLIENT
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
     FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
     DISPLAY_MONITOR->InitCommonEventSubscriber();
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     GESTURESENSE_WRAPPER->InitGestureSenseWrapper();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -1173,14 +1181,18 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, boo
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
 {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     return sMsgHandler_.OnInjectKeyEvent(keyEvent, pid, isNativeInject);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
 {
     auto keyEvent = KeyEventHdr->GetKeyEvent();
@@ -1196,15 +1208,19 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
     bool isNativeInject)
 {
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
+#else
+    return RET_OK;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1450,8 +1466,6 @@ int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
         MMI_HILOGE("Failed to get the keyboard status, ret:%{public}d", ret);
         return ret;
     }
-#else
-    MMI_HILOGD("Function not supported");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -1466,8 +1480,6 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
         MMI_HILOGE("Failed to update the keyboard status, ret:%{public}d", ret);
         return ret;
     }
-#else
-    MMI_HILOGD("Function not supported");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -1513,11 +1525,11 @@ void MMIService::OnThread()
 #endif // OHOS_RSS_CLIENT
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#if defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER) && defined(OHOS_BUILD_ENABLE_KEYBOARD)
         if (isCesStart_ && !DISPLAY_MONITOR->IsCommonEventSubscriberInit()) {
             DISPLAY_MONITOR->InitCommonEventSubscriber();
         }
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
         epoll_event ev[MAX_EVENT_SIZE] = {};
         int32_t timeout = TimerMgr->CalcNextDelay();
         MMI_HILOGD("timeout:%{public}d", timeout);
@@ -1700,6 +1712,7 @@ int32_t MMIService::EnableInputDevice(bool enable)
     return ret;
 }
 
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
 int32_t MMIService::UpdateCombineKeyState(bool enable)
 {
     auto eventSubscriberHandler = InputHandler->GetSubscriberHandler();
@@ -1717,6 +1730,7 @@ int32_t MMIService::UpdateCombineKeyState(bool enable)
     }
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
 
 int32_t MMIService::CheckPidPermission(int32_t pid)
 {
@@ -1732,29 +1746,35 @@ int32_t MMIService::CheckPidPermission(int32_t pid)
 int32_t MMIService::EnableCombineKey(bool enable)
 {
     CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::UpdateCombineKeyState, this, enable));
     if (ret != RET_OK) {
         MMI_HILOGE("Set key down duration failed: %{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     return RET_OK;
 }
 
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
 int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
     CHKPR(eventKeyCommandHandler, RET_ERR);
     return eventKeyCommandHandler->UpdateSettingsXml(businessId, delay);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
 
 int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
     CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::UpdateSettingsXml, this, businessId, delay));
     if (ret != RET_OK) {
         MMI_HILOGE("Set key down duration failed: %{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     return RET_OK;
 }
 
@@ -2036,23 +2056,29 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
 int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::SetShieldStatus, &sMsgHandler_, shieldMode, isShield));
     if (ret != RET_OK) {
         MMI_HILOGE("Set shield event interception state failed, return %{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
 }
 
 int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::GetShieldStatus, &sMsgHandler_, shieldMode, std::ref(isShield)));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set shield event interception status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
 }
 
 int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
@@ -2104,46 +2130,55 @@ int32_t MMIService::OnCancelInjection()
 int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnHasIrEmitter, this, std::ref(hasIrEmitter)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetInfraredFrequencies,
                                                         this, std::ref(requencys)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnTransmitInfrared, this, number, pattern));
     if (ret != RET_OK) {
         MMI_HILOGE("OnTransmitInfrared failed, returnCode:%{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     hasIrEmitter = false;
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &frequencies)
 {
     MMI_HILOGI("start get infrared frequency");
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
     for (auto &item : infos) {
@@ -2159,11 +2194,13 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &fre
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf is. %{public}s ", context.c_str());
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t> &pattern)
 {
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
@@ -2171,6 +2208,7 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     }
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
     MMI_HILOGI("TransmitInfrared para. %{public}s", context.c_str());
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 

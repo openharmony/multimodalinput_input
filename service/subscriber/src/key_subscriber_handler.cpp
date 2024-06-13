@@ -755,6 +755,7 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType)
 {
     CALL_DEBUG_ENTER;
@@ -777,6 +778,7 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool KeySubscriberHandler::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
