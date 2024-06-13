@@ -222,4 +222,9 @@ bool Parcel::ReadDouble(double &value)
 {
     return DfsMessageParcel::messageParcel->ReadDouble(value);
 }
+
+Media::PixelMap *Media::PixelMap::Unmarshalling(Parcel &parcel)
+{
+    return DfsMessageParcel::messageParcel->Unmarshalling(parcel);
+}
 } // namespace OHOS
