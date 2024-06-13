@@ -856,9 +856,9 @@ void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
     g_isRsRemoteDied = true;
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
-#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 void PointerDrawingManager::AttachToDisplay()
