@@ -203,12 +203,12 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
 }
 
 /**
- * @tc.name: MouseTransformProcessorMockTest_HandleTouchpadTwoFingerButton_01
+ * @tc.name: MouseTransformProcessorMockTest_HandleTwoFingerButton_01
  * @tc.desc: HandleTouchpadTwoFingerButton
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTouchpadTwoFingerButton_01, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 3;
