@@ -77,18 +77,6 @@ private:
 };
 
 /**
- * @tc.name: KnuckleGlowPoint_KnuckleGlowPoint_001
- * @tc.desc: Test Update
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPoint_KnuckleGlowPoint_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    EXPECT_NO_FATAL_FAILURE(KnuckleGlowPoint knuckleGlowPoint(pixelMap));
-}
-
-/**
  * @tc.name: KnuckleGlowPoint_Update_001
  * @tc.desc: Test Update
  * @tc.type: FUNC
@@ -98,7 +86,8 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Update_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto knuckleGlowPoint = KnuckleGlowPoint(pixelMap);
-    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Update());
+    knuckleGlowPoint.Update();
+    EXPECT_EQ(knuckleGlowPoint.lifespan_, -1);
 }
 
 /**
@@ -112,7 +101,8 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Update_002, TestSize.Level1)
     CALL_DEBUG_ENTER;
     auto knuckleGlowPoint = KnuckleGlowPoint(pixelMap);
     knuckleGlowPoint.lifespan_ = 1;
-    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Update());
+    knuckleGlowPoint.Update();
+    EXPECT_LT(knuckleGlowPoint.lifespan_, 1);
 }
 
 /**
@@ -127,7 +117,8 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Draw_001, TestSize.Level1)
     auto knuckleGlowPoint = KnuckleGlowPoint(pixelMap);
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
-    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Draw(canvas));
+    knuckleGlowPoint.Draw(canvas);
+    EXPECT_EQ(knuckleGlowPoint.lifespan_, -1);
 }
 
 /**
@@ -145,7 +136,8 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Draw_002, TestSize.Level1)
     knuckleGlowPoint.pointY_ = 1;
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
-    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Draw(canvas));
+    knuckleGlowPoint.Draw(canvas);
+    EXPECT_EQ(knuckleGlowPoint.lifespan_, 1);
 }
 
 /**
@@ -161,7 +153,8 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Reset_001, TestSize.Level1)
     double pointX = 0.1;
     double pointY = 0.1;
     float lifespanoffset = 0.1f;
-    EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Reset(pointX, pointY, lifespanoffset));
+    knuckleGlowPoint.Reset(pointX, pointY, lifespanoffset);
+    EXPECT_DOUBLE_EQ(knuckleGlowPoint.pointX_, 0.1);
 }
 
 /**

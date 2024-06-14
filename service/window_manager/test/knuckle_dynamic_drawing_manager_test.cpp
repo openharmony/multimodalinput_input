@@ -97,7 +97,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest,
     item.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     pointerEvent->SetPointerId(1);
     pointerEvent->AddPointerItem(item);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_FALSE(knuckleDynamicDrawMgr.isStop_);
 }
 
 /**
@@ -120,9 +121,10 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetTargetDisplayId(50);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawMgr.KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_TRUE(knuckleDynamicDrawMgr.isDrawing_);
 }
 
 /**
@@ -136,12 +138,13 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Init
     CALL_TEST_DEBUG;
     KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
     knuckleDynamicDrawMgr.glowTraceSystem_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
+    knuckleDynamicDrawMgr.InitPointerPathPaint();
     std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
     auto pixelMap = DecodeImageToPixelMap(imagePath);
+    ASSERT_NE(pixelMap, nullptr);
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.InitPointerPathPaint());
+    knuckleDynamicDrawMgr.InitPointerPathPaint();
 }
 
 /**
@@ -188,7 +191,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerId(1);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent));
+    knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent);
 
     knuckleDynamicDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
@@ -199,7 +202,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
     knuckleDynamicDrawMgr.glowTraceSystem_ =
         std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
     knuckleDynamicDrawMgr.isDrawing_ = true;
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent));
+    knuckleDynamicDrawMgr.StartTouchDraw(pointerEvent);
 }
 
 /**
@@ -245,14 +248,14 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Crea
     knuckleDynamicDrawMgr.surfaceNode_ = nullptr;
     knuckleDynamicDrawMgr.displayInfo_.width = 200;
     knuckleDynamicDrawMgr.displayInfo_.height = 200;
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.CreateTouchWindow(displayId));
+    knuckleDynamicDrawMgr.CreateTouchWindow(displayId);
 
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     knuckleDynamicDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_NE(knuckleDynamicDrawMgr.surfaceNode_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.CreateTouchWindow(displayId));
+    knuckleDynamicDrawMgr.CreateTouchWindow(displayId);
 }
 
 /**
@@ -280,7 +283,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_TRUE(knuckleDynamicDrawingMgr->isDrawing_);
 }
 
 /**
@@ -308,7 +312,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_NE(knuckleDynamicDrawingMgr->lastUpTime_, 0);
 }
 
 /**
@@ -345,7 +350,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     item2.SetDisplayY(displayY);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->AddPointerItem(item2);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_TRUE(knuckleDynamicDrawingMgr->isDrawing_);
 }
 
 /**
@@ -373,7 +379,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_NE(knuckleDynamicDrawingMgr->firstDownTime_, 0);
 }
 
 /**
@@ -401,7 +408,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_EQ(knuckleDynamicDrawingMgr->pointCounter_, 1);
 }
 
 /**
@@ -429,7 +437,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent));
+    knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
+    EXPECT_FALSE(knuckleDynamicDrawingMgr->traceControlPoints_.empty());
 }
 
 /**
@@ -443,7 +452,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
     CALL_TEST_DEBUG;
     DisplayInfo displayInfo = { .id = 1, .x = 1, .y = 1, .width = 1, .height = 1,
         .dpi = 240, .name = "display", .uniq = "xx" };
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo));
+    knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
+    EXPECT_EQ(knuckleDynamicDrawingMgr->displayInfo_.width, 1);
 }
 
 /**
@@ -456,7 +466,8 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
 {
     CALL_TEST_DEBUG;
     DisplayInfo displayInfo;
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo));
+    knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
+    EXPECT_EQ(knuckleDynamicDrawingMgr->displayInfo_.width, 0);
 }
 } // namespace MMI
 } // namespace OHOS
