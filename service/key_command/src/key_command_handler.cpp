@@ -59,6 +59,7 @@ constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
 constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 constexpr int64_t NO_DELAY = 0;
+constexpr int64_t FREQUENCY = 1000;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
 const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
@@ -1678,7 +1679,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
-    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
+    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * FREQUENCY) {
         MMI_HILOGI("Skip, upTime - downTime <= duration");
         return false;
     }
