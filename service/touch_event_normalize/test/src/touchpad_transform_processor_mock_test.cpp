@@ -18,6 +18,7 @@
 
 #include "define_multimodal.h"
 #include "libinput_mock.h"
+#include "pointer_event.h"
 #include "preferences_manager_mock.h"
 #include "touchpad_transform_processor.h"
 
@@ -30,6 +31,11 @@ namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
+namespace {
+constexpr int32_t MT_TOOL_FINGER { 0 };
+constexpr int32_t MT_TOOL_PEN { 1 };
+constexpr int32_t MT_TOOL_PALM { 10 };
+} // namespace
 
 class TouchPadTransformProcessorMockTest : public testing::Test {
 public:
@@ -247,6 +253,153 @@ HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMockTest_
 
     auto pointerEvent = processor.OnEvent(&event);
     ASSERT_TRUE(pointerEvent == nullptr);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorMock_SetTouchPadSwipeData_01
+ * @tc.desc: SetTouchPadSwipeData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_SetTouchPadSwipeData_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t action = PointerEvent::POINTER_ACTION_SWIPE_UPDATE;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
+
+    libinput_event_gesture gestureevent {};
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetGestureEvent).WillRepeatedly(Return(&gestureevent));
+    EXPECT_CALL(libinputMock, GestureEventGetTime).WillRepeatedly(Return(1000));
+    EXPECT_CALL(libinputMock, GestureEventGetFingerCount).WillRepeatedly(Return(-1));
+
+    int32_t ret = processor.SetTouchPadSwipeData(&event, action);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorMock_SetTouchPadSwipeData_02
+ * @tc.desc: SetTouchPadSwipeData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_SetTouchPadSwipeData_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t action = PointerEvent::POINTER_ACTION_SWIPE_UPDATE;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
+
+    libinput_event_gesture gestureevent {};
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetGestureEvent).WillRepeatedly(Return(&gestureevent));
+    EXPECT_CALL(libinputMock, GestureEventGetTime).WillRepeatedly(Return(1000));
+    EXPECT_CALL(libinputMock, GestureEventGetFingerCount).WillRepeatedly(Return(0));
+
+    int32_t ret = processor.SetTouchPadSwipeData(&event, action);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorMock_SetTouchPadSwipeData_03
+ * @tc.desc: SetTouchPadSwipeData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_SetTouchPadSwipeData_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t action = PointerEvent::POINTER_ACTION_SWIPE_UPDATE;
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
+
+    libinput_event_gesture gestureevent {};
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetGestureEvent).WillRepeatedly(Return(&gestureevent));
+    EXPECT_CALL(libinputMock, GestureEventGetTime).WillRepeatedly(Return(1000));
+    EXPECT_CALL(libinputMock, GestureEventGetFingerCount).WillRepeatedly(Return(2));
+
+    int32_t ret = processor.SetTouchPadSwipeData(&event, action);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorMock_GetTouchPadToolType_01
+ * @tc.desc: GetTouchPadToolType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_GetTouchPadToolType_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    TouchPadTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
+
+    libinput_event_touch touchevent {};
+    libinput_device device {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, TouchpadGetToolType).WillRepeatedly(Return(MT_TOOL_FINGER));
+
+    int32_t ret = processor.GetTouchPadToolType(&touchevent, &device);
+    EXPECT_EQ(ret, PointerEvent::TOOL_TYPE_FINGER);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorMock_GetTouchPadToolType_02
+ * @tc.desc: GetTouchPadToolType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_GetTouchPadToolType_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    TouchPadTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
+
+    libinput_event_touch touchevent {};
+    libinput_device device {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, TouchpadGetToolType).WillRepeatedly(Return(MT_TOOL_PEN));
+
+    int32_t ret = processor.GetTouchPadToolType(&touchevent, &device);
+    EXPECT_EQ(ret, PointerEvent::TOOL_TYPE_PEN);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorMock_GetTouchPadToolType_03
+ * @tc.desc: GetTouchPadToolType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_GetTouchPadToolType_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 2;
+    TouchPadTransformProcessor processor(deviceId);
+    processor.pointerEvent_ = PointerEvent::Create();
+    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
+
+    libinput_event_touch touchevent {};
+    libinput_device device {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, TouchpadGetToolType).WillRepeatedly(Return(MT_TOOL_PALM));
+
+    int32_t ret = processor.GetTouchPadToolType(&touchevent, &device);
+    EXPECT_EQ(ret, 0);
 }
 } // namespace MMI
 } // namespace OHOS
