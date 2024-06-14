@@ -16,6 +16,7 @@
 #include "mouse_transform_processor.h"
 
 #include <cinttypes>
+#include <chrono>
 #include <functional>
 
 #include <linux/input-event-codes.h>
@@ -64,6 +65,7 @@ constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -182,6 +184,14 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
+        GetTouchpadRightClickType(switchTypeData);
+        RightClickType switchType = RightClickType(switchTypeData);
+        if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
+            button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+            MMI_HILOGI("Right click up, do sleep");
+            std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME_FOR_BUTTON_UP));
+        }
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
