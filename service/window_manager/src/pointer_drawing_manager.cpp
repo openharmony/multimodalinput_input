@@ -149,17 +149,16 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     if (!SetHardWareLocation(displayId, physicalX, physicalY)) {
         return RET_ERR;
     }
-    MMI_HILOGD("Pointer window move success");
+    MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d", pointerStyle.id);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
-    if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::CROSS) {
-        // 触发光标找回效果时恢复为默认光标
-        MMI_HILOGD("Restores to the default cursor when the cursor retrieval effect is triggered");
+    if (cursorEnlarged) {
         MAGIC_POINTER_VELOCITY_TRACKER->SetLastPointerStyle(pointerStyle);
         MAGIC_POINTER_VELOCITY_TRACKER->SetDirection(direction);
-        pointerStyle.id = MOUSE_ICON::DEFAULT;
+        if (pointerStyle.id != MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::CROSS) {
+            pointerStyle.id = MOUSE_ICON::DEFAULT;
+        }
     }
-    surfaceNode_->SetScale(scale_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
@@ -198,20 +197,12 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        surfaceNode_->SetScale(scale_);
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Move pointer, physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
     }
-}
-
-void PointerDrawingManager::SetPointerScale(float scale)
-{
-    scale_ = scale;
 }
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
