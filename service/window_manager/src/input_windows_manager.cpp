@@ -2022,7 +2022,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
+    if (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
+        pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
         WindowInfoEX windowInfoEX;
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
