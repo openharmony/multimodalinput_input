@@ -156,7 +156,6 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         MAGIC_POINTER_VELOCITY_TRACKER->SetLastPointerStyle(pointerStyle);
         MAGIC_POINTER_VELOCITY_TRACKER->SetDirection(direction);
         if (pointerStyle.id != MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::CROSS) {
-            MMI_HILOGD("Restores to the default cursor when the cursor retrieval effect is triggered");
             pointerStyle.id = MOUSE_ICON::DEFAULT;
         }
     }
