@@ -423,6 +423,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
 }
 
