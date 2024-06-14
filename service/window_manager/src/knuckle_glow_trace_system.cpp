@@ -27,13 +27,13 @@ namespace {
 constexpr float BASIC_DISTANCE_BETWEEN_POINTS { 5.0f };
 } // namespace
 
-KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, std::shared_ptr<Rosen::Drawing::Bitmap> bitmap,
+KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, std::shared_ptr<OHOS::Media::PixelMap> pixelMap,
     int32_t maxDivergenceNum) : maxDivergenceNum_(maxDivergenceNum)
 {
     CALL_DEBUG_ENTER;
     for (int32_t i = 0; i < pointSize; ++i) {
-        divergentPoints_.emplace_back(std::make_shared<KnuckleDivergentPoint>(bitmap));
-        glowPoints_.emplace_back(std::make_shared<KnuckleGlowPoint>(bitmap));
+        divergentPoints_.emplace_back(std::make_shared<KnuckleDivergentPoint>(pixelMap));
+        glowPoints_.emplace_back(std::make_shared<KnuckleGlowPoint>(pixelMap));
     }
 }
 
@@ -54,7 +54,7 @@ void KnuckleGlowTraceSystem::Update()
     }
 }
 
-void KnuckleGlowTraceSystem::Draw(Rosen::Drawing::RecordingCanvas* canvas)
+void KnuckleGlowTraceSystem::Draw(Rosen::ExtendRecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
     for (size_t i = 0; i < glowPoints_.size(); ++i) {
