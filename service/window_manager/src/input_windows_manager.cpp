@@ -1729,6 +1729,9 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         static std::unordered_map<int32_t, int32_t> winId2ZorderMap;
         bool isHotArea = false;
+        if (targetWindowId <= 1) {
+            targetMouseWinIds_.clear();
+        }
         for (const auto &item : windowsInfo) {
             if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
                 winId2ZorderMap.insert({item.id, item.zOrder});
@@ -1775,11 +1778,11 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     "hasn't been set up yet, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
                 bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
                 if (isSpecialWindow) {
-                    AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                    AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                     isHotArea = true;
                     continue;
                 } else if (isHotArea) {
-                    AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                    AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                     break;
                 } else {
                     break;
@@ -2382,11 +2385,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 MMI_HILOG_DISPATCHI("the first special window status:%{public}d", isFirstSpecialWindow);
             }
             if (isSpecialWindow) {
-                AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                 isHotArea = true;
                 continue;
             } else if (isHotArea) {
-                AddTargetWindowIds(pointerEvent->GetPointerId(), item.id);
+                AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
                 break;
             } else {
                 break;
@@ -3218,35 +3221,53 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowAndDisplayInfo(int32_t w
     return std::nullopt;
 }
 
-void InputWindowsManager::GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds)
+void InputWindowsManager::GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType,
+    std::vector<int32_t> &windowIds)
 {
     CALL_DEBUG_ENTER;
-    if (targetWindowIds_.find(pointerItemId) == targetWindowIds_.end()) {
-        MMI_HILOGD("Get target windowId fail, pointerItem pointerId:%{public}d", pointerItemId);
+    if (sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (targetMouseWinIds_.find(pointerItemId) != targetMouseWinIds_.end()) {
+            windowIds = targetMouseWinIds_[pointerItemId];
+        }
+        return;
+    } else if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (targetTouchWinIds_.find(pointerItemId) != targetTouchWinIds_.end()) {
+            windowIds = targetTouchWinIds_[pointerItemId];
+        }
     }
-    windowIds = targetWindowIds_[pointerItemId];
 }
 
-void InputWindowsManager::AddTargetWindowIds(int32_t pointerItemId, int32_t windowId)
+void InputWindowsManager::AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    if (targetWindowIds_.find(pointerItemId) != targetWindowIds_.end()) {
-        targetWindowIds_[pointerItemId].push_back(windowId);
-    } else {
-        std::vector<int32_t> windowIds;
-        windowIds.push_back(windowId);
-        targetWindowIds_.emplace(pointerItemId, windowIds);
+    if (sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (targetMouseWinIds_.find(pointerItemId) != targetMouseWinIds_.end()) {
+            targetMouseWinIds_[pointerItemId].push_back(windowId);
+        } else {
+            std::vector<int32_t> windowIds;
+            windowIds.push_back(windowId);
+            targetMouseWinIds_.emplace(pointerItemId, windowIds);
+        }
+        return;
+    } else if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (targetTouchWinIds_.find(pointerItemId) != targetTouchWinIds_.end()) {
+            targetTouchWinIds_[pointerItemId].push_back(windowId);
+        } else {
+            std::vector<int32_t> windowIds;
+            windowIds.push_back(windowId);
+            targetTouchWinIds_.emplace(pointerItemId, windowIds);
+        }
     }
 }
 
 void InputWindowsManager::ClearTargetWindowId(int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
-    if (targetWindowIds_.find(pointerId) == targetWindowIds_.end()) {
+    if (targetTouchWinIds_.find(pointerId) == targetTouchWinIds_.end()) {
         MMI_HILOGD("Clear target windowId fail, pointerId:%{public}d", pointerId);
         return;
     }
-    targetWindowIds_.erase(pointerId);
+    targetTouchWinIds_.erase(pointerId);
 }
 
 void InputWindowsManager::SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event)
