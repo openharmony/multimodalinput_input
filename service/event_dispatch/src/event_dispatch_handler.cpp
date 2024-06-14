@@ -149,7 +149,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     CALL_DEBUG_ENTER;
     CHKPV(point);
     std::vector<int32_t> windowIds;
-    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     int32_t count = 0;
     int32_t pointerId = point->GetPointerId();
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
@@ -224,7 +224,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
 
     std::vector<int32_t> windowIds;
-    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
