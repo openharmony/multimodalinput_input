@@ -53,15 +53,15 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
     int32_t GetHoverScrollState(bool &state) override;
-    int32_t SetPointerVisible(bool visible) override;
+    int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor(int32_t &color) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false) override;
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
     int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
@@ -78,12 +78,12 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
-    int32_t SubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas) override;
@@ -116,6 +116,17 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
+    int32_t Authorize(bool isAuthorize) override;
+    int32_t CancelInjection() override;
+    int32_t HasIrEmitter(bool &hasIrEmitter) override;
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
+    int32_t SetCurrentUser(int32_t userId) override;
+    int32_t EnableHardwareCursorStats(bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
+    int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

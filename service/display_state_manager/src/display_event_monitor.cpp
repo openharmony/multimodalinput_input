@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,15 +14,17 @@
  */
 
 #include "display_event_monitor.h"
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+#include "stylus_key_handler.h"
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DisplayEventMonitor"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DisplayEventMonitor" };
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-} // namespace
-
 DisplayEventMonitor::DisplayEventMonitor() {}
 DisplayEventMonitor::~DisplayEventMonitor() {}
 
@@ -45,22 +47,33 @@ public:
             MMI_HILOGE("action is empty");
             return;
         }
+        MMI_HILOGD("receivedScreenStatus: %{public}s", action.c_str());
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            MMI_HILOGD("display screen on");
+            MMI_HILOGI("display screen on");
+            DISPLAY_MONITOR->SetScreenStatus(action);
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
+            STYLUS_HANDLER->IsLaunchAbility();
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
-                MMI_HILOGD("start enable fingersense");
+                MMI_HILOGI("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("display screen off");
+            DISPLAY_MONITOR->SetScreenStatus(action);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+            MMI_HILOGD("display screen locked");
+            DISPLAY_MONITOR->SetScreenLocked(true);
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+            MMI_HILOGD("display screen unlocked");
+            DISPLAY_MONITOR->SetScreenLocked(false);
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
-            return;
         }
     }
 };
@@ -68,22 +81,30 @@ public:
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
     } else {
-        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
+#else
+    MMI_HILOGW("Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     shieldModeBeforeSreenOff_ = KeyEventHdr->GetCurrentShieldMode();
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
     } else {
-        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
+#else
+    MMI_HILOGW("Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void DisplayEventMonitor::InitCommonEventSubscriber()
@@ -96,6 +117,8 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));

@@ -27,6 +27,7 @@ public:
     DISALLOW_COPY_AND_MOVE(GestureTransformProcessor);
     ~GestureTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
+    std::shared_ptr<PointerEvent> GetPointerEvent() override { return nullptr; }
 
 private:
     const int32_t defaultPointerId { 0 };

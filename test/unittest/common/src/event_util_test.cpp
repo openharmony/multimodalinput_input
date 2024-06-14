@@ -19,10 +19,12 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventUtilTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventUtilTest" };
 constexpr int32_t TIME_WAIT_FOR_EVENT { 1000 };
 constexpr int32_t SEC_TO_NANOSEC { 1000000000 };
 } // namespace

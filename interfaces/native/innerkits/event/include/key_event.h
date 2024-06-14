@@ -2838,6 +2838,13 @@ public:
     static const int32_t KEYCODE_LAUNCHER_MENU;
 
     /**
+     * Stylus key
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_STYLUS_SCREEN;
+
+    /**
      * Unknown key operation, which is usually used to indicate the initial invalid value.
      *
      * @since 9
@@ -3063,6 +3070,19 @@ public:
      */
     static const int32_t INTENTION_CAMERA;
 
+    /**
+     * Outbound Notification Center
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_CALL_NOTIFICATION_CENTER;
+
+     /**
+     * Outbound Control Center
+     *
+     * @since 11
+     */
+    static const int32_t KEYCODE_CALL_CONTROL_CENTER;
 public:
     class KeyItem {
     public:
@@ -3213,6 +3233,8 @@ public:
      * @since 9
      */
     static std::shared_ptr<KeyEvent> Create();
+
+    virtual void Reset() override;
 
     /**
      * @brief Obtains the key code of this key event.
@@ -3391,6 +3413,13 @@ public:
      */
     bool ReadFromParcel(Parcel &in);
 
+    /**
+     * @brief Converts a key event action into a short string.
+     * @param Indicates the key event action.
+     * @return Returns the string converted from the key action.
+     * @since 12
+    */
+    static std::string_view ActionToShortStr(int32_t action);
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method

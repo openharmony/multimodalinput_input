@@ -18,12 +18,13 @@
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GestureTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "GestureTransformProcessor" };
-} // namespace
-
 GestureTransformProcessor::GestureTransformProcessor(int32_t deviceId)
     : deviceId_(deviceId) {}
 
@@ -150,6 +151,7 @@ std::shared_ptr<PointerEvent> GestureTransformProcessor::OnEvent(struct libinput
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->UpdateId();
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
     return pointerEvent_;
 }
 } // namespace MMI

@@ -17,7 +17,10 @@
 #include <libinput.h>
 
 #include "gesture_handler.h"
+#include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GestureHandlerTest"
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -38,6 +41,7 @@ public:
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 10;
     double logicalY = 10;
@@ -59,6 +63,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_001, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_002, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 10;
     double logicalY = 10;
@@ -85,6 +90,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_002, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_003, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 9;
     double logicalY = 9;
@@ -116,6 +122,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_003, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_004, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 10;
     double logicalY = 10;
@@ -152,6 +159,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_004, TestSize.Le
  */
 HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Level1)
 {
+    CALL_DEBUG_ENTER;
     int32_t seatSlot = 0;
     double logicalX = 0;
     double logicalY = 0;
@@ -169,6 +177,91 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
     actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
     double rotateAngle = 0.0;
     ASSERT_EQ(GESTURE_HANDLER->GetRotateAngle(), rotateAngle);
+}
+
+/**
+ * @tc.name: GestureHandlerTest_GestureIdentify_005
+ * @tc.desc: Gesture identify
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t originType = 999;
+    int32_t seatSlot = 0;
+    double logicalX = 0.0;
+    double logicalY = 0.0;
+    auto actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    ASSERT_EQ(actionType, PointerEvent::POINTER_ACTION_UNKNOWN);
+}
+
+/**
+ * @tc.name: GestureHandlerTest_HandleTouchPadDownEvent_001
+ * @tc.desc: Handle touch pad down event
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadDownEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t seatSlot = 2;
+    double logicalX = 0.0;
+    double logicalY = 0.0;
+    auto originType = LIBINPUT_EVENT_TOUCHPAD_DOWN;
+    auto gestureType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    ASSERT_EQ(gestureType, PointerEvent::POINTER_ACTION_UNKNOWN);
+}
+
+/**
+ * @tc.name: GestureHandlerTest_HandleTouchPadMoveEvent_001
+ * @tc.desc: Handle touch pad move event
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t seatSlot = 0;
+    double logicalX = 0.0;
+    double logicalY = 0.0;
+    auto originType = LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    auto gestureType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    ASSERT_EQ(gestureType, PointerEvent::POINTER_ACTION_UNKNOWN);
+}
+
+/**
+ * @tc.name: GestureHandlerTest_HandleTouchPadMoveEvent_002
+ * @tc.desc: Handle touch pad move event
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadMoveEvent_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t seatSlot = 0;
+    double logicalX = 0.0;
+    double logicalY = 0.0;
+    auto originType = LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    auto gestureType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    ASSERT_EQ(gestureType, PointerEvent::POINTER_ACTION_UNKNOWN);
+}
+
+/**
+ * @tc.name: GestureHandlerTest_HandleTouchPadUpEvent_001
+ * @tc.desc: Handle touch pad up event
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(GestureHandlerTest, GestureHandlerTest_HandleTouchPadUpEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int32_t seatSlot = 0;
+    double logicalX = 0.0;
+    double logicalY = 0.0;
+    auto originType = LIBINPUT_EVENT_TOUCHPAD_UP;
+    auto gestureType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
+    ASSERT_EQ(gestureType, PointerEvent::POINTER_ACTION_UNKNOWN);
 }
 } // namespace MMI
 } // namespace OHOS

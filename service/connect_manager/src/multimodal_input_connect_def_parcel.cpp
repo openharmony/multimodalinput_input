@@ -17,11 +17,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MultimodalInputConnectDefParcel"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel" };
-} // namespace
 bool ConnectReqParcel::Marshalling(Parcel& out) const
 {
     WRITEINT32(out, data.moduleId);
@@ -31,9 +33,7 @@ bool ConnectReqParcel::Marshalling(Parcel& out) const
 ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
 {
     auto* request = new (std::nothrow) ConnectReqParcel();
-    if (request == nullptr) {
-        return nullptr;
-    }
+    CHKPP(request);
 
     if (!in.ReadInt32(request->data.moduleId)) {
         delete request;

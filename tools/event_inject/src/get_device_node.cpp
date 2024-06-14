@@ -15,10 +15,12 @@
 
 #include "get_device_node.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GetDeviceNode"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 const std::string DEVICES_INFO_PATH = "/proc/bus/input/devices";
 constexpr int32_t READ_CMD_BUFF_SIZE { 1024 };
 } // namespace
@@ -35,7 +37,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
         MMI_HILOGE("Devices is empty");
         return RET_ERR;
     }
-    DeviceList deviceList;
+    std::map<std::string, std::vector<std::string>> deviceList;
     AnalyseDevices(devices, deviceList);
     if (deviceList.empty()) {
         MMI_HILOGE("Device list is empty");
@@ -104,7 +106,8 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
     return deviceStrs;
 }
 
-void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs, DeviceList &deviceList) const
+void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs,
+    std::map<std::string, std::vector<std::string>> &deviceList) const
 {
     std::string name;
     for (const auto &item : deviceStrs) {

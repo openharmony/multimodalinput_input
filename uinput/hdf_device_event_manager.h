@@ -27,8 +27,8 @@ namespace MMI {
 using namespace OHOS::HDI::Input::V1_0;
 class HdfDeviceEventManager {
 public:
-    HdfDeviceEventManager();
-    virtual ~HdfDeviceEventManager();
+    HdfDeviceEventManager() = default;
+    virtual ~HdfDeviceEventManager() = default;
     void ConnectHDFInit();
     InjectThread injectThread_;
     std::thread thread_;
@@ -41,4 +41,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // HDF_DEVICE_EVENT_MANAGER_H
+#endif // HDF_DEVICE_EVENT_MANAGER_H

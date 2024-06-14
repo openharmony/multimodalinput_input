@@ -29,6 +29,9 @@ public:
         DOWN = 1,
         MOVE = 2,
         UP = 3,
+        PULL_DOWN = 4,
+        PULL_MOVE = 5,
+        PULL_UP = 6,
     };
 
     enum class ToolType : int32_t {

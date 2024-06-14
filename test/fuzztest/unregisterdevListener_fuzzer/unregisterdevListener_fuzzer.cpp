@@ -18,12 +18,11 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UnregisterDevListenerFuzzTest"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UnregisterDevListenerFuzzTest" };
-} // namespace
-
 class InputDeviceListenerTest : public IInputDeviceListener {
 public:
     InputDeviceListenerTest() : IInputDeviceListener() {}

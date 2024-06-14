@@ -15,10 +15,12 @@
 
 #include "processing_finger_device.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ProcessingFingerDevice"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
 constexpr int64_t FINGER_BLOCK_TIME { 6 };
 } // namespace
 

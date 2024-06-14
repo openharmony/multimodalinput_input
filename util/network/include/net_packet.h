@@ -19,6 +19,9 @@
 #include "proto.h"
 #include "stream_buffer.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "NetPacket"
+
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
     MmiMessageId idMsg;
@@ -29,7 +32,6 @@ using PACKHEAD = struct PackHead {
 namespace OHOS {
 namespace MMI {
 class NetPacket : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
 public:
     explicit NetPacket(MmiMessageId msgId);
     NetPacket(const NetPacket &pkt);

@@ -17,6 +17,9 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+
 namespace OHOS {
 namespace MMI {
 MultimodalInputConnectDeathRecipient::MultimodalInputConnectDeathRecipient(

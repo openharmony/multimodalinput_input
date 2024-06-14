@@ -17,24 +17,26 @@
 
 #include <cinttypes>
 
-#include "input-event-codes.h"
+#include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util_ex.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MouseEventNormalize"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventNormalize" };
-} // namespace
 MouseEventNormalize::MouseEventNormalize() {}
 MouseEventNormalize::~MouseEventNormalize() {}
 
@@ -69,11 +71,22 @@ int32_t MouseEventNormalize::GetCurrentDeviceId() const
     return currentDeviceId_;
 }
 
-std::shared_ptr<PointerEvent>MouseEventNormalize::GetPointerEvent()
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent()
 {
     auto processor = GetCurrentProcessor();
     CHKPP(processor);
     return processor->GetPointerEvent();
+}
+
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent(int32_t deviceId)
+{
+    auto iter = processors_.find(deviceId);
+    if (iter == processors_.end()) {
+        MMI_HILOGE("Can't find mouse processor by deviceId:%{public}d", deviceId);
+        return nullptr;
+    }
+    CHKPP(iter->second);
+    return iter->second->GetPointerEvent();
 }
 
 int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
@@ -81,22 +94,20 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
     CHKPR(event, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKPR(device, RET_ERR);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
         MMI_HILOGE("The deviceId:%{public}d is invalid", deviceId);
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
-        if (!isOk) {
-            MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
-        }
     }
+    CHKPR(processor, RET_ERR);
     return processor->Normalize(event);
 }
 
@@ -132,23 +143,40 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
     CHKPR(event, RET_ERR);
     auto device = libinput_event_get_device(event);
     CHKPR(device, RET_ERR);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
-        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
+        MMI_HILOGE("The deviceId is invalid, deviceId:%{public}d", deviceId);
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
-        if (!isOk) {
-            MMI_HILOGE("Duplicate device record, deviceId: %{public}d", deviceId);
-        }
     }
+    CHKPR(processor, RET_ERR);
     return processor->NormalizeRotateEvent(event, type, angle);
+}
+
+bool MouseEventNormalize::CheckAndPackageAxisEvent(libinput_event* event)
+{
+    CHKPF(event);
+    auto device = libinput_event_get_device(event);
+    CHKPR(device, RET_ERR);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
+    if (deviceId < 0) {
+        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
+        return RET_ERR;
+    }
+    SetCurrentDeviceId(deviceId);
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
+    if (auto it = processors_.find(deviceId); it != processors_.end()) {
+        processor = it->second;
+    }
+    CHKPF(processor);
+    return processor->CheckAndPackageAxisEvent();
 }
 
 int32_t MouseEventNormalize::SetMouseScrollRows(int32_t rows)
@@ -191,9 +219,9 @@ int32_t MouseEventNormalize::SetTouchpadScrollSwitch(bool switchFlag) const
     return MouseTransformProcessor::SetTouchpadScrollSwitch(switchFlag);
 }
 
-int32_t MouseEventNormalize::GetTouchpadScrollSwitch(bool &switchFlag) const
+void MouseEventNormalize::GetTouchpadScrollSwitch(bool &switchFlag) const
 {
-    return MouseTransformProcessor::GetTouchpadScrollSwitch(switchFlag);
+    MouseTransformProcessor::GetTouchpadScrollSwitch(switchFlag);
 }
 
 int32_t MouseEventNormalize::SetTouchpadScrollDirection(bool state) const
@@ -201,9 +229,9 @@ int32_t MouseEventNormalize::SetTouchpadScrollDirection(bool state) const
     return MouseTransformProcessor::SetTouchpadScrollDirection(state);
 }
 
-int32_t MouseEventNormalize::GetTouchpadScrollDirection(bool &switchFlag) const
+void MouseEventNormalize::GetTouchpadScrollDirection(bool &switchFlag) const
 {
-    return MouseTransformProcessor::GetTouchpadScrollDirection(switchFlag);
+    MouseTransformProcessor::GetTouchpadScrollDirection(switchFlag);
 }
 
 int32_t MouseEventNormalize::SetTouchpadTapSwitch(bool switchFlag) const
@@ -211,9 +239,9 @@ int32_t MouseEventNormalize::SetTouchpadTapSwitch(bool switchFlag) const
     return MouseTransformProcessor::SetTouchpadTapSwitch(switchFlag);
 }
 
-int32_t MouseEventNormalize::GetTouchpadTapSwitch(bool &switchFlag) const
+void MouseEventNormalize::GetTouchpadTapSwitch(bool &switchFlag) const
 {
-    return MouseTransformProcessor::GetTouchpadTapSwitch(switchFlag);
+    MouseTransformProcessor::GetTouchpadTapSwitch(switchFlag);
 }
 
 int32_t MouseEventNormalize::SetTouchpadPointerSpeed(int32_t speed) const
@@ -221,9 +249,9 @@ int32_t MouseEventNormalize::SetTouchpadPointerSpeed(int32_t speed) const
     return MouseTransformProcessor::SetTouchpadPointerSpeed(speed);
 }
 
-int32_t MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
+void MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
 {
-    return MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
+    MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
 }
 
 int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
@@ -231,9 +259,9 @@ int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
     return MouseTransformProcessor::SetTouchpadRightClickType(type);
 }
 
-int32_t MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
+void MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
 {
-    return MouseTransformProcessor::GetTouchpadRightClickType(type);
+    MouseTransformProcessor::GetTouchpadRightClickType(type);
 }
 } // namespace MMI
 } // namespace OHOS

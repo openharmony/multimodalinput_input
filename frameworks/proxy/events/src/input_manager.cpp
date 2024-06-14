@@ -15,17 +15,17 @@
 
 #include "input_manager.h"
 
-#include "error_multimodal.h"
-#include "input_manager_impl.h"
 #include "define_multimodal.h"
+#include "error_multimodal.h"
+#include "input_handler_type.h"
+#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManager"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
-} // namespace
-
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
@@ -106,9 +106,10 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeKeyEvent(subscriberId);
 }
 
-int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
+    SwitchEvent::SwitchType switchType)
 {
-    return InputMgrImpl.SubscribeSwitchEvent(callback);
+    return InputMgrImpl.SubscribeSwitchEvent(static_cast<int32_t>(switchType), callback);
 }
 
 void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
@@ -126,9 +127,9 @@ int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<PointerEvent
     return InputMgrImpl.AddMonitor(monitor);
 }
 
-int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
+int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType)
 {
-    return InputMgrImpl.AddMonitor(monitor);
+    return InputMgrImpl.AddMonitor(monitor, eventType);
 }
 
 void InputManager::RemoveMonitor(int32_t monitorId)
@@ -169,12 +170,14 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
@@ -182,6 +185,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder)
 {
     CHKPV(pointerEvent);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(zOrder);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
@@ -269,9 +273,9 @@ int32_t InputManager::GetHoverScrollState(bool &state)
     return InputMgrImpl.GetHoverScrollState(state);
 }
 
-int32_t InputManager::SetPointerVisible(bool visible)
+int32_t InputManager::SetPointerVisible(bool visible, int32_t priority)
 {
-    return InputMgrImpl.SetPointerVisible(visible);
+    return InputMgrImpl.SetPointerVisible(visible, priority);
 }
 
 bool InputManager::IsPointerVisible()
@@ -314,14 +318,14 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl.SetAnrObserver(observer);
 }
 
-int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension)
 {
-    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle);
+    return InputMgrImpl.SetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
-int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
+int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
-    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle);
+    return InputMgrImpl.GetPointerStyle(windowId, pointerStyle, isUiExtension);
 }
 
 bool InputManager::GetFunctionKeyState(int32_t funcKey)
@@ -357,6 +361,16 @@ void InputManager::AppendExtraData(const ExtraData& extraData)
 int32_t InputManager::EnableInputDevice(bool enable)
 {
     return InputMgrImpl.EnableInputDevice(enable);
+}
+
+int32_t InputManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    return InputMgrImpl.AddVirtualInputDevice(device, deviceId);
+}
+
+int32_t InputManager::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    return InputMgrImpl.RemoveVirtualInputDevice(deviceId);
 }
 
 int32_t InputManager::SetKeyDownDuration(const std::string& businessId, int32_t delay)
@@ -469,6 +483,16 @@ int32_t InputManager::GetTouchpadRotateSwitch(bool &rotateSwitch)
     return InputMgrImpl.GetTouchpadRotateSwitch(rotateSwitch);
 }
 
+int32_t InputManager::EnableHardwareCursorStats(bool enable)
+{
+    return InputMgrImpl.EnableHardwareCursorStats(enable);
+}
+
+int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
@@ -508,14 +532,49 @@ void InputManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> wa
     InputMgrImpl.RemoveServiceWatcher(watcher);
 }
 
-int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime)
+int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime, bool enable)
 {
-    return InputMgrImpl.MarkProcessed(eventId, actionTime);
+    LogTracer lt(eventId, 0, 0);
+    if (enable) {
+        return InputMgrImpl.MarkProcessed(eventId, actionTime);
+    }
+    MMI_HILOGD("Skip MarkProcessed eventId:%{public}d", eventId);
+    return RET_OK;
 }
 
 int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
 {
     return InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
+}
+
+void InputManager::Authorize(bool isAuthorize)
+{
+    InputMgrImpl.Authorize(isAuthorize);
+}
+
+int32_t InputManager::HasIrEmitter(bool &hasIrEmitter)
+{
+    return InputMgrImpl.HasIrEmitter(hasIrEmitter);
+}
+
+int32_t InputManager::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+{
+    return InputMgrImpl.GetInfraredFrequencies(requencys);
+}
+
+int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
+{
+    return InputMgrImpl.TransmitInfrared(number, pattern);
+}
+
+int32_t InputManager::SetCurrentUser(int32_t userId)
+{
+    return InputMgrImpl.SetCurrentUser(userId);
+}
+
+int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
+{
+    return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
 }
 } // namespace MMI
 } // namespace OHOS

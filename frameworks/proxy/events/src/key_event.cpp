@@ -17,11 +17,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEvent"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent" };
 const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_FN, "KEYCODE_FN"},
     {KeyEvent::KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
@@ -412,6 +414,8 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_RIGHT_KNOB, "KEYCODE_RIGHT_KNOB"},
     {KeyEvent::KEYCODE_VOICE_SOURCE_SWITCH, "KEYCODE_VOICE_SOURCE_SWITCH"},
     {KeyEvent::KEYCODE_LAUNCHER_MENU, "KEYCODE_LAUNCHER_MENU"},
+    {KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER, "KEYCODE_CALL_NOTIFICATION_CENTER"},
+    {KeyEvent::KEYCODE_CALL_CONTROL_CENTER, "KEYCODE_CALL_CONTROL_CENTER"},
 };
 } // namespace
 const int32_t KeyEvent::UNKNOWN_FUNCTION_KEY = -1;
@@ -779,6 +783,7 @@ const int32_t KeyEvent::KEYCODE_WLAN = 2844;
 const int32_t KeyEvent::KEYCODE_UWB = 2845;
 const int32_t KeyEvent::KEYCODE_WWAN_WIMAX = 2846;
 const int32_t KeyEvent::KEYCODE_RFKILL = 2847;
+const int32_t KeyEvent::KEYCODE_STYLUS_SCREEN = 2849;
 const int32_t KeyEvent::KEYCODE_CHANNEL = 3001;
 const int32_t KeyEvent::KEYCODE_BTN_0 = 3100;
 const int32_t KeyEvent::KEYCODE_BTN_1 = 3101;
@@ -808,6 +813,8 @@ const int32_t KeyEvent::KEYCODE_RIGHT_KNOB_ROLL_DOWN = 10005;
 const int32_t KeyEvent::KEYCODE_RIGHT_KNOB = 10006;
 const int32_t KeyEvent::KEYCODE_VOICE_SOURCE_SWITCH = 10007;
 const int32_t KeyEvent::KEYCODE_LAUNCHER_MENU = 10008;
+const int32_t KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER = 10009;
+const int32_t KeyEvent::KEYCODE_CALL_CONTROL_CENTER = 10010;
 
 const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0X00000000;
 const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;
@@ -938,7 +945,11 @@ KeyEvent::KeyEvent(const KeyEvent& other)
       keyCode_(other.keyCode_),
       keys_(other.keys_),
       keyAction_(other.keyAction_),
-      keyIntention_(other.keyIntention_) {}
+      keyIntention_(other.keyIntention_),
+      numLock_(other.numLock_),
+      capsLock_(other.capsLock_),
+      scrollLock_(other.scrollLock_),
+      repeat_(other.repeat_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -947,6 +958,22 @@ std::shared_ptr<KeyEvent> KeyEvent::Create()
     auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(InputEvent::EVENT_TYPE_KEY));
     CHKPP(event);
     return event;
+}
+
+void KeyEvent::Reset()
+{
+    InputEvent::Reset();
+    keyCode_ = KeyEvent::UNKNOWN_FUNCTION_KEY;
+    keyAction_ = KeyEvent::KEY_ACTION_UNKNOWN;
+    keyIntention_ = KeyEvent::INTENTION_UNKNOWN;
+    numLock_ = false;
+    capsLock_ = false;
+    scrollLock_ = false;
+    repeat_ = false;
+    keys_.clear();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    enhanceData_.clear();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 }
 
 int32_t KeyEvent::GetKeyCode() const
@@ -1220,7 +1247,7 @@ bool KeyEvent::ReadEnhanceDataFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < size; i++) {
-        uint32_t val;
+        uint32_t val = 0;
         READUINT32(in, val);
         enhanceData_.emplace_back(val);
     }
@@ -1307,6 +1334,22 @@ bool KeyEvent::IsRepeat() const
 void KeyEvent::SetRepeat(bool repeat)
 {
     repeat_ = repeat;
+}
+
+std::string_view KeyEvent::ActionToShortStr(int32_t action)
+{
+    switch (action) {
+        case KeyEvent::KEY_ACTION_CANCEL:
+            return "K:C:";
+        case KeyEvent::KEY_ACTION_UNKNOWN:
+            return "K:UK:";
+        case KeyEvent::KEY_ACTION_UP:
+            return "K:U:";
+        case KeyEvent::KEY_ACTION_DOWN:
+            return "K:D:";
+        default:
+            return "A:?:";
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

@@ -37,6 +37,8 @@
 #include "key_option.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#include "infrared_frequency_info.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -103,7 +105,7 @@ public:
      * @since 10
      */
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
-    
+
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
@@ -146,12 +148,14 @@ public:
      * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,
      * the <b>callback</b> specified is invoked to process the event.
      * @param callback Indicates the callback.
+     * @param switchType Indicates the type of switch input event.
      * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
      * If the value is greater than or equal to <b>0</b>,
      * the subscription is successful. Otherwise, the subscription fails.
      * @since 9
      */
-    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback,
+        SwitchEvent::SwitchType switchType = SwitchEvent::SwitchType::SWITCH_DEFAULT);
 
     /**
      * @brief Unsubscribes from a switch input event.
@@ -190,12 +194,13 @@ public:
      * an input event is copied and distributed to the monitor while being distributed to the original target.
      * @param monitor Indicates the input event monitor. After an input event is generated,
      * the functions of the monitor object will be called.
+     * @param eventType Indicates the eventType for monitor.
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
      * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
      * @since 9
      */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
 
     /**
      * @brief Removes a monitor.
@@ -436,7 +441,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority = 0);
 
     /**
      * @brief Checks whether the pointer icon is visible.
@@ -452,7 +457,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
 
     /**
      * @brief Obtains the mouse pointer style.
@@ -461,7 +466,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
 
     /**
      * @brief Sets pointer color.
@@ -739,6 +744,23 @@ public:
      */
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 
+     /**
+     * @brief Turn on or off hard cursor statistics.
+     * @param frameCount Counting the frame rate of continuous mouse movement.
+     * @param frameCount Statistics of mouse continuous movement synchronization frame rate.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t EnableHardwareCursorStats(bool enable);
+    /**
+     * @brief Get the mouse hard cursor information.
+     * @param frameCount Counting the frame rate of continuous mouse movement.
+     * @param frameCount Statistics of mouse continuous movement synchronization frame rate.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+
     /**
      * @brief ClearWindowPointerStyle.
      * @param pid Indicates pid.
@@ -776,9 +798,11 @@ public:
     */
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
-    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime, bool enable = true);
 
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+
+    void Authorize(bool isAuthorize);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.
@@ -813,6 +837,52 @@ public:
      * @since 11
      */
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+
+    /**
+     * @brief Get whether System has IrEmitter.
+     * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t HasIrEmitter(bool &hasIrEmitter);
+
+    /**
+     * @brief Get InfraredFrequency of the IrEmitter in device.
+     * @param requencys take out the IrEmitter's Frequency.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+
+    /**
+     * @brief user IrEmitter with parameter number and pattern.
+     * @param number   Frequency of IrEmitter works .
+     * @param pattern Pattern of signal transmission in alternate on/off mode, in microseconds.
+     * @return 0 if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+
+    int32_t SetCurrentUser(int32_t userId);
+
+    int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+    
+    /**
+     * @brief 添加虚拟输入设备
+     * @param device 输入设备信息
+     * @param deviceId 出参，所创建的虚拟输入设备对应的设备Id
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+
+    /**
+     * @brief 移除虚拟输入设备
+     * @param deviceId 要移除的虚拟输入设备对应的设备Id
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
 private:
     InputManager() = default;

@@ -15,23 +15,27 @@
 
 #include "app_state_observer.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AppStateObserver"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AppStateObserver" };
 std::mutex mutex_;
 } // namespace
 AppObserverManager::AppObserverManager() {}
 AppObserverManager::~AppObserverManager() {}
 
-void ApplicationStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
+void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &processData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("change app name = %{public}s, uid = %{public}d, state = %{public}d ",
-        appStateData.bundleName.c_str(),
-        appStateData.uid,
-        appStateData.state);
+    MMI_HILOGD("process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
+        processData.bundleName.c_str(),
+        processData.uid,
+        processData.state);
     std::vector<AppExecFwk::AppStateData> list {};
     GetForegroundApplicationInfo(list);
 }
@@ -57,10 +61,7 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 {
     CALL_DEBUG_ENTER;
     auto appMgr = GetAppMgr();
-    if (appMgr == nullptr) {
-        MMI_HILOGE("GetAppMgr failed");
-        return RET_ERR;
-    }
+    CHKPR(appMgr, RET_ERR);
     int32_t ret = appMgr->GetForegroundApplications(list);
     if (ret == RET_OK) {
         MMI_HILOGD("GetForegroundApplications success");

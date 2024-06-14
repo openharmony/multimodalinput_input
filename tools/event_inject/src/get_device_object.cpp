@@ -19,10 +19,12 @@
 #include <regex>
 #include <thread>
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "GetDeviceObject"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceObject" };
 bool IsKeyboardDevice(const std::string &deviceName)
 {
     std::regex regExp("keyboard model[1-3]");

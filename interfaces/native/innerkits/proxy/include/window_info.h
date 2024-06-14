@@ -25,6 +25,11 @@ inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 
 inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
 
+enum SecureFlag {
+    DEFAULT_MODE = 0,
+    PRIVACY_MODE = 1,
+};
+
 /**
  * @brief Enumerates the fold display mode.
  */
@@ -162,6 +167,18 @@ struct Rect {
     int32_t height;
 };
 
+enum class WindowInputType : uint8_t {
+    NORMAL = 0,
+    TRANSMIT_ALL = 1,
+    TRANSMIT_EXCEPT_MOVE = 2,
+    ANTI_MISTAKE_TOUCH = 3,
+    TRANSMIT_AXIS_MOVE = 4,
+    TRANSMIT_MOUSE_MOVE = 5,
+    TRANSMIT_LEFT_RIGHT = 6,
+    TRANSMIT_BUTTOM = 7,
+    MIX_LEFT_RIGHT_ANTI_AXIS_MOVE = 18,
+    MIX_BUTTOM_ANTI_AXIS_MOVE = 19
+};
 
 struct WindowInfo {
     /**
@@ -169,7 +186,9 @@ struct WindowInfo {
      *
      * @since 9
      */
-    static constexpr int32_t MAX_HOTAREA_COUNT = 10;
+    static constexpr int32_t MAX_HOTAREA_COUNT = 50;
+
+    static constexpr int32_t DEFAULT_HOTAREA_COUNT = 10;
 
     /**
      * The number of pointer change areas
@@ -191,6 +210,13 @@ struct WindowInfo {
      * @since 9
      */
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
+
+    /**
+     * Only handwriting window
+     *
+     * @since 12
+     */
+    static constexpr uint32_t FLAG_BIT_HANDWRITING = 2;
 
     /**
      * Globally unique identifier of the window
@@ -285,6 +311,20 @@ struct WindowInfo {
      * @since 9
      */
     std::vector<float> transform;
+
+    /**
+     * pixelMap Indicates the special-shaped window. Its actual type must be OHOS::Media::PixelMap*,
+     * which is used to determine whether an event is dispatched to the current window.
+     *
+     * @since 12
+     */
+    void* pixelMap { nullptr };
+
+    WindowInputType windowInputType { WindowInputType::NORMAL };
+
+    SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
+
+    int32_t windowType;
 };
 
 /**
@@ -394,6 +434,8 @@ struct DisplayGroupInfo {
      * @since 9
      */
     int32_t focusWindowId;
+
+    int32_t currentUserId { -1 };
 
     /**
      * List of window information of the logical display arranged in Z order, with the top window at the top

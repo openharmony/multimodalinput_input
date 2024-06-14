@@ -30,7 +30,8 @@ class InputMonitorManager final : public InputHandlerManager {
     DECLARE_DELAYED_SINGLETON(InputMonitorManager);
 public:
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     InputHandlerType GetHandlerType() const override;

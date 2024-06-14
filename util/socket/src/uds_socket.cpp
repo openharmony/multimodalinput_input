@@ -20,12 +20,11 @@
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UDSSocket"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSocket" };
-} // namespace
-
 UDSSocket::UDSSocket() {}
 
 UDSSocket::~UDSSocket()
@@ -91,7 +90,7 @@ int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int3
 void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
+    while (!circBuf.IsEmpty()) {
         const int32_t unreadSize = circBuf.UnreadSize();
         if (unreadSize < headSize) {
             break;

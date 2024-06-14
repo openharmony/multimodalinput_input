@@ -52,4 +52,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // INJECT_THREAD_H
+#endif // INJECT_THREAD_H

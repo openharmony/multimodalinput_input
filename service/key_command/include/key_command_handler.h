@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,18 +27,36 @@
 #include <vector>
 
 #include "nocopyable.h"
-
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 
 namespace OHOS {
 namespace MMI {
+enum KeyCommandType : int32_t {
+    TYPE_SHORTKEY = 0,
+    TYPE_SEQUENCE = 1,
+    TYPE_FINGERSCENE = 2,
+    TYPE_REPEAT_KEY = 3,
+    TYPE_MULTI_FINGERS = 4,
+};
+
+enum class KnuckleType : int32_t {
+    KNUCKLE_TYPE_SINGLE = 0,
+    KNUCKLE_TYPE_DOUBLE = 1,
+};
+
+enum class NotifyType : int32_t {
+    CANCEL,
+    INCONSISTENTGESTURE,
+    REGIONGESTURE,
+    LETTERGESTURE,
+    OTHER
+};
+
 struct Ability {
     std::string bundleName;
     std::string abilityName;
@@ -75,6 +93,12 @@ struct SequenceKey {
     }
 };
 
+struct ExcludeKey {
+    int32_t keyCode { -1 };
+    int32_t keyAction { -1 };
+    int64_t delay { 0 };
+};
+
 struct Sequence {
     std::vector<SequenceKey> sequenceKeys;
     std::string statusConfig;
@@ -82,6 +106,7 @@ struct Sequence {
     int64_t abilityStartDelay { 0 };
     int32_t timerId { -1 };
     Ability ability;
+    friend std::ostream& operator<<(std::ostream&, const Sequence&);
 };
 
 struct TwoFingerGesture {
@@ -94,6 +119,7 @@ struct TwoFingerGesture {
         int32_t id { 0 };
         int32_t x { 0 };
         int32_t y { 0 };
+        int64_t downTime { 0 };
     } touches[MAX_TOUCH_NUM];
 };
 
@@ -103,6 +129,8 @@ struct KnuckleGesture {
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
+    std::string statusConfig;
+    bool statusConfigValue { false };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -133,8 +161,11 @@ public:
     ~KeyCommandHandler() override = default;
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
     int32_t EnableCombineKey(bool enable);
-    KnuckleGesture GetSingleKnuckleGesture();
-    KnuckleGesture GetDoubleKnuckleGesture();
+    KnuckleGesture GetSingleKnuckleGesture() const;
+    KnuckleGesture GetDoubleKnuckleGesture() const;
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void PrintGestureInfo(int32_t fd);
+    std::string ConvertKeyActionToString(int32_t keyAction);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -149,8 +180,12 @@ public:
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef UNIT_TEST
 public:
@@ -159,8 +194,11 @@ private:
 #endif // UNIT_TEST
     void Print();
     void PrintSeq();
+    void PrintExcludeKeys();
     bool ParseConfig();
+    bool ParseExcludeConfig();
     bool ParseJson(const std::string &configFile);
+    bool ParseExcludeJson(const std::string &configFile);
     void ParseRepeatKeyMaxCount();
     void ParseStatusConfigObserver();
     void LaunchAbility(const Ability &ability);
@@ -172,12 +210,16 @@ private:
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
+    bool PreHandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -185,9 +227,11 @@ private:
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     std::shared_ptr<KeyEvent> CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
+    bool IsExcludeKey(const std::shared_ptr<KeyEvent> key);
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
+    void HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent);
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
     template <class T>
@@ -216,6 +260,8 @@ private:
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
+    bool CheckTwoFingerGestureAction() const;
+    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -225,22 +271,39 @@ private:
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
-    void KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
+        KnuckleGesture &knuckleGesture, KnuckleType type);
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    void HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent> touchEvent);
+    void ProcessKnuckleGestureTouchUp(NotifyType type);
+    void ResetKnuckleGesture();
+    std::string GesturePointsToStr() const;
+    void ReportIfNeed();
+    void ReportRegionGesture();
+    void ReportLetterGesture();
+    void ReportGestureInfo();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
 private:
+    Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
     ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::vector<Sequence> sequences_;
+    std::vector<ExcludeKey> excludeKeys_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     std::vector<RepeatKey> repeatKeys_;
     std::vector<std::string> businessIds_;
     bool isParseConfig_ { false };
+    bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     TwoFingerGesture twoFingerGesture_;
@@ -261,6 +324,7 @@ private:
     int32_t maxCount_ { 0 };
     int32_t count_ { 0 };
     int32_t repeatTimerId_ { -1 };
+    int32_t knuckleCount_ { 0 };
     int64_t downActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
@@ -271,6 +335,23 @@ private:
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
+    int32_t screenRecordingSuccessCount_ { 0 };
+    int32_t lastKeyEventCode_ { -1 };
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    bool isGesturing_ { false };
+    bool isLetterGesturing_ { false };
+    bool isLastGestureSucceed_ { false };
+    float gestureLastX_ { 0.0f };
+    float gestureLastY_ { 0.0f };
+    float gestureTrackLength_ { 0.0f };
+    std::vector<float> gesturePoints_;
+    std::vector<int64_t> gestureTimeStamps_;
+    int32_t smartShotSuccTimes_ { 0 };
+    int32_t gestureFailCount_ { 0 };
+    int32_t drawSSuccessCount_ { 0 };
+    int64_t drawOFailTimestamp_ { 0 };
+    int64_t drawOSuccTimestamp_ { 0 };
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 };
 } // namespace MMI
 } // namespace OHOS

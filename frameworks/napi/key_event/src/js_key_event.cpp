@@ -19,11 +19,12 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsKeyEvent"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsKeyEvent" };
-
 enum class Action : int32_t {
     CANCEL = 0,
     DOWN = 1,

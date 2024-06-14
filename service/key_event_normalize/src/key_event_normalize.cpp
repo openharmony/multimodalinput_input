@@ -19,10 +19,14 @@
 #include "key_map_manager.h"
 #include "key_unicode_transformation.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventNormalize"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventNormalize" };
 constexpr uint32_t KEYSTATUS = 0;
 } // namespace
 
@@ -44,12 +48,13 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     CHKPR(event, PARAM_INPUT_INVALID);
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     keyEvent->UpdateId();
+    StartLogTraceId(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
+    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{public}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
@@ -70,6 +75,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     keyEvent->SetDeviceId(deviceId);
     keyEvent->SetKeyCode(keyCode);
     keyEvent->SetKeyAction(keyAction);
+    StartLogTraceId(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetPressedKeys().empty()) {
         keyEvent->SetActionStartTime(time);
     }
@@ -84,7 +90,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
 
     HandleKeyAction(device, item, keyEvent);
 
-    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
     return RET_OK;
 }
@@ -121,7 +127,7 @@ void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 {
-    if (InputDevMgr->IsKeyboardDevice(device) || InputDevMgr->IsPointerDevice(device)) {
+    if (INPUT_DEV_MGR->IsKeyboardDevice(device) || INPUT_DEV_MGR->IsPointerDevice(device)) {
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }

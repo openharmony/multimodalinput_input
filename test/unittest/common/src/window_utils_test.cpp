@@ -19,10 +19,12 @@
 #include "mmi_log.h"
 #include "wm_common.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "WindowUtilsTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "WindowUtilsTest" };
 constexpr int32_t IMAGE_WIDTH = 720;
 constexpr int32_t IMAGE_HEIGHT = 1280;
 constexpr uint32_t defaultWindowId = -1;

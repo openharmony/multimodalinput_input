@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,14 +19,17 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerEvent"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -110,6 +113,46 @@ int32_t PointerEvent::PointerItem::GetWindowY() const
 void PointerEvent::PointerItem::SetWindowY(int32_t y)
 {
     windowY_ = y;
+}
+
+double PointerEvent::PointerItem::GetDisplayXPos() const
+{
+    return displayXPos_;
+}
+
+void PointerEvent::PointerItem::SetDisplayXPos(double x)
+{
+    displayXPos_ = x;
+}
+
+double PointerEvent::PointerItem::GetDisplayYPos() const
+{
+    return displayYPos_;
+}
+
+void PointerEvent::PointerItem::SetDisplayYPos(double y)
+{
+    displayYPos_ = y;
+}
+
+double PointerEvent::PointerItem::GetWindowXPos() const
+{
+    return windowXPos_;
+}
+
+void PointerEvent::PointerItem::SetWindowXPos(double x)
+{
+    windowXPos_ = x;
+}
+
+double PointerEvent::PointerItem::GetWindowYPos() const
+{
+    return windowYPos_;
+}
+
+void PointerEvent::PointerItem::SetWindowYPos(double y)
+{
+    windowYPos_ = y;
 }
 
 int32_t PointerEvent::PointerItem::GetWidth() const
@@ -219,7 +262,13 @@ double PointerEvent::PointerItem::GetPressure() const
 
 void PointerEvent::PointerItem::SetPressure(double pressure)
 {
-    pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+    if (pressure < 0.0) {
+        pressure_ = 0.0;
+    } else if (TOOL_TYPE_PEN == GetToolType()) {
+        pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+    } else {
+        pressure_ = pressure;
+    }
 }
 
 int32_t PointerEvent::PointerItem::GetLongAxis() const
@@ -282,6 +331,16 @@ void PointerEvent::PointerItem::SetRawDx(int32_t rawDx)
     rawDx_ = rawDx;
 }
 
+int32_t PointerEvent::PointerItem::GetOriginPointerId() const
+{
+    return originPointerId_;
+}
+
+void PointerEvent::PointerItem::SetOriginPointerId(int32_t originPointerId)
+{
+    originPointerId_ = originPointerId;
+}
+
 int32_t PointerEvent::PointerItem::GetRawDy() const
 {
     return rawDy_;
@@ -319,7 +378,12 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
-        out.WriteInt32(targetWindowId_)
+        out.WriteInt32(targetWindowId_) &&
+        out.WriteDouble(displayXPos_) &&
+        out.WriteDouble(displayYPos_) &&
+        out.WriteDouble(windowXPos_) &&
+        out.WriteDouble(windowYPos_) &&
+        out.WriteInt32(originPointerId_)
     );
 }
 
@@ -350,7 +414,12 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
-        in.ReadInt32(targetWindowId_)
+        in.ReadInt32(targetWindowId_) &&
+        in.ReadDouble(displayXPos_) &&
+        in.ReadDouble(displayYPos_) &&
+        in.ReadDouble(windowXPos_) &&
+        in.ReadDouble(windowYPos_) &&
+        in.ReadInt32(originPointerId_)
     );
 }
 
@@ -359,9 +428,15 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
-      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
-      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_) {}
+      pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
+      buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), zOrder_(other.zOrder_),
+      axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
+      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+      fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+      dispatchTimes_(other.dispatchTimes_)
+      {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -380,12 +455,19 @@ void PointerEvent::Reset()
     pressedButtons_.clear();
     sourceType_ = SOURCE_TYPE_UNKNOWN;
     pointerAction_ = POINTER_ACTION_UNKNOWN;
+    originPointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
     fingerCount_ = 0;
     zOrder_ = -1.0f;
+    dispatchTimes_ = 0;
     axes_ = 0U;
     axisValues_.fill(0.0);
+    velocity_ = 0.0;
     pressedKeys_.clear();
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    fingerprintDistanceX_ = 0.0;
+    fingerprintDistanceY_ = 0.0;
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 }
 
 int32_t PointerEvent::GetPointerAction() const
@@ -396,6 +478,17 @@ int32_t PointerEvent::GetPointerAction() const
 void PointerEvent::SetPointerAction(int32_t pointerAction)
 {
     pointerAction_ = pointerAction;
+    originPointerAction_ = pointerAction;
+}
+
+int32_t PointerEvent::GetOriginPointerAction() const
+{
+    return originPointerAction_;
+}
+
+void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
+{
+    originPointerAction_ = pointerAction;
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
@@ -425,7 +518,11 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_QUADTAP, "quadtap" },
     { PointerEvent::POINTER_ACTION_HOVER_MOVE, "hover-move" },
     { PointerEvent::POINTER_ACTION_HOVER_ENTER, "hover-enter" },
-    { PointerEvent::POINTER_ACTION_HOVER_EXIT, "hover-exit" }
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN, "fingerprint-down" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_UP, "fingerprint-up" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH, "fingerprint-retouch" },
+    { PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK, "fingerprint-click" },
 };
 
 const char* PointerEvent::DumpPointerAction() const
@@ -468,11 +565,24 @@ void PointerEvent::RemovePointerItem(int32_t pointerId)
     }
 }
 
+void PointerEvent::RemoveAllPointerItems()
+{
+    pointers_.clear();
+}
+
 void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 {
     if (pointers_.size() >= MAX_N_POINTER_ITEMS) {
         MMI_HILOGE("Exceed maximum allowed number of pointer items");
         return;
+    }
+    int32_t pointerId = pointerItem.GetPointerId();
+    for (auto &item : pointers_) {
+        if (item.GetPointerId() == pointerId) {
+            item = pointerItem;
+            MMI_HILOGI("Pointer:%{public}d is already exists", pointerId);
+            return;
+        }
     }
     pointers_.push_back(pointerItem);
 }
@@ -480,11 +590,12 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem)
 {
     for (auto &item : pointers_) {
-        if (item.GetPointerId() == pointerId) {
+        if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) == pointerId) {
             item = pointerItem;
             return;
         }
     }
+    MMI_HILOGI("Pointer:%{public}d is not found", pointerId);
     AddPointerItem(pointerItem);
 }
 
@@ -536,6 +647,11 @@ std::vector<int32_t> PointerEvent::GetPointerIds() const
     return pointerIdList;
 }
 
+std::list<PointerEvent::PointerItem> PointerEvent::GetAllPointerItems() const
+{
+    return pointers_;
+}
+
 int32_t PointerEvent::GetSourceType() const
 {
     return sourceType_;
@@ -560,6 +676,12 @@ const char* PointerEvent::DumpSourceType() const
         }
         case PointerEvent::SOURCE_TYPE_JOYSTICK: {
             return "joystick";
+        }
+        case PointerEvent::SOURCE_TYPE_FINGERPRINT: {
+            return "fingerprint";
+        }
+        case PointerEvent::SOURCE_TYPE_CROWN: {
+            return "crown";
         }
         default: {
             break;
@@ -588,12 +710,12 @@ void PointerEvent::SetFingerCount(int32_t fingerCount)
     fingerCount_ = fingerCount;
 }
 
-float  PointerEvent::GetZOrder() const
+float PointerEvent::GetZOrder() const
 {
     return zOrder_;
 }
 
-void  PointerEvent::SetZOrder(float zOrder)
+void PointerEvent::SetZOrder(float zOrder)
 {
     zOrder_ = zOrder;
 }
@@ -628,6 +750,16 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
         ret = static_cast<bool>(static_cast<uint32_t>(axes) & (1 << static_cast<uint32_t>(axis)));
     }
     return ret;
+}
+
+double PointerEvent::GetVelocity() const
+{
+    return velocity_;
+}
+
+void PointerEvent::SetVelocity(double velocity)
+{
+    velocity_ = velocity;
 }
 
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
@@ -684,6 +816,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, pointerAction_);
 
+    WRITEINT32(out, originPointerAction_);
+
     WRITEINT32(out, buttonId_);
 
     WRITEINT32(out, fingerCount_);
@@ -699,12 +833,18 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
+    WRITEDOUBLE(out, velocity_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
         WRITEUINT32(out, enhanceData_[i]);
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    WRITEDOUBLE(out, fingerprintDistanceX_);
+    WRITEDOUBLE(out, fingerprintDistanceY_);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
     return true;
 }
 
@@ -741,17 +881,40 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < nPressedButtons; ++i) {
-        int32_t buttonId;
+        int32_t buttonId = 0;
         READINT32(in, buttonId);
         SetButtonPressed(buttonId);
     }
 
     READINT32(in, sourceType_);
     READINT32(in, pointerAction_);
+    READINT32(in, originPointerAction_);
     READINT32(in, buttonId_);
     READINT32(in, fingerCount_);
     READFLOAT(in, zOrder_);
-    uint32_t axes;
+
+    if (!ReadAxisFromParcel(in)) {
+        return false;
+    }
+
+    READDOUBLE(in, velocity_);
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (!ReadEnhanceDataFromParcel(in)) {
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    READDOUBLE(in, fingerprintDistanceX_);
+    READDOUBLE(in, fingerprintDistanceY_);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    return true;
+}
+
+bool PointerEvent::ReadAxisFromParcel(Parcel &in)
+{
+    uint32_t axes = 0;
     READUINT32(in, axes);
 
     for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
@@ -762,14 +925,30 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
             SetAxisValue(axis, val);
         }
     }
-
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    if (!ReadEnhanceDataFromParcel(in)) {
-        return false;
-    }
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     return true;
 }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+void PointerEvent::SetFingerprintDistanceX(double x)
+{
+    fingerprintDistanceX_ = x;
+}
+
+void PointerEvent::SetFingerprintDistanceY(double y)
+{
+    fingerprintDistanceY_ = y;
+}
+
+double PointerEvent::GetFingerprintDistanceX() const
+{
+    return fingerprintDistanceX_;
+}
+
+double PointerEvent::GetFingerprintDistanceY() const
+{
+    return fingerprintDistanceY_;
+}
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
@@ -782,7 +961,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < size; i++) {
-        uint32_t val;
+        uint32_t val = 0;
         READUINT32(in, val);
         enhanceData_.emplace_back(val);
     }
@@ -792,7 +971,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
 
 bool PointerEvent::ReadBufferFromParcel(Parcel &in)
 {
-    int32_t bufflen;
+    int32_t bufflen = 0;
     READINT32(in, bufflen);
     if (bufflen > static_cast<int32_t>(MAX_N_BUFFER_SIZE)) {
         return false;
@@ -1005,6 +1184,99 @@ void PointerEvent::ClearBuffer()
 std::vector<uint8_t> PointerEvent::GetBuffer() const
 {
     return buffer_;
+}
+
+int32_t PointerEvent::GetDispatchTimes() const
+{
+    return dispatchTimes_;
+}
+
+void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
+{
+    dispatchTimes_ = dispatchTimes;
+}
+
+void PointerEvent::SetHandlerEventType(HandleEventType eventType)
+{
+    handleEventType_ = eventType;
+}
+
+HandleEventType PointerEvent::GetHandlerEventType() const
+{
+    return handleEventType_;
+}
+
+std::string_view PointerEvent::ActionToShortStr(int32_t action)
+{
+    // 该函数逻辑简单，功能单一，考虑性能影响，使用switch-case而不是表驱动实现。
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+            return "P:C:";
+        case PointerEvent::POINTER_ACTION_DOWN:
+            return "P:D:";
+        case PointerEvent::POINTER_ACTION_MOVE:
+            return "P:M:";
+        case PointerEvent::POINTER_ACTION_UP:
+            return "P:U:";
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+            return "P:AB:";
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+            return "P:AU:";
+        case PointerEvent::POINTER_ACTION_AXIS_END:
+            return "P:AE:";
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+            return "P:BD:";
+        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+            return "P:BU:";
+        case PointerEvent::POINTER_ACTION_ENTER_WINDOW:
+            return "P:EW:";
+        case PointerEvent::POINTER_ACTION_LEAVE_WINDOW:
+            return "P:LW:";
+        case PointerEvent::POINTER_ACTION_PULL_DOWN:
+            return "P:PD:";
+        case PointerEvent::POINTER_ACTION_PULL_MOVE:
+            return "P:PM:";
+        case PointerEvent::POINTER_ACTION_PULL_UP:
+            return "P:PU:";
+        case PointerEvent::POINTER_ACTION_PULL_IN_WINDOW:
+            return "P:PI:";
+        case PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW:
+            return "P:PO:";
+        case PointerEvent::POINTER_ACTION_SWIPE_BEGIN:
+            return "P:SB:";
+        case PointerEvent::POINTER_ACTION_SWIPE_UPDATE:
+            return "P:SU:";
+        case PointerEvent::POINTER_ACTION_SWIPE_END:
+            return "P:SE:";
+        case PointerEvent::POINTER_ACTION_ROTATE_BEGIN:
+            return "P:RB:";
+        case PointerEvent::POINTER_ACTION_ROTATE_UPDATE:
+            return "P:RU:";
+        case PointerEvent::POINTER_ACTION_ROTATE_END:
+            return "P:RE:";
+        case PointerEvent::POINTER_ACTION_TRIPTAP:
+            return "P:TT:";
+        case PointerEvent::POINTER_ACTION_QUADTAP:
+            return "P:Q:";
+        case PointerEvent::POINTER_ACTION_HOVER_MOVE:
+            return "P:HM:";
+        case PointerEvent::POINTER_ACTION_HOVER_ENTER:
+            return "P:HE:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN:
+            return "P:FD:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_UP:
+            return "P:FU:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE:
+            return "P:FS:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH:
+            return "P:FR:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK:
+            return "P:FC:";
+        case PointerEvent::POINTER_ACTION_UNKNOWN:
+            return "P:UK:";
+        default:
+            return "P:?:";
+    }
 }
 } // namespace MMI
 } // namespace OHOS

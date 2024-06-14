@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,12 +21,11 @@
 #include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventDataTransformation"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventDataTransformation" };
-} // namespace
-
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
@@ -123,7 +122,7 @@ int32_t InputEventDataTransformation::SwitchEventToNetPacket(
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-    pkt << swEvent->GetSwitchValue() << swEvent->GetSwitchMask();
+    pkt << swEvent->GetSwitchType() << swEvent->GetSwitchValue() << swEvent->GetSwitchMask();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
@@ -139,6 +138,8 @@ int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std
     }
     int32_t data = 0;
     pkt >> data;
+    swEvent->SetSwitchType(data);
+    pkt >> data;
     swEvent->SetSwitchValue(data);
     pkt >> data;
     swEvent->SetSwitchMask(data);
@@ -151,7 +152,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
         << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
-        << event->GetAgentWindowId() << event->GetFlag();
+        << event->GetAgentWindowId() << event->GetFlag() << event->IsMarkEnabled();
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Serialize packet is failed");
         return RET_ERR;
@@ -186,11 +187,14 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetAgentWindowId(tField);
     uint32_t tFlag = InputEvent::EVENT_FLAG_NONE;
     pkt >> tFlag;
+    event->AddFlag(tFlag);
+    bool markEnabled = true;
+    pkt >> markEnabled;
+    event->SetMarkEnabled(markEnabled);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Deserialize packet is failed");
         return RET_ERR;
     }
-    event->AddFlag(tFlag);
     return RET_OK;
 }
 
@@ -201,14 +205,18 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-    pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetFingerCount() << event->GetZOrder() << event->GetAxes();
 
+    SerializeFingerprint(event, pkt);
+
+    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
+        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
+        << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
             pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
         }
     }
+    pkt << event->GetVelocity();
     std::set<int32_t> pressedBtns { event->GetPressedButtons() };
     pkt << pressedBtns.size();
     for (int32_t btnId : pressedBtns) {
@@ -248,12 +256,21 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
+void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    pkt << event->GetFingerprintDistanceX() << event->GetFingerprintDistanceY();
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+}
+
 int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     int32_t tField;
     pkt >> tField;
     event->SetPointerAction(tField);
+    pkt >> tField;
+    event->SetOriginPointerAction(tField);
     pkt >> tField;
     event->SetPointerId(tField);
     pkt >> tField;
@@ -264,6 +281,8 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetFingerCount(tField);
     pkt >> tField;
     event->SetZOrder(tField);
+    pkt >> tField;
+    event->SetDispatchTimes(tField);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
@@ -297,6 +316,15 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         MMI_HILOGE("Deserialize input event failed");
         return RET_ERR;
     }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    double distanceX {0.0};
+    double distanceY {0.0};
+    pkt >> distanceX;
+    pkt >> distanceY;
+    event->SetFingerprintDistanceX(distanceX);
+    event->SetFingerprintDistanceY(distanceY);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
     if (DeserializePressedButtons(event, pkt) != RET_OK) {
         MMI_HILOGE("Deserialize pressed buttons failed");
@@ -349,6 +377,9 @@ void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<P
             event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
         }
     }
+    double velocity;
+    pkt >> velocity;
+    event->SetVelocity(velocity);
 }
 
 int32_t InputEventDataTransformation::SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)
@@ -399,7 +430,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         pkt << 0;
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
-        MMI_HILOGD("GetPointerEventEnhanceData failed!");
+        MMI_HILOGD("GetPointerEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;
@@ -457,7 +488,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Key
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
         pkt << 0;
-        MMI_HILOGD("GetKeyEventEnhanceData failed!");
+        MMI_HILOGD("GetKeyEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;

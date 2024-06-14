@@ -19,7 +19,11 @@
 #include "event_util_test.h"
 #include "input_manager.h"
 #include "key_event.h"
+#include "mmi_log.h"
 #include "proto.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventTest"
 
 namespace OHOS {
 namespace MMI {
@@ -41,6 +45,7 @@ public:
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     KeyEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
@@ -64,6 +69,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto KeyEvent1 = KeyEvent::Create();
     ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -93,6 +99,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto KeyEvent1 = KeyEvent::Create();
     ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -125,6 +132,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto KeyEvent1 = KeyEvent::Create();
     ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -158,6 +166,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto KeyEvent1 = KeyEvent::Create();
     ASSERT_NE(KeyEvent1, nullptr);
     KeyEvent1->SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -195,6 +204,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     auto event1 = KeyEvent::from(inputEvent);
@@ -229,6 +239,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, false);
@@ -244,6 +255,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_001, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
@@ -259,6 +271,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_002, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, false);
@@ -274,11 +287,27 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_003, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
     bool result = keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
     ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetKeyIntention_001
+ * @tc.desc: GetKey intention
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetKeyIntention_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t result = keyEvent->GetKeyIntention();
+    ASSERT_EQ(result, -1);
 }
 
 /**
@@ -289,6 +318,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_004, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, false);
@@ -304,6 +334,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_005, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
@@ -319,6 +350,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_006, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_NUM_LOCK);
@@ -333,6 +365,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_001, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_SCROLL_LOCK);
@@ -347,6 +380,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_002, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_CAPS_LOCK);
@@ -361,6 +395,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_003, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_A);
@@ -375,6 +410,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_004, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -402,6 +438,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_001, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
@@ -440,6 +477,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_002, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     keyOption->SetPreKeys(preKeys);
@@ -467,6 +505,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_003, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_SetEnhanceData_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
     uint32_t enHanceDataLen = 3;
@@ -489,6 +528,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetEnhanceData_001, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_IsRepeat_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetRepeat(false);
@@ -504,11 +544,26 @@ HWTEST_F(KeyEventTest, KeyEventTest_IsRepeat_001, TestSize.Level1)
  */
 HWTEST_F(KeyEventTest, KeyEventTest_IsRepeat_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     keyEvent->SetRepeat(true);
     bool result = keyEvent->IsRepeat();
     ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_Reset
+ * @tc.desc: Test Reset
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_Reset, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->Reset());
 }
 } // namespace MMI
 } // namespace OHOS

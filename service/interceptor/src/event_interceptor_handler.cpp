@@ -26,12 +26,13 @@
 #include "proto.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventInterceptorHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventInterceptorHandler" };
-} // namespace
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -201,7 +202,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         MMI_HILOGE("keyItems is empty");
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(keyItems.front().GetDeviceId());
     CHKPF(inputDevice);
     uint32_t capKeyboard = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     for (const auto &interceptor : interceptors_) {
@@ -258,7 +259,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId(), false);
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(pointerItem.GetDeviceId(), false);
     CHKPF(inputDevice);
     uint32_t capPointer = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     uint32_t capTouch = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
@@ -371,11 +372,12 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s | ProgramName:%s \t",
                 item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
                 session->GetFd(),
-                session->GetEarliestEventTime(), session->GetDescript().c_str());
+                session->GetEarliestEventTime(), session->GetDescript().c_str(),
+                session->GetProgramName().c_str());
     }
 }
 } // namespace MMI

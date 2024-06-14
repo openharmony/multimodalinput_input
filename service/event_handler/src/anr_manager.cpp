@@ -19,20 +19,23 @@
 
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "proto.h"
 #include "timer_manager.h"
-#include "window_manager.h"
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_ANRDETECT
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ANRManager"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
-const std::string FOUNDATION = "foundation";
-constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
-constexpr int32_t TIME_CONVERT_RATIO = 1000;
+const std::string FOUNDATION { "foundation" };
+constexpr int32_t MAX_TIMER_COUNT { 50 };
+constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -83,6 +86,22 @@ void ANRManager::RemoveTimers(SessionPtr sess)
     }
 }
 
+void ANRManager::RemoveTimersByType(SessionPtr sess, int32_t type)
+{
+    CHKPV(sess);
+    if (type != ANR_DISPATCH && type != ANR_MONITOR) {
+        MMI_HILOGE("remove times failed, your input parm is %{public}d, which is not legal", type);
+        return;
+    }
+    std::vector<int32_t> timerIds = sess->GetTimerIds(ANR_MONITOR);
+    for (int32_t item : timerIds) {
+        if (item != -1) {
+            TimerMgr->RemoveTimer(item);
+            anrTimerCount_--;
+        }
+    }
+}
+
 void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, SessionPtr sess)
 {
     CHKPV(sess);
@@ -90,13 +109,13 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
     }
-    if (anrTimerCount_ >= MAX_ANR_TIMER_COUNT) {
-        MMI_HILOGD("Add anr timer failed, anrtimer count reached the maximum number:%{public}d", MAX_ANR_TIMER_COUNT);
+    if (anrTimerCount_ >= MAX_TIMER_COUNT) {
+        MMI_HILOGD("Add timer failed, timer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
         return;
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
         CHKPV(sess);
-        if (type == ANR_MONITOR || WinMgr->IsWindowVisible(sess->GetPid())) {
+        if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
             DfxHisysevent::ApplicationBlockInput(sess);
             MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",

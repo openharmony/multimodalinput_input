@@ -37,15 +37,18 @@ public:
     int32_t GetTokenType();
     bool CheckDispatchControl();
     bool VerifySystemApp();
+    bool CheckInfraredEmmit();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
+    bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
+    bool CheckHapPermission(std::string permissionCode);
     bool CheckMonitorPermission(uint32_t tokenId);
     bool CheckInterceptorPermission(uint32_t tokenId);
     bool CheckDispatchControlPermission(uint32_t tokenId);
 };
 
-#define PerHelper ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()
+#define PER_HELPER ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif  // PERMISSION_HELPER_H
+#endif // PERMISSION_HELPER_H

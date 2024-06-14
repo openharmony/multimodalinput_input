@@ -23,13 +23,16 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#include "uds_socket.h"
+#include "hisysevent.h"
 #include "proto.h"
+#include "uds_socket.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UDSSession"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 const std::string FOUNDATION = "foundation";
 } // namespace
 
@@ -64,19 +67,20 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
     int32_t retryCount = 0;
     const int32_t bufSize = static_cast<int32_t>(size);
     int32_t remSize = bufSize;
+    int32_t socketErrorNo = 0;
     while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
         retryCount += 1;
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                socketErrorNo = errno;
                 continue;
             }
             if (errno == ENOTSOCK) {
                 MMI_HILOGE("Got ENOTSOCK error, turn the socket to invalid");
                 invalidSocket_ = true;
             }
-            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d, pid:%{public}d", errno, fd_, pid_);
             return false;
         }
         idx += count;
@@ -86,9 +90,12 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
             usleep(SEND_RETRY_SLEEP_TIME);
         }
     }
+    if (socketErrorNo == EWOULDBLOCK) {
+        ReportSocketBufferFull();
+    }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
-        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
-            retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
+        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d errno:%{public}d, "
+                   "fd:%{public}d, pid:%{public}d", retryCount, SEND_RETRY_LIMIT, idx, bufSize, errno, fd_, pid_);
         return false;
     }
     return true;
@@ -97,7 +104,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 void UDSSession::Close()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Enter fd_:%{public}d.", fd_);
+    MMI_HILOGD("Enter fd_:%{public}d", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -130,6 +137,22 @@ bool UDSSession::SendMsg(NetPacket &pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
+void UDSSession::ReportSocketBufferFull() const
+{
+    int32_t ret = HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "INPUT_EVENT_SOCKET_TIMEOUT",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "MSG",
+        "remote client buffer full, cant send msg",
+        "PROGRAM_NAME",
+        programName_,
+        "REMOTE_PID",
+        pid_);
+    if (ret != 0) {
+        MMI_HILOGE("save input event socket timeout failed, ret:%{public}d", ret);
+    }
+}
+
 void UDSSession::SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId)
 {
     CALL_DEBUG_ENTER;
@@ -159,10 +182,10 @@ std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
 std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Delete events, anr type:%{public}d, id:%{public}d", type, id);
+    MMI_HILOGD("Delete events, anr type:%{public}d, id:%{public}d, pid:%{public}d", type, id, pid_);
     auto iter = events_.find(type);
     if (iter == events_.end()) {
-        MMI_HILOGE("Current events have no event type:%{public}d", type);
+        MMI_HILOGE("Current events have no event type:%{public}d pid:%{public}d", type, pid_);
         return {};
     }
     auto &events = iter->second;
@@ -177,7 +200,7 @@ std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
         ++canDelEventCount;
     }
     if (canDelEventCount == 0) {
-        MMI_HILOGW("Can not find event:%{public}d", id);
+        MMI_HILOGW("Can not find event:%{public}d pid:%{public}d", id, pid_);
         return timerIds;
     }
     events.erase(events.begin(), events.begin() + canDelEventCount);
@@ -186,8 +209,8 @@ std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
         isAnrProcess_[type] = false;
         return timerIds;
     }
-    MMI_HILOGD("First event, anr type:%{public}d, id:%{public}d, timerId:%{public}d", type,
-        events.begin()->id, events.begin()->timerId);
+    MMI_HILOGD("First event, anr type:%{public}d, id:%{public}d, timerId:%{public}d, pid: %{public}d",
+        type, events.begin()->id, events.begin()->timerId, pid_);
     int64_t endTime = 0;
     if (!AddInt64(events.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
         MMI_HILOGE("The addition of endTime overflows");

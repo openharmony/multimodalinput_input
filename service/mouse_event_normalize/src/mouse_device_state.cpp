@@ -17,12 +17,13 @@
 
 #include "define_multimodal.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MouseDeviceState"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseDeviceState" };
-} // namespace
-
 MouseDeviceState::MouseDeviceState()
 {
     mouseCoord_ = { 0, 0 };

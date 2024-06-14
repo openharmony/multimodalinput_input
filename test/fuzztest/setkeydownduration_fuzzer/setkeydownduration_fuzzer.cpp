@@ -20,9 +20,11 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SetKeyDownDurationFuzzTest"
+
 namespace OHOS {
 namespace MMI {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SetKeyDownDurationFuzzTest" };
 template <class T> size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
     size_t objectSize = sizeof(object);

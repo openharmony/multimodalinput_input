@@ -24,14 +24,16 @@
 #include "util_napi.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JSRegisterModule"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
-constexpr size_t EVENT_NAME_LEN = 64;
-constexpr size_t PRE_KEYS_SIZE = 4;
-constexpr size_t INPUT_PARAMETER_MIDDLE = 2;
-constexpr size_t INPUT_PARAMETER_MAX = 3;
+constexpr size_t EVENT_NAME_LEN { 64 };
+constexpr size_t PRE_KEYS_SIZE { 4 };
+constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
+constexpr size_t INPUT_PARAMETER_MAX { 3 };
 } // namespace
 
 static Callbacks callbacks = {};
@@ -54,10 +56,10 @@ void JsCommon::ThrowError(napi_env env, int32_t code)
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-        MMI_HILOGE("shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+        MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "shiled API", "ohos.permission.INPUT_CONTROL_DISPATCHING");
     } else {
-        MMI_HILOGE("dispatch control failed");
+        MMI_HILOGE("Dispatch control failed");
     }
 }
 
@@ -157,13 +159,13 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     if (argc == INPUT_PARAMETER_MAX) {
         CHKRP(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
         if (valueType != napi_function) {
-            MMI_HILOGE("the third parameter is not napi_function");
+            MMI_HILOGE("The third parameter is not napi_function");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
-        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback[0]), REFERENCE_REF);
+        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback), REFERENCE_REF);
     } else {
-        event->callback[0] = nullptr;
+        event->callback = nullptr;
     }
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
@@ -250,7 +252,6 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
             if (MatchCombinationKeys(monitorInfo, keyEvent)) {
-                monitorInfo->keyEvent = keyEvent;
                 EmitAsyncCallbackWork(monitorInfo);
             }
             ++infoIter;
@@ -282,7 +283,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -290,12 +290,11 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(callbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+        MMI_HILOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            napi_delete_reference(env, event->callback[0]);
             delete event;
             return nullptr;
         }
@@ -336,7 +335,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -351,9 +349,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
-    if (event->callback[0] != nullptr) {
-        napi_delete_reference(env, event->callback[0]);
-    }
     delete event;
     return nullptr;
 }
@@ -362,7 +357,7 @@ static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER_MIDDLE) {
         MMI_HILOGE("At least two parameters is required");
@@ -404,9 +399,9 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
         return nullptr;
@@ -459,6 +454,19 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "ShieldMode", result), SET_NAMED_PROPERTY);
     return exports;
+}
+
+KeyEventMonitorInfo::~KeyEventMonitorInfo()
+{
+    if (callback == nullptr) {
+        return;
+    }
+    uint32_t refcount = 0;
+    CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
+    if (refcount == 0) {
+        CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
+    }
+    callback = nullptr;
 }
 
 EXTERN_C_START

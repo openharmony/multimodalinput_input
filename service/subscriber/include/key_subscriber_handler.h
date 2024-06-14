@@ -70,6 +70,7 @@ private:
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
+    bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);
     bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
         const std::shared_ptr<Subscriber> &subscriber);
@@ -81,7 +82,9 @@ private:
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes);
     bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
+    bool IsEnableCombineKeySwipe(const std::shared_ptr<KeyEvent> key);
     bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
     void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
@@ -113,7 +116,8 @@ private:
     bool enableCombineKey_ { true };
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
+    bool needSkipPowerKeyUp_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // KEY_SUBSCRIBER_HANDLER_H
+#endif // KEY_SUBSCRIBER_HANDLER_H

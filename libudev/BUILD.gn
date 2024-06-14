@@ -29,7 +29,7 @@ ohos_static_library("mmi_libudev") {
   configs = [ ":mmi_libudev_config" ]
 
   sources = [ "src/udev_device.cpp" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -37,6 +37,7 @@ ohos_static_library("mmi_libudev") {
   }
   external_deps = [ "hilog:libhilog" ]
 
+  defines += [ "MMI_DISABLE_LOG_TRACE" ]
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -46,13 +47,16 @@ output_path = "multimodalinput/mmi_unit_out"
 
 group("test") {
   testonly = true
-  deps = [ ":libudev-test" ]
+  deps = [
+    ":e2e-libudev-test",
+    ":libudev-test",
+  ]
 }
 
 ohos_unittest("libudev-test") {
   module_out_path = output_path
   include_dirs = [
-    "${mmi_path}/test/unittest/standalone/include",
+    "${mmi_path}/util/common/include",
     "//third_party/libevdev",
   ]
 
@@ -66,10 +70,14 @@ ohos_unittest("libudev-test") {
     "test/custom_udev_test.cpp",
   ]
 
+  external_deps = [ "hilog:libhilog" ]
+
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/libevdev",
   ]
+
+  defines += [ "MMI_DISABLE_LOG_TRACE" ]
 }
 
 ohos_unittest("e2e-libudev-test") {

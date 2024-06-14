@@ -25,10 +25,14 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "HotplugDetector"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HotplugDetector"};
 constexpr auto MAX_EVENT_BUF_SIZE = 512;
 constexpr auto INPUT_DEVICES_PATH = "/dev/input/";
 
@@ -59,14 +63,15 @@ bool HotplugDetector::Init(const callback& addFunc, const callback& removeFunc)
 
     auto fd = UniqueFd{inotify_init1(IN_CLOEXEC)};
     if (fd < 0) {
-        MMI_HILOGE("Failed to initialize inotify. Error:%{public}s.", SystemError().message().c_str());
+        MMI_HILOGE("Failed to initialize inotify. Error:%{public}s", SystemError().message().c_str());
         return false;
     }
     if (inotify_add_watch(fd, INPUT_DEVICES_PATH, IN_DELETE | IN_CREATE) < 0) {
-        MMI_HILOGE("Failed to add watch for input devices. Error:%{public}s.", SystemError().message().c_str());
+        MMI_HILOGE("Failed to add watch for input devices. Error:%{public}s", SystemError().message().c_str());
         return false;
     }
     if (!Scan()) {
+        MMI_HILOGE("Failed to open input devices path");
         return false;
     }
     inotifyFd_ = std::move(fd);
@@ -79,7 +84,7 @@ bool HotplugDetector::Scan() const
     using namespace std::literals::string_literals;
     auto* dir = opendir(INPUT_DEVICES_PATH);
     if (dir == nullptr) {
-        MMI_HILOGE("Failed to open device input dir. Error:%{public}s.", SystemError().message().c_str());
+        MMI_HILOGE("Failed to open device input dir. Error:%{public}s", SystemError().message().c_str());
         return false;
     }
     dirent* entry = nullptr;
@@ -105,7 +110,7 @@ void HotplugDetector::OnEvent() const
     if (res < EVSIZE) {
         auto err = SystemError();
         if (err != std::errc::resource_unavailable_try_again) {
-            MMI_HILOGE("Filed to read inotify event. Error:%{public}s.", err.message().c_str());
+            MMI_HILOGE("Filed to read inotify event. Error:%{public}s", err.message().c_str());
         }
         return;
     }

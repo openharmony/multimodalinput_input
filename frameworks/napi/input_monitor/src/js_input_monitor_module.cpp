@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,23 +25,26 @@
 #include "proto.h"
 #include "util_napi_error.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsInputMonitorModule"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
 const std::set<std::string> ACTION_TYPE = {
-    "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick"
+    "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
+    "fingerprint"
 };
-constexpr int32_t TWO_PARAMETERS = 2;
-constexpr int32_t THREE_PARAMETERS = 3;
-constexpr int32_t RECT_LIST_SIZE = 2;
+constexpr int32_t TWO_PARAMETERS { 2 };
+constexpr int32_t THREE_PARAMETERS { 3 };
+constexpr int32_t RECT_LIST_SIZE { 2 };
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
 
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
@@ -64,11 +67,11 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
         return nullptr;
     }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
         MMI_HILOGE("AddEnv failed");
         return nullptr;
     }
-    JsInputMonMgr.AddMonitor(env, typeName, argv[1]);
+    JS_INPUT_MONITOR_MGR.AddMonitor(env, typeName, argv[1]);
     return nullptr;
 }
 
@@ -82,7 +85,7 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
         return;
     }
-    hotRectAreaList = JsInputMonMgr.GetHotRectAreaList(env, napiRect, rectArrayLength);
+    hotRectAreaList = JS_INPUT_MONITOR_MGR.GetHotRectAreaList(env, napiRect, rectArrayLength);
     if (hotRectAreaList.size() != rectArrayLength) {
         MMI_HILOGE("Hot Rect Area Parameter error");
         return;
@@ -94,11 +97,11 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
         return;
     }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
         MMI_HILOGE("AddEnv failed");
         return;
     }
-    JsInputMonMgr.AddMonitor(env, "mouse", hotRectAreaList, rectArrayLength, napiCallback);
+    JS_INPUT_MONITOR_MGR.AddMonitor(env, "mouse", hotRectAreaList, rectArrayLength, napiCallback);
     return;
 }
 
@@ -106,7 +109,7 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -142,11 +145,11 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
             return nullptr;
         }
-        if (!JsInputMonMgr.AddEnv(env, info)) {
+        if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
             MMI_HILOGE("AddEnv failed");
             return nullptr;
         }
-        JsInputMonMgr.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
+        JS_INPUT_MONITOR_MGR.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     }
     return nullptr;
 }
@@ -155,7 +158,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < TWO_PARAMETERS) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
@@ -173,7 +176,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -190,7 +193,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < TWO_PARAMETERS) {
-        JsInputMonMgr.RemoveMonitor(env, typeName);
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
     }
@@ -202,12 +205,12 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    if (!JsInputMonMgr.AddEnv(env, info)) {
-        JsInputMonMgr.RemoveMonitor(env, typeName);
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName);
         return nullptr;
     }
 
-    JsInputMonMgr.RemoveMonitor(env, typeName, argv[1]);
+    JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, argv[1]);
     return nullptr;
 }
 
@@ -215,7 +218,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -245,7 +248,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (argc < THREE_PARAMETERS) {
-        JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, fingers);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
     }
@@ -255,12 +258,12 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
         return nullptr;
     }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
-        JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
+    if (!JS_INPUT_MONITOR_MGR.AddEnv(env, info)) {
+        JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, fingers);
         return nullptr;
     }
 
-    JsInputMonMgr.RemoveMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
+    JS_INPUT_MONITOR_MGR.RemoveMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     return nullptr;
 }
 
@@ -268,7 +271,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
 
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {

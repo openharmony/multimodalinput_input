@@ -36,9 +36,10 @@ public:
     DISALLOW_COPY_AND_MOVE(GestureHandler);
     int32_t GestureIdentify(int32_t originType, int32_t seatSlot, double logicalX, double logicalY);
     double GetRotateAngle();
+    void InitRotateGesture();
+    bool GetRotateStatus();
 
 private:
-    void InitRotateGesture();
     int32_t HandleTouchPadDownEvent(int32_t seatSlot, double logicalX, double logicalY);
     int32_t HandleTouchPadMoveEvent(int32_t seatSlot, double logicalX, double logicalY);
     int32_t HandleTouchPadUpEvent(int32_t seatSlot);

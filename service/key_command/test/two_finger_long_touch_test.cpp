@@ -25,13 +25,16 @@
 
 // Ability manager stub header
 #include "ability_manager_client.h"
+#include "display_event_monitor.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TwoFingerLongTouchTest"
 
 namespace OHOS {
 namespace MMI {
 
 namespace {
 using namespace testing::ext;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TwoFingerLongTouchTest" };
 constexpr std::chrono::milliseconds WAIT_TIME_MS(50);
 
 const std::string TEST_DIR = "/data/test";

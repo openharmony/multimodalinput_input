@@ -20,11 +20,18 @@
 #include "hos_key_event.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventValueTransformation"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformation" };
-constexpr int32_t INVALID_KEY_CODE = -1;
+constexpr uint32_t BIT_SET_INDEX { 16 };
+constexpr int32_t INVALID_KEY_CODE { -1 };
+constexpr int32_t MAX_KEY_SIZE { 3 };
+constexpr int32_t MIN_KEY_SIZE { 1 };
 } // namespace
 
 const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
@@ -224,7 +231,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {168, {"KEY_MEDIA_REWIND", 168, 14, HOS_KEY_MEDIA_REWIND}},
     {208, {"KEY_MEDIA_FAST_FORWARD", 208, 15, HOS_KEY_MEDIA_FAST_FORWARD}},
     {582, {"KEY_VOICE_ASSISTANT", 582, 20, HOS_KEY_VOICE_ASSISTANT}},
-    {240, {"KEY_UNKNOWN", 240, -1, HOS_KEY_UNKNOWN}},
+    {240, {"KEY_FN", 240, 0, HOS_KEY_FN}},
 
     {142, {"KEY_SLEEP", 142, 2600, HOS_KEY_SLEEP}},
     {85, {"KEY_ZENKAKU_HANKAKU", 85, 2601, HOS_KEY_ZENKAKU_HANKAKU}},
@@ -408,6 +415,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {247, {"KEY_RFKILL", 247, 2847, HOS_KEY_RFKILL}},
     {248, {"KEY_MUTE", 248, 23, HOS_KEY_MUTE}},
     {196, {"KEY_F26", 196, 2848, HOS_KEY_F26}},
+    {197, {"KEY_F27", 197, 2849, HOS_KEY_F27}},
 
     {363, {"KEY_CHANNEL", 363, 3001, HOS_KEY_CHANNEL}},
     {256, {"KEY_BTN_0", 256, 3100, HOS_KEY_BTN_0}},
@@ -497,15 +505,16 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
 };
 } // namespace
 
-int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
+int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
 {
-    if (items.size() < 1 || items.size() > 3) {
+    if (items.size() < MIN_KEY_SIZE || items.size() > MAX_KEY_SIZE) {
         return KeyEvent::INTENTION_UNKNOWN;
     }
 
     int64_t keyCodes = 0;
     for (const auto &item : items) {
-        keyCodes = (keyCodes << 16) + item.GetKeyCode();
+        keyCodes = static_cast<int64_t>(
+            (static_cast<uint64_t>(keyCodes) << BIT_SET_INDEX) + (static_cast<uint64_t>(item.GetKeyCode())));
     }
     auto iter = MAP_KEY_INTENTION.find(keyCodes);
     if (iter == MAP_KEY_INTENTION.end()) {

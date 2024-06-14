@@ -75,7 +75,7 @@ FINGERSENSE_KNOCK_EVENT_INFO:
   __BASE: {type: STATISTIC, level: MINOR, desc: report fingersense knuckle knock event info}
   DKF_D_I: {type: INT32, desc: fs dk fail time interval}
   DKF_T_I: {type: INT32, desc: fs Double knuckle double knock fail time interval}
-  DKS_D_I: {type: INT32, desc: fs Single knuckle double knock  succ distance interval}
+  DKS_D_I: {type: INT32, desc: fs Single knuckle double knock succ distance interval}
   DKS_T_I: {type: INT32, desc: fs Double knuckle double knock succ time interval}
   DK_F_T: {type: INT32, desc: Double knuckle double knock fail times}
   DK_S_T: {type: INT32, desc: Double knuckle double knock succ times}
@@ -96,7 +96,7 @@ FINGERSENSE_KNOCK_EVENT_INFO:
   L_W_S_T: {type: INT32, desc: fs letter w gesture succ times}
   RG_F_S_TIME_DIFF: {type: INT32, desc: region gesture fail then success time diff}
   RG_S_F_TIME_DIFF: {type: STRING, desc: region gesture success then fail time diff}
-  RG_S_T: {type: INT32, desc: Region gesture succ times}
+  RG_S_T: {type: INT32, desc: region gesture succ times}
   RG_TRACK_LENGTH: {type: INT32, desc: region gesture track length}
   RG_TRACK_TIME: {type: INT32, desc: region gesture track time}
   SCR_ORIENTATION: {type: INT32, desc: screen orientation portrait or landscape}
@@ -258,3 +258,23 @@ TOUCHPAD_POINTER_SPEED_SETTING:
 TOUCHPAD_RIGHT_CLICK_SETTING:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad right click setting}
   SWITCH_VALUE: {type: INT32, desc: touchpad right click setting}
+
+MAGIC_CURSOR_COLOR:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the color of Magic Cursor}
+  FILL_COLOR: {type: STRING, desc: fill color}
+  STROKE_COLOR: {type: STRING, desc: stroke color}
+
+MAGIC_CURSOR_SHAPE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the SHAPE of Magic Cursor}
+  MOUSE_STYLE: {type: STRING, desc: mouse style}
+  FILL_CODE: {type: STRING, desc: fill code}
+  
+MAGIC_CURSOR_SIZE:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: report changing the size of Magic Cursor}
+  MOUSE_SIZE: {type: STRING, desc: mouse size}
+  FILL_CODE: {type: STRING, desc: fill code}
+
+FANTASY_CURSOR_FAILED:
+  __BASE: {type: FAULT, level: MINOR, desc: report ERROR of Magic Cursor}
+  ERROR_NAME: {type: STRING, desc: error name}
+  ERROR_CODE: {type: STRING, desc: error code}

@@ -18,12 +18,11 @@
 #include "util_napi.h"
 #include "util_napi_value.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventNapi"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventNapi" };
-} // namespace
-
 napi_status KeyEventNapi::CreateKeyEvent(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out)
 {
     auto status = SetNameProperty(env, out, "action", in->GetKeyAction() - KeyEvent::KEY_ACTION_CANCEL);

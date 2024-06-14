@@ -15,11 +15,12 @@
 
 #include "mmi_service.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MmiServiceDemo"
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiServiceDemo" };
-constexpr int32_t sleepTime = 10 * 60;
+constexpr int32_t SLEEP_TIME = 10 * 60;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -29,7 +30,7 @@ int32_t main(int32_t argc, const char *argv[])
     auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
     service->OnStart();
     while (1) {
-        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));
     }
     service->OnStop();
     service->OnDump();

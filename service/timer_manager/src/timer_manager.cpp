@@ -15,15 +15,19 @@
 
 #include "timer_manager.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TimerManager"
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MIN_DELAY = -1;
-constexpr int32_t MIN_INTERVAL = 36;
-constexpr int32_t MAX_INTERVAL_MS = 10000;
-constexpr int32_t MAX_TIMER_COUNT = 64;
-constexpr int32_t NONEXISTENT_ID = -1;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
+constexpr int32_t MIN_DELAY { -1 };
+constexpr int32_t MIN_INTERVAL { 36 };
+constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t MAX_TIMER_COUNT { 64 };
+constexpr int32_t NONEXISTENT_ID { -1 };
 std::mutex timerMutex_;
 } // namespace
 

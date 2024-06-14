@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,33 +15,62 @@
 
 #include "dfx_hisysevent.h"
 
-#include "input_windows_manager.h"
+#include <fstream>
+
+#include "i_input_windows_manager.h"
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DfxHisysevent"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DfxHisysevent" };
-constexpr int32_t INVALID_DEVICE_ID = -1;
-constexpr uint32_t REPORT_DISPATCH_TIMES = 100;
-constexpr uint32_t REPORT_COMBO_START_TIMES = 100;
-constexpr uint32_t POINTER_CLEAR_TIMES = 10;
-constexpr int32_t CONVERSION_US_TO_MS = 1000;
-constexpr int32_t TIMES_LEVEL1 = 10;
-constexpr int32_t TIMES_LEVEL2 = 25;
-constexpr int32_t TIMES_LEVEL3 = 30;
-constexpr int32_t TIMES_LEVEL4 = 50;
-constexpr int32_t FINGERSENSE_EVENT_TIMES = 1;
-constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
-constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
+constexpr int32_t INVALID_DEVICE_ID { -1 };
+constexpr uint32_t REPORT_DISPATCH_TIMES { 100 };
+constexpr uint32_t REPORT_COMBO_START_TIMES { 100 };
+constexpr uint32_t POINTER_CLEAR_TIMES { 10 };
+constexpr int32_t CONVERSION_US_TO_MS { 1000 };
+constexpr int32_t TIMES_LEVEL1 { 10 };
+constexpr int32_t TIMES_LEVEL2 { 25 };
+constexpr int32_t TIMES_LEVEL3 { 30 };
+constexpr int32_t TIMES_LEVEL4 { 50 };
+constexpr int32_t FINGERSENSE_EVENT_TIMES { 1 };
+constexpr size_t SINGLE_KNUCKLE_SIZE { 1 };
+constexpr size_t DOUBLE_KNUCKLE_SIZE { 2 };
+constexpr int32_t FAIL_SUCC_TIME_DIFF { 3 * 60 * 1000 };
+constexpr int32_t MIN_GESTURE_TIMESTAMPS_SIZE { 2 };
 const std::string EMPTY_STRING { "" };
+const std::string LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
+const std::string ACC_PATH { "/sys/devices/platform/_sensor/acc_info" };
+const std::string TP_PATH { "/sys/touchscreen/touch_chip_info" };
 } // namespace
+
+static std::string GetVendorInfo(const std::string &nodePath)
+{
+    char realPath[PATH_MAX] = {};
+    if (realpath(nodePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("The realpath return nullptr");
+        return "";
+    }
+    std::ifstream file(realPath);
+    if (!file.is_open()) {
+        MMI_HILOGE("Unable to open file:%{public}s, error:%{public}d", nodePath.c_str(), errno);
+        return "";
+    }
+    std::string vendorInfo;
+    file >> vendorInfo;
+    file.close();
+    return vendorInfo;
+}
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    std::shared_ptr dev = InputDevMgr->GetInputDevice(id);
+    std::shared_ptr<InputDevice> dev = INPUT_DEV_MGR->GetInputDevice(id);
     CHKPV(dev);
     std::string message;
-    std::string name = "";
+    std::string name;
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::FAULT) {
         message = "The input_device connection failed for already existing";
         name = "INPUT_DEV_CONNECTION_FAILURE";
@@ -86,7 +115,7 @@ void DfxHisysevent::OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
-        std::shared_ptr dev = InputDevMgr->GetInputDevice(id);
+        std::shared_ptr dev = INPUT_DEV_MGR->GetInputDevice(id);
         CHKPV(dev);
         int32_t ret = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
@@ -188,7 +217,7 @@ void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer,
             "EVENTTYPE", pointer->GetEventType(),
             "AGENT_WINDOWID", pointer->GetAgentWindowId(),
             "TARGET_WINDOWID", pointer->GetTargetWindowId(),
-            "PID", WinMgr->GetWindowPid(pointer->GetTargetWindowId()),
+            "PID", WIN_MGR->GetWindowPid(pointer->GetTargetWindowId()),
             "FD", fd,
             "MSG", "The window manager successfully update target pointer");
         if (ret != 0) {
@@ -226,7 +255,7 @@ void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
             "FD", fd,
             "AGENT_WINDOWID", key->GetAgentWindowId(),
             "TARGET_WINDOWID", key->GetTargetWindowId(),
-            "PID", WinMgr->GetWindowPid(key->GetTargetWindowId()),
+            "PID", WIN_MGR->GetWindowPid(key->GetTargetWindowId()),
             "MSG", "The window manager successfully update target key");
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
@@ -415,10 +444,7 @@ void DfxHisysevent::ReportComboStartTimes()
 
 void DfxHisysevent::ReportPowerInfo(std::shared_ptr<KeyEvent> key, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
-    if (key == nullptr) {
-        MMI_HILOGE("get key is failed");
-        return;
-    }
+    CHKPV(key);
     if (key->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         int32_t ret = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
@@ -465,7 +491,7 @@ void DfxHisysevent::StatisticTouchpadGesture(std::shared_ptr<PointerEvent> point
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
-        MMI_HILOGW("HiviewDFX Statistic touchpad gesture is error, pointer action is invalid.");
+        MMI_HILOGW("HiviewDFX Statistic touchpad gesture is error, pointer action is invalid");
     }
 }
 
@@ -481,7 +507,7 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
 
     auto it = mapSettingCodeToSettingType.find(settingCode);
     if (it == mapSettingCodeToSettingType.end()) {
-        MMI_HILOGE("HiviewDFX Report touchpad setting state is error, setting code is invalid.");
+        MMI_HILOGE("HiviewDFX Report touchpad setting state is error, setting code is invalid");
         return;
     }
     std::string name = it->second;
@@ -505,7 +531,7 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
 
     auto it = mapSettingCodeToSettingType.find(settingCode);
     if (it == mapSettingCodeToSettingType.end()) {
-        MMI_HILOGW("HiviewDFX Report touchpad setting state is error, setting code is invalid.");
+        MMI_HILOGW("HiviewDFX Report touchpad setting state is error, setting code is invalid");
         return;
     }
     std::string name = it->second;
@@ -527,7 +553,10 @@ void DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime)
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "SK_S_T", FINGERSENSE_EVENT_TIMES,
-        "SKS_T_I", intervalTime);
+        "SKS_T_I", intervalTime,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
@@ -546,7 +575,7 @@ void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> 
         knuckleFailCount = "DKF_T_I";
         invalidTimeFailCount = "DK_F_T";
     } else {
-        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size: %{public}zu.", size);
+        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size:%{public}zu", size);
         return;
     }
     int32_t ret = HiSysEventWrite(
@@ -555,7 +584,10 @@ void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> 
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         knuckleFailCount, FINGERSENSE_EVENT_TIMES,
         "SKF_T_I", intervalTime,
-        invalidTimeFailCount, FINGERSENSE_EVENT_TIMES);
+        invalidTimeFailCount, FINGERSENSE_EVENT_TIMES,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
@@ -570,7 +602,10 @@ void DfxHisysevent::ReportFailIfInvalidDistance(const std::shared_ptr<PointerEve
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "SK_F_T", FINGERSENSE_EVENT_TIMES,
         "DKF_D_I", distance,
-        "FSF_D_C", FINGERSENSE_EVENT_TIMES);
+        "FSF_D_C", FINGERSENSE_EVENT_TIMES,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
@@ -601,5 +636,182 @@ void DfxHisysevent::ReportScreenCaptureGesture()
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+void DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::string stroke_Color)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_COLOR",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "FILL_COLOR", fill_Color,
+        "STROKE_COLOR", stroke_Color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
 }
+ 
+void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MMI::MOUSE_ICON mouse_Style)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_SHAPE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "MOUSE_STYLE", mouse_Style,
+        "FILL_CODE", fill_Code);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
 }
+ 
+void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::string mouse_Size)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "MAGIC_CURSOR_SIZE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "MOUSE_SIZE", mouse_Size,
+        "FILL_CODE", fill_Code);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+ 
+void DfxHisysevent::ReportMagicCursorFault(std::string error_Code, std::string error_Name)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FANTASY_CURSOR_FAILED",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "ERROR_CODE", error_Code,
+        "ERROR_NAME", error_Name);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
+void DfxHisysevent::ReportSmartShotSuccTimes(int32_t smartShotSuccTimes)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_S_T", smartShotSuccTimes,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureTrackLength(int32_t knuckleGestureTrackLength)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_TRACK_LENGTH", knuckleGestureTrackLength);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureTrackTime(const std::vector<int64_t> &gestureTimeStamps)
+{
+    size_t size = gestureTimeStamps.size();
+    if (size < MIN_GESTURE_TIMESTAMPS_SIZE) {
+        MMI_HILOGE("HiviewDFX Report knuckle gesture track time error, knuckle timestamps size:%{public}zu", size);
+        return;
+    }
+    int32_t knuckleGestureTrackTime = (gestureTimeStamps[size - 1] - gestureTimeStamps[0]) / CONVERSION_US_TO_MS;
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_TRACK_TIME", knuckleGestureTrackTime);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportScreenRecorderGesture(int32_t successTimes, int32_t intervalTime)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "DK_S_T", successTimes,
+        "DKS_T_I", intervalTime,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureFaildTimes(int32_t failedTimes)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "LG_F_T", failedTimes,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleDrawSSuccessTimes(int32_t successTimes)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "L_S_S_T", successTimes,
+        "TP_INFO", GetVendorInfo(TP_PATH),
+        "S_INFO", GetVendorInfo(ACC_PATH),
+        "LCD_INFO", GetVendorInfo(LCD_PATH));
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTime)
+{
+    intervalTime /= CONVERSION_US_TO_MS;
+    if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
+        return;
+    }
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_S_F_TIME_DIFF", intervalTime / CONVERSION_US_TO_MS);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime)
+{
+    intervalTime /= CONVERSION_US_TO_MS;
+    if (intervalTime >= FAIL_SUCC_TIME_DIFF) {
+        return;
+    }
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "RG_F_S_TIME_DIFF", intervalTime / CONVERSION_US_TO_MS);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+} // namespace MMI
+} // namespace OHOS

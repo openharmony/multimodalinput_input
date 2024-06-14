@@ -19,12 +19,11 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UtilNapiValue"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapiValue" };
-} // namespace
-
 napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, bool value)
 {
     napi_value napiValue{};
@@ -267,7 +266,7 @@ std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
     auto status = napi_get_named_property(env, object, name.c_str(), &napiValue);
     CHKRR(status, "get property", {});
 
-    uint32_t length;
+    uint32_t length = 0;
     status = napi_get_array_length(env, napiValue, &length);
     CHKRR(status, "get array length", {});
 
