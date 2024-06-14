@@ -15,20 +15,19 @@
 
 #include "touchpad_transform_processor.h"
 
-#include <sstream>
 #include <linux/input.h>
 
+#include <sstream>
+
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
+#include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "mouse_device_state.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
-#include "dfx_hisysevent.h"
-#include "multimodal_input_preferences_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -42,9 +41,9 @@ constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
-constexpr int32_t FINGER_MOTION_MAX { 9 };
+constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
-constexpr int32_t DEFAULT_POINTER_ID {0 };
+constexpr int32_t DEFAULT_POINTER_ID { 0 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 } // namespace
@@ -608,15 +607,14 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     } else if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
         motionCnt++;
         if ((motionCnt >= FINGER_MOTION_MAX) || IsInvalidMulTapGesture(event)) {
-            MMI_HILOGD("the motion is too much");
+            MMI_HILOGD("The motion is too much");
             SetMULTI_FINGERTAP_HDRDefault();
             return RET_OK;
         }
     }
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
-        multiFingersState = static_cast<MulFingersTap>(upCnt);
+        multiFingersState_ = static_cast<MulFingersTap>(upCnt);
         MMI_HILOGD("This is multifinger tap event, finger count:%{public}d", upCnt);
-        return RET_OK;
     }
     return RET_OK;
 }
@@ -630,7 +628,7 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
     beginTime = 0;
     lastTime = 0;
     if (isAlldefault) {
-        multiFingersState = MulFingersTap::NOTAP;
+        multiFingersState_ = MulFingersTap::NO_TAP;
     }
     pointerMaps.clear();
 }
@@ -644,9 +642,9 @@ bool MultiFingersTapHandler::ClearPointerItems(std::shared_ptr<PointerEvent> poi
     return true;
 }
 
-MulFingersTap MultiFingersTapHandler::GetMultiFingersState()
+MulFingersTap MultiFingersTapHandler::GetMultiFingersState() const
 {
-    return multiFingersState;
+    return multiFingersState_;
 }
 
 bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *event)
@@ -685,7 +683,7 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
     if (pointerMaps.find(seatSlot) != pointerMaps.end()) {
         return false;
     } else {
-        pointerMaps[seatSlot] = {-1.0, -1.0};
+        pointerMaps[seatSlot] = {-1.0F, -1.0F};
         return true;
     }
 }

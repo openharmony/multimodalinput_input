@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,10 +18,10 @@
 
 #include "event_log_helper.h"
 #include "event_util_test.h"
+#include "input_manager.h"
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
-#include "input_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerTest"
@@ -116,6 +116,20 @@ void InputManagerTest::TearDown()
 std::string InputManagerTest::GetEventDump()
 {
     return TestUtil->GetEventDump();
+}
+
+/**
+ * @tc.name: InputManagerTest_GetWinSyncBatchSize
+ * @tc.desc: Test GetWinSyncBatchSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetWinSyncBatchSize, TestSize.Level1)
+{
+    int32_t maxAreasCount = 1;
+    int32_t displayCount = 2;
+    int32_t ret = InputManager::GetInstance()->GetWinSyncBatchSize(maxAreasCount, displayCount);
+    EXPECT_EQ(ret, 38);
 }
 
 /**
@@ -1604,6 +1618,50 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_001, TestSize.Lev
 }
 
 /**
+ * @tc.name: InputManagerTest_SubscribeSwitchEvent_001
+ * @tc.desc: Subscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.Level1)
+{
+    auto fun = [](std::shared_ptr<SwitchEvent> event) {
+        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
+            event->GetSwitchType(), event->GetSwitchValue());
+    };
+    int32_t subscribeId = InputManager::GetInstance()->SubscribeSwitchEvent(fun, SwitchEvent::SwitchType::SWITCH_LID);
+    ASSERT_NE(subscribeId, INVAID_VALUE);
+    InputManager::GetInstance()->UnsubscribeSwitchEvent(subscribeId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeSwitchEvent_002
+ * @tc.desc: Subscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
+{
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), INVAID_VALUE);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeSwitchEvent_003
+ * @tc.desc: Subscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.Level1)
+{
+    auto fun = [](std::shared_ptr<SwitchEvent> event) {
+        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
+            event->GetSwitchType(), event->GetSwitchValue());
+    };
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
+        fun, SwitchEvent::SwitchType(INVAID_VALUE)), INVAID_VALUE);
+}
+
+/**
  * @tc.name: InputManagerTest_UnsubscribeSwitchEvent_001
  * @tc.desc: Unsubscribes from a switch input event.
  * @tc.type: FUNC
@@ -2976,6 +3034,50 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
     int32_t userId = 10;
     int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
     EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_HasIrEmitter
+ * @tc.desc: Test HasIrEmitter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
+{
+    bool hasIrEmitter = false;
+    int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetInfraredFrequencies
+ * @tc.desc: Test GetInfraredFrequencies
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Level1)
+{
+    InfraredFrequency infraredFrequency;
+    infraredFrequency.max_ = 30;
+    infraredFrequency.min_ = 10;
+    std::vector<InfraredFrequency> requencys;
+    requencys.push_back(infraredFrequency);
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TransmitInfrared
+ * @tc.desc: Test TransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
+{
+    int64_t number = 10;
+    std::vector<int64_t> pattern = { 10, 20, 30 };
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -31,7 +31,7 @@ struct KeyEventValueTransformation {
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput);
 int32_t InputTransformationKeyValue(int32_t keyCode);
-int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items);
+int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_VALUE_TRANSFORMATION_H

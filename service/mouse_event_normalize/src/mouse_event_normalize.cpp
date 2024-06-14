@@ -17,14 +17,14 @@
 
 #include <cinttypes>
 
-#include "input-event-codes.h"
+#include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util_ex.h"
@@ -100,7 +100,7 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
@@ -149,7 +149,7 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
-    std::shared_ptr<MouseTransformProcessor>processor { nullptr };
+    std::shared_ptr<MouseTransformProcessor> processor { nullptr };
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {

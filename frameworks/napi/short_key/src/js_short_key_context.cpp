@@ -21,10 +21,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MAX_DELAY = 4000;
-constexpr int32_t MIN_DELAY = 0;
-const std::string SHORT_KEY_CLASS = "multimodalinput_short_key_class";
-const std::string SHORT_KEY_INSTANCE = "multimodalinput_short_key";
+constexpr int32_t MAX_DELAY { 4000 };
+constexpr int32_t MIN_DELAY { 0 };
+const std::string SHORT_KEY_CLASS { "multimodalinput_short_key_class" };
+const std::string SHORT_KEY_INSTANCE { "multimodalinput_short_key" };
 
 enum class FingerprintAction : int32_t {
     DOWN = 0,

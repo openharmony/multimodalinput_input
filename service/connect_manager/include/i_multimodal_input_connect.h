@@ -137,6 +137,10 @@ public:
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) = 0;
     virtual int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) = 0;
+    virtual int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) = 0;
+    virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
+    virtual int32_t EnableHardwareCursorStats(bool enable) = 0;
+    virtual int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

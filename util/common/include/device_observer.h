@@ -31,4 +31,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // DEVICE_OBSERVER_H

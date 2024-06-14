@@ -96,7 +96,7 @@ FINGERSENSE_KNOCK_EVENT_INFO:
   L_W_S_T: {type: INT32, desc: fs letter w gesture succ times}
   RG_F_S_TIME_DIFF: {type: INT32, desc: region gesture fail then success time diff}
   RG_S_F_TIME_DIFF: {type: STRING, desc: region gesture success then fail time diff}
-  RG_S_T: {type: INT32, desc: Region gesture succ times}
+  RG_S_T: {type: INT32, desc: region gesture succ times}
   RG_TRACK_LENGTH: {type: INT32, desc: region gesture track length}
   RG_TRACK_TIME: {type: INT32, desc: region gesture track time}
   SCR_ORIENTATION: {type: INT32, desc: screen orientation portrait or landscape}

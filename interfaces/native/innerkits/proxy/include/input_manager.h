@@ -38,6 +38,7 @@
 #include "pointer_style.h"
 #include "window_info.h"
 #include "infrared_frequency_info.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -193,12 +194,13 @@ public:
      * an input event is copied and distributed to the monitor while being distributed to the original target.
      * @param monitor Indicates the input event monitor. After an input event is generated,
      * the functions of the monitor object will be called.
+     * @param eventType Indicates the eventType for monitor.
      * @return Returns the monitor ID, which uniquely identifies a monitor in the process.
      * If the value is greater than or equal to <b>0</b>, the monitor is successfully added. Otherwise,
      * the monitor fails to be added.
      * @since 9
      */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
 
     /**
      * @brief Removes a monitor.
@@ -742,6 +744,23 @@ public:
      */
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 
+     /**
+     * @brief Turn on or off hard cursor statistics.
+     * @param frameCount Counting the frame rate of continuous mouse movement.
+     * @param frameCount Statistics of mouse continuous movement synchronization frame rate.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t EnableHardwareCursorStats(bool enable);
+    /**
+     * @brief Get the mouse hard cursor information.
+     * @param frameCount Counting the frame rate of continuous mouse movement.
+     * @param frameCount Statistics of mouse continuous movement synchronization frame rate.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+
     /**
      * @brief ClearWindowPointerStyle.
      * @param pid Indicates pid.
@@ -863,6 +882,23 @@ public:
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+    
+    /**
+     * @brief 添加虚拟输入设备
+     * @param device 输入设备信息
+     * @param deviceId 出参，所创建的虚拟输入设备对应的设备Id
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+
+    /**
+     * @brief 移除虚拟输入设备
+     * @param deviceId 要移除的虚拟输入设备对应的设备Id
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
 private:
     InputManager() = default;

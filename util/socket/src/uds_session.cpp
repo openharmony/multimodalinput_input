@@ -74,14 +74,13 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 socketErrorNo = errno;
-                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
             if (errno == ENOTSOCK) {
                 MMI_HILOGE("Got ENOTSOCK error, turn the socket to invalid");
                 invalidSocket_ = true;
             }
-            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
+            MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d, pid:%{public}d", errno, fd_, pid_);
             return false;
         }
         idx += count;
@@ -95,8 +94,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         ReportSocketBufferFull();
     }
     if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
-        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
-            retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
+        MMI_HILOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d errno:%{public}d, "
+                   "fd:%{public}d, pid:%{public}d", retryCount, SEND_RETRY_LIMIT, idx, bufSize, errno, fd_, pid_);
         return false;
     }
     return true;

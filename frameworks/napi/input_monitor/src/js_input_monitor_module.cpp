@@ -35,9 +35,9 @@ const std::set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
     "fingerprint"
 };
-constexpr int32_t TWO_PARAMETERS = 2;
-constexpr int32_t THREE_PARAMETERS = 3;
-constexpr int32_t RECT_LIST_SIZE = 2;
+constexpr int32_t TWO_PARAMETERS { 2 };
+constexpr int32_t THREE_PARAMETERS { 3 };
+constexpr int32_t RECT_LIST_SIZE { 2 };
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)

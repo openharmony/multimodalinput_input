@@ -345,8 +345,12 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         return;
     }
     work->data = static_cast<void *>(dataWorker);
-    int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback,
-                                         uv_qos_user_initiated);
+    int32_t ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+        },
+        UvQueueWorkAsyncCallback, uv_qos_user_initiated);
     if (ret != 0) {
         delete dataWorker;
         delete work;
