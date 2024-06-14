@@ -28,8 +28,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const uint32_t NUMBER_PARAMETERS = 2;
-constexpr int32_t MAX_NUMBER_ARRAY_ELEMENT = 500;
+const uint32_t NUMBER_PARAMETERS { 2 };
+constexpr int32_t MAX_NUMBER_ARRAY_ELEMENT { 500 };
 }
 
 bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetype& type)
@@ -201,7 +201,7 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
         }
         CHKRP(napi_set_element(env, result, i, item), SET_ELEMENT);
     }
-    MMI_HILOGD("js_register_module.GetInfraredFrequencies :%{public}s ", logPrint.c_str());
+    MMI_HILOGD("js_register_module.GetInfraredFrequencies:%{public}s ", logPrint.c_str());
     return result;
 }
 
@@ -221,7 +221,7 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     for (int32_t i = 0; i < size; i++) {
         context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
     }
-    MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
+    MMI_HILOGD("js_register_module.TransmitInfrared para size:%{public}s", context.c_str());
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {

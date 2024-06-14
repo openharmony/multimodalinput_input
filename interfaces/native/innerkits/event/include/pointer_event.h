@@ -27,6 +27,7 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -332,6 +333,13 @@ public:
      * @since 12
      */
     static constexpr int32_t SOURCE_TYPE_FINGERPRINT = 5;
+
+    /**
+     * Indicates that the input source generates a crown event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_CROWN = 6;
 
     /**
      * Indicates an invalid button ID.
@@ -1411,6 +1419,21 @@ public:
     uint32_t GetAxes() const;
 
     /**
+     * @brief Obtains the axis value velocity.
+     * @return Returns the axis value velocity.
+     * @since 12
+     */
+    double GetVelocity() const;
+
+    /**
+     * @brief Sets the axis value velocity.
+     * @param velocity Indicates the axis value velocity.
+     * @return void
+     * @since 12
+     */
+    void SetVelocity(double velocity);
+
+    /**
      * @brief Set the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
      * @return void.
@@ -1517,6 +1540,34 @@ public:
      */
     void SetDispatchTimes(int32_t dispatchTimes);
 
+    /**
+    * @brief Set the handlerEventType for pointerEvent
+    * @return void
+    * @since 12
+    */
+    void SetHandlerEventType(HandleEventType eventType);
+
+    /**
+     * @brief Get the handlerEventType for pointerEvent
+     * @return handlerEventType
+     * @since 12
+     */
+    HandleEventType GetHandlerEventType() const;
+
+    /**
+     * @brief Get the originPointerAction for pointerEvent
+     * @return originPointerAction
+     * @since 12
+     */
+    int32_t GetOriginPointerAction() const;
+
+    /**
+     * @brief Set the originPointerAction for pointerEvent
+     * @return void
+     * @since 12
+     */
+    void SetOriginPointerAction(int32_t pointerAction);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1574,11 +1625,13 @@ private:
     std::set<int32_t> pressedButtons_;
     int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
+    int32_t originPointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
     float zOrder_ { -1.0f };
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
+    double velocity_ { 0.0 };
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
@@ -1589,6 +1642,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

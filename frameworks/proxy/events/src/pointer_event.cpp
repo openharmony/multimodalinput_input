@@ -29,7 +29,7 @@ namespace {
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
-constexpr int32_t SIMULATE_EVENT_START_ID = 10000;
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -428,8 +428,9 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
-      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
+      pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
+      buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), zOrder_(other.zOrder_),
+      axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
@@ -454,12 +455,14 @@ void PointerEvent::Reset()
     pressedButtons_.clear();
     sourceType_ = SOURCE_TYPE_UNKNOWN;
     pointerAction_ = POINTER_ACTION_UNKNOWN;
+    originPointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
     fingerCount_ = 0;
     zOrder_ = -1.0f;
     dispatchTimes_ = 0;
     axes_ = 0U;
     axisValues_.fill(0.0);
+    velocity_ = 0.0;
     pressedKeys_.clear();
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     fingerprintDistanceX_ = 0.0;
@@ -475,6 +478,17 @@ int32_t PointerEvent::GetPointerAction() const
 void PointerEvent::SetPointerAction(int32_t pointerAction)
 {
     pointerAction_ = pointerAction;
+    originPointerAction_ = pointerAction;
+}
+
+int32_t PointerEvent::GetOriginPointerAction() const
+{
+    return originPointerAction_;
+}
+
+void PointerEvent::SetOriginPointerAction(int32_t pointerAction)
+{
+    originPointerAction_ = pointerAction;
 }
 
 static const std::unordered_map<int32_t, std::string> pointerActionMap = {
@@ -666,6 +680,9 @@ const char* PointerEvent::DumpSourceType() const
         case PointerEvent::SOURCE_TYPE_FINGERPRINT: {
             return "fingerprint";
         }
+        case PointerEvent::SOURCE_TYPE_CROWN: {
+            return "crown";
+        }
         default: {
             break;
         }
@@ -735,6 +752,16 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
     return ret;
 }
 
+double PointerEvent::GetVelocity() const
+{
+    return velocity_;
+}
+
+void PointerEvent::SetVelocity(double velocity)
+{
+    velocity_ = velocity;
+}
+
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
 {
     pressedKeys_ = pressedKeys;
@@ -789,6 +816,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, pointerAction_);
 
+    WRITEINT32(out, originPointerAction_);
+
     WRITEINT32(out, buttonId_);
 
     WRITEINT32(out, fingerCount_);
@@ -804,6 +833,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
+    WRITEDOUBLE(out, velocity_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -858,6 +888,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READINT32(in, sourceType_);
     READINT32(in, pointerAction_);
+    READINT32(in, originPointerAction_);
     READINT32(in, buttonId_);
     READINT32(in, fingerCount_);
     READFLOAT(in, zOrder_);
@@ -865,6 +896,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
+
+    READDOUBLE(in, velocity_);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
@@ -1161,6 +1194,16 @@ int32_t PointerEvent::GetDispatchTimes() const
 void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
 {
     dispatchTimes_ = dispatchTimes;
+}
+
+void PointerEvent::SetHandlerEventType(HandleEventType eventType)
+{
+    handleEventType_ = eventType;
+}
+
+HandleEventType PointerEvent::GetHandlerEventType() const
+{
+    return handleEventType_;
 }
 
 std::string_view PointerEvent::ActionToShortStr(int32_t action)

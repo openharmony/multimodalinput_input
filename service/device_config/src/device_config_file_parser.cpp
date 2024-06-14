@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t COMMENT_SUBSCRIPT = 0;
+constexpr int32_t COMMENT_SUBSCRIPT { 0 };
 } // namespace
 
 enum evdev_device_udev_tags {

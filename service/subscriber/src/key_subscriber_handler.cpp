@@ -37,10 +37,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t UNOBSERVED = -1;
-constexpr int32_t ACTIVE_EVENT = 2;
+constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
 } // namespace
 
@@ -275,7 +275,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_DOWN &&
         keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_UP &&
         keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-        MMI_HILOGE("There is no need to set mute");
+        MMI_HILOGD("There is no need to set mute");
         return false;
     }
     int32_t ret = -1;
@@ -436,7 +436,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(keyOption);
-    MMI_HILOGI("notify key down subscribers size:%{public}zu", subscribers.size());
+    MMI_HILOGD("notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
         NotifyKeyDownRightNow(keyEvent, subscribers, handled);
     } else {
@@ -755,6 +755,7 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType)
 {
     CALL_DEBUG_ENTER;
@@ -771,12 +772,13 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
             keyAction = KeyEvent::KEY_ACTION_DOWN;
         }
         if (keyCode == keyOption->GetFinalKey() && trrigerType == keyAction && subscribers.size() > 0) {
-            MMI_HILOGD("current key event is subscribed.");
+            MMI_HILOGD("Current key event is subscribed");
             return true;
         }
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool KeySubscriberHandler::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
