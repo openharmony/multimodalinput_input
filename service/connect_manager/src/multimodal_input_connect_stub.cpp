@@ -558,6 +558,10 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -633,6 +637,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubSetNapStatus(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -899,6 +907,10 @@ int32_t MultimodalInputConnectStub::StubNotifyNapOnline(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputEventObserver(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = RemoveInputEventObserver();
     return ret;
 }
@@ -926,6 +938,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t pid = 0;
     int32_t windowId = 0;
     READINT32(data, pid, RET_ERR);
@@ -1528,6 +1544,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
 int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t windowId = -1;
     bool isCaptureMode = false;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1560,6 +1580,10 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1589,6 +1613,10 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubEnableCombineKey(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -2241,6 +2269,10 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -2332,6 +2364,10 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     auto device = std::make_shared<InputDevice>();
     if (g_parseInputDevice(data, device) != RET_OK) {
         MMI_HILOGE("ParseInputDevice failed");
@@ -2350,6 +2386,10 @@ int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& dat
 int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t deviceId { -1 };
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = RemoveVirtualInputDevice(deviceId);

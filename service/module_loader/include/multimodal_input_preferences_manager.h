@@ -57,7 +57,9 @@ private:
     bool g_touchpadPinchSwitch { true };
     bool g_touchpadSwipeSwitch { true };
     bool g_hoverScrollState { true };
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     bool g_moveEventFilterFlag { false };
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t g_pointerColor { -1 };
     int32_t g_pointerSize { 1 };
     int32_t g_pointerStyle { 0 };
