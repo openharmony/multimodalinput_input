@@ -88,7 +88,7 @@ private:
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_FALSE(knuckleDivergentPoint->IsEnded());
+    EXPECT_TRUE(knuckleDivergentPoint->IsEnded());
 }
 
 /**
@@ -101,7 +101,7 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_002, TestS
 {
     CALL_TEST_DEBUG;
     knuckleDivergentPoint->lifespan_ = 1;
-    EXPECT_TRUE(knuckleDivergentPoint->IsEnded());
+    EXPECT_FALSE(knuckleDivergentPoint->IsEnded());
 }
 
 /**
@@ -113,7 +113,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_002, TestS
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Update());
+    knuckleDivergentPoint->Update();
+    EXPECT_LT(knuckleDivergentPoint->lifespan_, 0);
 }
 
 /**
@@ -126,7 +127,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_002, TestSi
 {
     CALL_TEST_DEBUG;
     knuckleDivergentPoint->lifespan_ = 1;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Update());
+    knuckleDivergentPoint->Update();
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, 0);
 }
 
 /**
@@ -138,7 +140,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_002, TestSi
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Clear_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Clear());
+    knuckleDivergentPoint->Clear();
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, -1);
 }
 
 /**
@@ -150,7 +153,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Clear_001, TestSiz
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(nullptr));
+    knuckleDivergentPoint->Draw(nullptr);
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, -1);
 }
 
 /**
@@ -163,8 +167,9 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_002, TestSize
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
-    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
+    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(10, 10));
+    knuckleDivergentPoint->Draw(canvas);
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, -1);
 }
 
 /**
@@ -181,7 +186,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_003, TestSize
     knuckleDivergentPoint->pointY_ = 1;
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
+    knuckleDivergentPoint->Draw(canvas);
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, 1);
 }
 
 /**
@@ -193,23 +199,11 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_003, TestSize
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    double pointX = 0.0;
-    double pointY = 0.0;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
-}
-
-/**
- * @tc.name: KnuckleDivergentPointTest_Reset_002
- * @tc.desc: Test Reset
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    double pointX = 1.0;
-    double pointY = 1.0;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
+    double pointX = 10.0;
+    double pointY = 5.0;
+    knuckleDivergentPoint->Reset(pointX, pointY);
+    EXPECT_DOUBLE_EQ(knuckleDivergentPoint->pointX_, 10.0);
+    EXPECT_DOUBLE_EQ(knuckleDivergentPoint->pointY_, 5.0);
 }
 } // namespace MMI
 } // namespace OHOS
