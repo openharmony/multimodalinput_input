@@ -1596,6 +1596,8 @@ napi_value JsPointerContext::GetTouchpadThreeFingersTapSwitch(napi_env env, napi
         return jsPointerMgr->GetTouchpadThreeFingersTapSwitch(env, handle);
     };
     return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;

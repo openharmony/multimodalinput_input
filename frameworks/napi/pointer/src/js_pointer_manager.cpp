@@ -986,6 +986,8 @@ napi_value JsPointerManager::GetTouchpadThreeFingersTapSwitch(napi_env env, napi
     bool switchFlag = true;
     int32_t ret = InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchFlag);
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
 napi_value JsPointerManager::EnableHardwareCursorStats(napi_env env, bool enable)
 {
     CALL_DEBUG_ENTER;
