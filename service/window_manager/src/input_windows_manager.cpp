@@ -315,12 +315,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     int32_t pid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (iter != touchItemDownInfos_.end()) {
-            pid = GetWindowPid(iter->second.window.agentWindowId);
-            if (pid == INVALID_FD) {
-                MMI_HILOG_DISPATCHI("Cant not find pid");
-                pid = iter->second.window.pid;
-                iter->second.flag = false;
-            }
+            MMI_HILOG_DISPATCHI("Cant not find pid");
+            pid = iter->second.window.pid;
+            iter->second.flag = false;
             MMI_HILOG_DISPATCHD("touchscreen occurs, new pid:%{public}d", pid);
         }
     }
