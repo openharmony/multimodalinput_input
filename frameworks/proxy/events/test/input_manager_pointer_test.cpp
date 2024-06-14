@@ -18,10 +18,12 @@
 #include "input_manager_util.h"
 #include "pixel_map.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerPointerTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerPointerTest"};
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t SIZE_TYPE_CASE = 3;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 222;
@@ -1603,35 +1605,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
     int32_t newType = 1;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_SetTouchpadRotateSwitch_001
- * @tc.desc: Set touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool rotateSwitch = false;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_GetTouchpadRotateSwitch_001
- * @tc.desc: Get touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool rotateSwitch = true;
-    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
-    bool newRotateSwitch = true;
-    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
-    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 
 /**

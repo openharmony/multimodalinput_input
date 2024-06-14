@@ -14,14 +14,17 @@
  */
 
 #include "key_option.h"
+
 #include "config_multimodal.h"
 #include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyOption"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyOption" };
-constexpr int32_t PRE_KEYS_MAX_SIZE = 4;
+constexpr int32_t PRE_KEYS_MAX_SIZE { 4 };
 }
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
@@ -74,18 +77,18 @@ void KeyOption::SetFinalKeyUpDelay(int32_t delay)
 
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
-    int32_t preKeysSize;
+    int32_t preKeysSize = 0;
     READINT32(in, preKeysSize);
     if (preKeysSize < 0) {
         return false;
     }
     if (preKeysSize > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("The preKeys size(%{public}d) exceeds maximum allowed size(%{public}d)", preKeysSize,
+        MMI_HILOGE("The preKeys size:%{public}d, exceeds maximum allowed size:%{public}d", preKeysSize,
             PRE_KEYS_MAX_SIZE);
         return false;
     }
     for (auto i = 0; i < preKeysSize; ++i) {
-        int32_t keyValue;
+        int32_t keyValue = 0;
         READINT32(in, keyValue);
         preKeys_.insert(keyValue);
     }
@@ -100,7 +103,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
 bool KeyOption::WriteToParcel(Parcel &out) const
 {
     if (preKeys_.size() > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("The preKeys size(%{public}zu) exceeds maximum allowed size(%{public}d)", preKeys_.size(),
+        MMI_HILOGE("The preKeys size:%{public}zu, exceeds maximum allowed size:%{public}d", preKeys_.size(),
             PRE_KEYS_MAX_SIZE);
         return false;
     }

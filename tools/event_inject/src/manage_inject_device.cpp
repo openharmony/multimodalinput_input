@@ -18,10 +18,12 @@
 #include <chrono>
 #include <thread>
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ManageInjectDevice"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
 constexpr int64_t INJECT_SLEEP_TIMES { 10 };
 } // namespace
 

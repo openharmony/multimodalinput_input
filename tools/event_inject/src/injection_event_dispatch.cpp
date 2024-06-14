@@ -27,10 +27,12 @@
 #include "proto.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InjectionEventDispatch"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionEventDispatch" };
 constexpr uint32_t SEND_EVENT_ARGV_COUNTS { 5 };
 constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX { 1 };
 constexpr uint32_t SEND_EVENT_TYPE_INDEX { 2 };
@@ -274,7 +276,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
-        MMI_HILOGE("Send event to device node failed.");
+        MMI_HILOGE("Send event to device node failed");
         return RET_ERR;
     }
     if (fd >= 0) {

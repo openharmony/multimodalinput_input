@@ -15,14 +15,24 @@
 
 #include "js_short_key_context.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsShortKeyContext"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MAX_DELAY = 4000;
-constexpr int32_t MIN_DELAY = 0;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsShortKeyContext" };
-constexpr const char *SHORT_KEY_CLASS = "multimodalinput_short_key_class";
-constexpr const char *SHORT_KEY_INSTANCE = "multimodalinput_short_key";
+constexpr int32_t MAX_DELAY { 4000 };
+constexpr int32_t MIN_DELAY { 0 };
+const std::string SHORT_KEY_CLASS { "multimodalinput_short_key_class" };
+const std::string SHORT_KEY_INSTANCE { "multimodalinput_short_key" };
+
+enum class FingerprintAction : int32_t {
+    DOWN = 0,
+    UP = 1,
+    SLIDE = 2,
+    RETOUCH = 3,
+    CLICK = 4,
+};
 } // namespace
 
 JsShortKeyContext::JsShortKeyContext() : mgr_(std::make_shared<JsShortKeyManager>()) {}
@@ -40,12 +50,12 @@ napi_value JsShortKeyContext::CreateInstance(napi_env env)
                                            nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     CHKRP(status, DEFINE_CLASS);
 
-    status = napi_set_named_property(env, global, SHORT_KEY_CLASS, jsClass);
+    status = napi_set_named_property(env, global, SHORT_KEY_CLASS.c_str(), jsClass);
     CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
     CHKRP(napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(napi_set_named_property(env, global, SHORT_KEY_INSTANCE, jsInstance), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), jsInstance), SET_NAMED_PROPERTY);
 
     JsShortKeyContext *jsContext = nullptr;
     CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
@@ -70,7 +80,7 @@ napi_value JsShortKeyContext::CreateJsObject(napi_env env, napi_callback_info in
     JsShortKeyContext *jsContext = new (std::nothrow) JsShortKeyContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("jsvm ends");
+        MMI_HILOGI("Jsvm ends");
         JsShortKeyContext *context = static_cast<JsShortKeyContext*>(data);
         delete context;
     }, nullptr, nullptr);
@@ -89,14 +99,14 @@ JsShortKeyContext* JsShortKeyContext::GetInstance(napi_env env)
     CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(napi_has_named_property(env, global, SHORT_KEY_INSTANCE, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), &result), HAS_NAMED_PROPERTY);
     if (!result) {
         THROWERR(env, "multimodal_short_key was not found");
         return nullptr;
     }
 
     napi_value object = nullptr;
-    CHKRP(napi_get_named_property(env, global, SHORT_KEY_INSTANCE, &object), SET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), &object), SET_NAMED_PROPERTY);
     if (object == nullptr) {
         THROWERR(env, "object is nullptr");
         return nullptr;
@@ -169,6 +179,25 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay, argv[2]);
 }
 
+napi_value JsShortKeyContext::GetNapiInt32(napi_env env, int32_t code)
+{
+    CALL_DEBUG_ENTER;
+    napi_value ret = nullptr;
+    CHKRP(napi_create_int32(env, code, &ret), CREATE_INT32);
+    return ret;
+}
+
+napi_value JsShortKeyContext::EnumClassConstructor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value args[1] = { 0 };
+    napi_value ret = nullptr;
+    void *data = nullptr;
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    return ret;
+}
+
 napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -181,6 +210,19 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setKeyDownDuration", SetKeyDownDuration),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
+
+    napi_property_descriptor fingerprintActionArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("DOWN", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("UP", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("SLIDE", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::SLIDE))),
+        DECLARE_NAPI_STATIC_PROPERTY("RETOUCH", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::RETOUCH))),
+        DECLARE_NAPI_STATIC_PROPERTY("CLICK", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CLICK))),
+    };
+    napi_value fingerprintAction = nullptr;
+    CHKRP(napi_define_class(env, "FingerprintAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(fingerprintActionArr) / sizeof(*fingerprintActionArr), fingerprintActionArr, &fingerprintAction),
+        DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "FingerprintAction", fingerprintAction), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI

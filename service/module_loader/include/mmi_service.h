@@ -26,12 +26,14 @@
 
 #include "app_debug_listener.h"
 #include "delegate_tasks.h"
+#include "display_manager.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 #include "nap_process.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -64,7 +66,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
     int32_t GetHoverScrollState(bool &state) override;
-    int32_t SetPointerVisible(bool visible) override;
+    int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerColor(int32_t color) override;
@@ -72,10 +74,10 @@ public:
     int32_t EnableCombineKey(bool enable) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false) override;
     int32_t NotifyNapOnline() override;
     int32_t RemoveInputEventObserver() override;
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
     int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
@@ -92,12 +94,12 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
-    int32_t SubscribeSwitchEvent(int32_t subscribeId) override;
+    int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override;
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override;
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
@@ -130,13 +132,27 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
+    int32_t Authorize(bool isAuthorize) override;
+    int32_t CancelInjection() override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    int32_t HasIrEmitter(bool &hasIrEmitter) override;
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
+    int32_t OnHasIrEmitter(bool &hasIrEmitter);
+    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies);
+    int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
+    int32_t SetCurrentUser(int32_t userId) override;
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
+    int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
+    int32_t EnableHardwareCursorStats(bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
-    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent);
-    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 protected:
@@ -178,12 +194,13 @@ protected:
         int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
-    int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
@@ -196,17 +213,25 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     void AddAppDebugListener();
     void RemoveAppDebugListener();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t UpdateCombineKeyState(bool enable);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
+    int32_t OnAuthorize(bool isAuthorize);
+    int32_t OnCancelInjection();
 
 private:
+    int32_t CheckPidPermission(int32_t pid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     bool isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+    sptr<Rosen::Display> displays_[2] = { nullptr, nullptr };
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif // OHOS_RSS_CLIENT

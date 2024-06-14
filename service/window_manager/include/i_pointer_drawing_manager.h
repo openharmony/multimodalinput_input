@@ -42,7 +42,7 @@ public:
         return true;
     }
     virtual void DeletePointerVisible(int32_t pid) {}
-    virtual int32_t SetPointerVisible(int32_t pid, bool visible)
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority)
     {
         return 0;
     }
@@ -58,7 +58,8 @@ public:
     {
         return 0;
     }
-    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
+        bool isUiExtension = false)
     {
         return 0;
     }
@@ -66,7 +67,8 @@ public:
     {
         return 0;
     }
-    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle)
+    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
+        bool isUiExtension = false)
     {
         return 0;
     }
@@ -105,10 +107,29 @@ public:
     {
         return {};
     }
+    virtual IconStyle GetIconStyle(const MOUSE_ICON mouseStyle)
+    {
+        return {};
+    }
     virtual std::map<MOUSE_ICON, IconStyle> GetMouseIconPath()
     {
         return {};
     }
+    virtual int32_t SwitchPointerStyle()
+    {
+        return 0;
+    }
+    virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
+    virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
+    virtual int32_t EnableHardwareCursorStats(int32_t pid, bool enable)
+    {
+        return 0;
+    }
+    virtual int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+    {
+        return 0;
+    }
+    virtual void ForceClearPointerVisiableStatus();
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

@@ -18,12 +18,11 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AddMonitorFuzzTeset"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddMonitorFuzzTeset" };
-} // namespace
-
 class InputEventConsumerTest : public IInputEventConsumer {
 public:
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
@@ -42,10 +41,10 @@ bool AddMonitorFuzzTeset(const uint8_t* data, size_t /* size */)
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 
-    auto PointerEventFun = [](std::shared_ptr<PointerEvent> event) {
+    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
         MMI_HILOGD("Add monitor success");
     };
-    monitorId = InputManager::GetInstance()->AddMonitor(PointerEventFun);
+    monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 
     auto consumer = std::make_shared<InputEventConsumerTest>();

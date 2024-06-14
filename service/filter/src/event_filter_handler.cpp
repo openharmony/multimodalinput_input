@@ -19,12 +19,13 @@
 #include "input_device_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventFilterHandler"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterHandler" };
-} // namespace
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -71,19 +72,18 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPR(filter, ERROR_NULL_POINTER);
-    MMI_HILOGI("Add filter,filterId:%{public}d,priority:%{public}d,clientPid:%{public}d,filters_ size:%{public}zu",
+    MMI_HILOGI("Add filter, filterId:%{public}d, priority:%{public}d, clientPid:%{public}d, filters_ size:%{public}zu",
         filterId, priority, clientPid, filters_.size());
-    
     std::weak_ptr<EventFilterHandler> weakPtr = shared_from_this();
     auto deathCallback = [weakPtr, filterId, clientPid](const wptr<IRemoteObject> &object) {
         auto sharedPtr = weakPtr.lock();
         if (sharedPtr != nullptr) {
             auto ret = sharedPtr->RemoveInputEventFilter(filterId, clientPid);
             if (ret != RET_OK) {
-                MMI_HILOGW("Remove filter on dead return:%{public}d, filterId:%{public}d,clientPid:%{public}d",
+                MMI_HILOGW("Remove filter on dead return:%{public}d, filterId:%{public}d, clientPid:%{public}d",
                     ret, filterId, clientPid);
             } else {
-                MMI_HILOGW("Remove filter on dead success, filterId:%{public}d,clientPid:%{public}d",
+                MMI_HILOGW("Remove filter on dead success, filterId:%{public}d, clientPid:%{public}d",
                     filterId, clientPid);
             }
         }
@@ -91,7 +91,6 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) EventFilterDeathRecipient(deathCallback);
     CHKPR(deathRecipient, RET_ERR);
     filter->AsObject()->AddDeathRecipient(deathRecipient);
-    
     FilterInfo info { .filter = filter, .deathRecipient = deathRecipient, .filterId = filterId,
         .priority = priority, .deviceTags = deviceTags, .clientPid = clientPid };
     auto it = filters_.cbegin();
@@ -121,7 +120,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
             if (it->clientPid == clientPid) {
                 auto id = it->filterId;
                 filters_.erase(it++);
-                MMI_HILOGI("Filter remove success, filterId:%{public}d,clientPid:%{public}d", id, clientPid);
+                MMI_HILOGI("Filter remove success, filterId:%{public}d, clientPid:%{public}d", id, clientPid);
                 continue;
             }
             ++it;
@@ -129,7 +128,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
         }
         if (it->IsSameClient(filterId, clientPid)) {
             filters_.erase(it++);
-            MMI_HILOGI("Filter remove success, filterId:%{public}d,clientPid:%{public}d", filterId, clientPid);
+            MMI_HILOGI("Filter remove success, filterId:%{public}d, clientPid:%{public}d", filterId, clientPid);
             return RET_OK;
         }
         ++it;
@@ -137,7 +136,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
     if (filterId == -1) {
         return RET_OK;
     }
-    MMI_HILOGI("Filter not found, filterId:%{public}d,clientPid:%{public}d", filterId, clientPid);
+    MMI_HILOGI("Filter not found, filterId:%{public}d, clientPid:%{public}d", filterId, clientPid);
     return RET_OK;
 }
 
@@ -165,7 +164,7 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
         MMI_HILOGE("keyItems is empty");
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(keyItems.front().GetDeviceId());
     CHKPF(inputDevice);
     for (auto &i: filters_) {
         if (!inputDevice->HasCapability(i.deviceTags)) {
@@ -193,7 +192,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = INPUT_DEV_MGR->GetInputDevice(pointerItem.GetDeviceId());
     CHKPF(inputDevice);
     for (auto &i: filters_) {
         if (!inputDevice->HasCapability(i.deviceTags)) {

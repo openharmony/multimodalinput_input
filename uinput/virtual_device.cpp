@@ -21,11 +21,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "VirtualDevice"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace OHOS::HiviewDFX;
-constexpr HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "VirtualDevice" };
 constexpr uint32_t MAX_NAME_LENGTH { 80 };
 
 bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
@@ -93,6 +95,11 @@ bool VirtualDevice::SetUp()
         }
     }
 
+    return SetUpExt();
+}
+
+bool VirtualDevice::SetUpExt()
+{
     errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
     if (ret != EOK) {
         MMI_HILOGE("Failed to copy deviceName");

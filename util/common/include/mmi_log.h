@@ -27,15 +27,78 @@
 #include "util.h"
 #include "klog.h"
 
+#ifndef MMI_DISABLE_LOG_TRACE
+
 namespace OHOS {
 namespace MMI {
-inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
-} // namespace MMI
-} // namespace OHOS
+class LogTracer {
+public:
+    LogTracer();
 
-#ifndef MMI_FUNC_FMT
-#define MMI_FUNC_FMT "in %{public}s, "
+    LogTracer(int64_t, int32_t, int32_t);
+
+    LogTracer(LogTracer &&other) noexcept;
+
+    LogTracer &operator=(LogTracer &&other) noexcept;
+
+    ~LogTracer();
+
+private:
+    int64_t traceId_;
+};
+
+void StartLogTraceId(int64_t, int32_t, int32_t);
+
+void EndLogTraceId(int64_t);
+
+const char *FormatLogTrace();
+
+void ResetLogTrace();
+}
+}
+
+#define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
+#define MMI_FUNC_NOLINE_FMT "[%{public}s][%{public}s] "
+#define MMI_TRACE_ID  (OHOS::MMI::FormatLogTrace()),
+#else
+#define MMI_FUNC_FMT "[%{public}s:%{public}d] "
+#define MMI_FUNC_NOLINE_FMT "[%{public}s] "
+#define MMI_TRACE_ID
+#endif //MMI_DISABLE_LOG_TRACE
+
+#ifdef MMI_LOG_DOMAIN
+#undef MMI_LOG_DOMAIN
 #endif
+#ifdef MMI_LOG_FRAMEWORK
+#undef MMI_LOG_FRAMEWORK
+#endif
+#define MMI_LOG_FRAMEWORK 0XD002800
+#ifdef MMI_LOG_SERVER
+#undef MMI_LOG_SERVER
+#endif
+#define MMI_LOG_SERVER 0XD002801
+#ifdef MMI_LOG_HANDLER
+#undef MMI_LOG_HANDLER
+#endif
+#define MMI_LOG_HANDLER 0XD002802
+#ifdef MMI_LOG_WINDOW
+#undef MMI_LOG_WINDOW
+#endif
+#define MMI_LOG_WINDOW 0XD002803
+#ifdef MMI_LOG_CURSOR
+#undef MMI_LOG_CURSOR
+#endif
+#define MMI_LOG_CURSOR 0XD002804
+#ifdef MMI_LOG_DISPATCH
+#undef MMI_LOG_DISPATCH
+#endif
+#define MMI_LOG_DISPATCH 0XD002805
+#ifdef MMI_LOG_ANRDETECT
+#undef MMI_LOG_ANRDETECT
+#endif
+#define MMI_LOG_ANRDETECT 0XD002806
+
+#define MMI_LOG_DOMAIN MMI_LOG_FRAMEWORK
 
 #ifndef MMI_FUNC_INFO
 #define MMI_FUNC_INFO __FUNCTION__
@@ -49,22 +112,137 @@ inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #define MMI_LINE_INFO   MMI_FILE_NAME, __LINE__
 #endif
 
+#define MMI_HILOG_BASE(type, level, domain, tag, fmt, ...) do { \
+        HILOG_IMPL(type, level, domain, tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID MMI_FUNC_INFO, __LINE__, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HEADER(level, lh, fmt, ...) do { \
+        HILOG_IMPL(LOG_CORE, level, lh.domain, lh.tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID lh.func, lh.line, \
+        ##__VA_ARGS__); \
+} while (0)
 #define MMI_HILOGD(fmt, ...) do { \
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) { \
-        ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGW(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGE(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGF(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_SERVERD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_SERVER, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_SERVERI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERW(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERF(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_HANDLERD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_HANDLER, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_HANDLERI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERW(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERF(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_WINDOWD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_WINDOW, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_WINDOWI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWW(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWF(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_CURSORD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_CURSOR, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_CURSORI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORW(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORF(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_DISPATCHD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_DISPATCHI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_DISPATCHW(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_DISPATCHE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_DISPATCHF(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
+#define MMI_HILOG_ANRDETECTD(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+#define MMI_HILOG_ANRDETECTI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTW(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTF(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \
@@ -102,41 +280,48 @@ inline constexpr int32_t FINAL_FINGER { 1 };
 
 class InnerFunctionTracer {
 public:
-    using HilogFunc = std::function<int(const char *)>;
-
-public:
-    InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
-        : logfn_ { logfn }, tag_ { tag }, level_ { level }
+    InnerFunctionTracer(LogLevel level, const char* tag, const char* logfn, uint32_t logline)
+        : level_ { level }, tag_ { tag }, logfn_ { logfn }, logline_ { logline }
     {
-        if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
+        if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                logfn_("in %{public}s, enter");
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, MMI_FUNC_FMT "enter", MMI_TRACE_ID logfn_, logline_);
             }
         }
     }
     ~InnerFunctionTracer()
     {
-        if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
+        if (HiLogIsLoggable(MMI_LOG_DOMAIN, tag_, level_)) {
             if (logfn_ != nullptr) {
-                logfn_("in %{public}s, leave");
+                HILOG_IMPL(LOG_CORE, level_, MMI_LOG_DOMAIN, tag_, MMI_FUNC_NOLINE_FMT "leave", MMI_TRACE_ID logfn_);
             }
         }
     }
 private:
-    HilogFunc logfn_ { nullptr };
-    const char* tag_ { nullptr };
     LogLevel level_ { LOG_LEVEL_MIN };
+    const char* tag_ { nullptr };
+    const char* logfn_ { nullptr };
+    const uint32_t logline_ { 0 };
+};
+
+struct LogHeader {
+    const uint32_t domain;
+    const char* tag;
+    const char* func;
+    const uint32_t line;
+
+    LogHeader(uint32_t domain, const char* tag, const char* func, uint32_t line)
+        : domain(domain), tag(tag), func(func), line(line) {}
 };
 } // namespace MMI
 } // namespace OHOS
 
-#define CALL_DEBUG_ENTER        ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Debug___    \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
+#define MMI_LOG_HEADER { MMI_LOG_DOMAIN, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
 
-#define CALL_INFO_TRACE         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
-
-#define CALL_TEST_DEBUG         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
-    (test_info_ == nullptr ? "TestBody" : test_info_->name())), LABEL.tag, LOG_DEBUG }
+#define CALL_DEBUG_ENTER ::OHOS::MMI::InnerFunctionTracer __innerFuncTracer_Debug___ \
+    { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
+#define CALL_INFO_TRACE ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
+    { LOG_INFO, MMI_LOG_TAG, __FUNCTION__, __LINE__  }
+#define CALL_TEST_DEBUG ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
+    { LOG_DEBUG, MMI_LOG_TAG, test_info_ == nullptr ? "TestBody" : test_info_->name(), __LINE__ }
 #endif // MMI_LOG_H

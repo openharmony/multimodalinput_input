@@ -57,8 +57,8 @@ namespace MMI {
 #define MMISEVER_WMS_DEVICE_ADDED 1
 // notifyDeviceChange@Device removed
 #define MMISEVER_WMS_DEVICE_REMOVE 2
-#define SEND_RETRY_LIMIT 2
-#define SEND_RETRY_SLEEP_TIME 10000
+#define SEND_RETRY_LIMIT 50
+#define SEND_RETRY_SLEEP_TIME 500
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32
 #define INPUT_POINTER_DEVICES "input.pointer.device"

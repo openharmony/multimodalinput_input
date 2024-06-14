@@ -23,11 +23,11 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UpdateDisplayInfoFuzzTest"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UpdateDisplayInfoFuzzTest" };
-} // namespace
 template<class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
@@ -75,6 +75,20 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
     }
     windowInfo.pointerHotAreas = pointerHotAreasInfo;
     windowInfo.defaultHotAreas = defaultHotAreasInfo;
+    std::vector<int32_t> pointerChangeAreasInfos;
+    for (size_t j = 0; j < WindowInfo::POINTER_CHANGEAREA_COUNT; ++j) {
+        int32_t temp = 0;
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, temp);
+        pointerChangeAreasInfos.push_back(temp);
+    }
+    windowInfo.pointerChangeAreas = pointerChangeAreasInfos;
+    std::vector<float> transformInfos;
+    for (size_t j = 0; j < WindowInfo::WINDOW_TRANSFORM_SIZE; ++j) {
+        float temp = 0;
+        startPos += GetObject<float>(data + startPos, size - startPos, temp);
+        transformInfos.push_back(temp);
+    }
+    windowInfo.transform = transformInfos;
 }
 
 void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)

@@ -25,7 +25,9 @@
 #include "define_multimodal.h"
 #include "fingersense_manager.h"
 #include "fingersense_wrapper.h"
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "key_event_normalize.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "mmi_log.h"
 #include "want.h"
 #include "util.h"
@@ -41,9 +43,27 @@ class DisplayEventMonitor final {
         void UpdateShieldStatusOnScreenOff();
         void InitCommonEventSubscriber();
         bool IsCommonEventSubscriberInit();
+        void SetScreenStatus(const std::string &screenStatus)
+        {
+            screenStatus_ = screenStatus;
+        }
+        const std::string GetScreenStatus()
+        {
+            return screenStatus_;
+        }
+        void SetScreenLocked(bool isLocked)
+        {
+            isScreenLocked_ = isLocked;
+        }
+        bool GetScreenLocked() const
+        {
+            return isScreenLocked_;
+        }
     private:
         int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
+        std::string screenStatus_;
+        bool isScreenLocked_ { true };
 };
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()
 } // namespace MMI

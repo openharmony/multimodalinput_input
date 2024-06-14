@@ -13,23 +13,27 @@
 
 import("//build/ohos.gni")
 
+mmi_part_name = "input"
+mmi_subsystem_name = "multimodalinput"
 mmi_path = "//foundation/multimodalinput/input"
 graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 security_component_path = "//base/security"
+c_utils_root = "//commonlibrary/c_utils"
+hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
   resource_schedule_service_enabled = false
   input_feature_product = "default"
   input_feature_enable_pgo = false
   input_feature_pgo_path = ""
-  input_feature_combination_key = true
+  input_feature_combination_key = false
   input_feature_pointer_drawing = true
   input_feature_interceptor = true
   input_feature_monitor = true
-  input_feature_keyboard = true
-  input_feature_switch = false
+  input_feature_keyboard = false
+  input_feature_switch = true
   input_feature_mouse = true
   input_feature_joystick = true
   input_feature_touchscreen = true
@@ -37,7 +41,12 @@ declare_args() {
   input_feature_short_key = true
   input_feature_coverage = false
   input_ext_feature_anco = false
-  input_ext_feature_fingersense = false
+  input_ext_feature_fingersense = true
+  input_ext_feature_gesturesense = true
+  input_feature_fingerprint = false
+  input_feature_crown = true
+  input_ext_feature_magiccursor = false
+  input_feature_infrared_emitter = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -59,6 +68,7 @@ declare_args() {
   ]
 
   libmmi_common_sources = [
+    "events/src/axis_event.cpp",
     "events/src/input_device.cpp",
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
@@ -75,7 +85,6 @@ declare_args() {
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/scene_board_judgement.cpp",
-    "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
@@ -88,8 +97,8 @@ declare_args() {
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
+    "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
-    "display_state_manager/src/display_event_monitor.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/anr_manager.cpp",
@@ -100,8 +109,15 @@ declare_args() {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
+    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
+    "key_command/src/setting_datashare.cpp",
+    "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
+    "message_handle/src/authorization_dialog.cpp",
+    "message_handle/src/authorize_helper.cpp",
+    "message_handle/src/inject_notice_manager.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
@@ -114,6 +130,8 @@ declare_args() {
     "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
+
+  infraredemitter_sources = [ "src/js_register_module.cpp" ]
 
   inputdevice_sources = [
     "src/js_event_target.cpp",
@@ -133,6 +151,7 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/evdev-debounce.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-fallback.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-joystick.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-privacy-switch.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-middle-button.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-buttons.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-edge-scroll.c",
@@ -192,8 +211,11 @@ declare_args() {
   ]
 
   libmmi_virtual_device_sources = [
+    "src/virtual_crown.cpp",
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
+    "src/virtual_fingerprint_key.cpp",
+    "src/virtual_fingerprint_mouse.cpp",
     "src/virtual_gamepad.cpp",
     "src/virtual_joystick.cpp",
     "src/virtual_keyboard.cpp",
@@ -205,6 +227,8 @@ declare_args() {
     "src/virtual_knob_mouse.cpp",
     "src/virtual_knob_sys_ctrl.cpp",
     "src/virtual_mouse.cpp",
+    "src/virtual_pc_switch.cpp",
+    "src/virtual_pc_touchpad.cpp",
     "src/virtual_pen.cpp",
     "src/virtual_pen_keyboard.cpp",
     "src/virtual_pen_mouse.cpp",
@@ -252,6 +276,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
+print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
 
 input_default_defines = []
 
@@ -291,6 +316,14 @@ if (input_feature_short_key) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
 }
 
+if (input_feature_fingerprint) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
+}
+
+if (input_feature_crown) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CROWN" ]
+}
+
 if (!defined(global_parts_info) ||
     defined(global_parts_info.security_security_component_manager)) {
   security_component_enable = true
@@ -306,14 +339,45 @@ if (input_ext_feature_fingersense) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
 }
 
+if (input_ext_feature_gesturesense) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
+}
+
 if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
       [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
+
+  if (input_feature_product != "pc") {
+    input_default_defines += [ "OHOS_BUILD_ENABLE_INFRARED_EMITTER" ]
+  }
+
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/mmi_service_ext.cpp",
+  ]
+
+  if (input_feature_product != "pc") {
+    libmmi_service_sources += [ "${mmi_path}/service/infrared_emitter/src/infrared_emitter_controller.cpp" ]
+  }
+}
+
+if (input_feature_product == "pc") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
+}
+
+if (input_ext_feature_magiccursor) {
+  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
+  g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
+  g2d_path = "//foundation/graphic/graphic_2d"
+  surface_path = "//foundation/graphic/graphic_surface"
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
+  libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
+    "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
 }

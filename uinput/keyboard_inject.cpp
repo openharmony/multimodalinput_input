@@ -18,12 +18,14 @@
 #include "linux/input-event-codes.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "keyBoardInject"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<KeyboardInject> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject" };
 constexpr int32_t INPUT_KEY_BACK { 2 };
 constexpr int32_t LINUX_KEY_BACK { 158 };
 } // namespace

@@ -24,13 +24,17 @@
 #include <unistd.h>
 
 #include "define_multimodal.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "util.h"
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "LibinputAdapter"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
 constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 constexpr int32_t MAX_RETRY_COUNT { 5 };
 
@@ -67,7 +71,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             MMI_HILOGWK("The error path is %{public}s", path);
             return RET_ERR;
         }
-        int32_t fd;
+        int32_t fd = 0;
         for (int32_t i = 0; i < MAX_RETRY_COUNT; i++) {
             fd = open(realPath, flags);
             if (fd >= 0) {
@@ -122,7 +126,7 @@ void LibinputAdapter::EventDispatch(int32_t fd)
     } else if (fd == hotplugDetector_.GetFd()) {
         hotplugDetector_.OnEvent();
     } else {
-        MMI_HILOGE("EventDispatch() called with unknown fd: %{public}d.", fd);
+        MMI_HILOGE("EventDispatch() called with unknown fd:%{public}d", fd);
     }
 }
 

@@ -12,20 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-#include "ipc_skeleton.h"
 
 #include "nap_process.h"
+
+#include "ipc_skeleton.h"
+
 #include "input_event_handler.h"
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "NapProcess"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NapProcess" };
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t NAP_EVENT = 0;
-constexpr int32_t SUBSCRIBED = 1;
-constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t NAP_EVENT { 0 };
+constexpr int32_t SUBSCRIBED { 1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 } // namespace
 
 NapProcess *NapProcess::instance_ = new (std::nothrow) NapProcess();
@@ -44,10 +49,10 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data, int32_t syncState)
 {
     CALL_DEBUG_ENTER;
     if (napClientPid_ < 0) {
-        MMI_HILOGE("Client pid is unavailable!");
+        MMI_HILOGE("Client pid is unavailable");
         return RET_ERR;
     }
-    MMI_HILOGD("NotifyBundle info is : %{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("NotifyBundle info pid:%{public}d, uid:%{public}d, bundleName:%{public}s, syncState:%{public}d",
         data.pid, data.uid, data.bundleName.c_str(), syncState);
     NetPacket pkt(MmiMessageId::NOTIFY_BUNDLE_NAME);
     pkt << data.pid;
@@ -88,12 +93,12 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     napData.bundleName = bundleName;
     if (napStatus == ACTIVE_EVENT) {
         RemoveMmiSubscribedEventData(napData);
-        MMI_HILOGD("Remove active event from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("Remove active event from napMap, pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             pid, uid, bundleName.c_str());
     }
     if (napStatus == NAP_EVENT) {
         AddMmiSubscribedEventData(napData, napStatus);
-        MMI_HILOGD("Add nap process to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("Add nap process to napMap, pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             pid, uid, bundleName.c_str());
     }
     return RET_OK;
@@ -131,7 +136,7 @@ int32_t NapProcess::NotifyNapOnline()
     CALL_DEBUG_ENTER;
     int32_t pid = IPCSkeleton::GetCallingPid();
     napClientPid_ = pid;
-    MMI_HILOGD("NotifyNapOnline pid is %{public}d", pid);
+    MMI_HILOGD("NotifyNapOnline pid:%{public}d", pid);
     return RET_OK;
 }
 

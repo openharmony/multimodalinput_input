@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("../../multimodalinput_mini.gni")
 ohos_executable("input_device_display_bind") {
   sources = [ "src/input_device_display_bind.cpp" ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

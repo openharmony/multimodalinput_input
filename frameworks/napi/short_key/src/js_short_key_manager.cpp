@@ -17,11 +17,12 @@
 
 #include "napi_constants.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsShortKeyManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsShortKeyManager" };
-
 enum class ReturnType {
     VOID,
     BOOL,
@@ -48,7 +49,7 @@ AsyncContext::~AsyncContext()
     }
 }
 
-bool getResult(sptr<AsyncContext> asyncContext, napi_value * results, int32_t size)
+static bool GetResult(sptr<AsyncContext> asyncContext, napi_value * results, int32_t size)
 {
     CALL_DEBUG_ENTER;
     int32_t length = 2;
@@ -105,7 +106,11 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     napi_value resource = nullptr;
     CHKRV(napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
-    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
+    napi_status status = napi_create_async_work(
+        env, nullptr, resource,
+        [](napi_env env, void* data) {
+            MMI_HILOGD("async_work callback function is called");
+        },
         [](napi_env env, napi_status status, void* data) {
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
             /**
@@ -118,7 +123,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             asyncContext->DecStrongRef(nullptr);
             napi_value results[2] = { 0 };
             int32_t size = 2;
-            if (!getResult(asyncContext, results, size)) {
+            if (!GetResult(asyncContext, results, size)) {
                 MMI_HILOGE("Failed to create napi data");
                 return;
             }
@@ -136,7 +141,8 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
-    if (status != napi_ok || napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
+    if (status != napi_ok ||
+        napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
         MMI_HILOGE("Create async work failed");
         asyncContext->DecStrongRef(nullptr);
     }

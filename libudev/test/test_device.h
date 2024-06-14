@@ -89,7 +89,7 @@ public:
     {
         libevdev_set_name(evdev_, TEST_NAME);
         libevdev_enable_event_type(evdev_, EV_KEY);
-        for (int i = KEY_ESC; i < KEY_D; i++) {
+        for (int32_t i = KEY_ESC; i < KEY_D; i++) {
             libevdev_enable_event_code(evdev_, EV_KEY, i, nullptr);
         }
     }

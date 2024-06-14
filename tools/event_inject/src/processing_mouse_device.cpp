@@ -15,12 +15,11 @@
 
 #include "processing_mouse_device.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ProcessingMouseDevice"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingMouseDevice" };
-} // namespace
-
 int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {

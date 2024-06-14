@@ -26,6 +26,7 @@
 #include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
 #include "multimodalinput_ipc_interface_code.h"
+#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,7 +59,7 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);
     int32_t GetHoverScrollState(bool &state);
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);
     int32_t SetPointerColor(int32_t color);
@@ -66,8 +67,8 @@ public:
     int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t GetDeviceIds(std::vector<int32_t> &ids);
@@ -85,12 +86,12 @@ public:
         uint32_t deviceTags);
     int32_t MarkEventConsumed(int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
-    int32_t SubscribeSwitchEvent(int32_t subscribeId);
+    int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
-    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject);
     int32_t SetAnrObserver();
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
@@ -119,9 +120,19 @@ public:
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
-
+    int32_t Authorize(bool isAuthorize);
+    int32_t CancelInjection();
+    int32_t HasIrEmitter(bool &hasIrEmitter);
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+    int32_t SetCurrentUser(int32_t userId);
+    int32_t EnableHardwareCursorStats(bool enable);
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
 private:
     MultimodalInputConnectManager() = default;
@@ -141,5 +152,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define MultimodalInputConnMgr MultimodalInputConnectManager::GetInstance()
+#define MULTIMODAL_INPUT_CONNECT_MGR MultimodalInputConnectManager::GetInstance()
 #endif // MULTIMODAL_INPUT_CONNECT_MANAGER_H

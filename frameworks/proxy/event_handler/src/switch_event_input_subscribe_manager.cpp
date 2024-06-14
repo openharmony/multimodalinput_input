@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,27 +22,41 @@
 #include "error_multimodal.h"
 #include "multimodal_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SwitchEventInputSubscribeManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SwitchEventInputSubscribeManager" };
-constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
+constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
 } // namespace
 int32_t SwitchEventInputSubscribeManager::subscribeManagerId_ = 0;
 
 SwitchEventInputSubscribeManager::SwitchEventInputSubscribeManager() {}
 SwitchEventInputSubscribeManager::~SwitchEventInputSubscribeManager() {}
 
+SwitchEventInputSubscribeManager::SubscribeSwitchEventInfo::SubscribeSwitchEventInfo(
+    int32_t switchType,
+    std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+    : switchType_(switchType), callback_(callback)
+{
+}
+
 int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
+    int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
-    CALL_INFO_TRACE;
-    CHKPR(callback, INVALID_SUBSCRIBE_ID);
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, ERROR_NULL_POINTER);
+    if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
+        MMI_HILOGE("switch type error");
+        return RET_ERR;
+    }
 
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return INVALID_SUBSCRIBE_ID;
+        return EVENT_REG_FAIL;
     }
     if (SwitchEventInputSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
@@ -50,9 +64,14 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     }
     int32_t subscribeId = SwitchEventInputSubscribeManager::subscribeManagerId_;
     ++SwitchEventInputSubscribeManager::subscribeManagerId_;
-    subscribeInfos_[subscribeId] = callback;
-    MMIEventHdl.SubscribeSwitchEvent(subscribeId);
-    MMI_HILOGI("subscribeId:%{public}d,", subscribeId);
+    subscribeInfos_.emplace(std::make_pair(subscribeId, SubscribeSwitchEventInfo(switchType, callback)));
+    int32_t ret = MMIEventHdl.SubscribeSwitchEvent(subscribeId, switchType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Subscribing switch event failed, ret:%{public}d", ret);
+        subscribeInfos_.erase(subscribeId);
+        return INVALID_SUBSCRIBE_ID;
+    }
+    MMI_HILOGI("subscribeId:%{public}d,switchType:%{public}d", subscribeId, switchType);
 
     return subscribeId;
 }
@@ -101,7 +120,8 @@ int32_t SwitchEventInputSubscribeManager::OnSubscribeSwitchEventCallback(std::sh
     std::lock_guard<std::mutex> guard(mtx_);
     auto it = subscribeInfos_.find(subscribeId);
     if (it != subscribeInfos_.end()) {
-        callback = it->second;
+        SubscribeSwitchEventInfo &subscribeInfo = it->second;
+        callback = subscribeInfo.GetCallback();
     }
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(event);
@@ -117,8 +137,10 @@ void SwitchEventInputSubscribeManager::OnConnected()
         return;
     }
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
-        if (MMIEventHdl.SubscribeSwitchEvent(it->first) != RET_OK) {
-            MMI_HILOGE("Subscribe switch event failed");
+        SubscribeSwitchEventInfo &subscribeInfo = it->second;
+        int32_t ret = MMIEventHdl.SubscribeSwitchEvent(subscribeInfo.GetSwitchType(), it->first);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Subscribe switch event failed, ret:%{public}d", ret);
         }
     }
 }

@@ -21,11 +21,12 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsUtil"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
-
 std::map<int32_t, std::string> axisType = {
     { ABS_MT_TOUCH_MAJOR, "touchmajor" },
     { ABS_MT_TOUCH_MINOR, "touchminor" },

@@ -23,12 +23,14 @@
 #include "bytrace_adapter.h"
 #include "multimodal_event_handler.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeyEventInputSubscribeManager"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventInputSubscribeManager" };
-constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
-constexpr size_t PRE_KEYS_NUM = 4;
+constexpr int32_t INVALID_SUBSCRIBE_ID { -1 };
+constexpr size_t PRE_KEYS_NUM { 4 };
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
@@ -132,7 +134,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     if (subscribeId < 0) {
-        MMI_HILOGE("The subscribe id is less than 0");
+        MMI_HILOGE("Subscribe id is less than 0");
         return RET_ERR;
     }
 
@@ -142,7 +144,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return INVALID_SUBSCRIBE_ID;
     }
     if (subscribeInfos_.empty()) {
-        MMI_HILOGE("The subscribeInfos is empty");
+        MMI_HILOGE("Subscribe Infos is empty");
         return RET_ERR;
     }
 

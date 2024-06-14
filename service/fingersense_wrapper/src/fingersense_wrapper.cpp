@@ -20,11 +20,15 @@
 #include "define_multimodal.h"
 #include "pointer_event.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "FingersenseWrapper"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 const std::string FINGERSENSE_WRAPPER_PATH = "libfingersense_wrapper.z.so";
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "FingersenseWrapper" };
 } // namespace
 
 FingersenseWrapper::FingersenseWrapper() {}
@@ -42,7 +46,7 @@ void FingersenseWrapper::InitFingerSenseWrapper()
     CALL_DEBUG_ENTER;
     fingerSenseWrapperHandle_ = dlopen(FINGERSENSE_WRAPPER_PATH.c_str(), RTLD_NOW);
     if (fingerSenseWrapperHandle_ == nullptr) {
-        MMI_HILOGE("libfingersense_wrapper.z.so was not loaded, error: %{public}s", dlerror());
+        MMI_HILOGE("libfingersense_wrapper.z.so was not loaded, error:%{public}s", dlerror());
         return;
     }
 
@@ -52,12 +56,15 @@ void FingersenseWrapper::InitFingerSenseWrapper()
     disableFingerSense_ = (DISABLE_FINGERSENSE)dlsym(fingerSenseWrapperHandle_, "DisableFingerSense");
     if (setCurrentToolType_ == nullptr || notifyTouchUp_ == nullptr || enableFingersense_ == nullptr ||
         disableFingerSense_ == nullptr) {
-        MMI_HILOGE("fingersense wrapper symbol failed, error: %{public}s", dlerror());
+        MMI_HILOGE("fingersense wrapper symbol failed, error:%{public}s", dlerror());
+        dlclose(fingerSenseWrapperHandle_);
         return;
     }
+
     sendFingerSenseDisplayMode_ = (SEND_FINGERSENSE_DISPLAYMODE)dlsym(fingerSenseWrapperHandle_, "UpdateDisplayMode");
     if (sendFingerSenseDisplayMode_ == nullptr) {
-        MMI_HILOGE("send fingersense display mode symbol failed, error: %{public}s", dlerror());
+        MMI_HILOGE("send fingersense display mode symbol failed, error:%{public}s", dlerror());
+        dlclose(fingerSenseWrapperHandle_);
         return;
     }
     MMI_HILOGD("fingersense wrapper init success");

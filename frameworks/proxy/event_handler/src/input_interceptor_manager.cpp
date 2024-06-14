@@ -18,32 +18,25 @@
 #include "input_handler_manager.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputInterceptorManager"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
-} // namespace
-
 InputInterceptorManager::InputInterceptorManager() {}
 InputInterceptorManager::~InputInterceptorManager() {}
 
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
     HandleEventType eventType)
 {
-    if (interceptor == nullptr) {
-        MMI_HILOGE("No interceptor was specified.");
-        return INVALID_HANDLER_ID;
-    }
+    CHKPR(interceptor, INVALID_HANDLER_ID);
     return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType);
 }
 
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
     HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
-    if (interceptor == nullptr) {
-        MMI_HILOGE("No interceptor was specified.");
-        return INVALID_HANDLER_ID;
-    }
+    CHKPR(interceptor, INVALID_HANDLER_ID);
     return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType, priority, deviceTags);
 }
 

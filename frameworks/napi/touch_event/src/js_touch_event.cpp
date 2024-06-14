@@ -19,12 +19,11 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsMouseEvent"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseEvent" };
-} // namespace
-
 napi_value JsTouchEvent::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_DEBUG_ENTER;
@@ -52,6 +51,9 @@ napi_value JsTouchEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("DOWN", GetNapiInt32(env, static_cast<int32_t>(Action::DOWN))),
         DECLARE_NAPI_STATIC_PROPERTY("MOVE", GetNapiInt32(env, static_cast<int32_t>(Action::MOVE))),
         DECLARE_NAPI_STATIC_PROPERTY("UP", GetNapiInt32(env, static_cast<int32_t>(Action::UP))),
+        DECLARE_NAPI_STATIC_PROPERTY("PULL_DOWN", GetNapiInt32(env, static_cast<int32_t>(Action::PULL_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("PULL_MOVE", GetNapiInt32(env, static_cast<int32_t>(Action::PULL_MOVE))),
+        DECLARE_NAPI_STATIC_PROPERTY("PULL_UP", GetNapiInt32(env, static_cast<int32_t>(Action::PULL_UP))),
     };
     napi_value action = nullptr;
     CHKRP(napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,8 +41,13 @@
 #include "virtual_trackpad.h"
 #include "virtual_trackpad_sys_ctrl.h"
 #include "virtual_touchpad.h"
+#include "virtual_pc_switch.h"
+#include "virtual_pc_touchpad.h"
 #include "virtual_touchscreen.h"
 #include "virtual_trackpad_mouse.h"
+#include "virtual_fingerprint_key.h"
+#include "virtual_fingerprint_mouse.h"
+#include "virtual_crown.h"
 
 namespace OHOS {
 namespace MMI {
@@ -91,7 +96,7 @@ static bool CheckFileName(const std::string& fileName)
     std::vector<std::string> validFileNames = {
         "mouse", "keyboard", "joystick", "trackball", "remotecontrol",
         "trackpad", "knob", "gamepad", "touchpad", "touchscreen",
-        "pen", "all"
+        "pen", "pc", "all"
     };
     std::string deviceName = fileName.substr(pos + 1);
     bool result = std::any_of(validFileNames.begin(), validFileNames.end(), [deviceName](const std::string& str) {
@@ -185,6 +190,14 @@ static void StartTrackpad()
     virtualTrackpadSysCtrl.SetUp();
 }
 
+static void StartPc()
+{
+    static VirtualPcTouchpad virtualPcTouchpad;
+    virtualPcTouchpad.SetUp();
+    static VirtualPcSwitch virtualPcSwitch;
+    virtualPcSwitch.SetUp();
+}
+
 static void StartKnob()
 {
     static VirtualKnob virtualKnob;
@@ -233,8 +246,22 @@ static void StartPen()
     virtualPenKeyboard.SetUp();
 }
 
-using virtualFun = void (*)();
-std::map<std::string, virtualFun> mapFun = {
+static void StartFingerprint()
+{
+    static VirtualFingerprintKey fingerprintKey;
+    fingerprintKey.SetUp();
+    static VirtualFingerprintMouse fingerprintMouse;
+    fingerprintMouse.SetUp();
+}
+
+static void StartCrown()
+{
+    static VirtualCrown virtualCrown;
+    virtualCrown.SetUp();
+}
+
+using VirtualFun = void (*)();
+std::map<std::string, VirtualFun> mapFun = {
     {"mouse", &StartMouse},
     {"keyboard", &StartKeyboard},
     {"joystick", &StartJoystick},
@@ -244,8 +271,11 @@ std::map<std::string, virtualFun> mapFun = {
     {"knob", &StartKnob},
     {"gamepad", &StartGamePad},
     {"touchpad", &StartTouchPad},
+    {"pc", &StartPc},
     {"touchscreen", &StartTouchScreen},
-    {"pen", &StartPen}
+    {"pen", &StartPen},
+    {"fingerprint", &StartFingerprint},
+    {"crown", &StartCrown}
 };
 
 static void StartAllDevices()
@@ -390,6 +420,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
     std::string phys;
     std::map<std::string, std::string> typeDevice = {
         {"Virtual Mouse",                "mouse"},
+        {"Virtual Crown",                "mouse"},
         {"Virtual keyboard",             "keyboard"},
         {"Virtual KeyboardConsumerCtrl", "keyboard"},
         {"Virtual keyboardExt",          "keyboard"},
@@ -405,6 +436,8 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual SingleFinger",         "touchpad"},
         {"Virtual Stylus",               "touchpad"},
         {"Virtual Touchpad",             "touchpad"},
+        {"Virtual PcSwitch",             "pc"},
+        {"Virtual PcTouchPad",           "pc"},
         {"Virtual RemoteControl",        "remotecontrol"},
         {"Virtual Joystick",             "joystick"},
         {"Virtual GamePad",              "gamepad"},

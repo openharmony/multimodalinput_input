@@ -27,11 +27,13 @@
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "SYSTEM_INFO"
+
 namespace OHOS {
 namespace MMI {
 namespace SYSTEM_INFO {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SYSTEM_INFO" };
 constexpr int32_t LOCATION { 14 };
 constexpr int32_t TIME_WAIT_FOR_OP { 1000 };
 constexpr int32_t DEFAULT_PID { -1 };

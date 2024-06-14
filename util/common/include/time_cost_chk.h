@@ -21,6 +21,9 @@
 
 #include "nocopyable.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TimeCostChk"
+
 namespace OHOS {
 namespace MMI {
 inline constexpr int64_t MAX_INPUT_EVENT_TIME { 1000 };
@@ -45,8 +48,6 @@ static std::map<int32_t, std::string> paramType = {
     { 805, "gesturn_pinch_end" },
 };
 template <class T> class TimeCostChk {
-    static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };
-
 public:
     TimeCostChk(const std::string &strReason, const std::string &strOutputStr, int64_t tmChk, T llParam1,
         int64_t llParam2 = 0)
@@ -62,7 +63,7 @@ public:
     {
         int64_t ullCost = GetElapsed_micro();
         if ((ullCost > uiTime_) && strReason_.size() > 0 && strOutput_.size() > 0) {
-            if (llParam1_ != 0 || llParam2_ != 0) {
+            if ((llParam1_ != 0 || llParam2_ != 0) && (paramType.find(llParam1_) != paramType.end())) {
                 MMI_HILOGD("Time cost overtime (%{public}" PRId64 ",(us)>%{public}" PRId64
                     "(us)) when Reason:%{public}s,chk:%{public}s,"
                     "paramType:%{public}s, param2:%{public}" PRId64 "",

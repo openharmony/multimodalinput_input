@@ -31,8 +31,7 @@
 namespace OHOS {
 namespace MMI {
 class InputDeviceManager final : public IDeviceObject {
-    DECLARE_DELAYED_SINGLETON(InputDeviceManager);
-
+private:
     struct InputDeviceInfo {
         struct libinput_device *inputDeviceOrigin { nullptr };
         std::string networkIdOrigin;
@@ -44,12 +43,18 @@ class InputDeviceManager final : public IDeviceObject {
         std::string sysUid;
         VendorConfig vendorConfig;
     };
+
 public:
+    InputDeviceManager() = default;
+    ~InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
+
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
     std::vector<int32_t> GetInputDeviceIds() const;
-    std::shared_ptr<InputDevice> GetInputDevice(int32_t id, bool checked = true) const;
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked = true) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
@@ -58,7 +63,7 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
-    void NotifyPointerDevice(bool hasPointerDevice, bool isVisible);
+    void NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug);
     void AddDevListener(SessionPtr sess);
     void RemoveDevListener(SessionPtr sess);
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -78,30 +83,44 @@ public:
     void SetInputStatusChangeCallback(inputDeviceCallback callback);
     VendorConfig GetVendorConfig(int32_t deviceId) const;
     int32_t OnEnableInputDevice(bool enable);
+    std::vector<int32_t> GetTouchPadIds();
+
+    static std::shared_ptr<InputDeviceManager> GetInstance();
 
 private:
-    int32_t ParseDeviceId(const std::string &sysName);
+    int32_t ParseDeviceId(struct libinput_device *inputDevice);
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
+    void NotifyDevRemoveCallback(int32_t deviceId,  const InputDeviceInfo &deviceInfo);
     int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
+    int32_t MakeVirtualDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo);
+    int32_t GenerateVirtualDeviceId(int32_t &deviceId);
+    bool IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const;
+    bool IsTouchableDevice(std::shared_ptr<InputDevice> inputDevice) const;
+    bool IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevice) const;
+
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
+    std::map<int32_t, std::shared_ptr<InputDevice>> virtualInputDevices_;
     std::map<std::string, std::string> inputDeviceScreens_;
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
-    std::list<SessionPtr> devListener_;
+    std::list<SessionPtr> devListeners_;
     inputDeviceCallback devCallbacks_ { nullptr };
     std::map<int32_t, std::string> displayInputBindInfos_;
     DeviceConfigManagement configManagement_;
     bool sessionLostCallbackInitialized_ { false };
+
+    static std::shared_ptr<InputDeviceManager> instance_;
+    static std::mutex mutex_;
 };
 
-#define InputDevMgr ::OHOS::DelayedSingleton<InputDeviceManager>::GetInstance()
+#define INPUT_DEV_MGR ::OHOS::MMI::InputDeviceManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_MANAGER_H

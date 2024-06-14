@@ -27,16 +27,20 @@
 #include "proto.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventMonitorHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-constexpr size_t MAX_EVENTIDS_SIZE = 1000;
+constexpr size_t MAX_EVENTIDS_SIZE { 1000 };
 #endif // OHOS_BUILD_ENABLE_TOUCH
-constexpr int32_t ACTIVE_EVENT = 2;
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t UNOBSERVED = -1;
+constexpr int32_t ACTIVE_EVENT { 2 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t UNOBSERVED { -1 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -72,6 +76,14 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
         MMI_HILOGD("Monitor is succeeded");
         return;
     }
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    if (pointerEvent->GetPointerItem(pointerId, item)) {
+        if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+            MMI_HILOGD("Knuckle event, skip");
+            return;
+        }
+    }
     CHKPV(nextHandler_);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
@@ -103,6 +115,7 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, Handl
 
 void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
 {
+    LogTracer lt(eventId, 0, 0);
     monitors_.MarkConsumed(eventId, session);
 }
 
@@ -158,56 +171,28 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
     monitors_.OnSessionLost(session);
 }
 
-void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
-    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write key event failed");
-        return;
-    }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
     }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
     }
 }
 
-void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
-    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     auto currentTime = GetSysClockTime();
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        if (ANRMgr->TriggerANR(ANR_MONITOR, currentTime, session_)) {
-            MMI_HILOGW("The pointer event does not report normally, application not response");
-            return;
-        }
-    }
-    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write pointer event failed");
-        return;
-    }
-    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
-    }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        session_->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
-        MMI_HILOGD("session pid : %{public}d", session_->GetPid());
-        ANRMgr->AddTimer(ANR_MONITOR, pointerEvent->GetId(), currentTime, session_);
     }
 }
 
@@ -293,10 +278,7 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
         return;
     }
     state.isMonitorConsumed_ = true;
-    if (state.lastPointerEvent_ == nullptr) {
-        MMI_HILOGE("No former touch event");
-        return;
-    }
+    CHKPV(state.lastPointerEvent_);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MMI_HILOGD("Cancel operation");
     auto pointerEvent = std::make_shared<PointerEvent>(*state.lastPointerEvent_);
@@ -315,9 +297,15 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
 {
     CHKPF(keyEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
+    NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
+    pkt << InputHandlerType::MONITOR << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return false;
+    }
     for (const auto &mon : monitors_) {
         if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
-            mon.SendToClient(keyEvent);
+            mon.SendToClient(keyEvent, pkt);
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
@@ -420,9 +408,19 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
 {
     CHKPV(pointerEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
+    NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
+    pkt << InputHandlerType::MONITOR << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
+        return;
+    }
+    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+        return;
+    }
     for (const auto &monitor : monitors_) {
-        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
-            monitor.SendToClient(pointerEvent);
+        if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
+            monitor.SendToClient(pointerEvent, pkt);
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
@@ -471,10 +469,12 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s "
+                "| EventType:%s | ProgramName:%s \t",
                 item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
-                session->GetEarliestEventTime(), session->GetDescript().c_str());
+                session->GetEarliestEventTime(), session->GetDescript().c_str(),
+                item.eventType_, session->GetProgramName().c_str());
     }
 }
 } // namespace MMI

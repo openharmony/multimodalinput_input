@@ -30,16 +30,37 @@ class SwitchEventInputSubscribeManager final {
     DECLARE_SINGLETON(SwitchEventInputSubscribeManager);
 
 public:
+    class SubscribeSwitchEventInfo {
+    public:
+        SubscribeSwitchEventInfo(int32_t switchType,
+            std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+        ~SubscribeSwitchEventInfo() = default;
+
+        int32_t GetSwitchType() const
+        {
+            return switchType_;
+        }
+
+        std::function<void(std::shared_ptr<SwitchEvent>)> GetCallback() const
+        {
+            return callback_;
+        }
+    private:
+        int32_t switchType_ { -1 };
+        std::function<void(std::shared_ptr<SwitchEvent>)> callback_ { nullptr };
+    };
+
+public:
     DISALLOW_MOVE(SwitchEventInputSubscribeManager);
 
-    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+    int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
 
     int32_t OnSubscribeSwitchEventCallback(std::shared_ptr<SwitchEvent> event, int32_t subscribeId);
     void OnConnected();
 
 private:
-    std::map<int32_t, std::function<void(std::shared_ptr<SwitchEvent>)>> subscribeInfos_;
+    std::map<int32_t, SubscribeSwitchEventInfo> subscribeInfos_;
     static int32_t subscribeManagerId_;
     std::mutex mtx_;
 };

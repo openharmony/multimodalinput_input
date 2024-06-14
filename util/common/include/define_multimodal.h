@@ -202,6 +202,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define CHKFR(cond, r, desc) \
+    do { \
+        if (!(cond)) { \
+            MMI_HILOGE("CHKFR(%{public}s) is false, hint is %{public}s", #cond, desc); \
+            return r; \
+        } \
+    } while (0)
+
 #define CHK_KEY_ITEM(keyItem) \
     do { \
         if (!(keyItem)) { \

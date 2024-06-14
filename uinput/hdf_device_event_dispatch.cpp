@@ -20,12 +20,12 @@
 #include "mmi_log.h"
 #include "virtual_touch_screen.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "HdfDeviceEventDispatch"
+
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventDispatch" };
-} // namespace
 std::unique_ptr<VirtualTouchScreen> g_pTouchScreen = nullptr;
 InjectThread HdfDeviceEventDispatch::injectThread_;
 
@@ -34,8 +34,6 @@ HdfDeviceEventDispatch::HdfDeviceEventDispatch(const uint32_t maxX, const uint32
     g_pTouchScreen = std::make_unique<VirtualTouchScreen>(maxX, maxY);
     g_pTouchScreen->SetUp();
 }
-
-HdfDeviceEventDispatch::~HdfDeviceEventDispatch() {}
 
 int32_t HdfDeviceEventDispatch::EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex)
 {

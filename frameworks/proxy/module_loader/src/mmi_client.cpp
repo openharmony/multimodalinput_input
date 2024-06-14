@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "mmi_client.h"
 
 #include <cinttypes>
@@ -29,10 +29,12 @@
 #include "multimodal_input_connect_manager.h"
 #include "xcollie/watchdog.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MMIClient"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
 const std::string THREAD_NAME = "OS_mmi_EventHdr";
 } // namespace
 
@@ -109,10 +111,6 @@ bool MMIClient::StartEventRunner()
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
         MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
-        int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
-        if (ret != 0) {
-            MMI_HILOGW("Add watchdog thread failed, ret: %{public}d", ret);
-        }
     }
 
     if (isConnected_ && fd_ >= 0) {
@@ -142,7 +140,8 @@ bool MMIClient::AddFdListener(int32_t fd)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
-    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener, "MMITask");
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener, "MMITask",
+        AppExecFwk::EventQueue::Priority::VIP);
     if (errCode != ERR_OK) {
         MMI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             GetErrorStr(errCode).c_str());
@@ -265,12 +264,13 @@ void MMIClient::OnConnected()
 int32_t MMIClient::Socket()
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret =
+        MULTIMODAL_INPUT_CONNECT_MGR->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return IMultimodalInputConnect::INVALID_SOCKET_FD;
     }
-    fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
+    fd_ = MULTIMODAL_INPUT_CONNECT_MGR->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {

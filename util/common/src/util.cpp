@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <cinttypes>
 #include <cstdarg>
 #include <fstream>
+#include <iostream>
 
 #include <sys/prctl.h>
 #include <sys/stat.h>
@@ -28,24 +29,27 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "aggregator.h"
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "securec.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "Util"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Util" };
-constexpr int32_t FILE_SIZE_MAX = 0x6C445;
-constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
-constexpr int32_t INVALID_FILE_SIZE = -1;
-constexpr int32_t MIN_INTERVALTIME = 36;
-constexpr int32_t MAX_INTERVALTIME = 100;
-constexpr int32_t MIN_DELAYTIME = 300;
-constexpr int32_t MAX_DELAYTIME = 1000;
-constexpr int32_t COMMENT_SUBSCRIPT = 0;
+constexpr int32_t FILE_SIZE_MAX { 0x6C445 };
+constexpr int32_t MAX_PRO_FILE_SIZE { 128000 };
+constexpr int32_t INVALID_FILE_SIZE { -1 };
+constexpr int32_t MIN_INTERVALTIME { 36 };
+constexpr int32_t MAX_INTERVALTIME { 100 };
+constexpr int32_t MIN_DELAYTIME { 300 };
+constexpr int32_t MAX_DELAYTIME { 1000 };
+constexpr int32_t COMMENT_SUBSCRIPT { 0 };
 const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
@@ -54,9 +58,10 @@ const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
-constexpr size_t BUF_TID_SIZE = 10;
-constexpr size_t BUF_CMD_SIZE = 512;
-constexpr size_t PROGRAM_NAME_SIZE = 256;
+constexpr size_t BUF_TID_SIZE { 10 };
+constexpr size_t BUF_CMD_SIZE { 512 };
+constexpr size_t PROGRAM_NAME_SIZE { 256 };
+constexpr int32_t TIME_CONVERSION_UNIT { 1000 };
 } // namespace
 
 int64_t GetSysClockTime()
@@ -66,7 +71,7 @@ int64_t GetSysClockTime()
         MMI_HILOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
-    return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+    return (ts.tv_sec * TIME_CONVERSION_UNIT * TIME_CONVERSION_UNIT) + (ts.tv_nsec / TIME_CONVERSION_UNIT);
 }
 
 int64_t GetMillisTime()
@@ -84,7 +89,7 @@ static std::string GetThisThreadIdOfString()
         char buf[BUF_TID_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
-            printf("ERR: in %s, #%d, call sprintf_s failed, ret = %d.", __func__, __LINE__, ret);
+            printf("ERR: in %s, #%d, call sprintf_s failed, ret = %d", __func__, __LINE__, ret);
             return threadLocalId;
         }
         buf[BUF_TID_SIZE - 1] = '\0';
@@ -184,14 +189,11 @@ const char *GetProgramName()
         return "";
     }
     FILE *fp = fopen(buf, "rb");
-    if (fp == nullptr) {
-        KMSG_LOGE("The fp is nullptr, filename = %s.", buf);
-        return "";
-    }
+    CHKPS(fp);
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
-        KMSG_LOGE("fgets failed.");
+        KMSG_LOGE("fgets failed");
         if (fclose(fp) != 0) {
             KMSG_LOGW("Close file:%s failed", buf);
         }
@@ -206,12 +208,12 @@ const char *GetProgramName()
     std::string tempName(bufLine);
     tempName = GetFileName(tempName);
     if (tempName.empty()) {
-        KMSG_LOGE("tempName is empty.");
+        KMSG_LOGE("tempName is empty");
         return "";
     }
     const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
-        KMSG_LOGE("The copySize is 0.");
+        KMSG_LOGE("The copySize is 0");
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
@@ -297,10 +299,7 @@ void ReadProFile(const std::string &filePath, int32_t deviceId,
         return;
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGI("The realpath return nullptr");
-        return;
-    }
+    CHKPV(realpath(filePath.c_str(), realPath));
     if (!IsValidProPath(realPath)) {
         MMI_HILOGE("File path is error");
         return;
@@ -347,10 +346,7 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
         const char* line = strLine.c_str();
         int32_t len = strlen(line);
         char* realLine = static_cast<char*>(malloc(len + 1));
-        if (realLine == nullptr) {
-            MMI_HILOGE("Malloc failed");
-            return;
-        }
+        CHKPV(realLine);
         if (strcpy_s(realLine, len + 1, line) != EOK) {
             MMI_HILOGE("strcpy_s error");
             free(realLine);
@@ -386,10 +382,7 @@ std::string ReadJsonFile(const std::string &filePath)
         return "";
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
-        return "";
-    }
+    CHKPS(realpath(filePath.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("File path is error");
         return "";
@@ -462,7 +455,7 @@ static int32_t ReadConfigFile(const std::string &realPath, DeviceConfig &devConf
             continue;
         }
         pos = tmp.find('=');
-        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
+        if ((pos == std::string::npos) || (tmp.back() == '=')) {
             MMI_HILOGE("Find config item error");
             cfgFile.close();
             return RET_ERR;
@@ -486,10 +479,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGI("The realpath return nullptr");
-        return RET_ERR;
-    }
+    CHKPR(realpath(filePath.c_str(), realPath), RET_ERR);
     if (!IsValidTomlPath(realPath)) {
         MMI_HILOGE("File path is error");
         return RET_ERR;
@@ -526,10 +516,7 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
-        return RET_ERR;
-    }
+    CHKPR(realpath(filePath.c_str(), realPath), RET_ERR);
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         MMI_HILOGE("File size out of read range");
@@ -562,10 +549,7 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
         return "";
     }
     char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGI("The realpath return nullptr");
-        return "";
-    }
+    CHKPS(realpath(filePath.c_str(), realPath));
     if (!IsFileExists(realPath)) {
         MMI_HILOGE("File is not existent");
         return "";
@@ -581,5 +565,78 @@ std::string FileVerification(std::string &filePath, const std::string &checkExte
     }
     return realPath;
 }
+
+
+bool Aggregator::Record(const LogHeader &lh, const std::string &key, const std::string &record)
+{
+    constexpr int32_t oneSecond = 1000;
+    if (timerId_ != -1) {
+        resetTimer_(timerId_);
+    } else {
+        timerId_ = addTimer_(oneSecond, 1, [this, lh]() {
+            FlushRecords(lh);
+            timerId_ = -1;
+        });
+    }
+    if (key == key_) {
+        auto now = std::chrono::system_clock::now();
+        records_.push_back({record, now});
+        if (records_.size() >= maxRecordCount_) {
+            FlushRecords(lh);
+        }
+        return true;
+    } else {
+        FlushRecords(lh, key, record);
+        key_ = key;
+        return false;
+    }
+}
+
+void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const std::string &extraRecord)
+{
+    constexpr uint32_t milliSecondWidth = 3;
+    constexpr uint32_t microToMilli = 1000;
+    size_t recordCount = records_.size();
+    std::ostringstream oss;
+    if (!records_.empty()) {
+        oss << key_;
+        oss << ", first: " << records_.front().record << "-(";
+        auto firstTime = records_.front().timestamp;
+        time_t firstTimeT = std::chrono::system_clock::to_time_t(firstTime);
+        std::tm *bt = std::localtime(&firstTimeT);
+        if (bt == nullptr) {
+            MMI_HILOGE("bt is nullptr, this is a invalid time");
+            return;
+        }
+        oss << std::put_time(bt, "%Y-%m-%d %H:%M:%S");
+        auto since_epoch = firstTime.time_since_epoch();
+        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch).count() % microToMilli;
+        oss << '.' << std::setfill('0') << std::setw(milliSecondWidth) << millis << "ms)";
+
+        for (size_t i = 1; i < records_.size(); ++i) {
+            const auto &recordInfo = records_[i];
+            auto timeDiff = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    recordInfo.timestamp - firstTime).count();
+            oss << ", " << recordInfo.record << "+" << timeDiff;
+        }
+        records_.clear();
+        oss << ", count: " << recordCount;
+    }
+    if (!extraRecord.empty()) {
+        if (!oss.str().empty()) {
+            oss << ", last: ";
+        }
+        oss << key << ": " << extraRecord;
+    }
+    if (!oss.str().empty()) {
+        MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s", oss.str().c_str());
+    }
+}
+
+Aggregator::~Aggregator()
+{
+    FlushRecords(MMI_LOG_HEADER);
+}
+
 } // namespace MMI
 } // namespace OHOS

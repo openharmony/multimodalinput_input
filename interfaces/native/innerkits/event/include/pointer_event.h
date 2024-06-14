@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -62,7 +63,7 @@ public:
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
-     * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
+     * Indicates a pointer action representing that a finger leaves the touchscreen or touchpad.
      *
      * @since 9
      */
@@ -164,6 +165,21 @@ public:
 
     static constexpr int32_t POINTER_ACTION_HOVER_EXIT = 27;
 
+    /**
+     * Indicates that the fingerprint action.
+     *
+     * @since 12
+     */
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_DOWN = 28;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_UP = 29;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_SLIDE = 30;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_RETOUCH = 31;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 32;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -181,7 +197,8 @@ public:
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the horizontal scroll axis.
+         * When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          *
          * @since 9
@@ -311,6 +328,20 @@ public:
     static constexpr int32_t SOURCE_TYPE_JOYSTICK = 4;
 
     /**
+     * Indicates that the input source generates a fingerprint event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_FINGERPRINT = 5;
+
+    /**
+     * Indicates that the input source generates a crown event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_CROWN = 6;
+
+    /**
      * Indicates an invalid button ID.
      *
      * @since 9
@@ -432,7 +463,7 @@ public:
     /**
      * Indicates a knuckle.
      *
-     * @since 9
+     * @since 11
      */
     static constexpr int32_t TOOL_TYPE_KNUCKLE = 8;
 
@@ -679,6 +710,21 @@ public:
         void SetPointerId(int32_t pointerId);
 
         /**
+         * @brief Obtains the origin id of the pointer in this event.
+         * @return Returns the pointer id.
+         * @since 12
+         */
+        int32_t GetOriginPointerId() const;
+
+        /**
+         * @brief Sets the origin id of the pointer in this event.
+         * @param pointerId Indicates the pointer id to set.
+         * @return void
+         * @since 12
+         */
+        void SetOriginPointerId(int32_t originPointerId);
+
+        /**
          * @brief Obtains the time when the pointer is pressed.
          * @return Returns the time.
          * @since 9
@@ -718,6 +764,7 @@ public:
          * @since 9
          */
         int32_t GetDisplayX() const;
+        double GetDisplayXPos() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
@@ -726,6 +773,7 @@ public:
          * @since 9
          */
         void SetDisplayX(int32_t displayX);
+        void SetDisplayXPos(double displayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
@@ -735,6 +783,7 @@ public:
          * @since 9
          */
         int32_t GetDisplayY() const;
+        double GetDisplayYPos() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
@@ -743,6 +792,7 @@ public:
          * @since 9
          */
         void SetDisplayY(int32_t displayY);
+        void SetDisplayYPos(double displayY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
@@ -750,6 +800,7 @@ public:
          * @since 9
          */
         int32_t GetWindowX() const;
+        double GetWindowXPos() const;
 
         /**
          * @brief Sets the x coordinate of the active window.
@@ -758,6 +809,7 @@ public:
          * @since 9
          */
         void SetWindowX(int32_t x);
+        void SetWindowXPos(double x);
 
         /**
          * @brief Obtains the y coordinate of the active window.
@@ -765,6 +817,7 @@ public:
          * @since 9
          */
         int32_t GetWindowY() const;
+        double GetWindowYPos() const;
 
         /**
          * @brief Sets the y coordinate of the active window.
@@ -773,6 +826,7 @@ public:
          * @since 9
          */
         void SetWindowY(int32_t y);
+        void SetWindowYPos(double y);
 
         /**
          * @brief Obtains the width of the pressed area.
@@ -1037,20 +1091,21 @@ public:
          * @since 9
          */
         bool ReadFromParcel(Parcel &in);
-		
+
         /**
          * @brief Obtains the raw X coordinate.
          * @return Returns the raw X coordinate.
          * @since 9
          */
         int32_t GetRawDx() const;
-		
+
         /**
          * @brief Sets the raw X coordinate.
          * @param rawDx Indicates the raw X coordinate to set.
          * @return void
          * @since 9
          */
+
         void SetRawDx(int32_t rawDx);
         /**
          * @brief Obtains the raw Y coordinate.
@@ -1058,7 +1113,7 @@ public:
          * @since 9
          */
         int32_t GetRawDy() const;
-		
+
         /**
          * @brief Sets the raw Y coordinate.
          * @param rawDy Indicates the raw Y coordinate to set.
@@ -1067,29 +1122,34 @@ public:
          */
         void SetRawDy(int32_t rawDy);
     private:
-        int32_t pointerId_ {};
+        int32_t pointerId_ { -1 };
         bool pressed_ { false };
         int32_t displayX_ {};
         int32_t displayY_ {};
         int32_t windowX_ {};
         int32_t windowY_ {};
+        double displayXPos_ {};
+        double displayYPos_ {};
+        double windowXPos_ {};
+        double windowYPos_ {};
         int32_t width_ {};
         int32_t height_ {};
-        double  tiltX_ {};
-        double  tiltY_ {};
+        double tiltX_ {};
+        double tiltY_ {};
         int32_t toolDisplayX_ {};
         int32_t toolDisplayY_ {};
         int32_t toolWindowX_ {};
         int32_t toolWindowY_ {};
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
-        double  pressure_ {};
+        double pressure_ {};
         int32_t longAxis_ {};
         int32_t shortAxis_ {};
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t originPointerId_ { 0 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
     };
@@ -1181,6 +1241,20 @@ public:
      * @since 9
      */
     void RemovePointerItem(int32_t pointerId);
+
+    /**
+     * @brief All of the pointer items is be removed.
+     * @return void
+     * @since 9
+     */
+    void RemoveAllPointerItems();
+
+    /**
+     * @brief Return all the pointerItems.
+     * @return Returns pointers_.
+     * @since 9
+     */
+    std::list<PointerItem> GetAllPointerItems() const;
 
     /**
      * @brief Updates a pointer item based on the pointer ID.
@@ -1345,6 +1419,21 @@ public:
     uint32_t GetAxes() const;
 
     /**
+     * @brief Obtains the axis value velocity.
+     * @return Returns the axis value velocity.
+     * @since 12
+     */
+    double GetVelocity() const;
+
+    /**
+     * @brief Sets the axis value velocity.
+     * @param velocity Indicates the axis value velocity.
+     * @return void
+     * @since 12
+     */
+    void SetVelocity(double velocity);
+
+    /**
      * @brief Set the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
      * @return void.
@@ -1413,6 +1502,13 @@ public:
      */
     static bool HasAxis(uint32_t axes, AxisType axis);
 
+    /**
+     * @brief Converts a pointer event action into a short string.
+     * @param Indicates the pointer event action.
+     * @return Returns the string converted from the pointer action.
+     * @since 12
+     */
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -1429,6 +1525,80 @@ public:
      * @since 9
      */
     bool ReadFromParcel(Parcel &in);
+
+    /**
+     * @brief The number of times the input event is dispatched.
+     * @return Return the event dispatch times.
+     * @since 12
+     */
+    int32_t GetDispatchTimes() const;
+
+    /**
+     * @brief The number of times the same input event was distributed to multiple different windows.
+     * @return void
+     * @since 12
+     */
+    void SetDispatchTimes(int32_t dispatchTimes);
+
+    /**
+    * @brief Set the handlerEventType for pointerEvent
+    * @return void
+    * @since 12
+    */
+    void SetHandlerEventType(HandleEventType eventType);
+
+    /**
+     * @brief Get the handlerEventType for pointerEvent
+     * @return handlerEventType
+     * @since 12
+     */
+    HandleEventType GetHandlerEventType() const;
+
+    /**
+     * @brief Get the originPointerAction for pointerEvent
+     * @return originPointerAction
+     * @since 12
+     */
+    int32_t GetOriginPointerAction() const;
+
+    /**
+     * @brief Set the originPointerAction for pointerEvent
+     * @return void
+     * @since 12
+     */
+    void SetOriginPointerAction(int32_t pointerAction);
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    /**
+     * @brief Set the fingerprint distance X.
+     * @param X Indicates the distance X.
+     * @return void.
+     * @since 12
+     */
+    void SetFingerprintDistanceX(double x);
+
+    /**
+     * @brief Set the fingerprint distance Y.
+     * @param Y Indicates the distance Y.
+     * @return void.
+     * @since 12
+     */
+    void SetFingerprintDistanceY(double y);
+
+    /**
+     * @brief Get the fingerprint distance X.
+     * @return distance X.
+     * @since 12
+     */
+    double GetFingerprintDistanceX() const;
+
+    /**
+     * @brief Get the fingerprint distance Y.
+     * @return distance Y.
+     * @since 12
+     */
+    double GetFingerprintDistanceY() const;
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 protected:
     /**
@@ -1447,6 +1617,7 @@ private:
 private:
     bool ReadEnhanceDataFromParcel(Parcel &in);
     bool ReadBufferFromParcel(Parcel &in);
+    bool ReadAxisFromParcel(Parcel &in);
 
 private:
     int32_t pointerId_ { -1 };
@@ -1454,16 +1625,24 @@ private:
     std::set<int32_t> pressedButtons_;
     int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
+    int32_t originPointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
     float zOrder_ { -1.0f };
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
+    double velocity_ { 0.0 };
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    double fingerprintDistanceX_ { 0.0 };
+    double fingerprintDistanceY_ { 0.0 };
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    int32_t dispatchTimes_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

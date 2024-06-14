@@ -17,11 +17,11 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "AxisEvent"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AxisEvent" };
-} // namespace
 std::shared_ptr<AxisEvent> AxisEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
     return nullptr;
@@ -58,5 +58,23 @@ int32_t AxisEvent::GetAxisValue() const
 }
 
 void AxisEvent::SetAxisValue(int32_t axisValue) {}
+
+std::string_view AxisEvent::ActionToShortStr(int32_t action)
+{
+    switch (action) {
+        case AxisEvent::AXIS_ACTION_CANCEL:
+            return "A:C:";
+        case AxisEvent::AXIS_ACTION_START:
+            return "A:S:";
+        case AxisEvent::AXIS_ACTION_UPDATE:
+            return "A:U:";
+        case AxisEvent::AXIS_ACTION_END:
+            return "A:E:";
+        case AxisEvent::AXIS_ACTION_UNKNOWN:
+            return "A:UK:";
+        default:
+            return "A:?:";
+    }
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,6 +70,13 @@ public:
     static constexpr int32_t EVENT_TYPE_AXIS = 0X00030000;
 
     /**
+     * The actual type of the current input event is FingerprintEvent or its derived class.
+     *
+     * @since 12
+     */
+    static constexpr int32_t EVENT_TYPE_FINGERPRINT = 0X00040000;
+
+    /**
      * The multimodal input service sends input events to the interceptor and listener. This is the default value.
      *
      * @since 9
@@ -96,6 +103,17 @@ public:
      * @since 10
      */
     static constexpr uint32_t EVENT_FLAG_SIMULATE = 0x00000004;
+
+    /**
+     * The multimodal input service hide pointer.
+     *
+     * @since 12
+     */
+    static constexpr uint32_t EVENT_FLAG_HIDE_POINTER = 0x00000008;
+
+    static constexpr uint32_t EVENT_FLAG_RAW_POINTER_MOVEMENT = 0x00000010;
+    static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
+    static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
 
 public:
     /**
@@ -317,6 +335,14 @@ public:
     void ClearFlag();
 
     /**
+     * @brief Clears all flags of an input event.
+     * @param flag Indicates the flag of the input event.
+     * @return void
+     * @since 12
+     */
+    void ClearFlag(uint32_t flag);
+
+    /**
      * @brief Marks an input event as completed.
      * This method can only be called once.
      * @return void
@@ -331,7 +357,7 @@ public:
      * @since 9
      */
     void SetProcessedCallback(std::function<void(int32_t, int64_t)> callback);
-    
+
     /**
      * @brief Sets the extra data of an input event.
      * @param data the extra data.
@@ -350,6 +376,29 @@ public:
      */
     void GetExtraData(std::shared_ptr<const uint8_t[]> &data, uint32_t &length) const;
 
+    /**
+     * @brief Checks whether the "Processed feedback" of this event is enabled or not.
+     * @return Returns <b>true</b> if we need a "Processed feedback" for this event;
+     * returns <b>false</b> otherwise.
+     * @since 12
+     */
+    bool IsMarkEnabled() const;
+
+    /**
+     * @brief Sets the markEnabled_ field of an input event.
+     * @param markEnabled Indicates whether we need a "Processed feedback" or not for this event.
+     * @return void
+     * @since 12
+     */
+    void SetMarkEnabled(bool markEnabled);
+
+    /**
+     * @brief Converts a input event action into a short string.
+     * @param Indicates the input event action.
+     * @return Returns the string converted from the input action.
+     * @since 12
+    */
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -376,17 +425,18 @@ protected:
     explicit InputEvent(int32_t eventType);
 
 private:
-    int32_t eventType_;
-    int32_t id_;
-    int64_t actionTime_;
+    int32_t eventType_ { -1 };
+    int32_t id_ { -1 };
+    int64_t actionTime_ { -1 };
     uint64_t sensorInputTime_ { 0 };
-    int32_t action_;
-    int64_t actionStartTime_;
-    int32_t deviceId_;
-    int32_t targetDisplayId_;
-    int32_t targetWindowId_;
-    int32_t agentWindowId_;
-    uint32_t bitwise_;
+    int32_t action_ { -1 };
+    int64_t actionStartTime_ { -1 };
+    int32_t deviceId_ { -1 };
+    int32_t targetDisplayId_ { -1 };
+    int32_t targetWindowId_ { -1 };
+    int32_t agentWindowId_ { -1 };
+    uint32_t bitwise_ { 0 };
+    bool markEnabled_ { true };
     std::function<void(int32_t, int64_t)> processedCallback_;
     std::shared_ptr<const uint8_t[]> extraData_;
     uint32_t extraDataLength_ { 0 };

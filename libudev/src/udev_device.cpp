@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,15 +26,20 @@
 #include <unordered_map>
 #include <vector>
 
+#include <unistd.h>
+
 #include <libudev.h>
 #include <linux/input.h>
-#include <unistd.h>
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MmiLibudev"
+
 using namespace std::literals;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiLibudev" };
 constexpr int UTIL_PATH_SIZE = 1024;
 constexpr int UTIL_LINE_SIZE = 16384;
 
@@ -64,13 +69,13 @@ std::string ResolveSymLink(const std::string &syspath)
     }
 
     std::string_view tail{ linkTarget, len };
-    int back = 0;
+    int32_t back = 0;
     for (; StartsWith(tail, backStr); back++) {
         tail.remove_prefix(backStr.size());
     }
 
     std::string_view base = syspath;
-    for (int i = 0; i <= back; i++) {
+    for (int32_t i = 0; i <= back; i++) {
         if (!ChopTail(base, '/')) {
             return syspath;
         }
@@ -86,12 +91,14 @@ std::optional<std::string> GetLinkValue(const std::string &slink, const std::str
     char target[UTIL_PATH_SIZE];
     ssize_t len = readlink(path.c_str(), target, sizeof(target));
     if (len <= 0 || len == static_cast<ssize_t>(sizeof(target))) {
+        MMI_HILOGE("Failed to read link");
         return std::nullopt;
     }
 
     std::string_view result{ target, len };
     auto pos = result.rfind('/');
     if (pos == std::string_view::npos) {
+        MMI_HILOGE("Failed to get link value");
         return std::nullopt;
     }
     return std::string{ result.substr(pos + 1) };
@@ -139,7 +146,6 @@ public:
 
     static udev_device *NewFromSyspath(const std::string &syspathParam)
     {
-        CALL_DEBUG_ENTER;
         // path starts in sys
         if (!StartsWith(syspathParam, "/sys/") || syspathParam.back() == '/') {
             errno = EINVAL;
@@ -167,7 +173,6 @@ public:
 
     static udev_device *NewFromDevnum(char type, dev_t devnum)
     {
-        CALL_DEBUG_ENTER;
         const char *typeStr = nullptr;
 
         if (type == 'b') {
@@ -175,6 +180,7 @@ public:
         } else if (type == 'c') {
             typeStr = "char";
         } else {
+            MMI_HILOGE("Param invalid");
             errno = EINVAL;
             return nullptr;
         }
@@ -230,7 +236,6 @@ public:
 
     udev_device *GetParentWithSubsystem(const std::string &subsystem)
     {
-        CALL_DEBUG_ENTER;
         udev_device *parent = GetParent();
         while (parent != nullptr) {
             auto parentSubsystem = parent->GetSubsystem();
@@ -274,7 +279,6 @@ private:
 
     static udev_device *NewFromChild(udev_device *child)
     {
-        CALL_DEBUG_ENTER;
         std::string_view path = child->GetSyspath();
 
         while (true) {
@@ -292,7 +296,6 @@ private:
 
     void SetSyspath(std::string newSyspath)
     {
-        CALL_DEBUG_ENTER;
         syspath = std::move(newSyspath);
 
         AddProperty("DEVPATH", syspath.substr(0, "/sys"sv.size()));
@@ -327,15 +330,16 @@ private:
 
     void ReadUeventFile()
     {
-        CALL_DEBUG_ENTER;
         if (ueventLoaded) {
             return;
         }
 
         auto filename = syspath + "/uevent";
-        std::ifstream f(filename, std::ios_base::in);
+        char realPath[PATH_MAX] = {};
+        CHKPV(realpath(filename.c_str(), realPath));
+        std::ifstream f(realPath, std::ios_base::in);
         if (!f.is_open()) {
-            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", filename.c_str(), std::strerror(errno));
+            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", realPath, std::strerror(errno));
             return;
         }
         ueventLoaded = true;
@@ -369,18 +373,18 @@ private:
         bool hasJoystickAxesOrButtons = false;
         // Some mouses have so much buttons that they overflow in joystick range, ignore them
         if (!key.CheckBit(BTN_JOYSTICK - 1)) {
-            for (int button = BTN_JOYSTICK; button < BTN_DIGI && !hasJoystickAxesOrButtons; button++) {
+            for (int32_t button = BTN_JOYSTICK; button < BTN_DIGI && !hasJoystickAxesOrButtons; button++) {
                 hasJoystickAxesOrButtons = key.CheckBit(button);
             }
-            for (int button = BTN_TRIGGER_HAPPY1; button <= BTN_TRIGGER_HAPPY40 && !hasJoystickAxesOrButtons;
+            for (int32_t button = BTN_TRIGGER_HAPPY1; button <= BTN_TRIGGER_HAPPY40 && !hasJoystickAxesOrButtons;
                 button++) {
                 hasJoystickAxesOrButtons = key.CheckBit(button);
             }
-            for (int button = BTN_DPAD_UP; button <= BTN_DPAD_RIGHT && !hasJoystickAxesOrButtons; button++) {
+            for (int32_t button = BTN_DPAD_UP; button <= BTN_DPAD_RIGHT && !hasJoystickAxesOrButtons; button++) {
                 hasJoystickAxesOrButtons = key.CheckBit(button);
             }
         }
-        for (int axis = ABS_RX; axis < ABS_PRESSURE && !hasJoystickAxesOrButtons; axis++) {
+        for (int32_t axis = ABS_RX; axis < ABS_PRESSURE && !hasJoystickAxesOrButtons; axis++) {
             hasJoystickAxesOrButtons = abs.CheckBit(axis);
         }
         return hasJoystickAxesOrButtons;
@@ -405,7 +409,7 @@ private:
 
     void CheckMouseButton(const BitVector &key, bool &flag)
     {
-        for (int button = BTN_MOUSE; button < BTN_JOYSTICK && !flag; button++) {
+        for (int32_t button = BTN_MOUSE; button < BTN_JOYSTICK && !flag; button++) {
             flag = key.CheckBit(button);
         }
     }
@@ -506,14 +510,14 @@ private:
 
         /* only consider KEY_* here, not BTN_* */
         bool found = false;
-        for (int i = 0; i < BTN_MISC && !found; ++i) {
+        for (int32_t i = 0; i < BTN_MISC && !found; ++i) {
             found = key.CheckBit(i);
         }
         /* If there are no keys in the lower block, check the higher blocks */
-        for (int i = KEY_OK; i < BTN_DPAD_UP && !found; ++i) {
+        for (int32_t i = KEY_OK; i < BTN_DPAD_UP && !found; ++i) {
             found = key.CheckBit(i);
         }
-        for (int i = KEY_ALS_TOGGLE; i < BTN_TRIGGER_HAPPY && !found; ++i) {
+        for (int32_t i = KEY_ALS_TOGGLE; i < BTN_TRIGGER_HAPPY && !found; ++i) {
             found = key.CheckBit(i);
         }
 
@@ -524,7 +528,7 @@ private:
         /* the first 32 bits are ESC, numbers, and Q to D; if we have all of
          * those, consider it a full keyboard; do not test KEY_RESERVED, though */
         bool isKeyboard = true;
-        for (int i = KEY_ESC; i < KEY_D && isKeyboard; i++) {
+        for (int32_t i = KEY_ESC; i < KEY_D && isKeyboard; i++) {
             isKeyboard = key.CheckBit(i);
         }
         if (isKeyboard) {
@@ -542,7 +546,6 @@ private:
 
     void CheckInputProperties()
     {
-        CALL_DEBUG_ENTER;
         BitVector ev{ GetProperty("EV") };
         BitVector abs{ GetProperty("ABS") };
         BitVector key{ GetProperty("KEY") };
@@ -575,7 +578,6 @@ private:
 
     std::optional<std::string> GetSubsystem()
     {
-        CALL_DEBUG_ENTER;
         if (!subsystem_.has_value()) {
             auto res = GetLinkValue("subsystem", syspath);
             // read "subsystem" link
@@ -621,27 +623,21 @@ udev *udev_unref([[maybe_unused]] udev *udev)
 
 udev_device *udev_device_ref(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     device->Ref();
     return device;
 }
 
 udev_device *udev_device_unref(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     device->Unref();
     return nullptr;
 }
 
 udev *udev_device_get_udev(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return udev_new();
 }
 
@@ -675,41 +671,31 @@ udev_device *udev_device_get_parent(udev_device *device)
 udev_device *udev_device_get_parent_with_subsystem_devtype(udev_device *device, const char *subsystem,
     const char *devtype)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     if (subsystem == nullptr) {
         errno = EINVAL;
         return nullptr;
     }
     // Searching with specific devtype is not supported, since not used by libinput
-    if (devtype != nullptr) {
-        return nullptr;
-    }
+    CHKPP(devtype);
     return device->GetParentWithSubsystem(subsystem);
 }
 
 const char *udev_device_get_syspath(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return device->GetSyspath().c_str();
 }
 
 const char *udev_device_get_sysname(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return device->GetSysname().c_str();
 }
 
 const char *udev_device_get_devnode(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return device->GetDevnode().c_str();
 }
 
@@ -720,9 +706,8 @@ int udev_device_get_is_initialized(udev_device *device)
 
 const char *udev_device_get_property_value(udev_device *device, const char *key)
 {
-    if (device == nullptr || key == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
+    CHKPP(key);
     std::string skey{ key };
     if (!device->HasProperty(key)) {
         return nullptr;

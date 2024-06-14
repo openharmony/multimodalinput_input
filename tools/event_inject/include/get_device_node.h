@@ -19,8 +19,6 @@
 #include "nocopyable.h"
 #include "msg_head.h"
 
-#define DeviceList std::map<std::string, std::vector<std::string>>
-
 namespace OHOS {
 namespace MMI {
 class GetDeviceNode {
@@ -32,7 +30,8 @@ public:
 private:
     void InitDeviceInfo();
     std::vector<std::string> ReadDeviceFile();
-    void AnalyseDevices(const std::vector<std::string> &cmdResult, DeviceList &deviceList) const;
+    void AnalyseDevices(const std::vector<std::string> &cmdResult,
+        std::map<std::string, std::vector<std::string>> &deviceList) const;
 private:
     std::map<std::string, std::string> deviceList_;
 };

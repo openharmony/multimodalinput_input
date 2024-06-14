@@ -15,12 +15,11 @@
 
 #include "processing_pad_device.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ProcessingPadDevice"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPadDevice" };
-} // namespace
-
 int32_t ProcessingPadDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {

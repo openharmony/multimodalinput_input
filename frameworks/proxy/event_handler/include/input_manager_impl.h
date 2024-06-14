@@ -23,12 +23,15 @@
 
 #include "net_packet.h"
 
-#include "window_info.h"
-#include "nap_process.h"
 #include "event_filter_service.h"
 #include "event_handler.h"
 #include "extra_data.h"
+#include "i_anr_observer.h"
+#include "i_input_event_consumer.h"
+#include "i_input_service_watcher.h"
+#include "i_window_checker.h"
 #include "if_mmi_client.h"
+#include "infrared_frequency_info.h"
 #include "input_device_impl.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
@@ -36,14 +39,13 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
-#include "i_anr_observer.h"
-#include "i_input_service_watcher.h"
-#include "mmi_event_observer.h"
-#include "i_window_checker.h"
 #include "key_option.h"
+#include "mmi_event_observer.h"
+#include "nap_process.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "switch_event.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -68,19 +70,19 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback
     );
     void UnsubscribeKeyEvent(int32_t subscriberId);
-    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+    int32_t SubscribeSwitchEvent(int32_t switchType, std::function<void(std::shared_ptr<SwitchEvent>)> callback);
     void UnsubscribeSwitchEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t NotifyNapOnline();
-    void NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus);
+    void NotifyBundleName(int32_t pid, int32_t uid, const std::string &bundleName, int32_t syncStatus);
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -92,7 +94,8 @@ public:
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
 
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
@@ -106,11 +109,14 @@ public:
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     void RemoveInterceptor(int32_t interceptorId);
 
-    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
-    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
+    void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
     bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void OnDisconnected();
 
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
@@ -137,10 +143,10 @@ public:
     int32_t SetHoverScrollState(bool state);
     int32_t GetHoverScrollState(bool &state);
 
-    int32_t SetPointerVisible(bool visible);
+    int32_t SetPointerVisible(bool visible, int32_t priority);
     bool IsPointerVisible();
-    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle);
-    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle, bool isUiExtension = false);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension = false);
 
     int32_t SetPointerColor(int32_t color);
     int32_t GetPointerColor(int32_t &color);
@@ -164,6 +170,8 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type);
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t EnableHardwareCursorStats(bool enable);
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
@@ -177,7 +185,6 @@ public:
     // 快捷键拉起Ability
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
-    EventHandlerPtr GetEventHandler() const;
     void AppendExtraData(const ExtraData& extraData);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
@@ -188,6 +195,18 @@ public:
     int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
 
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
+    void Authorize(bool isAuthorize);
+    int32_t CancelInjection();
+
+    int32_t HasIrEmitter(bool &hasIrEmitter);
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+    int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
+    int32_t SetCurrentUser(int32_t userId);
+    int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
+
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
@@ -200,6 +219,8 @@ private:
     int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
+    int32_t GetDisplayMaxSize();
+    int32_t GetWindowMaxSize(int32_t maxAreasCount);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();
@@ -230,6 +251,7 @@ private:
     WindowGroupInfo windowGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
+    mutable std::mutex resourceMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };

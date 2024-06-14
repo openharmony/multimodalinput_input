@@ -16,21 +16,21 @@
 #ifndef MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 #define MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
 
+#include "nocopyable.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 
-#include "singleton.h"
+#include "i_preference_manager.h"
 
 namespace OHOS {
 namespace MMI {
-class MultiModalInputPreferencesManager {
-    DECLARE_DELAYED_SINGLETON(MultiModalInputPreferencesManager);
-
+class MultiModalInputPreferencesManager : public IPreferenceManager {
 public:
+    MultiModalInputPreferencesManager() = default;
+    ~MultiModalInputPreferencesManager() = default;
     DISALLOW_COPY_AND_MOVE(MultiModalInputPreferencesManager);
+
     int32_t InitPreferences();
     int32_t GetPreferencesSettings();
     int32_t InitPreferencesMap();
@@ -48,7 +48,7 @@ private:
     int32_t g_keyboardRepeatDelay { 500 };
     int32_t g_mouseScrollRows { 3 };
     int32_t g_mousePrimaryButton { 0 };
-    int32_t g_pointerSpeed { 5 };
+    int32_t g_pointerSpeed { 7 };
     int32_t g_touchpadRightClickType { 1 };
     int32_t g_touchpadPointerSpeed { 9 };
     bool g_touchpadTapSwitch { true };
@@ -76,9 +76,13 @@ private:
     const std::string pointerColor = "pointerColor";
     const std::string pointerSize = "pointerSize";
     const std::string pointerStyle = "pointerStyle";
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t g_magicPointerColor { -1 };
+    int32_t g_magicPointerSize { 3 };
+    const std::string magicPointerColor = "magicPointerColor";
+    const std::string magicPointerSize = "magicPointerSize";
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 };
-
-#define PreferencesMgr ::OHOS::DelayedSingleton<MultiModalInputPreferencesManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MULTIMODAL_INPUT_PREFERENCES_MANAGER_H

@@ -15,10 +15,12 @@
 
 #include "processing_keyboard_device.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "ProcessingKeyboardDevice"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
 constexpr int32_t EVENT_REPORT_COUNTS { 50 };
 constexpr int64_t EVENT_REPORT_TIMES { 20 };
 } // namespace

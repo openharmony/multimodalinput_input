@@ -28,16 +28,15 @@
 #include "proto.h"
 #include "token_setproc.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputManagerManualTest"
+
 namespace OHOS {
 namespace MMI {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
 HapInfoParams infoManagerTestInfoParms = {
     .userID = 1,
     .bundleName = "inputManagerManualTest",

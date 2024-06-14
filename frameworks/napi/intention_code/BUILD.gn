@@ -28,7 +28,7 @@ ohos_shared_library("intentioncode") {
     "src/js_intention_code.cpp",
     "src/native_register_module.cpp",
   ]
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -43,7 +43,10 @@ ohos_shared_library("intentioncode") {
     ":intentionCode_config",
   ]
 
-  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "c_utils:utils",

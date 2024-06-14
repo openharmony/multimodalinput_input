@@ -20,12 +20,11 @@
 #include "napi_constants.h"
 #include "util_napi.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JsKeyCode"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsKeyCode" };
-} // namespace
-
 napi_value JsKeyCode::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_DEBUG_ENTER;
@@ -394,6 +393,10 @@ napi_value JsKeyCode::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_7", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_7)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_8", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_8)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_9", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_9)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_CALL_NOTIFICATION_CENTER",
+            GetNapiInt32(env, KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_CALL_CONTROL_CENTER",
+            GetNapiInt32(env, KeyEvent::KEYCODE_CALL_CONTROL_CENTER)),
     };
 
     napi_value result = nullptr;

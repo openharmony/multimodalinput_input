@@ -32,6 +32,9 @@ public:
     bool EmitEvent(uint16_t type, uint16_t code, uint32_t value) const;
     bool SetUp();
 
+private:
+    bool SetUpExt();
+
 protected:
     virtual const std::vector<uint32_t>& GetEventTypes() const;
     virtual const std::vector<uint32_t>& GetKeys() const;

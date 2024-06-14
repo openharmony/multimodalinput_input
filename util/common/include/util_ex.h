@@ -29,12 +29,14 @@
 #include "struct_multimodal.h"
 #include "util.h"
 
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "UtilEx"
+
 namespace OHOS {
 namespace MMI {
 template<class ...Ts>
 int32_t mprintf(int32_t fd, const char* fmt, Ts... args)
 {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
     if (fmt == nullptr) {
         return RET_ERR;
     }

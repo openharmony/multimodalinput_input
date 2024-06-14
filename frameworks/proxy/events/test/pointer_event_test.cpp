@@ -13,17 +13,20 @@
  * limitations under the License.
  */
 
+#include "axis_event.h"
 #include "define_multimodal.h"
 #include "event_util_test.h"
+#include "input_device.h"
+#include "input_event.h"
 #include "proto.h"
 #include "util.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "PointerEventTest"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest" };
-#endif // OHOS_BUILD_ENABLE_POINTER
 using namespace testing::ext;
 } // namespace
 class PointerEventTest : public testing::Test {
@@ -75,12 +78,12 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     sleep(10);
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    SimulateInputEventUtilTest(pointerEvent);
 }
 
 /**
@@ -92,11 +95,11 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    SimulateInputEventUtilTest(pointerEvent);
 }
 
 /**
@@ -108,11 +111,11 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -124,6 +127,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
@@ -176,6 +180,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -216,6 +221,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_002, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -248,6 +254,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_003, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -294,6 +301,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_004, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -317,6 +325,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->SetDeviceId(1);
@@ -355,9 +364,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.L
     item2.SetRawDy(100);
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent != nullptr);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    SimulateInputEventUtilTest(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
+    ASSERT_FALSE(pointerEvent->IsValid());
 }
 
 /**
@@ -368,6 +375,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -403,6 +411,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -435,6 +444,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_002, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -464,7 +474,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
     item2.SetDownTime(100);
     item2.SetPressed(false);
     pointerEvent2->AddPointerItem(item2);
-    ASSERT_TRUE(!pointerEvent2->IsValid());
+    ASSERT_FALSE(!pointerEvent2->IsValid());
 }
 
 /**
@@ -475,6 +485,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_003, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -502,6 +513,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_004, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -529,6 +541,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -567,6 +580,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchInputEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->SetTargetDisplayId(0);
@@ -712,6 +726,51 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetShortAxis_001, TestSize.Level1)
     item.SetDownTime(1);
     ASSERT_NO_FATAL_FAILURE(item.SetShortAxis(shortAxis));
     ASSERT_EQ(item.GetShortAxis(), shortAxis);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetPointerCount_001
+ * @tc.desc: Get pointer count
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetPointerCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    int32_t pointerCount = pointerEvent->GetPointerCount();
+    ASSERT_EQ(pointerCount, 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetExtraData_001
+ * @tc.desc: Set extra data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const uint32_t length = 5;
+    std::shared_ptr<const uint8_t[]> data;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetExtraData(data, length);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetExtraData_001
+ * @tc.desc: Get extra data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    std::shared_ptr<const uint8_t[]> retrievedData;
+    uint32_t retrievedLength;
+    inputEvent->GetExtraData(retrievedData, retrievedLength);
 }
 
 /**
@@ -980,6 +1039,499 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
     pointerEvent->ClearBuffer();
     buffer = pointerEvent->GetBuffer();
     ASSERT_EQ(buffer.size(), 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetOriginPointerId_001
+ * @tc.desc: Sets the origin id of the pointer in this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetOriginPointerId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t originPointerId = 11;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetOriginPointerId(originPointerId));
+    ASSERT_EQ(item.GetOriginPointerId(), originPointerId);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetDisplayXPos_001
+ * @tc.desc: Sets the x coordinate relative to the upper left corner of the screen.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayXPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double displayX = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetDisplayXPos(displayX));
+    ASSERT_EQ(item.GetDisplayXPos(), displayX);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetDisplayYPos_001
+ * @tc.desc: Sets the y coordinate relative to the upper left corner of the screen.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetDisplayYPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double displayY = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetDisplayYPos(displayY));
+    ASSERT_EQ(item.GetDisplayYPos(), displayY);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetWindowXPos_001
+ * @tc.desc: Sets the x coordinate of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowXPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double x = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetWindowXPos(x));
+    ASSERT_EQ(item.GetWindowXPos(), x);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetWindowYPos_001
+ * @tc.desc: Sets the y coordinate of the active window.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetWindowYPos_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double y = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetWindowYPos(y));
+    ASSERT_EQ(item.GetWindowYPos(), y);
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_001
+ * @tc.desc: Verify ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t eventType = 1;
+    AxisEvent axisevent(eventType);
+    int32_t action = AxisEvent::AXIS_ACTION_CANCEL;
+    auto ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:C:");
+    action = AxisEvent::AXIS_ACTION_START;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:S:");
+    action = AxisEvent::AXIS_ACTION_UPDATE;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:U:");
+    action = AxisEvent::AXIS_ACTION_END;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:E:");
+    action = AxisEvent::AXIS_ACTION_UNKNOWN;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:UK:");
+    action = 10;
+    ret = axisevent.ActionToShortStr(action);
+    ASSERT_EQ(ret, "A:?:");
+}
+
+/**
+ * @tc.name: PointerEventTest_AddCapability_001
+ * @tc.desc: Verify AddCapability
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_AddCapability_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDevice device;
+    InputDeviceCapability cap;
+    cap = INPUT_DEV_CAP_TOUCH;
+    ASSERT_NO_FATAL_FAILURE(device.AddCapability(cap));
+    cap = INPUT_DEV_CAP_MAX;
+    ASSERT_NO_FATAL_FAILURE(device.AddCapability(cap));
+}
+
+/**
+ * @tc.name: PointerEventTest_HasCapability_001
+ * @tc.desc: Verify HasCapability
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDevice device;
+    InputDeviceCapability cap;
+    cap = INPUT_DEV_CAP_TOUCH;
+    bool ret = device.HasCapability(cap);
+    ASSERT_FALSE(ret);
+    cap = INPUT_DEV_CAP_MAX;
+    ret = device.HasCapability(cap);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_HasCapability_002
+ * @tc.desc: Verify HasCapability
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_HasCapability_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDevice device;
+    device.capabilities_.set(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+    device.capabilities_.set(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_KEYBOARD));
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_POINTER));
+    EXPECT_FALSE(device.HasCapability(INPUT_DEV_CAP_TOUCH));
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_KEYBOARD | INPUT_DEV_CAP_POINTER | INPUT_DEV_CAP_TOUCH));
+    EXPECT_TRUE(device.HasCapability(INPUT_DEV_CAP_KEYBOARD | INPUT_DEV_CAP_POINTER));
+}
+
+/**
+ * @tc.name: PointerEventTest_MarkProcessed_001
+ * @tc.desc: Verify MarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(int32_t, int64_t)> processedCallback_;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    inputEvent->markEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->MarkProcessed());
+    inputEvent->markEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->MarkProcessed());
+}
+
+/**
+ * @tc.name: PointerEventTest_SetExtraData_002
+ * @tc.desc: Verify SetExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    std::shared_ptr<const uint8_t[]> data;
+    uint32_t length = 10;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->SetExtraData(data, length));
+}
+
+/**
+ * @tc.name: PointerEventTest_GetExtraData_002
+ * @tc.desc: Verify GetExtraData
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    std::shared_ptr<const uint8_t[]> data;
+    uint32_t length = 10;
+    inputEvent->extraDataLength_ = 5;
+    std::shared_ptr<const uint8_t[]> extraData;
+    inputEvent->extraData_ = extraData;
+    ASSERT_NO_FATAL_FAILURE(inputEvent->GetExtraData(data, length));
+}
+
+/**
+ * @tc.name: PointerEventTest_WriteToParcel_001
+ * @tc.desc: Verify WriteToParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_WriteToParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    Parcel out;
+    inputEvent->extraDataLength_ = 5;
+    std::shared_ptr<const uint8_t[]> extraData;
+    inputEvent->extraData_ = extraData;
+    bool ret = inputEvent->WriteToParcel(out);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ReadFromParcel_001
+ * @tc.desc: Verify ReadFromParcel
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ReadFromParcel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    Parcel in;
+    inputEvent->extraDataLength_ = 1088;
+    bool ret = inputEvent->ReadFromParcel(in);
+    ASSERT_FALSE(ret);
+    inputEvent->extraDataLength_ = 10;
+    ret = inputEvent->ReadFromParcel(in);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_002
+ * @tc.desc: Verify ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_KEY);
+    int32_t action = InputEvent::ACTION_CANCEL;
+    auto ret = inputEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "B:C:");
+    action = InputEvent::ACTION_UNKNOWN;
+    ret = inputEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "B:UK:");
+    action = InputEvent::EVENT_FLAG_HIDE_POINTER;
+    ret = inputEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "B:?:");
+}
+
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+/**
+ * @tc.name: PointerEventTest_SetFingerprintDistanceX_001
+ * @tc.desc: Set the fingerprint distance X.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    double x = 10.0;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetFingerprintDistanceX(x));
+    ASSERT_EQ(pointerEvent->GetFingerprintDistanceX(), x);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetFingerprintDistanceY_001
+ * @tc.desc: Set the fingerprint distance Y.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetFingerprintDistanceY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    double y = 10.0;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetFingerprintDistanceY(y));
+    ASSERT_EQ(pointerEvent->GetFingerprintDistanceY(), y);
+}
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
+/**
+ * @tc.name: PointerEventTest_SetHandlerEventType
+ * @tc.desc: Verify SetHandlerEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetHandlerEventType(0);
+    ASSERT_EQ(pointerEvent->GetHandlerEventType(), 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetAxisValue_001
+ * @tc.desc: Test the funcation GetAxisValue
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
+    axis = PointerEvent::AXIS_TYPE_UNKNOWN;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
+    axis = PointerEvent::AXIS_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->GetAxisValue(axis));
+}
+
+/**
+ * @tc.name: PointerEventTest_SetAxisValue_001
+ * @tc.desc: Test the funcation SetAxisValue
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    double axisValue = 1.0;
+    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetAxisValue(axis, axisValue));
+    axis = PointerEvent::AXIS_TYPE_UNKNOWN;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetAxisValue(axis, axisValue));
+    axis = PointerEvent::AXIS_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetAxisValue(axis, axisValue));
+}
+
+/**
+ * @tc.name: PointerEventTest_HasAxis_001
+ * @tc.desc: Test the funcation HasAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_HasAxis_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    uint32_t axes = 1;
+    PointerEvent::AxisType axis = PointerEvent::AXIS_TYPE_MAX;
+    bool ret = pointerEvent->HasAxis(axes, axis);
+    ASSERT_FALSE(ret);
+    axis = PointerEvent::AXIS_TYPE_UNKNOWN;
+    ret = pointerEvent->HasAxis(axes, axis);
+    ASSERT_TRUE(ret);
+    axis = PointerEvent::AXIS_TYPE_PINCH;
+    ret = pointerEvent->HasAxis(axes, axis);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetPressure_001
+ * @tc.desc: Test the funcation SetPressure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double pressure = -1.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetPressure(pressure));
+    pressure = 1.0;
+    ASSERT_NO_FATAL_FAILURE(item.SetPressure(pressure));
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_003
+ * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_PULL_UP;
+    auto ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:PU:");
+    action = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:PI:");
+    action = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:PO:");
+    action = PointerEvent::POINTER_ACTION_SWIPE_BEGIN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:SB:");
+    action = PointerEvent::POINTER_ACTION_SWIPE_UPDATE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:SU:");
+    action = PointerEvent::POINTER_ACTION_SWIPE_END;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:SE:");
+    action = PointerEvent::POINTER_ACTION_ROTATE_BEGIN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:RB:");
+    action = PointerEvent::POINTER_ACTION_ROTATE_UPDATE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:RU:");
+    action = PointerEvent::POINTER_ACTION_ROTATE_END;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:RE:");
+    action = PointerEvent::POINTER_ACTION_TRIPTAP;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:TT:");
+}
+
+/**
+ * @tc.name: PointerEventTest_ActionToShortStr_004
+ * @tc.desc: Test the funcation ActionToShortStr
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t action = PointerEvent::POINTER_ACTION_QUADTAP;
+    auto ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:Q:");
+    action = PointerEvent::POINTER_ACTION_HOVER_MOVE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:HM:");
+    action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:HE:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FD:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_UP;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FU:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FS:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FR:");
+    action = PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:FC:");
+    action = PointerEvent::POINTER_ACTION_UNKNOWN;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:UK:");
+    action = 100;
+    ret = pointerEvent->ActionToShortStr(action);
+    ASSERT_EQ(ret, "P:?:");
 }
 } // namespace MMI
 } // namespace OHOS

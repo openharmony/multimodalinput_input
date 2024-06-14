@@ -17,7 +17,9 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#include "call_manager_client.h"
 #include "define_multimodal.h"
+#include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -27,14 +29,19 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "KeySubscriberHandler"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
-constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t UNOBSERVED = -1;
-constexpr int32_t ACTIVE_EVENT = 2;
+constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
+std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -100,7 +107,6 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
 
 int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_INFO_TRACE;
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
     return RemoveSubscriber(sess, subscribeId);
@@ -193,20 +199,34 @@ int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
     return RET_OK;
 }
 
+bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    MMI_HILOGD("Is Funciton Key In");
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_WLAN
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_CONFIG) {
+        return true;
+    }
+    return false;
+}
+
 bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (enableCombineKey_) {
         return true;
     }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
-        auto items = keyEvent->GetKeyItems();
-        return items.size() != 1 ? enableCombineKey_ : true;
-    }
-    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
+    if (IsFunctionKey(keyEvent)) {
         auto items = keyEvent->GetKeyItems();
         return items.size() != 1 ? enableCombineKey_ : true;
     }
@@ -216,6 +236,11 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
             return enableCombineKey_;
         }
         return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT ||
+        keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
+        MMI_HILOGD("subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
+        return IsEnableCombineKeySwipe(keyEvent);
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
         for (const auto &item : keyEvent->GetKeyItems()) {
@@ -230,9 +255,69 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     return enableCombineKey_;
 }
 
+bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    for (const auto &item : keyEvent->GetKeyItems()) {
+        int32_t keyCode = item.GetKeyCode();
+        if (keyCode != KeyEvent::KEYCODE_CTRL_LEFT && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+            keyCode != KeyEvent::KEYCODE_DPAD_RIGHT && keyCode != KeyEvent::KEYCODE_CTRL_RIGHT &&
+            keyCode != KeyEvent::KEYCODE_DPAD_LEFT) {
+            return enableCombineKey_;
+        }
+    }
+    return true;
+}
+
+bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_DOWN &&
+        keyEvent->GetKeyCode() != KeyEvent::KEYCODE_VOLUME_UP &&
+        keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        MMI_HILOGD("There is no need to set mute");
+        return false;
+    }
+    int32_t ret = -1;
+    if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
+        if (callManagerClientPtr == nullptr) {
+            callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+            if (callManagerClientPtr == nullptr) {
+                MMI_HILOGE("CallManager init fail");
+                return false;
+            }
+            callManagerClientPtr->Init(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+        }
+        if (!DEVICE_MONITOR->GetHasHandleRingMute()) {
+            ret = callManagerClientPtr->MuteRinger();
+            if (ret != ERR_OK) {
+                MMI_HILOGE("Set mute fail, ret:%{public}d", ret);
+                return false;
+            }
+            MMI_HILOGI("Set mute success");
+            DEVICE_MONITOR->SetHasHandleRingMute(true);
+            if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+                needSkipPowerKeyUp_ = true;
+            }
+            return true;
+        } else {
+            if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+                MMI_HILOGD("Set mute success, block volumeKey");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    if (HandleRingMute(keyEvent)) {
+        MMI_HILOGI("Mute Ring in subscribe keyEvent");
+        return true;
+    }
     if (!IsEnableCombineKey(keyEvent)) {
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
@@ -245,6 +330,12 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
         KeyEvent::ActionToString(keyAction));
+    if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
+        && keyAction == KeyEvent::KEY_ACTION_UP) {
+        MMI_HILOGD("Skip power key up");
+        needSkipPowerKeyUp_ = false;
+        return true;
+    }
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         MMI_HILOGD("Pressed KeyCode:%{public}d", keyCode);
     }
@@ -345,7 +436,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(keyOption);
-    MMI_HILOGI("notify key down subscribers size:%{public}zu", subscribers.size());
+    MMI_HILOGD("notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
         NotifyKeyDownRightNow(keyEvent, subscribers, handled);
     } else {
@@ -581,7 +672,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     CHKPV(subscriber);
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER || state == UNOBSERVED) {
-        MMI_HILOGW("nap client status:%{public}d", state);
+        MMI_HILOGD("nap client status:%{public}d", state);
         return;
     }
 
@@ -664,6 +755,7 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType)
 {
     CALL_DEBUG_ENTER;
@@ -680,12 +772,13 @@ bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trriger
             keyAction = KeyEvent::KEY_ACTION_DOWN;
         }
         if (keyCode == keyOption->GetFinalKey() && trrigerType == keyAction && subscribers.size() > 0) {
-            MMI_HILOGD("current key event is subscribed.");
+            MMI_HILOGD("Current key event is subscribed");
             return true;
         }
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool KeySubscriberHandler::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -813,7 +906,14 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
     mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
-
+    for (const auto &item : foregroundPids_) {
+        mprintf(fd, "Foreground Pids: %s", item);
+    }
+    mprintf(fd,
+            "enableCombineKey: %s | isForegroundExits: %s"
+            "| needSkipPowerKeyUp: %s \t",
+            enableCombineKey_ ? "true" : "false", isForegroundExits_ ? "true" : "false",
+            needSkipPowerKeyUp_ ? "true" : "false");
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
         auto &subscribers = iter->second;
         for (auto item = subscribers.begin(); item != subscribers.end(); item++) {
@@ -825,10 +925,12 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
             CHKPV(keyOption);
             mprintf(fd,
                     "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
-                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s "
+                    "| ProgramName:%s \t",
                     subscriber->id_, subscriber->timerId_, session->GetPid(),
                     session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
-                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false",
+                    session->GetProgramName().c_str());
             std::set<int32_t> preKeys = keyOption->GetPreKeys();
             for (const auto &preKey : preKeys) {
                 mprintf(fd, "preKeys:%d\t", preKey);

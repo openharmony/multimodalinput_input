@@ -29,6 +29,8 @@ public:
     static napi_value SetKeyDownDuration(napi_env env, napi_callback_info info);
 
 private:
+    static napi_value GetNapiInt32(napi_env env, int32_t code);
+    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateInstance(napi_env env);
     static JsShortKeyContext* GetInstance(napi_env env);
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);

@@ -14,13 +14,17 @@
  */
 
 #include "tablet_tool_tranform_processor.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
+
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "TabletToolTransformProcessor"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolTransformProcessor" };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 
@@ -61,7 +65,8 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
-    WinMgr->UpdateTargetPointer(pointerEvent_);
+    StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
     return pointerEvent_;
 }
 
@@ -138,8 +143,8 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     CALL_DEBUG_ENTER;
     CHKPF(event);
     int32_t targetDisplayId = -1;
-    LogicalCoordinate tCoord;
-    if (!WinMgr->CalculateTipPoint(event, targetDisplayId, tCoord)) {
+    PhysicalCoordinate tCoord;
+    if (!WIN_MGR->CalculateTipPoint(event, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
@@ -162,12 +167,14 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetDeviceId(deviceId_);
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetDisplayX(tCoord.x);
-    item.SetDisplayY(tCoord.y);
+    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
+    item.SetDisplayXPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
-    item.SetPressure(pressure);
     item.SetToolType(toolType);
+    item.SetPressure(pressure);
     item.SetTargetWindowId(-1);
 
     pointerEvent_->SetDeviceId(deviceId_);
@@ -187,8 +194,8 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 
     int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
-    LogicalCoordinate tCoord;
-    if (!WinMgr->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
+    PhysicalCoordinate tCoord;
+    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
@@ -211,8 +218,10 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
         item.SetPressed(true);
         item.SetToolType(toolType);
     }
-    item.SetDisplayX(tCoord.x);
-    item.SetDisplayY(tCoord.y);
+    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
+    item.SetDisplayXPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);

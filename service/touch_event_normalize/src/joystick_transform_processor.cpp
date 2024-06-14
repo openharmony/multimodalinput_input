@@ -17,12 +17,13 @@
 
 #include "mmi_log.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "JoystickTransformProcessor"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JoystickTransformProcessor" };
-} // namespace
-
 JoystickTransformProcessor::JoystickTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     joystickType.emplace_back(
@@ -142,7 +143,7 @@ std::shared_ptr<PointerEvent> JoystickTransformProcessor::OnEvent(struct libinpu
             return nullptr;
         }
     }
-    WinMgr->UpdateTargetPointer(pointerEvent_);
+    WIN_MGR->UpdateTargetPointer(pointerEvent_);
    
     return pointerEvent_;
 }

@@ -18,9 +18,8 @@
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain" };
-} // namespace
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "MmiEventSimulateDemoMain"
 
 int32_t main(int32_t argc, char* argv[])
 {

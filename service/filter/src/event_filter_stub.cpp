@@ -24,17 +24,18 @@
 #include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_HANDLER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventFilterStub"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterStub" };
-} // namespace
-
 int32_t EventFilterStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("code:%{public}d", code);
+    MMI_HILOGD("code:%{public}u", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventFilter::GetDescriptor()) {
@@ -60,10 +61,7 @@ int32_t EventFilterStub::StubHandleKeyEvent(MessageParcel& data, MessageParcel& 
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<KeyEvent> event = KeyEvent::Create();
-    if (event == nullptr) {
-        MMI_HILOGE("The event is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(event, RET_ERR);
 
     if (!event->ReadFromParcel(data)) {
         MMI_HILOGE("Read data error");
@@ -79,10 +77,7 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
-    if (event == nullptr) {
-        MMI_HILOGE("The event is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(event, RET_ERR);
 
     if (!event->ReadFromParcel(data)) {
         MMI_HILOGE("Read data error");

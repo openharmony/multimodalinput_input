@@ -23,11 +23,15 @@
 #include "mmi_log.h"
 #include "parameter.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "WatchdogTask"
+
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "WatchdogTask" };
-const std::string THREAD_NAME = "mmi_service";
+const std::string THREAD_NAME { "mmi_service" };
 } // namespace
 
 WatchdogTask::WatchdogTask() {}
@@ -38,7 +42,7 @@ std::string WatchdogTask::GetFirstLine(const std::string& path)
 {
     char checkPath[PATH_MAX] = { 0 };
     if (realpath(path.c_str(), checkPath) == nullptr) {
-        MMI_HILOGE("canonicalize failed. path is %{public}s", path.c_str());
+        MMI_HILOGE("Canonicalize failed. path:%{public}s", path.c_str());
         return "";
     }
     std::ifstream inFile(checkPath);
@@ -59,17 +63,15 @@ std::string WatchdogTask::GetProcessNameFromProcCmdline(int32_t pid)
     if (procCmdlineContent.empty()) {
         return "";
     }
-    size_t procNameStartPos = 0;
-    size_t procNameEndPos = procCmdlineContent.size();
-    for (size_t i = 0; i < procCmdlineContent.size(); i++) {
-        if (procCmdlineContent[i] == '/') {
-            procNameStartPos = i + 1;
-        } else if (procCmdlineContent[i] == '\0') {
-            procNameEndPos = i;
-            break;
-        }
+    auto pos = procCmdlineContent.find('\0');
+    if (pos != std::string::npos) {
+        procCmdlineContent = procCmdlineContent.substr(0, pos);
     }
-    return procCmdlineContent.substr(procNameStartPos, procNameEndPos - procNameStartPos);
+    pos = procCmdlineContent.rfind('/');
+    if (pos != std::string::npos) {
+        return procCmdlineContent.substr(pos + 1);
+    }
+    return procCmdlineContent;
 }
 
 bool WatchdogTask::IsNumberic(const std::string &str)
@@ -116,7 +118,7 @@ std::string WatchdogTask::GetSelfProcName()
     fin.close();
 
     std::string ret = std::string(readStr);
-    ret.erase(std::remove_if(ret.begin(), ret.end(), [](unsigned char c) {
+    auto comparisonFun = [](unsigned char c) {
         if (c >= '0' && c <= '9') {
             return false;
         }
@@ -129,7 +131,9 @@ std::string WatchdogTask::GetSelfProcName()
         if (c == '.' || c == '-' || c == '_') {
             return false;
         }
-        return true;}), ret.end());
+        return true;
+    };
+    ret.erase(std::remove_if(ret.begin(), ret.end(), comparisonFun), ret.end());
     return ret;
 }
 
@@ -137,7 +141,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
 {
     int32_t pid = getpid();
     if (IsProcessDebug(pid)) {
-        MMI_HILOGI("heap dump for %{public}d, don't report", pid);
+        MMI_HILOGI("Heap dump for %{public}d, don't report", pid);
         return;
     }
     uint32_t gid = getgid();
@@ -154,7 +158,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
         "PROCESS_NAME", GetSelfProcName(),
         "MSG", sendMsg,
         "STACK", OHOS::HiviewDFX::GetProcessStacktrace());
-    MMI_HILOGI("send event [FRAMEWORK,%{public}s], msg=%{public}s", eventName.c_str(), msg.c_str());
+    MMI_HILOGI("Send event, eventName:%{public}s, msg:%{public}s", eventName.c_str(), msg.c_str());
 }
 } // namespace MMI
 } // namespace OHOS

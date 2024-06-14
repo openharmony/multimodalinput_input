@@ -26,6 +26,7 @@ const std::vector<uint32_t>& VirtualKeyboard::GetEventTypes() const
     static const std::vector<uint32_t> evtTypes {EV_KEY};
     return evtTypes;
 }
+
 const std::vector<uint32_t>& VirtualKeyboard::GetKeys() const
 {
     static const std::vector<uint32_t> keys {KEY_BACK};

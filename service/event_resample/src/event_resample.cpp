@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,16 +17,17 @@
 
 #include "event_log_helper.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "util.h"
 
+#undef MMI_LOG_DOMAIN
+#define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "EventResample"
+
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "EventResample" };
-} // namespace
-
 EventResample::EventResample(){};
 EventResample::~EventResample(){};
 
@@ -48,7 +49,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         if (PointerEvent::POINTER_ACTION_UNKNOWN == inputEvent_.pointerAction) {
             result = ConsumeBatch(frameTime_, &outEvent);
             frameTime_ = 0;
-            if ((ERR_OK == result) && (NULL != outEvent)) {
+            if ((ERR_OK == result) && (nullptr != outEvent)) {
                 status = result;
                 break;
             } else {
@@ -64,16 +65,16 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
 
         // Update touch state object
         EventDump("UpdateTouchState", inputEvent_);
-        EventLogHelper::PrintEventData(pointerEvent_);
+        EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         UpdateTouchState(inputEvent_);
         return pointerEvent_;
     } while (0);
 
-    if ((ERR_OK == result) && (NULL != outEvent)) {
+    if ((ERR_OK == result) && (nullptr != outEvent)) {
         // Update pointer event
         UpdatePointerEvent(outEvent);
-        EventLogHelper::PrintEventData(pointerEvent_);
+        EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         return pointerEvent_;
     }
@@ -117,7 +118,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
 
     // Check that event can be consumed and initialize motion event.
     if (nullptr != pointerEvent) {
-        EventLogHelper::PrintEventData(pointerEvent_);
+        EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         pointerAction = pointerEvent->GetPointerAction();
         MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,
@@ -182,12 +183,12 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
-            MMI_HILOGD("Output event: toolWindowX = %{public}d toolWindowY = %{public}d", toolWindowX, toolWindowY);
+            MMI_HILOGD("Output event: toolWindowX:%{public}d toolWindowY:%{public}d", toolWindowX, toolWindowY);
             auto logicX = it.second.coordX;
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
             item.SetDisplayY(logicY);
-            
+
             auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
             item.SetWindowX(windowXY.first);
             item.SetWindowY(windowXY.second);
@@ -211,15 +212,15 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
     if (pointerEvent == nullptr) {
         return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
     }
-    auto windows = WinMgr->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &window : windows) {
         if (pointerEvent->GetTargetWindowId() == window.id) {
             if (window.transform.empty()) {
                 return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
             }
-            auto windowXY = WinMgr->TransformWindowXY(window, logicX, logicY);
-            auto windowX = windowXY.first;
-            auto windowY = windowXY.second;
+            auto windowXY = WIN_MGR->TransformWindowXY(window, logicX, logicY);
+            auto windowX = static_cast<int32_t>(windowXY.first);
+            auto windowY = static_cast<int32_t>(windowXY.second);
             return {windowX, windowY};
         }
     }
@@ -228,7 +229,7 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
 
 ErrCode EventResample::ConsumeBatch(int64_t frameTime, MotionEvent** outEvent)
 {
-    int32_t result;
+    int32_t result = 0;
     for (size_t i = batches_.size(); i > 0;) {
         i--;
         Batch& batch = batches_.at(i);
@@ -303,7 +304,7 @@ void EventResample::UpdateTouchState(MotionEvent &event)
             if (idx < 0) {
                 TouchState newState;
                 touchStates_.push_back(newState);
-                idx = touchStates_.size() - 1;
+                idx = static_cast<ssize_t>(touchStates_.size()) - 1;
             }
             TouchState& touchState = touchStates_.at(idx);
             touchState.Initialize(deviceId, source);
@@ -508,12 +509,10 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
 
 void EventResample::PrintfDeviceName()
 {
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
-    if (device == nullptr) {
-        MMI_HILOGW("The device is not found");
-        return;
-    }
-    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
+    auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
+    CHKPV(device);
+    MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", pointerEvent_->GetId(),
+        device->GetName().c_str());
 }
 
 } // namespace MMI
