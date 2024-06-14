@@ -107,6 +107,9 @@ public:
     napi_value SetTouchpadThreeFingersTapSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
     napi_value GetTouchpadThreeFingersTapSwitch(napi_env env, napi_value handle = nullptr);
     
+    napi_value EnableHardwareCursorStats(napi_env env, bool enable);
+    napi_value GetHardwareCursorStats(napi_env env);
+
 private:
     napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);
     napi_value GetTouchpadBoolData(napi_env env, napi_value handle, bool data, int32_t errorCode);

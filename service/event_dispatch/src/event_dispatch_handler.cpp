@@ -17,6 +17,8 @@
 
 #include <cinttypes>
 
+#include <linux/input-event-codes.h>
+
 #include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
 
@@ -26,8 +28,7 @@
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
-#include "input-event-codes.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "napi_constants.h"
 #include "proto.h"
@@ -43,6 +44,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
+constexpr int32_t INTERVAL_DURATION = 10;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -94,6 +96,53 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
+std::shared_ptr<WindowInfo> EventDispatchHandler::SearchCancelList (int32_t pointerId, int32_t windowId)
+{
+    if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
+        return nullptr;
+    }
+    auto windowList = cancelEventList_[pointerId];
+    for (auto &info : windowList) {
+        if (info->id == windowId) {
+            return info;
+        }
+    }
+    return nullptr;
+}
+
+bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, int32_t windowId,
+    std::optional<WindowInfo> &windowInfo)
+{
+    int32_t pointerId = point->GetPointerId();
+    if (windowInfo == std::nullopt) {
+        std::shared_ptr<WindowInfo> curInfo = SearchCancelList(pointerId, windowId);
+        if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            windowInfo = std::make_optional(*curInfo);
+            MMI_HILOG_DISPATCHI("touch event send cancel");
+        } else {
+            MMI_HILOGE("WindowInfo id nullptr");
+            return false;
+        }
+    }
+    std::shared_ptr<WindowInfo> curWindowInfo = std::make_shared<WindowInfo>(*windowInfo);
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
+            cancelEventList_[pointerId] = std::set<std::shared_ptr<WindowInfo>, EventDispatchHandler::CancelCmp>();
+        }
+        cancelEventList_[pointerId].insert(curWindowInfo);
+    } else if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end() &&
+            cancelEventList_[pointerId].find(curWindowInfo) != cancelEventList_[pointerId].end()) {
+            cancelEventList_[pointerId].erase(curWindowInfo);
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
     PointerEvent::PointerItem pointerItem)
 {
@@ -102,11 +151,16 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     std::vector<int32_t> windowIds;
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     int32_t count = 0;
+    int32_t pointerId = point->GetPointerId();
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end()) {
+            cancelEventList_.erase(pointerId);
+        }
+    }
     for (auto windowId : windowIds) {
-        int32_t pointerId = point->GetPointerId();
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
-        if (windowInfo == std::nullopt) {
-            MMI_HILOGE("WindowInfo id nullptr");
+        if (!ReissueEvent(point, windowId, windowInfo)) {
+            continue;
         }
         auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
         auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -127,6 +181,11 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         pointerEvent->SetDispatchTimes(count++);
         DispatchPointerEventInner(pointerEvent, fd);
     }
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        WIN_MGR->ClearTargetWindowId(pointerId);
+    }
 }
 
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
@@ -137,8 +196,16 @@ void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
 {
-    if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-        enableMark_ = !enableMark_;
+    auto currentEventTime = std::chrono::high_resolution_clock::now();
+    int64_t tm64Cost = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - LasteventBeginTime_).count();
+
+    if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE
+        || event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        enableMark_ = (tm64Cost > INTERVAL_DURATION) ? true : false;
+        if (enableMark_) {
+            LasteventBeginTime_ = currentEventTime;
+        }
         MMI_HILOGD("Id:%{public}d, markEnabled:%{public}d", event->GetId(), enableMark_);
         return enableMark_;
     }

@@ -18,6 +18,7 @@
 
 #include "nocopyable.h"
 
+#include "aggregator.h"
 #include "msg_handler.h"
 #include "uds_client.h"
 
@@ -69,6 +70,16 @@ private:
 
 private:
     std::function<void(int32_t, int64_t)> dispatchCallback_ { nullptr };
+    Aggregator aggregator_ {
+        [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
+            return 0;
+        },
+        [](int32_t timerId) -> int32_t
+        {
+            return 0;
+        },
+        30
+    };
 };
 } // namespace MMI
 } // namespace OHOS

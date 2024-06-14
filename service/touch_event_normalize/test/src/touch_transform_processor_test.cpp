@@ -16,10 +16,12 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "define_multimodal.h"
 #include "general_touchscreen.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "libinput-private.h"
 #include "libinput_wrapper.h"
 #include "touch_transform_processor.h"

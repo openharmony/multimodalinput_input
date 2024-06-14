@@ -20,17 +20,19 @@ graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 security_component_path = "//base/security"
+c_utils_root = "//commonlibrary/c_utils"
+hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
   resource_schedule_service_enabled = false
   input_feature_product = "default"
   input_feature_enable_pgo = false
   input_feature_pgo_path = ""
-  input_feature_combination_key = true
+  input_feature_combination_key = false
   input_feature_pointer_drawing = true
   input_feature_interceptor = true
   input_feature_monitor = true
-  input_feature_keyboard = true
+  input_feature_keyboard = false
   input_feature_switch = true
   input_feature_mouse = true
   input_feature_joystick = true
@@ -42,6 +44,7 @@ declare_args() {
   input_ext_feature_fingersense = true
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
+  input_feature_crown = true
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
 
@@ -96,7 +99,6 @@ declare_args() {
     "device_manager/src/input_device_manager.cpp",
     "device_state_manager/src/device_event_monitor.cpp",
     "dfx/src/dfx_hisysevent.cpp",
-    "display_state_manager/src/display_event_monitor.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/anr_manager.cpp",
@@ -108,9 +110,13 @@ declare_args() {
     "event_handler/src/key_map_manager.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
     "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
+    "hardware_cursor_pointer_manager/src/hardware_cursor_pointer_manager.cpp",
+    "key_command/src/setting_datashare.cpp",
+    "key_command/src/setting_observer.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/authorization_dialog.cpp",
+    "message_handle/src/authorize_helper.cpp",
     "message_handle/src/inject_notice_manager.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
@@ -205,6 +211,7 @@ declare_args() {
   ]
 
   libmmi_virtual_device_sources = [
+    "src/virtual_crown.cpp",
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
     "src/virtual_fingerprint_key.cpp",
@@ -313,6 +320,10 @@ if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 }
 
+if (input_feature_crown) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CROWN" ]
+}
+
 if (!defined(global_parts_info) ||
     defined(global_parts_info.security_security_component_manager)) {
   security_component_enable = true
@@ -353,6 +364,10 @@ if (input_ext_feature_anco) {
   }
 }
 
+if (input_feature_product == "pc") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_HARDWARE_CURSOR" ]
+}
+
 if (input_ext_feature_magiccursor) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   g2d_ext_path = "//foundation/graphic/graphic_2d_ext"
@@ -360,7 +375,9 @@ if (input_ext_feature_magiccursor) {
   surface_path = "//foundation/graphic/graphic_surface"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
   libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
 }

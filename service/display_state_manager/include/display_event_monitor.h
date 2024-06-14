@@ -25,7 +25,9 @@
 #include "define_multimodal.h"
 #include "fingersense_manager.h"
 #include "fingersense_wrapper.h"
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "key_event_normalize.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "mmi_log.h"
 #include "want.h"
 #include "util.h"

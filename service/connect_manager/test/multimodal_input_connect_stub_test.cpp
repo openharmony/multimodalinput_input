@@ -34,6 +34,260 @@ public:
 };
 
 /**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetMouseHotSpot
+ * @tc.desc: Test the function StubSetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetMouseHotSpot, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t pid = 100;
+    int32_t windowId = -1;
+    int32_t hotSpotX = 300;
+    int32_t hotSpotY = 300;
+    data.WriteInt32(pid);
+    data.WriteInt32(windowId);
+    EXPECT_EQ(stub->StubSetMouseHotSpot(data, reply), MMISERVICE_NOT_RUNNING);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubSetMouseHotSpot(data, reply), RET_OK);
+    windowId = 30;
+    data.WriteInt32(pid);
+    data.WriteInt32(windowId);
+    data.WriteInt32(hotSpotX);
+    data.WriteInt32(hotSpotY);
+    EXPECT_NE(stub->StubSetMouseHotSpot(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetMouseScrollRows
+ * @tc.desc: Test the function StubGetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetMouseScrollRows, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(stub->StubGetMouseScrollRows(data, reply), MMISERVICE_NOT_RUNNING);
+
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubGetMouseScrollRows(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerSize, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(stub->StubSetPointerSize(data, reply), MMISERVICE_NOT_RUNNING);
+    int32_t size = 10;
+    data.WriteInt32(size);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubSetPointerSize(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetNapStatus
+ * @tc.desc: Test the function StubSetNapStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetNapStatus, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(stub->StubSetNapStatus(data, reply), MMISERVICE_NOT_RUNNING);
+
+    int32_t pid = 1000;
+    int32_t uid = 1500;
+    std::string bundleName = "abc";
+    int32_t napStatus = 100;
+    data.WriteInt32(pid);
+    data.WriteInt32(uid);
+    data.WriteString(bundleName);
+    data.WriteInt32(napStatus);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubSetNapStatus(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerSize, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(stub->StubGetPointerSize(data, reply), MMISERVICE_NOT_RUNNING);
+
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubGetPointerSize(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetMousePrimaryButton
+ * @tc.desc: Test the function StubSetMousePrimaryButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetMousePrimaryButton, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t primaryButton = 2072;
+    data.WriteInt32(primaryButton);
+    EXPECT_NE(stub->StubSetMousePrimaryButton(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetHoverScrollState
+ * @tc.desc: Test the function StubSetHoverScrollState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetHoverScrollState, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    bool state = false;
+    data.WriteBool(state);
+    EXPECT_NE(stub->StubSetHoverScrollState(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetPointerVisible
+ * @tc.desc: Test the function StubSetPointerVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerVisible, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    bool visible = true;
+    int32_t priority = 1;
+    data.WriteBool(visible);
+    data.WriteInt32(priority);
+    EXPECT_NE(stub->StubSetPointerVisible(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubMarkProcessed
+ * @tc.desc: Test the function StubMarkProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubMarkProcessed, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NE(stub->StubMarkProcessed(data, reply), RET_OK);
+
+    int32_t eventType = 1;
+    int32_t eventId = 100;
+    data.WriteInt32(eventType);
+    data.WriteInt32(eventId);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubMarkProcessed(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerColor, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NE(stub->StubSetPointerColor(data, reply), RET_OK);
+
+    int32_t color = 123456;
+    data.WriteInt32(color);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubSetPointerColor(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerColor, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NE(stub->StubGetPointerColor(data, reply), RET_OK);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubGetPointerColor(data, reply), RET_OK);
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAddInputHandler
+ * @tc.desc: Test the function StubAddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAddInputHandler, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    std::shared_ptr<MMIService> service = std::static_pointer_cast<MMIService>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NE(stub->StubAddInputHandler(data, reply), RET_OK);
+
+    int32_t handlerType = InputHandlerType::NONE;
+    uint32_t eventType = 0x1;
+    int32_t priority = 1;
+    uint32_t deviceTags = 100;
+    data.WriteInt32(handlerType);
+    data.WriteUint32(eventType);
+    data.WriteInt32(priority);
+    data.WriteUint32(deviceTags);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    EXPECT_NE(stub->StubAddInputHandler(data, reply), RET_OK);
+}
+
+/**
  * @tc.name: MultimodalInputConnectStubTest_OnRemoteRequest_001
  * @tc.desc: Test the function OnRemoteRequest
  * @tc.type: FUNC

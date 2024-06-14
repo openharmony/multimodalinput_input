@@ -17,13 +17,13 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
-#include "dfx_hisysevent.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -85,7 +85,7 @@ int32_t SwitchSubscriberHandler::SubscribeSwitchEvent(SessionPtr sess, int32_t s
     }
     CHKPR(sess, ERROR_NULL_POINTER);
 
-    MMI_HILOGD("subscribeId:%{public}d switchType:%{public}d", subscribeId, switchType);
+    MMI_HILOGD("subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, switchType);
     InsertSubScriber(std::move(subscriber));
     InitSessionDeleteCallback();
@@ -134,7 +134,7 @@ void SwitchSubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
     CHKPV(subs);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
-            MMI_HILOGW("Repeat registration id:%{public}d desc:%{public}s",
+            MMI_HILOGW("Repeat registration id:%{public}d, desc:%{public}s",
                 subs->id_, subs->sess_->GetDescript().c_str());
             return;
         }
@@ -166,7 +166,7 @@ void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> swit
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_SWITCH);
     InputEventDataTransformation::SwitchEventToNetPacket(switchEvent, pkt);
     if (subscriber->sess_ == nullptr) {
-        MMI_HILOGE("subscriber's sess is null");
+        MMI_HILOGE("Subscriber's sess is null");
         return;
     }
     int32_t fd = subscriber->sess_->GetFd();

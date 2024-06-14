@@ -21,9 +21,9 @@
 #include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "i_preference_manager.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
-#include "multimodal_input_preferences_manager.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -33,15 +33,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID = -1;
-constexpr int32_t OPEN_AUTO_REPEAT = 1;
-constexpr int32_t DEFAULT_KEY_REPEAT_DELAY = 500;
-constexpr int32_t MIN_KEY_REPEAT_DELAY = 300;
-constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
-constexpr int32_t DEFAULT_KEY_REPEAT_RATE = 50;
-constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
-constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
-const std::string KEYBOARD_FILE_NAME = "keyboard_settings.xml";
+constexpr int32_t INVALID_DEVICE_ID { -1 };
+constexpr int32_t OPEN_AUTO_REPEAT { 1 };
+constexpr int32_t DEFAULT_KEY_REPEAT_DELAY { 500 };
+constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
+constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
+constexpr int32_t DEFAULT_KEY_REPEAT_RATE { 50 };
+constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
+constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
+const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 } // namespace
 
 KeyAutoRepeat::KeyAutoRepeat() {}
@@ -58,8 +58,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     CHKPR(device, ERROR_NULL_POINTER);
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
-    auto ret = ReadTomlFile(GetTomlFilePath(fileName), devConf);
-    if (ret == RET_ERR) {
+    if (ReadTomlFile(GetTomlFilePath(fileName), devConf) != RET_OK) {
         MMI_HILOGI("Can not read device config file");
         return RET_ERR;
     }
@@ -77,7 +76,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
-    MMI_HILOGD("AutoRepeatSwitch::%{public}d, keyEvent flag:%{public}x", devConf.autoSwitch, keyEvent->GetFlag());
+    MMI_HILOGD("AutoRepeatSwitch:%{public}d, keyEvent flag:%{public}x", devConf.autoSwitch, keyEvent->GetFlag());
     if (devConf.autoSwitch != OPEN_AUTO_REPEAT && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
         MMI_HILOGI("AutoRepeatSwitch not open and is not simulate event");
         return;
@@ -98,7 +97,8 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        MMI_HILOGI("Stop autorepeat, keyCode:%{public}d %{public}d", keyEvent_->GetKeyCode(), repeatKeyCode_);
+        MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d",
+            keyEvent_->GetKeyCode(), repeatKeyCode_);
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
             std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
             if (pressedKeyItem) {
@@ -203,10 +203,10 @@ int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
     }
     std::string name = "keyboardRepeatDelay";
     if (PutConfigDataToDatabase(name, repeatDelayTime) != RET_OK) {
-        MMI_HILOGE("Failed to set keyboard repeat delay.");
+        MMI_HILOGE("Failed to set keyboard repeat delay");
         return RET_ERR;
     }
-    MMI_HILOGD("Set keyboard repeat delay delay:%{public}d", repeatDelayTime);
+    MMI_HILOGD("Set keyboard repeat delay:%{public}d", repeatDelayTime);
     return RET_OK;
 }
 
@@ -234,7 +234,7 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatDelay(int32_t &delay)
     CALL_DEBUG_ENTER;
     std::string name = "keyboardRepeatDelay";
     if (GetConfigDataFromDatabase(name, delay) != RET_OK) {
-        MMI_HILOGE("Failed to get keyboard repeat delay.");
+        MMI_HILOGE("Failed to get keyboard repeat delay");
         return RET_ERR;
     }
     if (delay == 0) {
@@ -243,7 +243,7 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatDelay(int32_t &delay)
             delay = GetKeyboardRepeatTime(keyEvent_->GetDeviceId(), true);
         }
     }
-    MMI_HILOGD("Get keyboard repeat delay delay:%{public}d", delay);
+    MMI_HILOGD("Get keyboard repeat delay:%{public}d", delay);
     return RET_OK;
 }
 
@@ -252,7 +252,7 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
     CALL_DEBUG_ENTER;
     std::string name = "keyboardRepeatRate";
     if (GetConfigDataFromDatabase(name, rate) != RET_OK) {
-        MMI_HILOGE("Failed to get keyboard repeat rate.");
+        MMI_HILOGE("Failed to get keyboard repeat rate");
         return RET_ERR;
     }
     if (rate == 0) {
@@ -261,7 +261,7 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
             rate = GetKeyboardRepeatTime(keyEvent_->GetDeviceId(), false);
         }
     }
-    MMI_HILOGD("Get keyboard repeat rate rate:%{public}d", rate);
+    MMI_HILOGD("Get keyboard repeat rate:%{public}d", rate);
     return RET_OK;
 }
 

@@ -24,6 +24,7 @@ namespace MMI {
 inline constexpr std::string_view CALL_FUNCTION = "napi_call_function";
 inline constexpr std::string_view CREATE_OBJECT = "napi_create_object";
 inline constexpr std::string_view CREATE_INT32 = "napi_create_int32";
+inline constexpr std::string_view CREATE_UINT32 = "napi_create_uint32";
 inline constexpr std::string_view CREATE_PROMISE = "napi_create_promise";
 inline constexpr std::string_view CREATE_REFERENCE = "napi_create_reference";
 inline constexpr std::string_view CREATE_ASYNC_WORK = "napi_create_async_work";
@@ -63,10 +64,10 @@ inline constexpr std::string_view DELETE_ASYNC_WORK = "napi_delete_async_work";
 inline constexpr std::string_view COERCE_TO_BOOL = "napi_coerce_to_bool";
 inline constexpr std::string_view CREATE_ERROR = "napi_create_error";
 
-inline constexpr size_t MAX_STRING_LEN = 1024;
+inline constexpr size_t MAX_STRING_LEN { 1024 };
 
-inline constexpr int SUCCESS = 0;
-inline constexpr int FAILED = -1;
+inline constexpr int SUCCESS { 0 };
+inline constexpr int FAILED { -1 };
 inline constexpr int32_t ANR_DISPATCH = 0;
 inline constexpr int32_t ANR_MONITOR = 1;
 

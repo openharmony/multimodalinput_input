@@ -15,7 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "input_windows_manager.h"
+#include "ui/rs_canvas_drawing_node.h"
+#include "ui/rs_surface_node.h"
+
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "knuckle_glow_point.h"
 

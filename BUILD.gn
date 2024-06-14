@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -141,7 +141,9 @@ group("ut_mmi_debug_tools") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
+    "frameworks/proxy:InputManagerImplTest",
     "frameworks/proxy:InputManagerInjectTest",
     "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:InputManagerTest",
@@ -150,22 +152,31 @@ group("mmi_tests") {
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
     "service:ApplicationStateObserverTest",
+    "service:ConnectManagerEXTest",
     "service:ConnectManagerTest",
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",
     "service:DeviceManagerTest",
+    "service:DfxHisysEventTest",
     "service:DisplayStateManagerTest",
     "service:EventDispatchTest",
     "service:EventDumpTest",
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
     "service:EventHandlerTest",
+    "service:FingerprintEventProcessorTest",
+    "service:InfraredEmitterTest",
+    "service:InputWindowsManagerTest",
     "service:InterceptorTest",
     "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
+    "service:KnuckleDrawingManagerTest",
+    "service:KnuckleDynamicDrawingManagerTest",
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
+    "service:ServerMsgHandlerTest",
+    "service:StylusKeyTest",
     "service:StylusKeyTest",
     "service:SubscriberTest",
     "service:TimerManagerTest",
@@ -174,15 +185,20 @@ group("mmi_tests") {
     "service:event_resample_test",
     "service:mmi-service-tests",
     "service:rust_mmi_test",
+    "service/crown_transform_processor/test:CrownTransformProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
-    "service/touch_event_normalize/test:TouchEventNormalizeTest",
-    "service/touch_event_normalize/test:TransformPointTest",
+    "service/mouse_event_normalize/test:MouseTransformProcessorMockTest",
+    "service/touch_event_normalize/test:TouchEventNormalizeTests",
     "test/fuzztest:test",
     "test/unittest/interfaces:InputNativeTest",
     "tools/inject_event:InjectEventTest",
     "util:rust_mmi_key_config_test",
     "util:ut-mmi-util-out",
   ]
+
+  if (input_feature_switch) {
+    deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
+  }
 }
 
 group("examples_group") {

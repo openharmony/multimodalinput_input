@@ -219,5 +219,213 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandlePointerEventFilter
     flag = event->HandlePointerEventFilter(pointerEvent);
     EXPECT_FALSE(flag);
 }
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandleKeyEvent_002
+ * @tc.desc: Verify the HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    EXPECT_NE(keyEvent, nullptr);
+    EventFilterHandler event;
+    KeyEvent::KeyItem item;
+    item.SetDeviceId(1);
+    keyEvent->AddKeyItem(item);
+    bool result = event.HandleKeyEventFilter(keyEvent);
+    ASSERT_FALSE(result);
+    ASSERT_NO_FATAL_FAILURE(event.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandlePointerEvent_001
+ * @tc.desc: Verify the HandlePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandlePointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    EventFilterHandler event;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    EXPECT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    item.SetDeviceId(1);
+    keyEvent->AddKeyItem(item);
+    bool result = event.HandlePointerEventFilter(pointerEvent);
+    ASSERT_FALSE(result);
+    ASSERT_NO_FATAL_FAILURE(event.HandlePointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandleTouchEvent_001
+ * @tc.desc: Verify the HandleTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    EventFilterHandler event;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    EXPECT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    item.SetDeviceId(1);
+    keyEvent->AddKeyItem(item);
+    bool result = event.HandlePointerEventFilter(pointerEvent);
+    ASSERT_FALSE(result);
+    ASSERT_NO_FATAL_FAILURE(event.HandleTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandlePointerEventFilter_002
+ * @tc.desc: Verify the HandlePointerEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandlePointerEventFilter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    EXPECT_NE(event, nullptr);
+    EventFilterHandler handler;
+    bool result = handler.HandlePointerEventFilter(event);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandlePointerEventFilter_003
+ * @tc.desc: Verify the HandlePointerEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandlePointerEventFilter_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    EXPECT_NE(event, nullptr);
+    EventFilterHandler handler;
+    EventFilterHandler::FilterInfo filter1 = {nullptr, nullptr, 1, 10, 0x1, 100};
+    EventFilterHandler::FilterInfo filter2 = {nullptr, nullptr, 2, 20, 0x2, 200};
+    EventFilterHandler::FilterInfo filter3 = {nullptr, nullptr, 3, 30, 0x3, 300};
+    handler.filters_.push_back(filter1);
+    handler.filters_.push_back(filter2);
+    handler.filters_.push_back(filter3);
+    ASSERT_EQ(handler.filters_.size(), 3);
+    ASSERT_TRUE(handler.filters_.front().IsSameClient(1, 100));
+    ASSERT_TRUE(handler.filters_.back().IsSameClient(3, 300));
+    bool result = handler.HandlePointerEventFilter(event);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandlePointerEventFilter_004
+ * @tc.desc: Verify the HandlePointerEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandlePointerEventFilter_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    EXPECT_NE(event, nullptr);
+    EventFilterHandler handler;
+    EventFilterHandler::FilterInfo filter1 = {nullptr, nullptr, 1, 10, 0x1, 100};
+    EventFilterHandler::FilterInfo filter2 = {nullptr, nullptr, 2, 20, 0x2, 200};
+    EventFilterHandler::FilterInfo filter3 = {nullptr, nullptr, 3, 30, 0x3, 300};
+    handler.filters_.push_back(filter1);
+    handler.filters_.push_back(filter2);
+    handler.filters_.push_back(filter3);
+    ASSERT_EQ(handler.filters_.size(), 3);
+    ASSERT_TRUE(handler.filters_.front().IsSameClient(1, 100));
+    ASSERT_TRUE(handler.filters_.back().IsSameClient(3, 300));
+    int32_t pointerId = 1;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    event->AddPointerItem(item);
+    event->SetPointerId(1);
+    bool result = handler.HandlePointerEventFilter(event);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandleKeyEventFilter_002
+ * @tc.desc: Verify the HandleKeyEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEventFilter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    EXPECT_NE(event, nullptr);
+    EventFilterHandler handler;
+    bool result = handler.HandleKeyEventFilter(event);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandleKeyEventFilter_003
+ * @tc.desc: Verify the HandleKeyEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEventFilter_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    EXPECT_NE(event, nullptr);
+    EventFilterHandler handler;
+    EventFilterHandler::FilterInfo filter1 = {nullptr, nullptr, 1, 10, 0x1, 100};
+    EventFilterHandler::FilterInfo filter2 = {nullptr, nullptr, 2, 20, 0x2, 200};
+    EventFilterHandler::FilterInfo filter3 = {nullptr, nullptr, 3, 30, 0x3, 300};
+    handler.filters_.push_back(filter1);
+    handler.filters_.push_back(filter2);
+    handler.filters_.push_back(filter3);
+    ASSERT_EQ(handler.filters_.size(), 3);
+    ASSERT_TRUE(handler.filters_.front().IsSameClient(1, 100));
+    ASSERT_TRUE(handler.filters_.back().IsSameClient(3, 300));
+    bool result = handler.HandleKeyEventFilter(event);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_HandleKeyEventFilter_004
+ * @tc.desc: Verify the HandleKeyEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEventFilter_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    EXPECT_NE(event, nullptr);
+    std::shared_ptr<PointerEvent> pointevent = PointerEvent::Create();
+    EXPECT_NE(pointevent, nullptr);
+    EventFilterHandler handler;
+    EventFilterHandler::FilterInfo filter1 = {nullptr, nullptr, 1, 10, 0x1, 100};
+    EventFilterHandler::FilterInfo filter2 = {nullptr, nullptr, 2, 20, 0x2, 200};
+    EventFilterHandler::FilterInfo filter3 = {nullptr, nullptr, 3, 30, 0x3, 300};
+    handler.filters_.push_back(filter1);
+    handler.filters_.push_back(filter2);
+    handler.filters_.push_back(filter3);
+    ASSERT_EQ(handler.filters_.size(), 3);
+    ASSERT_TRUE(handler.filters_.front().IsSameClient(1, 100));
+    ASSERT_TRUE(handler.filters_.back().IsSameClient(3, 300));
+    int32_t pointerId = 1;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(pointerId);
+    pointevent->AddPointerItem(item);
+    pointevent->SetPointerId(1);
+    bool result = handler.HandleKeyEventFilter(event);
+    ASSERT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS

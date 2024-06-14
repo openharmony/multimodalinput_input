@@ -27,13 +27,13 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr double PI = 3.14159265358979323846f;
-constexpr double MOVE_SPEED = 10.0f;
-constexpr double BASIC_GRAVITY_Y = 0.5f;
-constexpr int32_t BASIC_LIFESPAN = 15;
-constexpr float DOUBLE = 2.0f;
-constexpr float DYNAMIC_EFFECT_SIZE = 0.8f;
-constexpr int32_t ARGB_COLOR_ARRAY = 0x20c8ffff;
+constexpr double PI { 3.14159265358979323846f };
+constexpr double MOVE_SPEED { 10.0f };
+constexpr double BASIC_GRAVITY_Y { 0.5f };
+constexpr int32_t BASIC_LIFESPAN { 15 };
+constexpr float DOUBLE { 2.0f };
+constexpr float DYNAMIC_EFFECT_SIZE { 0.8f };
+constexpr int32_t ARGB_COLOR_ARRAY { 0x20c8ffff };
 } // namespace
 
 KnuckleDivergentPoint::KnuckleDivergentPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap)
@@ -65,6 +65,7 @@ void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
+        MMI_HILOGE("can not draw");
         return;
     }
 

@@ -551,5 +551,19 @@ HWTEST_F(KeyEventTest, KeyEventTest_IsRepeat_002, TestSize.Level1)
     bool result = keyEvent->IsRepeat();
     ASSERT_TRUE(result);
 }
+
+/**
+ * @tc.name: KeyEventTest_Reset
+ * @tc.desc: Test Reset
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_Reset, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->Reset());
+}
 } // namespace MMI
 } // namespace OHOS

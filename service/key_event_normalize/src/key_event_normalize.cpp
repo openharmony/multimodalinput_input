@@ -90,7 +90,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
 
     HandleKeyAction(device, item, keyEvent);
 
-    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
     return RET_OK;
 }

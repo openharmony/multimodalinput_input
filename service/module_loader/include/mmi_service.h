@@ -139,12 +139,16 @@ public:
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
-    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies);
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
+    int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
+    int32_t EnableHardwareCursorStats(bool enable) override;
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
@@ -192,12 +196,12 @@ protected:
         int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
@@ -211,10 +215,14 @@ protected:
     void OnDelegateTask(epoll_event& ev);
 
     void AddReloadDeviceTimer();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     void AddAppDebugListener();
     void RemoveAppDebugListener();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
     int32_t UpdateCombineKeyState(bool enable);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
 
