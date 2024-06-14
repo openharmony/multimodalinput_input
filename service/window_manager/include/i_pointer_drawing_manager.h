@@ -119,7 +119,6 @@ public:
     {
         return 0;
     }
-    virtual void SetPointerScale(float scale) {}
     virtual void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
     virtual void Dump(int32_t fd, const std::vector<std::string> &args) {}
     virtual int32_t EnableHardwareCursorStats(int32_t pid, bool enable)
