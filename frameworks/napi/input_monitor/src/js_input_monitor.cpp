@@ -1409,7 +1409,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 } else {
                     bool switchThreeFinger = true;
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
-                    if (!switchThreeFinger) {
+                    if (switchThreeFinger) {
                         closed = true;
                         MMI_HILOGD("THREE_FINGERS_SWIPE but three finger action is closed");
                     }
@@ -1437,15 +1437,17 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 } else {
                     bool switchThreeFinger = true;
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
-                    if (!switchThreeFinger) {
+                    if (switchThreeFinger) {
                         closed = true;
                         MMI_HILOGD("THREE_FINGERS_TAP but three finger action is closed");                  
                     }
                 }
                 if(closed) {
-                    ret = TransformMultiTapEvent(pointerEvent, napiPointer);
+                    napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
+                ret = TransformMultiTapEvent(pointerEvent, napiPointer);
+                break;
                 break;
             }
             case TypeName::JOYSTICK:{
