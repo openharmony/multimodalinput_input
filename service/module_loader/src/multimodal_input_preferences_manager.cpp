@@ -118,23 +118,23 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
 
 int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
 {
-    preferencesMap[pointerSize] = {mouseFileName, g_pointerSize};
-    preferencesMap[pointerSpeed] = {mouseFileName, g_pointerSpeed};
-    preferencesMap[pointerColor] = {mouseFileName, g_pointerColor};
-    preferencesMap[pointerStyle] = {mouseFileName, g_pointerStyle};
-    preferencesMap[mouseScrollRows] = {mouseFileName, g_mouseScrollRows};
-    preferencesMap[hoverScrollState] = {mouseFileName, static_cast<int32_t>(g_hoverScrollState)};
-    preferencesMap[mousePrimaryButton] = {mouseFileName, g_mousePrimaryButton};
-    preferencesMap[touchpadTapSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadTapSwitch)};
-    preferencesMap[keyboardRepeatRate] = {keyboarFileName, g_keyboardRepeatRate};
-    preferencesMap[keyboardRepeatDelay] = {keyboarFileName, g_keyboardRepeatDelay};
-    preferencesMap[touchpadPinchSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadPinchSwitch)};
-    preferencesMap[touchpadSwipeSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadSwipeSwitch)};
-    preferencesMap[touchpadPointerSpeed] = {touchpadFileName, g_touchpadPointerSpeed};
-    preferencesMap[touchpadScrollSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollSwitch)};
-    preferencesMap[touchpadRightClickType] = {touchpadFileName, g_touchpadRightClickType};
-    preferencesMap[touchpadScrollDirection] = {touchpadFileName, static_cast<int32_t>(g_touchpadScrollDirection)};
-    preferencesMap[touchpadThreeFingerTapSwitch] = {touchpadFileName, static_cast<int32_t>(g_touchpadThreeFingerTapSwitch)};
+    preferencesMap[pointerSize] = {MOUSE_FILE_NAME, g_pointerSize};
+    preferencesMap[pointerSpeed] = {MOUSE_FILE_NAME, g_pointerSpeed};
+    preferencesMap[pointerColor] = {MOUSE_FILE_NAME, g_pointerColor};
+    preferencesMap[pointerStyle] = {MOUSE_FILE_NAME, g_pointerStyle};
+    preferencesMap[mouseScrollRows] = {MOUSE_FILE_NAME, g_mouseScrollRows};
+    preferencesMap[hoverScrollState] = {MOUSE_FILE_NAME, static_cast<int32_t>(g_hoverScrollState)};
+    preferencesMap[mousePrimaryButton] = {MOUSE_FILE_NAME, g_mousePrimaryButton};
+    preferencesMap[touchpadTapSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadTapSwitch)};
+    preferencesMap[keyboardRepeatRate] = {KEYBOARD_FILE_NAME, g_keyboardRepeatRate};
+    preferencesMap[keyboardRepeatDelay] = {KEYBOARD_FILE_NAME, g_keyboardRepeatDelay};
+    preferencesMap[touchpadPinchSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadPinchSwitch)};
+    preferencesMap[touchpadSwipeSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadSwipeSwitch)};
+    preferencesMap[touchpadPointerSpeed] = {TOUCHPAD_FILE_NAME, g_touchpadPointerSpeed};
+    preferencesMap[touchpadScrollSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadScrollSwitch)};
+    preferencesMap[touchpadRightClickType] = {TOUCHPAD_FILE_NAME, g_touchpadRightClickType};
+    preferencesMap[touchpadScrollDirection] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadScrollDirection)};
+    preferencesMap[touchpadThreeFingerTapSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadThreeFingerTapSwitch)};
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     preferencesMap[magicPointerSize] = {MOUSE_FILE_NAME, g_magicPointerSize};
     preferencesMap[magicPointerColor] = {MOUSE_FILE_NAME, g_magicPointerColor};
