@@ -2409,8 +2409,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         touchWindow = &it->second.window;
         if (it->second.flag) {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            MMI_HILOG_DISPATCHI("touch event send cancel, window:%{public}d, pointerId:%{public}d", touchWindow->id,
-                pointerId);
+            MMI_HILOG_DISPATCHI("Not found event down target window, maybe this window was untouchable,"
+                "need send cancel event, windowId:%{public}d pointerId:%{public}d", touchWindow->id, pointerId);
         }
     }
     winMap.clear();
