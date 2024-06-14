@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
 #include "input_device.h"
@@ -26,7 +27,6 @@
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
-#include "anr_handler.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -103,7 +103,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     ResetLogTrace();
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
-        MMI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
+        MMI_HILOGE("Msg handling failed. id:%{public}d, ret:%{public}d", id, ret);
         return;
     }
 }
@@ -174,6 +174,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_DISPATCHI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
+    std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
+    aggregator_.Record({MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__}, logInfo.c_str(),
+        std::to_string(pointerEvent->GetId()));
     EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");

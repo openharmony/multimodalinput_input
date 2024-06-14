@@ -37,7 +37,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MT_TOOL_PALM = 2;
+constexpr int32_t MT_TOOL_PALM { 2 };
 } // namespace
 
 InputEventHandler::InputEventHandler()
@@ -114,7 +114,7 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event* event)
         if (TimerMgr->IsExist(timerId_)) {
             TimerMgr->ResetTimer(timerId_);
         } else {
-            static constexpr int32_t timeout = 30;
+            static constexpr int32_t timeout = 400;
             std::weak_ptr<InputEventHandler> weakPtr = shared_from_this();
             timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
                 CALL_DEBUG_ENTER;

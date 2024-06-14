@@ -25,16 +25,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t SEC_TO_NANOSEC = 1000000000;
-constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-constexpr int32_t PAINT_WIDTH = 20;
-constexpr int32_t ARGB_A = 0;
-constexpr int32_t ARGB_RGB = 255;
-constexpr double BASIC_LIFESPAN = 200.0f;
-constexpr int32_t TRACE_COLOR = 255;
-constexpr float BASIC_SIZE = 100.0f;
-constexpr int32_t ARGB_COLOR_ARRAY = 0x11c8ffff;
-constexpr int32_t HALF = 2;
+constexpr int32_t SEC_TO_NANOSEC { 1000000000 };
+constexpr int32_t NANOSECOND_TO_MILLISECOND { 1000000 };
+constexpr int32_t PAINT_WIDTH { 20 };
+constexpr int32_t ARGB_A { 0 };
+constexpr int32_t ARGB_RGB { 255 };
+constexpr double BASIC_LIFESPAN { 200.0f };
+constexpr int32_t TRACE_COLOR { 255 };
+constexpr float BASIC_SIZE { 100.0f };
+constexpr int32_t ARGB_COLOR_ARRAY { 0x11c8ffff };
+constexpr double HALF { 2.0 };
 } // namespace
 
 KnuckleGlowPoint::KnuckleGlowPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap) : traceShadow_(bitmap) {}
@@ -71,6 +71,7 @@ void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     CHKPV(canvas);
     CHKPV(traceShadow_);
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
+        MMI_HILOGE("can not draw");
         return;
     }
     OHOS::Rosen::Drawing::Filter filter;

@@ -17,11 +17,12 @@
 
 #include <cinttypes>
 
-#include "define_multimodal.h"
+#include "ffrt.h"
+#include "ffrt_inner.h"
 
+#include "define_multimodal.h"
 #include "input_manager_impl.h"
 #include "multimodal_input_connect_manager.h"
-#include "ffrt.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_ANRDETECT
@@ -31,10 +32,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME = 3500000;
-constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME = 50000;
-constexpr int32_t INVALID_OR_PROCESSED_ID = -1;
-constexpr int32_t TIME_TRANSITION = 1000;
+constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME { 3500000 };
+constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
+constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
+constexpr int32_t TIME_TRANSITION { 1000 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -65,7 +66,7 @@ void ANRHandler::SendEvent(int32_t eventType, int32_t eventId)
     auto task = [this, eventType, eventId] {
         MarkProcessed(eventType, eventId);
     };
-    ffrt::submit(task, {}, {}, ffrt::task_attr().qos(ffrt::qos_user_initiated));
+    ffrt::submit(task, {}, {}, ffrt::task_attr().qos(ffrt_qos_deadline_request));
 }
 
 void ANRHandler::ResetAnrArray()

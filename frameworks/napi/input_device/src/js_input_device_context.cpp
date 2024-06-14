@@ -25,16 +25,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr uint32_t MIN_N_SIZE = 1;
-constexpr uint32_t MAX_N_SIZE = 5;
-constexpr int32_t STANDARD_KEY_REPEAT_DELAY = 500;
-constexpr int32_t MIN_KEY_REPEAT_DELAY = 300;
-constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
-constexpr int32_t STANDARD_KEY_REPEAT_RATE = 50;
-constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
-constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
-constexpr int32_t ARGC_NUM = 2;
-constexpr size_t INPUT_PARAMETER = 2;
+constexpr uint32_t MIN_N_SIZE { 1 };
+constexpr uint32_t MAX_N_SIZE { 5 };
+constexpr int32_t STANDARD_KEY_REPEAT_DELAY { 500 };
+constexpr int32_t MIN_KEY_REPEAT_DELAY { 300 };
+constexpr int32_t MAX_KEY_REPEAT_DELAY { 1000 };
+constexpr int32_t STANDARD_KEY_REPEAT_RATE { 50 };
+constexpr int32_t MIN_KEY_REPEAT_RATE { 36 };
+constexpr int32_t MAX_KEY_REPEAT_RATE { 100 };
+constexpr int32_t ARGC_NUM { 2 };
+constexpr size_t INPUT_PARAMETER { 2 };
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -122,18 +122,11 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     CHKRP(napi_get_named_property(env, global, "multimodal_input_device", &object), GET_NAMED_PROPERTY);
-
-    if (object == nullptr) {
-        MMI_HILOGE("object is nullptr");
-        return nullptr;
-    }
+    CHKPP(object);
 
     JsInputDeviceContext *instance = nullptr;
     CHKRP(napi_unwrap(env, object, (void**)&instance), UNWRAP);
-    if (instance == nullptr) {
-        MMI_HILOGE("instance is nullptr");
-        return nullptr;
-    }
+    CHKPP(instance);
     napi_close_handle_scope(env, scope);
     return instance;
 }
@@ -326,10 +319,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     }
 
     JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
-    if (jsContext == nullptr) {
-        MMI_HILOGE("jsContext is empty");
-        return nullptr;
-    }
+    CHKPP(jsContext);
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
     if (argc == INPUT_PARAMETER) {
         return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCodes);
@@ -390,11 +380,7 @@ napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_inf
     }
 
     JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
-    if (jsContext == nullptr) {
-        MMI_HILOGE("jsContext is empty");
-        return nullptr;
-    }
-
+    CHKPP(jsContext);
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
     CHKPP(jsInputDeviceMgr);
     return jsInputDeviceMgr->SupportKeysSync(env, deviceId, keyCodes);
@@ -701,11 +687,7 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
-    auto instance = CreateInstance(env);
-    if (instance == nullptr) {
-        MMI_HILOGE("failed to create instance");
-        return nullptr;
-    }
+    CHKPP(CreateInstance(env));
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
@@ -724,10 +706,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatRate", GetKeyboardRepeatRate),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
-    if (CreateEnumKeyboardType(env, exports) == nullptr) {
-        MMI_HILOGE("Failed to create keyboard type enum");
-        return nullptr;
-    }
+    CHKPP(CreateEnumKeyboardType(env, exports));
     return exports;
 }
 } // namespace MMI

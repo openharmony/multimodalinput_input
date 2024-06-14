@@ -29,7 +29,7 @@
 #include "input_event_handler.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
@@ -71,6 +71,7 @@ constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 constexpr int32_t LONG_ABILITY_START_DELAY = 2000;
+constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";

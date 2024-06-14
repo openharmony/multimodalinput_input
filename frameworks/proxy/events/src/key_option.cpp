@@ -14,6 +14,7 @@
  */
 
 #include "key_option.h"
+
 #include "config_multimodal.h"
 #include "mmi_log.h"
 
@@ -23,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t PRE_KEYS_MAX_SIZE = 4;
+constexpr int32_t PRE_KEYS_MAX_SIZE { 4 };
 }
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
@@ -82,7 +83,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         return false;
     }
     if (preKeysSize > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("The preKeys size(%{public}d) exceeds maximum allowed size(%{public}d)", preKeysSize,
+        MMI_HILOGE("The preKeys size:%{public}d, exceeds maximum allowed size:%{public}d", preKeysSize,
             PRE_KEYS_MAX_SIZE);
         return false;
     }
@@ -102,7 +103,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
 bool KeyOption::WriteToParcel(Parcel &out) const
 {
     if (preKeys_.size() > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("The preKeys size(%{public}zu) exceeds maximum allowed size(%{public}d)", preKeys_.size(),
+        MMI_HILOGE("The preKeys size:%{public}zu, exceeds maximum allowed size:%{public}d", preKeys_.size(),
             PRE_KEYS_MAX_SIZE);
         return false;
     }

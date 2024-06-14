@@ -36,13 +36,19 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
 using namespace testing::ext;
+namespace {
+InputWindowsManager *g_instance;
 } // namespace
+
+#ifdef WIN_MGR
+#undef WIN_MGR
+#endif
+#define WIN_MGR g_instance
 
 class InputWindowsManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {};
+    static void SetUpTestCase(void);
     static void TearDownTestCase(void) {};
     void SetUp(void)
     {
@@ -91,6 +97,11 @@ public:
 private:
     bool preHoverScrollState_ { true };
 };
+
+void InputWindowsManagerTest::SetUpTestCase(void)
+{
+    g_instance = static_cast<InputWindowsManager *>(IInputWindowsManager::GetInstance().get());
+}
 
 void FingersenseWrapperTest(int32_t num) {}
 
@@ -658,7 +669,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_
     WIN_MGR->SetWindowPointerStyle(area, pid, windowId);
     assert(lastPointerStyle_.id == pointerStyle.id);
     assert(windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
-        mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != defaultIconPath));
+        mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != DEFAULT_ICON_PATH));
     assert(WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) == RET_OK);
     assert(lastPointerStyle_.id == style.id);
 }
@@ -4028,7 +4039,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), ERR_OK);
 }
 
-
 /**
  * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget
  * @tc.desc: Test UpdateTouchScreenTarget
@@ -4069,6 +4079,88 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsManager.displayGroupInfo_.displaysInfo[0].x = 300;
     inputWindowsManager.displayGroupInfo_.displaysInfo[0].y = INT32_MAX;
     EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_002
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_NO_INTERCEPT;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 300;
+    displayInfo.height = 300;
+    displayInfo.x = 300;
+    displayInfo.y = 300;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(100);
+    item.SetDisplayY(100);
+    item.SetDisplayXPos(100);
+    item.SetDisplayYPos(100);
+    item.SetTargetWindowId(2);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.flags = WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    pointerEvent->SetZOrder(180.5f);
+    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    windowInfo.pixelMap = nullptr;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.flags = 0;
+    inputWindowsManager.isOpenAntiMisTakeObserver_ = false;
+    inputWindowsManager.antiMistake_.isOpen = false;
+    windowInfo.id = 18;
+    windowInfo.windowInputType = WindowInputType::NORMAL;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.pointerId = 9;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(pointerEvent->GetTargetDisplayId(), windowGroupInfo));
+    WindowInfoEX windowInfoEX;
+    int32_t pointerId = 25;
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerId, windowInfoEX));
+    EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPidAndUpdateTarget_002
+ * @tc.desc: Test getting PID and updating the target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetTargetDisplayId(10);
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 52;
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = 2;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = 52;
+    windowInfo.pid = 100;
+    windowInfo.agentWindowId = 65;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(keyEvent->GetTargetDisplayId(), windowGroupInfo));
+    EXPECT_EQ(inputWindowsManager.GetPidAndUpdateTarget(keyEvent), 100);
 }
 
 /**
@@ -4138,7 +4230,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputWindowsManager::FoldStatusLisener foldStatusLisener;
+    InputWindowsManager::FoldStatusLisener foldStatusLisener(*g_instance);
     Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
     EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
     foldStatus = Rosen::FoldStatus::EXPAND;
@@ -4160,9 +4252,89 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UnregisterFoldStatusLi
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
-    inputWindowsManager.foldStatusListener_ = new (std::nothrow) InputWindowsManager::FoldStatusLisener();
+    inputWindowsManager.foldStatusListener_ = new (std::nothrow) InputWindowsManager::FoldStatusLisener(*g_instance);
     ASSERT_NE(inputWindowsManager.foldStatusListener_, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UnregisterFoldStatusListener());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
+ * @tc.desc: Test UpdateAndAdjustMouseLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
+    inputWindowsManager.lastPointerEventForFold_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager.lastPointerEventForFold_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPressed(false);
+    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
+    item.SetPressed(true);
+    item.SetPointerId(1);
+    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnFoldStatusChanged(foldStatus));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation
+ * @tc.desc: Test FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(5);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    WindowInfoEX windowInfoEX;
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    DisplayInfo displayInfo;
+    displayInfo.id = 5;
+    displayInfo.displayDirection = DIRECTION0;
+    displayInfo.direction = DIRECTION90;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].displayDirection = DIRECTION270;
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetWindowPointerStyle_002
+ * @tc.desc: Test SetWindowPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetWindowPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pid = 10;
+    int32_t windowId = 50;
+    WindowArea area = WindowArea::FOCUS_ON_BOTTOM_RIGHT;
+    inputWindowsManager.lastPointerStyle_.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetWindowPointerStyle(area, pid, windowId));
+
+    windowId = -1;
+    inputWindowsManager.lastPointerStyle_.id = MOUSE_ICON::EAST;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetWindowPointerStyle(area, pid, windowId));
 }
 } // namespace MMI
 } // namespace OHOS

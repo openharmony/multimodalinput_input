@@ -334,6 +334,7 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
     int32_t consumerCount = 0;
+    MMI_HILOG_DISPATCHD("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     for (const auto &item : monitorHandlers_) {
         if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;

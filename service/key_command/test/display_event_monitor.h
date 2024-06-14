@@ -21,32 +21,32 @@
 namespace OHOS {
 namespace MMI {
 class DisplayEventMonitor final {
-    public:
-        DisplayEventMonitor() {}
-        virtual ~DisplayEventMonitor() {}
-        static std::shared_ptr<DisplayEventMonitor> GetInstance()
-        {
-            std::shared_ptr<DisplayEventMonitor> instance = std::make_shared<DisplayEventMonitor>();
-            return instance;
-        }
-        void UpdateShieldStatusOnScreenOn() {}
-        void UpdateShieldStatusOnScreenOff() {}
-        void InitCommonEventSubscriber() {}
-        bool IsCommonEventSubscriberInit()
-        {
-            return false;
-        }
-        const std::string GetScreenStatus()
-        {
-            return screenStatus_;
-        }
-        bool GetScreenLocked() const
-        {
-            return isScreenLocked_;
-        }
-    private:
-        std::string screenStatus_;
-        bool isScreenLocked_ { false };
+public:
+    DisplayEventMonitor() {}
+    virtual ~DisplayEventMonitor() {}
+    static std::shared_ptr<DisplayEventMonitor> GetInstance()
+    {
+        std::shared_ptr<DisplayEventMonitor> instance = std::make_shared<DisplayEventMonitor>();
+        return instance;
+    }
+    void UpdateShieldStatusOnScreenOn() {}
+    void UpdateShieldStatusOnScreenOff() {}
+    void InitCommonEventSubscriber() {}
+    bool IsCommonEventSubscriberInit()
+    {
+        return false;
+    }
+    const std::string GetScreenStatus()
+    {
+        return screenStatus_;
+    }
+    bool GetScreenLocked() const
+    {
+        return isScreenLocked_;
+    }
+private:
+    std::string screenStatus_;
+    bool isScreenLocked_ { false };
 };
 #define DISPLAY_MONITOR DisplayEventMonitor::GetInstance()
 } // namespace MMI

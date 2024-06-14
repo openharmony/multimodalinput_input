@@ -56,16 +56,16 @@ public:
 
 void TouchEventNormalizeTest::SetUp()
 {
-    TouchEventHdr->GetTouchpadPinchSwitch(prePinchSwitch_);
-    TouchEventHdr->GetTouchpadSwipeSwitch(preSwipeSwitch_);
-    TouchEventHdr->GetTouchpadRotateSwitch(preRotateSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(prePinchSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(preSwipeSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(preRotateSwitch_);
 }
 
 void TouchEventNormalizeTest::TearDown()
 {
-    TouchEventHdr->SetTouchpadPinchSwitch(prePinchSwitch_);
-    TouchEventHdr->SetTouchpadSwipeSwitch(preSwipeSwitch_);
-    TouchEventHdr->SetTouchpadRotateSwitch(preRotateSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(prePinchSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
 }
 
 /**
@@ -117,12 +117,12 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_MakeTransformProcessor
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 123456;
-    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH), nullptr);
-    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TABLET_TOOL), nullptr);
-    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH_PAD), nullptr);
-    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::GESTURE), nullptr);
-    ASSERT_NE(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::JOYSTICK), nullptr);
-    ASSERT_EQ(TouchEventHdr->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::KNUCKLE), nullptr);
+    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH), nullptr);
+    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TABLET_TOOL), nullptr);
+    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::TOUCH_PAD), nullptr);
+    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::GESTURE), nullptr);
+    ASSERT_NE(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::JOYSTICK), nullptr);
+    ASSERT_EQ(TOUCH_EVENT_HDR->MakeTransformProcessor(deviceId, TouchEventNormalize::DeviceType::KNUCKLE), nullptr);
 }
 
 /**
@@ -135,7 +135,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadPinchSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = false;
-    ASSERT_TRUE(TouchEventHdr->SetTouchpadPinchSwitch(flag) == RET_OK);
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(flag) == RET_OK);
 }
 
 /**
@@ -148,9 +148,9 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = true;
-    TouchEventHdr->SetTouchpadPinchSwitch(flag);
+    TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(flag);
     bool newFlag = true;
-    TouchEventHdr->GetTouchpadPinchSwitch(flag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -164,7 +164,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadSwipeSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = false;
-    ASSERT_TRUE(TouchEventHdr->SetTouchpadSwipeSwitch(flag) == RET_OK);
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(flag) == RET_OK);
 }
 
 /**
@@ -177,9 +177,9 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
 {
     CALL_TEST_DEBUG;
     bool flag = true;
-    TouchEventHdr->SetTouchpadSwipeSwitch(flag);
+    TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(flag);
     bool newFlag = true;
-    TouchEventHdr->GetTouchpadSwipeSwitch(flag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(flag);
     ASSERT_TRUE(flag == newFlag);
 }
 
@@ -193,7 +193,7 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitc
 {
     CALL_TEST_DEBUG;
     bool rotateSwitch = false;
-    ASSERT_TRUE(TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
 }
 
 /**
@@ -206,9 +206,9 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitc
 {
     CALL_TEST_DEBUG;
     bool rotateSwitch = true;
-    TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(rotateSwitch);
     bool newRotateSwitch = true;
-    TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 } // namespace MMI

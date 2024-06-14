@@ -30,17 +30,15 @@ struct StylusKey {
 };
 class StylusKeyHandler final {
     DECLARE_DELAYED_SINGLETON(StylusKeyHandler);
-    public:
-        DISALLOW_COPY_AND_MOVE(StylusKeyHandler);
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-        bool HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent);
-        void IsLaunchAbility();
-        void SetLastEventState(bool state);
-    private:
-        void LaunchAbility(const Ability &ability);
-    private:
-        StylusKey stylusKey_;
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+public:
+    DISALLOW_COPY_AND_MOVE(StylusKeyHandler);
+    bool HandleStylusKey(std::shared_ptr<KeyEvent> keyEvent);
+    void IsLaunchAbility();
+    void SetLastEventState(bool state);
+private:
+    void LaunchAbility(const Ability &ability);
+private:
+    StylusKey stylusKey_;
 };
 #define STYLUS_HANDLER ::OHOS::DelayedSingleton<StylusKeyHandler>::GetInstance()
 } // namespace MMI

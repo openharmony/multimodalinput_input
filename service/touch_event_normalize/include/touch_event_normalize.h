@@ -68,7 +68,7 @@ private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
 };
 
-#define TouchEventHdr ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()
+#define TOUCH_EVENT_HDR ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_EVENT_NORMALIZE_H
