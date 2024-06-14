@@ -44,7 +44,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsSceneBoardEnabled_00
     CALL_TEST_DEBUG;
     MMISceneBoardJudgement judgement;
     bool ret = judgement.IsSceneBoardEnabled();
-    ASSERT_FALSE(ret); 
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -58,7 +58,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_IsResampleEnabled_001,
     CALL_TEST_DEBUG;
     MMISceneBoardJudgement judgement;
     bool ret = judgement.IsResampleEnabled();
-    ASSERT_FALSE(ret); 
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -109,7 +109,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_InitWithConfigFile_001
     configFile.close();
     judgement.InitWithConfigFile("test_config.txt", enabled);
     ASSERT_TRUE(enabled);
-    std::remove("test_config.txt"); 
+    std::remove("test_config.txt");
 }
 
 /**
