@@ -48,7 +48,7 @@ private:
 };
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_AlphaTypeToAlphaType
+ * @tc.name: KnuckleDynamicDrawingManagerTest_AlphaTypeToAlphaType
  * @tc.desc: Test Overrides AlphaTypeToAlphaType function branches
  * @tc.type: Function
  * @tc.require:
@@ -70,7 +70,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Alph
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_PixelFormatToColorType
+ * @tc.name: KnuckleDynamicDrawingManagerTest_PixelFormatToColorType
  * @tc.desc: Test Overrides PixelFormatToColorType function branches
  * @tc.type: Function
  * @tc.require:
@@ -106,7 +106,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Pixe
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_KnuckleDynamicDrawHandler
+ * @tc.name: KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_Normal
  * @tc.desc: Test Normal branch of covering KnuckleDynamicDrawHandler function
  * @tc.type: Function
  * @tc.require:
@@ -127,7 +127,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_KnuckleDynamicDrawHandler_001
+ * @tc.name: KnuckleDynamicDrawingManagerTest_KnuckleDynamicDrawHandler_Abnormal
  * @tc.desc: Test Abnormal branch of covering KnuckleDynamicDrawHandler function
  * @tc.type: Function
  * @tc.require:
@@ -152,7 +152,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_InitPointerPathPaint
+ * @tc.name: KnuckleDynamicDrawingManagerTest_InitPointerPathPaint
  * @tc.desc: Test Overrides InitPointerPathPaint function branches
  * @tc.type: Function
  * @tc.require:
@@ -170,7 +170,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Init
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
+ * @tc.name: KnuckleDynamicDrawingManagerTest_IsSingleKnuckle
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
  * @tc.require:
@@ -193,7 +193,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_IsSi
     pointerEvent->SetPointerId(2);
     pointerEvent->AddPointerItem(item);
     knuckleDynamicDrawMgr.canvasNode_ = nullptr;
-    ASSERT_FALSE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
+    ASSERT_TRUE(knuckleDynamicDrawMgr.IsSingleKnuckle(pointerEvent));
 
     knuckleDynamicDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
@@ -201,7 +201,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_IsSi
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CheckPointerAction
+ * @tc.name: KnuckleDynamicDrawingManagerTest_CheckPointerAction
  * @tc.desc: Test Overrides CheckPointerAction function branches
  * @tc.type: Function
  * @tc.require:
@@ -241,7 +241,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Chec
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_StartTouchDraw
+ * @tc.name: KnuckleDynamicDrawingManagerTest_StartTouchDraw
  * @tc.desc: Test Overrides StartTouchDraw function branches
  * @tc.type: Function
  * @tc.require:
@@ -267,6 +267,50 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
 }
 
 /**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_ProcessMoveEvent
+ * @tc.desc: Test Overrides ProcessMoveEvent function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_ProcessMoveEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    knuckleDynamicDrawMgr.pointCounter_ = 6;
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
+    knuckleDynamicDrawMgr.glowTraceSystem_ =
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->AddPointerItem(item);
+    knuckleDynamicDrawMgr.pointCounter_ = 2;
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+
+    Rosen::Drawing::Point point;
+    point.SetX(100);
+    point.SetY(100);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    point.SetX(150);
+    point.SetY(150);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    point.SetX(200);
+    point.SetY(200);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    point.SetX(300);
+    point.SetY(300);
+    knuckleDynamicDrawMgr.traceControlPoints_.push_back(point);
+    knuckleDynamicDrawMgr.lastUpdateTimeMillis_ = 50;
+    pointerEvent->SetActionTime(100);
+    ASSERT_NO_FATAL_FAILURE(knuckleDynamicDrawMgr.ProcessMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DrawGraphic
  * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
  * @tc.desc: Test Overrides DrawGraphic function branches
  * @tc.type: Function
@@ -294,7 +338,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Draw
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CreateTouchWindow
+ * @tc.name: KnuckleDynamicDrawingManagerTest_CreateTouchWindow
  * @tc.desc: Test Overrides CreateTouchWindow function branches
  * @tc.type: Function
  * @tc.require:

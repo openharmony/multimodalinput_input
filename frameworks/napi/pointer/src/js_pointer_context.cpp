@@ -227,7 +227,7 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("color parameter type is invalid");
+        MMI_HILOGE("Color parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
         return nullptr;
     }
@@ -240,7 +240,7 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
         return jsPointerMgr->SetPointerColor(env, color);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -260,7 +260,7 @@ napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info in
         return jsPointerMgr->GetPointerColor(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -280,7 +280,7 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("color parameter type is invalid");
+        MMI_HILOGE("Color parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
         return nullptr;
     }
@@ -313,7 +313,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("speed parameter type is invalid");
+        MMI_HILOGE("Speed parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
         return nullptr;
     }
@@ -331,7 +331,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         return jsPointerMgr->SetPointerSpeed(env, pointerSpeed);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -350,7 +350,7 @@ napi_value JsPointerContext::SetPointerSpeedSync(napi_env env, napi_callback_inf
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("speed parameter type is invalid");
+        MMI_HILOGE("Speed parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
         return nullptr;
     }
@@ -380,7 +380,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
         return jsPointerMgr->GetPointerSpeed(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -409,7 +409,7 @@ napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("rows parameter type is invalid");
+        MMI_HILOGE("Rows parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rows", "number");
         return nullptr;
     }
@@ -427,7 +427,7 @@ napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info
         return jsPointerMgr->SetMouseScrollRows(env, rows);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -447,7 +447,7 @@ napi_value JsPointerContext::GetMouseScrollRows(napi_env env, napi_callback_info
         return jsPointerMgr->GetMouseScrollRows(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -497,7 +497,7 @@ napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info
         return jsPointerMgr->SetPointerLocation(env, x, y);
     }
     if (!JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -615,7 +615,7 @@ napi_value JsPointerContext::SetMoveEventFilters(napi_env env, napi_callback_inf
     }
 
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("flag parameter type is invalid");
+        MMI_HILOGE("Flag parameter type is invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter type error");
         return nullptr;
     }
@@ -687,7 +687,7 @@ napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info inf
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("size parameter type is invalid");
+        MMI_HILOGE("Size parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
         return nullptr;
     }
@@ -705,7 +705,7 @@ napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info inf
         return jsPointerMgr->SetPointerSize(env, size);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -725,7 +725,7 @@ napi_value JsPointerContext::GetPointerSize(napi_env env, napi_callback_info inf
         return jsPointerMgr->GetPointerSize(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -745,7 +745,7 @@ napi_value JsPointerContext::SetPointerSizeSync(napi_env env, napi_callback_info
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("size parameter type is invalid");
+        MMI_HILOGE("Size parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size", "number");
         return nullptr;
     }
@@ -813,7 +813,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle);
     }
     if (!JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -891,7 +891,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return jsPointerMgr->GetPointerStyle(env, windowid);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1219,7 +1219,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
         return jsPointerMgr->SetMousePrimaryButton(env, primaryButton);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1239,7 +1239,7 @@ napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_i
         return jsPointerMgr->GetMousePrimaryButton(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1258,7 +1258,7 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("state parameter type is invalid");
+        MMI_HILOGE("State parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
         return nullptr;
     }
@@ -1272,7 +1272,7 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
         return jsPointerMgr->SetHoverScrollState(env, state);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -1293,7 +1293,7 @@ napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_inf
         return jsPointerMgr->GetHoverScrollState(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }

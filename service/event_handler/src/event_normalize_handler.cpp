@@ -342,6 +342,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -356,6 +357,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
         nextHandler_->HandleKeyEvent(keyEvent);
     }
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 {
@@ -547,10 +549,12 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (HandleTouchEventWithFlag(pointerEvent)) {
         MMI_HILOGD("Touch event is filtered with flag");
         return RET_OK;
     }
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     if (MMISceneBoardJudgement::IsSceneBoardEnabled() && MMISceneBoardJudgement::IsResampleEnabled()) {
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
@@ -689,6 +693,7 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
     return timerId_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 int32_t EventNormalizeHandler::SetMoveEventFilters(bool flag)
 {
     moveEventFilterFlag_ = flag;
@@ -756,6 +761,7 @@ double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent
     }
     return offset;
 }
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 
 int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent)
 {

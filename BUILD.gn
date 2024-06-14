@@ -141,6 +141,7 @@ group("ut_mmi_debug_tools") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerImplTest",
     "frameworks/proxy:InputManagerInjectTest",
@@ -163,11 +164,14 @@ group("mmi_tests") {
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
     "service:EventHandlerTest",
+    "service:FingerprintEventProcessorTest",
     "service:InfraredEmitterTest",
     "service:InputWindowsManagerTest",
     "service:InterceptorTest",
     "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
+    "service:KnuckleDrawingManagerTest",
+    "service:KnuckleDynamicDrawingManagerTest",
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
@@ -183,6 +187,7 @@ group("mmi_tests") {
     "service:rust_mmi_test",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
+    "service/mouse_event_normalize/test:MouseTransformProcessorMockTest",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
     "test/fuzztest:test",
     "test/unittest/interfaces:InputNativeTest",

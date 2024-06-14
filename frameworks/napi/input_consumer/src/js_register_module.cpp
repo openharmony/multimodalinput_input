@@ -56,10 +56,10 @@ void JsCommon::ThrowError(napi_env env, int32_t code)
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-        MMI_HILOGE("shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+        MMI_HILOGE("Shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
         THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "shiled API", "ohos.permission.INPUT_CONTROL_DISPATCHING");
     } else {
-        MMI_HILOGE("dispatch control failed");
+        MMI_HILOGE("Dispatch control failed");
     }
 }
 
@@ -159,7 +159,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     if (argc == INPUT_PARAMETER_MAX) {
         CHKRP(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
         if (valueType != napi_function) {
-            MMI_HILOGE("the third parameter is not napi_function");
+            MMI_HILOGE("The third parameter is not napi_function");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
@@ -290,7 +290,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(callbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+        MMI_HILOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {

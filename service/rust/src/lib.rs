@@ -14,7 +14,7 @@
  */
 
 //!
-use hilog_rust::{error, hilog, info, debug, HiLogLabel, LogType};
+use hilog_rust::{error, hilog, debug, HiLogLabel, LogType};
 use std::ffi::{c_char, CString};
 use std::sync::Once;
 
@@ -534,7 +534,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
             *abs_x += dx * gain;
             *abs_y += dy * gain;
         }
-        info!(
+        debug!(
             LOG_LABEL,
             "abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
@@ -592,7 +592,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
             *abs_x += deltax;
             *abs_y += deltay;
         }
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
@@ -625,7 +625,7 @@ pub unsafe extern "C" fn HandleAxisAccelerateTouchpad (
         if !mode {
             *abs_axis = if *abs_axis >= 0.0 { gain } else { -gain };
         }
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_axis {}", @public(*abs_axis)
         );
@@ -798,7 +798,7 @@ fn test_handle_motion_accelerate_capture_soft_harden_offset_false_touchpad()
     let ret: i32;
     unsafe {
         ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 2);
-        info!(
+        debug!(
         LOG_LABEL,
         "ret =  {}", @public(ret)
         );

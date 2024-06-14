@@ -30,9 +30,13 @@
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "i_input_windows_manager.h"
+#ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "key_command_handler.h"
+#endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "key_subscriber_handler.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "mouse_event_normalize.h"
 #include "switch_subscriber_handler.h"
 #include "securec.h"
@@ -209,9 +213,13 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 break;
             }
             case 'k': {
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY)
                 auto keyHandler = InputHandler->GetKeyCommandHandler();
                 CHKPV(keyHandler);
                 keyHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Combination key does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
                 break;
             }
             default: {
