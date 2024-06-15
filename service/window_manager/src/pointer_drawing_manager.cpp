@@ -95,6 +95,15 @@ constexpr float IMAGE_PIXEL { 0.0f };
 
 namespace OHOS {
 namespace MMI {
+void RsRemoteDiedCallback()
+{
+    CALL_DEBUG_ENTER;
+    g_isRsRemoteDied = true;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
 PointerDrawingManager::PointerDrawingManager()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -110,6 +119,8 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -843,15 +854,6 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     }
 }
 
-void RsRemoteDiedCallback()
-{
-    CALL_DEBUG_ENTER;
-    g_isRsRemoteDied = true;
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-}
-
 void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
@@ -868,8 +870,6 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     g_isRsRemoteDied = false;
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
