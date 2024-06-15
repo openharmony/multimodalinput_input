@@ -163,6 +163,11 @@ bool PermissionHelper::VerifySystemApp()
     return DfsMessageParcel::messageParcel->VerifySystemApp();
 }
 
+bool PermissionHelper::CheckInjectPermission()
+{
+    return DfsMessageParcel::messageParcel->CheckInjectPermission();
+}
+
 bool PermissionHelper::CheckInterceptor()
 {
     return DfsMessageParcel::messageParcel->CheckInterceptor();

@@ -38,6 +38,7 @@ public:
     bool CheckDispatchControl();
     bool VerifySystemApp();
     bool CheckInfraredEmmit();
+    bool CheckInjectPermission();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
