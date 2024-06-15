@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_stub.h"
 
 #include <sys/types.h>
@@ -25,10 +24,11 @@
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "multimodalinput_ipc_interface_code.h"
+#include "nap_process.h"
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
-#include "nap_process.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -104,7 +104,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
-    MMI_HILOGD("RemoteRequest code:%{public}d tid:%{public}" PRIu64 " pid:%{public}d", code, GetThisThreadId(), pid);
+    MMI_HILOGD("RemoteRequest code:%{public}d, tid:%{public}" PRIu64 ", pid:%{public}d", code, GetThisThreadId(), pid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -402,7 +402,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     }
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
-    MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t tokenType = PER_HELPER->GetTokenType();
@@ -447,7 +447,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     READUINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = AddInputEventFilter(filter, filterId, priority, deviceTags);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call AddInputEventFilter failed ret:%{public}d", ret);
+        MMI_HILOGE("Call AddInputEventFilter failed:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -465,7 +465,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
     READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = RemoveInputEventFilter(filterId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call RemoveInputEventFilter failed ret:%{public}d", ret);
+        MMI_HILOGE("Call RemoveInputEventFilter failed:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -489,7 +489,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, 
     READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMouseScrollRows(rows);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMouseScrollRows failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMouseScrollRows failed:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", rows, GetCallingPid());
@@ -512,14 +512,14 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     READINT32(data, focusX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusY, IPC_PROXY_DEAD_OBJECT_ERR);
     if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetCustomCursor failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -538,15 +538,15 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     CHKPR(pixelMap, RET_ERR);
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("Reading windowid the tlv count %{public}d", windowId);
+    MMI_HILOGD("Reading windowid the tlv count:%{public}d", windowId);
     if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
 
     int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMouseIcon failed:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -568,7 +568,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, Mes
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
     int32_t hotSpotX = 0;
@@ -577,7 +577,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, Mes
     READINT32(data, hotSpotY, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMouseHotSpot(winPid, windowId, hotSpotX, hotSpotY);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMouseHotSpot failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMouseHotSpot failed:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -699,7 +699,7 @@ int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& dat
         MMI_HILOGE("Call SetMousePrimaryButton failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success primaryButton:%{public}d,pid:%{public}d", primaryButton, GetCallingPid());
+    MMI_HILOGD("Success primaryButton:%{public}d, pid:%{public}d", primaryButton, GetCallingPid());
     return RET_OK;
 }
 
@@ -718,7 +718,7 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
         return ret;
     }
     WRITEINT32(reply, primaryButton, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Mouse primaryButton:%{public}d,ret:%{public}d", primaryButton, ret);
+    MMI_HILOGD("Mouse primaryButton:%{public}d, ret:%{public}d", primaryButton, ret);
     return RET_OK;
 }
 
@@ -786,7 +786,7 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         return ret;
     }
     WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    MMI_HILOGD("visible:%{public}d, ret:%{public}d, pid:%{public}d", visible, ret, GetCallingPid());
     return RET_OK;
 }
 
@@ -890,7 +890,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
         return RET_ERR;
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);
+    MMI_HILOGD("Pointer speed:%{public}d, ret:%{public}d", speed, ret);
     return RET_OK;
 }
 
@@ -928,7 +928,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
+    MMI_HILOGD("Successfully set windowId:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }
 
@@ -969,7 +969,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     WRITEINT32(reply, pointerStyle.color, RET_ERR);
     WRITEINT32(reply, pointerStyle.id, RET_ERR);
     WRITEINT32(reply, pointerStyle.options, RET_ERR);
-    MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
+    MMI_HILOGD("Successfully get windowId:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }
 
@@ -981,7 +981,7 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
     int32_t size = 0;
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
     if (size < 0 || size > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("Invalid size: %{public}d", size);
+        MMI_HILOGE("Invalid size:%{public}d", size);
         return RET_ERR;
     }
     std::vector<int32_t> keys;
@@ -1755,7 +1755,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel
         return ret;
     }
     WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad scroll direction switch :%{public}d, ret:%{public}d", state, ret);
+    MMI_HILOGD("Touchpad scroll direction switch state:%{public}d, ret:%{public}d", state, ret);
     return RET_OK;
 }
 
@@ -1794,7 +1794,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad tap switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    MMI_HILOGD("Touchpad tap switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
@@ -1833,7 +1833,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& d
         return ret;
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad pointer speed :%{public}d, ret:%{public}d", speed, ret);
+    MMI_HILOGD("Touchpad pointer speed:%{public}d, ret:%{public}d", speed, ret);
     return RET_OK;
 }
 
@@ -1956,7 +1956,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPinchSwitch(MessageParcel& da
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad pinch switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    MMI_HILOGD("Touchpad pinch switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
@@ -1995,7 +1995,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadSwipeSwitch(MessageParcel& da
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad swipe switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    MMI_HILOGD("Touchpad swipe switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
@@ -2034,7 +2034,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
         return ret;
     }
     WRITEINT32(reply, type, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad right button menu type :%{public}d, ret:%{public}d", type, ret);
+    MMI_HILOGD("Touchpad right button menu type:%{public}d, ret:%{public}d", type, ret);
     return RET_OK;
 }
 
@@ -2073,7 +2073,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
         return ret;
     }
     WRITEBOOL(reply, rotateSwitch, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad rotate switch: %{public}d, ret:%{public}d", rotateSwitch, ret);
+    MMI_HILOGD("Touchpad rotate switch:%{public}d, ret:%{public}d", rotateSwitch, ret);
     return RET_OK;
 }
 
@@ -2246,7 +2246,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     std::vector<int64_t> pattern;
     READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
     if (patternLen > MAX_N_TRANSMIT_INFRARED_PATTERN || patternLen <= 0) {
-        MMI_HILOGE("transmit infrared pattern len is invalid");
+        MMI_HILOGE("Transmit infrared pattern len is invalid");
         return false;
     }
     for (int32_t i = 0; i < patternLen; i++) {
@@ -2277,7 +2277,7 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     int32_t infoId = -1;
     READINT32(data, infoId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (infoId <= 0) {
-        MMI_HILOGE("Invalid infoId, infoId: %{public}d", infoId);
+        MMI_HILOGE("Invalid infoId:%{public}d", infoId);
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
@@ -2317,7 +2317,7 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
         MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success enable:%{public}d,pid:%{public}d", enable, GetCallingPid());
+    MMI_HILOGD("Success enable:%{public}d, pid:%{public}d", enable, GetCallingPid());
     return RET_OK;
 }
 
