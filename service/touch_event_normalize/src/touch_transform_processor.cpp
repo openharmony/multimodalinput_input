@@ -109,7 +109,7 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
     CALL_DEBUG_ENTER;
     TransformTouchProperties(rawTouch_, pointerItem);
     if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
-        MMI_HILOGD("fingersense start classify touch down event");
+        MMI_HILOGD("Fingersense start classify touch down event");
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouch_, toolType);
     }
 }
@@ -183,7 +183,7 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     TransformTouchProperties(rawTouch_, item);
     if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
-        MMI_HILOGD("notify fingersense touch up event");
+        MMI_HILOGD("Notify fingersense touch up event");
         FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouch_);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
