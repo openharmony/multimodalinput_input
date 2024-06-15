@@ -366,6 +366,7 @@ ohos_unittest("InputManagerTest") {
     "events/test/input_manager_simulate_test.cpp",
     "events/test/input_manager_test.cpp",
     "events/test/virtual_input_device_test.cpp",
+    "events/test/input_manager_update_display_info_test.cpp",
   ]
 
   configs = [
