@@ -258,7 +258,7 @@ int32_t libinput_event_touchpad_get_touch_contact_short_axis(struct libinput_eve
 
 int32_t libinput_event_touchpad_get_tool_type(struct libinput_event_touch *event)
 {
-    return g_instance->TouchpadGetToolType(event);
+    return (event != nullptr ? event->toolType : 0);
 }
 
 int32_t libinput_device_touchpad_btn_tool_type_down(struct libinput_device *device, int32_t btnToolType)
