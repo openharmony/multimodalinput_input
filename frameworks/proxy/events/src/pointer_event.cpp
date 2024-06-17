@@ -993,7 +993,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
         return false;
     }
 
-    size_t maxPressedButtons = 3;
+    const size_t maxPressedButtons = 3;
     if (pressedButtons_.size() > maxPressedButtons) {
         MMI_HILOGE("PressedButtons_.size is greater than three and is invalid");
         return false;
@@ -1072,8 +1072,7 @@ bool PointerEvent::IsValidCheckMouse() const
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
     CALL_DEBUG_ENTER;
-    int32_t touchPointID = GetPointerId();
-    if (touchPointID < 0) {
+    if (GetPointerId() < 0) {
         MMI_HILOGE("TouchPointID is invalid");
         return false;
     }

@@ -149,6 +149,12 @@ inline bool MMI_LE(float left, float right) //less or equal
     constexpr float epsilon = 0.001f;
     return (left - right) < epsilon;
 }
+
+inline constexpr int64_t MS2US(int64_t ms)
+{
+    constexpr int64_t unit { 1000 };
+    return (ms * unit);
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H
