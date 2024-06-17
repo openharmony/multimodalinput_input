@@ -317,10 +317,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std:
     fingers_(fingers)
 {
     SetCallback(callback);
-    if (monitor_ == nullptr) {
-        MMI_HILOGE("The monitor is null");
-        return;
-    }
+    CHKPV(monitor_);
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
@@ -339,10 +336,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
     fingers_(fingers)
 {
     SetCallback(callback);
-    if (monitor_ == nullptr) {
-        MMI_HILOGE("The monitor is null");
-        return;
-    }
+    CHKPV(monitor_);
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
@@ -1496,19 +1490,13 @@ bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
 {
     napi_value xProperty;
     CHKRF(napi_get_named_property(env, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
-    if (xProperty == nullptr) {
-        MMI_HILOGE("xProperty == nullptr, return");
-        return false;
-    }
+    CHKPF(xProperty);
     int32_t xInt { 0 };
     CHKRF(napi_get_value_int32(env, xProperty, &xInt), GET_VALUE_INT32);
 
     napi_value yProperty;
     CHKRF(napi_get_named_property(env, napiPointer, "screenY", &yProperty), GET_NAMED_PROPERTY);
-    if (yProperty == nullptr) {
-        MMI_HILOGE("yProperty == nullptr, return");
-        return false;
-    }
+    CHKPF(yProperty);
     int32_t yInt { 0 };
     CHKRF(napi_get_value_int32(env, yProperty, &yInt), GET_VALUE_INT32);
 

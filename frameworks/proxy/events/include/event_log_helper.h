@@ -35,7 +35,7 @@ static constexpr std::string_view InfoTrackingDict =
         " DY-DisplayY, DYP-DisplayYPos, ET-EventType, GU-GetUnicode, I-id, IP-IsPressed, IR-IsRepeat, SI-IsSimulate,"
         " KA-KeyAction, KC-KeyCode, KIC-keyItemsCount, LA-LongAxis, NL-NumLock, OPI-OriginPointerId, PA-PointerAction,"
         " PI-pointerId, P-Pressure, SA-ShortAxis, SL-ScrollLock, ST-SourceType, WI-WindowId, WXP-WindowXPos, "
-        "WYP-WindowYPos";
+        "WYP-WindowYPos, PBS-PressedButtonsSize";
 
 static constexpr std::string_view DebugTrackingDict =
         "Debug-InputTracking-Dict: "
@@ -146,10 +146,12 @@ private:
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
         MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
-            ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d, SI:%{public}s",
+            ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d"
+            ", SI:%{public}s, PBS:%{public}zu",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetTargetDisplayId(),
-            event->GetTargetWindowId(), event->GetDispatchTimes(), isSimulate.c_str());
+            event->GetTargetWindowId(), event->GetDispatchTimes(), isSimulate.c_str(),
+            event->GetPressedButtons().size());
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {

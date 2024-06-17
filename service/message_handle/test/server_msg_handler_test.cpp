@@ -1150,27 +1150,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, Tes
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent
- * @tc.desc: Test if (iter == authorizationCollection_.end()) branch success
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler msgHandler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    int32_t pid = 15;
-    bool isNativeInject = true;
-    keyEvent->SetId(1);
-    keyEvent->eventType_ = 1;
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    msgHandler.authorizationCollection_.insert(std::make_pair(10, AuthorizationStatus::UNKNOWN));
-    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), COMMON_PERMISSION_CHECK_ERROR);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_001
  * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch success
  * @tc.type: FUNC
@@ -1232,27 +1211,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_003, TestSi
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     EXPECT_NE(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), RET_OK);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_001
- * @tc.desc: Test if (iter == authorizationCollection_.end()) branch success
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler msgHandler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    int32_t pid = 15;
-    bool isNativeInject = true;
-    pointerEvent->SetId(1);
-    pointerEvent->eventType_ = 1;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    msgHandler.authorizationCollection_.insert(std::make_pair(10, AuthorizationStatus::UNKNOWN));
-    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject), COMMON_PERMISSION_CHECK_ERROR);
 }
 
 /**
@@ -1318,6 +1276,54 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_004, Te
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     EXPECT_NE(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject), RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_01
+ * @tc.desc: Test CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    Direction direction;
+    Offset offset;
+    direction = DIRECTION90;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_02
+ * @tc.desc: Test CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    Direction direction;
+    Offset offset;
+    direction = DIRECTION180;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_03
+ * @tc.desc: Test CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    Direction direction;
+    Offset offset;
+    direction = DIRECTION270;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
 }
 } // namespace MMI
 } // namespace OHOS

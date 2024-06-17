@@ -183,11 +183,12 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
     }
 }
 
-void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent,
+                                                       NetPacket &pkt) const
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
-    MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d,TokenType:%{public}d, pid:%{public}d",
+    MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     auto currentTime = GetSysClockTime();
     if (!session_->SendMsg(pkt)) {
@@ -199,7 +200,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler& monitor)
 {
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
-        MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
+        MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu, monitors errCode:%{public}d",
                    monitors_.size(), INVALID_MONITOR_MON);
         return RET_ERR;
     }
