@@ -205,9 +205,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-
     SerializeFingerprint(event, pkt);
-
     pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
         << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
         << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();

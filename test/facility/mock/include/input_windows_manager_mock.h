@@ -90,7 +90,7 @@ public:
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
 
-    void GetTargetWindowIds(int32_t, std::vector<int32_t>&) override {}
+    void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
 

@@ -27,6 +27,7 @@
 #include "event_handler.h"
 #include "extra_data.h"
 #include "i_anr_observer.h"
+#include "i_input_event_consumer.h"
 #include "i_input_service_watcher.h"
 #include "i_window_checker.h"
 #include "if_mmi_client.h"
@@ -112,8 +113,10 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
     bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void OnDisconnected();
 
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);

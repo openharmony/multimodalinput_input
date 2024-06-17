@@ -95,6 +95,15 @@ constexpr float IMAGE_PIXEL { 0.0f };
 
 namespace OHOS {
 namespace MMI {
+void RsRemoteDiedCallback()
+{
+    CALL_DEBUG_ENTER;
+    g_isRsRemoteDied = true;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
 PointerDrawingManager::PointerDrawingManager()
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -110,6 +119,8 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -149,17 +160,16 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     if (!SetHardWareLocation(displayId, physicalX, physicalY)) {
         return RET_ERR;
     }
-    MMI_HILOGD("Pointer window move success");
+    MMI_HILOGD("Pointer window move success, pointerStyle id: %{public}d", pointerStyle.id);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     bool cursorEnlarged = MAGIC_POINTER_VELOCITY_TRACKER->GetCursorEnlargedStatus();
-    if (cursorEnlarged && pointerStyle.id != MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::CROSS) {
-        // 触发光标找回效果时恢复为默认光标
-        MMI_HILOGD("Restores to the default cursor when the cursor retrieval effect is triggered");
+    if (cursorEnlarged) {
         MAGIC_POINTER_VELOCITY_TRACKER->SetLastPointerStyle(pointerStyle);
         MAGIC_POINTER_VELOCITY_TRACKER->SetDirection(direction);
-        pointerStyle.id = MOUSE_ICON::DEFAULT;
+        if (pointerStyle.id != MOUSE_ICON::DEFAULT && pointerStyle.id != MOUSE_ICON::CROSS) {
+            pointerStyle.id = MOUSE_ICON::DEFAULT;
+        }
     }
-    surfaceNode_->SetScale(scale_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
@@ -198,20 +208,12 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        surfaceNode_->SetScale(scale_);
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Move pointer, physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
     }
-}
-
-void PointerDrawingManager::SetPointerScale(float scale)
-{
-    scale_ = scale;
 }
 
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
@@ -852,12 +854,6 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     }
 }
 
-void RsRemoteDiedCallback()
-{
-    CALL_DEBUG_ENTER;
-    g_isRsRemoteDied = true;
-}
-
 void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
@@ -874,8 +870,6 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     g_isRsRemoteDied = false;
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1208,7 +1202,6 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
     // 这个color每8位代表一个通道值，分别是alpha和rgb，总共32位。
     color = static_cast<int32_t>(static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR));
-    color &= MAX_POINTER_COLOR;
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
