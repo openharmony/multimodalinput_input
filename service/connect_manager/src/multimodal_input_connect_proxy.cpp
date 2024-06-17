@@ -2139,7 +2139,7 @@ int32_t MultimodalInputConnectProxy::SetTouchpadThreeFingersTapSwitch(bool switc
                                       MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH),
                                       data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("MultimodalInputConnectProxy::SetTouchpadThreeFingersTapSwitch Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("MultimodalInputConnectProxy::SetTouchpadSwitch Send request fail, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -2161,7 +2161,7 @@ int32_t MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch(bool &swit
                                       MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH),
                                       data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
         return ret;
     }
     READBOOL(reply, switchFlag);

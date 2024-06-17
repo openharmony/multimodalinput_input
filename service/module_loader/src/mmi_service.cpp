@@ -2244,7 +2244,7 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
     }
-    return ret;    
+    return ret;
 }
 
 int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)

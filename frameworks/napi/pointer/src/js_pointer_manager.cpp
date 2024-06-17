@@ -977,7 +977,6 @@ napi_value JsPointerManager::SetTouchpadThreeFingersTapSwitch(napi_env env, bool
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(switchFlag);
     return SetTouchpadData(env, handle, ret);
-
 }
 
 napi_value JsPointerManager::GetTouchpadThreeFingersTapSwitch(napi_env env, napi_value handle)
