@@ -189,7 +189,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         RightClickType switchType = RightClickType(switchTypeData);
         if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
             button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
-            MMI_HILOGI("Right click up, do sleep");
+            MMI_HILOGD("Right click up, do sleep");
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_BUTTON_UP));
         }
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
