@@ -244,7 +244,8 @@ bool PointerDrawingManager::GetMouseDisplayState() const
 {
     return false;
 }
-int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY)
+int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId,
+    int32_t focusX, int32_t focusY)
 {
     return 0;
 }
