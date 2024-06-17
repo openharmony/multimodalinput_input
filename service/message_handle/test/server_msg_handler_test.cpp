@@ -15,10 +15,8 @@
 
 #include <cinttypes>
 #include <cstdio>
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include <libinput.h>
 
+#include <gtest/gtest.h>
 
 #include "input_event_handler.h"
 #include "libinput.h"
@@ -32,10 +30,6 @@
 #include "pointer_event.h"
 #include "server_msg_handler.h"
 #include "stream_buffer.h"
-#include "input_windows_manager_mock.h"
-#include "error_multimodal.h"
-
-
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ServerMsgHandlerTest"
