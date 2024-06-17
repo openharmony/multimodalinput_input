@@ -38,6 +38,18 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+class MyEventFilter : public IRemoteStub<IEventFilter> {
+public:
+    bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) override
+    {
+        return true;
+    }
+    bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override
+    {
+        return true;
+    }
+};
+
 /**
  * @tc.name: SwitchEventInputSubscribeManagerTest_SubscribeSwitchEvent_001
  * @tc.desc: Verify SubscribeSwitchEvent
@@ -194,6 +206,53 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
     switchFlag = false;
     ret = inputManager.GetTouchpadScrollSwitch(switchFlag);
     ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_SetPixelMapData_001
+ * @tc.desc: Test the funcation SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_SetPixelMapData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputManagerImpl inputManagerImpl;
+    int32_t infoId = -1;
+    void* pixelMap = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputManagerImpl.SetPixelMapData(infoId, pixelMap));
+    infoId = 1;
+    EXPECT_NO_FATAL_FAILURE(inputManagerImpl.SetPixelMapData(infoId, pixelMap));
+}
+
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_ReAddInputEventFilter_002
+ * @tc.desc: Test the funcation ReAddInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_ReAddInputEventFilter_002, TestSize.Level1)
+{
+    InputManagerImpl inputManager;
+    sptr<IEventFilter> filter1 = new (std::nothrow) MyEventFilter();
+    std::tuple<sptr<IEventFilter>, int32_t, uint32_t> value1(filter1, 10, 20);
+    inputManager.eventFilterServices_.insert(std::make_pair(1, value1));
+    EXPECT_NO_FATAL_FAILURE(inputManager.ReAddInputEventFilter());
+    sptr<IEventFilter> filter2 = new (std::nothrow) MyEventFilter();
+    std::tuple<sptr<IEventFilter>, int32_t, uint32_t> value2(filter2, 20, 30);
+    inputManager.eventFilterServices_.insert(std::make_pair(2, value1));
+    sptr<IEventFilter> filter3 = new (std::nothrow) MyEventFilter();
+    std::tuple<sptr<IEventFilter>, int32_t, uint32_t> value3(filter3, 30, 40);
+    inputManager.eventFilterServices_.insert(std::make_pair(3, value3));
+    sptr<IEventFilter> filter4 = new (std::nothrow) MyEventFilter();
+    std::tuple<sptr<IEventFilter>, int32_t, uint32_t> value4(filter4, 40, 50);
+    inputManager.eventFilterServices_.insert(std::make_pair(4, value4));
+    sptr<IEventFilter> filter5 = new (std::nothrow) MyEventFilter();
+    std::tuple<sptr<IEventFilter>, int32_t, uint32_t> value5(filter5, 50, 60);
+    inputManager.eventFilterServices_.insert(std::make_pair(5, value5));
+    EXPECT_NO_FATAL_FAILURE(inputManager.ReAddInputEventFilter());
 }
 } // namespace MMI
 } // namespace OHOS
