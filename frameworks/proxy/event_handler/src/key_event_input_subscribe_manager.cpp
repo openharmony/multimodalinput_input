@@ -17,10 +17,9 @@
 
 #include <cinttypes>
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-
-#include "bytrace_adapter.h"
 #include "multimodal_event_handler.h"
 
 #undef MMI_LOG_TAG
@@ -119,8 +118,8 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
-    MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
-        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
+    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+        "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         tIter->GetSubscribeId(), keyOption->GetFinalKey(),
         keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
@@ -180,7 +179,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
     callback(event);
-    MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
+    MMI_HILOGD("Key event id:%{public}d, keyCode:%{public}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }
 

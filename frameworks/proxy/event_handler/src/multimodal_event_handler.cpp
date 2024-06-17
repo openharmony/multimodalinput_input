@@ -15,8 +15,6 @@
 
 #include "multimodal_event_handler.h"
 
-#include "proto.h"
-
 #include "event_log_helper.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
@@ -24,6 +22,7 @@
 #include "input_handler_manager.h"
 #include "mmi_client.h"
 #include "multimodal_input_connect_manager.h"
+#include "proto.h"
 #include "switch_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_DOMAIN

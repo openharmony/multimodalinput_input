@@ -79,18 +79,53 @@ std::unique_ptr<OHOS::Media::PixelMap> ServerMsgHandlerTest::SetMouseIconTest(co
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_SetPixelMapData
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_01
  * @tc.desc: Test SetPixelMapData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData, TestSize.Level1)
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
     void* pixelMap = nullptr;
     int32_t result = servermsghandler.SetPixelMapData(infoId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_02
+ * @tc.desc: Test SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    int32_t infoId = 2;
+    void* pixelMap = nullptr;
+    int32_t result = servermsghandler.SetPixelMapData(infoId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_03
+ * @tc.desc: Test SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    int32_t infoId = -1;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = ServerMsgHandlerTest::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    int32_t result = servermsghandler.SetPixelMapData(infoId, (void *)pixelMap.get());
     EXPECT_EQ(result, ERR_INVALID_VALUE);
 }
 
@@ -1324,6 +1359,74 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_03, TestSize
     Offset offset;
     direction = DIRECTION270;
     ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_01
+ * @tc.desc: Test InitInjectNoticeSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    servermsghandler.injectNotice_ = nullptr;
+
+    bool ret = servermsghandler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnDisplayInfo_01
+ * @tc.desc: Test the function OnDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    ret = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnWindowGroupInfo_01
+ * @tc.desc: Test the function OnWindowGroupInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowGroupInfo_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
