@@ -15,8 +15,11 @@
 
 #include <cinttypes>
 #include <cstdio>
-
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <libinput.h>
+
+
 #include "input_event_handler.h"
 #include "libinput.h"
 #include "pixel_map.h"
@@ -29,6 +32,10 @@
 #include "pointer_event.h"
 #include "server_msg_handler.h"
 #include "stream_buffer.h"
+#include "input_windows_manager_mock.h"
+#include "error_multimodal.h"
+
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "ServerMsgHandlerTest"
@@ -79,16 +86,32 @@ std::unique_ptr<OHOS::Media::PixelMap> ServerMsgHandlerTest::SetMouseIconTest(co
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_SetPixelMapData
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_01
  * @tc.desc: Test SetPixelMapData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData, TestSize.Level1)
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
+    void* pixelMap = nullptr;
+    int32_t result = servermsghandler.SetPixelMapData(infoId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_02
+ * @tc.desc: Test SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    int32_t infoId = 2;
     void* pixelMap = nullptr;
     int32_t result = servermsghandler.SetPixelMapData(infoId, pixelMap);
     EXPECT_EQ(result, ERR_INVALID_VALUE);
@@ -1324,6 +1347,74 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_03, TestSize
     Offset offset;
     direction = DIRECTION270;
     ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_01
+ * @tc.desc: Test InitInjectNoticeSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    servermsghandler.injectNotice_ = nullptr;
+
+    bool ret = servermsghandler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnDisplayInfo_01
+ * @tc.desc: Test the function OnDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    ret = handler.OnDisplayInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnWindowGroupInfo_01
+ * @tc.desc: Test the function OnWindowGroupInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowGroupInfo_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
