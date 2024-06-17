@@ -59,6 +59,7 @@ constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
 constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 constexpr int64_t NO_DELAY = 0;
+constexpr int64_t FREQUENCY = 1000;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
 const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
@@ -99,6 +100,13 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnHandleTouchEvent(pointerEvent);
+    int32_t id = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(id, item);
+    int32_t toolType = item.GetToolType();
+    if (toolType == PointerEvent::TOOL_TYPE_KNUCKLE) {
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
@@ -270,10 +278,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
-        MMI_HILOGD("Inject knuckle event, skip");
-        return;
-    }
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -676,7 +680,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
     int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
-        return "";
+        return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
     for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
@@ -1066,8 +1070,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         HandleRepeatKeys(key);
         return false;
     } else {
-        bool isRepeatKeyHandle = HandleRepeatKeys(key);
-        if (isRepeatKeyHandle) {
+        if (HandleRepeatKeys(key)) {
             return true;
         }
     }
@@ -1076,13 +1079,13 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     return false;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
     HandlePointerVisibleKeys(key);
-    bool handleEventStatus = HandleEvent(key);
-    if (handleEventStatus) {
+    if (HandleEvent(key)) {
         return true;
     }
 
@@ -1123,7 +1126,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     return false;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointer)
 {
     CALL_DEBUG_ENTER;
@@ -1138,6 +1143,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
     }
     return HandleMulFingersTap(pointer);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -1673,7 +1679,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
-    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
+    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * FREQUENCY) {
         MMI_HILOGI("Skip, upTime - downTime <= duration");
         return false;
     }

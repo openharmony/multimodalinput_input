@@ -19,11 +19,9 @@
 #include "image/bitmap.h"
 #include "draw/canvas.h"
 #include "utils/matrix.h"
-#ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
-#else
-#include "recording/recording_canvas.h"
-#endif // USE_ROSEN_DRAWING
+#include "render/rs_pixel_map_util.h"
+
 
 namespace OHOS {
 namespace MMI {
@@ -33,11 +31,11 @@ constexpr int32_t DEFAULT_LIFESPAN = -1;
 
 class KnuckleDivergentPoint {
 public:
-    explicit KnuckleDivergentPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap);
+    explicit KnuckleDivergentPoint(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     ~KnuckleDivergentPoint() = default;
     void Update();
     void Clear();
-    void Draw(Rosen::Drawing::RecordingCanvas* canvas);
+    void Draw(Rosen::ExtendRecordingCanvas* canvas);
     void Reset(double pointX, double pointY);
     bool IsEnded() const;
 
@@ -47,8 +45,9 @@ private:
     double pointX_ { 0.0 };
     double pointY_ { 0.0 };
     int32_t lifespan_ { DEFAULT_LIFESPAN };
-    std::shared_ptr<Rosen::Drawing::Bitmap> traceShadow_ { nullptr };
+    std::shared_ptr<OHOS::Media::PixelMap> traceShadow_ { nullptr };
     Rosen::Drawing::Matrix traceMatrix_;
+    OHOS::Rosen::Drawing::Brush brush_;
 };
 } // namespace MMI
 } // namespace OHOS

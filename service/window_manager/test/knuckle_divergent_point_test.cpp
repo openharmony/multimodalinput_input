@@ -15,21 +15,16 @@
 
 #include <gtest/gtest.h>
 
-#include "image/bitmap.h"
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
 
-#ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
-#else
-#include "recording/recording_canvas.h"
-#include "ui/rs_canvas_drawing_node.h"
-#endif // USE_ROSEN_DRAWING
 #include "render/rs_pixel_map_util.h"
 
 #include "mmi_log.h"
 #include "pointer_event.h"
+#include "ui/rs_canvas_drawing_node.h"
 #include "knuckle_divergent_point.h"
 
 #undef MMI_LOG_TAG
@@ -51,11 +46,10 @@ public:
             std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
             auto pixelMap = DecodeImageToPixelMap(imagePath);
             CHKPV(pixelMap);
-            auto bitmap = PixelMapToBitmap(pixelMap);
-            CHKPV(bitmap);
-            knuckleDivergentPoint = std::make_shared<KnuckleDivergentPoint>(bitmap);
+            knuckleDivergentPoint = std::make_shared<KnuckleDivergentPoint>(pixelMap);
         }
     }
+    void TearDown(void) {}
 private:
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath)
     {
@@ -82,62 +76,33 @@ private:
         return pixelMap;
     }
 
-    std::shared_ptr<Rosen::Drawing::Bitmap> PixelMapToBitmap(std::shared_ptr<Media::PixelMap>& pixelMap)
-    {
-        CALL_DEBUG_ENTER;
-        auto data = pixelMap->GetPixels();
-        Rosen::Drawing::Bitmap bitmap;
-        Rosen::Drawing::ColorType colorType = PixelFormatToColorType(pixelMap->GetPixelFormat());
-        Rosen::Drawing::AlphaType alphaType = AlphaTypeToAlphaType(pixelMap->GetAlphaType());
-        Rosen::Drawing::ImageInfo imageInfo(pixelMap->GetWidth(), pixelMap->GetHeight(), colorType, alphaType);
-        bitmap.Build(imageInfo);
-        bitmap.SetPixels(const_cast<uint8_t*>(data));
-        return std::make_shared<Rosen::Drawing::Bitmap>(bitmap);
-    }
-
-    Rosen::Drawing::ColorType PixelFormatToColorType(Media::PixelFormat pixelFormat)
-    {
-        switch (pixelFormat) {
-            case Media::PixelFormat::RGB_565:
-                return Rosen::Drawing::ColorType::COLORTYPE_RGB_565;
-            case Media::PixelFormat::RGBA_8888:
-                return Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888;
-            case Media::PixelFormat::BGRA_8888:
-                return Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888;
-            case Media::PixelFormat::ALPHA_8:
-                return Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8;
-            case Media::PixelFormat::RGBA_F16:
-                return Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16;
-            case Media::PixelFormat::UNKNOWN:
-            case Media::PixelFormat::ARGB_8888:
-            case Media::PixelFormat::RGB_888:
-            case Media::PixelFormat::NV21:
-            case Media::PixelFormat::NV12:
-            case Media::PixelFormat::CMYK:
-            default:
-                return Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN;
-        }
-    }
-
-    Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType)
-    {
-        CALL_DEBUG_ENTER;
-        switch (alphaType) {
-            case Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN:
-                return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
-            case Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE:
-                return Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE;
-            case Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL:
-                return Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL;
-            case Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL:
-                return Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL;
-            default:
-                return Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN;
-        }
-    }
-
     std::shared_ptr<KnuckleDivergentPoint> knuckleDivergentPoint { nullptr };
 };
+
+/**
+ * @tc.name: KnuckleDivergentPointTest_IsEnded_001
+ * @tc.desc: Test IsEnded
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_TRUE(knuckleDivergentPoint->IsEnded());
+}
+
+/**
+ * @tc.name: KnuckleDivergentPointTest_IsEnded_002
+ * @tc.desc: Test IsEnded
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDivergentPoint->lifespan_ = 1;
+    EXPECT_FALSE(knuckleDivergentPoint->IsEnded());
+}
 
 /**
  * @tc.name: KnuckleDivergentPointTest_Update_001
@@ -148,7 +113,22 @@ private:
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Update());
+    knuckleDivergentPoint->Update();
+    EXPECT_LT(knuckleDivergentPoint->lifespan_, 0);
+}
+
+/**
+ * @tc.name: KnuckleDivergentPointTest_Update_002
+ * @tc.desc: Test Update
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDivergentPoint->lifespan_ = 1;
+    knuckleDivergentPoint->Update();
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, 0);
 }
 
 /**
@@ -160,7 +140,8 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Update_001, TestSi
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Clear_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Clear());
+    knuckleDivergentPoint->Clear();
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, -1);
 }
 
 /**
@@ -172,8 +153,41 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Clear_001, TestSiz
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    Rosen::Drawing::RecordingCanvas* canvas = nullptr;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
+    knuckleDivergentPoint->Draw(nullptr);
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, -1);
+}
+
+/**
+ * @tc.name: KnuckleDivergentPointTest_Draw_002
+ * @tc.desc: Test Draw
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(10, 10));
+    knuckleDivergentPoint->Draw(canvas);
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, -1);
+}
+
+/**
+ * @tc.name: KnuckleDivergentPointTest_Draw_003
+ * @tc.desc: Test Draw
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDivergentPoint->lifespan_ = 1;
+    knuckleDivergentPoint->pointX_ = 1;
+    knuckleDivergentPoint->pointY_ = 1;
+    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
+    knuckleDivergentPoint->Draw(canvas);
+    EXPECT_EQ(knuckleDivergentPoint->lifespan_, 1);
 }
 
 /**
@@ -185,36 +199,11 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_001, TestSize
 HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    double pointX = 0.0;
-    double pointY = 0.0;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
+    double pointX = 10.0;
+    double pointY = 5.0;
+    knuckleDivergentPoint->Reset(pointX, pointY);
+    EXPECT_DOUBLE_EQ(knuckleDivergentPoint->pointX_, 10.0);
+    EXPECT_DOUBLE_EQ(knuckleDivergentPoint->pointY_, 5.0);
 }
-
-/**
- * @tc.name: KnuckleDivergentPointTest_Reset_002
- * @tc.desc: Test Reset
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Reset_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    double pointX = 1.0;
-    double pointY = 1.0;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->Reset(pointX, pointY));
-}
-
-/**
- * @tc.name: KnuckleDivergentPointTest_IsEnded_001
- * @tc.desc: Test IsEnded
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_IsEnded_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(knuckleDivergentPoint->IsEnded());
-}
-
 } // namespace MMI
 } // namespace OHOS

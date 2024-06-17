@@ -2528,6 +2528,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_BOTTOM_LEFT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::TOP_LIMIT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::BOTTOM_RIGHT_LIMIT, getpid(), windowId);
+    ASSERT_NO_FATAL_FAILURE(window->GetWindowId());
 }
 
 /**
@@ -2742,8 +2743,8 @@ public:
 HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1)
 {
     auto watcher = std::make_shared<ServiceWatcher>();
-    InputManager::GetInstance()->AddServiceWatcher(watcher);
-    InputManager::GetInstance()->RemoveServiceWatcher(watcher);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AddServiceWatcher(watcher));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RemoveServiceWatcher(watcher));
 }
 
 /**
@@ -2757,7 +2758,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     int32_t offsetX = 20;
     int32_t offsetY = 20;
-    InputManager::GetInstance()->MoveMouse(offsetX, offsetY);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MoveMouse(offsetX, offsetY));
 }
 
 /**

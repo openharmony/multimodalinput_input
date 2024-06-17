@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "ipc_skeleton.h"
 #include "permission_helper.h"
-#include "proto.h"
+
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 
 #include "mmi_log.h"
-
-#include "tokenid_kit.h"
+#include "proto.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
