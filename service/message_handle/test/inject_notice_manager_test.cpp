@@ -89,5 +89,154 @@ HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_ConnectNoticeSrv, Test
     injectNoticeMgr.connectionCallback_->isConnected_ = false;
     EXPECT_FALSE(injectNoticeMgr.ConnectNoticeSrv());
 }
+
+/**
+ * @tc.name: AuthorizationDialogTest_ConnectSystemUi_002
+ * @tc.desc: Test ConnectSystemUi
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AuthorizationDialog dialog;
+    ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
+    bool ret = dialog.ConnectSystemUi();
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AuthorizationDialogTest_OnAbilityConnectDone_001
+ * @tc.desc: Test OnAbilityConnectDone
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_OnAbilityConnectDone_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AuthorizationDialog::DialogAbilityConnection conn;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    ASSERT_NO_FATAL_FAILURE(conn.OnAbilityConnectDone(element, remoteObject, resultCode));
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_StartNoticeAbility_002
+ * @tc.desc: Test StartNoticeAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_StartNoticeAbility_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager injectNoticeMgr;
+    injectNoticeMgr.isStartSrv_ = true;
+    bool ret = injectNoticeMgr.StartNoticeAbility();
+    ASSERT_TRUE(ret);
+    injectNoticeMgr.isStartSrv_ = false;
+    ret = injectNoticeMgr.StartNoticeAbility();
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_ConnectNoticeSrv_002
+ * @tc.desc: Test ConnectNoticeSrv
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_ConnectNoticeSrv_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager injectNoticeMgr;
+    injectNoticeMgr.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    ASSERT_NE(injectNoticeMgr.connectionCallback_, nullptr);
+    injectNoticeMgr.connectionCallback_->isConnected_ = true;
+    bool ret = injectNoticeMgr.ConnectNoticeSrv();
+    ASSERT_TRUE(ret);
+    injectNoticeMgr.connectionCallback_->isConnected_ = false;
+    ret = injectNoticeMgr.ConnectNoticeSrv();
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_OnAbilityConnectDone_002
+ * @tc.desc: Test OnAbilityConnectDone
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_OnAbilityConnectDone_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager::InjectNoticeConnection connection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    ASSERT_NO_FATAL_FAILURE(connection.OnAbilityConnectDone(element, remoteObject, resultCode));
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_SendNotice_001
+ * @tc.desc: Test SendNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_SendNotice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager::InjectNoticeConnection connection;
+    InjectNoticeInfo noticeInfo;
+    noticeInfo.pid = 1;
+    bool result = connection.InjectNoticeConnection::SendNotice(noticeInfo);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_SendNotice_002
+ * @tc.desc: Test SendNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_SendNotice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager::InjectNoticeConnection connection;
+    InjectNoticeInfo noticeInfo;
+    noticeInfo.pid = -1;
+    bool result = connection.InjectNoticeConnection::SendNotice(noticeInfo);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_CancelNotice_001
+ * @tc.desc: Test CancelNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_CancelNotice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager::InjectNoticeConnection connection;
+    InjectNoticeInfo noticeInfo;
+    noticeInfo.pid = 1;
+    bool result = connection.InjectNoticeConnection::CancelNotice(noticeInfo);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: InjectNoticeManagerTest_CancelNotice_002
+ * @tc.desc: Test CancelNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_CancelNotice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InjectNoticeManager::InjectNoticeConnection connection;
+    InjectNoticeInfo noticeInfo;
+    noticeInfo.pid = -1;
+    bool result = connection.InjectNoticeConnection::CancelNotice(noticeInfo);
+    EXPECT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS

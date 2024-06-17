@@ -21,10 +21,10 @@
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"
+#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util_ex.h"
@@ -167,7 +167,7 @@ bool MouseEventNormalize::CheckAndPackageAxisEvent(libinput_event* event)
     CHKPR(device, RET_ERR);
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
-        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
+        MMI_HILOGE("The deviceId is invalid, deviceId:%{public}d", deviceId);
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
