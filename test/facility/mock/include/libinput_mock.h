@@ -36,6 +36,8 @@ public:
     MOCK_METHOD(struct libinput_tablet_tool *, TabletToolGetTool, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(enum libinput_tablet_tool_tip_state, TabletToolGetTipState, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(enum libinput_tablet_tool_type, TabletToolGetType, (struct libinput_tablet_tool *));
+    MOCK_METHOD(enum libinput_pointer_axis_source, GetAxisSource, (struct libinput_event_pointer *));
+    MOCK_METHOD(struct libinput_event_pointer*, LibinputGetPointerEvent, (struct libinput_event *));
     MOCK_METHOD(int32_t, TabletToolGetToolType, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(double, TabletToolGetTiltX, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(double, TabletToolGetTiltY, (struct libinput_event_tablet_tool *));

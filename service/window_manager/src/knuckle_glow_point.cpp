@@ -37,7 +37,22 @@ constexpr int32_t ARGB_COLOR_ARRAY { 0x11c8ffff };
 constexpr double HALF { 2.0 };
 } // namespace
 
-KnuckleGlowPoint::KnuckleGlowPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap) : traceShadow_(bitmap) {}
+KnuckleGlowPoint::KnuckleGlowPoint(std::shared_ptr<OHOS::Media::PixelMap> pixelMap) : traceShadow_(pixelMap)
+{
+    OHOS::Rosen::Drawing::Filter filter;
+    OHOS::Rosen::OverdrawColorArray colorArray = {
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        ARGB_COLOR_ARRAY,
+    };
+    auto protanomalyMat = OHOS::Rosen::Drawing::ColorFilter::CreateOverDrawColorFilter(colorArray.data());
+    filter.SetColorFilter(protanomalyMat);
+    OHOS::Rosen::Drawing::Brush brush;
+    brush_.SetFilter(filter);
+}
 
 int64_t KnuckleGlowPoint::GetNanoTime() const
 {
@@ -65,7 +80,7 @@ void KnuckleGlowPoint::Update()
     UpdateMatrix();
 }
 
-void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
+void KnuckleGlowPoint::Draw(Rosen::ExtendRecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
@@ -74,23 +89,13 @@ void KnuckleGlowPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
         MMI_HILOGE("can not draw");
         return;
     }
-    OHOS::Rosen::Drawing::Filter filter;
-    OHOS::Rosen::OverdrawColorArray colorArray = {
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        ARGB_COLOR_ARRAY,
-    };
-    auto protanomalyMat = OHOS::Rosen::Drawing::ColorFilter::CreateOverDrawColorFilter(colorArray.data());
-    filter.SetColorFilter(protanomalyMat);
     canvas->SetMatrix(traceMatrix_);
-    OHOS::Rosen::Drawing::Brush brush;
-    brush.SetFilter(filter);
-    canvas->AttachBrush(brush);
-    canvas->DrawBitmap(*traceShadow_, pointX_ - traceShadow_->GetWidth() / HALF,
-        pointY_ - traceShadow_->GetHeight() / HALF);
+    canvas->AttachBrush(brush_);
+    Rosen::Drawing::Rect src = Rosen::Drawing::Rect(0, 0, traceShadow_->GetWidth(), traceShadow_->GetHeight());
+    Rosen::Drawing::Rect dst = Rosen::Drawing::Rect(pointX_ - traceShadow_->GetWidth() / HALF,
+        pointY_ - traceShadow_->GetHeight() / HALF, pointX_ + traceShadow_->GetWidth() / HALF,
+        pointY_ + traceShadow_->GetHeight());
+    canvas->DrawPixelMapRect(traceShadow_, src, dst, Rosen::Drawing::SamplingOptions());
     canvas->DetachBrush();
 }
 

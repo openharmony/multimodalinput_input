@@ -17,6 +17,7 @@
 
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#include "input_manager_impl.h"
 #include "switch_event_input_subscribe_manager.h"
 
 #undef MMI_LOG_TAG
@@ -133,5 +134,66 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
     ASSERT_EQ(SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(subscribeId), RET_OK);
 }
 
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_OnDisconnected_001
+ * @tc.desc: Verify OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_OnDisconnected_001, TestSize.Level1)
+{
+    InputManagerImpl inputManager;
+    EXPECT_NO_FATAL_FAILURE(inputManager.OnDisconnected());
+}
+
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_ReAddInputEventFilter_001
+ * @tc.desc: Verify ReAddInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_ReAddInputEventFilter_001, TestSize.Level1)
+{
+    InputManagerImpl inputManager;
+    EXPECT_NO_FATAL_FAILURE(inputManager.ReAddInputEventFilter());
+}
+
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_SetTouchpadScrollSwitch_001
+ * @tc.desc: Verify SetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_SetTouchpadScrollSwitch_001, TestSize.Level1)
+{
+    InputManagerImpl inputManager;
+    bool switchFlag = true;
+    int32_t ret = inputManager.SetTouchpadScrollSwitch(switchFlag);
+    ASSERT_EQ(ret, RET_OK);
+    switchFlag = false;
+    ret = inputManager.SetTouchpadScrollSwitch(switchFlag);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: SwitchEventInputSubscribeManagerTest_GetTouchpadScrollSwitch_001
+ * @tc.desc: Verify GetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_GetTouchpadScrollSwitch_001, TestSize.Level1)
+{
+    InputManagerImpl inputManager;
+    bool switchFlag = true;
+    int32_t ret = inputManager.GetTouchpadScrollSwitch(switchFlag);
+    ASSERT_EQ(ret, RET_OK);
+    switchFlag = false;
+    ret = inputManager.GetTouchpadScrollSwitch(switchFlag);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -22,6 +22,7 @@
 #include "iremote_broker.h"
 #include "message_parcel.h"
 #include "permission_helper.h"
+#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {
@@ -65,6 +66,7 @@ public:
     virtual bool ReadFloat(float &value) = 0;
     virtual double ReadDouble() = 0;
     virtual bool ReadDouble(double &value) = 0;
+    virtual Media::PixelMap *Unmarshalling(Parcel &parcel) = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
@@ -107,6 +109,7 @@ public:
     MOCK_METHOD1(ReadFloat, bool(float &value));
     MOCK_METHOD0(ReadDouble, double());
     MOCK_METHOD1(ReadDouble, bool(double &value));
+    MOCK_METHOD1(Unmarshalling, Media::PixelMap *(Parcel &parcel));
 };
 } // namespace MMI
 } // namespace OHOS
