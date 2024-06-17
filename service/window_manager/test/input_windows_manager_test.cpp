@@ -955,7 +955,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, Tes
     CALL_TEST_DEBUG;
     SessionPtr session = std::shared_ptr<UDSSession>();
     WIN_MGR->OnSessionLost(session);
-    DisplayGroupInfo actualInfo = WIN_MGR->GetDisplayGroupInfo();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo());
 }
 
 /**
@@ -1939,9 +1939,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchTouch_001, Tes
 {
     CALL_TEST_DEBUG;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    WIN_MGR->DispatchTouch(pointerAction);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
     pointerAction = PointerEvent::POINTER_ACTION_DOWN;
-    WIN_MGR->DispatchTouch(pointerAction);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
 }
 
 /**
@@ -2204,7 +2204,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_001, Test
     expectedResult.displayId = 1;
     expectedResult.physicalX = 960;
     expectedResult.physicalY = 540;
-    result = WIN_MGR->GetMouseInfo();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetMouseInfo());
 }
 
 /**
@@ -2304,7 +2304,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearExtraData_001, Te
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetExtraData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ExtraData actualData = WIN_MGR->GetExtraData();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetExtraData());
 }
 
 /**
@@ -2369,7 +2369,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_Dump_001, TestSize.Lev
     CALL_TEST_DEBUG;
     int32_t fd = 1;
     std::vector<std::string> args;
-    WIN_MGR->Dump(fd, args);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->Dump(fd, args));
 }
 
 /**
