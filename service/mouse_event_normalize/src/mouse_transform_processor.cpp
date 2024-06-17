@@ -22,21 +22,21 @@
 #include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
+#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
+#include "i_preference_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "parameters.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "timer_manager.h"
-#include "dfx_hisysevent.h"
-#include "util_ex.h"
 #include "util.h"
-#include "i_preference_manager.h"
+#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -670,9 +670,9 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         } else if (width == SOFT_HARDEN_DEVICE_WIDTH && height == SOFT_HARDEN_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_HARDEN;
         } else {
-            MMI_HILOGE("undefined width: %{public}d, height: %{public}d", width, height);
+            MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
-        MMI_HILOGD("device width: %{public}d, height:%{public}d", width, height);
+        MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
     }
     return ret;
 }
@@ -737,13 +737,13 @@ int32_t MouseTransformProcessor::GetTouchpadSpeed()
 {
     int32_t speed = DEFAULT_TOUCHPAD_SPEED;
     GetTouchpadPointerSpeed(speed);
-    MMI_HILOGD("(TouchPad) pointer speed:%{public}d", speed);
+    MMI_HILOGD("TouchPad pointer speed:%{public}d", speed);
     return speed;
 }
 
 int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
 {
-    MMI_HILOGI("SetPointerLocation(x:%{public}d, y:%{public}d)", x, y);
+    MMI_HILOGI("SetPointerLocation x:%{public}d, y:%{public}d", x, y);
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
