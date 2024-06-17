@@ -96,7 +96,8 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject)
+int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid,
+    bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
@@ -188,10 +189,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
-    return OnInjectPointerEventExt(pointerEvent);
+    return OnInjectPointerEventExt(pointerEvent, isShell);
 }
 
-int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -203,7 +204,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction())) {
+            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), bool isShell)) {
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
@@ -240,7 +241,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             break;
         }
     }
-    return SaveTargetWindowId(pointerEvent);
+    return SaveTargetWindowId(pointerEvent, isShell);
 }
 
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
@@ -327,7 +328,7 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
-int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
@@ -339,7 +340,11 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
             return RET_ERR;
         }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
-        targetWindowIds_[pointerId] = targetWindowId;
+        if (isShell) {
+            shellTargetWindowIds_[pointerId] = targetWindowId;
+        } else {
+            nativeTargetWindowIds_[pointerId] = targetWindowId;
+        }
     }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
@@ -352,12 +357,20 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
+bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t action, bool isShell)
 {
     int32_t targetWindowId = -1;
-    auto iter = targetWindowIds_.find(pointerEvent->GetPointerId());
-    if (iter != targetWindowIds_.end()) {
-        targetWindowId = iter->second;
+    if (isShell) {
+        auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
+        if (iter != shellTargetWindowIds_.end()) {
+            targetWindowId = iter->second;
+        }
+    } else {
+        auto iter = nativeTargetWindowIds_.find(pointerEvent->GetPointerId());
+        if (iter != nativeTargetWindowIds_.end()) {
+            targetWindowId = iter->second;
+        }
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
@@ -690,7 +703,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         if (InjectionType_ == InjectionType::POINTEREVENT) {
-            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
+            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true, false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         return ERR_OK;
