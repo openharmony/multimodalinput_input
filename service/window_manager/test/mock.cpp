@@ -197,7 +197,6 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo) {}
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) {}
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info) {}
-void PointerDrawingManager::SetPointerScale(float scale) {}
 bool PointerDrawingManager::Init()
 {
     return true;
