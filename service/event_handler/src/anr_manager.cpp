@@ -57,9 +57,9 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
     if (sess == nullptr) {
         if (pid_ != pid) {
             pid_ = pid;
-            MMI_HILOGE("sess is null, return value is %{public}d", RET_REE);
+            MMI_HILOGE("sess is null, return value is %{public}d", RET_ERR);
         }
-        return RET_REE;
+        return RET_ERR;
     }
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
     for (int32_t item : timerIds) {
