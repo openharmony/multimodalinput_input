@@ -19,16 +19,15 @@
 
 #include <unistd.h>
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-
 #include "anr_handler.h"
 #include "bytrace_adapter.h"
+#include "define_multimodal.h"
+#include "error_multimodal.h"
 #include "event_filter_service.h"
+#include "input_scene_board_judgement.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "input_scene_board_judgement.h"
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
@@ -217,7 +216,8 @@ void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
     }
     enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
     CHKPV(enhanceCfg_);
-    if (memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen)) {
+    errno_t ret = memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen);
+    if (ret != EOK) {
         MMI_HILOGE("cfg memcpy failed");
         return;
     }
