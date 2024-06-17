@@ -44,6 +44,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
+} // namespace
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
@@ -183,6 +186,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
+    processedCount_++;
+    if (processedCount_ == PRINT_INTERVAL_COUNT) {
+        MMI_HILOGI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
+        processedCount_ = 0;
+        lastEventId_ = pointerEvent->GetId();
+    }
     InputMgrImpl.OnPointerEvent(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
         pointerEvent->MarkProcessed();

@@ -42,6 +42,8 @@ private:
         int32_t lastReportId{ -1 };
     };
     ANREvent event_[ANR_EVENT_TYPE_NUM];
+    int32_t lastEventId_ { 0 };
+    int32_t processedCount_ { 0 };
 
     void SendEvent(int32_t eventType, int32_t eventId);
 };
