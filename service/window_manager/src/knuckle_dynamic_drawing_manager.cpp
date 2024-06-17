@@ -147,10 +147,6 @@ std::shared_ptr<Rosen::Drawing::Bitmap> KnuckleDynamicDrawingManager::PixelMapTo
 void KnuckleDynamicDrawingManager::InitPointerPathPaint()
 {
     CALL_DEBUG_ENTER;
-    for (int32_t i = 0; i < POINT_TOTAL_SIZE; i++) {
-        Rosen::Drawing::Point point = Rosen::Drawing::Point();
-        traceControlPoints_.emplace_back(point);
-    }
     pixelMap_ = DecodeImageToPixelMap(PENT_ICON_PATH);
     CHKPV(pixelMap_);
     auto bitmap = PixelMapToBitmap(pixelMap_);
@@ -189,6 +185,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
 {
     CALL_DEBUG_ENTER;
     CHKPF(touchEvent);
+    CHKPF(glowTraceSystem_);
     auto id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -199,6 +196,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             isStop_ = true;
             isDrawing_ = true;
             glowTraceSystem_->Clear();
+            CHKPF(canvasNode_);
 #ifndef USE_ROSEN_DRAWING
             auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
                 BeginRecording(displayInfo_.width, displayInfo_.height));
