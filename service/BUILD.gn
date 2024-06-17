@@ -971,6 +971,78 @@ ohos_unittest("InputWindowsManagerTest") {
   ]
 }
 
+ohos_unittest("InputWindowsManagerEXTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "window_manager/test" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "window_manager/src/input_windows_manager.cpp",
+    "window_manager/test/input_windows_manager_ex_test.cpp",
+    "window_manager/test/mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
+    "call_manager:tel_call_manager_api",
+    "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "faultloggerd:libbacktrace_local",
+    "ffrt:libffrt",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hdf_core:libhdi",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "init:libbeget_proxy",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "preferences:native_preferences",
+    "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "window_manager:libdm",
+    "window_manager:libwm_lite",
+    "window_manager:libwsutils",
+  ]
+}
+
 ohos_unittest("SubscriberTest") {
   module_out_path = module_output_path
 
