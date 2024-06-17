@@ -101,8 +101,8 @@ std::vector<std::vector<uint32_t>> InputManagerUpdateDisplayInfoTest::CreateMatr
         return std::vector<std::vector<uint32_t>>();
     }
     std::vector<std::vector<uint32_t>> matrix(height, std::vector<uint32_t>(width, 0));
-    std::random_device random;
-    std::mt19937 gen(random());
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(0, 1);
     for (int32_t i = 0; i < height; i++) {
         for (int32_t j = 0; j < width; j++) {
