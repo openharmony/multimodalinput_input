@@ -130,7 +130,7 @@ int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
         return RET_ERR;
     }
     callback(ids);
-    return ret;
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callback)

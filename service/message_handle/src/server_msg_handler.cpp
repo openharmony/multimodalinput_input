@@ -38,6 +38,7 @@
 #include "mmi_func_callback.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
+#include "touch_drawing_manager.h"
 #include "util_napi_error.h"
 #include "authorize_helper.h"
 
@@ -206,6 +207,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+            TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
