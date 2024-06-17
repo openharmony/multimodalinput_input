@@ -214,7 +214,8 @@ HWTEST_F(SwitchEventInputSubscribeManagerTest,
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SwitchEventInputSubscribeManagerTest, SwitchEventInputSubscribeManagerTest_SetPixelMapData_001, TestSize.Level1)
+HWTEST_F(SwitchEventInputSubscribeManagerTest,
+    SwitchEventInputSubscribeManagerTest_SetPixelMapData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     InputManagerImpl inputManagerImpl;
