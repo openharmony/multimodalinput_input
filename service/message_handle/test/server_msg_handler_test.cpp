@@ -111,6 +111,25 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_02, TestSize
 }
 
 /**
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_03
+ * @tc.desc: Test SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    int32_t infoId = -1;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = ServerMsgHandlerTest::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    int32_t result = servermsghandler.SetPixelMapData(infoId, (void *)pixelMap.get());
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+}
+
+/**
  * @tc.name: ServerMsgHandlerTest_SetShieldStatus_01
  * @tc.desc: Test SetShieldStatus
  * @tc.type: FUNC
