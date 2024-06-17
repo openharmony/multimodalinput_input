@@ -78,7 +78,8 @@ public:
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
+    int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid,
+        bool isNativeInject, bool isShell);
     int32_t OnGetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t OnSetFunctionKeyState(int32_t funcKey, bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
