@@ -17,7 +17,6 @@
 #include <cstdio>
 
 #include <gtest/gtest.h>
-
 #include "input_event_handler.h"
 #include "libinput.h"
 #include "pixel_map.h"
