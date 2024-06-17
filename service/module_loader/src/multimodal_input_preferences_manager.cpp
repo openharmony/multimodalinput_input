@@ -134,7 +134,8 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap[touchpadScrollSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadScrollSwitch)};
     preferencesMap[touchpadRightClickType] = {TOUCHPAD_FILE_NAME, g_touchpadRightClickType};
     preferencesMap[touchpadScrollDirection] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadScrollDirection)};
-    preferencesMap[touchpadThreeFingerTapSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadThreeFingerTapSwitch)};
+    preferencesMap[touchpadThreeFingerTapSwitch] = {TOUCHPAD_FILE_NAME,
+                                                    static_cast<int32_t>(g_touchpadThreeFingerTapSwitch)};
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     preferencesMap[magicPointerSize] = {MOUSE_FILE_NAME, g_magicPointerSize};
     preferencesMap[magicPointerColor] = {MOUSE_FILE_NAME, g_magicPointerColor};

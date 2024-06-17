@@ -84,7 +84,7 @@ public:
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);    
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
