@@ -35,7 +35,7 @@
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "timer_manager.h"
-#include "util.h
+#include "util.h"
 #include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
