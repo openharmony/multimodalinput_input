@@ -41,7 +41,8 @@ extern "C" {
         DEVICE_SOFT_HARDEN = 2,
         DEVICE_HARD_HARDEN = 3,
     };
-    int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
+    int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
+        int32_t speed, int32_t deviceType);
     int32_t HandleMotionAccelerateTouchpad(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
     int32_t HandleAxisAccelerateTouchpad(bool mode, double* abs_axis, int32_t deviceType);

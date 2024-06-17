@@ -107,15 +107,15 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
+    DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        ret = HandleMotionAccelerate(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
+        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
