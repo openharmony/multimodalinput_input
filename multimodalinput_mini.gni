@@ -46,7 +46,6 @@ declare_args() {
   input_feature_fingerprint = false
   input_feature_crown = true
   input_ext_feature_magiccursor = false
-  input_feature_infrared_emitter = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -276,7 +275,6 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
-print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
 
 input_default_defines = []
 
@@ -348,10 +346,6 @@ if (input_ext_feature_anco) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
       [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
-
-  if (input_feature_product != "pc") {
-    input_default_defines += [ "OHOS_BUILD_ENABLE_INFRARED_EMITTER" ]
-  }
 
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
