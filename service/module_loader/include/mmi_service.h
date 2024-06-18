@@ -152,7 +152,8 @@ public:
     void InitAncoUds();
     void StopAncoUds();
     int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
-    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
+    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
+        bool isNativeInject, bool isShell);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 protected:
@@ -198,7 +199,8 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
+    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+        int32_t pid, bool isNativeInject, bool isShell);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
