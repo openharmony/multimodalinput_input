@@ -108,5 +108,46 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
     actionTime = -2;
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
+
+/**
+ * @tc.name: InputHandlerManagerTest_AddProcessedEventId_001
+ * @tc.desc:Test the funcation AddProcessedEventId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddProcessedEventId_001, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    int32_t consumerCount = 1;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_002
+ * @tc.desc: Test the funcation OnDispatchEventProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_002, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    int32_t eventId = 2;
+    int64_t actionTime = 3;
+    manager.mouseEventIds_.insert(10);
+    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
+    eventId = 10;
+    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
+    manager.processedEvents_.insert(std::make_pair(10, 10));
+    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
+    manager.processedEvents_.insert(std::make_pair(5, 8));
+    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
+}
 } // namespace MMI
 } // namespace OHOS

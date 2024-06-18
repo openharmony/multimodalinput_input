@@ -17,12 +17,12 @@
 
 #include <cinttypes>
 
+#include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "anr_handler.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "mmi_log.h"
 #include "napi_constants.h"
 #include "net_packet.h"
 #include "proto.h"
