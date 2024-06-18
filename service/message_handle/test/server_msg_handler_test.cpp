@@ -25,6 +25,7 @@
 
 #include "define_multimodal.h"
 #include "image_source.h"
+#include "inject_notice_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "server_msg_handler.h"
@@ -1359,6 +1360,104 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_03, TestSize
     Offset offset;
     direction = DIRECTION270;
     ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnWindowGroupInfo_001
+ * @tc.desc: Test the function OnWindowGroupInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowGroupInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    SessionPtr sess = nullptr;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    int32_t ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    ret = handler.OnWindowGroupInfo(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnEnhanceConfig_003
+ * @tc.desc: Test the function OnEnhanceConfig
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnEnhanceConfig_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    MmiMessageId idMsg = MmiMessageId::ADD_INPUT_DEVICE_LISTENER;
+    NetPacket pkt(idMsg);
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME,
+        g_moduleType, g_writeFd, SECURITY_COMPONENT_SERVICE_ID - 1, g_pid);
+    int32_t ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+    sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd,
+        SECURITY_COMPONENT_SERVICE_ID, g_pid);
+    CircleStreamBuffer::ErrorStatus rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.OnEnhanceConfig(sess, pkt);
+    EXPECT_EQ(ret, RET_ERR);
+    rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    EXPECT_NO_FATAL_FAILURE(handler.OnEnhanceConfig(sess, pkt));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SetPixelMapData_001
+ * @tc.desc: Test the function SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t infoId = -5;
+    void* pixelMap = nullptr;
+    int32_t result = handler.SetPixelMapData(infoId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+    infoId = 2;
+    result = handler.SetPixelMapData(infoId, pixelMap);
+    EXPECT_EQ(result, ERR_INVALID_VALUE);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_001
+ * @tc.desc: Test the function InitInjectNoticeSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    EXPECT_TRUE(ret);
+    handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
+    manager.isStartSrv_ = false;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_TRUE(ret);
+    manager.isStartSrv_ = true;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_TRUE(ret);
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    manager.connectionCallback_->isConnected_ = false;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_TRUE(ret);
+    manager.connectionCallback_->isConnected_ = true;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_TRUE(ret);
 }
 
 /**
