@@ -513,7 +513,7 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     pkt << windowGroupInfo_.focusWindowId << windowGroupInfo_.displayId;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windowGroupInfo data failed");
@@ -1236,7 +1236,7 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& 
 
 int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle, bool isUiExtension)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
@@ -1317,7 +1317,7 @@ void InputManagerImpl::OnDisconnected()
 
 int32_t InputManagerImpl::SendDisplayInfo()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
@@ -1335,7 +1335,7 @@ int32_t InputManagerImpl::SendDisplayInfo()
 
 int32_t InputManagerImpl::SendWindowInfo()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::WINDOW_INFO);
@@ -1420,7 +1420,7 @@ int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)
 int32_t InputManagerImpl::GetDevice(int32_t deviceId,
     std::function<void(std::shared_ptr<InputDevice>)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
