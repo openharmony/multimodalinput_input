@@ -2184,7 +2184,6 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &fre
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf context:%{public}s", context.c_str());
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
@@ -2197,7 +2196,6 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     }
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
     MMI_HILOGI("TransmitInfrared para context:%{public}s", context.c_str());
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
