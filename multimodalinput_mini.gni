@@ -47,7 +47,7 @@ declare_args() {
   input_feature_crown = true
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
-  input_feature_move_event_filters = true
+  input_feature_move_event_filters = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
