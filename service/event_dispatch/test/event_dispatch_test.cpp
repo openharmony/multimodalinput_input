@@ -1042,7 +1042,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_006, Test
     int32_t testPointerId = 1;
     testPointerItem.SetPointerId(testPointerId + 1);
     event->AddPointerItem(testPointerItem);
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd)); 
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd));
 }
 } // namespace MMI
 } // namespace OHOS
