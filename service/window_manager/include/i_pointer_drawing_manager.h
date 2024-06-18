@@ -130,6 +130,7 @@ public:
         return 0;
     }
     virtual void ForceClearPointerVisiableStatus();
+    virtual void InitPointerObserver() {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
