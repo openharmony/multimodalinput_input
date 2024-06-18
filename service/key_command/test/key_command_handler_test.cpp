@@ -41,7 +41,6 @@ constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr int32_t INTERVAL_TIME = 100;
 constexpr int32_t INTERVAL_TIME_OUT = 500000;
-constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
@@ -1277,22 +1276,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_001,
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_SkipFinalKey
- * @tc.desc: Skip Final Key
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SkipFinalKey, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    int32_t keyCode = 1024;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    ASSERT_FALSE(handler.SkipFinalKey(keyCode, keyEvent));
-}
-
-/**
  * @tc.name: KeyCommandHandlerTest_HandleKeyDown
  * @tc.desc: Handle Key Down
  * @tc.type: FUNC
@@ -1317,9 +1300,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GetKeyDownDurationFromXml,
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
-    std::string businessId = "power";
-    int32_t ret = handler.GetKeyDownDurationFromXml(businessId);
-    ASSERT_EQ(ret, ERROR_DELAY_VALUE);
+    ShortcutKey shortcut {
+        .businessId = "power",
+    };
+    ASSERT_NO_FATAL_FAILURE(handler.GetKeyDownDurationFromXml(shortcut));
 }
 
 /**

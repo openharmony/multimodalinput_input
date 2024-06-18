@@ -108,14 +108,14 @@ JsShortKeyContext* JsShortKeyContext::GetInstance(napi_env env)
     napi_value object = nullptr;
     CHKRP(napi_get_named_property(env, global, SHORT_KEY_INSTANCE.c_str(), &object), SET_NAMED_PROPERTY);
     if (object == nullptr) {
-        THROWERR(env, "object is nullptr");
+        THROWERR(env, "Object is nullptr");
         return nullptr;
     }
 
     JsShortKeyContext *instance = nullptr;
     CHKRP(napi_unwrap(env, object, (void**)&instance), UNWRAP);
     if (instance == nullptr) {
-        THROWERR(env, "instance is nullptr");
+        THROWERR(env, "Instance is nullptr");
         return nullptr;
     }
     return instance;
@@ -157,11 +157,11 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     CHKRP(napi_get_value_int32(env, argv[1], &delay), GET_VALUE_INT32);
     if (delay < MIN_DELAY || delay > MAX_DELAY) {
         MMI_HILOGE("Invalid delay");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "delay is invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Delay is invalid");
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
-        MMI_HILOGE("delay parameter type is invalid");
+        MMI_HILOGE("Delay parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "delay", "number");
         return nullptr;
     }
@@ -172,7 +172,7 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
         return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay);
     }
     if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid");
+        MMI_HILOGE("Callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -203,7 +203,7 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
     CALL_DEBUG_ENTER;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
-        THROWERR(env, "failed to create instance");
+        THROWERR(env, "Failed to create instance");
         return nullptr;
     }
     napi_property_descriptor desc[] = {
