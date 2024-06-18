@@ -2099,8 +2099,6 @@ int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>&
 {
     CALL_INFO_TRACE;
     return MULTIMODAL_INPUT_CONNECT_MGR->GetInfraredFrequencies(requencys);
-    MMI_HILOGW("Infrared emitter device does not support");
-    return ERROR_UNSUPPORT;
 }
 
 int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
