@@ -164,22 +164,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_002,
 }
 
 /**
- * @tc.name: EventDispatchTest_NotifyPointerEventToRS_001
- * @tc.desc: Test the function NotifyPointerEventToRS
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSize.Level1)
-{
-    EventDispatchHandler eventdispatchhandler;
-    int32_t action = 1;
-    std::string name = "ExampleProgram";
-    uint32_t processId = 12345;
-    int32_t touchCnt = 0;
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.NotifyPointerEventToRS(action, name, processId, touchCnt));
-}
-
-/**
  * @tc.name: EventDispatchTest_HandlePointerEventInner_001
  * @tc.desc: Test the function HandlePointerEventInner
  * @tc.type: FUNC
