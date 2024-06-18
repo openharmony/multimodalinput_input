@@ -242,6 +242,7 @@ private:
     WindowGroupInfo windowGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
+    mutable std::mutex resourceMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
