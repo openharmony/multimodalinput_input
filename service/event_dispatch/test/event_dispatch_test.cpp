@@ -990,7 +990,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_004, Test
     EXPECT_NE(sharedPointerEvent, nullptr);
     std::vector<int32_t> pointerIdList;
     EXPECT_FALSE(pointerIdList.size() > 1);
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(sharedPointerEvent, fd)); 
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(sharedPointerEvent, fd));
 }
 
 /**
@@ -1016,7 +1016,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_005, Test
     int32_t testPointerId = 1;
     testPointerItem.SetPointerId(testPointerId);
     event->AddPointerItem(testPointerItem);
-    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd)); 
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd));
 }
 
 /**
