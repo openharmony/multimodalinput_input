@@ -113,7 +113,9 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
         TouchType rawTouchTmp = rawTouch_;
         int32_t displayX = pointerItem.GetDisplayX();
         int32_t displayY = pointerItem.GetDisplayY();
+#ifdef OHOS_BUILD_ENABLE_TOUCH
         WIN_MGR->ReverseXY(displayX, displayY);
+#endif // OHOS_BUILD_ENABLE_TOUCH
         rawTouchTmp.x = displayX * 8;
         rawTouchTmp.y = displayY * 8;
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
