@@ -35,6 +35,7 @@ namespace MMI {
 namespace {
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
+constexpr int32_t DRIVER_NUMBER { 8 };
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -116,8 +117,8 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         WIN_MGR->ReverseXY(displayX, displayY);
 #endif // OHOS_BUILD_ENABLE_TOUCH
-        rawTouchTmp.x = displayX * 8;
-        rawTouchTmp.y = displayY * 8;
+        rawTouchTmp.x = displayX * DRIVER_NUMBER;
+        rawTouchTmp.y = displayY * DRIVER_NUMBER;
         FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
     }
 }
