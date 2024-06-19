@@ -1209,13 +1209,13 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-    bool isNativeInject)
+int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t pid, bool isNativeInject, bool isShell)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject);
+    return sMsgHandler_.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell);
 #else
     return RET_OK;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -1272,12 +1272,13 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
     int32_t pid = GetCallingPid();
+    bool isShell = PER_HELPER->RequestFromShell();
     AdaptScreenResolution(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject);
+    ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject, isShell);
 #else
     ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent,
-        pid, isNativeInject));
+        pid, isNativeInject, isShell));
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);

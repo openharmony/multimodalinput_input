@@ -226,5 +226,14 @@ int32_t PermissionHelper::GetTokenType()
         return TokenType::TOKEN_INVALID;
     }
 }
+
+bool PermissionHelper::RequestFromShell()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    MMI_HILOGD("Token type is %{public}d", static_cast<int32_t>(tokenType));
+    return tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL;
+}
 } // namespace MMI
 } // namespace OHOS
