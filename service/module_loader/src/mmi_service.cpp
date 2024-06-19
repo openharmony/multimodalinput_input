@@ -332,9 +332,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     PREFERENCES_MGR->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
