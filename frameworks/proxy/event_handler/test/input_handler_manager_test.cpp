@@ -257,12 +257,12 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_FindHandler_005, TestS
 }
 
 /**
- * @tc.name: InputHandlerManagerTest_AddProcessedEventId_001
+ * @tc.name: InputHandlerManagerTest_AddProcessedEventId_002
  * @tc.desc: Verify AddProcessedEventId
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddProcessedEventId_001, TestSize.Level1)
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddProcessedEventId_002, TestSize.Level1)
 {
     MyInputHandlerManager manager;
     int32_t consumerCount = 1;
@@ -274,23 +274,6 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_AddProcessedEventId_00
     ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_CROWN);
     ASSERT_NO_FATAL_FAILURE(manager.AddProcessedEventId(pointerEvent, consumerCount));
-}
-
-/**
- * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_002
- * @tc.desc: Verify OnDispatchEventProcessed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_002, TestSize.Level1)
-{
-    MyInputHandlerManager manager;
-    int32_t eventId = 2;
-    int64_t actionTime = 2;
-    manager.mouseEventIds_.insert(1);
-    manager.mouseEventIds_.insert(2);
-    manager.mouseEventIds_.insert(3);
-    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
 
 /**
@@ -351,6 +334,23 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcess
     manager.processedEvents_[2] = 200;
     manager.processedEvents_[3] = 300;
     manager.processedEvents_[4] = 400;
+    ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_OnDispatchEventProcessed_006
+ * @tc.desc: Verify OnDispatchEventProcessed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDispatchEventProcessed_006, TestSize.Level1)
+{
+    MyInputHandlerManager manager;
+    int32_t eventId = 2;
+    int64_t actionTime = 2;
+    manager.mouseEventIds_.insert(1);
+    manager.mouseEventIds_.insert(2);
+    manager.mouseEventIds_.insert(3);
     ASSERT_NO_FATAL_FAILURE(manager.OnDispatchEventProcessed(eventId, actionTime));
 }
 
