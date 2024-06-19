@@ -1854,5 +1854,19 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001
     pointerDrawingManager.lastPhysicalX_ = -1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_InitPointerObserver_001
+ * @tc.desc: Test InitPointerObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
+}
 } // namespace MMI
 } // namespace OHOS
