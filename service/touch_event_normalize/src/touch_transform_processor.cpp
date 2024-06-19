@@ -110,7 +110,13 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
     TransformTouchProperties(rawTouch_, pointerItem);
     if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
         MMI_HILOGD("Fingersense start classify touch down event");
-        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouch_, toolType);
+        TouchType rawTouchTmp = rawTouch_;
+        int32_t displayX = rawTouchTmp.GetDisplayX();
+        int32_t displayY = rawTouchTmp.GetDisplayY();
+        WIN_MGR->ReverseXY(displayX, displayY);
+        rawTouchTmp.x = displayX * 8;
+        rawTouchTmp.y = displayY * 8;
+        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
     }
 }
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
