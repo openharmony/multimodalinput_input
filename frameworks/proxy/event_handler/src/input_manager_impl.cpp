@@ -400,6 +400,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     CHK_PID_AND_TID();
     CHKPV(consumer);
+    BytraceAdapter::StartConsumer(keyEvent);
     consumer->OnInputEvent(keyEvent);
     BytraceAdapter::StopConsumer();
     MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
@@ -424,13 +425,15 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
-        BytraceAdapter::StartConsumer(keyEvent);
+        BytraceAdapter::StartPostTaskEvent(keyEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
             this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
+            BytraceAdapter::StopPostTaskEvent();
             return;
         }
+        BytraceAdapter::StopPostTaskEvent();
     } else {
         BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
@@ -450,6 +453,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(pointerEvent);
+    BytraceAdapter::StartConsumer(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
     BytraceAdapter::StopConsumer();
     MMI_HILOG_DISPATCHD("Pointer event callback pointerId:%{public}d",
@@ -478,13 +482,15 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         MMI_HILOG_DISPATCHI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
-        BytraceAdapter::StartConsumer(pointerEvent);
+        BytraceAdapter::StartPostTaskEvent(pointerEvent);
         if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
             this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
             AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
+            BytraceAdapter::StopPostTaskEvent();
             return;
         }
+        BytraceAdapter::StopPostTaskEvent();
     } else {
         BytraceAdapter::StartConsumer(pointerEvent);
         inputConsumer->OnInputEvent(pointerEvent);
