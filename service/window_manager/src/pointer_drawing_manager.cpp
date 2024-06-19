@@ -358,11 +358,13 @@ void PointerDrawingManager::InitPointerObserver()
         MMI_HILOGI("Settingdata observer has init");
         return;
     }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
     if (ret == RET_OK) {
         hasInitObserver_ = true;
         MMI_HILOGD("Create pointer switch observer success");
     }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
  
 int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
