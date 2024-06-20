@@ -124,6 +124,7 @@ public:
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
     const DisplayInfo *GetDefaultDisplayInfo() const;
+    void ReverseXY(int32_t &x, int32_t &y);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO

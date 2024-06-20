@@ -3287,6 +3287,19 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
+{
+    Coordinate2D matrix;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        return;
+    }
+    ReverseRotateScreen(displayGroupInfo_.displaysInfo[0], x, y, matrix);
+    x = static_cast<int32_t>(matrix.x);
+    y = static_cast<int32_t>(matrix.y);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
 {
     CALL_DEBUG_ENTER;
