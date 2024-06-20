@@ -14,6 +14,48 @@
  */
 #include "mock.h"
 
+extern "C" {
+double libinput_event_tablet_tool_get_x_transformed(struct libinput_event_tablet_tool *event, uint32_t width)
+{
+    return -1.0;
+}
+
+double libinput_event_tablet_tool_get_y_transformed(struct libinput_event_tablet_tool *event, uint32_t height)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_x_transformed(struct libinput_event_touch *event, uint32_t width)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_y_transformed(struct libinput_event_touch *event, uint32_t height)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_tool_x_transformed(struct libinput_event_touch *event, uint32_t width)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_tool_y_transformed(struct libinput_event_touch *event, uint32_t height)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_tool_width_transformed(struct libinput_event_touch *event, uint32_t width)
+{
+    return -1.0;
+}
+
+double libinput_event_touch_get_tool_height_transformed(struct libinput_event_touch *event, uint32_t height)
+{
+    return -1.0;
+}
+} // extern "C"
+
 namespace OHOS {
 using namespace OHOS::MMI;
 
@@ -241,7 +283,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {
-    return false;
+    return DfsMessageParcel::messageParcel->GetMouseDisplayState();
 }
 int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId,
     int32_t focusX, int32_t focusY)
@@ -318,7 +360,7 @@ int32_t MultiModalInputPreferencesManager::GetIntValue(const std::string &key, i
 
 bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, bool defaultValue)
 {
-    return false;
+    return DfsMessageParcel::messageParcel->GetBoolValue(key, defaultValue);
 }
 
 int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, const std::string &setFile,
@@ -447,5 +489,10 @@ Rosen::DMError Rosen::DisplayManager::UnregisterFoldStatusListener(
     sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
 {
     return DfsMessageParcel::messageParcel->UnregisterFoldStatusListener(listener);
+}
+
+bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
+{
+    return DfsMessageParcel::messageParcel->IsSceneBoardEnabled();
 }
 } // namespace OHOS
