@@ -332,7 +332,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-    InitPointerListener();
+    IPointerDrawingManager::GetInstance()->InitPointerObserver();
     PREFERENCES_MGR->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
@@ -370,19 +370,6 @@ void MMIService::OnStop()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    RemoveSystemAbilityListener(MULTIMODAL_INPUT_SERVICE_ID);
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-}
-
-void MMIService::InitPointerListener()
-{
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MMI_HILOGI("Add mmi service listener start");
-    AddSystemAbilityListener(MULTIMODAL_INPUT_SERVICE_ID);
-    IPointerDrawingManager::GetInstance()->InitPointerObserver();
-    MMI_HILOGI("Add mmi service listener end");
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 void MMIService::AddAppDebugListener()
@@ -1336,10 +1323,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
         MMI_HILOGD("Common event service started");
-    }
-    if (systemAbilityId == MULTIMODAL_INPUT_SERVICE_ID) {
-        IPointerDrawingManager::GetInstance()->InitPointerObserver();
-        MMI_HILOGD("MMI service started");
     }
 }
 
