@@ -19,7 +19,9 @@
 #include <vector>
 
 #include "event_resample.h"
+#include "input_event.h"
 #include "mmi_log.h"
+#include "window_info.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "EventResampleTest"
@@ -619,6 +621,354 @@ HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY, TestSize.
     int32_t logicY = 100;
     std::pair<int32_t, int32_t> pair { logicX, logicY };
     ASSERT_EQ(EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY), pair);
+}
+
+/**
+ * @tc.name: EventResampleTest_UpdatePointerEvent_001
+ * @tc.desc: Test the funcation UpdatePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_UpdatePointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventResample::MotionEvent outEvent;
+    outEvent.actionTime = 100;
+    outEvent.pointerAction = PointerEvent::POINTER_ACTION_MOVE;
+    outEvent.actionTime = 5;
+    outEvent.eventId = 6;
+    EventResample::Pointer p;
+    p.coordX = 100;
+    p.coordY = 10;
+    p.toolType = 1;
+    p.id = 6;
+    outEvent.pointers.insert(std::make_pair(1, p));
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->UpdatePointerEvent(&outEvent));
+    outEvent.pointerAction = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->UpdatePointerEvent(&outEvent));
+    outEvent.pointerAction = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->UpdatePointerEvent(&outEvent));
+}
+
+/**
+ * @tc.name: EventResampleTest_UpdatePointerEvent_002
+ * @tc.desc: Test the funcation UpdatePointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_UpdatePointerEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventResample::MotionEvent outEvent;
+    outEvent.actionTime = 20;
+    outEvent.pointerAction = 10;
+    outEvent.actionTime = 2;
+    outEvent.eventId = 6;
+    EventResample::Pointer p;
+    p.coordX = 20;
+    p.coordY = 30;
+    p.toolType = 2;
+    p.id = 3;
+    outEvent.pointers.insert(std::make_pair(1, p));
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->UpdatePointerEvent(&outEvent));
+}
+
+/**
+ * @tc.name: EventResampleTest_TransformSampleWindowXY_001
+ * @tc.desc: Test the funcation TransformSampleWindowXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(100);
+    item.SetToolDisplayX(90);
+    item.SetToolDisplayY(90);
+    item.SetToolWindowX(50);
+    item.SetToolWindowY(50);
+    item.SetToolWidth(30);
+    item.SetToolHeight(30);
+    item.SetLongAxis(100);
+    item.SetShortAxis(20);
+    item.SetToolType(2);
+    item.SetTargetWindowId(0);
+    pointerEvent->AddPointerItem(item);
+    int32_t logicX = 100;
+    int32_t logicY = 100;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 10;
+    inputEvent->targetWindowId_ = 10;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY));
+    WindowInfo window;
+    window.transform.push_back(1.0f);
+    window.transform.push_back(2.0f);
+    window.transform.push_back(3.0f);
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY));
+}
+
+/**
+ * @tc.name: EventResampleTest_TransformSampleWindowXY_002
+ * @tc.desc: Test the funcation TransformSampleWindowXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_TransformSampleWindowXY_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(10);
+    item.SetToolDisplayX(9);
+    item.SetToolDisplayY(8);
+    item.SetToolWindowX(7);
+    item.SetToolWindowY(6);
+    item.SetToolWidth(5);
+    item.SetToolHeight(4);
+    item.SetLongAxis(3);
+    item.SetShortAxis(2);
+    item.SetToolType(1);
+    item.SetTargetWindowId(0);
+    pointerEvent->AddPointerItem(item);
+    int32_t logicX = 10;
+    int32_t logicY = 20;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 20;
+    inputEvent->targetWindowId_ = 10;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->TransformSampleWindowXY(pointerEvent, item, logicX, logicY));
+}
+
+/**
+ * @tc.name: EventResampleTest_ConsumeBatch_001
+ * @tc.desc: Test the funcation ConsumeBatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_ConsumeBatch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t frameTime = 5;
+    EventResample::MotionEvent** outEvent = new EventResample::MotionEvent*[3];
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ConsumeBatch(frameTime, outEvent));
+    frameTime = -4;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ConsumeBatch(frameTime, outEvent));
+}
+
+/**
+ * @tc.name: EventResampleTest_ResampleTouchState_001
+ * @tc.desc: Test the funcation ResampleTouchState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_ResampleTouchState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t sampleTime = 5;
+    EventResample::MotionEvent event;
+    EventResample::MotionEvent next;
+    event.actionTime = 10;
+    event.pointerAction = 20;
+    event.actionTime = 5;
+    event.eventId = 6;
+    next.actionTime = 20;
+    next.pointerAction = 30;
+    next.actionTime = 8;
+    next.eventId = 9;
+    EventResampleHdr->resampleTouch_ = false;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleTouchState(sampleTime, &event, &next));
+    EventResampleHdr->resampleTouch_ = true;
+    event.sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleTouchState(sampleTime, &event, &next));
+    event.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    event.pointerAction = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleTouchState(sampleTime, &event, &next));
+    event.pointerAction = PointerEvent::POINTER_ACTION_MOVE;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleTouchState(sampleTime, &event, &next));
+}
+
+/**
+ * @tc.name: EventResampleTest_ResampleTouchState_002
+ * @tc.desc: Test the funcation ResampleTouchState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_ResampleTouchState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t sampleTime = 7;
+    EventResample::MotionEvent event;
+    EventResample::MotionEvent next;
+    event.actionTime = 1;
+    event.pointerAction = 2;
+    event.actionTime = 2;
+    event.eventId = 4;
+    next.actionTime = 5;
+    next.pointerAction = 6;
+    next.actionTime = 7;
+    next.eventId = 8;
+    EventResampleHdr->resampleTouch_ = true;
+    event.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    event.pointerAction = PointerEvent::POINTER_ACTION_MOVE;
+    int32_t deviceId = 9;
+    int32_t source = 8;
+    EventResample::TouchState ts;
+    ts.deviceId = 9;
+    ts.source = 8;
+    ts.historyCurrent = 3;
+    ts.historySize = 4;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleTouchState(sampleTime, &event, &next));
+    deviceId = 15;
+    source = 13;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleTouchState(sampleTime, &event, &next));
+}
+
+/**
+ * @tc.name: EventResampleTest_ResampleCoordinates_001
+ * @tc.desc: Test the funcation ResampleCoordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_ResampleCoordinates_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t sampleTime = 6;
+    EventResample::MotionEvent event;
+    EventResample::TouchState touchState;
+    EventResample::History current;
+    EventResample::History other;
+    float alpha = 1.0;
+    EventResample::Pointer p;
+    p.coordX = 20;
+    p.coordY = 30;
+    p.toolType = 2;
+    p.id = 5;
+    event.pointers.insert(std::make_pair(1, p));
+    EventResample::TouchState ts;
+    ts.deviceId = 5;
+    ts.source = 2;
+    ts.historyCurrent = 3;
+    ts.historySize = 4;
+    EventResampleHdr->touchStates_.push_back(ts);
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleCoordinates(sampleTime, &event, touchState, &current,
+        &other, alpha));
+}
+
+/**
+ * @tc.name: EventResampleTest_ResampleCoordinates_002
+ * @tc.desc: Test the funcation ResampleCoordinates
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_ResampleCoordinates_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t sampleTime = 2;
+    EventResample::MotionEvent event;
+    EventResample::TouchState touchState;
+    EventResample::History current;
+    EventResample::History other;
+    float alpha = 5.0;
+    EventResample::Pointer p;
+    p.coordX = 5;
+    p.coordY = 8;
+    p.toolType = 9;
+    p.id = 2;
+    event.pointers.insert(std::make_pair(1, p));
+    EventResample::TouchState ts;
+    ts.deviceId = 3;
+    ts.source = 4;
+    ts.historyCurrent = 7;
+    ts.historySize = 5;
+    EventResampleHdr->touchStates_.push_back(ts);
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleCoordinates(sampleTime, &event, touchState, &current,
+        &other, alpha));
+}
+
+/**
+ * @tc.name: EventResampleTest_FindBatch_001
+ * @tc.desc: Test the funcation FindBatch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_FindBatch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    int32_t source = 3;
+    EventResample::MotionEvent motionEvent;
+    motionEvent.deviceId = 1;
+    motionEvent.sourceType = 3;
+    EventResample::Batch batch;
+    batch.samples.push_back(motionEvent);
+    EventResampleHdr->batches_.push_back(batch);
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->FindBatch(deviceId, source));
+    deviceId = 5;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->FindBatch(deviceId, source));
+    source = 6;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->FindBatch(deviceId, source));
+}
+
+/**
+ * @tc.name: EventResampleTest_FindTouchState_001
+ * @tc.desc: Test the funcation FindTouchState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_FindTouchState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    int32_t source = 2;
+    EventResample::TouchState ts;
+    ts.deviceId = 1;
+    ts.source = 2;
+    ts.historyCurrent = 3;
+    ts.historySize = 4;
+    EventResampleHdr->touchStates_.push_back(ts);
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->FindTouchState(deviceId, source));
+    deviceId = 5;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->FindTouchState(deviceId, source));
+    source = 6;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->FindTouchState(deviceId, source));
+}
+
+/**
+ * @tc.name: EventResampleTest_RewriteMessage_001
+ * @tc.desc: Test the funcation RewriteMessage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventResampleTest, EventResampleTest_RewriteMessage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventResample::TouchState state;
+    EventResample::MotionEvent event;
+    EventResample::Pointer p;
+    p.coordX = 20;
+    p.coordY = 30;
+    p.toolType = 2;
+    p.id = 5;
+    event.pointers.insert(std::make_pair(1, p));
+    EventResample::TouchState ts;
+    ts.deviceId = 3;
+    ts.source = 2;
+    ts.historyCurrent = 3;
+    ts.historySize = 4;
+    EventResampleHdr->touchStates_.push_back(ts);
+    event.actionTime = 10;
+    state.lastResample.actionTime = 5;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->RewriteMessage(state, event));
+    event.actionTime = 5;
+    state.lastResample.actionTime = 10;
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->RewriteMessage(state, event));
 }
 } // namespace MMI
 } // namespace OHOS
