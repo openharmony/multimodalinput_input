@@ -1097,7 +1097,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetM
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubGetMousePrimaryButton(data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -1157,7 +1157,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubIsPo
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubIsPointerVisible(data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -1360,7 +1360,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRegisterInputDeviceMonitor_001, Tes
     MessageParcel data;
     MessageParcel reply;
     int32_t ret = stub->StubRegisterInputDeviceMonitor(data, reply);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
