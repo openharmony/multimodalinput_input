@@ -503,6 +503,10 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(subscriber);
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        CHKPV(subscriber->keyOption_);
+        InputHandler->shortcut_.MarkShortcutConsumed(*subscriber->keyOption_);
+    }
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
@@ -661,7 +665,6 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
             ClearSubscriberTimer(subscribers);
             continue;
         }
-        InputHandler->shortcut_.MarkShortcutConsumed(*keyOption);
         NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled);
     }
     MMI_HILOGD("Handle key down:%{public}s", handled ? "true" : "false");
@@ -735,7 +738,6 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
-        InputHandler->shortcut_.MarkShortcutConsumed(*keyOption);
         NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
     }
     MMI_HILOGD("Handle key up:%{public}s", handled ? "true" : "false");

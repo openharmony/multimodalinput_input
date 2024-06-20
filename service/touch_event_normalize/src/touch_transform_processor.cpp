@@ -35,6 +35,7 @@ namespace MMI {
 namespace {
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
+constexpr int32_t DRIVER_NUMBER { 8 };
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -110,7 +111,15 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
     TransformTouchProperties(rawTouch_, pointerItem);
     if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
         MMI_HILOGD("Fingersense start classify touch down event");
-        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouch_, toolType);
+        TouchType rawTouchTmp = rawTouch_;
+        int32_t displayX = pointerItem.GetDisplayX();
+        int32_t displayY = pointerItem.GetDisplayY();
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        WIN_MGR->ReverseXY(displayX, displayY);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+        rawTouchTmp.x = displayX * DRIVER_NUMBER;
+        rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
     }
 }
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
