@@ -41,9 +41,7 @@
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #include "gesturesense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "input_device_manager.h"
 #include "ipc_skeleton.h"
 #include "i_input_windows_manager.h"
@@ -2132,55 +2130,46 @@ int32_t MMIService::OnCancelInjection()
 int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnHasIrEmitter, this, std::ref(hasIrEmitter)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnHasIrEmitter failed, ret:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetInfraredFrequencies,
                                                         this, std::ref(requencys)));
     if (ret != RET_OK) {
         MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnTransmitInfrared, this, number, pattern));
     if (ret != RET_OK) {
         MMI_HILOGE("OnTransmitInfrared failed, returnCode:%{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
 {
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     hasIrEmitter = false;
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &frequencies)
 {
     MMI_HILOGI("start get infrared frequency");
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::vector<InfraredFrequencyInfo> infos;
     InfraredEmitterController::GetInstance()->GetFrequencies(infos);
     for (auto &item : infos) {
@@ -2196,13 +2185,11 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &fre
         ",min=" + std::to_string(frequencies[i].min_) + ";";
     }
     MMI_HILOGD("data from hdf context:%{public}s", context.c_str());
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
 int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t> &pattern)
 {
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
@@ -2210,7 +2197,6 @@ int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<in
     }
     InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
     MMI_HILOGI("TransmitInfrared para context:%{public}s", context.c_str());
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return RET_OK;
 }
 
