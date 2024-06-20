@@ -27,6 +27,7 @@
 
 #include "define_multimodal.h"
 #include "mmi_log.h"
+#include "parameters.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDrawingManager"
@@ -53,6 +54,8 @@ constexpr int32_t ROTATION_ANGLE_0 { 0 };
 constexpr int32_t ROTATION_ANGLE_90 { 90 };
 constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
+constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
+int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -116,7 +119,12 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             canvasNode->ResetSurface(scaleW_, scaleH_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
+            CHKPF(surfaceNode_);
+            surfaceNode_->ClearChildren();
+            canvasNode_.reset();
+            surfaceNode_.reset();
         } else if (isRotate_) {
+            isRotate_ = false;
             return true;
         }
         return false;
@@ -191,7 +199,7 @@ void KnuckleDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> touchEv
 }
 
 void KnuckleDrawingManager::RotationCanvasNode(
-    std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, DisplayInfo displayInfo)
+    std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvasNode);
@@ -215,11 +223,6 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
-            isRotate_ = false;
-            RotationCanvasNode(canvasNode_, displayInfo_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
-        }
         MMI_HILOGD("surfaceNode_ is already exist");
         return;
     }
@@ -241,14 +244,15 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 #endif // USE_ROSEN_DRAWING
 
     screenId_ = static_cast<uint64_t>(displayId);
-    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->SetRotation(0);
-
     CreateCanvasNode();
     surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
+    if (displayInfo_.displayMode == DisplayMode::MAIN) {
+        screenId_ = FOLD_SCREEN_MAIN_ID;
+    }
+    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
-        isRotate_ = false;
+    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != 1) {
         RotationCanvasNode(canvasNode_, displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
@@ -341,6 +345,12 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         pointerInfos_.clear();
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
         canvasNode->ResetSurface(scaleW_, scaleH_);
+        canvasNode_->FinishRecording();
+        CHKPR(surfaceNode_, RET_ERR);
+        surfaceNode_->ClearChildren();
+        canvasNode_.reset();
+        surfaceNode_.reset();
+        return RET_OK;
     }
     path_.Reset();
     canvasNode_->FinishRecording();
