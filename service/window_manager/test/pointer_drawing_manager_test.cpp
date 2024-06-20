@@ -1854,5 +1854,25 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001
     pointerDrawingManager.lastPhysicalX_ = -1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetTargetDevice_001
+ * @tc.desc: Test SetTargetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetTargetDevice_001, TestSize.Level1)
+{
+    #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CALL_TEST_DEBUG;
+    uint32_t devId = 0;
+    hardwareCursorPointerManager_->devId_ = 0;
+    hardwareCursorPointerManager_->SetTargetDevice(devId);
+    ASSERT_FALSE(hardwareCursorPointerManager_->isEnableState_);
+    devId = 10;
+    hardwareCursorPointerManager_->SetTargetDevice(devId);
+    ASSERT_FALSE(hardwareCursorPointerManager_->isEnableState_);
+    #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+}
 } // namespace MMI
 } // namespace OHOS
