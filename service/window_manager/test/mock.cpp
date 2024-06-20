@@ -292,7 +292,7 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 }
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
-void InitPointerObserver()
+void PointerDrawingManager::InitPointerObserver()
 {}
 
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
