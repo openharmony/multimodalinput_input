@@ -648,7 +648,6 @@ HWTEST_F(EventResampleTest, EventResampleTest_UpdatePointerEvent_001, TestSize.L
     ASSERT_NO_FATAL_FAILURE(EventResampleHdr->UpdatePointerEvent(&outEvent));
     outEvent.pointerAction = PointerEvent::POINTER_ACTION_DOWN;
     ASSERT_NO_FATAL_FAILURE(EventResampleHdr->UpdatePointerEvent(&outEvent));
-
 }
 
 /**
@@ -858,7 +857,8 @@ HWTEST_F(EventResampleTest, EventResampleTest_ResampleCoordinates_001, TestSize.
     ts.historyCurrent = 3;
     ts.historySize = 4;
     EventResampleHdr->touchStates_.push_back(ts);
-    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleCoordinates(sampleTime, &event, touchState, &current, &other, alpha));
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleCoordinates(sampleTime, &event, touchState, &current,
+        &other, alpha));
 }
 
 /**
@@ -888,7 +888,8 @@ HWTEST_F(EventResampleTest, EventResampleTest_ResampleCoordinates_002, TestSize.
     ts.historyCurrent = 7;
     ts.historySize = 5;
     EventResampleHdr->touchStates_.push_back(ts);
-    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleCoordinates(sampleTime, &event, touchState, &current, &other, alpha));
+    ASSERT_NO_FATAL_FAILURE(EventResampleHdr->ResampleCoordinates(sampleTime, &event, touchState, &current,
+        &other, alpha));
 }
 
 /**
