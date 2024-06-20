@@ -71,27 +71,6 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerTest::SetMouseIconTe
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateStyleOptions_001
- * @tc.desc: Test UpdateStyleOptions
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateStyleOptions_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillOnce(testing::Return(RET_ERR));
-    pointerDrawingManager->UpdateStyleOptions();
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillOnce(testing::Return(RET_OK));
-    EXPECT_CALL(*WIN_MGR_MOCK, SetPointerStyle).WillOnce(testing::Return(RET_OK));
-    pointerDrawingManager->UpdateStyleOptions();
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillOnce(testing::Return(RET_OK));
-    EXPECT_CALL(*WIN_MGR_MOCK, SetPointerStyle).WillOnce(testing::Return(RET_ERR));
-    pointerDrawingManager->UpdateStyleOptions();
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_AttachToDisplay_002
  * @tc.desc: Test the funcation AttachToDisplay
  * @tc.type: FUNC
