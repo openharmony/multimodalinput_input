@@ -405,4 +405,34 @@ int libinput_get_funckey_state(struct libinput_device *device, unsigned int code
 {
     return 0;
 }
+
+uint32_t libinput_event_pointer_get_finger_count(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerEventGetFingerCount(event);
+}
+
+double libinput_event_pointer_get_dx_unaccelerated(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetDxUnaccelerated(event);
+}
+
+double libinput_event_pointer_get_dy_unaccelerated(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetDyUnaccelerated(event);
+}
+
+uint32_t libinput_event_pointer_get_button(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetButton(event);
+}
+
+int libinput_event_pointer_has_axis(struct libinput_event_pointer *event, enum libinput_pointer_axis axis)
+{
+    return g_instance->PointerHasAxis(event, axis);
+}
+
+double libinput_event_pointer_get_axis_value(struct libinput_event_pointer *event, enum libinput_pointer_axis axis)
+{
+    return g_instance->PointerGetAxisValue(event, axis);
+}
 } // extern "C"
