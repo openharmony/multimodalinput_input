@@ -225,7 +225,6 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
-    void InitPointerListener();
 
 private:
     int32_t CheckPidPermission(int32_t pid);
