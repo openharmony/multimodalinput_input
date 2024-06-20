@@ -254,7 +254,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     CHKPP(device);
     aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
         std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction() +
-        ", eventId: " + std::to_string(pointerEvent_->GetId()));
+        ", eventId: " + std::to_string(pointerEvent_->GetId()), std::to_string(pointerEvent_->GetId()));
 
     return pointerEvent_;
 }
