@@ -1342,7 +1342,6 @@ bool KeyCommandHandler::MatchShortcutKeys(std::shared_ptr<KeyEvent> keyEvent)
         }
         GetKeyDownDurationFromXml(shortcutKey);
         shortcutKey.Print();
-        InputHandler->shortcut_.MarkShortcutConsumed(shortcutKey);
 
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             if (HandleKeyDown(shortcutKey)) {
@@ -1364,6 +1363,7 @@ bool KeyCommandHandler::MatchShortcutKeys(std::shared_ptr<KeyEvent> keyEvent)
             });
         ShortcutKey tmpShorteKey = upAbilities.front();
         MMI_HILOGI("Start launch ability immediately");
+        InputHandler->shortcut_.MarkShortcutConsumed(tmpShorteKey);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, tmpShorteKey.ability.bundleName);
         LaunchAbility(tmpShorteKey);
         BytraceAdapter::StopLaunchAbility();
@@ -1620,6 +1620,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        InputHandler->shortcut_.MarkShortcutConsumed(shortcutKey);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();
@@ -1627,6 +1628,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
         MMI_HILOGI("Timer callback");
+        InputHandler->shortcut_.MarkShortcutConsumed(shortcutKey);
         currentLaunchAbilityKey_ = shortcutKey;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
