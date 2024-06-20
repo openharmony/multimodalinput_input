@@ -923,7 +923,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_006, TestSize.Level1)
 HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetBoolValue(_,_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, GetBoolValue(_, _)).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, GetMouseDisplayState()).WillOnce(Return(false));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
@@ -961,7 +961,7 @@ HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_007, TestSize.Level1)
 HWTEST_F(InputWindowsManagerTest, UpdateMouseTarget_008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetBoolValue(_,_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, GetBoolValue(_, _)).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
     EXPECT_CALL(*messageParcelMock_, GetMouseDisplayState()).WillOnce(Return(true));
     std::shared_ptr<InputWindowsManager> inputWindowsManager =

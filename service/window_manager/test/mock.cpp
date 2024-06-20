@@ -283,7 +283,6 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {
-    // return false;
     return DfsMessageParcel::messageParcel->GetMouseDisplayState();
 }
 int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId,
