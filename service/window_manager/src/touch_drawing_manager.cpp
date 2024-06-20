@@ -67,7 +67,7 @@ constexpr float INNER_CIRCLE_TRANSPARENCY { 0.6f };
 constexpr float OUT_CIRCLE_TRANSPARENCY { 0.1f };
 const std::string showCursorSwitchName { "settings.input.show_touch_hint" };
 const std::string pointerPositionSwitchName { "settings.developer.show_touch_track" };
-const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
 const std::string PRODUCT_PHONE { "phone" };
 } // namespace
 
@@ -220,7 +220,7 @@ void TouchDrawingManager::UpdateBubbleData()
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0) {
+    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != 1) {
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
@@ -353,7 +353,7 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
 void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction direction)
 {
     CHKPV(canvas);
-    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0) {
+    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != 1) {
         if (direction == Direction::DIRECTION90) {
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);

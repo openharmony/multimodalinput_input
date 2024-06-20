@@ -27,6 +27,7 @@
 #include "recording/recording_canvas.h"
 #include "ui/rs_canvas_drawing_node.h"
 #endif // USE_ROSEN_DRAWING
+#include "parameters.h"
 #include "render/rs_pixel_map_util.h"
 
 #undef MMI_LOG_TAG
@@ -60,6 +61,8 @@ constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
 constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t IN_DRAWING_TIME { 23000 };
+constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
+int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -158,7 +161,12 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             canvasNode->ResetSurface(scaleW_, scaleH_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
+            CHKPF(surfaceNode_);
+            surfaceNode_->ClearChildren();
+            canvasNode_.reset();
+            surfaceNode_.reset();
         } else if (isRotate_) {
+            isRotate_ = false;
             return true;
         }
         return false;
@@ -243,6 +251,10 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
     canvasNode->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
+    CHKPV(surfaceNode_);
+    surfaceNode_->ClearChildren();
+    canvasNode_.reset();
+    surfaceNode_.reset();
     isDrawing_ = true;
 }
 
@@ -372,12 +384,6 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
-            CHKPV(knuckleDrawMgr_);
-            isRotate_ = false;
-            knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
-        }
         MMI_HILOGD("surfaceNode_ is already exist");
         return;
     }
@@ -398,16 +404,18 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
 #endif // USE_ROSEN_DRAWING
 
     screenId_ = static_cast<uint64_t>(displayId);
-    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->SetRotation(0);
 
     CreateCanvasNode();
     surfaceNode_->AddChild(canvasNode_, DEFAULT_VALUE);
+    if (displayInfo_.displayMode == DisplayMode::MAIN) {
+        screenId_ = FOLD_SCREEN_MAIN_ID;
+    }
+    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (isRotate_ && displayInfo_.displayDirection == DIRECTION0) {
+    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != 1) {
         CHKPV(knuckleDrawMgr_);
-        isRotate_ = false;
-        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
+        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, &displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
     canvasNode->ResetSurface(scaleW_, scaleH_);
