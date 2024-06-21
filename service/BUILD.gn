@@ -978,7 +978,11 @@ ohos_unittest("InputWindowsManagerTest") {
 ohos_unittest("InputWindowsManagerEXTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "window_manager/test" ]
+  include_dirs = [
+    "window_manager/test",
+    "${mmi_path}/libudev/include",
+    "${mmi_path}/test/facility/libinput_interface/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -997,7 +1001,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
   ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]

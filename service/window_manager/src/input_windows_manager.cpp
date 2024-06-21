@@ -3183,7 +3183,7 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
                 pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
         }
         case WindowInputType::ANTI_MISTAKE_TOUCH:
-            return true;
+            return false;
         case WindowInputType::TRANSMIT_AXIS_MOVE:
             return false;
         case WindowInputType::TRANSMIT_MOUSE_MOVE:
@@ -3193,14 +3193,8 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
         case WindowInputType::TRANSMIT_BUTTOM:
             return false;
         case WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE:
-            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
-                return true;
-            }
             return false;
         case WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE:
-            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
-                return true;
-            }
             return false;
         default:
             return false;
@@ -3286,6 +3280,19 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
     }
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
+{
+    Coordinate2D matrix;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        return;
+    }
+    ReverseRotateScreen(displayGroupInfo_.displaysInfo[0], x, y, matrix);
+    x = static_cast<int32_t>(matrix.x);
+    y = static_cast<int32_t>(matrix.y);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
 {

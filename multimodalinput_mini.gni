@@ -349,10 +349,6 @@ if (input_ext_feature_anco) {
   libmmi_client_sources +=
       [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
 
-  if (input_feature_product != "pc") {
-    input_default_defines += [ "OHOS_BUILD_ENABLE_INFRARED_EMITTER" ]
-  }
-
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
     "${mmi_ext_path}/anco_uds_manager/src/input_windows_manager_ext.cpp",

@@ -1311,7 +1311,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::TRANSMIT_ALL;
-    ASSERT_TRUE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
+    ASSERT_FALSE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
 }
 
 /**
@@ -1329,7 +1329,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
-    ASSERT_TRUE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
+    ASSERT_FALSE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
 }
 
 /**
@@ -1804,7 +1804,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 {
     WIN_MGR->SetAntiMisTake(true);
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_TRUE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
+    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
 }
 
 /**
