@@ -317,7 +317,6 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
-    MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RENDER_SERVICE);
     DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
