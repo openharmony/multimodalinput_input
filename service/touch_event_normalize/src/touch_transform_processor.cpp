@@ -237,8 +237,8 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     CHKPP(device);
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
     aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
-        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
-        std::to_string(pointerEvent_->GetId()));
+        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction() +
+        ", eventId: " + std::to_string(pointerEvent_->GetId()), std::to_string(pointerEvent_->GetId()));
 
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);
