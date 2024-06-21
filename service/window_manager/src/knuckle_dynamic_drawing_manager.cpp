@@ -63,6 +63,7 @@ constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t IN_DRAWING_TIME { 23000 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
 int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
+constexpr int32_t SCREEN_ROTATE { 1 };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -100,9 +101,6 @@ void KnuckleDynamicDrawingManager::InitPointerPathPaint()
     CHKPV(pixelMap_);
     if (glowTraceSystem_ == nullptr) {
         glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap_, MAX_DIVERGENCE_NUM);
-    }
-    if (knuckleDrawMgr_ == nullptr) {
-        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
     }
     pointerPathPaint_.setStyle(SkPaint::Style::kStroke_Style);
     pointerPathPaint_.setStrokeJoin(SkPaint::Join::kRound_Join);
@@ -413,9 +411,8 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != 1) {
-        CHKPV(knuckleDrawMgr_);
-        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, &displayInfo_);
+    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != SCREEN_ROTATE) {
+        KnuckleDrawingManager::RotationCanvasNode(canvasNode_, displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
     canvasNode->ResetSurface(scaleW_, scaleH_);

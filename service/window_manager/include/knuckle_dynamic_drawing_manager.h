@@ -64,7 +64,6 @@ private:
     int32_t pointCounter_ { 0 };
     bool isDrawing_ { true };
     std::shared_ptr<KnuckleGlowTraceSystem> glowTraceSystem_ { nullptr };
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     Rosen::Drawing::Path pointerPath_;
     SkPaint pointerPathPaint_;
     int64_t lastUpdateTimeMillis_ { 0 };
