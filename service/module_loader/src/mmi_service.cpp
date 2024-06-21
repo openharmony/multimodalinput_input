@@ -317,6 +317,7 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
+    AddSystemAbilityListener(RENDER_SERVICE);
     DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER && OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -364,6 +365,7 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
+    RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
@@ -1321,6 +1323,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
         MMI_HILOGD("Common event service started");
+    }
+    if (systemAbilityId == RENDER_SERVICE) {
+        MMI_HILOGI("Init render service state observer start");
+        IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
 }
 

@@ -334,6 +334,8 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 }
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
+void PointerDrawingManager::InitPointerCallback()
+{}
 void PointerDrawingManager::InitPointerObserver()
 {}
 
