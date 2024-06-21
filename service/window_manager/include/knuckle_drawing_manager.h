@@ -39,6 +39,7 @@ public:
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
     static void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, const DisplayInfo& displayInfo);
+    static bool CheckRotatePolicy(const DisplayInfo& displayInfo);
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);

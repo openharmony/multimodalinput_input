@@ -62,8 +62,6 @@ constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t IN_DRAWING_TIME { 23000 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
-int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
-constexpr int32_t SCREEN_ROTATE { 1 };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -165,7 +163,9 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             surfaceNode_.reset();
         } else if (isRotate_) {
             isRotate_ = false;
-            return true;
+            if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+                return true;
+            }
         }
         return false;
     }
@@ -411,7 +411,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != SCREEN_ROTATE) {
+    if (KnuckleDrawingManager::CheckRotatePolicy(displayInfo_)) {
         KnuckleDrawingManager::RotationCanvasNode(canvasNode_, displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());

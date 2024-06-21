@@ -434,6 +434,8 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
 
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
     PointerInfo pointerInfo;
     pointerInfo.x = 100;
     pointerInfo.y = 100;

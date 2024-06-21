@@ -55,8 +55,14 @@ constexpr int32_t ROTATION_ANGLE_90 { 90 };
 constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
-int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", -1);
+const std::string FOLDABLE = system::GetParameter("const.window.foldabledevice.rotate_policy", "unknown");
+constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t SCREEN_ROTATE { 1 };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
+constexpr char FOLDABLE_ROTATE  { '1' };
+constexpr int32_t SUBSCRIPT_TWO { 2 };
+constexpr int32_t SUBSCRIPT_ZERO { 0 };
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -76,7 +82,6 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     displayInfo_.width = 0;
     displayInfo_.height = 0;
     displayInfo_.direction = Direction::DIRECTION0;
-    displayInfo_.displayDirection = Direction::DIRECTION0;
 }
 
 void KnuckleDrawingManager::KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent)
@@ -126,7 +131,9 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             surfaceNode_.reset();
         } else if (isRotate_) {
             isRotate_ = false;
-            return true;
+            if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
+                return true;
+            }
         }
         return false;
     }
@@ -220,6 +227,31 @@ void KnuckleDrawingManager::RotationCanvasNode(
     canvasNode->SetTranslateY(0);
 }
 
+bool KnuckleDrawingManager::CheckRotatePolicy(const DisplayInfo& displayInfo)
+{
+    CALL_DEBUG_ENTER;
+    bool isNeedRotate = false;
+    switch (ROTATE_POLICY) {
+        case WINDOW_ROTATE:
+            break;
+        case SCREEN_ROTATE:
+            isNeedRotate = true;
+            break;
+        case FOLDABLE_DEVICE: {
+            MMI_HILOGI("FOLDABLE:%{public}s", FOLDABLE.c_str());
+            if ((displayInfo.displayMode == DisplayMode::MAIN && FOLDABLE[SUBSCRIPT_ZERO] == FOLDABLE_ROTATE) ||
+                (displayInfo.displayMode == DisplayMode::FULL && FOLDABLE[SUBSCRIPT_TWO] == FOLDABLE_ROTATE)) {
+                isNeedRotate = true;
+            }
+            break;
+        }
+        default:
+            MMI_HILOGE("ROTATE_POLICY:%{public}d", ROTATE_POLICY);
+            break;
+    }
+    return isNeedRotate;
+}
+
 void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
@@ -253,7 +285,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != SCREEN_ROTATE) {
+    if (CheckRotatePolicy(displayInfo_)) {
         RotationCanvasNode(canvasNode_, displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
