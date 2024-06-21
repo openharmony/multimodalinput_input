@@ -581,8 +581,8 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
         if !mode {
             deltax = (dx * gain + COMPENSATE_VALUEX).trunc();
             deltay = (dy * gain + COMPENSATE_VALUEY).trunc();
-            COMPENSATE_VALUEX += (dx * gain + COMPENSATE_VALUEX).fract();
-            COMPENSATE_VALUEY += (dy * gain + COMPENSATE_VALUEX).fract();
+            COMPENSATE_VALUEX += deltax.fract();
+            COMPENSATE_VALUEY += deltay.fract();
             if (COMPENSATE_VALUEX).abs() >= 1.0 {
                 COMPENSATE_VALUEX = COMPENSATE_VALUEX - (COMPENSATE_VALUEX).trunc(); // 更新 compensate_value 值
             }
