@@ -23,6 +23,7 @@
 #include "draw/canvas.h"
 #include "include/core/SkPath.h"
 #include "include/core/SkPaint.h"
+#include "knuckle_drawing_manager.h"
 #include "knuckle_glow_trace_system.h"
 #include "pointer_event.h"
 #include "window_info.h"
