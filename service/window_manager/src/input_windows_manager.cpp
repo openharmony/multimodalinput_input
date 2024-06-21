@@ -971,7 +971,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     }
 }
 
-void InputWindowsManager::DispatchPointer(int32_t pointerAction)
+void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowId)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
@@ -993,7 +993,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
         MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
         return;
     }
-    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW && windowId <= 0) {
         std::optional<WindowInfo> windowInfo;
         int32_t eventAction = lastPointerEvent_->GetPointerAction();
         bool checkFlag = (eventAction == PointerEvent::POINTER_ACTION_MOVE &&
@@ -1078,7 +1078,7 @@ void InputWindowsManager::NotifyPointerToWindow()
         }
     }
     lastWindowInfo_ = *windowInfo;
-    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -1985,7 +1985,7 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         lastLogicY_ = logicalY;
         lastPointerEvent_ = pointerEvent;
         lastWindowInfo_ = touchWindow;
-        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         return;
     }
     lastLogicX_ = logicalX;
@@ -2497,7 +2497,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
-            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+            if (touchWindow->id != lastWindowInfo_.id) {
+                lastWindowInfo_ = *touchWindow;
+            }
+            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         }
         PointerStyle pointerStyle;
         int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
