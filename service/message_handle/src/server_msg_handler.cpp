@@ -377,7 +377,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         return false;
     }
     if (pointerEvent->GetTargetWindowId() > 0) {
-        PointerEvent->RemovePointerItem(pointerId);
+        pointerEvent->RemovePointerItem(pointerId);
         pointerId = pointerId % DEFAULT_POINTER_ID;
         pointerItem.SetPointerId(pointerId);
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
