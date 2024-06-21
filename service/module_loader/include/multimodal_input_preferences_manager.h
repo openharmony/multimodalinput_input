@@ -57,7 +57,7 @@ private:
     bool touchpadPinchSwitch_ { true };
     bool touchpadSwipeSwitch_ { true };
     bool hoverScrollState_ { true };
-    bool touchpadThreeFingerTapSwitch_ {false}
+    bool touchpadThreeFingerTapSwitch_ {false};
     int32_t pointerColor_ { -1 };
     int32_t pointerSize_ { 1 };
     int32_t pointerStyle_ { 0 };
