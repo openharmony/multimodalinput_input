@@ -56,6 +56,7 @@ constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
 int32_t PRODUCT_TYPE = system::GetIntParameter("const.window.device.rotate_policy", -1);
+constexpr int32_t SCREEN_ROTATE { 1 };
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -252,7 +253,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != 1) {
+    if (displayInfo_.displayDirection == DIRECTION0 && PRODUCT_TYPE != SCREEN_ROTATE) {
         RotationCanvasNode(canvasNode_, displayInfo_);
     }
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
