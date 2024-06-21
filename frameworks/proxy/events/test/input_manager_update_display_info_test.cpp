@@ -70,10 +70,11 @@ std::shared_ptr<OHOS::Media::PixelMap> InputManagerUpdateDisplayInfoTest::Matrix
     uint32_t *data = new (std::nothrow) uint32_t[length];
     CHKPP(data);
     for (uint32_t i = 0; i < maskHeight; i++) {
-        if (windowMask[i].size() != maskWidth) {
+        int32_t maskRowWidth = windowMask[i].size();
+        if (maskRowWidth != maskWidth) {
             MMI_HILOGE(
                 "Filed to create a pixelMap, err row:%{public}d curSize %{public}d not equal frist row size:%{public}d",
-                i, windowMask[i].size(), maskWidth);
+                i, maskRowWidth, maskWidth);
             return nullptr;
         }
         for (uint32_t j = 0; j < maskWidth; j++) {
