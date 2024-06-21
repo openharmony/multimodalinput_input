@@ -217,6 +217,25 @@ void TouchDrawingManager::UpdateBubbleData()
     }
 }
 
+void TouchDrawingManager::StopRecord()
+{
+    if (!lastPointerItem_.empty() && isChangedRotation_ && !stopRecord_) {
+        stopMaxPointerCount_ = maxPointerCount_;
+    }
+    if (!lastPointerItem_.empty() && isChangedRotation_) {
+        MMI_HILOGE("lastPointerItem_ is not empty");
+        DrawRotationLabels();
+        stopRecord_ = true;
+        CHKPV(crosshairCanvasNode_);
+        auto canvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scaleW_, scaleH_));
+        canvas->Clear();
+        crosshairCanvasNode_->FinishRecording();
+    }
+    if (!stopRecord_) {
+        UpdateLabels();
+    }
+}
+
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
@@ -224,13 +243,13 @@ void TouchDrawingManager::RotationScreen()
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
-            UpdateLabels();
         }
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    StopRecord();
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::CreateObserver()
@@ -461,6 +480,10 @@ void TouchDrawingManager::DrawPointerPositionHandler()
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
     UpdatePointerPosition();
+    if (stopRecord_) {
+        return;
+    }
+
     ClearTracker();
     RecordLabelsInfo();
     CHKPV(crosshairCanvasNode_);
@@ -483,6 +506,39 @@ void TouchDrawingManager::DrawPointerPositionHandler()
     }
     DrawLabels();
     crosshairCanvasNode_->FinishRecording();
+}
+
+void TouchDrawingManager::DrawRotationLabels()
+{
+    CHKPV(labelsCanvasNode_);
+    std::string viewP = "P: 0 / " + std::to_string(stopMaxPointerCount_);
+    auto dx = currentPt_.GetX() - firstPt_.GetX();
+    auto dy = currentPt_.GetY() - firstPt_.GetY();
+    std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
+    std::string viewDy = "dY: " + FormatNumber(dy, ONE_PRECISION);
+    std::string viewXv = "Xv: " + FormatNumber(xVelocity_, THREE_PRECISION);
+    std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
+    std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
+    Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
+    auto canvas = static_cast<RosenCanvas *>(labelsCanvasNode_->BeginRecording(scaleW_, scaleH_));
+    CHKPV(canvas);
+    Rosen::Drawing::Rect rect;
+    rect.top_ = rectTopPosition_;
+    rect.bottom_ = rectTopPosition_ + RECT_HEIGHT;
+    rect.left_ = 0;
+    rect.right_ = itemRectW_ + rect.left_;
+    RotationCanvas(canvas, displayInfo_.direction);
+
+    DrawRectItem(canvas, viewP, rect, color);
+    color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+    DrawRectItem(canvas, viewDx, rect, color);
+    color = std::abs(dy) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+    DrawRectItem(canvas, viewDy, rect, color);
+    DrawRectItem(canvas, viewXv, rect, LABELS_DEFAULT_COLOR);
+    DrawRectItem(canvas, viewYv, rect, LABELS_DEFAULT_COLOR);
+    color = isFirstDraw_ ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+    DrawRectItem(canvas, viewPrs, rect, color);
+    labelsCanvasNode_->FinishRecording();
 }
 
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
@@ -619,6 +675,7 @@ void TouchDrawingManager::UpdatePointerPosition()
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
         if (lastPointerItem_.empty()) {
             ClearLabels();
+            stopRecord_ = false;
         }
         maxPointerCount_ = ++currentPointerCount_;
     } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
@@ -684,6 +741,7 @@ void TouchDrawingManager::ClearLabels()
     isFirstDownAction_ = true;
     isDownAction_ = true;
     maxPointerCount_ = 0;
+    stopMaxPointerCount_ = 0;
     currentPointerCount_ = 0;
     currentPointerId_ = 0;
     xVelocity_ = 0.0;
