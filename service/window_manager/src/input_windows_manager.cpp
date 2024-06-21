@@ -3183,7 +3183,7 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
                 pointerAction == PointerEvent::POINTER_ACTION_PULL_MOVE);
         }
         case WindowInputType::ANTI_MISTAKE_TOUCH:
-            return true;
+            return false;
         case WindowInputType::TRANSMIT_AXIS_MOVE:
             return false;
         case WindowInputType::TRANSMIT_MOUSE_MOVE:
@@ -3193,14 +3193,8 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
         case WindowInputType::TRANSMIT_BUTTOM:
             return false;
         case WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE:
-            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
-                return true;
-            }
             return false;
         case WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE:
-            if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && toolType == PointerEvent::TOOL_TYPE_PEN) {
-                return true;
-            }
             return false;
         default:
             return false;

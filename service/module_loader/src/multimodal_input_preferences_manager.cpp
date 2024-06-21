@@ -89,25 +89,25 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     std::shared_ptr<NativePreferences::Preferences> touchpadPref =
         NativePreferences::PreferencesHelper::GetPreferences(PATH + TOUCHPAD_FILE_NAME, errCode);
     CHKPR(touchpadPref, errno);
-    g_pointerSize = mousePref->GetInt(pointerSize, POINTER_SIZE);
-    g_pointerSpeed = mousePref->GetInt(pointerSpeed, POINTER_SPEED);
-    g_pointerColor = mousePref->GetInt(pointerColor, POINTER_COLOR);
-    g_pointerStyle = mousePref->GetInt(pointerStyle, POINTER_STYLE);
-    g_mouseScrollRows = mousePref->GetInt(mouseScrollRows, MOUSE_SCROLL_ROWS);
-    g_hoverScrollState = mousePref->GetBool(hoverScrollState, BOOL_DEFAULT);
-    g_mousePrimaryButton = mousePref->GetInt(mousePrimaryButton, PRIMARY_BUTTON);
-    g_touchpadTapSwitch = touchpadPref->GetBool(touchpadTapSwitch, BOOL_DEFAULT);
-    g_keyboardRepeatRate = keyboardPref->GetInt(keyboardRepeatRate, KEYBOARD_REPEATRATE);
-    g_keyboardRepeatDelay = keyboardPref->GetInt(keyboardRepeatDelay, KEYBOARD_REPEATDELAY);
-    g_touchpadPinchSwitch = touchpadPref->GetBool(touchpadPinchSwitch, BOOL_DEFAULT);
-    g_touchpadSwipeSwitch = touchpadPref->GetBool(touchpadSwipeSwitch, BOOL_DEFAULT);
-    g_touchpadPointerSpeed = touchpadPref->GetInt(touchpadPointerSpeed, TOUCHPAD_POINTER_SPEED);
-    g_touchpadScrollSwitch = touchpadPref->GetBool(touchpadScrollSwitch, BOOL_DEFAULT);
-    g_touchpadRightClickType = touchpadPref->GetInt(touchpadRightClickType, RIGHT_CLICK_TYPE);
-    g_touchpadScrollDirection = touchpadPref->GetBool(touchpadScrollDirection, BOOL_DEFAULT);
+    pointerSize_ = mousePref->GetInt(strPointerSize_, POINTER_SIZE);
+    pointerSpeed_ = mousePref->GetInt(strPointerSpeed_, POINTER_SPEED);
+    pointerColor_ = mousePref->GetInt(strPointerColor_, POINTER_COLOR);
+    pointerStyle_ = mousePref->GetInt(strPointerStyle_, POINTER_STYLE);
+    mouseScrollRows_ = mousePref->GetInt(strMouseScrollRows_, MOUSE_SCROLL_ROWS);
+    hoverScrollState_ = mousePref->GetBool(strHoverScrollState_, BOOL_DEFAULT);
+    mousePrimaryButton_ = mousePref->GetInt(strMousePrimaryButton_, PRIMARY_BUTTON);
+    touchpadTapSwitch_ = touchpadPref->GetBool(strTouchpadTapSwitch_, BOOL_DEFAULT);
+    keyboardRepeatRate_ = keyboardPref->GetInt(strKeyboardRepeatRate_, KEYBOARD_REPEATRATE);
+    keyboardRepeatDelay_ = keyboardPref->GetInt(strKeyboardRepeatDelay_, KEYBOARD_REPEATDELAY);
+    touchpadPinchSwitch_ = touchpadPref->GetBool(strTouchpadPinchSwitch_, BOOL_DEFAULT);
+    touchpadSwipeSwitch_ = touchpadPref->GetBool(strTouchpadSwipeSwitch_, BOOL_DEFAULT);
+    touchpadPointerSpeed_ = touchpadPref->GetInt(strTouchpadPointerSpeed_, TOUCHPAD_POINTER_SPEED);
+    touchpadScrollSwitch_ = touchpadPref->GetBool(strTouchpadScrollSwitch_, BOOL_DEFAULT);
+    touchpadRightClickType_ = touchpadPref->GetInt(strTouchpadRightClickType_, RIGHT_CLICK_TYPE);
+    touchpadScrollDirection_ = touchpadPref->GetBool(strTouchpadScrollDirection_, BOOL_DEFAULT);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    g_magicPointerSize = mousePref->GetInt(magicPointerSize, MAGIC_POINTER_SIZE);
-    g_magicPointerColor = mousePref->GetInt(magicPointerColor, POINTER_COLOR);
+    magicPointerSize_ = mousePref->GetInt(strMagicPointerSize_, MAGIC_POINTER_SIZE);
+    magicPointerColor_ = mousePref->GetInt(strMagicPointerColor_, POINTER_COLOR);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(PATH + MOUSE_FILE_NAME);
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(PATH + KEYBOARD_FILE_NAME);
@@ -117,33 +117,33 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
 
 int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
 {
-    preferencesMap[pointerSize] = {MOUSE_FILE_NAME, g_pointerSize};
-    preferencesMap[pointerSpeed] = {MOUSE_FILE_NAME, g_pointerSpeed};
-    preferencesMap[pointerColor] = {MOUSE_FILE_NAME, g_pointerColor};
-    preferencesMap[pointerStyle] = {MOUSE_FILE_NAME, g_pointerStyle};
-    preferencesMap[mouseScrollRows] = {MOUSE_FILE_NAME, g_mouseScrollRows};
-    preferencesMap[hoverScrollState] = {MOUSE_FILE_NAME, static_cast<int32_t>(g_hoverScrollState)};
-    preferencesMap[mousePrimaryButton] = {MOUSE_FILE_NAME, g_mousePrimaryButton};
-    preferencesMap[touchpadTapSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadTapSwitch)};
-    preferencesMap[keyboardRepeatRate] = {KEYBOARD_FILE_NAME, g_keyboardRepeatRate};
-    preferencesMap[keyboardRepeatDelay] = {KEYBOARD_FILE_NAME, g_keyboardRepeatDelay};
-    preferencesMap[touchpadPinchSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadPinchSwitch)};
-    preferencesMap[touchpadSwipeSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadSwipeSwitch)};
-    preferencesMap[touchpadPointerSpeed] = {TOUCHPAD_FILE_NAME, g_touchpadPointerSpeed};
-    preferencesMap[touchpadScrollSwitch] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadScrollSwitch)};
-    preferencesMap[touchpadRightClickType] = {TOUCHPAD_FILE_NAME, g_touchpadRightClickType};
-    preferencesMap[touchpadScrollDirection] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(g_touchpadScrollDirection)};
+    preferencesMap_[strPointerSize_] = {MOUSE_FILE_NAME, pointerSize_};
+    preferencesMap_[strPointerSpeed_] = {MOUSE_FILE_NAME, pointerSpeed_};
+    preferencesMap_[strPointerColor_] = {MOUSE_FILE_NAME, pointerColor_};
+    preferencesMap_[strPointerStyle_] = {MOUSE_FILE_NAME, pointerStyle_};
+    preferencesMap_[strMouseScrollRows_] = {MOUSE_FILE_NAME, mouseScrollRows_};
+    preferencesMap_[strHoverScrollState_] = {MOUSE_FILE_NAME, static_cast<int32_t>(hoverScrollState_)};
+    preferencesMap_[strMousePrimaryButton_] = {MOUSE_FILE_NAME, mousePrimaryButton_};
+    preferencesMap_[strTouchpadTapSwitch_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadTapSwitch_)};
+    preferencesMap_[strKeyboardRepeatRate_] = {KEYBOARD_FILE_NAME, keyboardRepeatRate_};
+    preferencesMap_[strKeyboardRepeatDelay_] = {KEYBOARD_FILE_NAME, keyboardRepeatDelay_};
+    preferencesMap_[strTouchpadPinchSwitch_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadPinchSwitch_)};
+    preferencesMap_[strTouchpadSwipeSwitch_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadSwipeSwitch_)};
+    preferencesMap_[strTouchpadPointerSpeed_] = {TOUCHPAD_FILE_NAME, touchpadPointerSpeed_};
+    preferencesMap_[strTouchpadScrollSwitch_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadScrollSwitch_)};
+    preferencesMap_[strTouchpadRightClickType_] = {TOUCHPAD_FILE_NAME, touchpadRightClickType_};
+    preferencesMap_[strTouchpadScrollDirection_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadScrollDirection_)};
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    preferencesMap[magicPointerSize] = {MOUSE_FILE_NAME, g_magicPointerSize};
-    preferencesMap[magicPointerColor] = {MOUSE_FILE_NAME, g_magicPointerColor};
+    preferencesMap_[strMagicPointerSize_] = {MOUSE_FILE_NAME, magicPointerSize_};
+    preferencesMap_[strMagicPointerColor_] = {MOUSE_FILE_NAME, magicPointerColor_};
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return RET_OK;
 }
 
 int32_t MultiModalInputPreferencesManager::GetIntValue(const std::string &key, int32_t defaultValue)
 {
-    auto iter = preferencesMap.find(key);
-    if (iter == preferencesMap.end()) {
+    auto iter = preferencesMap_.find(key);
+    if (iter == preferencesMap_.end()) {
         return defaultValue;
     }
     auto [fileName, value] = iter->second;
@@ -152,8 +152,8 @@ int32_t MultiModalInputPreferencesManager::GetIntValue(const std::string &key, i
 
 bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, bool defaultValue)
 {
-    auto iter = preferencesMap.find(key);
-    if (iter == preferencesMap.end()) {
+    auto iter = preferencesMap_.find(key);
+    if (iter == preferencesMap_.end()) {
         return defaultValue;
     }
     auto [fileName, value] = iter->second;
@@ -163,10 +163,10 @@ bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, boo
 int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, const std::string &setFile,
     int32_t setValue)
 {
-    auto iter = preferencesMap.find(key);
+    auto iter = preferencesMap_.find(key);
     std::string filePath = "";
-    if (iter == preferencesMap.end()) {
-        preferencesMap[key] = {setFile, setValue};
+    if (iter == preferencesMap_.end()) {
+        preferencesMap_[key] = {setFile, setValue};
         filePath = PATH + setFile;
     } else {
         auto [fileName, value] = iter->second;
@@ -175,7 +175,7 @@ int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, c
             return RET_OK;
         }
         filePath = PATH + fileName;
-        preferencesMap[key].second = setValue;
+        preferencesMap_[key].second = setValue;
     }
 
     int32_t errCode = RET_OK;
@@ -199,10 +199,10 @@ int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, c
 int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, const std::string &setFile,
     bool setValue)
 {
-    auto iter = preferencesMap.find(key);
+    auto iter = preferencesMap_.find(key);
     std::string filePath = "";
-    if (iter == preferencesMap.end()) {
-        preferencesMap[key] = {setFile, static_cast<int32_t>(setValue)};
+    if (iter == preferencesMap_.end()) {
+        preferencesMap_[key] = {setFile, static_cast<int32_t>(setValue)};
         filePath = PATH + setFile;
     } else {
         auto [fileName, value] = iter->second;
@@ -211,7 +211,7 @@ int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, 
             return RET_OK;
         }
         filePath = PATH + fileName;
-        preferencesMap[key].second = setValue;
+        preferencesMap_[key].second = setValue;
     }
 
     int32_t errCode = RET_OK;
@@ -235,27 +235,27 @@ int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, 
 int32_t MultiModalInputPreferencesManager::GetShortKeyDuration(const std::string &key)
 {
     int32_t errCode = RET_OK;
-    if (g_shortcutKeyMap.empty() || g_shortcutKeyMap.find(key) == g_shortcutKeyMap.end()) {
+    if (shortcutKeyMap_.empty() || shortcutKeyMap_.find(key) == shortcutKeyMap_.end()) {
         std::shared_ptr<NativePreferences::Preferences> pref =
             NativePreferences::PreferencesHelper::GetPreferences(PATH + SHORT_KEY_FILE_NAME, errCode);
         CHKPR(pref, errno);
         int32_t duration = pref->GetInt(key, ERROR_DELAY_VALUE);
         NativePreferences::PreferencesHelper::RemovePreferencesFromCache(PATH + SHORT_KEY_FILE_NAME);
-        g_shortcutKeyMap.emplace(key, duration);
+        shortcutKeyMap_.emplace(key, duration);
         return duration;
     }
-    return g_shortcutKeyMap[key];
+    return shortcutKeyMap_[key];
 }
 
 int32_t MultiModalInputPreferencesManager::SetShortKeyDuration(const std::string &key, int32_t setValue)
 {
-    auto iter = g_shortcutKeyMap.find(key);
-    if (iter != g_shortcutKeyMap.end() && iter->second == setValue) {
+    auto iter = shortcutKeyMap_.find(key);
+    if (iter != shortcutKeyMap_.end() && iter->second == setValue) {
         MMI_HILOGD("The set value is same");
         return RET_OK;
     }
 
-    g_shortcutKeyMap[key] = setValue;
+    shortcutKeyMap_[key] = setValue;
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
         NativePreferences::PreferencesHelper::GetPreferences(PATH + SHORT_KEY_FILE_NAME, errCode);

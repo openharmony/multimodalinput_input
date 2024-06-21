@@ -896,7 +896,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-    MMI_HILOGI("Action:%{public}d", pointerEvent->GetPointerAction());
+    MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
@@ -2098,34 +2098,19 @@ int32_t InputManagerImpl::CancelInjection()
 int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return MULTIMODAL_INPUT_CONNECT_MGR->HasIrEmitter(hasIrEmitter);
-#else
-    MMI_HILOGW("Infrared emitter device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 int32_t InputManagerImpl::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return MULTIMODAL_INPUT_CONNECT_MGR->GetInfraredFrequencies(requencys);
-#else
-    MMI_HILOGW("Infrared emitter device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
     CALL_INFO_TRACE;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     return MULTIMODAL_INPUT_CONNECT_MGR->TransmitInfrared(number, pattern);
-#else
-    MMI_HILOGW("Infrared emitter device does not support");
-    return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)

@@ -28,9 +28,11 @@
 #include "input_event_handler.h"
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"
+#include "libinput_interface.h"
 #include "mouse_event_normalize.h"
 #include "multimodal_input_preferences_manager.h"
 #include "pointer_drawing_manager.h"
+#include "scene_board_judgement.h"
 #include "setting_datashare.h"
 #include "timer_manager.h"
 #include "touch_drawing_manager.h"
@@ -42,28 +44,34 @@ class DfsMessageParcel {
 public:
     virtual ~DfsMessageParcel() = default;
 public:
+    virtual SessionPtr GetSession(int32_t fd) = 0;
     virtual int32_t GetClientFd(int32_t pid) = 0;
     virtual bool HasPointerDevice() = 0;
+    virtual bool GetMouseDisplayState() = 0;
+    virtual bool GetBoolValue(const std::string &key, bool defaultValue) = 0;
     virtual bool IsFoldable() = 0;
     virtual bool SendMsg(NetPacket &pkt) = 0;
-    virtual SessionPtr GetSession(int32_t fd) = 0;
     virtual Rosen::DMError RegisterFoldStatusListener(sptr<Rosen::DisplayManager::IFoldStatusListener> listener) = 0;
     virtual Rosen::DMError UnregisterFoldStatusListener(sptr<Rosen::DisplayManager::IFoldStatusListener> listener) = 0;
+    virtual bool IsSceneBoardEnabled() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
 };
 
 class MessageParcelMock : public DfsMessageParcel {
 public:
+    MOCK_METHOD1(GetSession, SessionPtr(int32_t fd));
     MOCK_METHOD1(GetClientFd, int32_t(int32_t pid));
     MOCK_METHOD0(HasPointerDevice, bool());
+    MOCK_METHOD0(GetMouseDisplayState, bool());
+    MOCK_METHOD2(GetBoolValue, bool(const std::string &key, bool defaultValue));
     MOCK_METHOD0(IsFoldable, bool());
     MOCK_METHOD1(SendMsg, bool(NetPacket &pkt));
-    MOCK_METHOD1(GetSession, SessionPtr(int32_t fd));
     MOCK_METHOD1(RegisterFoldStatusListener,
         Rosen::DMError(sptr<Rosen::DisplayManager::IFoldStatusListener> listener));
     MOCK_METHOD1(UnregisterFoldStatusListener,
         Rosen::DMError(sptr<Rosen::DisplayManager::IFoldStatusListener> listener));
+    MOCK_METHOD0(IsSceneBoardEnabled, bool());
 };
 } // namespace MMI
 } // namespace OHOS

@@ -1088,7 +1088,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
 
-    if (!specialKeys_.empty() && specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
+    if (specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
         HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
         return true;
     }
