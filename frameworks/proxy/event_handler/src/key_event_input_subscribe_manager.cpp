@@ -100,12 +100,12 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
 
+    std::lock_guard<std::mutex> guard(mtx_);
     auto [tIter, isOk] = subscribeInfos_.emplace(keyOption, callback);
     if (!isOk) {
         MMI_HILOGW("Subscription is duplicated");
@@ -169,7 +169,6 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);
     CHKPR(info, ERROR_NULL_POINTER);
@@ -186,6 +185,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;
@@ -204,6 +204,7 @@ const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscri
         MMI_HILOGE("Invalid input param id:%{public}d", id);
         return nullptr;
     }
+    std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == id) {
             return &subscriber;
