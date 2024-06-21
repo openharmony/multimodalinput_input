@@ -38,6 +38,7 @@
 #include "mmi_func_callback.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
+#include "touch_drawing_manager.h"
 #include "util_napi_error.h"
 #include "authorize_helper.h"
 
@@ -53,6 +54,7 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME = 5;
+constexpr int32_t DEFAULT_POINTER_ID = 10000;
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -163,7 +165,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
-    bool isNativeInject)
+    bool isNativeInject, bool isShell)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -187,10 +189,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
-    return OnInjectPointerEventExt(pointerEvent);
+    return OnInjectPointerEventExt(pointerEvent, isShell);
 }
 
-int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -202,10 +204,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction())) {
+            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+            TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
@@ -238,7 +241,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             break;
         }
     }
-    return SaveTargetWindowId(pointerEvent);
+    return SaveTargetWindowId(pointerEvent, isShell);
 }
 
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
@@ -325,8 +328,12 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
-int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        return RET_OK;
+    }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -337,25 +344,56 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
             return RET_ERR;
         }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
-        targetWindowIds_[pointerId] = targetWindowId;
+        if (isShell) {
+            shellTargetWindowIds_[pointerId] = targetWindowId;
+        } else {
+            nativeTargetWindowIds_[pointerId] = targetWindowId;
+        }
     }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
         int32_t pointerId = pointerEvent->GetPointerId();
-        targetWindowIds_.erase(pointerId);
+        if (isShell) {
+            shellTargetWindowIds_.erase(pointerId);
+        } else {
+            nativeTargetWindowIds_.erase(pointerId);
+        }
     }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
+bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
+    int32_t action, bool isShell)
 {
+    CHKPF(pointerEvent);
     int32_t targetWindowId = -1;
-    auto iter = targetWindowIds_.find(pointerEvent->GetPointerId());
-    if (iter != targetWindowIds_.end()) {
-        targetWindowId = iter->second;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        pointerEvent->RemovePointerItem(pointerId);
+        pointerId = pointerId % DEFAULT_POINTER_ID;
+        pointerItem.SetPointerId(pointerId);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        pointerEvent->SetPointerId(pointerId);
+        return true;
+    }
+    if (isShell) {
+        auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
+        if (iter != shellTargetWindowIds_.end()) {
+            targetWindowId = iter->second;
+        }
+    } else {
+        auto iter = nativeTargetWindowIds_.find(pointerEvent->GetPointerId());
+        if (iter != nativeTargetWindowIds_.end()) {
+            targetWindowId = iter->second;
+        }
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
@@ -366,12 +404,6 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     auto pointerIds = pointerEvent->GetPointerIds();
     if (pointerIds.empty()) {
         MMI_HILOGE("GetPointerIds is empty");
-        return false;
-    }
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
     }
     pointerEvent->SetTargetWindowId(targetWindowId);
@@ -688,7 +720,7 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         if (InjectionType_ == InjectionType::POINTEREVENT) {
-            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true);
+            OnInjectPointerEvent(pointerEvent_, CurrentPID_, true, false);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         return ERR_OK;

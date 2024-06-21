@@ -71,27 +71,6 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerTest::SetMouseIconTe
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateStyleOptions_001
- * @tc.desc: Test UpdateStyleOptions
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateStyleOptions_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillOnce(testing::Return(RET_ERR));
-    pointerDrawingManager->UpdateStyleOptions();
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillOnce(testing::Return(RET_OK));
-    EXPECT_CALL(*WIN_MGR_MOCK, SetPointerStyle).WillOnce(testing::Return(RET_OK));
-    pointerDrawingManager->UpdateStyleOptions();
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillOnce(testing::Return(RET_OK));
-    EXPECT_CALL(*WIN_MGR_MOCK, SetPointerStyle).WillOnce(testing::Return(RET_ERR));
-    pointerDrawingManager->UpdateStyleOptions();
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_AttachToDisplay_002
  * @tc.desc: Test the funcation AttachToDisplay
  * @tc.type: FUNC
@@ -1853,6 +1832,53 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
     pointerDrawingManager.lastPhysicalX_ = -1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+}
+/**
+ * @tc.name: InputWindowsManagerTest_InitPointerCallback_001
+ * @tc.desc: Test InitPointerCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerCallback());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetTargetDevice_001
+ * @tc.desc: Test SetTargetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetTargetDevice_001, TestSize.Level1)
+{
+    #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    CALL_TEST_DEBUG;
+    uint32_t devId = 0;
+    hardwareCursorPointerManager_->devId_ = 0;
+    hardwareCursorPointerManager_->SetTargetDevice(devId);
+    ASSERT_FALSE(hardwareCursorPointerManager_->isEnableState_);
+    devId = 10;
+    hardwareCursorPointerManager_->SetTargetDevice(devId);
+    ASSERT_FALSE(hardwareCursorPointerManager_->isEnableState_);
+    #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_InitPointerObserver_001
+ * @tc.desc: Test InitPointerObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
 }
 } // namespace MMI
 } // namespace OHOS

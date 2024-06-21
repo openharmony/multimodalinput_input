@@ -955,7 +955,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnSessionLost_001, Tes
     CALL_TEST_DEBUG;
     SessionPtr session = std::shared_ptr<UDSSession>();
     WIN_MGR->OnSessionLost(session);
-    DisplayGroupInfo actualInfo = WIN_MGR->GetDisplayGroupInfo();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetDisplayGroupInfo());
 }
 
 /**
@@ -1311,7 +1311,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::TRANSMIT_ALL;
-    ASSERT_TRUE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
+    ASSERT_FALSE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
 }
 
 /**
@@ -1329,7 +1329,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleWindowInputType_
     ASSERT_NE(pointerEvent, nullptr);
     WindowInfo window;
     window.windowInputType = WindowInputType::ANTI_MISTAKE_TOUCH;
-    ASSERT_TRUE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
+    ASSERT_FALSE(WIN_MGR->HandleWindowInputType(window, pointerEvent));
 }
 
 /**
@@ -1804,7 +1804,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SkipNavigationWindow_0
 {
     WIN_MGR->SetAntiMisTake(true);
     WIN_MGR->SetAntiMisTakeStatus(false);
-    ASSERT_TRUE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
+    ASSERT_FALSE(WIN_MGR->SkipNavigationWindow(WindowInputType::ANTI_MISTAKE_TOUCH, PointerEvent::TOOL_TYPE_PEN));
 }
 
 /**
@@ -1939,9 +1939,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchTouch_001, Tes
 {
     CALL_TEST_DEBUG;
     int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
-    WIN_MGR->DispatchTouch(pointerAction);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
     pointerAction = PointerEvent::POINTER_ACTION_DOWN;
-    WIN_MGR->DispatchTouch(pointerAction);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->DispatchTouch(pointerAction));
 }
 
 /**
@@ -2204,7 +2204,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetMouseInfo_001, Test
     expectedResult.displayId = 1;
     expectedResult.physicalX = 960;
     expectedResult.physicalY = 540;
-    result = WIN_MGR->GetMouseInfo();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetMouseInfo());
 }
 
 /**
@@ -2304,7 +2304,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ClearExtraData_001, Te
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetExtraData_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ExtraData actualData = WIN_MGR->GetExtraData();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->GetExtraData());
 }
 
 /**
@@ -2369,7 +2369,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_Dump_001, TestSize.Lev
     CALL_TEST_DEBUG;
     int32_t fd = 1;
     std::vector<std::string> args;
-    WIN_MGR->Dump(fd, args);
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->Dump(fd, args));
 }
 
 /**
@@ -2461,11 +2461,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetTargetWindowIds_001
     CALL_TEST_DEBUG;
     std::vector<int32_t> windowIds;
     int32_t pointerItemId = 1;
-    WIN_MGR->GetTargetWindowIds(pointerItemId, windowIds);
-    ASSERT_TRUE(windowIds.empty());
-    pointerItemId = -1;
-    WIN_MGR->GetTargetWindowIds(pointerItemId, windowIds);
-    ASSERT_TRUE(windowIds.empty());
+    int32_t windowId = 100;
+    int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    WIN_MGR->AddTargetWindowIds(pointerItemId, sourceType, windowId);
+    WIN_MGR->GetTargetWindowIds(pointerItemId, sourceType, windowIds);
+    ASSERT_TRUE(!windowIds.empty());
+    WIN_MGR->ClearTargetWindowId(pointerItemId);
 }
 
 /**
@@ -2480,9 +2481,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddTargetWindowIds_001
     InputWindowsManager manager;
     int32_t pointerItemId = 1;
     int32_t windowId = 100;
-    WIN_MGR->AddTargetWindowIds(pointerItemId, windowId);
-    ASSERT_FALSE(manager.targetWindowIds_.find(pointerItemId) != manager.targetWindowIds_.end());
-    ASSERT_EQ(manager.targetWindowIds_[pointerItemId].size(), 0);
+    int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    WIN_MGR->AddTargetWindowIds(pointerItemId, sourceType, windowId);
+    ASSERT_FALSE(manager.targetTouchWinIds_.find(pointerItemId) != manager.targetTouchWinIds_.end());
+    ASSERT_EQ(manager.targetTouchWinIds_[pointerItemId].size(), 0);
 }
 
 /**
@@ -2498,12 +2500,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AddTargetWindowIds_002
     int32_t pointerItemId = 2;
     int32_t windowId1 = 200;
     int32_t windowId2 = 201;
-    manager.targetWindowIds_[pointerItemId] = {windowId1};
-    WIN_MGR->AddTargetWindowIds(pointerItemId, windowId2);
-    ASSERT_TRUE(manager.targetWindowIds_.find(pointerItemId) != manager.targetWindowIds_.end());
-    ASSERT_EQ(manager.targetWindowIds_[pointerItemId].size(), 1);
-    ASSERT_EQ(manager.targetWindowIds_[pointerItemId][0], windowId1);
-    ASSERT_NE(manager.targetWindowIds_[pointerItemId][1], windowId2);
+    int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    manager.targetTouchWinIds_[pointerItemId] = {windowId1};
+    WIN_MGR->AddTargetWindowIds(pointerItemId, sourceType, windowId2);
+    ASSERT_TRUE(manager.targetTouchWinIds_.find(pointerItemId) != manager.targetTouchWinIds_.end());
+    ASSERT_EQ(manager.targetTouchWinIds_[pointerItemId].size(), 1);
+    ASSERT_EQ(manager.targetTouchWinIds_[pointerItemId][0], windowId1);
+    ASSERT_NE(manager.targetTouchWinIds_[pointerItemId][1], windowId2);
 }
 
 /**
@@ -3449,9 +3452,10 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetTargetWindowIds, Te
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsManager;
     int32_t pointerItemId = 1;
+    int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     std::vector<int32_t> windowIds { 1, 2, 3 };
-    inputWindowsManager.targetWindowIds_.insert(std::make_pair(pointerItemId, windowIds));
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetTargetWindowIds(pointerItemId, windowIds));
+    inputWindowsManager.targetTouchWinIds_.insert(std::make_pair(pointerItemId, windowIds));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
 }
 
 /**

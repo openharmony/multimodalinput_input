@@ -57,7 +57,10 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 {
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_HILOGE("Not found pid:%{public}d", pid);
+        if (pid_ != pid) {
+            pid_ = pid;
+            MMI_HILOGE("Not found pid:%{public}d", pid);
+        }
         return INVALID_FD;
     }
     return it->second;
@@ -345,7 +348,10 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
 {
     int32_t fd = GetClientFd(pid);
     if (fd <= 0) {
-        MMI_HILOGE("Session not found. pid:%{public}d", pid);
+        if (pid_ != pid) {
+            pid_ = pid;
+            MMI_HILOGE("Session not found. pid:%{public}d", pid);
+        }
         return nullptr;
     }
     return GetSession(fd);

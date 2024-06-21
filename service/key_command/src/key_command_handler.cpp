@@ -1088,7 +1088,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
 
-    if (!specialKeys_.empty() && specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
+    if (specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
         HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
         return true;
     }
@@ -1298,7 +1298,6 @@ void KeyCommandHandler::SendKeyEvent()
 bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(keyEvent);
     if (shortcutKeys_.empty()) {
         MMI_HILOGD("No shortkeys configuration data");
         return false;
@@ -1317,29 +1316,40 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
+
+    if (MatchShortcutKeys(keyEvent)) {
+        return true;
+    }
+    return HandleConsumedKeyEvent(keyEvent);
+}
+
+bool KeyCommandHandler::MatchShortcutKeys(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if ((keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) &&
+        InputHandler->shortcut_.HaveShortcutConsumed(keyEvent)) {
+        return false;
+    }
     bool result = false;
     std::vector<ShortcutKey> upAbilities;
+
     for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!shortcutKey.statusConfigValue) {
             continue;
         }
         if (!IsKeyMatch(shortcutKey, keyEvent)) {
-            MMI_HILOGD("Not key matched, next");
             continue;
         }
-        int32_t delay = GetKeyDownDurationFromXml(shortcutKey.businessId);
-        if (delay >= MIN_SHORT_KEY_DOWN_DURATION && delay <= MAX_SHORT_KEY_DOWN_DURATION) {
-            MMI_HILOGD("User defined new short key down duration:%{public}d", delay);
-            shortcutKey.keyDownDuration = delay;
-        }
+        GetKeyDownDurationFromXml(shortcutKey);
         shortcutKey.Print();
+
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
-            result = HandleKeyDown(shortcutKey) || result;
+            if (HandleKeyDown(shortcutKey)) {
+                result = true;
+            }
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
-            bool handleResult = HandleKeyUp(keyEvent, shortcutKey);
-            result = handleResult || result;
-            if (handleResult) {
+            if (HandleKeyUp(keyEvent, shortcutKey)) {
+                result = true;
                 upAbilities.push_back(shortcutKey);
             }
         } else {
@@ -1349,26 +1359,22 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     if (!upAbilities.empty()) {
         std::sort(upAbilities.begin(), upAbilities.end(),
             [](const ShortcutKey &lShortcutKey, const ShortcutKey &rShortcutKey) -> bool {
-            return lShortcutKey.keyDownDuration > rShortcutKey.keyDownDuration;
-        });
+                return lShortcutKey.keyDownDuration > rShortcutKey.keyDownDuration;
+            });
         ShortcutKey tmpShorteKey = upAbilities.front();
         MMI_HILOGI("Start launch ability immediately");
+        InputHandler->shortcut_.MarkShortcutConsumed(tmpShorteKey);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, tmpShorteKey.ability.bundleName);
         LaunchAbility(tmpShorteKey);
         BytraceAdapter::StopLaunchAbility();
     }
-    if (result) {
-        return result;
-    }
-    return HandleConsumedKeyEvent(keyEvent);
+    return result;
 }
 
 bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
-    CHKPF(keyEvent);
-    if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
-        && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+    if ((currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()) &&
+        (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP)) {
         MMI_HILOGI("Handle consumed key event, cancel opration");
         ResetCurrentLaunchAbilityKey();
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
@@ -1595,31 +1601,18 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
 
 bool KeyCommandHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
-    CALL_DEBUG_ENTER;
-    CHKPF(key);
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
         return false;
     }
-    if ((shortcutKey.preKeys.size() + 1) != key->GetKeyItems().size()) {
-        return false;
-    }
-    for (const auto &item : key->GetKeyItems()) {
-        int32_t keyCode = item.GetKeyCode();
-        if (SkipFinalKey(keyCode, key)) {
-            continue;
-        }
-        if (shortcutKey.preKeys.find(keyCode) == shortcutKey.preKeys.end()) {
-            return false;
-        }
-    }
-    MMI_HILOGD("Leave, key matched");
-    return true;
-}
+    auto pressedKeys = key->GetPressedKeys();
 
-bool KeyCommandHandler::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
-{
-    CHKPF(key);
-    return keyCode == key->GetKeyCode();
+    return std::all_of(shortcutKey.preKeys.cbegin(), shortcutKey.preKeys.cend(),
+        [&pressedKeys](int32_t keyCode) {
+            return std::any_of(pressedKeys.cbegin(), pressedKeys.cend(),
+                [keyCode](auto pressedKey) {
+                    return (pressedKey == keyCode);
+                });
+        });
 }
 
 bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
@@ -1627,6 +1620,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGI("Start launch ability immediately");
+        InputHandler->shortcut_.MarkShortcutConsumed(shortcutKey);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
         BytraceAdapter::StopLaunchAbility();
@@ -1634,6 +1628,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
         MMI_HILOGI("Timer callback");
+        InputHandler->shortcut_.MarkShortcutConsumed(shortcutKey);
         currentLaunchAbilityKey_ = shortcutKey;
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
         LaunchAbility(shortcutKey);
@@ -1652,23 +1647,17 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     return true;
 }
 
-int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
+void KeyCommandHandler::GetKeyDownDurationFromXml(ShortcutKey &shortcut) const
 {
-    CALL_DEBUG_ENTER;
-    return PREFERENCES_MGR->GetShortKeyDuration(businessId);
+    int32_t delay = PREFERENCES_MGR->GetShortKeyDuration(shortcut.businessId);
+    if ((delay >= MIN_SHORT_KEY_DOWN_DURATION) && (delay <= MAX_SHORT_KEY_DOWN_DURATION)) {
+        MMI_HILOGD("User defined new short key down duration:%{public}d", delay);
+        shortcut.keyDownDuration = delay;
+    }
 }
 
 bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
-    CALL_DEBUG_ENTER;
-    CHKPF(keyEvent);
-    if (shortcutKey.keyDownDuration == 0) {
-        MMI_HILOGI("Start launch ability immediately");
-        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_SHORTKEY, shortcutKey.ability.bundleName);
-        LaunchAbility(shortcutKey);
-        BytraceAdapter::StopLaunchAbility();
-        return true;
-    }
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
     if (!keyItem) {
         MMI_HILOGE("The keyItem is nullopt");
@@ -1678,7 +1667,8 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
-    if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
+
+    if (upTime - downTime <= MS2US(shortcutKey.keyDownDuration)) {
         MMI_HILOGI("Skip, upTime - downTime <= duration");
         return false;
     }

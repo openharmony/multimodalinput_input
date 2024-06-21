@@ -35,6 +35,7 @@ namespace MMI {
 namespace {
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
+constexpr int32_t DRIVER_NUMBER { 8 };
 } // namespace
 
 TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
@@ -109,8 +110,16 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
     CALL_DEBUG_ENTER;
     TransformTouchProperties(rawTouch_, pointerItem);
     if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
-        MMI_HILOGD("fingersense start classify touch down event");
-        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouch_, toolType);
+        MMI_HILOGD("Fingersense start classify touch down event");
+        TouchType rawTouchTmp = rawTouch_;
+        int32_t displayX = pointerItem.GetDisplayX();
+        int32_t displayY = pointerItem.GetDisplayY();
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        WIN_MGR->ReverseXY(displayX, displayY);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+        rawTouchTmp.x = displayX * DRIVER_NUMBER;
+        rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouchTmp, toolType);
     }
 }
 void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
@@ -183,7 +192,7 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     TransformTouchProperties(rawTouch_, item);
     if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
-        MMI_HILOGD("notify fingersense touch up event");
+        MMI_HILOGD("Notify fingersense touch up event");
         FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouch_);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -228,8 +237,8 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     CHKPP(device);
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
     aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
-        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
-        std::to_string(pointerEvent_->GetId()));
+        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction() +
+        ", eventId: " + std::to_string(pointerEvent_->GetId()), std::to_string(pointerEvent_->GetId()));
 
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size(), MMI_LOG_HEADER);

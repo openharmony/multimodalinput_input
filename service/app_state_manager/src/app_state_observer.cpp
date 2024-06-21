@@ -32,7 +32,7 @@ void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessDa
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
+    MMI_HILOGD("Process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
         processData.bundleName.c_str(),
         processData.uid,
         processData.state);
@@ -49,7 +49,7 @@ OHOS::sptr<OHOS::AppExecFwk::IAppMgr> ApplicationStateObserver::GetAppMgr()
     OHOS::sptr<ISystemAbilityManager> systemAbilityManager =
         OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!systemAbilityManager) {
-        MMI_HILOGE("get system ability manager failed");
+        MMI_HILOGE("Get system ability manager failed");
         return nullptr;
     }
     OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->GetSystemAbility(OHOS::APP_MGR_SERVICE_ID);
@@ -74,7 +74,7 @@ std::vector<AppExecFwk::AppStateData> AppObserverManager::GetForegroundAppData()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("foregroundAppData_.size(): %{public}zu", foregroundAppData_.size());
+    MMI_HILOGD("foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
     return foregroundAppData_;
 }
 
@@ -82,20 +82,20 @@ void AppObserverManager::SetForegroundAppData(std::vector<AppExecFwk::AppStateDa
 {
     CALL_DEBUG_ENTER;
     foregroundAppData_ = list;
-    MMI_HILOGD("foregroundAppData_.size(): %{public}zu", foregroundAppData_.size());
+    MMI_HILOGD("foregroundAppData_.size():%{public}zu", foregroundAppData_.size());
 }
 
 void AppObserverManager::InitAppStateObserver()
 {
     CALL_DEBUG_ENTER;
     if (hasInit_) {
-        MMI_HILOGI("app state observer has init");
+        MMI_HILOGI("App state observer has init");
         return;
     }
     OHOS::sptr<ISystemAbilityManager> systemAbilityManager =
         OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!systemAbilityManager) {
-        MMI_HILOGE("get system ability manager failed");
+        MMI_HILOGE("Get system ability manager failed");
         return;
     }
     OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->GetSystemAbility(OHOS::APP_MGR_SERVICE_ID);
@@ -105,7 +105,7 @@ void AppObserverManager::InitAppStateObserver()
     int32_t ret = appMgr->RegisterApplicationStateObserver(new ApplicationStateObserver());
     if (ret == RET_OK) {
         hasInit_ = true;
-        MMI_HILOGI("register app success");
+        MMI_HILOGI("Register app success");
     }
 }
 } // namespace MMI
