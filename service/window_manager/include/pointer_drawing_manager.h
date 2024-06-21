@@ -103,6 +103,7 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+    void InitPointerObserver() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -133,7 +134,7 @@ private:
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreateMagicCursorChangeObserver();
-    void CreatePointerSwitchObserver(isMagicCursor& item);
+    int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
@@ -179,6 +180,7 @@ private:
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
+    bool hasInitObserver_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
