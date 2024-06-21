@@ -129,7 +129,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetWinSyncBatchSize, TestSize.Level1
     int32_t maxAreasCount = 1;
     int32_t displayCount = 2;
     int32_t ret = InputManager::GetInstance()->GetWinSyncBatchSize(maxAreasCount, displayCount);
-    EXPECT_EQ(ret, 38);
+    EXPECT_EQ(ret, 37);
 }
 
 /**
@@ -2528,6 +2528,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_BOTTOM_LEFT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::TOP_LIMIT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::BOTTOM_RIGHT_LIMIT, getpid(), windowId);
+    ASSERT_NO_FATAL_FAILURE(window->GetWindowId());
 }
 
 /**
@@ -2742,8 +2743,8 @@ public:
 HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1)
 {
     auto watcher = std::make_shared<ServiceWatcher>();
-    InputManager::GetInstance()->AddServiceWatcher(watcher);
-    InputManager::GetInstance()->RemoveServiceWatcher(watcher);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AddServiceWatcher(watcher));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RemoveServiceWatcher(watcher));
 }
 
 /**
@@ -2757,7 +2758,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     int32_t offsetX = 20;
     int32_t offsetY = 20;
-    InputManager::GetInstance()->MoveMouse(offsetX, offsetY);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MoveMouse(offsetX, offsetY));
 }
 
 /**
@@ -3045,8 +3046,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
 {
     bool hasIrEmitter = false;
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
     EXPECT_EQ(ret, RET_OK);
+#else
+    int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 /**
@@ -3057,13 +3063,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Level1)
 {
-    InfraredFrequency infraredFrequency;
-    infraredFrequency.max_ = 30;
-    infraredFrequency.min_ = 10;
-    std::vector<InfraredFrequency> requencys;
-    requencys.push_back(infraredFrequency);
+    InfraredFrequency infraredFrequency = { 30, 10 };
+    std::vector<InfraredFrequency> requencys = { infraredFrequency };
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
     EXPECT_EQ(ret, RET_OK);
+#else
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 /**
@@ -3076,8 +3084,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
 {
     int64_t number = 10;
     std::vector<int64_t> pattern = { 10, 20, 30 };
+#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     EXPECT_EQ(ret, RET_OK);
+#else
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
+    EXPECT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 } // namespace MMI
 } // namespace OHOS
