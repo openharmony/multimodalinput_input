@@ -1833,6 +1833,19 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_001
     pointerDrawingManager.lastPhysicalX_ = -1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
+/**
+ * @tc.name: InputWindowsManagerTest_InitPointerCallback_001
+ * @tc.desc: Test InitPointerCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerCallback());
+}
 
 /**
  * @tc.name: InputWindowsManagerTest_SetTargetDevice_001
