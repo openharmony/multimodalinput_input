@@ -825,22 +825,6 @@ HWTEST_F(InputDeviceManagerTest, SupportKeys_Test_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: IsMatchKeys_Test_001
- * @tc.desc: Test the function IsMatchKeys
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDeviceManagerTest, IsMatchKeys_Test_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputDeviceManager inputDevice;
-    libinput_device* deviceOrigin = new (std::nothrow) libinput_device;
-    ASSERT_NE(deviceOrigin, nullptr);
-    std::vector<int32_t> keyCodes = {1, 2, 3};
-    ASSERT_NO_FATAL_FAILURE(inputDevice.IsMatchKeys(deviceOrigin, keyCodes));
-}
-
-/**
  * @tc.name: GetDeviceConfig_Test_002
  * @tc.desc: Test the function GetDeviceConfig
  * @tc.type: FUNC

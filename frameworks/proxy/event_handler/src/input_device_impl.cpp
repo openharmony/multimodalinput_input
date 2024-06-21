@@ -125,13 +125,12 @@ int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     std::vector<int32_t> ids;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetDeviceIds(ids);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetDeviceIds(ids) != RET_OK) {
         MMI_HILOGE("GetInputDeviceIds failed");
         return RET_ERR;
     }
     callback(ids);
-    return ret;
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callback)
@@ -139,8 +138,7 @@ int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callba
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetDevice(deviceId, inputDevice);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetDevice(deviceId, inputDevice) != RET_OK) {
         MMI_HILOGE("GetDevice failed");
         return RET_ERR;
     }
@@ -153,8 +151,7 @@ int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyC
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     std::vector<bool> keystroke;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SupportKeys(deviceId, keyCodes, keystroke);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->SupportKeys(deviceId, keyCodes, keystroke) != RET_OK) {
         MMI_HILOGE("SupportKeys failed");
         return RET_ERR;
     }
@@ -167,8 +164,7 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     int32_t keyboardType = 0;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardType(deviceId, keyboardType);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardType(deviceId, keyboardType) != RET_OK) {
         MMI_HILOGE("GetKeyboardType failed");
         return RET_ERR;
     }
@@ -179,8 +175,7 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
 int32_t InputDeviceImpl::SetKeyboardRepeatDelay(int32_t delay)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetKeyboardRepeatDelay(delay);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->SetKeyboardRepeatDelay(delay) != RET_OK) {
         MMI_HILOGE("SetKeyboardRepeatDelay failed");
         return RET_ERR;
     }
@@ -190,8 +185,7 @@ int32_t InputDeviceImpl::SetKeyboardRepeatDelay(int32_t delay)
 int32_t InputDeviceImpl::SetKeyboardRepeatRate(int32_t rate)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetKeyboardRepeatRate(rate);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->SetKeyboardRepeatRate(rate) != RET_OK) {
         MMI_HILOGE("SetKeyboardRepeatRate failed");
         return RET_ERR;
     }
@@ -203,8 +197,7 @@ int32_t InputDeviceImpl::GetKeyboardRepeatDelay(std::function<void(int32_t)> cal
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     int32_t repeatDelay = 0;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardRepeatDelay(repeatDelay);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardRepeatDelay(repeatDelay) != RET_OK) {
         MMI_HILOGE("GetKeyboardRepeatDelay failed");
         return RET_ERR;
     }
@@ -216,8 +209,7 @@ int32_t InputDeviceImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> call
 {
     CALL_DEBUG_ENTER;
     int32_t repeatRate = 0;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardRepeatRate(repeatRate);
-    if (ret != RET_OK) {
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetKeyboardRepeatRate(repeatRate) != RET_OK) {
         MMI_HILOGE("GetKeyboardRepeatRate failed");
         return RET_ERR;
     }

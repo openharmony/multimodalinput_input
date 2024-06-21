@@ -49,7 +49,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     CALL_DEBUG_ENTER;
     CHKPR(callback, ERROR_NULL_POINTER);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
-        MMI_HILOGE("switch type error");
+        MMI_HILOGE("Switch type error");
         return RET_ERR;
     }
 
@@ -71,7 +71,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
         subscribeInfos_.erase(subscribeId);
         return INVALID_SUBSCRIBE_ID;
     }
-    MMI_HILOGI("subscribeId:%{public}d,switchType:%{public}d", subscribeId, switchType);
+    MMI_HILOGI("subscribeId:%{public}d, switchType:%{public}d", subscribeId, switchType);
 
     return subscribeId;
 }
@@ -125,7 +125,7 @@ int32_t SwitchEventInputSubscribeManager::OnSubscribeSwitchEventCallback(std::sh
     }
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(event);
-    MMI_HILOGI("Switch event id:%{public}d switchValue:%{public}d", subscribeId, event->GetSwitchValue());
+    MMI_HILOGI("Switch event id:%{public}d, switchValue:%{public}d", subscribeId, event->GetSwitchValue());
     return RET_OK;
 }
 
