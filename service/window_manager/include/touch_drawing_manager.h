@@ -79,6 +79,8 @@ private:
     void DrawLabels();
     void DrawRectItem(RosenCanvas* canvas, const std::string &text,
         Rosen::Drawing::Rect &rect, const Rosen::Drawing::Color &color);
+    void DrawRotationLabels();
+    void StopRecord();
     void UpdatePointerPosition();
     void RecordLabelsInfo();
     void UpdateLastPointerItem(PointerEvent::PointerItem &pointerItem);
@@ -108,6 +110,7 @@ private:
     int32_t currentPointerId_ { 0 };
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };
+    int32_t stopMaxPointerCount_ { 0 };
     int32_t rectTopPosition_ { 0 };
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
@@ -122,6 +125,7 @@ private:
     bool isDownAction_ { false };
     bool isFirstDraw_ { true };
     bool isChangedRotation_ { false };
+    bool stopRecord_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
 };

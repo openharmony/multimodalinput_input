@@ -1081,5 +1081,83 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RemovePointerPosition_
     TOUCH_DRAWING_MGR->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RemovePointerPosition());
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawRotationLabels_001
+ * @tc.desc: Test DrawRotationLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawRotationLabels_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION90;
+    TOUCH_DRAWING_MGR->displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawRotationLabels());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawRotationLabels_002
+ * @tc.desc: Test DrawRotationLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawRotationLabels_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION180;
+    TOUCH_DRAWING_MGR->displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawRotationLabels());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawRotationLabels_003
+ * @tc.desc: Test DrawRotationLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawRotationLabels_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION270;
+    TOUCH_DRAWING_MGR->displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawRotationLabels());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_StopRecord_001
+ * @tc.desc: Test StopRecord
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_StopRecord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetPressed(true);
+    TOUCH_DRAWING_MGR->lastPointerItem_.emplace_back(item);
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = true;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    if (TOUCH_DRAWING_MGR->crosshairCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->crosshairCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->StopRecord());
+}
 } // namespace MMI
 } // namespace OHOS
