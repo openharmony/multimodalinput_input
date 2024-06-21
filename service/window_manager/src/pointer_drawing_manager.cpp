@@ -122,7 +122,13 @@ PointerDrawingManager::PointerDrawingManager()
     hasMagicCursor_.name = "isMagicCursor";
     TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
         MMI_HILOGD("Timer callback");
-        CreatePointerSwitchObserver(hasMagicCursor_);
+        if (hasInitObserver_ == false) {
+            int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
+            if (ret == RET_OK) {
+                hasInitObserver_ = true;
+                MMI_HILOGD("Create pointer switch observer success on timer");
+            }
+        }
     });
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -367,7 +373,22 @@ void PointerDrawingManager::UpdateStyleOptions()
     }
 }
 
-void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
+void PointerDrawingManager::InitPointerObserver()
+{
+    if (hasInitObserver_) {
+        MMI_HILOGI("Settingdata observer has init");
+        return;
+    }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
+    if (ret == RET_OK) {
+        hasInitObserver_ = true;
+        MMI_HILOGD("Create pointer switch observer success");
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+ 
+int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
@@ -406,8 +427,10 @@ void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
+        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
+    return RET_OK;
 }
 
 bool PointerDrawingManager::HasMagicCursor()
