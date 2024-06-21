@@ -31,6 +31,7 @@
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
 #include "multimodal_input_preferences_manager.h"
+#include "scene_board_judgement.h"
 #include "util.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
@@ -372,11 +373,17 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
             }
         }
     } else {
-        if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-            physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
+        int32_t width = displayInfo_.width;
+        int32_t height = displayInfo_.height;
+        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+            height = displayInfo_.width;
+            width = displayInfo_.height;
         }
-        if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-            physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
+        if (physicalX > (width - imageWidth_ / cursorUnit)) {
+            physicalX = width - imageWidth_ / cursorUnit;
+        }
+        if (physicalY > (height - imageHeight_ / cursorUnit)) {
+            physicalY = height - imageHeight_ / cursorUnit;
         }
     }
 }
