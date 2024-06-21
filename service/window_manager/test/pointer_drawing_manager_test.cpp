@@ -1845,6 +1845,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerCallback_
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerCallback());
+}
 
 /**
  * @tc.name: InputWindowsManagerTest_SetTargetDevice_001
