@@ -324,10 +324,10 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
     }
-    if(fingerCount == FINGER_TAP_THREE) {
+    if (fingerCount == FINGER_TAP_THREE) {
         bool canUse = false;
         GetTouchpadThreeFingersTapSwitch(canUse);
-        if(!canUse) {
+        if (!canUse) {
             MMI_HILOGI("The fingerCount is 3 but TouchpadThreeFingersTapSwitch is set as false");
             return RET_OK;
         }
@@ -407,10 +407,10 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
         return RET_ERR;
     }
 
-    if(fingerCount == FINGER_TAP_THREE) {
+    if (fingerCount == FINGER_TAP_THREE) {
         bool canUse = false;
         GetTouchpadThreeFingersTapSwitch(canUse);
-        if(!canUse) {
+        if (!canUse) {
             MMI_HILOGI("The fingerCount is 3 but TouchpadThreeFingersTapSwitch is set as false");
             return RET_OK;
         }
@@ -637,10 +637,10 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
             return RET_OK;
         }
     }
-    if(upCnt == FINGER_TAP_THREE) {
+    if (upCnt == FINGER_TAP_THREE) {
         bool canUse = false;
         GetTouchpadThreeFingersTapSwitch(canUse);
-        if(!canUse) {
+        if (!canUse) {
             MMI_HILOGI("The event is FINGER_TAP_THREE but TouchpadThreeFingersTapSwitch is set as false");
             return RET_OK;
         }
