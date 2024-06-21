@@ -184,7 +184,6 @@ bool InputDeviceManager::HasPointerDevice()
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
-    // return nullptr;
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
 
