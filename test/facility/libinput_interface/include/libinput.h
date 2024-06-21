@@ -33,6 +33,9 @@ enum libinput_event_type {
     LIBINPUT_EVENT_POINTER_AXIS,
     LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD,
     LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD,
+    LIBINPUT_EVENT_POINTER_BUTTON,
+    LIBINPUT_EVENT_POINTER_MOTION,
+    LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE,
 
     LIBINPUT_EVENT_TOUCH_DOWN = 500,
     LIBINPUT_EVENT_TOUCH_UP,
@@ -113,6 +116,11 @@ enum libinput_tablet_tool_type {
     LIBINPUT_TABLET_TOOL_TYPE_MOUSE,
     LIBINPUT_TABLET_TOOL_TYPE_LENS,
     LIBINPUT_TABLET_TOOL_TYPE_TOTEM,
+};
+
+enum libinput_pointer_axis {
+	LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL = 0,
+	LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL = 1,
 };
 
 struct udev_device;
@@ -274,6 +282,18 @@ int32_t libinput_device_get_axis_flat(struct libinput_device* device, int32_t co
 int32_t libinput_device_get_axis_resolution(struct libinput_device* device, int32_t code);
 
 int libinput_get_funckey_state(struct libinput_device *device, unsigned int code);
+
+uint32_t libinput_event_pointer_get_finger_count(struct libinput_event_pointer *event);
+
+double libinput_event_pointer_get_dx_unaccelerated(struct libinput_event_pointer *event);
+
+double libinput_event_pointer_get_dy_unaccelerated(struct libinput_event_pointer *event);
+
+uint32_t libinput_event_pointer_get_button(struct libinput_event_pointer *event);
+
+int libinput_event_pointer_has_axis(struct libinput_event_pointer *event, enum libinput_pointer_axis axis);
+
+double libinput_event_pointer_get_axis_value(struct libinput_event_pointer *event, enum libinput_pointer_axis axis);
 
 #ifdef __cplusplus
 }
