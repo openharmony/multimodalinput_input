@@ -36,10 +36,23 @@ constexpr float DYNAMIC_EFFECT_SIZE { 0.8f };
 constexpr int32_t ARGB_COLOR_ARRAY { 0x20c8ffff };
 } // namespace
 
-KnuckleDivergentPoint::KnuckleDivergentPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap)
-    : traceShadow_(bitmap)
+KnuckleDivergentPoint::KnuckleDivergentPoint(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+    : traceShadow_(pixelMap)
 {
     CALL_DEBUG_ENTER;
+    OHOS::Rosen::Drawing::Filter filter;
+    OHOS::Rosen::OverdrawColorArray colorArray = {
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        0x00000000,
+        ARGB_COLOR_ARRAY,
+    };
+
+    auto protanomalyMat = OHOS::Rosen::Drawing::ColorFilter::CreateOverDrawColorFilter(colorArray.data());
+    filter.SetColorFilter(protanomalyMat);
+    brush_.SetFilter(filter);
 }
 
 void KnuckleDivergentPoint::Update()
@@ -60,7 +73,7 @@ void KnuckleDivergentPoint::Clear()
     lifespan_ = DEFAULT_LIFESPAN;
 }
 
-void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
+void KnuckleDivergentPoint::Draw(Rosen::ExtendRecordingCanvas* canvas)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
@@ -76,23 +89,11 @@ void KnuckleDivergentPoint::Draw(Rosen::Drawing::RecordingCanvas* canvas)
     traceMatrix_.Reset();
     traceMatrix_.PostScale(proportion, proportion, pointX_, pointY_);
     canvas->SetMatrix(traceMatrix_);
-    OHOS::Rosen::Drawing::Filter filter;
-    OHOS::Rosen::OverdrawColorArray colorArray = {
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        0x00000000,
-        ARGB_COLOR_ARRAY,
-    };
-
-    auto protanomalyMat = OHOS::Rosen::Drawing::ColorFilter::CreateOverDrawColorFilter(colorArray.data());
-    filter.SetColorFilter(protanomalyMat);
-    
-    OHOS::Rosen::Drawing::Brush brush;
-    brush.SetFilter(filter);
-    canvas->AttachBrush(brush);
-    canvas->DrawBitmap(*traceShadow_, pointX_, pointY_);
+    canvas->AttachBrush(brush_);
+    Rosen::Drawing::Rect src = Rosen::Drawing::Rect(0, 0, traceShadow_->GetWidth(), traceShadow_->GetHeight());
+    Rosen::Drawing::Rect dst = Rosen::Drawing::Rect(pointX_, pointY_, pointX_ + traceShadow_->GetWidth(),
+        pointY_ + traceShadow_->GetHeight());
+    canvas->DrawPixelMapRect(traceShadow_, src, dst, Rosen::Drawing::SamplingOptions());
     canvas->DetachBrush();
 }
 

@@ -54,6 +54,13 @@ public:
     MOCK_METHOD(int, GestureEventGetFingerCount, (struct libinput_event_gesture *));
     MOCK_METHOD(int, GestureEventGetDevCoordsX, (struct libinput_event_gesture *, uint32_t));
     MOCK_METHOD(int, GestureEventGetDevCoordsY, (struct libinput_event_gesture *, uint32_t));
+    MOCK_METHOD(uint32_t, PointerEventGetFingerCount, (struct libinput_event_pointer *));
+    MOCK_METHOD(double, PointerGetDxUnaccelerated, (struct libinput_event_pointer *));
+    MOCK_METHOD(double, PointerGetDyUnaccelerated, (struct libinput_event_pointer *));
+    MOCK_METHOD(uint32_t, PointerGetButton, (struct libinput_event_pointer *));
+    MOCK_METHOD(int, PointerHasAxis, (struct libinput_event_pointer *,  enum libinput_pointer_axis));
+    MOCK_METHOD(double, PointerGetAxisValue, (struct libinput_event_pointer *,  enum libinput_pointer_axis));
+
 };
 } // namespace MMI
 } // namespace OHOS

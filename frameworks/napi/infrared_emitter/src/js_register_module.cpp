@@ -45,8 +45,7 @@ bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetyp
 bool IsArray(const napi_env& env, const napi_value& value)
 {
     bool isArray = false;
-    napi_status ret = napi_is_array(env, value, &isArray);
-    if (ret != napi_ok) {
+    if (napi_is_array(env, value, &isArray) != napi_ok) {
         MMI_HILOGE("napi_is_array failed");
         return false;
     }

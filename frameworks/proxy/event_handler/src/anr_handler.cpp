@@ -36,6 +36,7 @@ constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME { 3500000 };
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
 constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
 constexpr int32_t TIME_TRANSITION { 1000 };
+constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -47,6 +48,12 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64, eventType, eventId,
         actionTime);
+    processedCount_++;
+    if (processedCount_ == PRINT_INTERVAL_COUNT) {
+        MMI_HILOGI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
+        processedCount_ = 0;
+        lastEventId_ = eventId;
+    }
     SendEvent(eventType, eventId);
 }
 

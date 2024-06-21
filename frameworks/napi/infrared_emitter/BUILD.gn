@@ -13,8 +13,6 @@
 
 import("../../../multimodalinput_mini.gni")
 
-print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
-
 config("infraredemitter_config") {
   visibility = [ ":*" ]
   include_dirs = [
