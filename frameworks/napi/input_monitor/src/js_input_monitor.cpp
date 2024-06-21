@@ -1412,17 +1412,13 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_SWIPE: {
-                bool closed = false;
+                bool canUse = false;
                 if (!IsThreeFingersSwipe(pointerEvent)) {
-                    closed = true;
-                    MMI_HILOGE("This event is not three fingers swipeEvent");
                 } else {
-                    bool switchThreeFinger = true;
-                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
-                    closed = switchThreeFinger
+                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
+                    MMI_HILOGD("THREE_FINGERS_SWIPE but three finger action can't use");
                 }
-                if(closed) {
-                    MMI_HILOGD("THREE_FINGERS_SWIPE but three finger action is closed");
+                if(!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1438,22 +1434,17 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
-                bool closed = false;
+                bool canUse = false;
                 if (!IsThreeFingersTap(pointerEvent)) {
-                    closed = true;
-                    MMI_HILOGE("The event is not threeFingersTapEvent");
                 } else {
-                    bool switchThreeFinger = true;
-                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchThreeFinger);
-                    closed = switchThreeFinger;
+                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
+                    MMI_HILOGD("THREE_FINGERS_TAP but three finger action can't use");
                 }
-                if (closed) {
-                    MMI_HILOGD("THREE_FINGERS_TAP but three finger action is closed");
+                if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
                 ret = TransformMultiTapEvent(pointerEvent, napiPointer);
-                break;
                 break;
             }
             case TypeName::JOYSTICK:{

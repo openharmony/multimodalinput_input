@@ -41,6 +41,7 @@ constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
+constexpr int32_t FINGER_TAP_THREE { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
@@ -319,6 +320,14 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
     }
+    if(fingerCount == FINGER_TAP_THREE) {
+        bool canUse = false;
+        GetTouchpadThreeFingersTapSwitch(canUse);
+        if(!canUse) {
+            MMI_HILOGI("The fingerCount is 3 but TouchpadThreeFingersTapSwitch is set as false");
+            return RET_OK;
+        }
+    }
     pointerEvent_->SetFingerCount(fingerCount);
 
     if (fingerCount == 0) {
@@ -392,6 +401,15 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
+    }
+
+    if(fingerCount == FINGER_TAP_THREE) {
+        bool canUse = false;
+        GetTouchpadThreeFingersTapSwitch(canUse);
+        if(!canUse) {
+            MMI_HILOGI("The fingerCount is 3 but TouchpadThreeFingersTapSwitch is set as false");
+            return RET_OK;
+        }
     }
 
     if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
@@ -612,6 +630,15 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
             return RET_OK;
         }
     }
+    if(upCnt == FINGER_TAP_THREE) {
+        bool canUse = false;
+        GetTouchpadThreeFingersTapSwitch(canUse);
+        if(!canUse) {
+            MMI_HILOGI("The event is FINGER_TAP_THREE but TouchpadThreeFingersTapSwitch is set as false");
+            return RET_OK;
+        }
+    }
+
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
         multiFingersState_ = static_cast<MulFingersTap>(upCnt);
         MMI_HILOGD("This is multifinger tap event, finger count:%{public}d", upCnt);

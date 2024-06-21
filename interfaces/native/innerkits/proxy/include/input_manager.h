@@ -867,7 +867,7 @@ public:
     
     /**
      * @brief Set the switch of touchpad three finger tap.
-     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     * @param switchFlag Indicates the touchpad three finger tap switch state.  true: user can use three finger function. otherwise can't use
      * @return if success; returns a non-0 value otherwise.
      * @since 9
      */
@@ -875,7 +875,7 @@ public:
 
     /**
      * @brief Get the switch of touchpad three finger tap.
-     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     * @param switchFlag Indicates the touchpad three finger tap switch state. true: user can use three finger function. otherwise can't use
      * @return if success; returns a non-0 value otherwise.
      * @since 9
      */
