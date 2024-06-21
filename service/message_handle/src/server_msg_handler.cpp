@@ -330,6 +330,7 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
 
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetTargetWindowId() > 0) {
         return RET_OK;
     }
@@ -367,6 +368,7 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
     int32_t action, bool isShell)
 {
+    CHKPF(pointerEvent);
     int32_t targetWindowId = -1;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
