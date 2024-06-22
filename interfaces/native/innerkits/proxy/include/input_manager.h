@@ -867,17 +867,19 @@ public:
     
     /**
      * @brief Set the switch of touchpad three finger tap.
-     * @param switchFlag Indicates the touchpad three finger tap switch state.  true: user can use three finger function. otherwise can't use
+     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     *  true: user can use three finger function. otherwise can't use
      * @return if success; returns a non-0 value otherwise.
-     * @since 9
+     * @since 12
      */
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
 
     /**
      * @brief Get the switch of touchpad three finger tap.
-     * @param switchFlag Indicates the touchpad three finger tap switch state. true: user can use three finger function. otherwise can't use
+     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     * true: user can use three finger function. otherwise can't use
      * @return if success; returns a non-0 value otherwise.
-     * @since 9
+     * @since 12
      */
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     

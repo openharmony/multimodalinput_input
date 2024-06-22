@@ -436,7 +436,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
         if (!threeFingerSwitch) {
-           return RET_OK;
+            return RET_OK;
         }
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
