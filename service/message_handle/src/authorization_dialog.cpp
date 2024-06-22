@@ -30,8 +30,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_USERID = -1;
-constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
+constexpr int32_t INVALID_USERID { -1 };
+constexpr int32_t MESSAGE_PARCEL_KEY_SIZE { 3 };
 std::atomic_bool g_isDialogShow = false;
 sptr<IRemoteObject> g_remoteObject = nullptr;
 }
@@ -53,7 +53,7 @@ bool AuthorizationDialog::ConnectSystemUi()
     if (g_isDialogShow) {
         AppExecFwk::ElementName element;
         dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
-        MMI_HILOGW("power dialog has been show");
+        MMI_HILOGW("Power dialog has been show");
         return true;
     }
     auto abilityMgr = AAFwk::AbilityManagerClient::GetInstance();
@@ -93,15 +93,15 @@ void AuthorizationDialog::DialogAbilityConnection::OnAbilityConnectDone(
         std::string paramStr = "{\"ability.want.params.uiExtensionType\":"+ midStr +
             AuthorizationDialog::GetUiExtensionType() + midStr + ",\"sysDialogZOrder\":2,\"isInputDlg\":true}";
         data.WriteString16(Str8ToStr16(paramStr));
-        MMI_HILOGI("show power dialog is begin");
+        MMI_HILOGI("Show power dialog is begin");
         const uint32_t cmdCode = 1;
         int32_t ret = remoteObject->SendRequest(cmdCode, data, reply, option);
         if (ret != ERR_OK) {
-            MMI_HILOGW("show power dialog is failed: %{public}d", ret);
+            MMI_HILOGW("Show power dialog is failed:%{public}d", ret);
             return;
         }
         g_isDialogShow = true;
-        MMI_HILOGI("show power dialog is success");
+        MMI_HILOGI("Show power dialog is success");
     });
 }
 
