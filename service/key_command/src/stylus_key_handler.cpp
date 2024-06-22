@@ -25,9 +25,9 @@
 
 namespace OHOS {
 namespace MMI {
-const std::string STYLUS_ABILITY_NAME = "HiNotePcMainAbility";
-const std::string STYLUS_BUNDLE_NAME = "com.hmos.hinote";
-const std::string IS_SCREEN_OFF = "is_sceen_off";
+const std::string STYLUS_ABILITY_NAME { "HiNotePcMainAbility" };
+const std::string STYLUS_BUNDLE_NAME { "com.hmos.hinote" };
+const std::string IS_SCREEN_OFF { "is_sceen_off" };
 
 StylusKeyHandler::StylusKeyHandler() {}
 StylusKeyHandler::~StylusKeyHandler() {}
