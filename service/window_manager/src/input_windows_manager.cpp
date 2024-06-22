@@ -3325,7 +3325,7 @@ int32_t InputWindowsManager::SetCurrentUser(int32_t userId)
     return RET_OK;
 }
 
-void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo)
+void InputWindowsManager::PrintChangedWindowByEvent(int32_t eventType, const WindowInfo newWindowInfo)
 {
     auto iter = lastMatchedWindow_.find(eventType);
     if (iter != lastMatchedWindow_.end() && iter->second.id != newWindowInfo.id) {

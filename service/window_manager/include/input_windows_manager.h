@@ -184,7 +184,7 @@ private:
     void RegisterFoldStatusListener();
     void UnregisterFoldStatusListener();
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
-    void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
+    void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
