@@ -71,6 +71,7 @@ private:
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
     void RotationCanvas(RosenCanvas *canvas, Direction direction);
     void CreateTouchWindow();
+    void DestoryTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
     void DrawPointerPositionHandler();
@@ -79,14 +80,12 @@ private:
     void DrawLabels();
     void DrawRectItem(RosenCanvas* canvas, const std::string &text,
         Rosen::Drawing::Rect &rect, const Rosen::Drawing::Color &color);
-    void DrawRotationLabels();
-    void StopRecord();
     void UpdatePointerPosition();
     void RecordLabelsInfo();
     void UpdateLastPointerItem(PointerEvent::PointerItem &pointerItem);
     void RemovePointerPosition();
     void ClearTracker();
-    void ClearLabels();
+    void InitLabels();
     template <class T>
     void CreateBubbleObserver(T& item);
     template <class T>
@@ -94,6 +93,7 @@ private:
     template <class T>
     std::string FormatNumber(T number, int32_t precision);
     bool IsValidAction(const int32_t action);
+    void Snapshot();
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
@@ -110,7 +110,6 @@ private:
     int32_t currentPointerId_ { 0 };
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };
-    int32_t stopMaxPointerCount_ { 0 };
     int32_t rectTopPosition_ { 0 };
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
@@ -128,6 +127,7 @@ private:
     bool stopRecord_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
+    std::mutex mutex_;
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
