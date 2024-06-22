@@ -136,8 +136,6 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
