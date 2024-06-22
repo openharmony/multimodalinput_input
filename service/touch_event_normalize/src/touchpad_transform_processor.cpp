@@ -324,10 +324,8 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
     } else if (fingerCount == FINGER_TAP_THREE) {
-        bool canUse = false;
-        GetTouchpadThreeFingersTapSwitch(canUse);
-        if (!canUse) {
-            MMI_HILOGI("The fingerCount is 3 but TouchpadThreeFingersTapSwitch is set as false");
+        GetTouchpadThreeFingersTapSwitch(tpSwipeSwitch);
+        if (!tpSwipeSwitch) {
             return RET_OK;
         }
     }
@@ -338,13 +336,24 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         return RET_ERR;
     }
 
+    AddItemForEventWhileTouchPadSwipeData(time, gesture);
+    
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
+        MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
+        DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
+    }
+
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::AddItemForEventWhileSetTouchPadSwipeData(int64_t time, libinput_event_gesture *gesture)
+{
     int32_t sumX = 0;
     int32_t sumY = 0;
     for (int32_t i = 0; i < fingerCount; i++) {
         sumX += libinput_event_gesture_get_device_coords_x(gesture, i);
         sumY += libinput_event_gesture_get_device_coords_y(gesture, i);
     }
-
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
@@ -355,12 +364,6 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-
-    if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
-        MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
-        DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
-    }
-
     return RET_OK;
 }
 
@@ -404,13 +407,6 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
-    } else if (fingerCount == FINGER_TAP_THREE) {
-        bool canUse = false;
-        GetTouchpadThreeFingersTapSwitch(canUse);
-        if (!canUse) {
-            MMI_HILOGI("The fingerCount is 3 but TouchpadThreeFingersTapSwitch is set as false");
-            return RET_OK;
-        }
     }
 
     if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
