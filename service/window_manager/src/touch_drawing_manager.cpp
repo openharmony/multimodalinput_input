@@ -122,7 +122,15 @@ void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
         AddCanvasNode(bubbleCanvasNode_, false);
         DrawBubbleHandler();
     }
-    if (pointerMode_.isShow) {
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
+        && pointerEvent->GetAllPointerItems().size() == 1) {
+        lastPointerItem_.clear();
+    }
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN
+        && pointerEvent->GetAllPointerItems().size() == 1) {
+        stopRecord_ = false;
+    }
+    if (pointerMode_.isShow && !stopRecord_) {
         CreateTouchWindow();
         AddCanvasNode(trackerCanvasNode_, true);
         AddCanvasNode(crosshairCanvasNode_, false);
@@ -130,7 +138,6 @@ void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
         DrawPointerPositionHandler();
         lastPt_ = currentPt_;
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
@@ -198,9 +205,12 @@ void TouchDrawingManager::UpdateLabels()
 {
     CALL_DEBUG_ENTER;
     if (pointerMode_.isShow) {
+        CreateTouchWindow();
+        AddCanvasNode(labelsCanvasNode_, false);
         DrawLabels();
     } else {
         RemovePointerPosition();
+        DestoryTouchWindow();
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -208,31 +218,11 @@ void TouchDrawingManager::UpdateLabels()
 void TouchDrawingManager::UpdateBubbleData()
 {
     if (!bubbleMode_.isShow) {
-        CHKPV(bubbleCanvasNode_);
-        auto canvas = static_cast<RosenCanvas *>(bubbleCanvasNode_->BeginRecording(scaleW_, scaleH_));
-        CHKPV(canvas);
-        canvas->Clear();
-        bubbleCanvasNode_->FinishRecording();
+        CHKPV(surfaceNode_);
+        surfaceNode_->RemoveChild(bubbleCanvasNode_);
+        bubbleCanvasNode_.reset();
+        DestoryTouchWindow();
         Rosen::RSTransaction::FlushImplicitTransaction();
-    }
-}
-
-void TouchDrawingManager::StopRecord()
-{
-    if (!lastPointerItem_.empty() && isChangedRotation_ && !stopRecord_) {
-        stopMaxPointerCount_ = maxPointerCount_;
-    }
-    if (!lastPointerItem_.empty() && isChangedRotation_) {
-        MMI_HILOGE("lastPointerItem_ is not empty");
-        DrawRotationLabels();
-        stopRecord_ = true;
-        CHKPV(crosshairCanvasNode_);
-        auto canvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scaleW_, scaleH_));
-        canvas->Clear();
-        crosshairCanvasNode_->FinishRecording();
-    }
-    if (!stopRecord_) {
-        UpdateLabels();
     }
 }
 
@@ -243,13 +233,17 @@ void TouchDrawingManager::RotationScreen()
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
+            if (!lastPointerItem_.empty() || stopRecord_) {
+                Snapshot();
+            } else if(!stopRecord_) {
+                UpdateLabels();
+            }
         }
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
-    StopRecord();
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::CreateObserver()
@@ -267,6 +261,7 @@ void TouchDrawingManager::CreateObserver()
             GetBoolValue(pointerPositionSwitchName, pointerMode_.isShow);
         hasPointerObserver_ = true;
     }
+    MMI_HILOGD("bubbleMode_: %{public}d, pointerMode_: %{public}d", bubbleMode_.isShow, pointerMode_.isShow);
 }
 
 template <class T>
@@ -330,12 +325,12 @@ std::string TouchDrawingManager::FormatNumber(T number, int32_t precision)
 void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(surfaceNode_);
     if (canvasNode != nullptr) {
         return;
     }
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
-    CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
 #ifndef USE_ROSEN_DRAWING
@@ -372,7 +367,7 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
 void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction direction)
 {
     CHKPV(canvas);
-    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0) {
+    if (displayInfo_.displayDirection == DIRECTION0) {
         if (direction == Direction::DIRECTION90) {
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
@@ -388,7 +383,8 @@ void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction directio
 void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
-    if (surfaceNode_ != nullptr) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (surfaceNode_ != nullptr || scaleW_ == 0 || scaleH_ == 0) {
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -406,7 +402,7 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
 #endif
     surfaceNode_->SetRotation(0);
-    uint64_t screenId = static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId());
+    uint64_t screenId = static_cast<uint64_t>(displayInfo_.id);
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId = FOLD_SCREEN_MAIN_ID;
     } else if (displayInfo_.displayMode == DisplayMode::FULL) {
@@ -424,6 +420,7 @@ void TouchDrawingManager::DrawBubbleHandler()
     if (IsValidAction(pointerAction)) {
         DrawBubble();
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::DrawBubble()
@@ -480,10 +477,6 @@ void TouchDrawingManager::DrawPointerPositionHandler()
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
     UpdatePointerPosition();
-    if (stopRecord_) {
-        return;
-    }
-
     ClearTracker();
     RecordLabelsInfo();
     CHKPV(crosshairCanvasNode_);
@@ -506,12 +499,13 @@ void TouchDrawingManager::DrawPointerPositionHandler()
     }
     DrawLabels();
     crosshairCanvasNode_->FinishRecording();
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void TouchDrawingManager::DrawRotationLabels()
+void TouchDrawingManager::Snapshot()
 {
     CHKPV(labelsCanvasNode_);
-    std::string viewP = "P: 0 / " + std::to_string(stopMaxPointerCount_);
+    std::string viewP = "P: 0 / " + std::to_string(maxPointerCount_);
     auto dx = currentPt_.GetX() - firstPt_.GetX();
     auto dy = currentPt_.GetY() - firstPt_.GetY();
     std::string viewDx = "dX: " + FormatNumber(dx, ONE_PRECISION);
@@ -539,6 +533,12 @@ void TouchDrawingManager::DrawRotationLabels()
     color = isFirstDraw_ ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
     DrawRectItem(canvas, viewPrs, rect, color);
     labelsCanvasNode_->FinishRecording();
+    CHKPV(crosshairCanvasNode_);
+    auto crosshairCanvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scaleW_, scaleH_));
+    CHKPV(crosshairCanvas);
+    crosshairCanvas->Clear();
+    crosshairCanvasNode_->FinishRecording();
+    stopRecord_ = true;
 }
 
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
@@ -609,7 +609,7 @@ void TouchDrawingManager::DrawLabels()
     CALL_DEBUG_ENTER;
     CHKPV(labelsCanvasNode_);
     std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
-        std::string viewX = "X: " + FormatNumber(currentPt_.GetX(), ONE_PRECISION);
+    std::string viewX = "X: " + FormatNumber(currentPt_.GetX(), ONE_PRECISION);
     std::string viewY = "Y: " + FormatNumber(currentPt_.GetY(), ONE_PRECISION);
     auto dx = currentPt_.GetX() - firstPt_.GetX();
     auto dy = currentPt_.GetY() - firstPt_.GetY();
@@ -619,6 +619,7 @@ void TouchDrawingManager::DrawLabels()
     std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
+    std::lock_guard<std::mutex> lock(mutex_);
     auto canvas = static_cast<RosenCanvas *>(labelsCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
     Rosen::Drawing::Rect rect;
@@ -674,8 +675,7 @@ void TouchDrawingManager::UpdatePointerPosition()
     int32_t pointerId = pointerEvent_->GetPointerId();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
         if (lastPointerItem_.empty()) {
-            ClearLabels();
-            stopRecord_ = false;
+            InitLabels();
         }
         maxPointerCount_ = ++currentPointerCount_;
     } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
@@ -721,8 +721,21 @@ void TouchDrawingManager::RemovePointerPosition()
 
     surfaceNode_->RemoveChild(labelsCanvasNode_);
     labelsCanvasNode_.reset();
+    
+    pointerEvent_.reset();
+    Rosen::RSTransaction::FlushImplicitTransaction();
     isFirstDraw_ = true;
     pressure_ = 0.0;
+}
+
+void TouchDrawingManager::DestoryTouchWindow()
+{
+    if (bubbleMode_.isShow || pointerMode_.isShow) {
+        return;
+    }
+    CHKPV(surfaceNode_);
+    surfaceNode_->ClearChildren();
+    surfaceNode_.reset();
 }
 
 void TouchDrawingManager::ClearTracker()
@@ -736,12 +749,11 @@ void TouchDrawingManager::ClearTracker()
     }
 }
 
-void TouchDrawingManager::ClearLabels()
+void TouchDrawingManager::InitLabels()
 {
     isFirstDownAction_ = true;
     isDownAction_ = true;
     maxPointerCount_ = 0;
-    stopMaxPointerCount_ = 0;
     currentPointerCount_ = 0;
     currentPointerId_ = 0;
     xVelocity_ = 0.0;
