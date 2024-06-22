@@ -181,7 +181,6 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     uint64_t time = libinput_event_touch_get_time_usec(touch);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-
     PointerEvent::PointerItem item;
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
@@ -193,7 +192,15 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     TransformTouchProperties(rawTouch_, item);
     if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
         MMI_HILOGD("Notify fingersense touch up event");
-        FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouch_);
+        TouchType rawTouchTmp = rawTouch_;
+        int32_t displayX = item.GetDisplayX();
+        int32_t displayY = item.GetDisplayY();
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        WIN_MGR->ReverseXY(displayX, displayY);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+        rawTouchTmp.x = displayX * DRIVER_NUMBER;
+        rawTouchTmp.y = displayY * DRIVER_NUMBER;
+        FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouchTmp);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
