@@ -1418,7 +1418,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                     MMI_HILOGD("THREE_FINGERS_SWIPE but three finger action can't use");
                 }
-                if(!canUse) {
+                if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
