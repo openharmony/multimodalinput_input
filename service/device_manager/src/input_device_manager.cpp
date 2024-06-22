@@ -42,12 +42,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_DEVICE_ID = -1;
-constexpr int32_t SUPPORT_KEY = 1;
-const std::string UNKNOWN_SCREEN_ID = "";
-const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
-constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID = 1000;
-constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 128;
+constexpr int32_t INVALID_DEVICE_ID { -1 };
+constexpr int32_t SUPPORT_KEY { 1 };
+const std::string UNKNOWN_SCREEN_ID { "" };
+const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
+constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
+constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM { 128 };
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
@@ -808,7 +808,7 @@ void InputDeviceManager::NotifyDevRemoveCallback(int32_t deviceId, const InputDe
     CALL_DEBUG_ENTER;
     if (auto sysUid = deviceInfo.sysUid; !sysUid.empty()) {
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("send device info to window manager, deivceId:%{public}d, status:remove", deviceId);
+        MMI_HILOGI("Send device info to window manager, deivceId:%{public}d, status:remove", deviceId);
     }
 }
 
