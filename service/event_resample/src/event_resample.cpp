@@ -89,11 +89,12 @@ std::shared_ptr<PointerEvent> EventResample::GetPointerEvent()
 
 void EventResample::EventDump(const char *msg, MotionEvent &event)
 {
-    MMI_HILOGD("%{public}s: a=%{public}d t=%{public}" PRId64 " c=%{public}d s=%{public}d d=%{public}d e=%{public}d",
+    MMI_HILOGD("%{public}s: pointerAction:%{public}d, actionTime:%{public}" PRId64 ", pointerCount:%{public}d,"
+               "sourceType:%{public}d, deviceId:%{public}d, eventId:%{public}d",
                msg, event.pointerAction, event.actionTime, event.pointerCount,
                event.sourceType, event.deviceId, event.eventId);
     for (auto &it : event.pointers) {
-        MMI_HILOGD("ID %{public}d: x=%{public}d y=%{public}d (%{public}d)",
+        MMI_HILOGD("ID:%{public}d, coordX:%{public}d, coordY:%{public}d, toolType:%{public}d",
                    it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
     }
 }
@@ -121,7 +122,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
         EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
         PrintfDeviceName();
         pointerAction = pointerEvent->GetPointerAction();
-        MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,
+        MMI_HILOGD("pointerAction:%{public}d, actionTime:%{public}" PRId64 " frameTime_:%{public}" PRId64,
                    pointerAction, pointerEvent->GetActionTime(), frameTime_);
         switch (pointerAction) {
             case PointerEvent::POINTER_ACTION_DOWN:
@@ -153,7 +154,7 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result)
         Batch& batch = batches_.at(batchIndex);
         if (CanAddSample(batch, inputEvent_)) {
             batch.samples.push_back(inputEvent_);
-            MMI_HILOGD("Event added to batch:%{public}d %{public}d %{public}d",
+            MMI_HILOGD("Event added to batch, deviceId:%{public}d, sourceType:%{public}d, pointerAction:%{public}d",
                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
             return true;
         }
@@ -183,7 +184,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
-            MMI_HILOGD("Output event: toolWindowX:%{public}d toolWindowY:%{public}d", toolWindowX, toolWindowY);
+            MMI_HILOGD("Output event: toolWindowX:%{public}d, toolWindowY:%{public}d", toolWindowX, toolWindowY);
             auto logicX = it.second.coordX;
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
