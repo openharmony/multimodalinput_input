@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string GESTURESENSE_WRAPPER_PATH = "libgesture.z.so";
+const std::string GESTURESENSE_WRAPPER_PATH { "libgesture.z.so" };
 } // namespace
 
 GesturesenseWrapper::GesturesenseWrapper() {}
@@ -51,17 +51,17 @@ void GesturesenseWrapper::InitGestureSenseWrapper()
     }
     touchUp_ = (TOUCH_UP)dlsym(gesturesenseWrapperHandle_, "TouchUp");
     if (touchUp_ == nullptr) {
-        MMI_HILOGE("gesturesense wrapper symbol failed, touchUp_ error:%{public}s", dlerror());
+        MMI_HILOGE("Gesturesense wrapper symbol failed, touchUp_ error:%{public}s", dlerror());
         goto fail;
         return;
     }
     getBoundingSquareness_ = (GET_BOUNDING_SQUARENESS)dlsym(gesturesenseWrapperHandle_, "GetBoundingSquareness");
     if (getBoundingSquareness_ == nullptr) {
-        MMI_HILOGE("gesturesense wrapper symbol failed, getBoundingSquareness_ error:%{public}s", dlerror());
+        MMI_HILOGE("Gesturesense wrapper symbol failed, getBoundingSquareness_ error:%{public}s", dlerror());
         goto fail;
         return;
     }
-    MMI_HILOGI("gesturesense wrapper init success");
+    MMI_HILOGI("Gesturesense wrapper init success");
     return;
 fail:
     dlclose(gesturesenseWrapperHandle_);
