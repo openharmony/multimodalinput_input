@@ -351,6 +351,12 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
 {
     int32_t sumX = 0;
     int32_t sumY = 0;
+    
+    if (fingerCount == 0) {
+        MMI_HILOGD("There is no finger in swipe action:%{public}d", action);
+        return RET_ERR;
+    }
+    
     for (int32_t i = 0; i < fingerCount; i++) {
         sumX += libinput_event_gesture_get_device_coords_x(gesture, i);
         sumY += libinput_event_gesture_get_device_coords_y(gesture, i);
