@@ -346,7 +346,8 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture)
+int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture,
+                                                                     int32_t fingerCount)
 {
     int32_t sumX = 0;
     int32_t sumY = 0;

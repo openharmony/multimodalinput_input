@@ -92,7 +92,7 @@ private:
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
-    int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture);
+    int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
