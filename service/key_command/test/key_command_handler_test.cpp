@@ -2718,9 +2718,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
     KeyCommandHandler handler;
     std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
     ASSERT_NE(touchEvent, nullptr);
-    GESTURESENSE_WRAPPER->touchUp_ = [](const std::vector<float> &, const std::vector<int64_t> &, bool, bool) -> int32_t {
+    GESTURESENSE_WRAPPER->touchUp_ = [](const std::vector<float> &, const std::vector<int64_t> &, bool, bool)
+        -> int32_t {
             return 0;
-        };
+    };
     ASSERT_NE(GESTURESENSE_WRAPPER->touchUp_, nullptr);
     handler.gesturePoints_.assign(LINE_COORDINATES.begin(), LINE_COORDINATES.end());
     handler.gestureTimeStamps_.assign(LINE_TIMESTAMPS.begin(), LINE_TIMESTAMPS.end());
