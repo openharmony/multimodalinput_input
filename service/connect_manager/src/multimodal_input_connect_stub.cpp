@@ -2316,10 +2316,6 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    // if (!PerHelper->VerifySystemApp()) {
-    //     MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
-    //     return ERROR_NOT_SYSAPI;
-    // }
     bool threeFingersTapSwitch = true;
     READBOOL(data, threeFingersTapSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetTouchpadThreeFingersTapSwitch(threeFingersTapSwitch);
@@ -2333,10 +2329,6 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(Message
 int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    // if (!PerHelper->VerifySystemApp()) {
-    //     MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
-    //     return ERROR_NOT_SYSAPI;
-    // }
     bool switchFlag = true;
     int32_t ret = GetTouchpadThreeFingersTapSwitch(switchFlag);
     if (ret != RET_OK) {

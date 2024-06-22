@@ -637,14 +637,6 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
             return RET_OK;
         }
     }
-    if (upCnt == FINGER_TAP_THREE) {
-        bool canUse = false;
-        GetTouchpadThreeFingersTapSwitch(canUse);
-        if (!canUse) {
-            MMI_HILOGI("The event is FINGER_TAP_THREE but TouchpadThreeFingersTapSwitch is set as false");
-            return RET_OK;
-        }
-    }
 
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
         multiFingersState_ = static_cast<MulFingersTap>(upCnt);
