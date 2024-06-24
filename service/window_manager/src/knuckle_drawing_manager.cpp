@@ -55,12 +55,12 @@ constexpr int32_t ROTATION_ANGLE_90 { 90 };
 constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", -1);
-const std::string FOLDABLE = system::GetParameter("const.window.foldabledevice.rotate_policy", "unknown");
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t SCREEN_ROTATE { 1 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-constexpr char FOLDABLE_ROTATE  { '1' };
+constexpr char FOLDABLE_ROTATE  { '0' };
 constexpr int32_t SUBSCRIPT_TWO { 2 };
 constexpr int32_t SUBSCRIPT_ZERO { 0 };
 } // namespace
@@ -125,9 +125,8 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
             canvasNode->ResetSurface(scaleW_, scaleH_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
-            CHKPF(surfaceNode_);
-            surfaceNode_->ClearChildren();
             canvasNode_.reset();
+            CHKPF(surfaceNode_);
             surfaceNode_.reset();
         } else if (isRotate_) {
             isRotate_ = false;
@@ -207,7 +206,7 @@ void KnuckleDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> touchEv
 }
 
 void KnuckleDrawingManager::RotationCanvasNode(
-    std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, const DisplayInfo& displayInfo)
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvasNode);
@@ -233,9 +232,9 @@ bool KnuckleDrawingManager::CheckRotatePolicy(const DisplayInfo& displayInfo)
     bool isNeedRotate = false;
     switch (ROTATE_POLICY) {
         case WINDOW_ROTATE:
+            isNeedRotate = true;
             break;
         case SCREEN_ROTATE:
-            isNeedRotate = true;
             break;
         case FOLDABLE_DEVICE: {
             MMI_HILOGI("FOLDABLE:%{public}s", FOLDABLE.c_str());
@@ -246,7 +245,7 @@ bool KnuckleDrawingManager::CheckRotatePolicy(const DisplayInfo& displayInfo)
             break;
         }
         default:
-            MMI_HILOGE("ROTATE_POLICY:%{public}d", ROTATE_POLICY);
+            MMI_HILOGW("Unknown ROTATE_POLICY:%{public}d", ROTATE_POLICY);
             break;
     }
     return isNeedRotate;
@@ -283,7 +282,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId_ = FOLD_SCREEN_MAIN_ID;
     }
-    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
+    MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     if (CheckRotatePolicy(displayInfo_)) {
         RotationCanvasNode(canvasNode_, displayInfo_);
@@ -379,9 +378,8 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
         canvasNode->ResetSurface(scaleW_, scaleH_);
         canvasNode_->FinishRecording();
-        CHKPR(surfaceNode_, RET_ERR);
-        surfaceNode_->ClearChildren();
         canvasNode_.reset();
+        CHKPR(surfaceNode_, RET_ERR);
         surfaceNode_.reset();
         return RET_OK;
     }
