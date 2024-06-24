@@ -75,6 +75,7 @@ constexpr int32_t BOTTOM_AREA { 5 };
 constexpr int32_t BOTTOM_LEFT_AREA { 6 };
 constexpr int32_t LEFT_AREA { 7 };
 constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
+constexpr int32_t RS_PROCESS_TIMEOUT { 500 * 1000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -2045,7 +2046,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (!touchWindow) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+            int64_t beginTime = GetSysClockTime();
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
+            int64_t endTime = GetSysClockTime();
+            if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
+                MMI_HILOGW("Rs process timeout");
+            }
             return RET_ERR;
         }
         touchWindow = std::make_optional(mouseDownInfo_);
@@ -2129,8 +2135,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    int64_t beginTime = GetSysClockTime();
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
-
+    int64_t endTime = GetSysClockTime();
+    if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
+        MMI_HILOGW("Rs process timeout");
+    }
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
     }
