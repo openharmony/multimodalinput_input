@@ -67,9 +67,10 @@ constexpr float OUT_CIRCLE_TRANSPARENCY { 0.1f };
 const std::string showCursorSwitchName { "settings.input.show_touch_hint" };
 const std::string pointerPositionSwitchName { "settings.developer.show_touch_track" };
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", -1);
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 const std::string PRODUCT_PHONE { "phone" };
 } // namespace
@@ -236,14 +237,18 @@ void TouchDrawingManager::RotationScreen()
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
-            if (!lastPointerItem_.empty() || stopRecord_) {
-                Snapshot();
-            } else if (!stopRecord_) {
-                UpdateLabels();
-            }
         }
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
+        }
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+
+    if (pointerMode_.isShow && isChangedRotation_) {
+        if (!lastPointerItem_.empty() || stopRecord_) {
+            Snapshot();
+        } else if (!stopRecord_) {
+            UpdateLabels();
         }
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
@@ -549,8 +554,8 @@ bool TouchDrawingManager::IsWindowRotation()
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
     return (ROTATE_POLICY == WINDOW_ROTATE || (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo_.displayMode == DisplayMode::MAIN && FOLDABLE_DEVICE_POLICY[0] == (WINDOW_ROTATE + '0')) ||
-        (displayInfo_.displayMode == DisplayMode::FULL && FOLDABLE_DEVICE_POLICY[2] == (WINDOW_ROTATE + '0')))));
+        ((displayInfo_.displayMode == DisplayMode::MAIN && FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo_.displayMode == DisplayMode::FULL && FOLDABLE_DEVICE_POLICY[2] == ROTATE_WINDOW_ROTATE))));
 }
 
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
