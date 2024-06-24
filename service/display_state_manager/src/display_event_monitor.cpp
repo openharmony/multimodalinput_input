@@ -14,6 +14,7 @@
  */
 
 #include "display_event_monitor.h"
+
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
@@ -44,33 +45,33 @@ public:
         CALL_DEBUG_ENTER;
         std::string action = eventData.GetWant().GetAction();
         if (action.empty()) {
-            MMI_HILOGE("action is empty");
+            MMI_HILOGE("Action is empty");
             return;
         }
-        MMI_HILOGD("receivedScreenStatus: %{public}s", action.c_str());
+        MMI_HILOGD("Received screen status:%{public}s", action.c_str());
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            MMI_HILOGI("display screen on");
+            MMI_HILOGI("Display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
             STYLUS_HANDLER->IsLaunchAbility();
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
-                MMI_HILOGI("start enable fingersense");
+                MMI_HILOGI("Start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
-            MMI_HILOGD("display screen off");
+            MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-            MMI_HILOGD("display screen locked");
+            MMI_HILOGD("Display screen locked");
             DISPLAY_MONITOR->SetScreenLocked(true);
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
-            MMI_HILOGD("display screen unlocked");
+            MMI_HILOGD("Display screen unlocked");
             DISPLAY_MONITOR->SetScreenLocked(false);
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
@@ -85,7 +86,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
     } else {
-        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("Shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -100,7 +101,7 @@ void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
     if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
         KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
     } else {
-        MMI_HILOGD("shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
+        MMI_HILOGD("Shield mode before screen off:%{public}d", shieldModeBeforeSreenOff_);
     }
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -111,7 +112,7 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
 {
     CALL_DEBUG_ENTER;
     if (hasInit_) {
-        MMI_HILOGE("current common event has subscribered");
+        MMI_HILOGE("Current common event has subscribered");
         return;
     }
     EventFwk::MatchingSkills matchingSkills;
