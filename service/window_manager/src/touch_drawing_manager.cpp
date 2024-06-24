@@ -557,7 +557,7 @@ bool TouchDrawingManager::IsWindowRotation()
         (ROTATE_POLICY == FOLDABLE_DEVICE &&
         ((displayInfo_.displayMode == DisplayMode::MAIN &&
         FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
-        (displayInfo_.displayMode == DisplayMode::FULL && 
+        (displayInfo_.displayMode == DisplayMode::FULL &&
         FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
 }
 
