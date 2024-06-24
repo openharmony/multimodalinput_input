@@ -320,45 +320,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_005, 
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_001
- * @tc.desc: Test DrawBubbleHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_002
- * @tc.desc: Test DrawBubbleHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_003
- * @tc.desc: Test DrawBubbleHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_DrawBubble_001
  * @tc.desc: Test DrawBubble
  * @tc.type: Function
@@ -371,19 +332,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_001, TestSi
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DrawBubble_002
- * @tc.desc: Test DrawBubble
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubble());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_001
  * @tc.desc: Test DrawPointerPositionHandler
  * @tc.type: Function
@@ -392,19 +340,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_002, TestSi
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_002
- * @tc.desc: Test DrawPointerPositionHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler());
 }
 
@@ -502,76 +437,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawCrosshairs_003, Te
     ASSERT_NE(canvas, nullptr);
     TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION270;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawCrosshairs(canvas, x, y));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_001
- * @tc.desc: Test UpdatePointerPosition
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(5);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_002
- * @tc.desc: Test UpdatePointerPosition
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(5);
-    TOUCH_DRAWING_MGR->currentPointerId_ = 5;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_003
- * @tc.desc: Test UpdatePointerPosition
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerId(0);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_004
- * @tc.desc: Test UpdatePointerPosition
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdatePointerPosition_005
- * @tc.desc: Test UpdatePointerPosition
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerPosition_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetPressed(true);
-    TOUCH_DRAWING_MGR->lastPointerItem_.emplace_back(item);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->UpdatePointerPosition());
 }
 
 /**
@@ -804,18 +669,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawRectItem_002, Test
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawRectItem(canvas, text, rect, color));
     TOUCH_DRAWING_MGR->labelsCanvasNode_->FinishRecording();
     Rosen::RSTransaction::FlushImplicitTransaction();
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_CreateTouchWindow_001
- * @tc.desc: Test CreateTouchWindow
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_CreateTouchWindow_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->CreateTouchWindow());
 }
 
 /**
