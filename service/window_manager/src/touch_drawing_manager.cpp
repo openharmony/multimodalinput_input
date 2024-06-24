@@ -62,12 +62,15 @@ constexpr uint64_t FOLD_SCREEN_FULL_ID { 0 };
 constexpr float TEXT_SIZE { 28.0f };
 constexpr float TEXT_SCALE { 1.0f };
 constexpr float TEXT_SKEW { 0.0f };
-constexpr float CALCULATE_TEMP { 2.0f };
 constexpr float INNER_CIRCLE_TRANSPARENCY { 0.6f };
 constexpr float OUT_CIRCLE_TRANSPARENCY { 0.1f };
 const std::string showCursorSwitchName { "settings.input.show_touch_hint" };
 const std::string pointerPositionSwitchName { "settings.developer.show_touch_track" };
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", -1);
+const std::string FOLDABLE_DEVICE_ROTATE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "unknown");
+constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 const std::string PRODUCT_PHONE { "phone" };
 } // namespace
 
@@ -152,7 +155,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     bubble_.outerCircleWidth = static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE;
     itemRectW_ = static_cast<double>(displayInfo_.width) / RECT_COUNT;
     rectTopPosition_ = 0;
-    if (displayInfo_.displayDirection == DIRECTION0) {
+    if (IsWindowRotation()) {
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             rectTopPosition_ = PRODUCT_TYPE == PRODUCT_PHONE ? PHONE_RECT_TOP : PAD_RECT_TOP;
         }
@@ -229,13 +232,13 @@ void TouchDrawingManager::UpdateBubbleData()
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0) {
+    if (isChangedRotation_ && IsWindowRotation()) {
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
             if (!lastPointerItem_.empty() || stopRecord_) {
                 Snapshot();
-            } else if(!stopRecord_) {
+            } else if (!stopRecord_) {
                 UpdateLabels();
             }
         }
@@ -367,13 +370,13 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
 void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction direction)
 {
     CHKPV(canvas);
-    if (displayInfo_.displayDirection == DIRECTION0) {
+    if (IsWindowRotation()) {
         if (direction == Direction::DIRECTION90) {
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
         } else if (direction == Direction::DIRECTION180) {
-            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_TEMP,
-                displayInfo_.height / CALCULATE_TEMP);
+            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_MIDDLE,
+                displayInfo_.height / CALCULATE_MIDDLE);
         } else if (direction == Direction::DIRECTION270) {
             canvas->Translate(displayInfo_.height, 0);
             canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
