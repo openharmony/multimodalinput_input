@@ -628,7 +628,6 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 {
     CALL_DEBUG_ENTER;
     OHOS::Media::SourceOptions opts;
-    opts.formatHint = "image/svg+xml";
     uint32_t ret = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
     CHKPP(imageSource);
