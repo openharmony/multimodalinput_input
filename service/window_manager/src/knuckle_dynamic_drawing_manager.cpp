@@ -157,9 +157,8 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             canvasNode->ResetSurface(scaleW_, scaleH_);
             canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
-            CHKPF(surfaceNode_);
-            surfaceNode_->ClearChildren();
             canvasNode_.reset();
+            CHKPF(surfaceNode_);
             surfaceNode_.reset();
         } else if (isRotate_) {
             isRotate_ = false;
@@ -249,9 +248,8 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
     auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
     canvasNode->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
-    CHKPV(surfaceNode_);
-    surfaceNode_->ClearChildren();
     canvasNode_.reset();
+    CHKPV(surfaceNode_);
     surfaceNode_.reset();
     isDrawing_ = true;
 }
@@ -409,7 +407,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId_ = FOLD_SCREEN_MAIN_ID;
     }
-    MMI_HILOGI("ScreenId: %{public}" PRIu64, screenId_);
+    MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     if (KnuckleDrawingManager::CheckRotatePolicy(displayInfo_)) {
         KnuckleDrawingManager::RotationCanvasNode(canvasNode_, displayInfo_);
