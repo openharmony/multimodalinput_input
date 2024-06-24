@@ -854,7 +854,11 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
         auto inputDevice = item.second.inputDeviceOrigin;
-        if (libinput_device_has_capability(inputDevice, LIBINPUT_DEVICE_CAP_TABLET_PAD)) {
+        if (inputDevice == nullptr) {
+            continue;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
+        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
             ids.push_back(item.first);
         }
     }
