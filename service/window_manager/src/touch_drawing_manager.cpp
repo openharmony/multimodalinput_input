@@ -68,7 +68,7 @@ const std::string showCursorSwitchName { "settings.input.show_touch_hint" };
 const std::string pointerPositionSwitchName { "settings.developer.show_touch_track" };
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", -1);
-const std::string FOLDABLE_DEVICE_ROTATE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "unknown");
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 const std::string PRODUCT_PHONE { "phone" };
@@ -546,10 +546,11 @@ void TouchDrawingManager::Snapshot()
 
 bool TouchDrawingManager::IsWindowRotation()
 {
-    CALL_DEBUG_ENTER;
-    return (ROTATE_POLICY == WINDOW_ROTATE || (ROTATE_POLICY == FOLDABLE_DEVICE && 
-        (displayInfo_.displayMode == DisplayMode::MAIN && FOLDABLE_DEVICE_ROTATE_POLICY[0] == WINDOW_ROTATE + '0') ||
-        (displayInfo_.displayMode == DisplayMode::FULL && FOLDABLE_DEVICE_ROTATE_POLICY[2] == WINDOW_ROTATE + '0')))
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    return (ROTATE_POLICY == WINDOW_ROTATE || (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo_.displayMode == DisplayMode::MAIN && FOLDABLE_DEVICE_POLICY[0] == (WINDOW_ROTATE + '0')) ||
+        (displayInfo_.displayMode == DisplayMode::FULL && FOLDABLE_DEVICE_POLICY[2] == (WINDOW_ROTATE + '0')))));
 }
 
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
