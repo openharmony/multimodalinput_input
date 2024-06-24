@@ -553,9 +553,12 @@ bool TouchDrawingManager::IsWindowRotation()
 {
     MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
         ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
-    return (ROTATE_POLICY == WINDOW_ROTATE || (ROTATE_POLICY == FOLDABLE_DEVICE &&
-        ((displayInfo_.displayMode == DisplayMode::MAIN && FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
-        (displayInfo_.displayMode == DisplayMode::FULL && FOLDABLE_DEVICE_POLICY[2] == ROTATE_WINDOW_ROTATE))));
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo_.displayMode == DisplayMode::MAIN &&
+        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo_.displayMode == DisplayMode::FULL && 
+        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
 }
 
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
