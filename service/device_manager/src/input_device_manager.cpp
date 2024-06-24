@@ -858,7 +858,7 @@ std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
             continue;
         }
         enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
-        if ((udevTags & EVDEV_UDEV_TAG_TABLET_PAD) != 0) {
+        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
             ids.push_back(item.first);
         }
     }
