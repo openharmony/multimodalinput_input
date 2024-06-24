@@ -544,6 +544,14 @@ void TouchDrawingManager::Snapshot()
     stopRecord_ = true;
 }
 
+bool TouchDrawingManager::IsWindowRotation()
+{
+    CALL_DEBUG_ENTER;
+    return (ROTATE_POLICY == WINDOW_ROTATE || (ROTATE_POLICY == FOLDABLE_DEVICE && 
+        (displayInfo_.displayMode == DisplayMode::MAIN && FOLDABLE_DEVICE_ROTATE_POLICY[0] == WINDOW_ROTATE + '0') ||
+        (displayInfo_.displayMode == DisplayMode::FULL && FOLDABLE_DEVICE_ROTATE_POLICY[2] == WINDOW_ROTATE + '0')))
+}
+
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
 {
     CALL_DEBUG_ENTER;
