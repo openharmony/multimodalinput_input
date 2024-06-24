@@ -868,18 +868,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawRectItem_002, Test
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_CreateTouchWindow_001
- * @tc.desc: Test CreateTouchWindow
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_CreateTouchWindow_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->CreateTouchWindow());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_CreateTouchWindow_002
  * @tc.desc: Test CreateTouchWindow
  * @tc.type: Function
