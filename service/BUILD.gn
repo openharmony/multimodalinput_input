@@ -1502,12 +1502,16 @@ ohos_unittest("DisplayStateManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "display_state_manager/test/display_event_monitor_test.cpp" ]
+  sources = [
+    "display_state_manager/test/display_event_monitor_test.cpp",
+    "display_state_manager/test/mock.cpp",
+  ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
