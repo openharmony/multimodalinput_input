@@ -94,6 +94,7 @@ private:
     std::string FormatNumber(T number, int32_t precision);
     bool IsValidAction(const int32_t action);
     void Snapshot();
+    bool IsWindowRotation();
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
