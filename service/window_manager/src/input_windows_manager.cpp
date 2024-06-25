@@ -2901,32 +2901,39 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
     const Direction direction = info.direction;
     MMI_HILOGD("X:%{public}.2f, Y:%{public}.2f, info.width:%{public}d, info.height:%{public}d",
         x, y, info.width, info.height);
-    if (direction == DIRECTION0) {
-        MMI_HILOGD("direction is DIRECTION0");
-        cursorPos.x = x;
-        cursorPos.y = y;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
-        return;
-    }
-    if (direction == DIRECTION90) {
-        MMI_HILOGD("direction is DIRECTION90");
-        cursorPos.y = static_cast<double>(info.width) - x;
-        cursorPos.x = y;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
-        return;
-    }
-    if (direction == DIRECTION180) {
-        MMI_HILOGD("direction is DIRECTION180");
-        cursorPos.x = static_cast<double>(info.width) - x;
-        cursorPos.y = static_cast<double>(info.height) - y;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
-        return;
-    }
-    if (direction == DIRECTION270) {
-        MMI_HILOGD("direction is DIRECTION270");
-        cursorPos.x = static_cast<double>(info.height) - y;
-        cursorPos.y = x;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+    switch (direction) {
+        case DIRECTION0: {
+            MMI_HILOGD("direction is DIRECTION0");
+            cursorPos.x = x;
+            cursorPos.y = y;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        case DIRECTION90: {
+            MMI_HILOGD("direction is DIRECTION90");
+            cursorPos.y = static_cast<double>(info.width) - x;
+            cursorPos.x = y;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        case DIRECTION180: {
+            MMI_HILOGD("direction is DIRECTION180");
+            cursorPos.x = static_cast<double>(info.width) - x;
+            cursorPos.y = static_cast<double>(info.height) - y;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        case DIRECTION270: {
+            MMI_HILOGD("direction is DIRECTION270");
+            cursorPos.x = static_cast<double>(info.height) - y;
+            cursorPos.y = x;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        default: {
+            MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
+            break;
+        }
     }
 }
 
@@ -3292,7 +3299,6 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 {
-    Coordinate2D matrix;
     if (displayGroupInfo_.displaysInfo.empty()) {
         MMI_HILOGE("displayGroupInfo_.displaysInfo is empty");
         return;
@@ -3302,6 +3308,7 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
         MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
         return;
     }
+    Coordinate2D matrix;
     ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);
