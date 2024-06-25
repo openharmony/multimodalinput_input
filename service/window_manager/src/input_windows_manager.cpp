@@ -1749,6 +1749,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
+                        (action == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) ||
+                        (action == PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
                         winId2ZorderMap.insert({item.id, item.zOrder});
                         continue;
