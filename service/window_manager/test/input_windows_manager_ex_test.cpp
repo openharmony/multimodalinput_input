@@ -820,9 +820,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_003
     EXPECT_FALSE(ret);
 }
 
-
-
-
 /**
  * @tc.name: CalculateTipPoint_001
  * @tc.desc: Test the function CalculateTipPoint
