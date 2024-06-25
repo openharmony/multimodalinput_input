@@ -407,7 +407,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         programName.c_str(), moduleType, pid);
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
-            return this->AddSocketPairInfo(rogramName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+            return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
         }
         );
     DfxHisysevent::ClientConnectData data = {
@@ -437,7 +437,7 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filte
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, filter, filterId, priority, deviceTags, clientPid] {
-            return this->AddInputEventFilter(filter, filterId, priority, deviceTags, clientPid);
+            return sMsgHandler_.AddInputEventFilter(filter, filterId, priority, deviceTags, clientPid);
         }
         );
     if (ret != RET_OK) {
@@ -853,7 +853,7 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle,
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [cllientPid, windowId, pointerStyle, isUiExtension] {
+        [clientPid, windowId, pointerStyle, isUiExtension] {
             return IPointerDrawingManager::GetInstance()->SetPointerStyle(
                 clientPid, windowId, pointerStyle, isUiExtension);
         }
