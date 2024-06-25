@@ -129,6 +129,10 @@ protected:
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t StubAncoAddChannel(MessageParcel& data, MessageParcel& reply);
+    int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
     int32_t VerifyTouchPadSetting(void);

@@ -204,6 +204,10 @@ group("mmi_tests") {
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
   }
+
+  if (input_ext_feature_anco) {
+    deps += [ "frameworks/proxy/events/test:InputManagerAncoTest" ]
+  }
 }
 
 group("examples_group") {

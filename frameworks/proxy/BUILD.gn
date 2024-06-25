@@ -127,6 +127,10 @@ ohos_shared_library("libmmi-client") {
     "${mmi_path}/util:libmmi-util",
   ]
 
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_stub" ]
+  }
+
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [

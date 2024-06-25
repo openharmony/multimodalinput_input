@@ -2284,5 +2284,29 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
+{
+    int32_t ret = delegateTasks_.PostSyncTask([channel]() {
+        return WIN_MGR->AncoAddChannel(channel);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("AncoAddChannel fail, error:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::AncoRemoveChannel(sptr<IAncoChannel> channel)
+{
+    int32_t ret = delegateTasks_.PostSyncTask([channel]() {
+        return WIN_MGR->AncoRemoveChannel(channel);
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("AncoRemoveChannel fail, error:%{public}d", ret);
+    }
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS
