@@ -70,6 +70,8 @@ private:
 
 private:
     std::function<void(int32_t, int64_t)> dispatchCallback_ { nullptr };
+    int32_t lastEventId_ { 0 };
+    int32_t processedCount_ { 0 };
     Aggregator aggregator_ {
         [](int32_t intervalMs, int32_t repeatCount, std::function<void()> callback) -> int32_t {
             return 0;

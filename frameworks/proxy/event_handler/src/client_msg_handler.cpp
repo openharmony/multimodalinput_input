@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "event_log_helper.h"
 #include "input_device.h"
@@ -26,7 +27,6 @@
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
-#include "anr_handler.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -44,6 +44,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
+} // namespace
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
@@ -103,7 +106,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     ResetLogTrace();
     auto ret = (*callback)(client, pkt);
     if (ret < 0) {
-        MMI_HILOGE("Msg handling failed. id:%{public}d,ret:%{public}d", id, ret);
+        MMI_HILOGE("Msg handling failed. id:%{public}d, ret:%{public}d", id, ret);
         return;
     }
 }
@@ -183,6 +186,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
+    processedCount_++;
+    if (processedCount_ == PRINT_INTERVAL_COUNT) {
+        MMI_HILOGI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
+        processedCount_ = 0;
+        lastEventId_ = pointerEvent->GetId();
+    }
     InputMgrImpl.OnPointerEvent(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
         pointerEvent->MarkProcessed();

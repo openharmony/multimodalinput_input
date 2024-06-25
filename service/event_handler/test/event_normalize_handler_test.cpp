@@ -23,8 +23,10 @@
 #include "event_resample.h"
 #include "general_touchpad.h"
 #include "input_device_manager.h"
+#include "input_scene_board_judgement.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
+#include "touchpad_transform_processor.h"
 
 #include "libinput-private.h"
 
@@ -403,6 +405,117 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_TerminateAxis, Tes
     EXPECT_NO_FATAL_FAILURE(handler.TerminateAxis(event));
 }
 
+/**
+ * @tc.name: EventNormalizeHandlerTest_ProcessNullEvent_002
+ * @tc.desc: Test the function ProcessNullEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_002, TestSize.Level1)
+{
+    EventNormalizeHandler handler;
+    int64_t frameTime = 100;
+    libinput_event* event = nullptr;
+    EventResampleHdr->pointerEvent_ = PointerEvent::Create();
+    MMISceneBoardJudgement judgement;
+    judgement.IsSceneBoardEnabled();
+    judgement.IsResampleEnabled();
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    bool ret = handler.ProcessNullEvent(event, frameTime);
+    ASSERT_FALSE(ret);
+    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    ret = handler.ProcessNullEvent(event, frameTime);
+    ASSERT_FALSE(ret);
+    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_JOYSTICK;
+    ret = handler.ProcessNullEvent(event, frameTime);
+    ASSERT_FALSE(ret);
+    EventResampleHdr->pointerEvent_ = nullptr;
+    ret = handler.ProcessNullEvent(event, frameTime);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandleEvent_001
+ * @tc.desc: Test the function HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, TestSize.Level1)
+{
+    EventNormalizeHandler handler;
+    MultiFingersTapHandler processor;
+    int64_t frameTime = 100;
+    libinput_event* event = new (std::nothrow) libinput_event;
+    ASSERT_NE(event, nullptr);
+    event->type = LIBINPUT_EVENT_TOUCH_CANCEL;
+    handler.HandleEvent(event, frameTime);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_TOUCH_FRAME;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_TAP;
+    processor.multiFingersState_ = MulFingersTap::TRIPLETAP;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    processor.multiFingersState_ = MulFingersTap::NO_TAP;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_DEVICE_ADDED;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_DEVICE_REMOVED;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_KEYBOARD_KEY;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_MOTION;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_BUTTON;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_AXIS;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_TAP;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_TOUCHPAD_UP;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_TOUCHPAD_MOTION;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_NONE;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+    event->type = LIBINPUT_EVENT_GESTURE_SWIPE_END;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_HandleKeyboardEvent_001
+ * @tc.desc: Test the function HandleKeyboardEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyboardEvent_001, TestSize.Level1)
+{
+    EventNormalizeHandler handler;
+    libinput_event* event = nullptr;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pressedKeys_.push_back(1);
+    pointerEvent->pressedKeys_.push_back(2);
+    pointerEvent->pressedKeys_.push_back(3);
+    pointerEvent->pressedKeys_.push_back(4);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
+    event = new (std::nothrow) libinput_event;
+    ASSERT_NE(event, nullptr);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
+}
+
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 /**
  * @tc.name: EventNormalizeHandlerTest_SetMoveEventFilters_001
@@ -649,20 +762,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleTouchEventWi
 }
 
 /**
- * @tc.name: EventNormalizeHandlerTest_AddHandleTimer_001
- * @tc.desc: Add handlerTimer
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_AddHandleTimer_001, TestSize.Level1)
-{
-    EventNormalizeHandler eventNormalizeHandler;
-    const int32_t timeOut = 400;
-    int32_t timeId = eventNormalizeHandler.AddHandleTimer(timeOut);
-    ASSERT_NE(timeId, -1);
-}
-
-/**
  * @tc.name: EventNormalizeHandlerTest_CalcTouchOffset_001
  * @tc.desc: Determine whether the touch produces displacement
  * @tc.type: FUNC
@@ -700,6 +799,21 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_CalcTouchOffset_00
     pointerEvent->AddPointerItem(item2);
     double offSet = eventNormalizeHandler.CalcTouchOffset(pointerEvent);
     ASSERT_EQ(offSet, 1.f);
+}
+#endif // #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+
+/**
+ * @tc.name: EventNormalizeHandlerTest_AddHandleTimer_001
+ * @tc.desc: Add handlerTimer
+ * @tc.type: FUNC
+ * @tc.require:SR000HQ0RR
+ */
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_AddHandleTimer_001, TestSize.Level1)
+{
+    EventNormalizeHandler eventNormalizeHandler;
+    const int32_t timeOut = 400;
+    int32_t timeId = eventNormalizeHandler.AddHandleTimer(timeOut);
+    ASSERT_NE(timeId, -1);
 }
 
 /**
@@ -830,12 +944,12 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_OnEventDeviceRemov
 }
 
 /**
- * @tc.name: EventNormalizeHandlerTest_ProcessNullEvent_002
+ * @tc.name: EventNormalizeHandlerTest_ProcessNullEvent_003
  * @tc.desc: Process nullEvent
  * @tc.type: FUNC
  * @tc.require:SR000HQ0RR
  */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_002, TestSize.Level1)
+HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_003, TestSize.Level1)
 {
     EventNormalizeHandler eventNormalizeHandler;
     libinput_event *event = nullptr;
@@ -843,6 +957,5 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     bool flag = eventNormalizeHandler.ProcessNullEvent(event, frametime);
     ASSERT_FALSE(flag);
 }
-#endif // #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 } // namespace MMI
 } // namespace OHOS

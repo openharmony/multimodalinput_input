@@ -317,10 +317,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std:
     fingers_(fingers)
 {
     SetCallback(callback);
-    if (monitor_ == nullptr) {
-        MMI_HILOGE("The monitor is null");
-        return;
-    }
+    CHKPV(monitor_);
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
@@ -339,10 +336,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
     fingers_(fingers)
 {
     SetCallback(callback);
-    if (monitor_ == nullptr) {
-        MMI_HILOGE("The monitor is null");
-        return;
-    }
+    CHKPV(monitor_);
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
@@ -1304,14 +1298,18 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             }
         }
         evQueue_.push(pointerEvent);
-        jsTaskNum_ = 1;
     }
 
     if (!evQueue_.empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
-        CHKPV(monitorInfo);
+        if (monitorInfo == nullptr) {
+            MMI_HILOGE("monitorInfo is nullptr");
+            delete work;
+            work = nullptr;
+            return;
+        }
         monitorInfo->monitorId = monitorId_;
         monitorInfo->fingers = fingers_;
         work->data = monitorInfo;
@@ -1319,15 +1317,15 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         auto status = napi_get_uv_event_loop(jsEnv_, &loop);
         if (status != napi_ok) {
             THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
-            delete work;
-            {
-                std::lock_guard<std::mutex> guard(mutex_);
-                jsTaskNum_ = 0;
-            }
+            CleanData(&monitorInfo, &work);
             return;
         }
         int32_t ret = uv_queue_work_with_qos(
-            loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
+            loop, work,
+            [](uv_work_t *work) {
+                MMI_HILOGD("uv_queue_work callback function is called");
+            },
+            &JsInputMonitor::JsCallback, uv_qos_user_initiated);
         if (ret != 0) {
             MMI_HILOGE("add uv_queue failed, ret is %{public}d", ret);
             CleanData(&monitorInfo, &work);
@@ -1363,7 +1361,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    jsTaskNum_ = 0;
     if (!isMonitoring_) {
         MMI_HILOGE("Js monitor stop");
         return;
@@ -1493,19 +1490,13 @@ bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
 {
     napi_value xProperty;
     CHKRF(napi_get_named_property(env, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
-    if (xProperty == nullptr) {
-        MMI_HILOGE("xProperty == nullptr, return");
-        return false;
-    }
+    CHKPF(xProperty);
     int32_t xInt { 0 };
     CHKRF(napi_get_value_int32(env, xProperty, &xInt), GET_VALUE_INT32);
 
     napi_value yProperty;
     CHKRF(napi_get_named_property(env, napiPointer, "screenY", &yProperty), GET_NAMED_PROPERTY);
-    if (yProperty == nullptr) {
-        MMI_HILOGE("yProperty == nullptr, return");
-        return false;
-    }
+    CHKPF(yProperty);
     int32_t yInt { 0 };
     CHKRF(napi_get_value_int32(env, yProperty, &yInt), GET_VALUE_INT32);
 

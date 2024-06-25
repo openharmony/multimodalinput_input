@@ -71,6 +71,7 @@ public:
     virtual ExtraData GetExtraData() const = 0;
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
+    virtual void ClearTargetWindowId(int32_t pointerId) = 0;
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
@@ -89,7 +90,7 @@ public:
         PointerStyle pointerStyle, bool isUiExtension = false) = 0;
     virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId,
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
-    virtual void DispatchPointer(int32_t pointerAction) = 0;
+    virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual bool IsNeedRefreshLayer(int32_t windowId) = 0;
@@ -102,6 +103,7 @@ public:
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
     virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;
+    virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -114,7 +116,7 @@ public:
     virtual void UpdatePointerChangeAreas() = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
-    virtual void GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds) = 0;
+    virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
 

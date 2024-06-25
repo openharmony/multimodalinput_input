@@ -36,6 +36,8 @@ public:
     MOCK_METHOD(struct libinput_tablet_tool *, TabletToolGetTool, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(enum libinput_tablet_tool_tip_state, TabletToolGetTipState, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(enum libinput_tablet_tool_type, TabletToolGetType, (struct libinput_tablet_tool *));
+    MOCK_METHOD(enum libinput_pointer_axis_source, GetAxisSource, (struct libinput_event_pointer *));
+    MOCK_METHOD(struct libinput_event_pointer*, LibinputGetPointerEvent, (struct libinput_event *));
     MOCK_METHOD(int32_t, TabletToolGetToolType, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(double, TabletToolGetTiltX, (struct libinput_event_tablet_tool *));
     MOCK_METHOD(double, TabletToolGetTiltY, (struct libinput_event_tablet_tool *));
@@ -52,6 +54,13 @@ public:
     MOCK_METHOD(int, GestureEventGetFingerCount, (struct libinput_event_gesture *));
     MOCK_METHOD(int, GestureEventGetDevCoordsX, (struct libinput_event_gesture *, uint32_t));
     MOCK_METHOD(int, GestureEventGetDevCoordsY, (struct libinput_event_gesture *, uint32_t));
+    MOCK_METHOD(uint32_t, PointerEventGetFingerCount, (struct libinput_event_pointer *));
+    MOCK_METHOD(double, PointerGetDxUnaccelerated, (struct libinput_event_pointer *));
+    MOCK_METHOD(double, PointerGetDyUnaccelerated, (struct libinput_event_pointer *));
+    MOCK_METHOD(uint32_t, PointerGetButton, (struct libinput_event_pointer *));
+    MOCK_METHOD(int, PointerHasAxis, (struct libinput_event_pointer *,  enum libinput_pointer_axis));
+    MOCK_METHOD(double, PointerGetAxisValue, (struct libinput_event_pointer *,  enum libinput_pointer_axis));
+
 };
 } // namespace MMI
 } // namespace OHOS

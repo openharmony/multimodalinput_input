@@ -14,7 +14,7 @@
  */
 
 //!
-use hilog_rust::{error, hilog, info, debug, HiLogLabel, LogType};
+use hilog_rust::{error, hilog, debug, HiLogLabel, LogType};
 use std::ffi::{c_char, CString};
 use std::sync::Once;
 
@@ -534,7 +534,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
             *abs_x += dx * gain;
             *abs_y += dy * gain;
         }
-        info!(
+        debug!(
             LOG_LABEL,
             "abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
@@ -581,18 +581,12 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
         if !mode {
             deltax = (dx * gain + COMPENSATE_VALUEX).trunc();
             deltay = (dy * gain + COMPENSATE_VALUEY).trunc();
-            COMPENSATE_VALUEX += deltax.fract();
-            COMPENSATE_VALUEY += deltay.fract();
-            if (COMPENSATE_VALUEX).abs() >= 1.0 {
-                COMPENSATE_VALUEX = COMPENSATE_VALUEX - (COMPENSATE_VALUEX).trunc(); // 更新 compensate_value 值
-            }
-            if (COMPENSATE_VALUEY).abs() >= 1.0 {
-                COMPENSATE_VALUEY =COMPENSATE_VALUEY- (COMPENSATE_VALUEY).trunc(); // 更新 compensate_value 值
-            }
+            COMPENSATE_VALUEX = (dx * gain + COMPENSATE_VALUEX).fract();
+            COMPENSATE_VALUEY = (dy * gain + COMPENSATE_VALUEY).fract();
             *abs_x += deltax;
             *abs_y += deltay;
         }
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
@@ -625,7 +619,7 @@ pub unsafe extern "C" fn HandleAxisAccelerateTouchpad (
         if !mode {
             *abs_axis = if *abs_axis >= 0.0 { gain } else { -gain };
         }
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_axis {}", @public(*abs_axis)
         );
@@ -716,6 +710,225 @@ fn test_handle_motion_accelerate_capture_mode_false_touchpad()
     assert_eq!(abs_y, 0.0);
 }
 
+/* test for touchpad klv */
+#[test]
+fn test_handle_motion_accelerate_capture_klv_offset_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00000001, dy: 0.00000002 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 1);
+    }
+    assert_eq!(ret, RET_ERR);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_klv_speed_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 0, 1);
+    }
+    assert_eq!(ret, RET_ERR);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_klv_mode_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 1);
+    }
+    assert_eq!(ret, RET_OK);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_klv_nomarl_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 1);
+    }
+    assert_eq!(ret, RET_OK);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_klv_offset_exceed_max_touchpad()
+{
+    let offset: Offset = Offset{ dx: 82.00002, dy: 82.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 1);
+    }
+    assert_eq!(ret, RET_OK);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+/* test for touchpad soft_harden */
+#[test]
+fn test_handle_motion_accelerate_capture_soft_harden_offset_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00000001, dy: 0.00000002 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 2);
+        debug!(
+        LOG_LABEL,
+        "ret =  {}", @public(ret)
+        );
+    }
+    assert_eq!(ret, RET_ERR);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_soft_harden_speed_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 0, 2);
+    }
+    assert_eq!(ret, RET_ERR);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_soft_harden_mode_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 2);
+    }
+    assert_eq!(ret, RET_OK);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_soft_harden_nomarl_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 2);
+    }
+    assert_eq!(ret, RET_OK);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_soft_harden_offset_exceed_max_touchpad()
+{
+    let offset: Offset = Offset{ dx: 160.00002, dy: 160.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 2);
+    }
+    assert_eq!(ret, RET_OK);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+/* test for touchpad hard_harden */
+#[test]
+fn test_handle_motion_accelerate_capture_hard_harden_offset_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00000001, dy: 0.00000002 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 3);
+    }
+    assert_eq!(ret, RET_ERR);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_hard_harden_speed_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 0, 3);
+    }
+    assert_eq!(ret, RET_ERR);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_hard_harden_mode_false_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 3);
+    }
+    assert_eq!(ret, RET_OK);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_hard_harden_nomarl_touchpad()
+{
+    let offset: Offset = Offset{ dx: 0.00002, dy: 1.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 3);
+    }
+    assert_eq!(ret, RET_OK);
+}
+
+#[test]
+fn test_handle_motion_accelerate_capture_hard_harden_offset_exceed_max_touchpad()
+{
+    let offset: Offset = Offset{ dx: 160.00002, dy: 160.00004 };
+    let mut abs_x: f64 = 0.0;
+    let mut abs_y: f64 = 0.0;
+    let ret: i32;
+    unsafe {
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 3);
+    }
+    assert_eq!(ret, RET_OK);
+    assert_eq!(abs_x, 0.0);
+    assert_eq!(abs_y, 0.0);
+}
 /* test touchpad axis */
 #[test]
 fn test_handle_axis_accelerate_normal_touchpad()

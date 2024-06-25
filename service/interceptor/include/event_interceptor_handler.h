@@ -48,7 +48,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:

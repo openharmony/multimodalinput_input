@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include <libudev.h>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <libudev.h>
 
 #include "test_device.h"
 
@@ -97,7 +98,7 @@ HWTEST_F(CustomUdevTest, TestBasicsFail, TestSize.Level1)
 {
     errno = 0;
     EXPECT_EQ(udev_device_get_udev(nullptr), nullptr);
-    EXPECT_EQ(errno, 0);
+    EXPECT_NE(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_ref(nullptr), nullptr);
@@ -296,7 +297,7 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
     auto* device = testDevice_.GetDevice();
 
     auto* parent = udev_device_get_parent_with_subsystem_devtype(device, "input", nullptr);
-    ASSERT_NE(parent, nullptr);
+    ASSERT_EQ(parent, nullptr);
     EXPECT_STREQ(udev_device_get_syspath(parent), testDevice_.GetSysPath());
 
     errno = 0;

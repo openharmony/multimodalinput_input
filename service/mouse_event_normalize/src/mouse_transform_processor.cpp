@@ -16,26 +16,27 @@
 #include "mouse_transform_processor.h"
 
 #include <cinttypes>
+#include <chrono>
 #include <functional>
 
 #include <linux/input-event-codes.h>
 
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "event_log_helper.h"
+#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
+#include "i_preference_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "parameters.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "timer_manager.h"
-#include "dfx_hisysevent.h"
-#include "util_ex.h"
 #include "util.h"
-#include "i_preference_manager.h"
+#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -64,6 +65,7 @@ constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
@@ -156,6 +158,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     uint32_t button = libinput_event_pointer_get_button(data);
+    uint32_t originButton = button;
     const int32_t type = libinput_event_get_type(event);
     bool tpTapSwitch = true;
     GetTouchpadTapSwitch(tpTapSwitch);
@@ -181,10 +184,19 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
+        GetTouchpadRightClickType(switchTypeData);
+        RightClickType switchType = RightClickType(switchTypeData);
+        if (type == LIBINPUT_EVENT_POINTER_TAP && switchType == RightClickType::TP_TWO_FINGER_TAP &&
+            button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE) {
+            MMI_HILOGD("Right click up, do sleep");
+            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_BUTTON_UP));
+        }
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->DeleteReleaseButton(buttonId);
+        DeletePressedButton(originButton);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
@@ -192,6 +204,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->SetButtonPressed(buttonId);
+        buttonMapping_[originButton] = buttonId;
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
     } else {
@@ -199,6 +212,15 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         return RET_ERR;
     }
     return RET_OK;
+}
+
+void MouseTransformProcessor::DeletePressedButton(uint32_t originButton)
+{
+    auto iter = buttonMapping_.find(originButton);
+    if (iter != buttonMapping_.end()) {
+        pointerEvent_->DeleteReleaseButton(iter->second);
+        buttonMapping_.erase(iter);
+    }
 }
 
 int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button,
@@ -648,9 +670,9 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
         } else if (width == SOFT_HARDEN_DEVICE_WIDTH && height == SOFT_HARDEN_DEVICE_HEIGHT) {
             ret = DeviceType::DEVICE_SOFT_HARDEN;
         } else {
-            MMI_HILOGE("undefined width: %{public}d, height: %{public}d", width, height);
+            MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
-        MMI_HILOGD("device width: %{public}d, height:%{public}d", width, height);
+        MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
     }
     return ret;
 }
@@ -715,13 +737,13 @@ int32_t MouseTransformProcessor::GetTouchpadSpeed()
 {
     int32_t speed = DEFAULT_TOUCHPAD_SPEED;
     GetTouchpadPointerSpeed(speed);
-    MMI_HILOGD("(TouchPad) pointer speed:%{public}d", speed);
+    MMI_HILOGD("TouchPad pointer speed:%{public}d", speed);
     return speed;
 }
 
 int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
 {
-    MMI_HILOGI("SetPointerLocation(x:%{public}d, y:%{public}d)", x, y);
+    MMI_HILOGI("SetPointerLocation x:%{public}d, y:%{public}d", x, y);
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");
@@ -792,6 +814,13 @@ void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_poi
 void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t evenType,
     uint32_t &button)
 {
+    // touchpad two finger button -> 273
+    uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
+    if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+        return;
+    }
+
     // touchpad right click 273 -> 272
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
@@ -802,18 +831,6 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
     // touchpad left click 280 -> 272
     if (button == BTN_RIGHT_MENUE_CODE) {
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
-        return;
-    }
-
-    // touchpad two finger button 272 -> 273
-    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
-        evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        uint32_t fingerCount = libinput_event_pointer_get_finger_count(data);
-        auto state = libinput_event_pointer_get_button_state(data);
-        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT ||
-            (state == LIBINPUT_BUTTON_STATE_RELEASED && fingerCount == TP_CLICK_FINGER_ONE)) {
-            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
-        }
         return;
     }
 }

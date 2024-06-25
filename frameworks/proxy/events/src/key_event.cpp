@@ -1268,7 +1268,7 @@ int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
             return SCROLL_LOCK_FUNCTION_KEY;
         }
         default: {
-            MMI_HILOGW("Unknown key code");
+            MMI_HILOGW("Unknown key code:%{public}d", keyCode);
             return UNKNOWN_FUNCTION_KEY;
         }
     }
@@ -1287,7 +1287,7 @@ bool KeyEvent::GetFunctionKey(int32_t funcKey) const
             return scrollLock_;
         }
         default: {
-            MMI_HILOGW("Unknown function key");
+            MMI_HILOGW("Unknown function key:%{public}d", funcKey);
             return false;
         }
     }
@@ -1310,7 +1310,7 @@ int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
             return funcKey;
         }
         default: {
-            MMI_HILOGW("Unknown function key");
+            MMI_HILOGW("Unknown function key:%{public}d", funcKey);
             return UNKNOWN_FUNCTION_KEY;
         }
     }

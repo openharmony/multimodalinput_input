@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,10 +18,10 @@
 
 #include "event_log_helper.h"
 #include "event_util_test.h"
+#include "input_manager.h"
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
-#include "input_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerTest"
@@ -1618,6 +1618,50 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_001, TestSize.Lev
 }
 
 /**
+ * @tc.name: InputManagerTest_SubscribeSwitchEvent_001
+ * @tc.desc: Subscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.Level1)
+{
+    auto fun = [](std::shared_ptr<SwitchEvent> event) {
+        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
+            event->GetSwitchType(), event->GetSwitchValue());
+    };
+    int32_t subscribeId = InputManager::GetInstance()->SubscribeSwitchEvent(fun, SwitchEvent::SwitchType::SWITCH_LID);
+    ASSERT_NE(subscribeId, INVAID_VALUE);
+    InputManager::GetInstance()->UnsubscribeSwitchEvent(subscribeId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeSwitchEvent_002
+ * @tc.desc: Subscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
+{
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), INVAID_VALUE);
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeSwitchEvent_003
+ * @tc.desc: Subscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.Level1)
+{
+    auto fun = [](std::shared_ptr<SwitchEvent> event) {
+        MMI_HILOGD("Subscribe switch event success, type:%{public}d, value:%{public}d",
+            event->GetSwitchType(), event->GetSwitchValue());
+    };
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
+        fun, SwitchEvent::SwitchType(INVAID_VALUE)), INVAID_VALUE);
+}
+
+/**
  * @tc.name: InputManagerTest_UnsubscribeSwitchEvent_001
  * @tc.desc: Unsubscribes from a switch input event.
  * @tc.type: FUNC
@@ -2484,6 +2528,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_BOTTOM_LEFT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::TOP_LIMIT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::BOTTOM_RIGHT_LIMIT, getpid(), windowId);
+    ASSERT_NO_FATAL_FAILURE(window->GetWindowId());
 }
 
 /**
@@ -2698,8 +2743,8 @@ public:
 HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1)
 {
     auto watcher = std::make_shared<ServiceWatcher>();
-    InputManager::GetInstance()->AddServiceWatcher(watcher);
-    InputManager::GetInstance()->RemoveServiceWatcher(watcher);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AddServiceWatcher(watcher));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->RemoveServiceWatcher(watcher));
 }
 
 /**
@@ -2713,7 +2758,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     int32_t offsetX = 20;
     int32_t offsetY = 20;
-    InputManager::GetInstance()->MoveMouse(offsetX, offsetY);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MoveMouse(offsetX, offsetY));
 }
 
 /**

@@ -38,11 +38,11 @@ std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
 std::mutex SettingDataShare::mutex_;
 sptr<IRemoteObject> SettingDataShare::remoteObj_;
 namespace {
-const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
-const std::string SETTING_COLUMN_VALUE = "VALUE";
-const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
-const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
-constexpr int32_t DECIMAL_BASE = 10;
+const std::string SETTING_COLUMN_KEYWORD { "KEYWORD" };
+const std::string SETTING_COLUMN_VALUE { "VALUE" };
+const std::string SETTING_URI_PROXY { "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true" };
+const std::string SETTINGS_DATA_EXT_URI { "datashare:///com.ohos.settingsdata.DataAbility" };
+constexpr int32_t DECIMAL_BASE { 10 };
 } // namespace
 
 SettingDataShare::~SettingDataShare() {}

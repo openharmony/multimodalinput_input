@@ -322,6 +322,25 @@ void BytraceAdapter::StartConsumer(std::shared_ptr<KeyEvent> keyEvent)
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "eventConsume keyEventId:" + std::to_string(keyEvent->GetId()));
 }
 
+void BytraceAdapter::StartPostTaskEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startpostEvent pointerEventId:" +
+        std::to_string(pointerEvent->GetId()));
+}
+
+void BytraceAdapter::StartPostTaskEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startpostEvent keyEventId:" +
+        std::to_string(keyEvent->GetId()));
+}
+
+void BytraceAdapter::StopPostTaskEvent()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
 void BytraceAdapter::StartSocketHandle(int32_t msgId)
 {
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "socketMsgHandle msgId:" + std::to_string(msgId));

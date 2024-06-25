@@ -19,12 +19,13 @@
 
 #include <linux/input-event-codes.h>
 
-#include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
+#include "transaction/rs_interfaces.h"
 
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -33,7 +34,6 @@
 #include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
-#include <transaction/rs_interfaces.h>
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -43,8 +43,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
-constexpr int32_t INTERVAL_DURATION = 10;
+constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
+constexpr int32_t INTERVAL_DURATION { 10 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -96,19 +96,70 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
     }
 }
 
+std::shared_ptr<WindowInfo> EventDispatchHandler::SearchCancelList (int32_t pointerId, int32_t windowId)
+{
+    if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
+        return nullptr;
+    }
+    auto windowList = cancelEventList_[pointerId];
+    for (auto &info : windowList) {
+        if (info->id == windowId) {
+            return info;
+        }
+    }
+    return nullptr;
+}
+
+bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, int32_t windowId,
+    std::optional<WindowInfo> &windowInfo)
+{
+    int32_t pointerId = point->GetPointerId();
+    if (windowInfo == std::nullopt) {
+        std::shared_ptr<WindowInfo> curInfo = SearchCancelList(pointerId, windowId);
+        if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            windowInfo = std::make_optional(*curInfo);
+            MMI_HILOG_DISPATCHI("Touch event send cancel");
+        } else {
+            MMI_HILOGE("WindowInfo id nullptr");
+            return false;
+        }
+    }
+    std::shared_ptr<WindowInfo> curWindowInfo = std::make_shared<WindowInfo>(*windowInfo);
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        if (cancelEventList_.find(pointerId) == cancelEventList_.end()) {
+            cancelEventList_[pointerId] = std::set<std::shared_ptr<WindowInfo>, EventDispatchHandler::CancelCmp>();
+        }
+        cancelEventList_[pointerId].insert(curWindowInfo);
+    } else if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end() &&
+            cancelEventList_[pointerId].find(curWindowInfo) != cancelEventList_[pointerId].end()) {
+            cancelEventList_[pointerId].erase(curWindowInfo);
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
 void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<PointerEvent> point,
     PointerEvent::PointerItem pointerItem)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
     std::vector<int32_t> windowIds;
-    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     int32_t count = 0;
+    int32_t pointerId = point->GetPointerId();
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        if (cancelEventList_.find(pointerId) != cancelEventList_.end()) {
+            cancelEventList_.erase(pointerId);
+        }
+    }
     for (auto windowId : windowIds) {
-        int32_t pointerId = point->GetPointerId();
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
-        if (windowInfo == std::nullopt) {
-            MMI_HILOGE("WindowInfo id nullptr");
+        if (!ReissueEvent(point, windowId, windowInfo)) {
             continue;
         }
         auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
@@ -129,6 +180,11 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         pointerEvent->SetDispatchTimes(count++);
         DispatchPointerEventInner(pointerEvent, fd);
+    }
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        WIN_MGR->ClearTargetWindowId(pointerId);
     }
 }
 
@@ -168,7 +224,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
 
     std::vector<int32_t> windowIds;
-    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
@@ -224,7 +280,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         return;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
-        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        MMI_HILOGD("Session pid:%{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
     }
 }
@@ -243,7 +299,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{public}d, Action:%{public}d, EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
@@ -274,7 +330,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return MSG_SEND_FAIL;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
-        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        MMI_HILOGD("Session pid:%{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     }
     return RET_OK;

@@ -45,8 +45,7 @@ bool CheckType(const napi_env& env, const napi_value& value, const napi_valuetyp
 bool IsArray(const napi_env& env, const napi_value& value)
 {
     bool isArray = false;
-    napi_status ret = napi_is_array(env, value, &isArray);
-    if (ret != napi_ok) {
+    if (napi_is_array(env, value, &isArray) != napi_ok) {
         MMI_HILOGE("napi_is_array failed");
         return false;
     }
@@ -201,7 +200,7 @@ static napi_value GetInfraredFrequencies(napi_env env, napi_callback_info info)
         }
         CHKRP(napi_set_element(env, result, i, item), SET_ELEMENT);
     }
-    MMI_HILOGD("js_register_module.GetInfraredFrequencies :%{public}s ", logPrint.c_str());
+    MMI_HILOGD("js_register_module.GetInfraredFrequencies:%{public}s ", logPrint.c_str());
     return result;
 }
 
@@ -221,7 +220,7 @@ static napi_value TransmitInfrared(napi_env env, napi_callback_info info)
     for (int32_t i = 0; i < size; i++) {
         context = context + std::to_string(i) + ": pattern: " + std::to_string(pattern[i]) + ";";
     }
-    MMI_HILOGD("js_register_module.TransmitInfrared para size :%{public}s", context.c_str());
+    MMI_HILOGD("js_register_module.TransmitInfrared para size:%{public}s", context.c_str());
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     if (ret != RET_OK) {
         if (RET_OK > ret || COMMON_PERMISSION_CHECK_ERROR == ret || ERROR_NOT_SYSAPI == ret) {

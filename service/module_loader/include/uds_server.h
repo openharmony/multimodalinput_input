@@ -89,6 +89,7 @@ protected:
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
     std::map<int32_t, std::shared_ptr<mmi_epoll_event>> epollEventMap_;
+    mutable int32_t pid_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
