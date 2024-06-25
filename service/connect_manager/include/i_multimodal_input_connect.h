@@ -19,6 +19,9 @@
 #include "iremote_broker.h"
 
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_channel.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
 #include "mmi_event_observer.h"
@@ -139,6 +142,10 @@ public:
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
     virtual int32_t EnableHardwareCursorStats(bool enable) = 0;
     virtual int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) = 0;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
+    virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
+#endif // OHOS_BUILD_ENABLE_ANCO
 };
 } // namespace MMI
 } // namespace OHOS
