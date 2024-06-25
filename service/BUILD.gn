@@ -162,7 +162,6 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_keyboard) {
     sources += [
       "display_state_manager/src/display_event_monitor.cpp",
-      "key_command/src/shortcut_handler.cpp",
       "key_event_normalize/src/key_event_normalize.cpp",
       "key_event_normalize/src/key_unicode_transformation.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
@@ -403,10 +402,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
 
   configs = [ ":libmmi_server_config" ]
 
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
+  cflags = [ "-DUNIT_TEST" ]
 
   sources = [
     "key_command/src/key_command_handler.cpp",
