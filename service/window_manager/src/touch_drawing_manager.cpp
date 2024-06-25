@@ -523,7 +523,6 @@ void TouchDrawingManager::Snapshot()
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
     auto canvas = static_cast<RosenCanvas *>(labelsCanvasNode_->BeginRecording(scaleW_, scaleH_));
-    CHKPV(canvas);
     Rosen::Drawing::Rect rect;
     rect.top_ = rectTopPosition_;
     rect.bottom_ = rectTopPosition_ + RECT_HEIGHT;
@@ -543,7 +542,6 @@ void TouchDrawingManager::Snapshot()
     labelsCanvasNode_->FinishRecording();
     CHKPV(crosshairCanvasNode_);
     auto crosshairCanvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scaleW_, scaleH_));
-    CHKPV(crosshairCanvas);
     crosshairCanvas->Clear();
     crosshairCanvasNode_->FinishRecording();
     stopRecord_ = true;
