@@ -19,6 +19,7 @@
 
 #include "input_windows_manager.h"
 #include "mock.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -681,6 +682,145 @@ HWTEST_F(InputWindowsManagerTest, TransformTipPoint_003, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_TransformTipPoint_004
+ * @tc.desc: Test the function TransformTipPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
+
+    libinput_event_tablet_tool event {};
+    Direction direction;
+    direction = DIRECTION90;
+    PhysicalCoordinate coord;
+    coord.x = 5.5;
+    coord.y = 3.2;
+    int32_t displayId = 2;
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformTipPoint_005
+ * @tc.desc: Test the function TransformTipPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
+
+    libinput_event_tablet_tool event {};
+    Direction direction;
+    direction = DIRECTION270;
+    PhysicalCoordinate coord;
+    coord.x = 6.5;
+    coord.y = 8.2;
+    int32_t displayId = 3;
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformTipPoint_006
+ * @tc.desc: Test the function TransformTipPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
+
+    libinput_event_tablet_tool event {};
+    Direction direction;
+    direction = DIRECTION0;
+    PhysicalCoordinate coord;
+    coord.x = 6.5;
+    coord.y = 8.2;
+    int32_t displayId = 3;
+    bool ret = inputWindowsManager->TransformTipPoint(&event, coord, displayId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_001
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = 2;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(true));
+
+    bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_002
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = 3;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
+
+    int32_t displayId = MouseEventHdr->GetDisplayId();
+    EXPECT_FALSE(displayId < 0);
+
+    std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(5, 7);
+    bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_003
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
+    int32_t displayId = MouseEventHdr->GetDisplayId();
+    EXPECT_FALSE(displayId < 0);
+
+    std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(6, 8);
+    int32_t windowId = GLOBAL_WINDOW_ID;
+    bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: CalculateTipPoint_001
  * @tc.desc: Test the function CalculateTipPoint
  * @tc.type: FUNC
@@ -720,6 +860,30 @@ HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_002, TestSize.Level1)
     int32_t displayId;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->CalculateTipPoint(&event, displayId, coord));
     inputWindowsManager->displayGroupInfo_.displaysInfo.clear();
+}
+
+/**
+ * @tc.name: CalculateTipPoint_003
+ * @tc.desc: Test the function CalculateTipPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, CalculateTipPoint_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    libinput_event_tablet_tool event {};
+    int32_t targetDisplayId = 3;
+    PhysicalCoordinate coord;
+    coord.x = 3.5;
+    coord.y = 5.2;
+    bool result = inputWindowsManager->TransformTipPoint(&event, coord, targetDisplayId);
+    EXPECT_FALSE(result);
+    bool ret = inputWindowsManager->CalculateTipPoint(&event, targetDisplayId, coord);
+    EXPECT_FALSE(ret);
 }
 
 /**
