@@ -172,7 +172,7 @@ void SettingDataShare::Initialize(int32_t systemAbilityId)
 {
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPV(sam);
-    auto remoteObj = sam->GetSystemAbility(systemAbilityId);
+    auto remoteObj = sam->CheckSystemAbility(systemAbilityId);
     CHKPV(remoteObj);
     remoteObj_ = remoteObj;
 }
