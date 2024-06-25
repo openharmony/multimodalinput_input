@@ -2105,10 +2105,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         dragPointerStyle_ = pointerStyle;
     }
-    if (!touchWindow) {
-        MMI_HILOGE("TouchWindow is nullopt");
-        return RET_ERR;
-    }
     WindowInfo window = *touchWindow;
     if (!dragFlag_) {
         isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);

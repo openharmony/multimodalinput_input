@@ -151,6 +151,7 @@ group("mmi_tests") {
     "libudev:test",
     "service:ApplicationStateObserverTest",
     "service:ConnectManagerEXTest",
+    "service:ConnectManagerProxyEXTest",
     "service:ConnectManagerTest",
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",

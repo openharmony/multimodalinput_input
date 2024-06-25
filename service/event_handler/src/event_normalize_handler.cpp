@@ -197,8 +197,6 @@ bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t fram
         int32_t sourceType = pointerEvent->GetSourceType();
         if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             HandleTouchEvent(event, frameTime);
-        } else {
-            return true;
         }
         return true;
     }
@@ -254,9 +252,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
-        MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
-            "SourceType:%{public}d,ButtonId:%{public}d,"
-            "VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
+        MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d, PointerId:%{public}d,"
+            "SourceType:%{public}d, ButtonId:%{public}d,"
+            "VerticalAxisValue:%{public}lf, HorizontalAxisValue:%{public}lf",
             pointerEvent->GetPointerAction(), pointerEvent->GetPointerId(), pointerEvent->GetSourceType(),
             pointerEvent->GetButtonId(), pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
@@ -265,9 +263,9 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
             return;
         }
-        MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-            "DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,"
-            "Width:%{public}d,Height:%{public}d,Pressure:%{public}f,Device:%{public}d",
+        MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
+            "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
+            "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
             item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
             item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
@@ -319,7 +317,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_HILOGE("KeyEvent package failed, ret:%{public}d, errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         BytraceAdapter::StopPackageEvent();
         return KEY_EVENT_PKG_FAIL;
     }
@@ -549,7 +547,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
         CHKPR(outputEvent, RET_OK);
-        MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
+        MMI_HILOGD("Output event received, SourceType:%{public}d, PointerAction:%{public}d, status:%{public}d",
             outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
         EndLogTraceId(pointerEvent->GetId());
         pointerEvent = outputEvent;
@@ -644,9 +642,9 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
     enum libinput_switch sw = libinput_event_switch_get_switch(swev);
-    MMI_HILOGI("libinput_event_switch type: %{public}d, state: %{public}d", sw, state);
+    MMI_HILOGI("libinput_event_switch type:%{public}d, state:%{public}d", sw, state);
     if (sw == LIBINPUT_SWITCH_PRIVACY && state == LIBINPUT_SWITCH_STATE_OFF) {
-        MMI_HILOGD("privacy switch event ignored");
+        MMI_HILOGD("Privacy switch event ignored");
         return RET_OK;
     }
     auto swEvent = std::make_unique<SwitchEvent>(static_cast<int32_t>(state));
@@ -657,7 +655,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
     swEvent->SetSwitchType(switchStatus);
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
-    MMI_HILOGW("switch device does not support");
+    MMI_HILOGW("Switch device does not support");
 #endif // OHOS_BUILD_ENABLE_SWITCH
     return RET_OK;
 }
