@@ -789,10 +789,9 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
         if (!isDragBorder_) {
-            int32_t ret = WIN_MGR->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+            GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
             MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
                 info.windowPid, info.windowId, pointerStyle.id);
-            CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
         }
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -869,8 +868,7 @@ void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, in
             pointerStyle.id = MOUSE_ICON::NORTH_WEST;
             break;
         case WindowArea::FOCUS_ON_INNER:
-            int32_t ret = GetPointerStyle(pid, winId, pointerStyle);
-            CHKNOKRV(ret, "Get pointer style failed, pointerStyleInfo is nullptr");
+            GetPointerStyle(pid, winId, pointerStyle);
             break;
     }
 }
@@ -890,11 +888,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         iconStyle.iconPath != DEFAULT_ICON_PATH)) {
         PointerStyle style;
-        int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
-        if (ret != RET_OK) {
-            MMI_HILOG_CURSORE("Get global pointer style failed");
-            return;
-        }
+        GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         lastPointerStyle_ = style;
     }
     MMI_HILOG_CURSORI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
@@ -2082,11 +2076,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
             pointerStyle.id, lastPointerStyle_.id);
     } else {
-        int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-            return ret;
-        }
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
@@ -2508,11 +2498,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         }
         PointerStyle pointerStyle;
-        int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (ret != RET_OK) {
-            MMI_HILOG_DISPATCHE("Get pointer style failed, pointerStyleInfo is nullptr");
-            return ret;
-        }
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
