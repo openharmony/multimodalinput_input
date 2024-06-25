@@ -1175,5 +1175,74 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RemovePointerPosition_
     TOUCH_DRAWING_MGR->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RemovePointerPosition());
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_Snapshot_001
+ * @tc.desc: Test Snapshot
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_Snapshot_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION90;
+    TOUCH_DRAWING_MGR->displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->Snapshot());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_Snapshot_002
+ * @tc.desc: Test Snapshot
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_Snapshot_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION180;
+    TOUCH_DRAWING_MGR->displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->Snapshot());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_Snapshot_003
+ * @tc.desc: Test Snapshot
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_Snapshot_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    if (TOUCH_DRAWING_MGR->labelsCanvasNode_ == nullptr) {
+        TOUCH_DRAWING_MGR->labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    }
+    TOUCH_DRAWING_MGR->isChangedRotation_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.direction = DIRECTION270;
+    TOUCH_DRAWING_MGR->displayInfo_.displayDirection = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->Snapshot());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_InitLabels_001
+ * @tc.desc: Test InitLabels
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_InitLabels_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->InitLabels()
+    EXPECT_EQ(TOUCH_DRAWING_MGR->isFirstDownAction_, true);
+    EXPECT_EQ(TOUCH_DRAWING_MGR->isDownAction_, true);
+    EXPECT_EQ(TOUCH_DRAWING_MGR->maxPointerCount_, 0);
+}
 } // namespace MMI
 } // namespace OHOS
