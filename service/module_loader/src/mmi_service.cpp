@@ -193,7 +193,7 @@ bool MMIService::InitLibinputService()
     if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
         ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()->OnEvent(event, frameTime);
         }
-        ))){
+        ))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
