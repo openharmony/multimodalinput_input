@@ -18,8 +18,10 @@
 #include "cJSON.h"
 #include "util.h"
 
+#include "ability_manager_client.h"
 #include "display_event_monitor.h"
 #include "event_log_helper.h"
+#include "gesturesense_wrapper.h"
 #include "input_event_handler.h"
 #include "input_handler_type.h"
 #include "i_preference_manager.h"
@@ -28,6 +30,7 @@
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "stylus_key_handler.h"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -2701,6 +2704,187 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AddSequenceKey_004, TestSi
     inputEvent->actionTime_ = 100000;
     ret = handler.AddSequenceKey(keyEvent);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_004
+ * @tc.desc: Test knuckle gesture touch up event straight line
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    GESTURESENSE_WRAPPER->touchUp_ = [](const std::vector<float> &, const std::vector<int64_t> &, bool, bool)
+        -> int32_t {
+            return 0;
+    };
+    ASSERT_NE(GESTURESENSE_WRAPPER->touchUp_, nullptr);
+    handler.gesturePoints_.assign(LINE_COORDINATES.begin(), LINE_COORDINATES.end());
+    handler.gestureTimeStamps_.assign(LINE_TIMESTAMPS.begin(), LINE_TIMESTAMPS.end());
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+    handler.gesturePoints_.assign(CIRCLE_COORDINATES.begin(), CIRCLE_COORDINATES.end());
+    handler.gestureTimeStamps_.assign(CIRCLE_TIMESTAMPS.begin(), CIRCLE_TIMESTAMPS.end());
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+    handler.gesturePoints_.assign(CURVE_COORDINATES.begin(), CURVE_COORDINATES.end());
+    handler.gestureTimeStamps_.assign(CURVE_TIMESTAMPS.begin(), CURVE_TIMESTAMPS.end());
+    handler.isGesturing_ = true;
+    handler.isLetterGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_004
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_004, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business1";
+    key.statusConfig = "config1";
+    key.statusConfigValue = true;
+    key.finalKey = 4;
+    key.keyDownDuration = 5;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    key.timerId = 6;
+    handler.lastMatchedKey_.finalKey = 1;
+    handler.lastMatchedKey_.triggerType = 2;
+    keyEvent->SetKeyCode(1);
+    keyEvent->SetKeyAction(2);
+    bool result = handler.IsKeyMatch(handler.lastMatchedKey_, keyEvent);
+    ASSERT_TRUE(result);
+    handler.shortcutKeys_.insert(std::make_pair("key1", key));
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_005
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_005, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business1";
+    key.statusConfig = "config1";
+    key.statusConfigValue = true;
+    key.finalKey = 4;
+    key.keyDownDuration = 5;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    key.timerId = 6;
+    handler.currentLaunchAbilityKey_.finalKey = 1;
+    handler.currentLaunchAbilityKey_.triggerType = 2;
+    keyEvent->SetKeyCode(1);
+    keyEvent->SetKeyAction(2);
+    bool result = handler.IsKeyMatch(handler.currentLaunchAbilityKey_, keyEvent);
+    ASSERT_TRUE(result);
+    handler.shortcutKeys_.insert(std::make_pair("key1", key));
+    handler.currentLaunchAbilityKey_.timerId = 0;
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_TRUE(ret);
+    handler.currentLaunchAbilityKey_.timerId = -1;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.currentLaunchAbilityKey_.timerId = 0;
+    handler.currentLaunchAbilityKey_.finalKey = 1;
+    handler.currentLaunchAbilityKey_.triggerType = 2;
+    keyEvent->SetKeyCode(3);
+    keyEvent->SetKeyAction(4);
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.currentLaunchAbilityKey_.timerId = -1;
+    handler.currentLaunchAbilityKey_.finalKey = 1;
+    handler.currentLaunchAbilityKey_.triggerType = 2;
+    keyEvent->SetKeyCode(3);
+    keyEvent->SetKeyAction(4);
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleMatchedSequence_002
+ * @tc.desc: Test the funcation HandleMatchedSequence
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMatchedSequence_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    bool isLaunchAbility = true;
+    DISPLAY_MONITOR->isScreenLocked_ = false;
+    sequence.ability.bundleName = ".screenshot";
+    DISPLAY_MONITOR->screenStatus_ = "usual.event.SCREEN_OFF";
+    bool ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    DISPLAY_MONITOR->screenStatus_ = "usual.event.SCREEN_OFF";
+    sequence.ability.bundleName = "abc";
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.screenStatus_ = "usual.event.SCREEN_OFF";
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    DISPLAY_MONITOR->screenStatus_ = "usual.event.SCREEN_LOCKED";
+    DISPLAY_MONITOR->isScreenLocked_ = true;
+    sequence.ability.bundleName = ".screenshot";
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    DISPLAY_MONITOR->isScreenLocked_ = false;
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    DISPLAY_MONITOR->isScreenLocked_ = true;
+    sequence.ability.bundleName = "abc";
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    DISPLAY_MONITOR->isScreenLocked_ = false;
+    sequence.ability.bundleName = "abc";
+    ret = handler.HandleMatchedSequence(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandlePointerVisibleKeys_001
+ * @tc.desc: Test HandlePointerVisibleKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerVisibleKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_F9;
+    handler.lastKeyEventCode_ = KeyEvent::KEYCODE_CTRL_LEFT;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerVisibleKeys(keyEvent));
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_F1;
+    handler.lastKeyEventCode_ = KeyEvent::KEYCODE_CTRL_LEFT;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerVisibleKeys(keyEvent));
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_F9;
+    handler.lastKeyEventCode_ = KeyEvent::KEYCODE_CAPS_LOCK;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerVisibleKeys(keyEvent));
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_F1;
+    handler.lastKeyEventCode_ = KeyEvent::KEYCODE_CAPS_LOCK;
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePointerVisibleKeys(keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS
