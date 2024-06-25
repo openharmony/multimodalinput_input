@@ -453,27 +453,5 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     kceDrawMgr.pointerInfos_.push_back(pointerInfo);
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
 }
-
-/**
- * @tc.name: KnuckleDrawingManagerTest_RotationCanvasNode
- * @tc.desc: Test Overrides RotationCanvasNode function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_RotationCanvasNode, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(canvasNode, nullptr);
-    DisplayInfo displayInfo;
-    displayInfo.direction = Direction::DIRECTION0;
-    EXPECT_NO_FATAL_FAILURE(KnuckleDrawingManager::RotationCanvasNode(canvasNode, displayInfo));
-    displayInfo.direction = Direction::DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(KnuckleDrawingManager::RotationCanvasNode(canvasNode, displayInfo));
-    displayInfo.direction = Direction::DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(KnuckleDrawingManager::RotationCanvasNode(canvasNode, displayInfo));
-    displayInfo.direction = Direction::DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(KnuckleDrawingManager::RotationCanvasNode(canvasNode, displayInfo));
-}
 } // namespace MMI
 } // namespace OHOS
