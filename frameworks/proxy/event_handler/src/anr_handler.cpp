@@ -68,7 +68,7 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
         for (auto e : idList_) {
             idList += std::to_string(e) + " ";
         }
-        MMI_HILOGE("Ffrt PE: %{public}s", idList.c_str());
+        MMI_HILOGI("Ffrt PE: %{public}s", idList.c_str());
         idList_.clear();
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(eventType, eventId);
