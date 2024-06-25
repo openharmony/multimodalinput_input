@@ -61,11 +61,15 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
-        {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-        {MmiMessageId::WINDOW_AREA_INFO, MsgCallbackBind2(&ServerMsgHandler::OnWindowAreaInfo, this)},
-        {MmiMessageId::WINDOW_INFO, MsgCallbackBind2(&ServerMsgHandler::OnWindowGroupInfo, this)},
+        {MmiMessageId::DISPLAY_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->OnDisplayInfo(sess, pkt); }},
+        {MmiMessageId::WINDOW_AREA_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->OnWindowAreaInfo(sess, pkt); }},
+        {MmiMessageId::WINDOW_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->OnWindowGroupInfo(sess, pkt); }},
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        {MmiMessageId::SCINFO_CONFIG, MsgCallbackBind2(&ServerMsgHandler::OnEnhanceConfig, this)},
+        {MmiMessageId::SCINFO_CONFIG, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->OnEnhanceConfig(sess, pkt); }},
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
     };
