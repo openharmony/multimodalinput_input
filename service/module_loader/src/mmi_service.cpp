@@ -816,8 +816,13 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle), isUiExtension));
+    int32_t clientPid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [clientPid, windowId, &pointerStyle, isUiExtension] {
+            return IPointerDrawingManager::GetInstance()->GetPointerStyle(
+                clientPid, windowId, pointerStyle, isUiExtension);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, return:%{public}d", ret);
         return ret;
@@ -830,7 +835,11 @@ int32_t MMIService::SetHoverScrollState(bool state)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IInputWindowsManager::SetHoverScrollState, WIN_MGR, state));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [state] {
+            return ::OHOS::MMI::IInputWindowsManager::GetInstance()->SetHoverScrollState(state);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set mouse hover scroll state failed, return:%{public}d", ret);
         return ret;
@@ -851,7 +860,11 @@ int32_t MMIService::GetHoverScrollState(bool &state)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadHoverScrollState, this, std::ref(state)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &state] {
+            return this->ReadHoverScrollState(state);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get mouse hover scroll state, return:%{public}d", ret);
         return ret;
@@ -878,8 +891,11 @@ int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, 
 int32_t MMIService::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&MMIService::OnSupportKeys, this, deviceId, keys, std::ref(keystroke)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, deviceId, &keys, &keystroke] {
+            return this->OnSupportKeys(deviceId, keys, keystroke);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Support keys info process failed, ret:%{public}d", ret);
         return ret;
@@ -897,7 +913,11 @@ int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 {
     CALL_INFO_TRACE;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, std::ref(ids)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &ids] {
+            return this->OnGetDeviceIds(ids);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get deviceids failed, ret:%{public}d", ret);
         return ret;
@@ -919,8 +939,11 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &
 int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
     CALL_INFO_TRACE;
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this, deviceId, std::ref(inputDevice)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, deviceId, &inputDevice] {
+            return this->OnGetDevice(deviceId, inputDevice);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get input device info failed, ret:%{public}d", ret);
         return ret;
@@ -940,7 +963,11 @@ int32_t MMIService::RegisterDevListener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnRegisterDevListener, this, pid));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid] {
+            return this->OnRegisterDevListener(pid);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Register device listener failed, ret:%{public}d", ret);
         return ret;
@@ -959,7 +986,11 @@ int32_t MMIService::UnregisterDevListener()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnUnregisterDevListener, this, pid));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid] {
+            return this->OnUnregisterDevListener(pid);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Unregister device listener failed failed, ret:%{public}d", ret);
         return ret;
@@ -981,8 +1012,11 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this, deviceId, std::ref(keyboardType)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, deviceId, &keyboardType] {
+            return this->OnGetKeyboardType(deviceId, keyboardType);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyboard type failed, ret:%{public}d", ret);
         return ret;
@@ -994,7 +1028,11 @@ int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::SetKeyboardRepeatDelay, KeyRepeat, delay));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [delay] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->SetKeyboardRepeatDelay(delay);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set keyboard repeat delay failed, ret:%{public}d", ret);
         return ret;
@@ -1007,7 +1045,11 @@ int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::SetKeyboardRepeatRate, KeyRepeat, rate));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [rate] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->SetKeyboardRepeatRate(rate);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set keyboard repeat rate failed, ret:%{public}d", ret);
         return ret;
@@ -1020,8 +1062,11 @@ int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::GetKeyboardRepeatDelay, KeyRepeat, std::ref(delay)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [&delay] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->GetKeyboardRepeatDelay(delay);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyboard repeat delay failed, ret:%{public}d", ret);
         return ret;
@@ -1034,8 +1079,11 @@ int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::GetKeyboardRepeatRate, KeyRepeat, std::ref(rate)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [&rate] {
+            return ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()->GetKeyboardRepeatRate(rate);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyboard repeat rate failed, ret:%{public}d", ret);
         return ret;
@@ -1061,7 +1109,10 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority, deviceTags));
+        [this, pid, handlerType, eventType, priority, deviceTags] {
+            return this->CheckAddInput(pid, handlerType, eventType, priority, deviceTags);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return ret;
@@ -1102,7 +1153,10 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority, deviceTags));
+        [this, pid, handlerType, eventType, priority, deviceTags] {
+            return this->CheckRemoveInput(pid, handlerType, eventType, priority, deviceTags);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return ret;
@@ -1140,7 +1194,11 @@ int32_t MMIService::MarkEventConsumed(int32_t eventId)
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckMarkConsumed, this, pid, eventId));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, eventId] {
+            return this->CheckMarkConsumed(pid, eventId);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Mark event consumed failed, ret:%{public}d", ret);
         return ret;
@@ -1154,7 +1212,11 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
+        delegateTasks_.PostSyncTask(
+            [this, offsetX, offsetY] {
+                return sMsgHandler_.OnMoveMouse(offsetX, offsetY);
+            }
+            );
     if (ret != RET_OK) {
         MMI_HILOGE("The movemouse event processed failed, ret:%{public}d", ret);
         return ret;
@@ -1172,8 +1234,11 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, boo
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectKeyEventExt(keyEvent, pid, isNativeInject);
 #else
-    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent,
-        pid, isNativeInject));
+    ret = delegateTasks_.PostSyncTask(
+        [this, keyEvent, pid, isNativeInject] {
+            return this->CheckInjectKeyEvent(keyEvent, pid, isNativeInject);
+        }
+        );
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
@@ -1278,8 +1343,11 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject, isShell);
 #else
-    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent,
-        pid, isNativeInject, isShell));
+    ret = delegateTasks_.PostSyncTask(
+        [this, pointerEvent, pid, isNativeInject, isShell] {
+            return this->CheckInjectPointerEvent(pointerEvent, pid, isNativeInject, isShell);
+        }
+        );
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
