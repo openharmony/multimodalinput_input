@@ -69,6 +69,7 @@ private:
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode);
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
+    void ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
     void RotationCanvas(RosenCanvas *canvas, Direction direction);
     void CreateTouchWindow();
     void DestoryTouchWindow();
@@ -125,6 +126,7 @@ private:
     bool isDownAction_ { false };
     bool isFirstDraw_ { true };
     bool isChangedRotation_ { false };
+    bool isChangedMode_ { false };
     bool stopRecord_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
