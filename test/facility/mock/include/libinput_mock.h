@@ -60,7 +60,8 @@ public:
     MOCK_METHOD(uint32_t, PointerGetButton, (struct libinput_event_pointer *));
     MOCK_METHOD(int, PointerHasAxis, (struct libinput_event_pointer *,  enum libinput_pointer_axis));
     MOCK_METHOD(double, PointerGetAxisValue, (struct libinput_event_pointer *,  enum libinput_pointer_axis));
-
+    MOCK_METHOD(struct libinput_event_touch *, GetTouchpadEvent, (struct libinput_event *));
+    MOCK_METHOD(int32_t, TouchpadGetTool, (struct libinput_event_touch *));
 };
 } // namespace MMI
 } // namespace OHOS

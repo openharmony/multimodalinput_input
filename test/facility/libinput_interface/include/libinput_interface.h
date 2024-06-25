@@ -132,6 +132,8 @@ public:
     virtual uint32_t PointerGetButton(struct libinput_event_pointer *event) = 0;
     virtual int PointerHasAxis(struct libinput_event_pointer *event, enum libinput_pointer_axis axis) = 0;
     virtual double PointerGetAxisValue(struct libinput_event_pointer *event, enum libinput_pointer_axis axis) = 0;
+    virtual struct libinput_event_touch* GetTouchpadEvent(struct libinput_event *event) = 0;
+    virtual int32_t TouchpadGetTool(struct libinput_event_touch *event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
