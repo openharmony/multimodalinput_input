@@ -3294,9 +3294,15 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 {
     Coordinate2D matrix;
     if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGE("displayGroupInfo_.displaysInfo is empty");
         return;
     }
-    ReverseRotateScreen(displayGroupInfo_.displaysInfo[0], x, y, matrix);
+    const Direction direction = displayGroupInfo_.displaysInfo.front().direction;
+    if (direction < Direction::DIRECTION0 || direction > Direction::DIRECTION270) {
+        MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
+        return;
+    }
+    ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);
 }
