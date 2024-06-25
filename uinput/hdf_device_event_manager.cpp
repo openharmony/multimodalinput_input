@@ -39,7 +39,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
         MMI_HILOGE("The inputInterface_ is nullptr");
         return;
     }
-    thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
+    thread_ = std::thread([this] { injectThread_.InjectFunc(); });
     pthread_setname_np(thread_.native_handle(), name.c_str());
     int32_t ret = inputInterface_->OpenInputDevice(TOUCH_DEV_ID);
     if (ret == HDF_SUCCESS) {

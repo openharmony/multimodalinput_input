@@ -630,6 +630,8 @@ bool KeySubscriberHandler::InitSessionDeleteCallback()
     CHKPF(udsServerPtr);
     std::function<void(SessionPtr)> callback =
         std::bind(&KeySubscriberHandler::OnSessionDelete, this, std::placeholders::_1);
+    std::function<void(SessionPtr)> callback =
+        [this] (SessionPtr sess) { return this->OnSessionDelete(sess); };
     udsServerPtr->AddSessionDeletedCallback(callback);
     callbackInitialized_ = true;
     return true;
