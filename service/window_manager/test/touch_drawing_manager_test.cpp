@@ -1239,7 +1239,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_Snapshot_003, TestSize
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_InitLabels_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    TOUCH_DRAWING_MGR->InitLabels()
+    TOUCH_DRAWING_MGR->InitLabels();
     EXPECT_EQ(TOUCH_DRAWING_MGR->isFirstDownAction_, true);
     EXPECT_EQ(TOUCH_DRAWING_MGR->isDownAction_, true);
     EXPECT_EQ(TOUCH_DRAWING_MGR->maxPointerCount_, 0);
