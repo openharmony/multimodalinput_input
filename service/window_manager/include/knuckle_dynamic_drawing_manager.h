@@ -50,10 +50,6 @@ private:
     void InitPointerPathPaint();
     void UpdateTrackColors();
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
-    std::shared_ptr<Rosen::Drawing::Bitmap> PixelMapToBitmap(
-    std::shared_ptr<Media::PixelMap>& pixelMap);
-    Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
-    Rosen::Drawing::ColorType PixelFormatToColorType(Media::PixelFormat pixelFormat);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
@@ -79,9 +75,10 @@ private:
     int32_t lastDownX_ { 0 };
     int32_t lastDownY_ { 0 };
     int64_t lastUpTime_ { 0 };
-    int32_t nodeWidth_ { 0 };
-    int32_t nodeHeight_ { 0 };
+    int32_t scaleW_ { 0 };
+    int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
+    int64_t isInDrawingTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

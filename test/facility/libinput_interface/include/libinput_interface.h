@@ -90,6 +90,7 @@ struct libinput_event_gesture {
     struct device_coords coords[N_GESTURE_DEVICE_COORDS];
 };
 
+
 namespace OHOS {
 namespace MMI {
 
@@ -107,6 +108,8 @@ public:
     virtual struct libinput_tablet_tool* TabletToolGetTool(struct libinput_event_tablet_tool *event) = 0;
     virtual enum libinput_tablet_tool_tip_state TabletToolGetTipState(struct libinput_event_tablet_tool *event) = 0;
     virtual enum libinput_tablet_tool_type TabletToolGetType(struct libinput_tablet_tool *tool) = 0;
+    virtual enum libinput_pointer_axis_source GetAxisSource(struct libinput_event_pointer *event) = 0;
+    virtual struct libinput_event_pointer* LibinputGetPointerEvent(struct libinput_event *event) = 0;
     virtual int32_t TabletToolGetToolType(struct libinput_event_tablet_tool *event) = 0;
     virtual double TabletToolGetTiltX(struct libinput_event_tablet_tool *event) = 0;
     virtual double TabletToolGetTiltY(struct libinput_event_tablet_tool *event) = 0;
@@ -123,6 +126,12 @@ public:
     virtual int GestureEventGetFingerCount(struct libinput_event_gesture *event) = 0;
     virtual int GestureEventGetDevCoordsX(struct libinput_event_gesture *event, uint32_t idx) = 0;
     virtual int GestureEventGetDevCoordsY(struct libinput_event_gesture *event, uint32_t idx) = 0;
+    virtual uint32_t PointerEventGetFingerCount(struct libinput_event_pointer *event) = 0;
+    virtual double PointerGetDxUnaccelerated(struct libinput_event_pointer *event) = 0;
+    virtual double PointerGetDyUnaccelerated(struct libinput_event_pointer *event) = 0;
+    virtual uint32_t PointerGetButton(struct libinput_event_pointer *event) = 0;
+    virtual int PointerHasAxis(struct libinput_event_pointer *event, enum libinput_pointer_axis axis) = 0;
+    virtual double PointerGetAxisValue(struct libinput_event_pointer *event, enum libinput_pointer_axis axis) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

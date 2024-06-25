@@ -41,6 +41,264 @@ public:
 };
 
 /**
+ * @tc.name: EventMonitorHandlerTest_HandlePointerEvent
+ * @tc.desc: Test Overrides the if (OnHandleEvent(pointerEvent)) branch of the HandlePointerEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandlePointerEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t deviceId = 1;
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    pointerEvent->bitwise_ = PointerEvent::EVENT_FLAG_NONE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(deviceId);
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.HandlePointerEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleTouchEvent
+ * @tc.desc: Test Test Overrides the if (OnHandleEvent(pointerEvent)) branch of the HandleTouchEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleTouchEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t deviceId = 1;
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    pointerEvent->bitwise_ = PointerEvent::EVENT_FLAG_NONE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(deviceId);
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.HandleTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleTouchEvent_001
+ * @tc.desc: Test Overrides the if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) branch
+ * <br> of the HandleTouchEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->bitwise_ = PointerEvent::EVENT_FLAG_NONE;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.HandleTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_OnHandleEvent_Key
+ * @tc.desc: Test Overrides the if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_Key, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->bitwise_ = InputEvent::EVENT_FLAG_NO_MONITOR;
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(keyEvent));
+    keyEvent->bitwise_ = InputEvent::EVENT_FLAG_NONE;
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_OnHandleEvent_Pointer
+ * @tc.desc: Test Overrides the if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_Pointer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_NO_MONITOR;
+    ASSERT_FALSE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_OnHandleEvent_Pointer_001
+ * @tc.desc: Test Overrides the if (monitors_.HandleEvent(pointerEvent)) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnHandleEvent_Pointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_NONE;
+    int32_t deviceId = 1;
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetDeviceId(deviceId);
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ASSERT_TRUE(eventMonitorHandler.OnHandleEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_MarkConsumed_001
+ * @tc.desc: Test Overrides the if (eventIds.find(eventId) != eventIds.cend()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    int32_t deviceId = 1;
+    int32_t eventId = 20;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    consumptionState.eventIds_.insert(20);
+    consumptionState.isMonitorConsumed_ = false;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.MarkConsumed(eventId, session));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_MarkConsumed_002
+ * @tc.desc: Test Overrides the if (tIter == states_.end()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    int32_t deviceId = 1;
+    int32_t eventId = 20;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    consumptionState.eventIds_.insert(10);
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.MarkConsumed(eventId, session));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_MarkConsumed_003
+ * @tc.desc: Test Overrides the if (state.isMonitorConsumed_) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_MarkConsumed_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    int32_t deviceId = 1;
+    int32_t eventId = 10;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    EventMonitorHandler::MonitorCollection::ConsumptionState consumptionState;
+    consumptionState.eventIds_.insert(10);
+    consumptionState.isMonitorConsumed_ = true;
+    eventMonitorHandler.monitors_.states_.insert(std::make_pair(deviceId, consumptionState));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.MarkConsumed(eventId, session));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent
+ * @tc.desc: Test Overrides the if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_KEY, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_001
+ * @tc.desc: Test Overwrites the else branch of if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.HandleEvent(keyEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_Monitor
+ * @tc.desc: Test Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetButtonId(1);
+    pointerEvent->SetFingerCount(2);
+    pointerEvent->SetZOrder(100);
+    pointerEvent->SetDispatchTimes(1000);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_POINTER);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sess { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_POINTER, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sess);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
+
+    pointerEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_FINGERPRINT);
+    EventMonitorHandler::SessionHandler sesshdl { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sesshdl);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_OnHandleEvent_001
  * @tc.desc: Test OnHandleEvent
  * @tc.type: FUNC

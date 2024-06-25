@@ -19,14 +19,13 @@
 #include <condition_variable>
 
 #include "anr_handler.h"
-#include "mmi_log.h"
-#include "proto.h"
-#include "util.h"
-
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "proto.h"
+#include "util.h"
 #include "xcollie/watchdog.h"
 
 #undef MMI_LOG_TAG
@@ -35,7 +34,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string THREAD_NAME = "OS_mmi_EventHdr";
+const std::string THREAD_NAME { "OS_mmi_EventHdr" };
 } // namespace
 
 using namespace AppExecFwk;
@@ -148,7 +147,7 @@ bool MMIClient::AddFdListener(int32_t fd)
         return false;
     }
     isRunning_ = true;
-    MMI_HILOGI("server was listening");
+    MMI_HILOGI("Server was listening");
     return true;
 }
 

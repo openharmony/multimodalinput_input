@@ -20,21 +20,18 @@
 #include "image/bitmap.h"
 #include "include/core/SkCanvas.h"
 #include "include/core/SkPaint.h"
-#ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
-#else
-#include "recording/recording_canvas.h"
-#endif // USE_ROSEN_DRAWING
+#include "render/rs_pixel_map_util.h"
 #include "utils/matrix.h"
 
 namespace OHOS {
 namespace MMI {
 class KnuckleGlowPoint {
 public:
-    explicit KnuckleGlowPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap);
+    explicit KnuckleGlowPoint(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     ~KnuckleGlowPoint() = default;
     void Update();
-    void Draw(Rosen::Drawing::RecordingCanvas* canvas);
+    void Draw(Rosen::ExtendRecordingCanvas* canvas);
     void Reset(double pointX, double pointY, float lifespanOffset);
     bool IsEnded() const;
 
@@ -49,7 +46,8 @@ private:
     float traceSize_  { 0.f };
 
     Rosen::Drawing::Matrix traceMatrix_;
-    std::shared_ptr<Rosen::Drawing::Bitmap> traceShadow_ { nullptr };
+    std::shared_ptr<OHOS::Media::PixelMap> traceShadow_ { nullptr };
+    OHOS::Rosen::Drawing::Brush brush_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -106,7 +106,7 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
         bool isUiExtension = false) const;
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
-    void DispatchPointer(int32_t pointerAction);
+    void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
     PointerStyle GetLastPointerStyle() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -124,6 +124,7 @@ public:
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
     const DisplayInfo *GetDefaultDisplayInfo() const;
+    void ReverseXY(int32_t &x, int32_t &y);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -148,14 +149,12 @@ public:
     void UpdatePointerChangeAreas();
 #endif // OHOS_BUILD_ENABLE_POINTER
     std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId);
-    void GetTargetWindowIds(int32_t pointerItemId, std::vector<int32_t> &windowIds);
-    void AddTargetWindowIds(int32_t pointerItemId, int32_t windowId);
-    void ClearTargetWindowIds();
+    void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds);
+    void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId);
+    void ClearTargetWindowId(int32_t pointerId);
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
-    void CancelLastTouchWindow(const WindowInfo *currTouchWindow, std::shared_ptr<PointerEvent> pointerEvent);
-    void ClearTouchCancelFlag(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
@@ -299,7 +298,8 @@ private:
     bool isOpenAntiMisTakeObserver_ { false };
     std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     bool mouseFlag_ {false};
-    std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
+    std::map<int32_t, std::vector<int32_t>> targetTouchWinIds_;
+    std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };

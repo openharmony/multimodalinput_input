@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t BIT_SET_INDEX { 16 };
+constexpr uint32_t BIT_SET_INDEX { 16 };
 constexpr int32_t INVALID_KEY_CODE { -1 };
 constexpr int32_t MAX_KEY_SIZE { 3 };
 constexpr int32_t MIN_KEY_SIZE { 1 };
@@ -112,6 +112,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {125, {"KEY_META_LEFT", 125, 2076, HOS_KEY_META_LEFT}},
     {126, {"KEY_META_RIGHT", 126, 2077, HOS_KEY_META_RIGHT}},
     {464, {"KEY_FUNCTION", 464, 2078, HOS_KEY_FUNCTION}},
+    {766, {"KEY_FUNCTION", 766, 2078, HOS_KEY_FUNCTION}},
     {99, {"KEY_SYSRQ", 99, 2079, HOS_KEY_SYSRQ}},
     {119, {"KEY_BREAK", 119, 2080, HOS_KEY_BREAK}},
     {102, {"KEY_MOVE_HOME", 102, 2081, HOS_KEY_MOVE_HOME}},
@@ -513,7 +514,8 @@ int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
 
     int64_t keyCodes = 0;
     for (const auto &item : items) {
-        keyCodes = (keyCodes << BIT_SET_INDEX) + item.GetKeyCode();
+        keyCodes = static_cast<int64_t>(
+            (static_cast<uint64_t>(keyCodes) << BIT_SET_INDEX) + (static_cast<uint64_t>(item.GetKeyCode())));
     }
     auto iter = MAP_KEY_INTENTION.find(keyCodes);
     if (iter == MAP_KEY_INTENTION.end()) {

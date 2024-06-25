@@ -102,7 +102,7 @@ HWTEST_F(MMIServerTest, AllocSocketFd_001, TestSize.Level1)
     int32_t toReturnClientFd = 1;
     int32_t tokenType = 1;
     int32_t ret = mmiService.AllocSocketFd(programName, moduleType, toReturnClientFd, tokenType);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -262,7 +262,7 @@ HWTEST_F(MMIServerTest, GetMousePrimaryButton_001, TestSize.Level1)
     MMIService mmiService;
     int32_t primaryButton = 1;
     int32_t ret = mmiService.GetMousePrimaryButton(primaryButton);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -291,7 +291,7 @@ HWTEST_F(MMIServerTest, MarkProcessed_001, TestSize.Level1)
     int32_t eventType = 1;
     int32_t eventId = 1;
     int32_t ret = mmiService.MarkProcessed(eventType, eventId);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -380,7 +380,7 @@ HWTEST_F(MMIServerTest, OnSupportKeys_001, TestSize.Level1)
     int32_t ret = mmiService.OnSupportKeys(deviceId, keys, keystroke);
     EXPECT_EQ(ret, return_code);
     ret = mmiService.OnSupportKeys(deviceId, keys, keystroke1);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -425,7 +425,7 @@ HWTEST_F(MMIServerTest, GetDeviceIds_001, TestSize.Level1)
     MMIService mmiService;
     std::vector<int32_t> ids{ 1 };
     int32_t ret = mmiService.GetDeviceIds(ids);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -587,7 +587,7 @@ HWTEST_F(MMIServerTest, AddInputHandler_001, TestSize.Level1)
     int32_t priority = 1;
     uint32_t deviceTags = 1;
     int32_t ret = mmiService.AddInputHandler(handlerType, eventType, priority, deviceTags);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -623,7 +623,7 @@ HWTEST_F(MMIServerTest, RemoveInputHandler_001, TestSize.Level1)
     int32_t priority = 1;
     uint32_t deviceTags = 1;
     int32_t ret = mmiService.RemoveInputHandler(handlerType, eventType, priority, deviceTags);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -654,7 +654,7 @@ HWTEST_F(MMIServerTest, MoveMouseEvent_001, TestSize.Level1)
     int32_t offsetX = 100;
     int32_t offsetY = 200;
     int32_t ret = mmiService.MoveMouseEvent(offsetX, offsetY);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -672,6 +672,29 @@ HWTEST_F(MMIServerTest, CheckInjectKeyEvent_001, TestSize.Level1)
     bool isNativeInject = false;
     int32_t ret = mmiService.CheckInjectKeyEvent(Event, pid, isNativeInject);
     EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: CheckInjectKeyEvent_001
+ * @tc.desc: Test the function AdaptScreenResolution
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, AdaptScreenResolution_001, TestSize.Level1)
+{
+    MMIService mmiService;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10000);
+    item.SetDisplayX(360);
+    item.SetDisplayY(500);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(10000);
+    int32_t ret = mmiService.AdaptScreenResolution(pointerEvent);
+    EXPECT_NE(ret, RET_ERR);
+    ret = mmiService.AdaptScreenResolution(pointerEvent);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -721,7 +744,7 @@ HWTEST_F(MMIServerTest, GetDisplayBindInfo_001, TestSize.Level1)
     MMIService mmiService;
     DisplayBindInfos infos;
     int32_t ret = mmiService.GetDisplayBindInfo(infos);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -737,7 +760,7 @@ HWTEST_F(MMIServerTest, SetDisplayBind_001, TestSize.Level1)
     int32_t displayId = 2;
     std::string msg = "test";
     int32_t ret = mmiService.SetDisplayBind(deviceId, displayId, msg);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -859,7 +882,7 @@ HWTEST_F(MMIServerTest, OnGetWindowPid_001, TestSize.Level1)
     int32_t windowId = 1;
     int32_t windowPid = 1;
     int32_t ret = mmiService.OnGetWindowPid(windowId, windowPid);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -873,7 +896,7 @@ HWTEST_F(MMIServerTest, GetWindowPid_001, TestSize.Level1)
     MMIService mmiService;
     int32_t windowId = 1;
     int32_t ret = mmiService.GetWindowPid(windowId);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**

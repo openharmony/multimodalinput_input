@@ -14,7 +14,7 @@
  */
 
 #include "injectevent_fuzzer.h"
-
+#include "input_manager.h"
 #include "define_multimodal.h"
 #include "mmi_service.h"
 #include "mmi_log.h"
@@ -56,7 +56,7 @@ bool InjectKeyEvent(const uint8_t* data, const size_t size, size_t &startPos)
     kitDown.SetKeyCode(keyCodePressed);
     kitDown.SetPressed(true);
     injectDownEvent->AddPressedKeyItems(kitDown);
-    OHOS::DelayedSingleton<MMIService>::GetInstance()->InjectKeyEvent(injectDownEvent, true);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     auto injectUpEvent = KeyEvent::Create();
     CHKPF(injectUpEvent);
@@ -69,7 +69,7 @@ bool InjectKeyEvent(const uint8_t* data, const size_t size, size_t &startPos)
     injectUpEvent->SetKeyCode(keyCode);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    OHOS::DelayedSingleton<MMIService>::GetInstance()->InjectKeyEvent(injectUpEvent, true);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
     return true;
 }
 
@@ -98,7 +98,7 @@ bool InjectTouchEvent(const uint8_t* data, const size_t size, size_t &startPos)
     pointerDownEvent->SetPointerId(0);
     pointerDownEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     MMI_HILOGD("Call InputManager::InjectTouchEvent");
-    OHOS::DelayedSingleton<MMIService>::GetInstance()->InjectPointerEvent(pointerDownEvent, true);
+    InputManager::GetInstance()->SimulateInputEvent(pointerDownEvent);
 
     auto pointerUpEvent = PointerEvent::Create();
     CHKPF(pointerUpEvent);
@@ -114,7 +114,7 @@ bool InjectTouchEvent(const uint8_t* data, const size_t size, size_t &startPos)
     pointerUpEvent->SetPointerId(0);
     pointerUpEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     MMI_HILOGD("Call InputManager::InjectTouchEvent");
-    OHOS::DelayedSingleton<MMIService>::GetInstance()->InjectPointerEvent(pointerUpEvent, true);
+    InputManager::GetInstance()->SimulateInputEvent(pointerUpEvent);
     return true;
 }
 
@@ -143,7 +143,7 @@ bool InjectMouseEvent(const uint8_t* data, const size_t size, size_t &startPos)
     pointerDownEvent->SetPointerId(0);
     pointerDownEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     MMI_HILOGD("Call InputManager::InjectMouseEvent");
-    OHOS::DelayedSingleton<MMIService>::GetInstance()->InjectPointerEvent(pointerDownEvent, true);
+    InputManager::GetInstance()->SimulateInputEvent(pointerDownEvent);
 
     auto pointerUpEvent = PointerEvent::Create();
     CHKPF(pointerUpEvent);
@@ -159,7 +159,7 @@ bool InjectMouseEvent(const uint8_t* data, const size_t size, size_t &startPos)
     pointerUpEvent->SetPointerId(0);
     pointerUpEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     MMI_HILOGD("Call InputManager::InjectMouseEvent");
-    OHOS::DelayedSingleton<MMIService>::GetInstance()->InjectPointerEvent(pointerUpEvent, true);
+    InputManager::GetInstance()->SimulateInputEvent(pointerUpEvent);
     return true;
 }
 

@@ -98,12 +98,13 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
-    void SetPointerScale(float scale) override;
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+    void InitPointerCallback() override;
+    void InitPointerObserver() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -134,7 +135,7 @@ private:
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreateMagicCursorChangeObserver();
-    void CreatePointerSwitchObserver(isMagicCursor& item);
+    int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
@@ -146,6 +147,7 @@ private:
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    void ForceClearPointerVisiableStatus() override;
 
 private:
     struct PidInfo {
@@ -178,8 +180,8 @@ private:
     int32_t tempPointerColor_ { -1 };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
-    float scale_ { 1.0 };
     isMagicCursor hasMagicCursor_;
+    bool hasInitObserver_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_stub.h"
 
 #include <sys/types.h>
@@ -25,10 +24,11 @@
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "multimodalinput_ipc_interface_code.h"
+#include "nap_process.h"
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
-#include "nap_process.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -92,10 +92,10 @@ int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &in
     return RET_OK;
 }
 } // namespace
-const int32_t TUPLE_PID = 0;
-const int32_t TUPLE_UID = 1;
-const int32_t TUPLE_NAME = 2;
-const int32_t DEFAULT_POINTER_COLOR = 0x000000;
+const int32_t TUPLE_PID { 0 };
+const int32_t TUPLE_UID { 1 };
+const int32_t TUPLE_NAME { 2 };
+const int32_t DEFAULT_POINTER_COLOR { 0x000000 };
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
@@ -104,7 +104,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
         static_cast<int64_t>(code));
-    MMI_HILOGD("RemoteRequest code:%{public}d tid:%{public}" PRIu64 " pid:%{public}d", code, GetThisThreadId(), pid);
+    MMI_HILOGD("RemoteRequest code:%{public}d, tid:%{public}" PRIu64 ", pid:%{public}d", code, GetThisThreadId(), pid);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -112,284 +112,285 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         return ERR_INVALID_STATE;
     }
     BytraceAdapter::StartIpcServer(code);
+    int32_t ret = RET_ERR;
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
-            return StubHandleAllocSocketFd(data, reply);
+            ret =  StubHandleAllocSocketFd(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_EVENT_FILTER):
-            return StubAddInputEventFilter(data, reply);
+            ret = StubAddInputEventFilter(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_FILTER):
-            return StubRemoveInputEventFilter(data, reply);
+            ret = StubRemoveInputEventFilter(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_SCROLL_ROWS):
-            return StubSetMouseScrollRows(data, reply);
+            ret = StubSetMouseScrollRows(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_SCROLL_ROWS):
-            return StubGetMouseScrollRows(data, reply);
+            ret = StubGetMouseScrollRows(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SIZE):
-            return StubSetPointerSize(data, reply);
+            ret = StubSetPointerSize(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SIZE):
-            return StubGetPointerSize(data, reply);
+            ret = StubGetPointerSize(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_CURSOR):
-            return StubSetCustomCursor(data, reply);
+            ret = StubSetCustomCursor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_ICON):
-            return StubSetMouseIcon(data, reply);
+            ret = StubSetMouseIcon(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_PRIMARY_BUTTON):
-            return StubSetMousePrimaryButton(data, reply);
+            ret = StubSetMousePrimaryButton(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_PRIMARY_BUTTON):
-            return StubGetMousePrimaryButton(data, reply);
+            ret = StubGetMousePrimaryButton(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_HOVER_SCROLL_STATE):
-            return StubSetHoverScrollState(data, reply);
+            ret = StubSetHoverScrollState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HOVER_SCROLL_STATE):
-            return StubGetHoverScrollState(data, reply);
+            ret = StubGetHoverScrollState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_VISIBLE):
-            return StubSetPointerVisible(data, reply);
+            ret = StubSetPointerVisible(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE):
-            return StubSetPointerStyle(data, reply);
+            ret = StubSetPointerStyle(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE):
-            return StubNotifyNapOnline(data, reply);
+            ret = StubNotifyNapOnline(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_OBSERVER):
-            return StubRemoveInputEventObserver(data, reply);
+            ret = StubRemoveInputEventObserver(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_NAP_STATUS):
-            return StubSetNapStatus(data, reply);
+            ret = StubSetNapStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CLEAN_WIDNOW_STYLE):
-            return StubClearWindowPointerStyle(data, reply);
+            ret = StubClearWindowPointerStyle(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_STYLE):
-            return StubGetPointerStyle(data, reply);
+            ret = StubGetPointerStyle(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::IS_POINTER_VISIBLE):
-            return StubIsPointerVisible(data, reply);
+            ret = StubIsPointerVisible(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REGISTER_DEV_MONITOR):
-            return StubRegisterInputDeviceMonitor(data, reply);
+            ret = StubRegisterInputDeviceMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNREGISTER_DEV_MONITOR):
-            return StubUnregisterInputDeviceMonitor(data, reply);
+            ret = StubUnregisterInputDeviceMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE_IDS):
-            return StubGetDeviceIds(data, reply);
+            ret = StubGetDeviceIds(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE):
-            return StubGetDevice(data, reply);
+            ret = StubGetDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUPPORT_KEYS):
-            return StubSupportKeys(data, reply);
+            ret = StubSupportKeys(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE):
-            return StubGetKeyboardType(data, reply);
+            ret = StubGetKeyboardType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_COLOR):
-            return StubSetPointerColor(data, reply);
+            ret = StubSetPointerColor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_COLOR):
-            return StubGetPointerColor(data, reply);
+            ret = StubGetPointerColor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED):
-            return StubSetPointerSpeed(data, reply);
+            ret = StubSetPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SPEED):
-            return StubGetPointerSpeed(data, reply);
+            ret = StubGetPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_EVENT):
-            return StubSubscribeKeyEvent(data, reply);
+            ret = StubSubscribeKeyEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT):
-            return StubUnsubscribeKeyEvent(data, reply);
+            ret = StubUnsubscribeKeyEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_SWITCH_EVENT):
-            return StubSubscribeSwitchEvent(data, reply);
+            ret = StubSubscribeSwitchEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_SWITCH_EVENT):
-            return StubUnsubscribeSwitchEvent(data, reply);
+            ret = StubUnsubscribeSwitchEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED):
-            return StubMarkProcessed(data, reply);
+            ret = StubMarkProcessed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_HANDLER):
-            return StubAddInputHandler(data, reply);
+            ret = StubAddInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
-            return StubRemoveInputHandler(data, reply);
+            ret = StubRemoveInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
-            return StubMarkEventConsumed(data, reply);
+            ret = StubMarkEventConsumed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE):
-            return StubMoveMouseEvent(data, reply);
+            ret = StubMoveMouseEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_KEY_EVENT):
-            return StubInjectKeyEvent(data, reply);
+            ret = StubInjectKeyEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_POINTER_EVENT):
-            return StubInjectPointerEvent(data, reply);
+            ret = StubInjectPointerEvent(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_ANR_OBSERVER):
-            return StubSetAnrListener(data, reply);
+            ret = StubSetAnrListener(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DISPLAY_BIND_INFO):
-            return StubGetDisplayBindInfo(data, reply);
+            ret = StubGetDisplayBindInfo(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_NAPSTATUS_DATA):
-            return StubGetAllMmiSubscribedEvents(data, reply);
+            ret = StubGetAllMmiSubscribedEvents(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND):
-            return StubSetDisplayBind(data, reply);
+            ret = StubSetDisplayBind(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_FUNCTION_KEY_STATE):
-            return StubGetFunctionKeyState(data, reply);
+            ret = StubGetFunctionKeyState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_FUNCTION_KEY_STATE):
-            return StubSetFunctionKeyState(data, reply);
+            ret = StubSetFunctionKeyState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_LOCATION):
-            return StubSetPointerLocation(data, reply);
+            ret = StubSetPointerLocation(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CAPTURE_MODE):
-            return StubSetMouseCaptureMode(data, reply);
+            ret = StubSetMouseCaptureMode(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_WINDOW_PID):
-            return StubGetWindowPid(data, reply);
+            ret = StubGetWindowPid(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::APPEND_EXTRA_DATA):
-            return StubAppendExtraData(data, reply);
+            ret = StubAppendExtraData(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_INPUT_DEVICE):
-            return StubEnableInputDevice(data, reply);
+            ret = StubEnableInputDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_COMBINE_KEY):
-            return StubEnableCombineKey(data, reply);
+            ret = StubEnableCombineKey(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEY_DOWN_DURATION):
-            return StubSetKeyDownDuration(data, reply);
+            ret = StubSetKeyDownDuration(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_SWITCH):
-            return StubSetTouchpadScrollSwitch(data, reply);
+            ret = StubSetTouchpadScrollSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_SWITCH):
-            return StubGetTouchpadScrollSwitch(data, reply);
+            ret = StubGetTouchpadScrollSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_DIRECT_SWITCH):
-            return StubSetTouchpadScrollDirection(data, reply);
+            ret = StubSetTouchpadScrollDirection(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SCROLL_DIRECT_SWITCH):
-            return StubGetTouchpadScrollDirection(data, reply);
+            ret = StubGetTouchpadScrollDirection(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_TAP_SWITCH):
-            return StubSetTouchpadTapSwitch(data, reply);
+            ret = StubSetTouchpadTapSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_TAP_SWITCH):
-            return StubGetTouchpadTapSwitch(data, reply);
+            ret = StubGetTouchpadTapSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_POINTER_SPEED):
-            return StubSetTouchpadPointerSpeed(data, reply);
+            ret = StubSetTouchpadPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_POINTER_SPEED):
-            return StubGetTouchpadPointerSpeed(data, reply);
+            ret = StubGetTouchpadPointerSpeed(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_DELAY):
-            return StubSetKeyboardRepeatDelay(data, reply);
+            ret = StubSetKeyboardRepeatDelay(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_RATE):
-            return StubSetKeyboardRepeatRate(data, reply);
+            ret = StubSetKeyboardRepeatRate(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_PINCH_SWITCH):
-            return StubSetTouchpadPinchSwitch(data, reply);
+            ret = StubSetTouchpadPinchSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_PINCH_SWITCH):
-            return StubGetTouchpadPinchSwitch(data, reply);
+            ret = StubGetTouchpadPinchSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SWIPE_SWITCH):
-            return StubSetTouchpadSwipeSwitch(data, reply);
+            ret = StubSetTouchpadSwipeSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_SWIPE_SWITCH):
-            return StubGetTouchpadSwipeSwitch(data, reply);
+            ret = StubGetTouchpadSwipeSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_RIGHT_CLICK_TYPE):
-            return StubSetTouchpadRightClickType(data, reply);
+            ret = StubSetTouchpadRightClickType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_RIGHT_CLICK_TYPE):
-            return StubGetTouchpadRightClickType(data, reply);
+            ret = StubGetTouchpadRightClickType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_ROTATE_SWITCH):
-            return StubSetTouchpadRotateSwitch(data, reply);
+            ret = StubSetTouchpadRotateSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_ROTATE_SWITCH):
-            return StubGetTouchpadRotateSwitch(data, reply);
+            ret = StubGetTouchpadRotateSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_DELAY):
-            return StubGetKeyboardRepeatDelay(data, reply);
+            ret = StubGetKeyboardRepeatDelay(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_RATE):
-            return StubGetKeyboardRepeatRate(data, reply);
+            ret = StubGetKeyboardRepeatRate(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_HOT_SPOT):
-            return StubSetMouseHotSpot(data, reply);
+            ret = StubSetMouseHotSpot(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_SHIELD_STATUS):
-            return StubSetShieldStatus(data, reply);
+            ret = StubSetShieldStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SHIELD_STATUS):
-            return StubGetShieldStatus(data, reply);
+            ret = StubGetShieldStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEY_STATE):
-            return StubGetKeyState(data, reply);
+            ret = StubGetKeyState(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_AUTHORIZE):
-            return StubAuthorize(data, reply);
+            ret = StubAuthorize(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_INJECTION):
-            return StubCancelInjection(data, reply);
+            ret = StubCancelInjection(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_OWN):
-            return StubHasIrEmitter(data, reply);
+            ret = StubHasIrEmitter(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_INFRARED_FREQUENCY):
-            return StubGetInfraredFrequencies(data, reply);
+            ret = StubGetInfraredFrequencies(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NATIVE_CANCEL_TRANSMIT):
-            return StubTransmitInfrared(data, reply);
+            ret = StubTransmitInfrared(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
-            return StubSetPixelMapData(data, reply);
+            ret = StubSetPixelMapData(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
-            return StubSetCurrentUser(data, reply);
+            ret = StubSetCurrentUser(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS):
-            return StubEnableHardwareCursorStats(data, reply);
+            ret = StubEnableHardwareCursorStats(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
-            return StubGetHardwareCursorStats(data, reply);
+            ret = StubGetHardwareCursorStats(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
-            return StubAddVirtualInputDevice(data, reply);
+            ret = StubAddVirtualInputDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
-            return StubRemoveVirtualInputDevice(data, reply);
+            ret = StubRemoveVirtualInputDevice(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+            ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
     BytraceAdapter::StopIpcServer();
-    return RET_ERR;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
@@ -401,7 +402,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     }
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
-    MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
+    MMI_HILOGD("clientName:%{public}s, moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t tokenType = PER_HELPER->GetTokenType();
@@ -446,7 +447,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     READUINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = AddInputEventFilter(filter, filterId, priority, deviceTags);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call AddInputEventFilter failed ret:%{public}d", ret);
+        MMI_HILOGE("Call AddInputEventFilter failed:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -464,7 +465,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
     READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = RemoveInputEventFilter(filterId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call RemoveInputEventFilter failed ret:%{public}d", ret);
+        MMI_HILOGE("Call RemoveInputEventFilter failed:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -488,7 +489,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, 
     READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMouseScrollRows(rows);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMouseScrollRows failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMouseScrollRows failed:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", rows, GetCallingPid());
@@ -511,14 +512,14 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
     READINT32(data, focusX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusY, IPC_PROXY_DEAD_OBJECT_ERR);
     if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
     int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetCustomCursor failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetCustomCursor failed:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -537,15 +538,15 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     CHKPR(pixelMap, RET_ERR);
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("Reading windowid the tlv count %{public}d", windowId);
+    MMI_HILOGD("Reading windowid the tlv count:%{public}d", windowId);
     if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
 
     int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMouseIcon failed:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -554,6 +555,10 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -563,7 +568,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, Mes
     READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (windowId <= 0) {
-        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        MMI_HILOGE("Invalid windowId:%{public}d", windowId);
         return RET_ERR;
     }
     int32_t hotSpotX = 0;
@@ -572,7 +577,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, Mes
     READINT32(data, hotSpotY, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMouseHotSpot(winPid, windowId, hotSpotX, hotSpotY);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMouseHotSpot failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetMouseHotSpot failed:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -629,6 +634,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubSetNapStatus(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -690,7 +699,7 @@ int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& dat
         MMI_HILOGE("Call SetMousePrimaryButton failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success primaryButton:%{public}d,pid:%{public}d", primaryButton, GetCallingPid());
+    MMI_HILOGD("Success primaryButton:%{public}d, pid:%{public}d", primaryButton, GetCallingPid());
     return RET_OK;
 }
 
@@ -709,7 +718,7 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
         return ret;
     }
     WRITEINT32(reply, primaryButton, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Mouse primaryButton:%{public}d,ret:%{public}d", primaryButton, ret);
+    MMI_HILOGD("Mouse primaryButton:%{public}d, ret:%{public}d", primaryButton, ret);
     return RET_OK;
 }
 
@@ -777,7 +786,7 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         return ret;
     }
     WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    MMI_HILOGD("visible:%{public}d, ret:%{public}d, pid:%{public}d", visible, ret, GetCallingPid());
     return RET_OK;
 }
 
@@ -786,6 +795,7 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
     }
     int32_t eventType;
     READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -880,7 +890,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
         return RET_ERR;
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);
+    MMI_HILOGD("Pointer speed:%{public}d, ret:%{public}d", speed, ret);
     return RET_OK;
 }
 
@@ -894,6 +904,10 @@ int32_t MultimodalInputConnectStub::StubNotifyNapOnline(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputEventObserver(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = RemoveInputEventObserver();
     return ret;
 }
@@ -914,13 +928,17 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
+    MMI_HILOGD("Successfully set windowId:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t pid = 0;
     int32_t windowId = 0;
     READINT32(data, pid, RET_ERR);
@@ -951,7 +969,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     WRITEINT32(reply, pointerStyle.color, RET_ERR);
     WRITEINT32(reply, pointerStyle.id, RET_ERR);
     WRITEINT32(reply, pointerStyle.options, RET_ERR);
-    MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
+    MMI_HILOGD("Successfully get windowId:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }
 
@@ -963,7 +981,7 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
     int32_t size = 0;
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
     if (size < 0 || size > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("Invalid size: %{public}d", size);
+        MMI_HILOGE("Invalid size:%{public}d", size);
         return RET_ERR;
     }
     std::vector<int32_t> keys;
@@ -1500,6 +1518,10 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
 int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetPointerLocation Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1519,6 +1541,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
 int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t windowId = -1;
     bool isCaptureMode = false;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1551,6 +1577,10 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1580,6 +1610,10 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubEnableCombineKey(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1721,7 +1755,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel
         return ret;
     }
     WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad scroll direction switch :%{public}d, ret:%{public}d", state, ret);
+    MMI_HILOGD("Touchpad scroll direction switch state:%{public}d, ret:%{public}d", state, ret);
     return RET_OK;
 }
 
@@ -1760,7 +1794,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad tap switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    MMI_HILOGD("Touchpad tap switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
@@ -1799,7 +1833,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& d
         return ret;
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad pointer speed :%{public}d, ret:%{public}d", speed, ret);
+    MMI_HILOGD("Touchpad pointer speed:%{public}d, ret:%{public}d", speed, ret);
     return RET_OK;
 }
 
@@ -1922,7 +1956,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPinchSwitch(MessageParcel& da
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad pinch switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    MMI_HILOGD("Touchpad pinch switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
@@ -1961,7 +1995,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadSwipeSwitch(MessageParcel& da
         return ret;
     }
     WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad swipe switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    MMI_HILOGD("Touchpad swipe switchFlag:%{public}d, ret:%{public}d", switchFlag, ret);
     return RET_OK;
 }
 
@@ -2000,7 +2034,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
         return ret;
     }
     WRITEINT32(reply, type, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad right button menu type :%{public}d, ret:%{public}d", type, ret);
+    MMI_HILOGD("Touchpad right button menu type:%{public}d, ret:%{public}d", type, ret);
     return RET_OK;
 }
 
@@ -2039,7 +2073,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
         return ret;
     }
     WRITEBOOL(reply, rotateSwitch, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad rotate switch: %{public}d, ret:%{public}d", rotateSwitch, ret);
+    MMI_HILOGD("Touchpad rotate switch:%{public}d, ret:%{public}d", rotateSwitch, ret);
     return RET_OK;
 }
 
@@ -2212,7 +2246,7 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
     std::vector<int64_t> pattern;
     READINT32(data, patternLen, IPC_PROXY_DEAD_OBJECT_ERR);
     if (patternLen > MAX_N_TRANSMIT_INFRARED_PATTERN || patternLen <= 0) {
-        MMI_HILOGE("transmit infrared pattern len is invalid");
+        MMI_HILOGE("Transmit infrared pattern len is invalid");
         return false;
     }
     for (int32_t i = 0; i < patternLen; i++) {
@@ -2232,6 +2266,10 @@ int32_t MultimodalInputConnectStub::StubTransmitInfrared(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -2239,7 +2277,7 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     int32_t infoId = -1;
     READINT32(data, infoId, IPC_PROXY_DEAD_OBJECT_ERR);
     if (infoId <= 0) {
-        MMI_HILOGE("Invalid infoId, infoId: %{public}d", infoId);
+        MMI_HILOGE("Invalid infoId:%{public}d", infoId);
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
@@ -2254,6 +2292,10 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetCurrentUser Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetCurrentUser(userId);
@@ -2275,7 +2317,7 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
         MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success enable:%{public}d,pid:%{public}d", enable, GetCallingPid());
+    MMI_HILOGD("Success enable:%{public}d, pid:%{public}d", enable, GetCallingPid());
     return RET_OK;
 }
 
@@ -2299,6 +2341,10 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     auto device = std::make_shared<InputDevice>();
     if (g_parseInputDevice(data, device) != RET_OK) {
         MMI_HILOGE("ParseInputDevice failed");
@@ -2317,6 +2363,10 @@ int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& dat
 int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t deviceId { -1 };
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = RemoveVirtualInputDevice(deviceId);

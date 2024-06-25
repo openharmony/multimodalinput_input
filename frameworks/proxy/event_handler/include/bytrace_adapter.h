@@ -68,6 +68,10 @@ public:
     static void StartConsumer(std::shared_ptr<KeyEvent> key);
     static void StopConsumer();
 
+    static void StartPostTaskEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    static void StartPostTaskEvent(std::shared_ptr<KeyEvent> keyEvent);
+    static void StopPostTaskEvent();
+
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);

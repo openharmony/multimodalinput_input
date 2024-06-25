@@ -30,9 +30,6 @@
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
-#include "preferences.h"
-#include "preferences_errno.h"
-#include "preferences_helper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -180,14 +177,14 @@ public:
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef UNIT_TEST
-public:
-#else
 private:
-#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
@@ -218,6 +215,7 @@ private:
     bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool MatchShortcutKeys(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
@@ -227,7 +225,8 @@ private:
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
-    int32_t GetKeyDownDurationFromXml(const std::string &businessId);
+    void HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent);
+    void GetKeyDownDurationFromXml(ShortcutKey &shortcut) const;
     void SendKeyEvent();
     template <class T>
     void CreateStatusConfigObserver(T& item);
@@ -251,7 +250,7 @@ private:
         keys_.clear();
         filterSequences_.clear();
     }
-    bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
+
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
@@ -331,6 +330,7 @@ private:
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
     int32_t screenRecordingSuccessCount_ { 0 };
+    int32_t lastKeyEventCode_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
     bool isLetterGesturing_ { false };
