@@ -28,9 +28,9 @@ ohos_source_set("mmi_anco_channel_proxy") {
   defines = input_default_defines
 
   sources = [
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "src/anco_channel_death_recipient.cpp",
     "src/anco_channel_proxy.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp"
   ]
 
   configs = [ ":mmi_anco_channel_config" ]
@@ -54,9 +54,9 @@ ohos_source_set("mmi_anco_channel_stub") {
   defines = input_default_defines
 
   sources = [
-    "src/anco_channel_stub.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "src/anco_channel.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp"
+    "src/anco_channel_stub.cpp",
   ]
 
   configs = [ ":mmi_anco_channel_config" ]
