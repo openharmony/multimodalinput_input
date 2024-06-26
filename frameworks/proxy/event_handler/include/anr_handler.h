@@ -17,6 +17,7 @@
 #define ANR_HANDLER_H
 
 #include <atomic>
+#include <mutex>
 
 #include "singleton.h"
 
