@@ -36,6 +36,10 @@ ohos_shared_library("oh_input_manager") {
     "${mmi_path}/util/network/include",
   ]
 
+  if (input_ext_feture_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
+
   sources = [ "./oh_input_manager.cpp" ]
 
   cflags = [ "-Werror" ]
