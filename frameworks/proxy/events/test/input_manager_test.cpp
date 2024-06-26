@@ -1684,8 +1684,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
 HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto mmichecker = std::make_shared<MMIWindowChecker>();
-    InputManager::GetInstance()->SetWindowCheckerHandler(mmichecker);
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
