@@ -56,9 +56,9 @@ void InjectionEventDispatch::InitManageFunction()
 {
     CALL_DEBUG_ENTER;
     InjectFunctionMap funs[] = {
-        {"help", std::bind(&InjectionEventDispatch::OnHelp, this)},
-        {"sendevent", std::bind(&InjectionEventDispatch::OnSendEvent, this)},
-        {"json", std::bind(&InjectionEventDispatch::OnJson, this)},
+        {"help", [this] { return this->OnHelp(); }},
+        {"sendevent", [this] { return this->OnSendEvent(); }},
+        {"json", [this] { return this->OnJson(); }},
     };
 
     for (auto &it : funs) {
