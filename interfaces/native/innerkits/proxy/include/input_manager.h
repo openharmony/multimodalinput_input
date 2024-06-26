@@ -771,13 +771,6 @@ public:
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
 
     /**
-     * @brief Sets a window input event consumer that runs on the specified thread.
-     * @param inputEventConsumer Indicates the consumer to set.
-     * @since 9
-     */
-    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
-
-    /**
      * @brief Sets whether shield key event interception, only support shield key event.
      * @param shieldMode Indicates shield mode.
      * @param isShield Indicates whether key event handler chain is shield. The value <b>true</b> indicates that

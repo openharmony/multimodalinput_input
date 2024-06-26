@@ -497,14 +497,10 @@ void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t w
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
 }
+
 void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     InputMgrImpl.ClearWindowPointerStyle(pid, windowId);
-}
-void InputManager::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
-{
-    CHKPV(windowChecker);
-    InputMgrImpl.SetWindowCheckerHandler(windowChecker);
 }
 
 void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
