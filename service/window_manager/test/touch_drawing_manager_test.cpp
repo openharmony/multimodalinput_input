@@ -1036,6 +1036,40 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_005, Te
 }
 
 /**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_006
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isChangedRotation_ = false;
+    TOUCH_DRAWING_MGR->isChangedMode_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.displayMode = DisplayMode::FULL;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = true;
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_007
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isChangedRotation_ = false;
+    TOUCH_DRAWING_MGR->isChangedMode_ = true;
+    TOUCH_DRAWING_MGR->displayInfo_.displayMode = DisplayMode::FULL;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = false;
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
  * @tc.name: TouchDrawingManagerTest_AddCanvasNode_001
  * @tc.desc: Test AddCanvasNode
  * @tc.type: Function
@@ -1216,6 +1250,19 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_InitLabels_001, TestSi
     EXPECT_EQ(TOUCH_DRAWING_MGR->isFirstDownAction_, true);
     EXPECT_EQ(TOUCH_DRAWING_MGR->isDownAction_, true);
     EXPECT_EQ(TOUCH_DRAWING_MGR->maxPointerCount_, 0);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ResetCanvasNode_001
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ResetCanvasNode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    TOUCH_DRAWING_MGR->ResetCanvasNode(canvasNode);
 }
 } // namespace MMI
 } // namespace OHOS

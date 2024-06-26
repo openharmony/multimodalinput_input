@@ -148,6 +148,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
+    isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
     scaleH_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
     displayInfo_ = displayInfo;
@@ -233,7 +234,11 @@ void TouchDrawingManager::UpdateBubbleData()
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (isChangedRotation_ && IsWindowRotation()) {
+    if (!isChangedRotation_) {
+        return;
+    }
+
+    if (IsWindowRotation()) {
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
@@ -241,17 +246,24 @@ void TouchDrawingManager::RotationScreen()
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
+    } else if (isChangedMode_ && displayInfo_.displayMode == DisplayMode::FULL) {
+        if (pointerMode_.isShow) {
+            ResetCanvasNode(trackerCanvasNode_);
+            ResetCanvasNode(crosshairCanvasNode_);
+        }
+        if (bubbleMode_.isShow) {
+            ResetCanvasNode(bubbleCanvasNode_);
+        }
     }
 
-    if (pointerMode_.isShow && isChangedRotation_) {
+    if (pointerMode_.isShow) {
         if (!lastPointerItem_.empty() || stopRecord_) {
             Snapshot();
         } else if (!stopRecord_) {
             UpdateLabels();
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::CreateObserver()
@@ -369,6 +381,15 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
         canvasNode->SetRotation(ROTATION_ANGLE_0);
         canvasNode->SetTranslateX(0);
     }
+    canvasNode->SetTranslateY(0);
+}
+
+void TouchDrawingManager::ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(canvasNode);
+    canvasNode->SetRotation(ROTATION_ANGLE_0);
+    canvasNode->SetTranslateX(0);
     canvasNode->SetTranslateY(0);
 }
 
