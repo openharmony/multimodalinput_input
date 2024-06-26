@@ -84,7 +84,7 @@ int32_t AncoChannelStub::StubUpdateWindowInfo(MessageParcel &data, MessageParcel
 {
     auto windows = std::make_shared<AncoWindows>();
 
-    if (!AncoWindows::Unmarshalling(data, *womdpws)) {
+    if (!AncoWindows::Unmarshalling(data, *windows)) {
         MMI_HILOGE("Failed to unmarshal anco windows");
         return RET_ERR;
     }
