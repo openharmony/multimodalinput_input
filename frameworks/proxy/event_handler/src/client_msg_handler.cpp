@@ -51,28 +51,35 @@ void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        { MmiMessageId::ON_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this) },
-        { MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
-            this, std::placeholders::_1, std::placeholders::_2) },
+        { MmiMessageId::ON_KEY_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnKeyEvent(client, pkt); }},
+        { MmiMessageId::ON_SUBSCRIBE_KEY, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnSubscribeKeyEventCallback(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-        { MmiMessageId::ON_SUBSCRIBE_SWITCH, std::bind(&ClientMsgHandler::OnSubscribeSwitchEventCallback,
-            this, std::placeholders::_1, std::placeholders::_2) },
+        { MmiMessageId::ON_SUBSCRIBE_SWITCH, [this] (const UDSClient &client, NetPacket &pkt) {
+            return this->OnSubscribeSwitchEventCallback(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        { MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this) },
+        { MmiMessageId::ON_POINTER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnPointerEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-        { MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this) },
-        { MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this) },
+        { MmiMessageId::ADD_INPUT_DEVICE_LISTENER, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnDevListener(client, pkt); }},
+        { MmiMessageId::NOTICE_ANR, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->OnAnr(client, pkt); }},
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
-        { MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this) },
+        { MmiMessageId::REPORT_KEY_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->ReportKeyEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-        { MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this) },
+        { MmiMessageId::REPORT_POINTER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->ReportPointerEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-        { MmiMessageId::NOTIFY_BUNDLE_NAME, MsgCallbackBind2(&ClientMsgHandler::NotifyBundleName, this) },
+        { MmiMessageId::NOTIFY_BUNDLE_NAME, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->NotifyBundleName(client, pkt); }},
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -88,8 +95,9 @@ void ClientMsgHandler::InitProcessedCallback()
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP) {
         MMI_HILOGD("Current session is hap");
-        dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1,
-            std::placeholders::_2);
+        dispatchCallback_ = [] (int32_t eventId, int64_t actionTime) {
+            return ClientMsgHandler::OnDispatchEventProcessed(eventId, actionTime);
+        };
     } else if (tokenType == static_cast<int32_t>(TokenType::TOKEN_NATIVE)) {
         MMI_HILOGD("Current session is native");
     } else {
