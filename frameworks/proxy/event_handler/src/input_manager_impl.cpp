@@ -2160,7 +2160,7 @@ int32_t InputManagerImpl::RemoveVirtualInputDevice(int32_t deviceId)
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-int32_t InputManagerImpl::AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer)
+int32_t InputManagerImpl::AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer)
 {
     std::lock_guard<std::mutex> guard(mtx_);
     if (ancoChannels_.find(consumer) != ancoChannels_.end()) {
@@ -2176,7 +2176,7 @@ int32_t InputManagerImpl::AncoAddConsumer(std::shared_ptr<IAncoConsumer> consume
     return RET_OK;
 }
 
-int32_t InputManagerImpl::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer)
+int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer)
 {
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = ancoChannels_.find(consumer);

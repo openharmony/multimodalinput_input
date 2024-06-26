@@ -17,8 +17,8 @@ config("mmi_anco_channel_config") {
   include_dirs = [
     "include",
     "${mmi_ext_path}/anco_uds_manager/include",
-    "${mmi_path}/input/interfaces/native/innerkits/event/include",
-    "${mmi_path}/input/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
 }
 
@@ -30,6 +30,7 @@ ohos_source_set("mmi_anco_channel_proxy") {
   sources = [
     "src/anco_channel_death_recipient.cpp",
     "src/anco_channel_proxy.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp"
   ]
 
   configs = [ ":mmi_anco_channel_config" ]
@@ -55,6 +56,7 @@ ohos_source_set("mmi_anco_channel_stub") {
   sources = [
     "src/anco_channel_stub.cpp",
     "src/anco_channel.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp"
   ]
 
   configs = [ ":mmi_anco_channel_config" ]

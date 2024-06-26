@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 
-enum class ANCO_WINDOW_UPDATE_TYPE : uint32_t {
+enum class ANCO_WINDOW_UPDATE_TYPE: uint32_t {
     ALL = 0,
     INCREMENT = 1,
 };
@@ -35,8 +35,8 @@ struct AncoWindowInfo {
     int32_t id;
 
     /**
-     * A 32-bit flag tthat represents tthe window status. If the 0th bitt is 1,
-     * the window is untouchablel; if the 0th bit is 0, the window is touchable.
+     * A 32-bit flag that represents the window status. If the 0th bitt is 1,
+     * the window is untouchable; if the 0th bit is 0, the window is touchable.
      */
     uint32_t flags;
 

@@ -22,6 +22,9 @@
 #include "libinput.h"
 
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_channel.h"
+#endif
 #include "key_event.h"
 #include "pointer_event.h"
 #include "pointer_style.h"

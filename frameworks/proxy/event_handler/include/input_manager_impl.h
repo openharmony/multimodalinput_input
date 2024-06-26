@@ -27,7 +27,7 @@
 #include "event_handler.h"
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
-#include "i_anco_consumer.h"
+#include "i_anco_channel.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_anr_observer.h"
 #include "i_input_event_consumer.h"
@@ -210,8 +210,8 @@ public:
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
-    int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 private:

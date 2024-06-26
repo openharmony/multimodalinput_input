@@ -15,6 +15,8 @@
 
 #include "anco_channel_stub.h"
 
+#include "string_ex.h"
+
 #include "define_multimodal.h"
 
 #undef MMI_LOG_DOMAIN
@@ -37,6 +39,7 @@ AncoChannelStub::AncoChannelStub()
 int32_t AncoChannelStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
+    CALL_INFO_TRACE;
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IAncoChannel::GetDescriptor()) {
         MMI_HILOGE("Got unexpected descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
@@ -56,10 +59,11 @@ int32_t AncoChannelStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
 
 int32_t AncoChannelStub::StubSyncPointerEvent(MessageParcel &data, MessageParcel &reply)
 {
+    CALL_INFO_TRACE;
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, RET_ERR);
     if (!pointerEvent->ReadFromParcel(data)) {
-        MMI_HILOGE("Failed to deserialize pointer event");
+        MMI_HILOGE("Failed to unmarshal PointerEvent");
         return RET_ERR;
     }
     return SyncInputEvent(pointerEvent);
@@ -70,7 +74,7 @@ int32_t AncoChannelStub::StubSyncKeyEvent(MessageParcel &data, MessageParcel &re
     auto keyEvent = KeyEvent::Create();
     CHKPR(keyEvent, RET_ERR);
     if (!keyEvent->ReadFromParcel(data)) {
-        MMI_HILOGE("Failed to deserialize key event");
+        MMI_HILOGE("Failed to unmarshal KeyEvent");
         return RET_ERR;
     }
     return SyncInputEvent(keyEvent);
@@ -78,7 +82,13 @@ int32_t AncoChannelStub::StubSyncKeyEvent(MessageParcel &data, MessageParcel &re
 
 int32_t AncoChannelStub::StubUpdateWindowInfo(MessageParcel &data, MessageParcel &reply)
 {
-    return RET_OK;
+    auto windows = std::make_shared<AncoWindows>();
+
+    if (!AncoWindows::Unmarshalling(data, *womdpws)) {
+        MMI_HILOGE("Failed to unmarshal anco windows");
+        return RET_ERR;
+    }
+    return UpdateWindowInfo(windows);
 }
 } // namespace MMI
 } // namespace OHOS

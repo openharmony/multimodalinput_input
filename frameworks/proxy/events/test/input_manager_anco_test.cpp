@@ -27,8 +27,8 @@ using namespace testing::ext;
 
 class InputManagerAncoTest : public testing::Test {
 public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
 };
 
 class AncoMonitor final : public IAncoConsumer {
@@ -50,6 +50,8 @@ int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 
 int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    std::cout << "No:" << keyEvent->GetId() << ",K:" << keyEvent->GetKeyCode()
+        << ",A:" << keyEvent->GetKeyrAction() << std::endl;
     return RET_OK;
 }
 
@@ -60,7 +62,7 @@ int32_t AncoMonitor::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
 
 /**
  * @tc.name: InputManagerAncoTest_SyncPointerEvent_001
- * @tc.desc: Sync pointer event
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */

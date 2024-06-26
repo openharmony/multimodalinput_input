@@ -206,7 +206,7 @@ group("mmi_tests") {
   }
 
   if (input_ext_feature_anco) {
-    deps += [ "frameworks/proxy/events/test:InputManagerAncoTest" ]
+    deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
 }
 

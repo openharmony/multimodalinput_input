@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 
-enum class AncoRequestId : uint32_t {
+enum class AncoRequestId {
     SYNC_POINTER_EVENT = 0,
     SYNC_KEY_EVENT,
     UPDATE_WINDOW_INFO,
