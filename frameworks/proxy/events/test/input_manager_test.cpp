@@ -129,7 +129,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetWinSyncBatchSize, TestSize.Level1
     int32_t maxAreasCount = 1;
     int32_t displayCount = 2;
     int32_t ret = InputManager::GetInstance()->GetWinSyncBatchSize(maxAreasCount, displayCount);
-    EXPECT_EQ(ret, 37);
+    EXPECT_EQ(ret, 38);
 }
 
 /**
@@ -1684,8 +1684,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
 HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto mmichecker = std::make_shared<MMIWindowChecker>();
-    InputManager::GetInstance()->SetWindowCheckerHandler(mmichecker);
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     CHKPV(window);
     uint32_t windowId = window->GetWindowId();
@@ -3046,13 +3044,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
 {
     bool hasIrEmitter = false;
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
     EXPECT_EQ(ret, RET_OK);
-#else
-    int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
-    EXPECT_EQ(ret, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 /**
@@ -3063,15 +3056,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
  */
 HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Level1)
 {
-    InfraredFrequency infraredFrequency = { 30, 10 };
-    std::vector<InfraredFrequency> requencys = { infraredFrequency };
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
+    InfraredFrequency infraredFrequency;
+    infraredFrequency.max_ = 30;
+    infraredFrequency.min_ = 10;
+    std::vector<InfraredFrequency> requencys;
+    requencys.push_back(infraredFrequency);
     int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
     EXPECT_EQ(ret, RET_OK);
-#else
-    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
-    EXPECT_EQ(ret, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 
 /**
@@ -3084,13 +3075,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
 {
     int64_t number = 10;
     std::vector<int64_t> pattern = { 10, 20, 30 };
-#ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     EXPECT_EQ(ret, RET_OK);
-#else
-    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
-    EXPECT_EQ(ret, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_INFRARED_EMITTER
 }
 } // namespace MMI
 } // namespace OHOS

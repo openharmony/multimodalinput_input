@@ -162,7 +162,6 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_keyboard) {
     sources += [
       "display_state_manager/src/display_event_monitor.cpp",
-      "key_command/src/shortcut_handler.cpp",
       "key_event_normalize/src/key_event_normalize.cpp",
       "key_event_normalize/src/key_unicode_transformation.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
@@ -238,6 +237,10 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/util:libmmi-util",
     "//third_party/cJSON:cjson",
   ]
+
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+  }
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
@@ -403,10 +406,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
 
   configs = [ ":libmmi_server_config" ]
 
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
+  cflags = [ "-DUNIT_TEST" ]
 
   sources = [
     "key_command/src/key_command_handler.cpp",
@@ -1347,6 +1347,39 @@ ohos_unittest("InterceptorTest") {
   external_deps = [ "hilog:libhilog" ]
 }
 
+ohos_unittest("KeyAutoRepeatExTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "event_handler/test/key_auto_repeat_ex_test.cpp",
+    "event_handler/test/mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
+
 ohos_unittest("EventHandlerTest") {
   module_out_path = module_output_path
 
@@ -1375,6 +1408,43 @@ ohos_unittest("EventHandlerTest") {
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("EventHandlerEXTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "event_handler/test/event_normalize_handler_ex_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/mock:mmi_mock_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -1502,12 +1572,16 @@ ohos_unittest("DisplayStateManagerTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "display_state_manager/test/display_event_monitor_test.cpp" ]
+  sources = [
+    "display_state_manager/test/display_event_monitor_test.cpp",
+    "display_state_manager/test/mock.cpp",
+  ]
 
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -1616,6 +1690,47 @@ ohos_unittest("ConnectManagerTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "image_framework:image_native",
+    "ipc:ipc_single",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
+ohos_unittest("ConnectManagerProxyEXTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "connect_manager/test" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
+    "connect_manager/src/multimodal_input_connect_proxy.cpp",
+    "connect_manager/test/message_parcel_mock.cpp",
+    "connect_manager/test/multimodal_input_connect_proxy_ex_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",

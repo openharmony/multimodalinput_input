@@ -18,9 +18,9 @@
 
 #include <gtest/gtest.h>
 
+#include "knuckle_drawing_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
-#include "knuckle_drawing_manager.h"
 #include "window_info.h"
 
 #undef MMI_LOG_TAG
@@ -320,13 +320,13 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateDisplayInfo,
     CALL_TEST_DEBUG;
     KnuckleDrawingManager kceDrawMgr;
     DisplayInfo displayInfo;
-    displayInfo.dpi = 200;
-    kceDrawMgr.displayInfo_.dpi = 200;
+    displayInfo.direction = Direction::DIRECTION0;
+    kceDrawMgr.displayInfo_.direction = Direction::DIRECTION0;
     kceDrawMgr.UpdateDisplayInfo(displayInfo);
     EXPECT_FALSE(kceDrawMgr.isRotate_);
-    kceDrawMgr.displayInfo_.dpi = 300;
+    kceDrawMgr.displayInfo_.direction = Direction::DIRECTION90;
     kceDrawMgr.UpdateDisplayInfo(displayInfo);
-    EXPECT_FALSE(kceDrawMgr.isRotate_);
+    EXPECT_TRUE(kceDrawMgr.isRotate_);
 }
 
 /**
@@ -413,6 +413,11 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     KnuckleDrawingManager kceDrawMgr;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
     PointerEvent::PointerItem item;
@@ -429,6 +434,8 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
 
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
     PointerInfo pointerInfo;
     pointerInfo.x = 100;
     pointerInfo.y = 100;

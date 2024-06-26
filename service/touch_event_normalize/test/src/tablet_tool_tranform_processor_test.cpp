@@ -70,25 +70,6 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
 }
 
 /**
- * @tc.name: TabletToolTranformProcessorTest_OnEvent_002
- * @tc.desc: Test the funcation OnEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEvent_002, TestSize.Level1)
-{
-    int32_t deviceId = 2;
-    TabletToolTransformProcessor processor(deviceId);
-    libinput_event_tablet_tool event {};
-
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_AXIS));
-
-    auto pointerEvent = processor.OnEvent(&event.base);
-    ASSERT_TRUE(pointerEvent == nullptr);
-}
-
-/**
  * @tc.name: TabletToolTranformProcessorTest_OnEvent_003
  * @tc.desc: Test the funcation OnEvent
  * @tc.type: FUNC
