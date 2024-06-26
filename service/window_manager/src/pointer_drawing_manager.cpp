@@ -344,7 +344,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
         MAGIC_CURSOR->UpdateMagicCursorChangeState(statusValue);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     };
-    std::string dynamicallyKey = "isVariable";
+    std::string dynamicallyKey = "smartChange";
     sptr<SettingObserver> magicCursorChangeObserver = SettingDataShare::GetInstance(
         MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(dynamicallyKey, func);
     ErrCode ret =
