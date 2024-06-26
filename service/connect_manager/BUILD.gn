@@ -84,7 +84,7 @@ ohos_source_set("mmi_connect_manager_service") {
 ohos_source_set("mmi_connect_manager_proxy") {
   part_name = "input"
   subsystem_name = "multimodalinput"
-  
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
