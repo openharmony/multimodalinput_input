@@ -41,9 +41,9 @@ static constexpr std::string_view DebugTrackingDict =
         "Debug-InputTracking-Dict: "
         "A-Action, AST-ActionStartTime, B-Buffer, BC-BufferCount, BI-ButtonId, BAV-BrakeAbsValue, F-Flag,"
         " GAV-GenericAxisValue, HAV-HorizontalAxisValue, HXAV-Hat0xAbsValue, HYAV-Hat0yAbsValue, KI-KeyIntention,"
-        " ME-MarkEnabled, PAV-PinchAxisValue, PC-PointerCount, RAV-RzAbsValue, SIT-SensorInputTime, "
+        " ME-MarkEnabled, PAV-PinchAxisValue, PC-PointerCount, RZAV-RzAbsValue, SIT-SensorInputTime, "
         "TAV-ThrottleAbsValue, TX-TiltX, TY-TiltY, VAV-VerticalAxisValue, W-Width, WX-WindowX, WY-WindowY,"
-        " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue";
+        " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue, RAV-RotateAxisValue";
 
 class EventLogHelper final {
 public:
@@ -197,17 +197,19 @@ private:
         }
         MMI_HILOG_HEADER(LOG_DEBUG, lh, "ET:%{public}s, AT:%{public}" PRId64 ", SIT:%{public}" PRIu64 ", A:%{public}d, "
             "AST:%{public}" PRId64 ", F:%{public}d, PA:%{public}s, ST:%{public}s, BI:%{public}d, VAV:%{public}.5f, "
-            "HAV:%{public}.5f, PAV:%{public}.5f, XAV:%{public}.5f, YAV:%{public}.5f, ZAV:%{public}.5f, "
-            "RAV:%{public}.5f, GAV:%{public}.5f, BAV:%{public}.5f, HXAV:%{public}.5f, HYAV:%{public}.5f, "
-            "TAV:%{public}.5f,PI:%{public}d, PC:%{public}zu, EN:%{public}d, BC:%{public}zu, B:%{public}s, "
-            "ME:%{public}d", InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
+            "HAV:%{public}.5f, PAV:%{public}.5f, PAV:%{public}.5f, XAV:%{public}.5f, YAV:%{public}.5f, "
+            "ZAV:%{public}.5f, RZAV:%{public}.5f, GAV:%{public}.5f, BAV:%{public}.5f, HXAV:%{public}.5f, "
+            "HYAV:%{public}.5f, TAV:%{public}.5f,PI:%{public}d, PC:%{public}zu, EN:%{public}d, BC:%{public}zu, "
+            "B:%{public}s, ME:%{public}d",
+            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->GetSensorInputTime(), event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ROTATE),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_BRAKE),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
