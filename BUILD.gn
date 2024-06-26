@@ -151,6 +151,7 @@ group("mmi_tests") {
     "libudev:test",
     "service:ApplicationStateObserverTest",
     "service:ConnectManagerEXTest",
+    "service:ConnectManagerProxyEXTest",
     "service:ConnectManagerTest",
     "service:DelegateTaskTest",
     "service:DeviceConfigTest",
@@ -161,6 +162,7 @@ group("mmi_tests") {
     "service:EventDumpTest",
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
+    "service:EventHandlerEXTest",
     "service:EventHandlerTest",
     "service:FingerprintEventProcessorTest",
     "service:InfraredEmitterTest",
@@ -168,6 +170,7 @@ group("mmi_tests") {
     "service:InputWindowsManagerEXTest",
     "service:InputWindowsManagerTest",
     "service:InterceptorTest",
+    "service:KeyAutoRepeatExTest",
     "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
     "service:KnuckleDivergentPointTest",
@@ -202,6 +205,10 @@ group("mmi_tests") {
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
+  }
+
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
 }
 

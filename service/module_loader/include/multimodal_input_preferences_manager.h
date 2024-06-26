@@ -76,7 +76,9 @@ private:
     const std::string strTouchpadPinchSwitch_ = "touchpadPinch";
     const std::string strTouchpadSwipeSwitch_ = "touchpadSwipe";
     const std::string strHoverScrollState_ = "isEnableHoverScroll";
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     const std::string strMoveEventFilterFlag_ = "moveEventFilterFlag";
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     const std::string strPointerColor_ = "pointerColor";
     const std::string strPointerSize_ = "pointerSize";
     const std::string strPointerStyle_ = "pointerStyle";

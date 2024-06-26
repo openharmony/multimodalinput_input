@@ -52,7 +52,7 @@ OHOS::sptr<OHOS::AppExecFwk::IAppMgr> ApplicationStateObserver::GetAppMgr()
         MMI_HILOGE("Get system ability manager failed");
         return nullptr;
     }
-    OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->GetSystemAbility(OHOS::APP_MGR_SERVICE_ID);
+    OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->CheckSystemAbility(OHOS::APP_MGR_SERVICE_ID);
     appManager_ = OHOS::iface_cast<OHOS::AppExecFwk::IAppMgr>(object);
     return appManager_;
 }
@@ -98,7 +98,7 @@ void AppObserverManager::InitAppStateObserver()
         MMI_HILOGE("Get system ability manager failed");
         return;
     }
-    OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->GetSystemAbility(OHOS::APP_MGR_SERVICE_ID);
+    OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->CheckSystemAbility(OHOS::APP_MGR_SERVICE_ID);
     CHKPV(object);
     sptr<AppExecFwk::IAppMgr> appMgr = OHOS::iface_cast<OHOS::AppExecFwk::IAppMgr>(object);
     CHKPV(appMgr);

@@ -47,6 +47,7 @@ public:
     virtual SessionPtr GetSession(int32_t fd) = 0;
     virtual int32_t GetClientFd(int32_t pid) = 0;
     virtual bool HasPointerDevice() = 0;
+    virtual std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked) = 0;
     virtual bool GetMouseDisplayState() = 0;
     virtual bool GetBoolValue(const std::string &key, bool defaultValue) = 0;
     virtual bool IsFoldable() = 0;
@@ -63,6 +64,7 @@ public:
     MOCK_METHOD1(GetSession, SessionPtr(int32_t fd));
     MOCK_METHOD1(GetClientFd, int32_t(int32_t pid));
     MOCK_METHOD0(HasPointerDevice, bool());
+    MOCK_METHOD2(GetInputDevice, std::shared_ptr<InputDevice>(int32_t deviceId, bool checked));
     MOCK_METHOD0(GetMouseDisplayState, bool());
     MOCK_METHOD2(GetBoolValue, bool(const std::string &key, bool defaultValue));
     MOCK_METHOD0(IsFoldable, bool());
