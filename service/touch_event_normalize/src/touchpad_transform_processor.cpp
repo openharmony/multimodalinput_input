@@ -338,7 +338,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         return RET_ERR;
     }
 
-    AddItemForEventWhileTouchPadSwipeData(time, gesture);
+    AddItemForEventWhileSetSwipeData(time, gesture);
     
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
