@@ -26,6 +26,9 @@
 
 #include "error_multimodal.h"
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_consumer.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_anr_observer.h"
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
@@ -876,6 +879,11 @@ public:
      * @since 12
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
     InputManager() = default;

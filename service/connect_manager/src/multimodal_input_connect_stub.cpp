@@ -384,6 +384,14 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
             ret = StubRemoveVirtualInputDevice(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL):
+            ret = StubAncoAddChannel(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_ANCO_CHANNEL):
+            ret = StubAncoRemoveChannel(data, reply);
+            break;
+#endif // OHOS_BUILD_ENABLE_ANCO
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2377,5 +2385,45 @@ int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& 
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t MultimodalInputConnectStub::StubAncoAddChannel(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+    CHKPR(remoteObj, ERR_INVALID_VALUE);
+    sptr<IAncoChannel> channel = iface_cast<IAncoChannel>(remoteObj);
+    CHKPR(channel, ERROR_NULL_POINTER);
+    int32_t ret = AncoAddChannel(channel);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AncoAddChannel fail, error:%{public}d", ret);
+    }
+    WRITEINT32(reply, ret);
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+    CHKPR(remoteObj, ERR_INVALID_VALUE);
+    sptr<IAncoChannel> channel = iface_cast<IAncoChannel>(remoteObj);
+    CHKPR(channel, ERROR_NULL_POINTER);
+    int32_t ret = AncoRemoveChannel(channel);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AncoRemoveChannel fail, error:%{public}d", ret);
+    }
+    WRITEINT32(reply, ret);
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS

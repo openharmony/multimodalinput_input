@@ -238,6 +238,10 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson",
   ]
 
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+  }
+
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm_lite" ]

@@ -795,5 +795,21 @@ int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t MultimodalInputConnectManager::AncoAddChannel(sptr<IAncoChannel> channel)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AncoAddChannel(channel);
+}
+
+int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> channel)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AncoRemoveChannel(channel);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS

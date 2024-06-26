@@ -156,6 +156,11 @@ public:
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel);
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
+#endif // OHOS_BUILD_ENABLE_ANCO
+
 private:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
