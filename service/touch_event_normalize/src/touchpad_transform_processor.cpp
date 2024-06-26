@@ -47,7 +47,7 @@ constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
-const std::string THREE_FINGER_TAP_KEY = "touchpadThreeFingerTap";
+std::string THREE_FINGER_TAP_KEY = "touchpadThreeFingerTap";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
