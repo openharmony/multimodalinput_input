@@ -168,12 +168,16 @@ void InputWindowsManager::Init(UDSServer& udsServer)
     CHKPV(udsServer_);
     bindInfo_.Load();
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
+    udsServer_->AddSessionDeletedCallback([this] (SessionPtr session) { return this->OnSessionLost(session); });
     InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
     INPUT_DEV_MGR->SetInputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-
+    INPUT_DEV_MGR->SetInputStatusChangeCallback(
+        [this] (int32_t deviceId, const std::string &sysUid, const std::string devStatus) {
+            return this->DeviceStatusChanged(deviceId, sysUid, devStatus);
+        }
+        );
     TimerMgr->AddTimer(WAIT_TIME_FOR_REGISTER, 1, [this]() {
         MMI_HILOG_HANDLERD("Timer callback");
         RegisterFoldStatusListener();
