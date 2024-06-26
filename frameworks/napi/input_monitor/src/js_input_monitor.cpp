@@ -1413,8 +1413,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::THREE_FINGERS_SWIPE: {
                 bool canUse = false;
-                if (!IsThreeFingersSwipe(pointerEvent)) {
-                } else {
+                if (IsThreeFingersSwipe(pointerEvent)) {
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                     MMI_HILOGD("THREE_FINGERS_SWIPE but three finger action can't use");
                 }
@@ -1435,8 +1434,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::THREE_FINGERS_TAP: {
                 bool canUse = false;
-                if (!IsThreeFingersTap(pointerEvent)) {
-                } else {
+                if (IsThreeFingersTap(pointerEvent)) {
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                     MMI_HILOGD("THREE_FINGERS_TAP but three finger action can't use");
                 }
