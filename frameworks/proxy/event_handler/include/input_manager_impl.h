@@ -81,7 +81,6 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
-    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
