@@ -152,13 +152,13 @@ ohos_shared_library("libmmi-server") {
     debug = false
   }
   sources += [
+    "${mmi_path}/util/napi/src/util_napi_error.cpp",
     "window_manager/src/knuckle_divergent_point.cpp",
     "window_manager/src/knuckle_drawing_manager.cpp",
     "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
     "window_manager/src/knuckle_glow_point.cpp",
     "window_manager/src/knuckle_glow_trace_system.cpp",
     "window_manager/src/touch_drawing_manager.cpp",
-    "${mmi_path}/util/napi/src/util_napi_error.cpp",
   ]
 
   if (input_feature_keyboard) {
