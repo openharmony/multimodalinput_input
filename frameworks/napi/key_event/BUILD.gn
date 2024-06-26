@@ -20,6 +20,7 @@ config("keyEvent_config") {
     "${mmi_path}/frameworks/napi/key_event/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/util/napi/include",
   ]
 }
 
@@ -27,6 +28,7 @@ ohos_shared_library("keyevent") {
   sources = [
     "src/js_key_event.cpp",
     "src/native_register_module.cpp",
+    "${mmi_path}/util/napi/src/util_napi.cpp",
   ]
   branch_protector_ret = "pac_ret"
   sanitize = {
