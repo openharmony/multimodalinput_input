@@ -44,7 +44,7 @@ private:
     ANREvent event_[ANR_EVENT_TYPE_NUM];
     int32_t lastEventId_ { 0 };
     int32_t processedCount_ { 0 };
-
+    std::vector<int32_t> idList_;
     void SendEvent(int32_t eventType, int32_t eventId);
 };
 
