@@ -90,6 +90,7 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
     "${graphics_path}/2d_graphics/include",
+    "${mmi_path}/util/napi/include",
   ]
 
   if (input_feature_fingerprint) {
@@ -157,6 +158,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/knuckle_glow_point.cpp",
     "window_manager/src/knuckle_glow_trace_system.cpp",
     "window_manager/src/touch_drawing_manager.cpp",
+    "${mmi_path}/util/napi/src/util_napi_error.cpp",
   ]
 
   if (input_feature_keyboard) {

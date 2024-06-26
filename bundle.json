@@ -144,7 +144,7 @@
             "header_files": [
               "key_event_napi.h"
             ],
-            "header_base": "//foundation/multimodalinput/input/util/common/include"
+            "header_base": "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include"
           },
           "type": "so"
         }
