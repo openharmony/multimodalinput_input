@@ -33,8 +33,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr auto MAX_EVENT_BUF_SIZE = 512;
-constexpr auto INPUT_DEVICES_PATH = "/dev/input/";
+constexpr auto MAX_EVENT_BUF_SIZE { 512 };
+constexpr auto INPUT_DEVICES_PATH { "/dev/input/" };
 
 auto SystemError()
 {

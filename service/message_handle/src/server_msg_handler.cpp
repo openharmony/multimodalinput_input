@@ -54,6 +54,7 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME = 5;
+constexpr int32_t DEFAULT_POINTER_ID = 10000;
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -329,6 +330,10 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
 
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        return RET_OK;
+    }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -363,7 +368,22 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
     int32_t action, bool isShell)
 {
+    CHKPF(pointerEvent);
     int32_t targetWindowId = -1;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return false;
+    }
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        pointerEvent->RemovePointerItem(pointerId);
+        pointerId = pointerId % DEFAULT_POINTER_ID;
+        pointerItem.SetPointerId(pointerId);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+        pointerEvent->SetPointerId(pointerId);
+        return true;
+    }
     if (isShell) {
         auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
         if (iter != shellTargetWindowIds_.end()) {
@@ -384,12 +404,6 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     auto pointerIds = pointerEvent->GetPointerIds();
     if (pointerIds.empty()) {
         MMI_HILOGE("GetPointerIds is empty");
-        return false;
-    }
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
     }
     pointerEvent->SetTargetWindowId(targetWindowId);

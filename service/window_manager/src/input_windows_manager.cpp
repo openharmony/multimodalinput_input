@@ -75,6 +75,7 @@ constexpr int32_t BOTTOM_AREA { 5 };
 constexpr int32_t BOTTOM_LEFT_AREA { 6 };
 constexpr int32_t LEFT_AREA { 7 };
 constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
+constexpr int32_t RS_PROCESS_TIMEOUT { 500 * 1000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -450,7 +451,6 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
         return INVALID_PID;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    PrintChangedWindowByEvent(InputEvent::EVENT_TYPE_KEY, *windowInfo);
     SetPrivacyModeFlag(windowInfo->privacyMode, keyEvent);
     keyEvent->SetTargetWindowId(windowInfo->id);
     keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
@@ -789,10 +789,9 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
         if (!isDragBorder_) {
-            int32_t ret = WIN_MGR->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+            GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
             MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
                 info.windowPid, info.windowId, pointerStyle.id);
-            CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
         }
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -869,8 +868,7 @@ void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, in
             pointerStyle.id = MOUSE_ICON::NORTH_WEST;
             break;
         case WindowArea::FOCUS_ON_INNER:
-            int32_t ret = GetPointerStyle(pid, winId, pointerStyle);
-            CHKNOKRV(ret, "Get pointer style failed, pointerStyleInfo is nullptr");
+            GetPointerStyle(pid, winId, pointerStyle);
             break;
     }
 }
@@ -890,11 +888,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         iconStyle.iconPath != DEFAULT_ICON_PATH)) {
         PointerStyle style;
-        int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
-        if (ret != RET_OK) {
-            MMI_HILOG_CURSORE("Get global pointer style failed");
-            return;
-        }
+        GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         lastPointerStyle_ = style;
     }
     MMI_HILOG_CURSORI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
@@ -971,7 +965,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     }
 }
 
-void InputWindowsManager::DispatchPointer(int32_t pointerAction)
+void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowId)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
@@ -993,7 +987,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
         MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
         return;
     }
-    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW && windowId <= 0) {
         std::optional<WindowInfo> windowInfo;
         int32_t eventAction = lastPointerEvent_->GetPointerAction();
         bool checkFlag = (eventAction == PointerEvent::POINTER_ACTION_MOVE &&
@@ -1078,7 +1072,7 @@ void InputWindowsManager::NotifyPointerToWindow()
         }
     }
     lastWindowInfo_ = *windowInfo;
-    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -1749,6 +1743,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                         (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
+                        (action == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) ||
+                        (action == PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) ||
                         (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
                         winId2ZorderMap.insert({item.id, item.zOrder});
                         continue;
@@ -1985,7 +1981,7 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         lastLogicY_ = logicalY;
         lastPointerEvent_ = pointerEvent;
         lastWindowInfo_ = touchWindow;
-        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         return;
     }
     lastLogicX_ = logicalX;
@@ -2046,7 +2042,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (!touchWindow) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+            int64_t beginTime = GetSysClockTime();
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);
+            int64_t endTime = GetSysClockTime();
+            if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
+                MMI_HILOGW("Rs process timeout");
+            }
             return RET_ERR;
         }
         touchWindow = std::make_optional(mouseDownInfo_);
@@ -2065,7 +2066,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             return RET_OK;
         }
     }
-    PrintChangedWindowByEvent(InputEvent::EVENT_TYPE_POINTER, *touchWindow);
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
@@ -2076,11 +2076,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
             pointerStyle.id, lastPointerStyle_.id);
     } else {
-        int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-            return ret;
-        }
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
             DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
@@ -2100,10 +2096,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (!isDragBorder_ && !isUiExtension_) {
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         dragPointerStyle_ = pointerStyle;
-    }
-    if (!touchWindow) {
-        MMI_HILOGE("TouchWindow is nullopt");
-        return RET_ERR;
     }
     WindowInfo window = *touchWindow;
     if (!dragFlag_) {
@@ -2131,8 +2123,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    int64_t beginTime = GetSysClockTime();
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
-
+    int64_t endTime = GetSysClockTime();
+    if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
+        MMI_HILOGW("Rs process timeout");
+    }
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
     }
@@ -2441,7 +2437,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    PrintChangedWindowByEvent(InputEvent::EVENT_TYPE_POINTER, *touchWindow);
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
@@ -2497,14 +2492,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     if (IsNeedDrawPointer(pointerItem)) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
-            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+            if (touchWindow->id != lastWindowInfo_.id) {
+                lastWindowInfo_ = *touchWindow;
+            }
+            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW, lastWindowInfo_.id);
         }
         PointerStyle pointerStyle;
-        int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
-        if (ret != RET_OK) {
-            MMI_HILOG_DISPATCHE("Get pointer style failed, pointerStyleInfo is nullptr");
-            return ret;
-        }
+        GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicDisplayInfo);
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
@@ -2893,32 +2887,39 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
     const Direction direction = info.direction;
     MMI_HILOGD("X:%{public}.2f, Y:%{public}.2f, info.width:%{public}d, info.height:%{public}d",
         x, y, info.width, info.height);
-    if (direction == DIRECTION0) {
-        MMI_HILOGD("direction is DIRECTION0");
-        cursorPos.x = x;
-        cursorPos.y = y;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
-        return;
-    }
-    if (direction == DIRECTION90) {
-        MMI_HILOGD("direction is DIRECTION90");
-        cursorPos.y = static_cast<double>(info.width) - x;
-        cursorPos.x = y;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
-        return;
-    }
-    if (direction == DIRECTION180) {
-        MMI_HILOGD("direction is DIRECTION180");
-        cursorPos.x = static_cast<double>(info.width) - x;
-        cursorPos.y = static_cast<double>(info.height) - y;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
-        return;
-    }
-    if (direction == DIRECTION270) {
-        MMI_HILOGD("direction is DIRECTION270");
-        cursorPos.x = static_cast<double>(info.height) - y;
-        cursorPos.y = x;
-        MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+    switch (direction) {
+        case DIRECTION0: {
+            MMI_HILOGD("direction is DIRECTION0");
+            cursorPos.x = x;
+            cursorPos.y = y;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        case DIRECTION90: {
+            MMI_HILOGD("direction is DIRECTION90");
+            cursorPos.y = static_cast<double>(info.width) - x;
+            cursorPos.x = y;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        case DIRECTION180: {
+            MMI_HILOGD("direction is DIRECTION180");
+            cursorPos.x = static_cast<double>(info.width) - x;
+            cursorPos.y = static_cast<double>(info.height) - y;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        case DIRECTION270: {
+            MMI_HILOGD("direction is DIRECTION270");
+            cursorPos.x = static_cast<double>(info.height) - y;
+            cursorPos.y = x;
+            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            break;
+        }
+        default: {
+            MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
+            break;
+        }
     }
 }
 
@@ -3284,11 +3285,17 @@ int32_t InputWindowsManager::CheckWindowIdPermissionByPid(int32_t windowId, int3
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
 {
-    Coordinate2D matrix;
     if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGE("displayGroupInfo_.displaysInfo is empty");
         return;
     }
-    ReverseRotateScreen(displayGroupInfo_.displaysInfo[0], x, y, matrix);
+    const Direction direction = displayGroupInfo_.displaysInfo.front().direction;
+    if (direction < Direction::DIRECTION0 || direction > Direction::DIRECTION270) {
+        MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
+        return;
+    }
+    Coordinate2D matrix;
+    ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);
 }
