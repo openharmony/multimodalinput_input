@@ -2316,7 +2316,7 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubSetTouchpadThreeFingersTapSwitch Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
@@ -2333,7 +2333,7 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(Message
 int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->VerifySystemApp()) {
+    if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
