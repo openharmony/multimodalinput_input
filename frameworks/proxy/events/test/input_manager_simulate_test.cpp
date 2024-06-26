@@ -726,7 +726,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_004, TestSize.Level
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         if (i == 0) {
-            ASSERT_FALSE(!sPointerEs.empty());
+            ASSERT_TRUE(!sPointerEs.empty());
         } else {
             ASSERT_TRUE(sPointerEs.empty());
         }
@@ -891,7 +891,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_008, TestSize.Level
     std::string sPointerEs = GetEventDump();
     MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_FALSE(!sPointerEs.empty());
+    ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -939,7 +939,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_009, TestSize.Level
     std::string sPointerEs = GetEventDump();
     MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_FALSE(!sPointerEs.empty());
+    ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -1083,7 +1083,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_012, TestSize.Level
     std::string sPointerEs = GetEventDump();
     MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    ASSERT_FALSE(!sPointerEs.empty());
+    ASSERT_TRUE(!sPointerEs.empty());
 #else
     ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
