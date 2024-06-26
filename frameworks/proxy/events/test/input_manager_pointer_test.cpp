@@ -140,6 +140,7 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
+    bool threeFingerSwitch_ { true };
 };
 
 void InputManagerPointerTest::SetUpTestCase()
@@ -166,6 +167,7 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     InputManager::GetInstance()->GetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->GetTouchpadRotateSwitch(preRotateSwitch_);
+    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
 }
@@ -185,6 +187,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadPinchSwitch(prePinchSwitch_);
     InputManager::GetInstance()->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     InputManager::GetInstance()->SetTouchpadRotateSwitch(preRotateSwitch_);
+    InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
@@ -1575,6 +1578,36 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadSwipeSwitch
     InputManager::GetInstance()->SetTouchpadSwipeSwitch(flag);
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadSwipeSwitch(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+}
+
+
+/**
+ * @tc.name: InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Set touchpad ThreeFingers Tap switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Get touchpad ThreeFingers Tap switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
 }
 
