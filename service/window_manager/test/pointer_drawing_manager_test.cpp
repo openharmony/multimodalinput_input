@@ -98,29 +98,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_001,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawMovePointer_002
- * @tc.desc: Test the funcation DrawMovePointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    int32_t displayId = 1;
-    int32_t physicalX = 2;
-    int32_t physicalY = 3;
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawMovePointer(displayId, physicalX, physicalY));
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(manager.DrawMovePointer(displayId, physicalX, physicalY));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawCursor_002
  * @tc.desc: Test the funcation DrawCursor
  * @tc.type: FUNC

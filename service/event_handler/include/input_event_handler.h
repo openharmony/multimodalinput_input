@@ -30,7 +30,6 @@
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
-#include "shortcut_handler.h"
 #include "switch_subscriber_handler.h"
 
 namespace OHOS {
@@ -53,8 +52,6 @@ public:
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
     std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const;
-
-    ShortcutHandler shortcut_;
 
 private:
     int32_t BuildInputHandlerChain();
