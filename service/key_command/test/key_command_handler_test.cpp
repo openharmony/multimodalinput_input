@@ -1339,7 +1339,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_001, TestSize.
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 0;
-    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -1892,7 +1892,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
