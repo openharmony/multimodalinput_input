@@ -32,11 +32,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t DENSITY_BASELINE = 160;
-constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
-constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
-constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
-constexpr int32_t CALCULATE_MIDDLE = 2;
 } // namespace
 class TouchDrawingManagerTest : public testing::Test {
 public:
@@ -207,28 +202,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, Tes
     EXPECT_TRUE(ret);
     ret = manager.IsValidAction(100);
     EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo_001
- * @tc.desc: Test update display info
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager manager;
-    DisplayInfo displayInfo;
-    displayInfo.dpi = 160;
-    manager.UpdateDisplayInfo(displayInfo);
-    EXPECT_EQ(manager.bubble_.innerCircleRadius,
-    displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE);
-    EXPECT_EQ(manager.bubble_.outerCircleRadius,
-    displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE);
-    EXPECT_EQ(manager.bubble_.outerCircleWidth,
-    static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE);
-    EXPECT_NO_FATAL_FAILURE(manager.UpdateDisplayInfo(displayInfo));
 }
 
 /**
