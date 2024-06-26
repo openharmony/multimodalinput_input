@@ -1943,16 +1943,6 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
-{
-    CALL_INFO_TRACE;
-    #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-        CHKPV(windowChecker);
-        MMI_HILOGD("winChecker_ is not null in %{public}d", getpid());
-        winChecker_ = windowChecker;
-    #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-}
-
 int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
 {
     CALL_INFO_TRACE;
