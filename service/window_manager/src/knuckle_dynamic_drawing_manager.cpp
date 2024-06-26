@@ -214,7 +214,7 @@ void KnuckleDynamicDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> 
     CHKPV(pointerEvent);
     int32_t ret = DrawGraphic(pointerEvent);
     if (ret != RET_OK) {
-        MMI_HILOGE("Draw graphic failed");
+        MMI_HILOGD("Can't get enough pointers to draw");
         return;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -338,7 +338,7 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 {
     CALL_DEBUG_ENTER;
     if (displayInfo_.direction != displayInfo.direction) {
-        MMI_HILOGE("displayInfo direction change");
+        MMI_HILOGD("DisplayInfo direction change");
         isRotate_ = true;
     }
     scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;

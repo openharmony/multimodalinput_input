@@ -896,7 +896,7 @@ int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 
 int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, std::ref(ids)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get deviceids failed, ret:%{public}d", ret);
@@ -918,7 +918,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &
 
 int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this, deviceId, std::ref(inputDevice)));
     if (ret != RET_OK) {
