@@ -106,7 +106,7 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
         bool isUiExtension = false) const;
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
-    void DispatchPointer(int32_t pointerAction);
+    void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
     PointerStyle GetLastPointerStyle() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -155,6 +155,11 @@ public:
     bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel);
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);

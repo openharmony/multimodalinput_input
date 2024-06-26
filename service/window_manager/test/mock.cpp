@@ -184,7 +184,7 @@ bool InputDeviceManager::HasPointerDevice()
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
-    return nullptr;
+    return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
 
 TimerManager::TimerManager() {}
@@ -333,6 +333,8 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
     return 0;
 }
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
+{}
+void PointerDrawingManager::InitPointerCallback()
 {}
 void PointerDrawingManager::InitPointerObserver()
 {}

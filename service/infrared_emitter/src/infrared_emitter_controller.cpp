@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "infrared_emitter_controller.h"
+
 #include <dlfcn.h>
 
-#include "infrared_emitter_controller.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -26,7 +27,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    const std::string IR_WRAPPER_PATH = "libconsumer_ir_service_1.0.z.so";
+    const std::string IR_WRAPPER_PATH { "libconsumer_ir_service_1.0.z.so" };
 }
 using namespace OHOS::HDI::V1_0;
 InfraredEmitterController *InfraredEmitterController::instance_ = new (std::nothrow) InfraredEmitterController();

@@ -14,7 +14,9 @@
  */
 
 #include "authorize_helper.h"
+
 #include <chrono>
+
 #include "define_multimodal.h"
 #include "mmi_log.h"
 
