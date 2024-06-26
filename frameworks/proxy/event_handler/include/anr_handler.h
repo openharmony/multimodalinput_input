@@ -46,6 +46,7 @@ private:
     int32_t processedCount_ { 0 };
     std::vector<int32_t> idList_;
     void SendEvent(int32_t eventType, int32_t eventId);
+    std::mutex mutex_;
 };
 
 #define ANRHDL ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()
