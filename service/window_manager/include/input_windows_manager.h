@@ -157,8 +157,8 @@ public:
     DisplayMode GetDisplayMode() const;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
-    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel);
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 private:

@@ -147,10 +147,6 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
-    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
-#endif // OHOS_BUILD_ENABLE_ANCO
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
@@ -158,6 +154,8 @@ public:
     int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent, int32_t pid, bool isNativeInject);
     int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid,
         bool isNativeInject, bool isShell);
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 protected:

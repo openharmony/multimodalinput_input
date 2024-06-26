@@ -16,7 +16,7 @@
 #ifndef ANCO_CHANNEL_DEATH_RECIPIENT_H
 #define ANCO_CHANNEL_DEATH_RECIPIENT_H
 
-#include "iremote_broker.h"
+#include "iremote_object.h"
 #include "nocopyable.h"
 
 namespace OHOS {

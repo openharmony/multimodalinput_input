@@ -32,14 +32,15 @@ AncoChannelProxy::AncoChannelProxy(const sptr<IRemoteObject> &remoteObj)
 
 int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
+        return RET_ERR;
     }
     if (!pointerEvent->WriteToParcel(data)) {
-        MMI_HILOGE("Failed to write PointerEvent");
-        return ERR_INVALID_VALUE;
+        MMI_HILOGE("Failed to marshal PointerEvent");
+        return RET_ERR;
     }
     MessageParcel reply;
     MessageOption option;
@@ -48,23 +49,24 @@ int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEv
     int32_t ret = remote->SendRequest(
         static_cast<uint32_t>(AncoRequestId::SYNC_POINTER_EVENT), data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
         return ret;
     }
-    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, ret, RET_ERR);
     return ret;
 }
 
 int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_INFO_TRACE;
     MessageParcel data;
     if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
+        return RET_ERR;
     }
     if (!keyEvent->WriteToParcel(data)) {
-        MMI_HILOGE("Failed to write KeyEvent");
-        return ERR_INVALID_VALUE;
+        MMI_HILOGE("Failed to marshal KeyEvent");
+        return RET_ERR;
     }
     MessageParcel reply;
     MessageOption option;
@@ -73,16 +75,37 @@ int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     int32_t ret = remote->SendRequest(
         static_cast<uint32_t>(AncoRequestId::SYNC_KEY_EVENT), data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
         return ret;
     }
-    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, ret, RET_ERR);
     return ret;
 }
 
 int32_t AncoChannelProxy::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
 {
-    return RET_OK;
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    if (!AncoWindows::Marshalling(*windows, data)) {
+        MMI_HILOGE("Failed to marshal windows");
+        return RET_ERR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(AncoRequestId::UPDATE_WINDOW_INFO), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SendRequest fail, error:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, RET_ERR);
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

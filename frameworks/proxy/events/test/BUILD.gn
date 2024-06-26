@@ -25,11 +25,6 @@ ohos_unittest("InputManagerAncoTest") {
 
   configs = [ "${mmi_path}:coverage_flags" ]
 
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",

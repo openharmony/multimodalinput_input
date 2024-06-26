@@ -85,8 +85,8 @@ static bool MarshalWindowInfo(const AncoWindowInfo &windowInfo, Parcel &parcel)
         parcel.WriteInt32(windowInfo.displayId) &&
         parcel.WriteFloat(windowInfo.zOrder) &&
         parcel.WriteFloatVector(windowInfo.transform) &&
-        MarshalVector(WindowInfo.defaultHotAreas, parcel, &MarshalRect) &&
-        MarshalVector(WindowInfo.ancoExcludedAreas, parcel, &MarshalRect)
+        MarshalVector(windowInfo.defaultHotAreas, parcel, &MarshalRect) &&
+        MarshalVector(windowInfo.ancoExcludedAreas, parcel, &MarshalRect)
     );
 }
 
@@ -100,9 +100,9 @@ static bool UnmarshalWindowInfo(Parcel &parcel, AncoWindowInfo &windowInfo)
         parcel.ReadUint32(action) &&
         parcel.ReadInt32(windowInfo.displayId) &&
         parcel.ReadFloat(windowInfo.zOrder) &&
-        parcel.ReadFloatVector(windowInfo.transform) &&
-        UnmarshalVector(parcel, WindowInfo.defaultHotAreas, &UnmarshalRect) &&
-        UnmarshalVector(parcel, WindowInfo.ancoExcludedAreas, &UnmarshalRect)
+        parcel.ReadFloatVector(&windowInfo.transform) &&
+        UnmarshalVector(parcel, windowInfo.defaultHotAreas, &UnmarshalRect) &&
+        UnmarshalVector(parcel, windowInfo.ancoExcludedAreas, &UnmarshalRect)
     );
     windowInfo.action = static_cast<WINDOW_UPDATE_ACTION>(action);
     return result;
@@ -111,8 +111,8 @@ static bool UnmarshalWindowInfo(Parcel &parcel, AncoWindowInfo &windowInfo)
 bool AncoWindows::Marshalling(const AncoWindows &windows, Parcel &parcel)
 {
     return (
-        parcel.WriteUint32(windows.updateType) &&
-        parcel.WriteUint32(windows.focusWindowId)
+        parcel.WriteUint32(static_cast<uint32_t>(windows.updateType)) &&
+        parcel.WriteInt32(windows.focusWindowId) &&
         MarshalVector(windows.windows, parcel, &MarshalWindowInfo)
     );
 }
@@ -122,9 +122,9 @@ bool AncoWindows::Unmarshalling(Parcel &parcel, AncoWindows &windows)
     uint32_t updateType {};
 
     bool result = (
-        parcel.WriteUint32(updateType) &&
-        parcel.WriteUint32(windows.focusWindowId)
-        MarshalVector(windows.windows, parcel, &MarshalWindowInfo)
+        parcel.ReadUint32(updateType) &&
+        parcel.ReadInt32(windows.focusWindowId)
+        UnmarshalVector(parcel, windows.windows, parcel, &UnmarshalWindowInfo)
     );
     windows.updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(windows.updateType);
     return result;
