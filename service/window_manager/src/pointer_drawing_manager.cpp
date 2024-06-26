@@ -136,8 +136,6 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -342,7 +340,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
         MAGIC_CURSOR->UpdateMagicCursorChangeState(statusValue);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     };
-    std::string dynamicallyKey = "isVariable";
+    std::string dynamicallyKey = "smartChange";
     sptr<SettingObserver> magicCursorChangeObserver = SettingDataShare::GetInstance(
         MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(dynamicallyKey, func);
     ErrCode ret =
