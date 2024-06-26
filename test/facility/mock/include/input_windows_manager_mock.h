@@ -65,7 +65,7 @@ public:
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, bool));
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
-    void DispatchPointer(int32_t pointerAction) override {}
+    void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(bool, IsNeedRefreshLayer, (int32_t));

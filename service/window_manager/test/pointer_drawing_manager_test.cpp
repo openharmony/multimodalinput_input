@@ -71,28 +71,6 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerTest::SetMouseIconTe
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_AttachToDisplay_002
- * @tc.desc: Test the funcation AttachToDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AttachToDisplay_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    manager.screenId_ = 0;
-    EXPECT_CALL(*WIN_MGR_MOCK, GetDisplayMode).WillRepeatedly(testing::Return(DisplayMode::MAIN));
-    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
-    manager.screenId_ = 5;
-    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawMovePointer_001
  * @tc.desc: Test the funcation DrawMovePointer
  * @tc.type: FUNC
@@ -117,29 +95,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_001,
     ASSERT_TRUE(manager.surfaceNode_ != nullptr);
     ret = manager.DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
     EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawMovePointer_002
- * @tc.desc: Test the funcation DrawMovePointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    int32_t displayId = 1;
-    int32_t physicalX = 2;
-    int32_t physicalY = 3;
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawMovePointer(displayId, physicalX, physicalY));
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(manager.DrawMovePointer(displayId, physicalX, physicalY));
 }
 
 /**

@@ -26,6 +26,9 @@
 
 #include "error_multimodal.h"
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_consumer.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_anr_observer.h"
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
@@ -771,13 +774,6 @@ public:
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
 
     /**
-     * @brief Sets a window input event consumer that runs on the specified thread.
-     * @param inputEventConsumer Indicates the consumer to set.
-     * @since 9
-     */
-    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
-
-    /**
      * @brief Sets whether shield key event interception, only support shield key event.
      * @param shieldMode Indicates shield mode.
      * @param isShield Indicates whether key event handler chain is shield. The value <b>true</b> indicates that
@@ -891,6 +887,11 @@ public:
      * @since 12
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
     InputManager() = default;

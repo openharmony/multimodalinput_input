@@ -46,7 +46,10 @@ void ANRManager::Init(UDSServer &udsServer)
     CALL_DEBUG_ENTER;
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
-    udsServer_->AddSessionDeletedCallback(std::bind(&ANRManager::OnSessionLost, this, std::placeholders::_1));
+    udsServer_->AddSessionDeletedCallback([this] (SessionPtr session) {
+        return this->OnSessionLost(session);
+    }
+    );
 }
 
 int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)

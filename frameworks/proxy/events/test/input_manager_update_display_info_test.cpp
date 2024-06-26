@@ -72,7 +72,7 @@ std::shared_ptr<OHOS::Media::PixelMap> InputManagerUpdateDisplayInfoTest::Matrix
     for (uint32_t i = 0; i < maskHeight; i++) {
         if (windowMask[i].size() != maskWidth) {
             MMI_HILOGE(
-                "Filed to create a pixelMap, err row:%{public}d curSize %{public}d not equal frist row size:%{public}d",
+                "Filed to create a pixelMap,row:%{public}d curSize:%{public}zu not equal frist row size:%{public}d",
                 i, windowMask[i].size(), maskWidth);
             return nullptr;
         }
