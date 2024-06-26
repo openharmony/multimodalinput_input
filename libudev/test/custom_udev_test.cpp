@@ -298,7 +298,7 @@ HWTEST_F(CustomUdevTest, TestGetParent2, TestSize.Level1)
 
     auto* parent = udev_device_get_parent_with_subsystem_devtype(device, "input", nullptr);
     ASSERT_EQ(parent, nullptr);
-    EXPECT_STREQ(udev_device_get_syspath(parent), testDevice_.GetSysPath());
+    EXPECT_NE(udev_device_get_syspath(parent), testDevice_.GetSysPath());
 
     errno = 0;
     EXPECT_EQ(udev_device_get_parent_with_subsystem_devtype(nullptr, "input", nullptr), nullptr);

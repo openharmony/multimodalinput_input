@@ -26,6 +26,9 @@
 #include "event_filter_service.h"
 #include "event_handler.h"
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_channel.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_anr_observer.h"
 #include "i_input_event_consumer.h"
 #include "i_input_service_watcher.h"
@@ -81,7 +84,6 @@ public:
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
-    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -206,6 +208,10 @@ public:
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -236,7 +242,6 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -260,6 +265,9 @@ private:
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    std::map<std::shared_ptr<IAncoConsumer>, sptr<IAncoChannel>> ancoChannels_;
+#endif // OHOS_BUILD_ENABLE_ANCO
 };
 
 #define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
