@@ -27,10 +27,10 @@ config("inputconsumer_config") {
 
 ohos_shared_library("inputconsumer") {
   sources = [
-    "src/js_register_module.cpp",
-    "src/js_register_util.cpp",
     "${mmi_path}/util/napi/src/util_napi.cpp",
     "${mmi_path}/util/napi/src/util_napi_error.cpp",
+    "src/js_register_module.cpp",
+    "src/js_register_util.cpp",
   ]
 
   configs = [
