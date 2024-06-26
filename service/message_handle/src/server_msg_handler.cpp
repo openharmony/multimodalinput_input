@@ -20,6 +20,7 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "authorization_dialog.h"
+#include "authorize_helper.h"
 #include "bytrace_adapter.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
@@ -40,7 +41,6 @@
 #include "time_cost_chk.h"
 #include "touch_drawing_manager.h"
 #include "util_napi_error.h"
-#include "authorize_helper.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -51,10 +51,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
+constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-constexpr int32_t SEND_NOTICE_OVERTIME = 5;
-constexpr int32_t DEFAULT_POINTER_ID = 10000;
+constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
+constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -90,13 +90,13 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     BytraceAdapter::StartSocketHandle(static_cast<int32_t>(id));
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
-        MMI_HILOGE("Unknown msg id:%{public}d,errCode:%{public}d", id, UNKNOWN_MSG_ID);
+        MMI_HILOGE("Unknown msg id:%{public}d, errCode:%{public}d", id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*callback)(sess, pkt);
     BytraceAdapter::StopSocketHandle();
     if (ret < 0) {
-        MMI_HILOGE("Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
+        MMI_HILOGE("Msg handling failed. id:%{public}d, errCode:%{public}d", id, ret);
     }
 }
 
