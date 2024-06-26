@@ -190,8 +190,10 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler,
-        std::placeholders::_1, std::placeholders::_2)))) {
+    if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
+        ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()->OnEvent(event, frameTime);
+        }
+        ))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
@@ -287,7 +289,7 @@ int32_t MMIService::Init()
         MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
     }
-    SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    SetRecvFun([this] (SessionPtr sess, NetPacket& pkt) {sMsgHandler_.OnMsgHandler(sess, pkt);});
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
     if (!InitService()) {
@@ -305,7 +307,7 @@ void MMIService::OnStart()
     CHKNOKRV(ret, "Init mmi_service failed");
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
-    t_ = std::thread(std::bind(&MMIService::OnThread, this));
+    t_ = std::thread([this] {this->OnThread();});
     pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
@@ -403,8 +405,11 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t uid = GetCallingUid();
     MMI_HILOGI("Enter, programName:%{public}s, moduleType:%{public}d, pid:%{public}d",
         programName.c_str(), moduleType, pid);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this, programName, moduleType,
-        uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &programName, moduleType, uid, pid, &serverFd, &toReturnClientFd, &tokenType] {
+            return this->AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
+        }
+        );
     DfxHisysevent::ClientConnectData data = {
         .pid = pid,
         .uid = uid,
@@ -430,8 +435,11 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filte
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     CHKPR(filter, ERROR_NULL_POINTER);
     int32_t clientPid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::AddInputEventFilter, &sMsgHandler_, filter,
-        filterId, priority, deviceTags, clientPid));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, filter, filterId, priority, deviceTags, clientPid] {
+            return sMsgHandler_.AddInputEventFilter(filter, filterId, priority, deviceTags, clientPid);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Add event filter failed, return:%{public}d", ret);
         return ret;
@@ -446,7 +454,10 @@ int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&ServerMsgHandler::RemoveInputEventFilter, &sMsgHandler_, filterId, clientPid));
+        [this, filterId, clientPid] {
+            return sMsgHandler_.RemoveInputEventFilter(filterId, clientPid);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Remove event filter failed, return:%{public}d", ret);
         return ret;
@@ -478,7 +489,11 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetMouseScrollRows, MouseEventHdr, rows));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [rows] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetMouseScrollRows(rows);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set the number of mouse scrolling rows failed, return:%{public}d", ret);
         return ret;
@@ -496,8 +511,11 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
         MMI_HILOGE("Check pid permission failed");
         return ret;
     }
-    ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
-        IPointerDrawingManager::GetInstance(), pixelMap, pid, windowId, focusX, focusY)));
+    ret = delegateTasks_.PostSyncTask(std::bind(
+        [pixelMap, pid, windowId, focusX, focusY] {
+            return IPointerDrawingManager::GetInstance()->SetCustomCursor(pixelMap, pid, windowId, focusX, focusY);
+        }
+        ));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the custom cursor failed, ret:%{public}d", ret);
         return ret;
@@ -515,8 +533,11 @@ int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
         MMI_HILOGE("Check pid permission failed");
         return ret;
     }
-    ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
-        IPointerDrawingManager::GetInstance(), pid, windowId, pixelMap)));
+    ret = delegateTasks_.PostSyncTask(std::bind(
+        [pid, windowId, pixelMap] {
+            return IPointerDrawingManager::GetInstance()->SetMouseIcon(pid, windowId, pixelMap);
+        }
+        ));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse icon failed, return:%{public}d", ret);
         return ret;
@@ -534,8 +555,11 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
         MMI_HILOGE("Check pid permission failed");
         return ret;
     }
-    ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
-        IPointerDrawingManager::GetInstance(), pid, windowId, hotSpotX, hotSpotY));
+    ret = delegateTasks_.PostSyncTask(
+        [pid, windowId, hotSpotX, hotSpotY] {
+            return IPointerDrawingManager::GetInstance()->SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse hot spot failed, return:%{public}d", ret);
         return ret;
@@ -568,7 +592,11 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMouseScrollRows, this, std::ref(rows)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &rows] {
+            return this->ReadMouseScrollRows(rows);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get the number of mouse scrolling rows failed, ret:%{public}d", ret);
         return ret;
@@ -581,8 +609,11 @@ int32_t MMIService::SetPointerSize(int32_t size)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerSize,
-        IPointerDrawingManager::GetInstance(), size));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [size] {
+            return IPointerDrawingManager::GetInstance()->SetPointerSize(size);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer size failed, return:%{public}d", ret);
         return ret;
@@ -603,7 +634,11 @@ int32_t MMIService::GetPointerSize(int32_t &size)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSize, this, std::ref(size)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &size] {
+            return this->ReadPointerSize(size);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer size failed, return:%{public}d", ret);
         return ret;
@@ -617,7 +652,10 @@ int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MouseEventNormalize::SetMousePrimaryButton, MouseEventHdr, primaryButton));
+        [primaryButton] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetMousePrimaryButton(primaryButton);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set mouse primary button failed, return:%{public}d", ret);
         return ret;
@@ -638,8 +676,11 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMousePrimaryButton, this, std::ref(primaryButton)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &primaryButton] {
+            return this->ReadMousePrimaryButton(primaryButton);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get mouse primary button failed, return:%{public}d", ret);
         return ret;
@@ -652,8 +693,12 @@ int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), visible, priority));
+    int32_t clientPid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [clientPid, visible, priority] {
+            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer visible failed, return:%{public}d", ret);
         return ret;
@@ -674,7 +719,11 @@ int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &visible] {
+            return this->CheckPointerVisible(visible);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Is pointer visible failed, return:%{public}d", ret);
         return ret;
@@ -687,8 +736,12 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(ANRMgr, RET_ERR);
-    int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
+    int32_t clientPid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [clientPid, eventType, eventId] {
+            return ::OHOS::DelayedSingleton<ANRManager>::GetInstance()->MarkProcessed(clientPid, eventType, eventId);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGD("Mark event processed failed, ret:%{public}d", ret);
         return ret;
@@ -700,8 +753,11 @@ int32_t MMIService::SetPointerColor(int32_t color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerColor,
-        IPointerDrawingManager::GetInstance(), color));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [color] {
+            return IPointerDrawingManager::GetInstance()->SetPointerColor(color);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer color failed, return:%{public}d", ret);
         return ret;
@@ -722,7 +778,11 @@ int32_t MMIService::GetPointerColor(int32_t &color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerColor, this, std::ref(color)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &color] {
+            return this->ReadPointerColor(color);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer color failed, return:%{public}d", ret);
         return ret;
@@ -735,7 +795,11 @@ int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerSpeed, MouseEventHdr, speed));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [speed] {
+            return ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()->SetPointerSpeed(speed);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer speed failed, return:%{public}d", ret);
         return ret;
@@ -756,7 +820,11 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &speed] {
+            return this->ReadPointerSpeed(speed);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed, return:%{public}d", ret);
         return ret;
@@ -783,8 +851,13 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle,
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
-        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle, isUiExtension));
+    int32_t clientPid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [clientPid, windowId, pointerStyle, isUiExtension] {
+            return IPointerDrawingManager::GetInstance()->SetPointerStyle(
+                clientPid, windowId, pointerStyle, isUiExtension);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed, return:%{public}d", ret);
         return ret;
@@ -802,8 +875,11 @@ int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
         MMI_HILOGE("Check pid permission failed");
         return ret;
     }
-    ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
-        IPointerDrawingManager::GetInstance(), pid, windowId));
+    ret = delegateTasks_.PostSyncTask(
+        [pid, windowId] {
+            return IPointerDrawingManager::GetInstance()->ClearWindowPointerStyle(pid, windowId);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed, return:%{public}d", ret);
         return ret;
