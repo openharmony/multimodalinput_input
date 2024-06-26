@@ -134,6 +134,11 @@ public:
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel);
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
+#endif // OHOS_BUILD_ENABLE_ANCO
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

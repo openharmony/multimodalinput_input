@@ -39,6 +39,10 @@ config("libmmi_public_client_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/common/include",
   ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+  }
 }
 
 config("libmmi_test_util") {
@@ -126,6 +130,10 @@ ohos_shared_library("libmmi-client") {
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_stub" ]
+  }
 
   part_name = "input"
   subsystem_name = "multimodalinput"
