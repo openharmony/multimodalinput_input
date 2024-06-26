@@ -324,7 +324,8 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     if (fingerCount < 0 || fingerCount > FINGER_COUNT_MAX) {
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
-    } else if (fingerCount == FINGER_TAP_THREE) {
+    }
+    if (fingerCount == FINGER_TAP_THREE) {
         GetTouchpadThreeFingersTapSwitch(tpSwipeSwitch);
         if (!tpSwipeSwitch) {
             return RET_OK;
