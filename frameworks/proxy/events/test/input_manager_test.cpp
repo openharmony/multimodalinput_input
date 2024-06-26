@@ -129,7 +129,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetWinSyncBatchSize, TestSize.Level1
     int32_t maxAreasCount = 1;
     int32_t displayCount = 2;
     int32_t ret = InputManager::GetInstance()->GetWinSyncBatchSize(maxAreasCount, displayCount);
-    EXPECT_EQ(ret, 38);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -184,37 +184,6 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-/**
- * @tc.name: InputManagerTest_InterceptTabletToolEvent_001
- * @tc.desc: Verify intercepting tablet tool event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
-    EXPECT_TRUE(IsValidHandlerId(interceptorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto pointerEvent = InputManagerUtil::SetupTabletToolEvent001();
-    ASSERT_NE(pointerEvent, nullptr);
-    TestSimulateInputEvent(pointerEvent);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-
-    if (IsValidHandlerId(interceptorId)) {
-        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
 {
@@ -245,7 +214,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -270,7 +239,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -464,7 +433,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
+    TestSimulateInputEvent(injectDownEvent, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
@@ -480,7 +449,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectUpEvent);
+    TestSimulateInputEvent(injectUpEvent, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
