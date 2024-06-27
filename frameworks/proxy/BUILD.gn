@@ -322,15 +322,12 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
 ohos_unittest("InputManagerImplTest") {
   module_out_path = module_output_path
   include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
   ]
-
-  if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
-  }
 
   sources = [
     "event_handler/src/bytrace_adapter.cpp",
