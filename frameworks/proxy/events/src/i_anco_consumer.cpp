@@ -123,8 +123,8 @@ bool AncoWindows::Unmarshalling(Parcel &parcel, AncoWindows &windows)
 
     bool result = (
         parcel.ReadUint32(updateType) &&
-        parcel.ReadInt32(windows.focusWindowId)
-        UnmarshalVector(parcel, windows.windows, parcel, &UnmarshalWindowInfo)
+        parcel.ReadInt32(windows.focusWindowId) &&
+        UnmarshalVector(parcel, windows.windows, &UnmarshalWindowInfo)
     );
     windows.updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(windows.updateType);
     return result;

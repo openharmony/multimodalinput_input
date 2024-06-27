@@ -62,14 +62,17 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
-    idList_.push_back(eventId);
-    if (idList_.size() >= PRINT_MARK_COUNT) {
-        std::string idList = "";
-        for (auto e : idList_) {
-            idList += std::to_string(e) + " ";
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        idList_.push_back(eventId);
+        if (idList_.size() >= PRINT_MARK_COUNT) {
+            std::string idList = "";
+            for (auto e : idList_) {
+                idList += std::to_string(e) + " ";
+            }
+            MMI_HILOGI("Ffrt PE: %{public}s", idList.c_str());
+            idList_.clear();
         }
-        MMI_HILOGI("Ffrt PE: %{public}s", idList.c_str());
-        idList_.clear();
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(eventType, eventId);
     if (ret != 0) {

@@ -101,7 +101,10 @@ config("libmmi_server_config") {
   }
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_path}/common/anco/comm/include",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -965,6 +968,8 @@ ohos_unittest("InputWindowsManagerTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
