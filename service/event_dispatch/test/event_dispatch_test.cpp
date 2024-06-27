@@ -1044,5 +1044,121 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_006, Test
     event->AddPointerItem(testPointerItem);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(event, fd));
 }
+
+/**
+ * @tc.name: EventDispatchTest_FilterInvalidPointerItem_007
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_007, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    int32_t fd = 1;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    UDSServer udsServer;
+    InputHandler->udsServer_ = &udsServer;
+    PointerEvent::PointerItem testPointerItem;
+    testPointerItem.pointerId_ = -1;
+    pointerEvent->pointers_.push_back(testPointerItem);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+    testPointerItem.pressed_ = false;
+    testPointerItem.displayX_ = 50;
+    testPointerItem.displayY_ = 100;
+    pointerEvent->pointers_.push_back(testPointerItem);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_007
+ * @tc.desc: Test the function HandleMultiWindowPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_007, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    ASSERT_NE(point, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(35);
+    pointerItem.SetWindowY(50);
+    pointerItem.SetTargetWindowId(2);
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    point->pointerId_ = 1;
+    std::shared_ptr<WindowInfo> windowInfo = std::make_shared<WindowInfo>();
+    windowInfo->id = 5;
+    eventdispatchhandler.cancelEventList_[1].insert(windowInfo);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    windowInfo->id = 1;
+    eventdispatchhandler.cancelEventList_[2].insert(windowInfo);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_CANCEL;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_010
+ * @tc.desc: Test the function DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_010, TestSize.Level1)
+{
+    EventDispatchHandler eventDispatchHandler;
+    int32_t fd = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    UDSServer udsServer;
+    InputHandler->udsServer_ = &udsServer;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    udsServer.sessionsMap_.insert(std::make_pair(fd, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    fd = -2;
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+    fd = 5;
+    udsServer.sessionsMap_.insert(std::make_pair(5, session));
+    ASSERT_NO_FATAL_FAILURE(eventDispatchHandler.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchKeyEventPid_006
+ * @tc.desc: Test the function DispatchKeyEventPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_006, TestSize.Level1)
+{
+    EventDispatchHandler eventDispatchHandler;
+    UDSServer udsServer;
+    std::shared_ptr<KeyEvent> KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    udsServer.sessionsMap_.insert(std::make_pair(-1, session));
+    StreamBuffer streamBuffer;
+    streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent);
+    streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), MSG_SEND_FAIL);
+}
 } // namespace MMI
 } // namespace OHOS
