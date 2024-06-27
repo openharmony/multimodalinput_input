@@ -379,9 +379,9 @@ impl AxisAccelerateCurvesTouchpad {
                         diff_nums: vec![0.0, 0.81, 1.56, 2.16, 2.4, -0.5]
                     },
                     AxisCurveItemTouchpad {
-                        speeds: vec![3.0, 5.0, 7.0, 9.0, 11.0, 41.0],
-                        slopes: vec![1.0, 0.75, 0.61, 0.51, 0.48, 0.75],
-                        diff_nums: vec![0.0, 0.75, 1.45, 2.15, 2.42, -0.55]
+                        speeds: vec![1.0, 3.0, 5.0, 6.0, 7.0, 8.0, 41.0],
+                        slopes: vec![1.52, 0.96, 0.71, 0.57, 0.47, 0.67, 0.75],
+                        diff_nums: vec![0.0, 0.56, 1.31, 2.01, 2.61, 1.21, 0.57]
                     },
                 ],
             });
@@ -474,15 +474,16 @@ fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> 
     let item = AxisAccelerateCurvesTouchpad::get_instance().get_axis_curve_by_speed_touchpad(valid_device_type as usize);
     unsafe {
         let num: f64 = fabs(axis_speed);
-        for i in 0..6 {
+        let len = item.speeds.len();
+        for i in 0..len {
             if num <= item.speeds[i] {
                 *gain = item.slopes[i] * num + item.diff_nums[i];
-                debug!(LOG_LABEL, "gain is set to {}, i is {}", @public(*gain), @public(i));
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain - item.diff_nums[i]) / num));
                 return true;
             }
         }
-        *gain = item.slopes[5] * num + item.diff_nums[5];
-        debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+        *gain = item.slopes[len - 1] * num + item.diff_nums[len - 1];
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain - item.diff_nums[len - 1]) / num));
     }
     debug!(LOG_LABEL, "get_axis_gain_touchpad leave");
     true

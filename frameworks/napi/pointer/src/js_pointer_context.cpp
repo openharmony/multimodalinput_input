@@ -1613,8 +1613,8 @@ napi_value JsPointerContext::GetHardwareCursorStats(napi_env env, napi_callback_
 napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 2;
-    napi_value argv[2];
+    size_t argc = INPUT_PARAMETER;
+    napi_value argv[INPUT_PARAMETER];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
@@ -1628,23 +1628,19 @@ napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_i
     }
     int32_t rows = DEFAULT_ROWS;
     CHKRP(napi_get_value_int32(env, argv[0], &rows), GET_VALUE_INT32);
-    if (rows < MIN_ROWS) {
-        rows = MIN_ROWS;
-    } else if (rows > MAX_ROWS) {
-        rows = MAX_ROWS;
-    }
+    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
-        return jsPointerMgr->SetTouchpadScrollRows(env, rows);
+        return jsPointerMgr->SetTouchpadScrollRows(env, newRows);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsPointerMgr->SetTouchpadScrollRows(env, rows, argv[1]);
+    return jsPointerMgr->SetTouchpadScrollRows(env, newRows, argv[1]);
 }
 
 napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_info info)
@@ -1664,7 +1660,6 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-
     return jsPointerMgr->GetTouchpadScrollRows(env, argv[0]);
 }
 

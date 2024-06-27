@@ -561,14 +561,10 @@ void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
 int32_t TouchPadTransformProcessor::SetTouchpadScrollRows(int32_t rows)
 {
     CALL_DEBUG_ENTER;
-    if (rows < MIN_ROWS) {
-        rows = MIN_ROWS;
-    } else if (rows > MAX_ROWS) {
-        rows = MAX_ROWS;
-    }
+    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
     std::string name = "touchpadScrollRows";
-    int32_t ret = PREFERENCES_MGR->SetIntValue(name, TOUCHPAD_FILE_NAME, rows);
-    MMI_HILOGD("Set touchpad scroll rows successfully, rows:%{public}d", rows);
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, TOUCHPAD_FILE_NAME, newRows);
+    MMI_HILOGD("Set touchpad scroll rows successfully, rows:%{public}d", newRows);
     return ret;
 }
 
