@@ -51,7 +51,7 @@ int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 int32_t AncoMonitor::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     std::cout << "No:" << keyEvent->GetId() << ",K:" << keyEvent->GetKeyCode()
-        << ",A:" << keyEvent->GetKeyrAction() << std::endl;
+        << ",A:" << keyEvent->GetKeyAction() << std::endl;
     return RET_OK;
 }
 
