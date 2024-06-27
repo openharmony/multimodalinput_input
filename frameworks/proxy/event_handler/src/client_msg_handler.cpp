@@ -31,7 +31,6 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "mmi_client.h"
-#include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "napi_constants.h"
