@@ -377,6 +377,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
             ret = StubGetHardwareCursorStats(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
+            ret = StubGetPointerSnapshot(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
             break;
@@ -2342,6 +2345,20 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<Media::PixelMap> pixelMap;
+    int32_t ret = GetPointerSnapshot(&pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPointerSnapshot failed ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
+    pixelMap->Marshalling(reply);
     return RET_OK;
 }
 
