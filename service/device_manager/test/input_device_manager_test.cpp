@@ -1431,7 +1431,6 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchPadIds_002, Test
 HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchKeys_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    // InputDeviceManager inputDevice;
     struct libinput_device *device = nullptr;
     std::vector<int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_T);
