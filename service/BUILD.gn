@@ -101,7 +101,10 @@ config("libmmi_server_config") {
   }
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_path}/common/anco/comm/include",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {

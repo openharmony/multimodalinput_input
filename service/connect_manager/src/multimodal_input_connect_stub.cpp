@@ -39,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
-using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
+constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -2359,13 +2359,11 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollRows(MessageParcel& dat
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
-    int32_t rows = 3; // the initial number of scrolling rows is 3.
+    int32_t rows = TOUCHPAD_SCROLL_ROWS;
     READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetTouchpadScrollRows(rows);
     if (ret != RET_OK) {
@@ -2383,13 +2381,11 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& dat
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
-    int32_t rows = 3; // the initial number of scrolling rows is 3.
+    int32_t rows = TOUCHPAD_SCROLL_ROWS;
     int32_t ret = GetTouchpadScrollRows(rows);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetTouchpadScrollRows failed ret:%{public}d", ret);

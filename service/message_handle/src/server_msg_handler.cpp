@@ -36,7 +36,6 @@
 #include "key_event_value_transformation.h"
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
-#include "mmi_func_callback.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #include "touch_drawing_manager.h"

@@ -28,6 +28,7 @@ enum class ReturnType {
     BOOL,
     NUMBER,
 };
+constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 }
 
 bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
@@ -1046,7 +1047,7 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    int32_t rows = 3;
+    int32_t rows = TOUCHPAD_SCROLL_ROWS;
     asyncContext->errorCode = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");

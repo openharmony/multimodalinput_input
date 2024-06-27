@@ -2061,9 +2061,7 @@ int32_t MultimodalInputConnectProxy::SetTouchpadScrollRows(int32_t rows)
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-
     WRITEINT32(data, rows, ERR_INVALID_VALUE);
-
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
