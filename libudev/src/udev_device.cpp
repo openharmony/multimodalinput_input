@@ -40,8 +40,8 @@
 
 using namespace std::literals;
 namespace {
-constexpr int UTIL_PATH_SIZE = 1024;
-constexpr int UTIL_LINE_SIZE = 16384;
+constexpr int UTIL_PATH_SIZE { 1024 };
+constexpr int UTIL_LINE_SIZE { 16384 };
 
 bool StartsWith(std::string_view str, std::string_view prefix)
 {
@@ -339,7 +339,7 @@ private:
         CHKPV(realpath(filename.c_str(), realPath));
         std::ifstream f(realPath, std::ios_base::in);
         if (!f.is_open()) {
-            MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", realPath, std::strerror(errno));
+            MMI_HILOGE("ReadUeventFile(): path:%{public}s, error:%{public}s", realPath, std::strerror(errno));
             return;
         }
         ueventLoaded = true;

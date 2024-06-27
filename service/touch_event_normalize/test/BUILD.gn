@@ -97,6 +97,10 @@ ohos_unittest("GestureTransformTest") {
     "${mmi_path}/util/socket/include",
   ]
 
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
+
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
@@ -240,6 +244,10 @@ ohos_unittest("TabletToolTranformTest") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
   ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
 
   sources = [
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",

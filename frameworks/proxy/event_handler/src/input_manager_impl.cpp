@@ -429,9 +429,10 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(client);
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(keyEvent);
-        if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnKeyEventTask,
-            this, inputConsumer, keyEvent), std::string("MMI::OnKeyEvent"), 0,
-            AppExecFwk::EventHandler::Priority::VIP)) {
+        if (!eventHandler->PostTask([this, inputConsumer, keyEvent] {
+                return this->OnKeyEventTask(inputConsumer, keyEvent);
+            },
+            std::string("MMI::OnKeyEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
             BytraceAdapter::StopPostTaskEvent();
             return;
@@ -486,9 +487,10 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
-        if (!eventHandler->PostTask(std::bind(&InputManagerImpl::OnPointerEventTask,
-            this, inputConsumer, pointerEvent), std::string("MMI::OnPointerEvent"), 0,
-            AppExecFwk::EventHandler::Priority::VIP)) {
+        if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
+                return this->OnPointerEventTask(inputConsumer, pointerEvent);
+            },
+            std::string("MMI::OnPointerEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
             BytraceAdapter::StopPostTaskEvent();
             return;
@@ -2149,9 +2151,9 @@ int32_t InputManagerImpl::RemoveVirtualInputDevice(int32_t deviceId)
     return MULTIMODAL_INPUT_CONNECT_MGR->RemoveVirtualInputDevice(deviceId);
 }
 
-#ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t InputManagerImpl::AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer)
 {
+#ifdef OHOS_BUILD_ENABLE_ANCO
     std::lock_guard<std::mutex> guard(mtx_);
     if (ancoChannels_.find(consumer) != ancoChannels_.end()) {
         return RET_OK;
@@ -2164,10 +2166,14 @@ int32_t InputManagerImpl::AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer
     }
     ancoChannels_.emplace(consumer, tChannel);
     return RET_OK;
+#endif // OHOS_BUILD_ENABLE_ANCO
+    MMI_HILOGI("AncoAddChannel function does not support");
+    return ERROR_UNSUPPORT;
 }
 
 int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer)
 {
+#ifdef OHOS_BUILD_ENABLE_ANCO
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = ancoChannels_.find(consumer);
     if (iter == ancoChannels_.end()) {
@@ -2181,7 +2187,9 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
     }
     ancoChannels_.erase(iter);
     return RET_OK;
-}
 #endif // OHOS_BUILD_ENABLE_ANCO
+    MMI_HILOGI("AncoRemoveChannel function does not support");
+    return ERROR_UNSUPPORT;
+}
 } // namespace MMI
 } // namespace OHOS

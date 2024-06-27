@@ -34,6 +34,7 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/interfaces/native/innerkits",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -319,6 +320,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
 ohos_unittest("InputManagerImplTest") {
   module_out_path = module_output_path
   include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",

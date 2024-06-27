@@ -94,6 +94,10 @@ public:
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
+    MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
+#endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
 

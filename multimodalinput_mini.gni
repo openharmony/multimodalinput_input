@@ -346,10 +346,8 @@ if (input_ext_feature_gesturesense) {
 if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
-  libmmi_client_sources += [
-    "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp",
-    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
-  ]
+  libmmi_client_sources +=
+      [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
 
   libmmi_service_sources += [
     "${mmi_ext_path}/anco_uds_manager/src/anco_uds_manager.cpp",
