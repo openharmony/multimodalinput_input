@@ -125,6 +125,7 @@ public:
     int32_t SetCurrentUser(int32_t userId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+    int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
