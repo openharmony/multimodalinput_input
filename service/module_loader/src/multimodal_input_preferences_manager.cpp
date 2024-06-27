@@ -31,6 +31,7 @@ constexpr int32_t MOUSE_SCROLL_ROWS { 3 };
 constexpr int32_t PRIMARY_BUTTON { 0 };
 constexpr int32_t POINTER_SPEED { 7 };
 constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
+constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t RIGHT_CLICK_TYPE { 1 };
 constexpr int32_t POINTER_COLOR { -1 };
 constexpr int32_t POINTER_SIZE { 1 };
@@ -105,6 +106,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     touchpadScrollSwitch_ = touchpadPref->GetBool(strTouchpadScrollSwitch_, BOOL_DEFAULT);
     touchpadRightClickType_ = touchpadPref->GetInt(strTouchpadRightClickType_, RIGHT_CLICK_TYPE);
     touchpadScrollDirection_ = touchpadPref->GetBool(strTouchpadScrollDirection_, BOOL_DEFAULT);
+    touchpadScrollRows_ = touchpadPref->GetInt(strTouchpadScrollRows_, TOUCHPAD_SCROLL_ROWS);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     magicPointerSize_ = mousePref->GetInt(strMagicPointerSize_, MAGIC_POINTER_SIZE);
     magicPointerColor_ = mousePref->GetInt(strMagicPointerColor_, POINTER_COLOR);
@@ -133,6 +135,7 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap_[strTouchpadScrollSwitch_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadScrollSwitch_)};
     preferencesMap_[strTouchpadRightClickType_] = {TOUCHPAD_FILE_NAME, touchpadRightClickType_};
     preferencesMap_[strTouchpadScrollDirection_] = {TOUCHPAD_FILE_NAME, static_cast<int32_t>(touchpadScrollDirection_)};
+    preferencesMap_[strTouchpadScrollRows_] = {TOUCHPAD_FILE_NAME, touchpadScrollRows_};
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     preferencesMap_[strMagicPointerSize_] = {MOUSE_FILE_NAME, magicPointerSize_};
     preferencesMap_[strMagicPointerColor_] = {MOUSE_FILE_NAME, magicPointerColor_};

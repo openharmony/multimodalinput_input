@@ -378,6 +378,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
             ret = StubGetHardwareCursorStats(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TOUCHPAD_SCROLL_ROWS):
+            ret = StubSetTouchpadScrollRows(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS):
+            ret = StubGetTouchpadScrollRows(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
             break;
@@ -2343,6 +2349,54 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t rows = 3; // the initial number of scrolling rows is 3.
+    READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetTouchpadScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetTouchpadScrollRows failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", rows, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t rows = 3; // the initial number of scrolling rows is 3.
+    int32_t ret = GetTouchpadScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadScrollRows failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
     return RET_OK;
 }
 

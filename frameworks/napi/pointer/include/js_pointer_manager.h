@@ -106,6 +106,8 @@ public:
     napi_value GetTouchpadRotateSwitch(napi_env env, napi_value handle = nullptr);
     napi_value EnableHardwareCursorStats(napi_env env, bool enable);
     napi_value GetHardwareCursorStats(napi_env env);
+    napi_value SetTouchpadScrollRows(napi_env env, int32_t rows, napi_value handle = nullptr);
+    napi_value GetTouchpadScrollRows(napi_env env, napi_value handle = nullptr);
 
 private:
     napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);

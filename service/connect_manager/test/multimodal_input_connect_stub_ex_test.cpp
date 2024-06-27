@@ -261,6 +261,7 @@ public:
     bool directionState_ = false;
     bool tapSwitchFlag_ = false;
     int32_t touchpadSpeed_ = 0;
+    int32_t touchpadScrollRows_ = 0;
     int32_t delay_ = 0;
     int32_t rate_ = 0;
     bool pinchSwitchFlag_ = false;
