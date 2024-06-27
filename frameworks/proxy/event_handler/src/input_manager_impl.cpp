@@ -2151,9 +2151,9 @@ int32_t InputManagerImpl::RemoveVirtualInputDevice(int32_t deviceId)
     return MULTIMODAL_INPUT_CONNECT_MGR->RemoveVirtualInputDevice(deviceId);
 }
 
-#ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t InputManagerImpl::AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer)
 {
+#ifdef OHOS_BUILD_ENABLE_ANCO
     std::lock_guard<std::mutex> guard(mtx_);
     if (ancoChannels_.find(consumer) != ancoChannels_.end()) {
         return RET_OK;
@@ -2166,10 +2166,14 @@ int32_t InputManagerImpl::AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer
     }
     ancoChannels_.emplace(consumer, tChannel);
     return RET_OK;
+#endif // OHOS_BUILD_ENABLE_ANCO
+    MMI_HILOGI("AncoAddChannel function does not support");
+    return ERROR_UNSUPPORT;
 }
 
 int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer)
 {
+#ifdef OHOS_BUILD_ENABLE_ANCO
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = ancoChannels_.find(consumer);
     if (iter == ancoChannels_.end()) {
@@ -2183,7 +2187,9 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
     }
     ancoChannels_.erase(iter);
     return RET_OK;
-}
 #endif // OHOS_BUILD_ENABLE_ANCO
+    MMI_HILOGI("AncoRemoveChannel function does not support");
+    return ERROR_UNSUPPORT;
+}
 } // namespace MMI
 } // namespace OHOS

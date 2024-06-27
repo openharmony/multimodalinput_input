@@ -32,6 +32,12 @@ ohos_source_set("mmi_anco_channel_proxy") {
     "src/anco_channel_death_recipient.cpp",
     "src/anco_channel_proxy.cpp",
   ]
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   configs = [ ":mmi_anco_channel_config" ]
 
@@ -58,6 +64,12 @@ ohos_source_set("mmi_anco_channel_stub") {
     "src/anco_channel.cpp",
     "src/anco_channel_stub.cpp",
   ]
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   configs = [ ":mmi_anco_channel_config" ]
 

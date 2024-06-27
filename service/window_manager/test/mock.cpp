@@ -499,4 +499,16 @@ bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
 {
     return DfsMessageParcel::messageParcel->IsSceneBoardEnabled();
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t InputWindowsManager::AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer)
+{
+    return ERR_OK;
+}
+
+int32_t InputWindowsManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer)
+{
+    return ERR_OK;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace OHOS

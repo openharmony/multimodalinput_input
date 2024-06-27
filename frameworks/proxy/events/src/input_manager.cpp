@@ -573,16 +573,14 @@ int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t display
     return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
 }
 
-#ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t InputManager::AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer)
 {
-    return InputMgrImpl.AncoAddConsumer(consumer);
+    return InputMgrImpl.AncoAddChannel(consumer);
 }
 
 int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer)
 {
-    return InputMgrImpl.AncoRemoveConsumer(consumer);
+    return InputMgrImpl.AncoRemoveChannel(consumer);
 }
-#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS
