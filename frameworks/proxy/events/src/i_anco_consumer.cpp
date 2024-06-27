@@ -126,7 +126,7 @@ bool AncoWindows::Unmarshalling(Parcel &parcel, AncoWindows &windows)
         parcel.ReadInt32(windows.focusWindowId) &&
         UnmarshalVector(parcel, windows.windows, &UnmarshalWindowInfo)
     );
-    windows.updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(windows.updateType);
+    windows.updateType = static_cast<ANCO_WINDOW_UPDATE_TYPE>(updateType);
     return result;
 }
 } // namespace MMI
