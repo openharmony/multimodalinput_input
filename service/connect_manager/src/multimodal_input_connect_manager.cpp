@@ -782,6 +782,13 @@ int32_t MultimodalInputConnectManager::GetHardwareCursorStats(uint32_t &frameCou
     return multimodalInputConnectService_->GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
+int32_t MultimodalInputConnectManager::GetPointerSnapshot(void *pixelMapPtr)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetPointerSnapshot(pixelMapPtr);
+}
+
 int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     std::lock_guard<std::mutex> guard(lock_);
