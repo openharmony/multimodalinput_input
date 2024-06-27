@@ -41,7 +41,10 @@ config("libmmi_public_client_config") {
   ]
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_path}/common/anco/comm/include",
+    ]
   }
 }
 
@@ -324,6 +327,10 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
   ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
 
   sources = [
     "event_handler/src/bytrace_adapter.cpp",
