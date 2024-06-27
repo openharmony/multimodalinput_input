@@ -1610,6 +1610,64 @@ napi_value JsPointerContext::GetHardwareCursorStats(napi_env env, napi_callback_
     return nullptr;
 }
 
+napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchpadScrollRows", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("rows parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touchpadScrollRows", "number");
+        return nullptr;
+    }
+    int32_t rows = DEFAULT_ROWS;
+    CHKRP(napi_get_value_int32(env, argv[0], &rows), GET_VALUE_INT32);
+    if (rows < MIN_ROWS) {
+        rows = MIN_ROWS;
+    } else if (rows > MAX_ROWS) {
+        rows = MAX_ROWS;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetTouchpadScrollRows(env, rows);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetTouchpadScrollRows(env, rows, argv[1]);
+}
+
+napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetTouchpadScrollRows(env);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+
+    return jsPointerMgr->GetTouchpadScrollRows(env, argv[0]);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1668,6 +1726,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),
         DECLARE_NAPI_STATIC_FUNCTION("enableHardwareCursorStats", EnableHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollRows", SetTouchpadScrollRows),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollRows", GetTouchpadScrollRows),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {
