@@ -119,9 +119,9 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
         if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
             point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             windowInfo = std::make_optional(*curInfo);
-            MMI_HILOG_DISPATCHI("Touch event send cancel");
+            MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
         } else {
-            MMI_HILOGE("WindowInfo id nullptr");
+            MMI_HILOGE("Window:%{public}d is nullptr", windowId);
             return false;
         }
     }
@@ -158,12 +158,20 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         }
     }
     for (auto windowId : windowIds) {
+        auto pointerEvent = std::make_shared<PointerEvent>(*point);
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
-        if (!ReissueEvent(point, windowId, windowInfo)) {
+        if (!ReissueEvent(pointerEvent, windowId, windowInfo)) {
             continue;
         }
-        auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
-        auto pointerEvent = std::make_shared<PointerEvent>(*point);
+        if (!windowInfo) {
+            continue;
+        }
+        auto fd = WIN_MGR->GetClientFd(pointerEvent, windowInfo->id);
+        if (fd < 0) {
+            auto udsServer = InputHandler->GetUDSServer();
+            CHKPV(udsServer);
+            udsServer->GetClientFd(windowInfo->id);
+        }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
         int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;

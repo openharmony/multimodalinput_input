@@ -242,6 +242,10 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
     int32_t SetMoveEventFilters(bool flag) { return 0; }
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
+#endif // OHOS_BUILD_ENABLE_ANCO
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -272,6 +276,7 @@ public:
     bool hasIrEmitter_ = false;
     int32_t retAddVirtualInputDevice_ = 0;
     int32_t retSetPixelMapData_ = 0;
+    int32_t retChannel_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
