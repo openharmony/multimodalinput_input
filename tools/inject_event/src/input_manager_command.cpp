@@ -1217,6 +1217,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
+                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
                             pointerEvent->AddPointerItem(item);
