@@ -132,6 +132,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             CHK_INVALID_RV(anrNoticedPid_, "Add anr timer failed, timer count reached the maximum number");
             NetPacket pkt(MmiMessageId::NOTICE_ANR);
             pkt << sess->GetPid();
+            pkt << id;
             if (pkt.ChkRWError()) {
                 MMI_HILOGE("Packet write failed");
                 return;
