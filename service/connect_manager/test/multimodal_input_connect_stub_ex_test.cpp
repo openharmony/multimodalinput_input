@@ -149,7 +149,7 @@ public:
     int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override
     {
         return subscribeId;
-    }   
+    }
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override
     {
         return static_cast<int32_t>(switchFlag);
