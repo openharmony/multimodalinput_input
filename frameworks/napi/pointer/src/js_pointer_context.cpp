@@ -1573,7 +1573,6 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
 napi_value JsPointerContext::SetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("enter SetTouchpadThreeFingersTapSwitch");
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
@@ -1587,7 +1586,6 @@ napi_value JsPointerContext::SetTouchpadThreeFingersTapSwitch(napi_env env, napi
 napi_value JsPointerContext::GetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("enter GetTouchpadThreeFingersTapSwitch");
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();

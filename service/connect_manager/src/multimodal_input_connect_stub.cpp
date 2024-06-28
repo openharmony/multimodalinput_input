@@ -2349,10 +2349,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(Message
     int32_t ret = GetTouchpadThreeFingersTapSwitch(switchFlag);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call StubGetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
-        return ret;
+    } else {
+        WRITEBOOL(reply, switchFlag);
     }
-    WRITEBOOL(reply, switchFlag);
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)

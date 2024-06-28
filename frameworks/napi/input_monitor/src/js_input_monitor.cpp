@@ -1415,7 +1415,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 bool canUse = false;
                 if (IsThreeFingersSwipe(pointerEvent)) {
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
-                    MMI_HILOGD("THREE_FINGERS_SWIPE but three finger action can't use");
                 }
                 if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
@@ -1436,7 +1435,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 bool canUse = false;
                 if (IsThreeFingersTap(pointerEvent)) {
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
-                    MMI_HILOGD("THREE_FINGERS_TAP but three finger action can't use");
                 }
                 if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
