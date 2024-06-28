@@ -150,6 +150,17 @@ public:
     {
         return subscribeId;
     }
+
+    
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override 
+    {
+        return static_cast<int32_t>(switchFlag);
+    }
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override
+    {
+        switchFlag = true;
+        return static_cast<int32_t>(switchFlag);
+    }
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
