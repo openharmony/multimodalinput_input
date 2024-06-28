@@ -140,7 +140,6 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
-    bool threeFingerSwitch_ { true };
 };
 
 void InputManagerPointerTest::SetUpTestCase()
@@ -1852,51 +1851,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadThreeFinger
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_GetTouchpadThreeFingersTapSwitch_001
- * @tc.desc: Get touchpad ThreeFingers Tap switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool flag = true;
-    InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag);
-    bool newFlag = true;
-    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(newFlag) == RET_OK);
-    ASSERT_TRUE(flag == newFlag);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_002
- * @tc.desc: Set touchpad ThreeFingers Tap switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool flag = true;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag) == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerPointerTest_GetTouchpadThreeFingersTapSwitch_002
- * @tc.desc: Get touchpad ThreeFingers Tap switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadThreeFingersTapSwitch_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    bool flag = false;
-    InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag);
-    bool newFlag = false;
-    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(newFlag) == RET_OK);
-    ASSERT_TRUE(flag == newFlag);
 }
 } // namespace MMI
 } // namespace OHOS
