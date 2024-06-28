@@ -518,6 +518,7 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_QUADTAP, "quadtap" },
     { PointerEvent::POINTER_ACTION_HOVER_MOVE, "hover-move" },
     { PointerEvent::POINTER_ACTION_HOVER_ENTER, "hover-enter" },
+    { PointerEvent::POINTER_ACTION_HOVER_EXIT, "hover-exit" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN, "fingerprint-down" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_UP, "fingerprint-up" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
@@ -993,7 +994,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
         return false;
     }
 
-    size_t maxPressedButtons = 3;
+    const size_t maxPressedButtons = 3;
     if (pressedButtons_.size() > maxPressedButtons) {
         MMI_HILOGE("PressedButtons_.size is greater than three and is invalid");
         return false;
@@ -1072,8 +1073,7 @@ bool PointerEvent::IsValidCheckMouse() const
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
     CALL_DEBUG_ENTER;
-    int32_t touchPointID = GetPointerId();
-    if (touchPointID < 0) {
+    if (GetPointerId() < 0) {
         MMI_HILOGE("TouchPointID is invalid");
         return false;
     }
@@ -1262,6 +1262,8 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:HM:";
         case PointerEvent::POINTER_ACTION_HOVER_ENTER:
             return "P:HE:";
+        case PointerEvent::POINTER_ACTION_HOVER_EXIT:
+            return "P:HEX:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN:
             return "P:FD:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_UP:

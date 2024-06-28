@@ -108,7 +108,7 @@ struct libinput_event_touch* libinput_event_get_touch_event(struct libinput_even
 
 struct libinput_event_touch* libinput_event_get_touchpad_event(struct libinput_event *event)
 {
-    return (event != nullptr ? reinterpret_cast<libinput_event_touch *>(event) : nullptr);
+    return g_instance->GetTouchpadEvent(event);
 }
 
 struct libinput_event_gesture* libinput_event_get_gesture_event(struct libinput_event *event)
@@ -258,7 +258,7 @@ int32_t libinput_event_touchpad_get_touch_contact_short_axis(struct libinput_eve
 
 int32_t libinput_event_touchpad_get_tool_type(struct libinput_event_touch *event)
 {
-    return (event != nullptr ? event->toolType : 0);
+    return g_instance->TouchpadGetTool(event);
 }
 
 int32_t libinput_device_touchpad_btn_tool_type_down(struct libinput_device *device, int32_t btnToolType)
@@ -318,7 +318,7 @@ int libinput_has_event_led_type(struct libinput_device *device)
 
 const char* libinput_device_get_name(struct libinput_device *device)
 {
-    return (device != nullptr ? device->name.c_str() : nullptr);
+    return g_instance->DeviceGetName(device);
 }
 
 unsigned int libinput_device_get_id_bustype(struct libinput_device *device)
@@ -404,5 +404,35 @@ int32_t libinput_device_get_axis_resolution(struct libinput_device* device, int3
 int libinput_get_funckey_state(struct libinput_device *device, unsigned int code)
 {
     return 0;
+}
+
+uint32_t libinput_event_pointer_get_finger_count(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerEventGetFingerCount(event);
+}
+
+double libinput_event_pointer_get_dx_unaccelerated(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetDxUnaccelerated(event);
+}
+
+double libinput_event_pointer_get_dy_unaccelerated(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetDyUnaccelerated(event);
+}
+
+uint32_t libinput_event_pointer_get_button(struct libinput_event_pointer *event)
+{
+    return g_instance->PointerGetButton(event);
+}
+
+int libinput_event_pointer_has_axis(struct libinput_event_pointer *event, enum libinput_pointer_axis axis)
+{
+    return g_instance->PointerHasAxis(event, axis);
+}
+
+double libinput_event_pointer_get_axis_value(struct libinput_event_pointer *event, enum libinput_pointer_axis axis)
+{
+    return g_instance->PointerGetAxisValue(event, axis);
 }
 } // extern "C"

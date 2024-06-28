@@ -65,7 +65,7 @@ public:
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
     MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, bool));
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
-    void DispatchPointer(int32_t pointerAction) override {}
+    void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(bool, IsNeedRefreshLayer, (int32_t));
@@ -76,6 +76,7 @@ public:
     MOCK_METHOD(bool, TouchPointToDisplayPoint, (int32_t, struct libinput_event_touch*, EventTouch&, int32_t&));
     MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&), (const));
     MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
+    MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -93,6 +94,10 @@ public:
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
+    MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
+#endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
 

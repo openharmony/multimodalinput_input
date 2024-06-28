@@ -403,11 +403,12 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 MapFun JsInputMonitor::GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent)
 {
     MapFun mapFunc;
-    mapFunc["id"] = std::bind(&InputEvent::GetId, inputEvent);
-    mapFunc["deviceId"] = std::bind(&InputEvent::GetDeviceId, inputEvent);
-    mapFunc["actionTime"] = std::bind(&InputEvent::GetActionTime, inputEvent);
-    mapFunc["screenId"] = std::bind(&InputEvent::GetTargetDisplayId, inputEvent);
-    mapFunc["windowId"] = std::bind(&InputEvent::GetTargetWindowId, inputEvent);
+    mapFunc["id"] = [inputEvent] { return inputEvent->GetId(); };
+    mapFunc["deviceId"] = [inputEvent] { return inputEvent->GetDeviceId(); };
+    mapFunc["actionTime"] = [inputEvent] { return inputEvent->GetActionTime(); };
+    mapFunc["screenId"] = [inputEvent] { return inputEvent->GetTargetDisplayId(); };
+    mapFunc["windowId"] = [inputEvent] { return inputEvent->GetTargetWindowId(); };
+
     return mapFunc;
 }
 
@@ -716,16 +717,16 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
 MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
 {
     MapFun mapFun;
-    mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
-    mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
-    mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
-    mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
-    mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
-    mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
-    mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
-    mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
-    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDx, item);
-    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDy, item);
+    mapFun["actionTime"] = [pointerEvent] { return pointerEvent->GetActionTime(); };
+    mapFun["screenId"] = [pointerEvent] { return pointerEvent->GetTargetDisplayId(); };
+    mapFun["windowId"] = [pointerEvent] { return pointerEvent->GetTargetWindowId(); };
+    mapFun["deviceId"] = [item] { return item.GetDeviceId(); };
+    mapFun["windowX"] = [item] { return item.GetWindowX(); };
+    mapFun["windowY"] = [item] { return item.GetWindowY(); };
+    mapFun["screenX"] = [item] { return item.GetDisplayX(); };
+    mapFun["screenY"] = [item] { return item.GetDisplayY(); };
+    mapFun["rawDeltaX"] = [item] { return item.GetRawDx(); };
+    mapFun["rawDeltaY"] = [item] { return item.GetRawDy(); };
     return mapFun;
 }
 

@@ -14,6 +14,7 @@
  */
 
 #include "app_debug_listener.h"
+
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -34,7 +35,7 @@ void AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugI
     CALL_DEBUG_ENTER;
     for (const auto &debugInfo : debugInfos) {
         appDebugPid_ = debugInfo.pid;
-        MMI_HILOGD("appDebugPid_ : %{public}d", appDebugPid_);
+        MMI_HILOGD("appDebugPid_:%{public}d", appDebugPid_);
     }
 }
 
@@ -50,7 +51,7 @@ void AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugIn
 
 int32_t AppDebugListener::GetAppDebugPid()
 {
-    MMI_HILOGD("appDebugPid_ : %{public}d", appDebugPid_);
+    MMI_HILOGD("appDebugPid_:%{public}d", appDebugPid_);
     return appDebugPid_;
 }
 } // namespace MMI

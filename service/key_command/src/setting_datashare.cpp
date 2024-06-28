@@ -38,11 +38,11 @@ std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
 std::mutex SettingDataShare::mutex_;
 sptr<IRemoteObject> SettingDataShare::remoteObj_;
 namespace {
-const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
-const std::string SETTING_COLUMN_VALUE = "VALUE";
-const std::string SETTING_URI_PROXY = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
-const std::string SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
-constexpr int32_t DECIMAL_BASE = 10;
+const std::string SETTING_COLUMN_KEYWORD { "KEYWORD" };
+const std::string SETTING_COLUMN_VALUE { "VALUE" };
+const std::string SETTING_URI_PROXY { "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true" };
+const std::string SETTINGS_DATA_EXT_URI { "datashare:///com.ohos.settingsdata.DataAbility" };
+constexpr int32_t DECIMAL_BASE { 10 };
 } // namespace
 
 SettingDataShare::~SettingDataShare() {}
@@ -145,7 +145,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
     }
     helper->RegisterObserver(uri, observer);
     helper->NotifyChange(uri);
-    std::thread execCb(SettingDataShare::ExecRegisterCb, observer);
+    std::thread execCb([this, observer] { this->ExecRegisterCb(observer); });
     execCb.detach();
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
@@ -172,7 +172,7 @@ void SettingDataShare::Initialize(int32_t systemAbilityId)
 {
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPV(sam);
-    auto remoteObj = sam->GetSystemAbility(systemAbilityId);
+    auto remoteObj = sam->CheckSystemAbility(systemAbilityId);
     CHKPV(remoteObj);
     remoteObj_ = remoteObj;
 }

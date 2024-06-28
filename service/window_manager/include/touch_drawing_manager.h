@@ -69,8 +69,10 @@ private:
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode);
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
+    void ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
     void RotationCanvas(RosenCanvas *canvas, Direction direction);
     void CreateTouchWindow();
+    void DestoryTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
     void DrawPointerPositionHandler();
@@ -84,7 +86,7 @@ private:
     void UpdateLastPointerItem(PointerEvent::PointerItem &pointerItem);
     void RemovePointerPosition();
     void ClearTracker();
-    void ClearLabels();
+    void InitLabels();
     template <class T>
     void CreateBubbleObserver(T& item);
     template <class T>
@@ -92,6 +94,8 @@ private:
     template <class T>
     std::string FormatNumber(T number, int32_t precision);
     bool IsValidAction(const int32_t action);
+    void Snapshot();
+    bool IsWindowRotation();
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
@@ -122,8 +126,11 @@ private:
     bool isDownAction_ { false };
     bool isFirstDraw_ { true };
     bool isChangedRotation_ { false };
+    bool isChangedMode_ { false };
+    bool stopRecord_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
+    std::mutex mutex_;
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI

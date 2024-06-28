@@ -17,12 +17,12 @@
 
 #include <cinttypes>
 
+#include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "anr_handler.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
-#include "mmi_log.h"
 #include "napi_constants.h"
 #include "net_packet.h"
 #include "proto.h"
@@ -35,7 +35,7 @@ namespace MMI {
 InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
-        std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1, std::placeholders::_2);
+        [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime); };
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,

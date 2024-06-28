@@ -22,6 +22,9 @@
 #include "libinput.h"
 
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_channel.h"
+#endif
 #include "key_event.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
@@ -90,7 +93,7 @@ public:
         PointerStyle pointerStyle, bool isUiExtension = false) = 0;
     virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId,
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
-    virtual void DispatchPointer(int32_t pointerAction) = 0;
+    virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     virtual bool IsNeedRefreshLayer(int32_t windowId) = 0;
@@ -103,6 +106,7 @@ public:
     virtual bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
     virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;
+    virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -118,6 +122,11 @@ public:
     virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
+    virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
+#endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
 

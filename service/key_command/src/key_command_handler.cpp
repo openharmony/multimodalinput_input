@@ -13,19 +13,18 @@
  * limitations under the License.
  */
 
+#include "key_command_handler.h"
+
 #include <ostream>
 #include <sstream>
 
-#include "key_command_handler.h"
-
-#include "ability_manager_client.h"
-#include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
 #include "file_ex.h"
-#include "setting_datashare.h"
 #include "system_ability_definition.h"
 
+#include "ability_manager_client.h"
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
@@ -34,13 +33,14 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "i_input_windows_manager.h"
+#include "i_preference_manager.h"
 #include "key_command_handler_util.h"
 #include "mmi_log.h"
-#include "i_preference_manager.h"
 #include "nap_process.h"
 #include "net_packet.h"
-#include "proto.h"
 #include "pointer_drawing_manager.h"
+#include "proto.h"
+#include "setting_datashare.h"
 #include "stylus_key_handler.h"
 #include "table_dump.h"
 #include "timer_manager.h"
@@ -54,17 +54,17 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr float MOVE_TOLERANCE = 3.0f;
-constexpr float MIN_GESTURE_STROKE_LENGTH = 200.0f;
-constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
-constexpr int32_t EVEN_NUMBER = 2;
-constexpr int64_t NO_DELAY = 0;
+constexpr float MOVE_TOLERANCE { 3.0f };
+constexpr float MIN_GESTURE_STROKE_LENGTH { 200.0f };
+constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
+constexpr int32_t EVEN_NUMBER { 2 };
+constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY = 1000;
-const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
-const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
-const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
-const std::string SCREENSHOT_ABILITY_NAME = "com.hmos.screenshot.ServiceExtAbility";
-const std::string SCREENRECORDER_BUNDLE_NAME = "com.hmos.screenrecorder";
+const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
+const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
+const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1089,7 +1089,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
 
-    if (!specialKeys_.empty() && specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
+    if (specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
         HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
         return true;
     }
@@ -1335,6 +1335,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
             shortcutKey.keyDownDuration = delay;
         }
         shortcutKey.Print();
+
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             result = HandleKeyDown(shortcutKey) || result;
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
@@ -1679,6 +1680,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGI("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
+
     if (upTime - downTime <= static_cast<int64_t>(shortcutKey.keyDownDuration) * FREQUENCY) {
         MMI_HILOGI("Skip, upTime - downTime <= duration");
         return false;

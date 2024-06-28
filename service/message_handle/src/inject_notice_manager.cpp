@@ -17,10 +17,10 @@
 
 #include <atomic>
 
-#include "ability_manager_client.h"
 #include "ffrt_inner.h"
 #include "message_parcel.h"
 
+#include "ability_manager_client.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_DOMAIN
@@ -31,9 +31,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_USERID = -1;
-constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_SEND = 0;
-constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_CLOSE = 1;
+constexpr int32_t INVALID_USERID { -1 };
+constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_SEND { 0 };
+constexpr int32_t MESSAGE_PARCEL_KEY_NOTICE_CLOSE { 1 };
 }
 
 InjectNoticeManager::InjectNoticeManager() : connectionCallback_(new (std::nothrow) InjectNoticeConnection()) {}
@@ -128,7 +128,7 @@ bool InjectNoticeManager::InjectNoticeConnection::SendNotice(const InjectNoticeI
     CHKPF(remoteObject_);
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
-        MMI_HILOGW("Requst send notice failed: %{public}d", ret);
+        MMI_HILOGW("Requst send notice failed:%{public}d", ret);
         return false;
     }
     MMI_HILOGI("Requst send notice ok");
@@ -147,7 +147,7 @@ bool InjectNoticeManager::InjectNoticeConnection::CancelNotice(const InjectNotic
     CHKPF(remoteObject_);
     int32_t ret = remoteObject_->SendRequest(cmdCode, data, reply, option);
     if (ret != ERR_OK) {
-        MMI_HILOGW("Requst send notice failed: %{public}d", ret);
+        MMI_HILOGW("Requst send notice failed:%{public}d", ret);
         return false;
     }
     MMI_HILOGI("Requst send notice ok");

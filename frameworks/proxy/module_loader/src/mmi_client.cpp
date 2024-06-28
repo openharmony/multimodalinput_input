@@ -19,14 +19,13 @@
 #include <condition_variable>
 
 #include "anr_handler.h"
-#include "mmi_log.h"
-#include "proto.h"
-#include "util.h"
-
 #include "input_manager_impl.h"
 #include "mmi_fd_listener.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "proto.h"
+#include "util.h"
 #include "xcollie/watchdog.h"
 
 #undef MMI_LOG_TAG
@@ -35,7 +34,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string THREAD_NAME = "OS_mmi_EventHdr";
+const std::string THREAD_NAME { "OS_mmi_EventHdr" };
 } // namespace
 
 using namespace AppExecFwk;
@@ -87,8 +86,7 @@ bool MMIClient::Start()
 {
     CALL_DEBUG_ENTER;
     msgHandler_.Init();
-    auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
-        std::placeholders::_1, std::placeholders::_2);
+    auto callback = [this] (const UDSClient& client, NetPacket& pkt) { return msgHandler_.OnMsgHandler(client, pkt); };
     if (!StartClient(callback)) {
         MMI_HILOGE("Client startup failed");
         Stop();
@@ -123,7 +121,7 @@ bool MMIClient::StartEventRunner()
             return false;
         }
     } else {
-        if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+        if (!eventHandler_->PostTask([this] { return this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_HILOGE("Send reconnect event failed");
             return false;
         }
@@ -148,7 +146,7 @@ bool MMIClient::AddFdListener(int32_t fd)
         return false;
     }
     isRunning_ = true;
-    MMI_HILOGI("server was listening");
+    MMI_HILOGI("Server was listening");
     return true;
 }
 
@@ -187,7 +185,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
     if (!circBuf_.Write(buf, size)) {
         MMI_HILOGW("Write data failed. size:%{public}zu", size);
     }
-    OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
+    OnReadPackets(circBuf_, [this] (NetPacket& pkt) { return this->OnPacket(pkt); });
 }
 
 int32_t MMIClient::Reconnect()
@@ -202,7 +200,7 @@ void MMIClient::OnReconnect()
         return;
     }
     CHKPV(eventHandler_);
-    if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+    if (!eventHandler_->PostTask([this] { return this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
         MMI_HILOGE("Post reconnect event failed");
     }
 }
@@ -237,7 +235,7 @@ void MMIClient::OnDisconnected()
     }
     Close();
     if (!isExit && eventHandler_ != nullptr) {
-        if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+        if (!eventHandler_->PostTask([this] { return this->OnReconnect(); }, CLIENT_RECONNECT_COOLING_TIME)) {
             MMI_HILOGE("Send reconnect event task failed");
         }
     }
