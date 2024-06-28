@@ -227,8 +227,11 @@ void ResetLogTrace();
 #define MMI_HILOG_DISPATCHF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
-#define MMI_HILOG_FREEZE(fmt, ...) do { \
+#define MMI_HILOG_FREEZEI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_FREEZEE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_ANRDETECTD(fmt, ...) do { \

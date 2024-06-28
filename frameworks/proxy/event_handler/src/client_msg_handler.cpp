@@ -183,7 +183,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    MMI_HILOG_FREEZE("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
+    MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
     aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
         std::to_string(pointerEvent->GetId()));
@@ -195,7 +195,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     processedCount_++;
     if (processedCount_ == PRINT_INTERVAL_COUNT) {
-        MMI_HILOG_FREEZE("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
+        MMI_HILOG_FREEZEI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
         processedCount_ = 0;
         lastEventId_ = pointerEvent->GetId();
     }
