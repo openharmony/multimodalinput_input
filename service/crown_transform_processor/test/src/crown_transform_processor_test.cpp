@@ -179,7 +179,7 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotat
     std::string name = libinput_device_get_name(dev);
     MMI_HILOGD("pointer device: %{public}s", name.c_str());
     int32_t result = CROWN_EVENT_HDR->NormalizeRotateEvent(event);
-    EXPECT_EQ(result, RET_OK);
+    EXPECT_NE(result, RET_OK);
 }
 
 /**

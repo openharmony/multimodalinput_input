@@ -89,6 +89,7 @@ bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
+std::mutex mutex_;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -98,10 +99,20 @@ namespace MMI {
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+void PointerDrawingManager::InitPointerCallback()
+{
+    MMI_HILOGI("Init RS Callback start");
+    std::lock_guard<std::mutex> guard(mutex_);
+    g_isRsRemoteDied = false;
+    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
 PointerDrawingManager::PointerDrawingManager()
@@ -111,7 +122,13 @@ PointerDrawingManager::PointerDrawingManager()
     hasMagicCursor_.name = "isMagicCursor";
     TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
         MMI_HILOGD("Timer callback");
-        CreatePointerSwitchObserver(hasMagicCursor_);
+        if (hasInitObserver_ == false) {
+            int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
+            if (ret == RET_OK) {
+                hasInitObserver_ = true;
+                MMI_HILOGD("Create pointer switch observer success on timer");
+            }
+        }
     });
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -119,8 +136,6 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -263,11 +278,7 @@ void PointerDrawingManager::UpdateMouseStyle()
 {
     CALL_DEBUG_ENTER;
     PointerStyle curPointerStyle;
-    int result = GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
-    if (result != RET_OK) {
-        MMI_HILOGE("Get current pointer style failed");
-        return;
-    }
+    GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (curPointerStyle.id == CURSOR_CIRCLE_STYLE) {
         lastMouseStyle_.id = curPointerStyle.id;
         int ret = SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
@@ -329,7 +340,7 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
         MAGIC_CURSOR->UpdateMagicCursorChangeState(statusValue);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     };
-    std::string dynamicallyKey = "isVariable";
+    std::string dynamicallyKey = "smartChange";
     sptr<SettingObserver> magicCursorChangeObserver = SettingDataShare::GetInstance(
         MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(dynamicallyKey, func);
     ErrCode ret =
@@ -344,11 +355,7 @@ void PointerDrawingManager::UpdateStyleOptions()
 {
     CALL_DEBUG_ENTER;
     PointerStyle curPointerStyle;
-    int result = WIN_MGR->GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
-    if (result != RET_OK) {
-        MMI_HILOGE("Get current pointer style failed");
-        return;
-    }
+    WIN_MGR->GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     curPointerStyle.options = HasMagicCursor() ? MAGIC_STYLE_OPT : MOUSE_STYLE_OPT;
     int ret = WIN_MGR->SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
     if (ret != RET_OK) {
@@ -356,7 +363,22 @@ void PointerDrawingManager::UpdateStyleOptions()
     }
 }
 
-void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
+void PointerDrawingManager::InitPointerObserver()
+{
+    if (hasInitObserver_) {
+        MMI_HILOGI("Settingdata observer has init");
+        return;
+    }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
+    if (ret == RET_OK) {
+        hasInitObserver_ = true;
+        MMI_HILOGD("Create pointer switch observer success");
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+ 
+int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
@@ -395,8 +417,10 @@ void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
+        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
+    return RET_OK;
 }
 
 bool PointerDrawingManager::HasMagicCursor()
@@ -869,7 +893,6 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
-    g_isRsRemoteDied = false;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -1132,8 +1155,8 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, in
         return RET_ERR;
     }
     PointerStyle pointerStyle;
-    int32_t ret = WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle);
-    if (ret != RET_OK || pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+    WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle);
+    if (pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid, pointerStyle.id);
         return RET_ERR;
     }
@@ -1400,12 +1423,8 @@ void PointerDrawingManager::DrawManager()
     if (hasDisplay_ && hasPointerDevice_ && surfaceNode_ == nullptr) {
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
-        int32_t ret = WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
+        WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-            return;
-        }
         Direction direction = DIRECTION0;
         if (displayInfo_.displayDirection == DIRECTION0) {
             direction = displayInfo_.direction;
@@ -1563,11 +1582,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         return RET_OK;
     }
     PointerStyle style;
-    int32_t ret = WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get global pointer style failed");
-        return RET_ERR;
-    }
+    WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style, isUiExtension);
     if (pointerStyle.id != style.id) {
         auto iconPath = GetMouseIconPath();
         auto it = iconPath.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
@@ -1705,10 +1720,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
         iconPath[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
         PointerStyle style;
-        if (WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style) != RET_OK) {
-            MMI_HILOGE("Get global pointer style failed");
-            return RET_ERR;
-        }
+        WIN_MGR->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
         pointerStyle = style;
     }
     if (windowId == windowId_ || windowId == GLOBAL_WINDOW_ID) {
@@ -1738,11 +1750,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
             return RET_OK;
         }
     }
-    int32_t ret = WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-        return ret;
-    }
+    WIN_MGR->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     MMI_HILOGD("Window id:%{public}d get pointer style:%{public}d success", windowId, pointerStyle.id);
     return RET_OK;
 }

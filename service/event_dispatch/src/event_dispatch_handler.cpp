@@ -19,12 +19,13 @@
 
 #include <linux/input-event-codes.h>
 
-#include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
+#include "transaction/rs_interfaces.h"
 
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "bytrace_adapter.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -33,7 +34,6 @@
 #include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
-#include <transaction/rs_interfaces.h>
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -43,8 +43,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
-constexpr int32_t INTERVAL_DURATION = 10;
+constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
+constexpr int32_t INTERVAL_DURATION { 10 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -119,9 +119,9 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
         if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
             point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             windowInfo = std::make_optional(*curInfo);
-            MMI_HILOG_DISPATCHI("touch event send cancel");
+            MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
         } else {
-            MMI_HILOGE("WindowInfo id nullptr");
+            MMI_HILOGE("Window:%{public}d is nullptr", windowId);
             return false;
         }
     }
@@ -158,12 +158,20 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         }
     }
     for (auto windowId : windowIds) {
+        auto pointerEvent = std::make_shared<PointerEvent>(*point);
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
-        if (!ReissueEvent(point, windowId, windowInfo)) {
+        if (!ReissueEvent(pointerEvent, windowId, windowInfo)) {
             continue;
         }
-        auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
-        auto pointerEvent = std::make_shared<PointerEvent>(*point);
+        if (!windowInfo) {
+            continue;
+        }
+        auto fd = WIN_MGR->GetClientFd(pointerEvent, windowInfo->id);
+        if (fd < 0) {
+            auto udsServer = InputHandler->GetUDSServer();
+            CHKPV(udsServer);
+            udsServer->GetClientFd(windowInfo->id);
+        }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
         int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
@@ -280,7 +288,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         return;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
-        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        MMI_HILOGD("Session pid:%{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
     }
 }
@@ -299,7 +307,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{public}d, Action:%{public}d, EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
@@ -330,7 +338,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return MSG_SEND_FAIL;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
-        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        MMI_HILOGD("Session pid:%{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     }
     return RET_OK;

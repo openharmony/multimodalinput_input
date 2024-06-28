@@ -26,6 +26,8 @@
 
 #include "display_manager.h"
 #include "mouse_device_state.h"
+#include "i_input_windows_manager.h"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MouseTransformProcessorMockTest"
@@ -35,6 +37,9 @@ namespace MMI {
 namespace {
 using namespace testing;
 using namespace testing::ext;
+constexpr uint32_t TP_CLICK_FINGER_ONE { 1 };
+constexpr uint32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
+constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
 }
 class MouseTransformProcessorMockTest : public testing::Test {
 public:
@@ -199,6 +204,167 @@ HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_Handle
     EXPECT_CALL(libinputMock, GetAxisSource).WillRepeatedly(Return(LIBINPUT_POINTER_AXIS_SOURCE_FINGER));
     tpScrollSwitch = false;
     int32_t ret = processor.HandleAxisInner(&event);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleTwoFingerButton_01
+ * @tc.desc: HandleTouchpadTwoFingerButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 3;
+    MouseTransformProcessor processor(deviceId);
+    uint32_t button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+
+    libinput_event_pointer event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillRepeatedly(Return(TP_RIGHT_CLICK_FINGER_CNT));
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, evenType, button));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleTwoFingerButton_02
+ * @tc.desc: HandleTouchpadTwoFingerButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 5;
+    MouseTransformProcessor processor(deviceId);
+    uint32_t button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+
+    libinput_event_pointer event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillRepeatedly(Return(TP_CLICK_FINGER_ONE));
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, evenType, button));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleTwoFingerButton_03
+ * @tc.desc: HandleTouchpadTwoFingerButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleTwoFingerButton_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 5;
+    MouseTransformProcessor processor(deviceId);
+    uint32_t button = BTN_RIGHT_MENUE_CODE;
+    int32_t evenType = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
+
+    libinput_event_pointer event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, PointerEventGetFingerCount).WillRepeatedly(Return(TP_CLICK_FINGER_ONE));
+    ASSERT_NO_FATAL_FAILURE(processor.HandleTouchpadTwoFingerButton(&event, evenType, button));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleMotionInner_01
+ * @tc.desc: HandleMotionInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 5;
+    MouseTransformProcessor processor(deviceId);
+
+    libinput_event_pointer pointerevent {};
+    libinput_event event {};
+
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    EXPECT_TRUE(cursorPos.displayId < 0);
+
+    int32_t ret = processor.HandleMotionInner(&pointerevent, &event);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleMotionInner_02
+ * @tc.desc: HandleMotionInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 7;
+    Direction direction;
+    MouseTransformProcessor processor(deviceId);
+    libinput_event_pointer pointerevent {};
+    libinput_event event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    cursorPos.displayId = 2;
+    EXPECT_CALL(libinputMock, PointerGetDxUnaccelerated).WillRepeatedly(Return(2.5));
+    EXPECT_CALL(libinputMock, PointerGetDxUnaccelerated).WillRepeatedly(Return(3.5));
+
+    direction = DIRECTION0;
+    int32_t ret = processor.HandleMotionInner(&pointerevent, &event);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleMotionInner_03
+ * @tc.desc: HandleMotionInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 8;
+    Direction direction;
+    MouseTransformProcessor processor(deviceId);
+    libinput_event_pointer pointerevent {};
+    libinput_event event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    cursorPos.displayId = 2;
+    EXPECT_CALL(libinputMock, PointerGetDxUnaccelerated).WillRepeatedly(Return(2.5));
+    EXPECT_CALL(libinputMock, PointerGetDxUnaccelerated).WillRepeatedly(Return(3.5));
+    direction = DIRECTION90;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
+    int32_t ret = processor.HandleMotionInner(&pointerevent, &event);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorMockTest_HandleMotionInner_04
+ * @tc.desc: HandleMotionInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorMockTest, MouseTransformProcessorMockTest_HandleMotionInner_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 8;
+    Direction direction;
+    MouseTransformProcessor processor(deviceId);
+    libinput_event_pointer pointerevent {};
+    libinput_event event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+    cursorPos.displayId = 2;
+    EXPECT_CALL(libinputMock, PointerGetDxUnaccelerated).WillRepeatedly(Return(2.5));
+    EXPECT_CALL(libinputMock, PointerGetDxUnaccelerated).WillRepeatedly(Return(3.5));
+    direction = DIRECTION90;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+
+    int32_t ret = processor.HandleMotionInner(&pointerevent, &event);
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI

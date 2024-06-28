@@ -36,6 +36,8 @@ constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME { 3500000 };
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
 constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
 constexpr int32_t TIME_TRANSITION { 1000 };
+constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
+constexpr int32_t PRINT_MARK_COUNT { 30 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -47,6 +49,12 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64, eventType, eventId,
         actionTime);
+    processedCount_++;
+    if (processedCount_ == PRINT_INTERVAL_COUNT) {
+        MMI_HILOGI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
+        processedCount_ = 0;
+        lastEventId_ = eventId;
+    }
     SendEvent(eventType, eventId);
 }
 
@@ -54,6 +62,18 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
+        idList_.push_back(eventId);
+        if (idList_.size() >= PRINT_MARK_COUNT) {
+            std::string idList = "";
+            for (auto e : idList_) {
+                idList += std::to_string(e) + " ";
+            }
+            MMI_HILOGI("Ffrt PE: %{public}s", idList.c_str());
+            idList_.clear();
+        }
+    }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(eventType, eventId);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);

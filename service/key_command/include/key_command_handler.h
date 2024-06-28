@@ -257,6 +257,7 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
+
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();

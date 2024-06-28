@@ -34,11 +34,16 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/interfaces/native/innerkits",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/common/include",
   ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+  }
 }
 
 config("libmmi_test_util") {
@@ -126,6 +131,10 @@ ohos_shared_library("libmmi-client") {
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
   ]
+
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_stub" ]
+  }
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -311,6 +320,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
 ohos_unittest("InputManagerImplTest") {
   module_out_path = module_output_path
   include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
@@ -366,6 +376,7 @@ ohos_unittest("InputManagerTest") {
     "events/src/input_manager_util.cpp",
     "events/test/input_manager_simulate_test.cpp",
     "events/test/input_manager_test.cpp",
+    "events/test/input_manager_update_display_info_test.cpp",
     "events/test/virtual_input_device_test.cpp",
   ]
 

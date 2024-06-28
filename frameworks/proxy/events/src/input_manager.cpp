@@ -497,14 +497,10 @@ void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t w
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
 }
+
 void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     InputMgrImpl.ClearWindowPointerStyle(pid, windowId);
-}
-void InputManager::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
-{
-    CHKPV(windowChecker);
-    InputMgrImpl.SetWindowCheckerHandler(windowChecker);
 }
 
 void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
@@ -575,6 +571,16 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
 int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
 {
     return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
+}
+
+int32_t InputManager::AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer)
+{
+    return InputMgrImpl.AncoAddChannel(consumer);
+}
+
+int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer)
+{
+    return InputMgrImpl.AncoRemoveChannel(consumer);
 }
 } // namespace MMI
 } // namespace OHOS
