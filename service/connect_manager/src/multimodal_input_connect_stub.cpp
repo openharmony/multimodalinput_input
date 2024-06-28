@@ -385,10 +385,10 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubRemoveVirtualInputDevice(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH):
-            return StubSetTouchpadThreeFingersTapSwitch(data, reply);
+            ret = StubSetTouchpadThreeFingersTapSwitch(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH):
-            return StubGetTouchpadThreeFingersTapSwitch(data, reply);
+            ret = StubGetTouchpadThreeFingersTapSwitch(data, reply);
             break;
 #ifdef OHOS_BUILD_ENABLE_ANCO
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL):
