@@ -377,7 +377,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
     int32_t pid = 0;
     int32_t eventId = 0;
     pkt >> pid;
-    pkc >> eventId;
+    pkt >> eventId;
     if (pkt.ChkRWError()) {
         MMI_HILOG_ANRDETECTE("Packet read data failed");
         return RET_ERR;
