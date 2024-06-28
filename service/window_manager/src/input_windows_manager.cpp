@@ -3296,7 +3296,7 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
         MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
         return;
     }
-    Coordinate2D matrix;
+    Coordinate2D matrix { 0.0, 0.0 };
     ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);
