@@ -39,7 +39,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
-using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {

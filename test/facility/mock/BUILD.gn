@@ -36,6 +36,10 @@ ohos_source_set("mmi_mock_sources") {
     "${mmi_path}/service/window_manager/include",
   ]
 
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
+
   sources = [
     "src/input_windows_manager_mock.cpp",
     "src/preferences_manager_mock.cpp",

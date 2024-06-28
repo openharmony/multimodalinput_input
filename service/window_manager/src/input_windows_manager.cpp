@@ -792,11 +792,9 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
-        if (!isDragBorder_) {
-            GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-            MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
-                info.windowPid, info.windowId, pointerStyle.id);
-        }
+        GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+        MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
+            info.windowPid, info.windowId, pointerStyle.id);
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
             isDragBorder_ = SelectPointerChangeArea(*windowInfo, pointerStyle, logicX, logicY);
@@ -3298,7 +3296,7 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
         MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
         return;
     }
-    Coordinate2D matrix;
+    Coordinate2D matrix { 0.0, 0.0 };
     ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);
