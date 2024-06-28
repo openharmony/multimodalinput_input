@@ -293,6 +293,90 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_00
 }
 
 /**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDevice_004
+ * @tc.desc: Test the function AddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceManager;
+    int32_t deviceId = 1;
+    std::shared_ptr<InputDevice> device;
+
+    int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 128;
+    for (int i = 0; i < MAX_VIRTUAL_INPUT_DEVICE_NUM; i++) {
+        deviceManager.virtualInputDevices_.insert(std::make_pair(i, std::make_shared<InputDevice>()));
+    }
+
+    EXPECT_EQ(deviceManager.GenerateVirtualDeviceId(deviceId), RET_ERR);
+    int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDevice_005
+ * @tc.desc: Test the function AddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceManager;
+    int32_t deviceId = 2;
+    std::shared_ptr<InputDevice> device;
+    deviceManager.virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
+    EXPECT_EQ(deviceManager.GenerateVirtualDeviceId(deviceId), RET_OK);
+
+    int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDevice_006
+ * @tc.desc: Test the function AddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceManager;
+    int32_t deviceId = 2;
+    std::shared_ptr<InputDevice> device;
+    std::shared_ptr<MockInputDevice> mockDevice = std::make_shared<MockInputDevice>();
+    deviceManager.virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
+    EXPECT_EQ(deviceManager.GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_CALL(*mockDevice, MakeVirtualDeviceInfo()).WillRepeatedly(testing::Return(RET_ERR));
+
+    int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_AddVirtualInputDevice_007
+ * @tc.desc: Test the function AddVirtualInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_AddVirtualInputDevice_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceManager;
+    int32_t deviceId = 2;
+    std::shared_ptr<InputDevice> device;
+    std::shared_ptr<MockInputDevice> mockDevice = std::make_shared<MockInputDevice>();
+    deviceManager.virtualInputDevices_.insert(std::make_pair(1, std::make_shared<InputDevice>()));
+    EXPECT_EQ(deviceManager.GenerateVirtualDeviceId(deviceId), RET_OK);
+    EXPECT_CALL(*mockDevice, MakeVirtualDeviceInfo()).WillRepeatedly(testing::Return(RET_OK));
+
+    int32_t ret = INPUT_DEV_MGR->AddVirtualInputDevice(device, deviceId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
  * @tc.name: InputDeviceManagerTest_GetKeyboardType_003
  * @tc.desc: Test the function GetKeyboardType
  * @tc.type: FUNC
@@ -358,6 +442,119 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test
     bool enable = true;
     int32_t keyboardType = KEYBOARD_TYPE_NONE;
     EXPECT_TRUE(keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD);
+    int32_t ret = inputDevice.OnEnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_02
+ * @tc.desc: Test the function OnEnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 3;
+    bool enable = true;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = true;
+    deviceInfo.enable = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+
+    int32_t ret = inputDevice.OnEnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_03
+ * @tc.desc: Test the function OnEnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 3;
+    bool enable = true;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = false;
+    deviceInfo.enable = true;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+
+    int32_t ret = inputDevice.OnEnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_04
+ * @tc.desc: Test the function OnEnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 5;
+    bool enable = true;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = false;
+    deviceInfo.enable = false;
+    deviceInfo.isPointerDevice = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+    
+    int32_t ret = inputDevice.OnEnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_05
+ * @tc.desc: Test the function OnEnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 3;
+    bool enable = true;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = false;
+    deviceInfo.enable = false;
+    deviceInfo.isPointerDevice = true;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+    
+    int32_t ret = inputDevice.OnEnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnEnableInputDevice_Test_06
+ * @tc.desc: Test the function OnEnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_Test_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    int32_t deviceId = 3;
+    bool enable = true;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = false;
+    deviceInfo.enable = true;
+    deviceInfo.isPointerDevice = true;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+    
     int32_t ret = inputDevice.OnEnableInputDevice(enable);
     EXPECT_EQ(ret, RET_OK);
 }
@@ -1186,5 +1383,62 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnEnableInputDevice_001,
     INPUT_DEV_MGR->inputDevice_.clear();
     KeyRepeat->deviceConfig_.clear();
 }
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchPadIds_001
+ * @tc.desc: Test GetTouchPadIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchPadIds_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceId = 5;
+    inDevice.isPointerDevice = false;
+    inDevice.enable = false;
+    inDevice.dhid = 2;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->GetTouchPadIds());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetTouchPadIds_002
+ * @tc.desc: Test GetTouchPadIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetTouchPadIds_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceId = 3;
+    inDevice.enable = false;
+    inDevice.dhid = 2;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    inputDevice.inputDevice_.clear();
+    ASSERT_NO_FATAL_FAILURE(INPUT_DEV_MGR->GetTouchPadIds());
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_IsMatchKeys_001
+ * @tc.desc: Test IsMatchKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchKeys_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    struct libinput_device *device = nullptr;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_T);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+
+    bool ret1 = INPUT_DEV_MGR->IsMatchKeys(device, keyCodes);
+    EXPECT_FALSE(ret1);
+}
+
 } // namespace MMI
 } // namespace OHOS

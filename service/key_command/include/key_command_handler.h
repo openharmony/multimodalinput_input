@@ -30,6 +30,9 @@
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
+#include "preferences.h"
+#include "preferences_errno.h"
+#include "preferences_helper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -184,7 +187,11 @@ public:
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef UNIT_TEST
+public:
+#else
 private:
+#endif // UNIT_TEST
     void Print();
     void PrintSeq();
     void PrintExcludeKeys();
@@ -215,7 +222,6 @@ private:
     bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
-    bool MatchShortcutKeys(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
@@ -226,7 +232,7 @@ private:
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
     void HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent> &keyEvent);
-    void GetKeyDownDurationFromXml(ShortcutKey &shortcut) const;
+    int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
     template <class T>
     void CreateStatusConfigObserver(T& item);
@@ -250,6 +256,7 @@ private:
         keys_.clear();
         filterSequences_.clear();
     }
+    bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
 
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();

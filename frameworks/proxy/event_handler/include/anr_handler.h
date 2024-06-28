@@ -17,6 +17,7 @@
 #define ANR_HANDLER_H
 
 #include <atomic>
+#include <mutex>
 
 #include "singleton.h"
 
@@ -44,8 +45,9 @@ private:
     ANREvent event_[ANR_EVENT_TYPE_NUM];
     int32_t lastEventId_ { 0 };
     int32_t processedCount_ { 0 };
-
+    std::vector<int32_t> idList_;
     void SendEvent(int32_t eventType, int32_t eventId);
+    std::mutex mutex_;
 };
 
 #define ANRHDL ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()
