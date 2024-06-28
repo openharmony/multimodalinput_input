@@ -145,7 +145,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
     }
     helper->RegisterObserver(uri, observer);
     helper->NotifyChange(uri);
-    std::thread execCb(SettingDataShare::ExecRegisterCb, observer);
+    std::thread execCb([this, observer] { this->ExecRegisterCb(observer); });
     execCb.detach();
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
@@ -172,7 +172,7 @@ void SettingDataShare::Initialize(int32_t systemAbilityId)
 {
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHKPV(sam);
-    auto remoteObj = sam->GetSystemAbility(systemAbilityId);
+    auto remoteObj = sam->CheckSystemAbility(systemAbilityId);
     CHKPV(remoteObj);
     remoteObj_ = remoteObj;
 }

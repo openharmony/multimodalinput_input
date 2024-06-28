@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef MMI_FUNC_CALLBACK_H
-#define MMI_FUNC_CALLBACK_H
-
-#include <functional>
+#include "anco_channel_death_recipient.h"
 
 namespace OHOS {
 namespace MMI {
-template<class MemberFunType, class ClassType>
-auto MsgCallbackBind1(MemberFunType func, ClassType* obj)
-{
-    return std::bind(func, obj, std::placeholders::_1);
-}
+AncoChannelDeathRecipient::AncoChannelDeathRecipient(
+    std::function<void(const wptr<IRemoteObject>&)> deathCallback)
+    : deathCallback_(deathCallback) {}
 
-template<class MemberFunType, class ClassType>
-auto MsgCallbackBind2(MemberFunType func, ClassType* obj)
+void AncoChannelDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    return std::bind(func, obj, std::placeholders::_1, std::placeholders::_2);
+    if (deathCallback_ != nullptr) {
+        deathCallback_(object);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
-#endif // MMI_FUNC_CALLBACK_H

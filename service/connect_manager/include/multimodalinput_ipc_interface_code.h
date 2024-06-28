@@ -111,6 +111,10 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_HARDWARE_CURSOR_STATS = 89,
     ADD_VIRTUAL_INPUT_DEVICE = 90,
     REMOVE_VIRTUAL_INPUT_DEVICE = 91,
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    ADD_ANCO_CHANNEL,
+    REMOVE_ANCO_CHANNEL,
+#endif // OHOS_BUILD_ENABLE_ANCO
 };
 
 enum class MultimodalinputEventObserverCode {
