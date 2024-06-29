@@ -16,14 +16,15 @@
 #ifndef INPUT_MANAGER_UTIL_H
 #define INPUT_MANAGER_UTIL_H
 
-#include "i_input_event_consumer.h"
 #include "image_source.h"
+#include "pixel_map.h"
+
+#include "i_input_event_consumer.h"
 #include "input_event.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "mmi_log.h"
-#include "pixel_map.h"
 #include "pointer_event.h"
 
 namespace OHOS {
