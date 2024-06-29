@@ -16,25 +16,26 @@
 #ifndef KEY_COMMAND_HANDLER_UTIL_H
 #define KEY_COMMAND_HANDLER_UTIL_H
 
-#include "ability_manager_client.h"
-#include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
+#include "file_ex.h"
+#include "system_ability_definition.h"
+
+#include "ability_manager_client.h"
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
 #include "error_multimodal.h"
-#include "file_ex.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "i_preference_manager.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
-#include "i_preference_manager.h"
 #include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "setting_datashare.h"
-#include "system_ability_definition.h"
 #include "timer_manager.h"
 #include "util_ex.h"
 
