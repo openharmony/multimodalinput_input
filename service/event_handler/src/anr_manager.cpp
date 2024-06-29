@@ -127,7 +127,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
             DfxHisysevent::ApplicationBlockInput(sess);
-            MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
+            MMI_HILOG_FREEZEE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
                 sess->GetPid(), type, id);
             CHK_INVALID_RV(anrNoticedPid_, "Add anr timer failed, timer count reached the maximum number");
             NetPacket pkt(MmiMessageId::NOTICE_ANR);

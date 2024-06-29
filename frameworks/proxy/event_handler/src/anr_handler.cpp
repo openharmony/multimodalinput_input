@@ -51,7 +51,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
         actionTime);
     processedCount_++;
     if (processedCount_ == PRINT_INTERVAL_COUNT) {
-        MMI_HILOGI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
+        MMI_HILOG_FREEZEI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, eventId);
         processedCount_ = 0;
         lastEventId_ = eventId;
     }
@@ -70,7 +70,7 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
             for (auto e : idList_) {
                 idList += std::to_string(e) + " ";
             }
-            MMI_HILOGI("Ffrt PE: %{public}s", idList.c_str());
+            MMI_HILOG_FREEZEI("Ffrt PE: %{public}s", idList.c_str());
             idList_.clear();
         }
     }
