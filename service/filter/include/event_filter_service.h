@@ -21,8 +21,8 @@
 #include "iremote_object.h"
 #include "nocopyable.h"
 
-#include "i_input_event_filter.h"
 #include "event_filter_stub.h"
+#include "i_input_event_filter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,7 +37,7 @@ public:
     bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
 private:
     const std::shared_ptr<IInputEventFilter> filter_;
-    static inline int32_t filterIdSeed_ = 0;
+    static inline int32_t filterIdSeed_ { 0 };
     static inline std::mutex mutex_;
 };
 } // namespace MMI
