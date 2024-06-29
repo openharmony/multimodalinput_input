@@ -30,11 +30,11 @@ public:
     void InitGestureSenseWrapper();
     typedef int32_t (*TOUCH_UP)(const std::vector<float> &, const std::vector<int64_t> &, bool, bool);
     typedef scalar (*GET_BOUNDING_SQUARENESS)(const std::vector<scalar> &);
-    TOUCH_UP touchUp_ = nullptr;
-    GET_BOUNDING_SQUARENESS getBoundingSquareness_ = nullptr;
+    TOUCH_UP touchUp_ { nullptr };
+    GET_BOUNDING_SQUARENESS getBoundingSquareness_ { nullptr };
 
 private:
-    void* gesturesenseWrapperHandle_ = nullptr;
+    void* gesturesenseWrapperHandle_ { nullptr };
 };
 
 #define GESTURESENSE_WRAPPER ::OHOS::DelayedSingleton<GesturesenseWrapper>::GetInstance()
