@@ -1035,7 +1035,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
-    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
     auto filter = InputHandler->GetFilterHandler();
     filter->HandlePointerEvent(pointerEvent);
 }
@@ -2473,7 +2473,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
     // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
     if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
-        MMI_HILOG_DISPATCHI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+        MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
             "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
             "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
             "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
@@ -2522,7 +2522,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
         touchItemDownInfos_[pointerId] = windowInfoEX;
-        MMI_HILOG_DISPATCHI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
+        MMI_HILOG_FREEZEI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOG_DISPATCHD("Clear extra data");
         pointerEvent->ClearBuffer();
@@ -2622,7 +2622,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
         return;
     }
 
-    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {

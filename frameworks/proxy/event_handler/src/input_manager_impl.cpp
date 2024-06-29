@@ -483,7 +483,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_DISPATCHI("id:%{public}d recv", pointerEvent->GetId());
+        MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
