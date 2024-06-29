@@ -1026,7 +1026,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetAnrObserver, TestSize.Level1)
         {}
         virtual ~IAnrObserverTest()
         {}
-        void OnAnr(int32_t pid) const override
+        void OnAnr(int32_t pid, int32_t eventId) const override
         {
             MMI_HILOGD("Set anr success");
         };
