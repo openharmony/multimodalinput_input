@@ -25,8 +25,8 @@
 
 #include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
-#include "multimodalinput_ipc_interface_code.h"
 #include "infrared_frequency_info.h"
+#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
