@@ -988,7 +988,7 @@ int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 
 int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &ids] {
             return this->OnGetDeviceIds(ids);
@@ -1014,7 +1014,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &
 
 int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, deviceId, &inputDevice] {
             return this->OnGetDevice(deviceId, inputDevice);

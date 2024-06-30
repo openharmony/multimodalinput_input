@@ -78,7 +78,6 @@ void KnuckleDivergentPoint::Draw(Rosen::ExtendRecordingCanvas* canvas)
     CALL_DEBUG_ENTER;
     CHKPV(canvas);
     if (IsEnded() || pointX_ <= 0 || pointY_ <= 0) {
-        MMI_HILOGE("can not draw");
         return;
     }
 
