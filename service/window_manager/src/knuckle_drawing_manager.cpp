@@ -71,6 +71,7 @@ KnuckleDrawingManager::KnuckleDrawingManager()
     paint_.SetAntiAlias(true);
     float outerCircleTransparency = 1.0f;
     paint_.SetAlphaF(outerCircleTransparency);
+    paint_.SetWidth(PAINT_STROKE_WIDTH);
     paint_.SetStyle(Rosen::Drawing::Paint::PaintStyle::PAINT_STROKE);
     paint_.SetJoinStyle(Rosen::Drawing::Pen::JoinStyle::ROUND_JOIN);
     paint_.SetCapStyle(Rosen::Drawing::Pen::CapStyle::ROUND_CAP);
@@ -137,7 +138,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
         }
         return false;
     }
-    MMI_HILOGI("touch tool type is single knuckle");
+    MMI_HILOGI("Touch tool type is single knuckle");
     return true;
 }
 
@@ -178,7 +179,7 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
         action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
         return true;
     }
-    MMI_HILOGE("action is not down or move or up, action:%{public}d", action);
+    MMI_HILOGE("Action is not down or move or up, action:%{public}d", action);
     return false;
 }
 
@@ -186,7 +187,7 @@ void KnuckleDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     if (displayInfo_.direction != displayInfo.direction) {
-        MMI_HILOGE("displayInfo direction change");
+        MMI_HILOGD("DisplayInfo direction change");
         isRotate_ = true;
     }
     scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
@@ -200,7 +201,7 @@ void KnuckleDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> touchEv
     CHKPV(touchEvent);
     int32_t ret = DrawGraphic(touchEvent);
     if (ret != RET_OK) {
-        MMI_HILOGE("Draw graphic failed, ret:%{public}d", ret);
+        MMI_HILOGD("Can't get enough pointers to draw");
         return;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -331,9 +332,6 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
     if (pointerInfos_.size() == MAX_POINTER_NUM) {
         pointerInfos_[POINT_INDEX3].x = (pointerInfos_[POINT_INDEX2].x + pointerInfos_[POINT_INDEX4].x) / MID_POINT;
         pointerInfos_[POINT_INDEX3].y = (pointerInfos_[POINT_INDEX2].y + pointerInfos_[POINT_INDEX4].y) / MID_POINT;
-    } else {
-        MMI_HILOGI("Can't get enough pointers to draw");
-        return RET_ERR;
     }
     return RET_OK;
 }
@@ -357,10 +355,9 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
     CHKPR(canvas, RET_ERR);
     if (!isActionUp_) {
         if (pointerInfos_.size() != MAX_POINTER_NUM) {
-            MMI_HILOGE("Size of pointerInfos_:%{public}zu", pointerInfos_.size());
+            MMI_HILOGD("Size of pointerInfos_:%{public}zu", pointerInfos_.size());
             return RET_ERR;
         }
-        paint_.SetWidth(PAINT_STROKE_WIDTH);
         path_.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
         path_.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,

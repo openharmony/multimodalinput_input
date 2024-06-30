@@ -14,6 +14,7 @@
  */
 
 #include "touch_drawing_manager.h"
+#include "bytrace_adapter.h"
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
@@ -598,6 +599,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         return;
     }
     CHKPV(trackerCanvasNode_);
+    BytraceAdapter::StartHandleTracker(pointerId);
     auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
     Rosen::Drawing::Pen pen;
@@ -624,6 +626,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         canvas->DetachPen();
     }
     trackerCanvasNode_->FinishRecording();
+    BytraceAdapter::StopHandleTracker();
 }
 
 void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y)
