@@ -235,7 +235,7 @@ void TouchDrawingManager::UpdateBubbleData()
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (!isChangedRotation_) {
+    if (!isChangedRotation_ && !isChangedMode_) {
         return;
     }
 
@@ -247,7 +247,7 @@ void TouchDrawingManager::RotationScreen()
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
-    } else if (isChangedMode_ && displayInfo_.displayMode == DisplayMode::FULL) {
+    } else if (isChangedMode_) {
         if (pointerMode_.isShow) {
             ResetCanvasNode(trackerCanvasNode_);
             ResetCanvasNode(crosshairCanvasNode_);
