@@ -990,7 +990,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         }
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
-        SetPixelMap(pixelmap);
+        if (mouseStyle == MOUSE_ICON::DEFAULT) {
+            SetPixelMap(pixelmap);
+        }
         MMI_HILOGI("Set mouseicon to system");
     }
     CHKPV(image);
@@ -1013,10 +1015,12 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
     *newPixelMapPtr = pixelMap_;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
-        MMI_HILOGD("magic pixelmap");
+        MMI_HILOGE("magic pixelmap");
         *newPixelMapPtr = MAGIC_CURSOR->GetPixelMap();
     }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#endif  // OHOS_BUILD_ENABLE_MAGICCURSOR
+    CHKPR(newPixelMapPtr, ERROR_NULL_POINTER);
+    CHKPR(*newPixelMapPtr, ERROR_NULL_POINTER);
     return RET_OK;
 }
 
