@@ -200,8 +200,8 @@ ohos_unittest("KeyEventTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -306,8 +306,8 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -394,8 +394,8 @@ ohos_unittest("InputManagerTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -437,8 +437,8 @@ ohos_unittest("InputManagerInjectTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -467,8 +467,8 @@ ohos_unittest("InputManagerManualTest") {
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -493,8 +493,8 @@ ohos_unittest("InputManagerFilterManualTest") {
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -530,8 +530,8 @@ ohos_unittest("PointerEventTest") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",

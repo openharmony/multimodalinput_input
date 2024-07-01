@@ -126,6 +126,8 @@ protected:
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);

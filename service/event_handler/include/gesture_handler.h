@@ -51,9 +51,9 @@ private:
     bool isStartRotate_ { false };
     std::map<int32_t, struct Position> fingerDownPosition_;
     std::map<int32_t, struct Position> fingerCurrentPosition_;
-    double initialAngle_ = 0.0;
-    double lastAngle_ = 0.0;
-    double rotateAngle_ = 0.0;
+    double initialAngle_ { 0.0 };
+    double lastAngle_ { 0.0 };
+    double rotateAngle_ { 0.0 };
 };
 
 #define GESTURE_HANDLER ::OHOS::DelayedSingleton<GestureHandler>::GetInstance()

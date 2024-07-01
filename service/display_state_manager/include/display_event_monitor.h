@@ -22,6 +22,8 @@
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "want.h"
+
 #include "define_multimodal.h"
 #include "fingersense_manager.h"
 #include "fingersense_wrapper.h"
@@ -29,7 +31,6 @@
 #include "key_event_normalize.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "mmi_log.h"
-#include "want.h"
 #include "util.h"
 
 namespace OHOS {

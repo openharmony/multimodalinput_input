@@ -145,7 +145,7 @@ private:
         PrintInfoDict();
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
-        MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
+        MMI_HILOGD("See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
             ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d"
             ", SI:%{public}s, PBS:%{public}zu",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
@@ -170,10 +170,11 @@ private:
             }
             MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, "
                 "DY:%{public}d, P:%{public}.2f, LA:%{public}d, SA:%{public}d, WI:%{public}d, DXP:%{public}f,"
-                "DYP:%{public}f, WXP:%{public}f, WYP:%{public}f, OPI:%{public}d", pointerId, item.GetDownTime(),
-                item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(), item.GetPressure(), item.GetLongAxis(),
-                item.GetShortAxis(), item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(),
-                item.GetWindowXPos(), item.GetWindowYPos(), item.GetOriginPointerId());
+                "DYP:%{public}f, WXP:%{public}f, WYP:%{public}f, OPI:%{public}d, SI:%{public}s",
+                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
+                item.GetOriginPointerId(), isSimulate.c_str());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();

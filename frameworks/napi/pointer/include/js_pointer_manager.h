@@ -20,13 +20,13 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "napi_constants.h"
 #include "refbase.h"
 #include "utils/log.h"
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
+#include "napi_constants.h"
 #include "pointer_style.h"
 #include "stream_buffer.h"
 #include "util_napi.h"
@@ -105,6 +105,8 @@ public:
     napi_value SetTouchpadRotateSwitch(napi_env env, bool rotateSwitch, napi_value handle = nullptr);
     napi_value GetTouchpadRotateSwitch(napi_env env, napi_value handle = nullptr);
     napi_value SetMoveEventFilters(napi_env env, bool flag);
+    napi_value SetTouchpadThreeFingersTapSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
+    napi_value GetTouchpadThreeFingersTapSwitch(napi_env env, napi_value handle = nullptr);
     napi_value EnableHardwareCursorStats(napi_env env, bool enable);
     napi_value GetHardwareCursorStats(napi_env env);
 

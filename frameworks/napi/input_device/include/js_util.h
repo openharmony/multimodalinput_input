@@ -18,10 +18,11 @@
 
 #include <uv.h>
 
-#include "input_device.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "refbase.h"
+
+#include "input_device.h"
 
 namespace OHOS {
 namespace MMI {
