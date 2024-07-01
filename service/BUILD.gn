@@ -1705,7 +1705,11 @@ ohos_unittest("ConnectManagerTest") {
 ohos_unittest("ConnectManagerProxyEXTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "connect_manager/test" ]
+  include_dirs = [
+    "connect_manager/test",
+    "${mmi_path}/common/anco/comm/include",
+    "interfaces/native/innerkits/proxy/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -1718,6 +1722,9 @@ ohos_unittest("ConnectManagerProxyEXTest") {
   ]
 
   sources = [
+    "${mmi_path}/common/anco/comm/src/anco_channel_death_recipient.cpp",
+    "${mmi_path}/common/anco/comm/src/anco_channel_proxy.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
     "connect_manager/src/multimodal_input_connect_proxy.cpp",
     "connect_manager/test/message_parcel_mock.cpp",
