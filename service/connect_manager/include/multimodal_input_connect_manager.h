@@ -25,8 +25,8 @@
 
 #include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
-#include "multimodalinput_ipc_interface_code.h"
 #include "infrared_frequency_info.h"
+#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
@@ -129,6 +129,8 @@ public:
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);

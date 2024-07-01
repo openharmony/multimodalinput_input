@@ -493,14 +493,14 @@ int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsy
     return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
-int32_t InputManager::SetTouchpadScrollRows(int32_t Rows)
+int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
 {
-    return InputMgrImpl.SetTouchpadScrollRows(Rows);
+    return InputMgrImpl.SetTouchpadScrollRows(rows);
 }
 
-int32_t InputManager::GetTouchpadScrollRows(int32_t &Rows)
+int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
 {
-    return InputMgrImpl.GetTouchpadScrollRows(Rows);
+    return InputMgrImpl.GetTouchpadScrollRows(rows);
 }
 
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
@@ -576,6 +576,16 @@ int32_t InputManager::TransmitInfrared(int64_t number, std::vector<int64_t>& pat
 int32_t InputManager::SetCurrentUser(int32_t userId)
 {
     return InputMgrImpl.SetCurrentUser(userId);
+}
+
+int32_t InputManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
 
 int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)

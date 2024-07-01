@@ -127,7 +127,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
             DfxHisysevent::ApplicationBlockInput(sess);
-            MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
+            MMI_HILOG_FREEZEE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
                 sess->GetPid(), type, id);
             CHK_INVALID_RV(anrNoticedPid_, "Add anr timer failed, timer count reached the maximum number");
             NetPacket pkt(MmiMessageId::NOTICE_ANR);
@@ -181,7 +181,7 @@ void ANRManager::OnSessionLost(SessionPtr session)
     CALL_DEBUG_ENTER;
     CHKPV(session);
     if (anrNoticedPid_ == session->GetPid()) {
-        MMI_HILOGD("The anrNoticedPid_ is invalid");
+        MMI_HILOGI("The anrNoticedPid_ changes to invalid");
         anrNoticedPid_ = -1;
     }
     MMI_HILOGI("SessionLost remove all Timers");
@@ -190,7 +190,7 @@ void ANRManager::OnSessionLost(SessionPtr session)
 
 int32_t ANRManager::SetANRNoticedPid(int32_t pid)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     anrNoticedPid_ = pid;
     return RET_OK;
 }

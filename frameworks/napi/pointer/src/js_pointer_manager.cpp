@@ -973,6 +973,21 @@ napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value ha
     return GetTouchpadBoolData(env, handle, rotateSwitch, ret);
 }
 
+napi_value JsPointerManager::SetTouchpadThreeFingersTapSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadThreeFingersTapSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
 napi_value JsPointerManager::EnableHardwareCursorStats(napi_env env, bool enable)
 {
     CALL_DEBUG_ENTER;
@@ -1052,6 +1067,7 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        delete asyncContext;
         return nullptr;
     }
     asyncContext->reserve << ReturnType::NUMBER << rows;
@@ -1061,6 +1077,7 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
         CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
         if (napi_get_undefined(env, &promise) != napi_ok) {
             CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            delete asyncContext;
             return nullptr;
         }
     } else {

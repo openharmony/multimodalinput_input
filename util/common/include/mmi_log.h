@@ -59,6 +59,7 @@ void ResetLogTrace();
 
 #define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
 #define MMI_FUNC_NOLINE_FMT "[%{public}s][%{public}s] "
+#define INPUT_KEY_FLOW "InputKeyFlow"
 #define MMI_TRACE_ID  (OHOS::MMI::FormatLogTrace()),
 #else
 #define MMI_FUNC_FMT "[%{public}s:%{public}d] "
@@ -226,6 +227,12 @@ void ResetLogTrace();
 #define MMI_HILOG_DISPATCHF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_FREEZEI(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_FREEZEE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
+} while (0)
 
 #define MMI_HILOG_ANRDETECTD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
@@ -317,6 +324,7 @@ struct LogHeader {
 } // namespace OHOS
 
 #define MMI_LOG_HEADER { MMI_LOG_DOMAIN, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
+#define MMI_LOG_FREEZE { MMI_LOG_DOMAIN, INPUT_KEY_FLOW, __FUNCTION__, __LINE__ }
 
 #define CALL_DEBUG_ENTER ::OHOS::MMI::InnerFunctionTracer __innerFuncTracer_Debug___ \
     { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
