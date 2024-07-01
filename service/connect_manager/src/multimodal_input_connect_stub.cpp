@@ -2351,6 +2351,10 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
 int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
     std::shared_ptr<Media::PixelMap> pixelMap;
     int32_t ret = GetPointerSnapshot(&pixelMap);
     if (ret != RET_OK) {
@@ -2358,6 +2362,10 @@ int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, 
         return ret;
     }
     CHKPR(pixelMap, ERR_INVALID_VALUE);
+    if (pixelMap->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
+        return ERR_INVALID_VALUE;
+    }
     pixelMap->Marshalling(reply);
     return RET_OK;
 }
