@@ -3333,5 +3333,126 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_001, TestSiz
     ret = handler.OnHandleEvent(key);
     EXPECT_TRUE(ret);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_001
+ * @tc.desc: Test the funcation HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey item;
+    bool isLaunched = true;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.times = 5;
+    handler.count_ = 5;
+    ASSERT_FALSE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+    handler.count_ = 10;
+    ASSERT_FALSE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_002
+ * @tc.desc: Test the funcation HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey item;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.times = 6;
+    handler.count_ = 5;
+    ASSERT_TRUE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_001
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2000;
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 10;
+    windowInfo.area.width = INT32_MAX;
+    windowInfo.area.y = 100;
+    windowInfo.area.height = 200;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_002
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 10;
+    windowInfo.area.width = 100;
+    windowInfo.area.y = 20;
+    windowInfo.area.height = INT32_MAX;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_003
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 30;
+    windowInfo.area.width = 300;
+    windowInfo.area.y = 90;
+    windowInfo.area.height = 1000;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
