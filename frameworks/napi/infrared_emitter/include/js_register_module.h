@@ -17,12 +17,12 @@
 #define JS_INFRARED_MANAGER_H
 
 #include "define_multimodal.h"
+#include "key_event.h"
+#include "key_option.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "nocopyable.h"
 #include "utils/log.h"
-#include "key_event.h"
-#include "key_option.h"
 
 namespace OHOS {
 namespace MMI {

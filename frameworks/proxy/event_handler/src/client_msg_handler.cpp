@@ -143,7 +143,6 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     }
     MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
     MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
-    EventLogHelper::PrintEventData(key, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -183,11 +182,11 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    MMI_HILOG_DISPATCHI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
+    MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
-    aggregator_.Record({MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__}, logInfo.c_str(),
+    aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
         std::to_string(pointerEvent->GetId()));
-    EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, MMI_LOG_TAG, __FUNCTION__, __LINE__});
+    EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
     }
@@ -195,7 +194,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     processedCount_++;
     if (processedCount_ == PRINT_INTERVAL_COUNT) {
-        MMI_HILOGI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
+        MMI_HILOG_FREEZEI("Last eventId:%{public}d, current eventId:%{public}d", lastEventId_, pointerEvent->GetId());
         processedCount_ = 0;
         lastEventId_ = pointerEvent->GetId();
     }

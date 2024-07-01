@@ -150,6 +150,15 @@ public:
     {
         return subscribeId;
     }
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override
+    {
+        return static_cast<int32_t>(switchFlag);
+    }
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override
+    {
+        switchFlag = true;
+        return static_cast<int32_t>(switchFlag);
+    }
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
@@ -6892,6 +6901,250 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_004, TestSize
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubAddVirtualInputDevice(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadThreeFingersTapSwitch_002
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadThreeFingersTapSwitch_003
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the function StubSetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadThreeFingersTapSwitch_002
+ * @tc.desc: Test the function StubSetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadThreeFingersTapSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadScrollRows_001
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadScrollRows_002
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollRows_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadScrollRows_003
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollRows_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadScrollRows_004
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollRows_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadScrollRows_001
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadScrollRows_002
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadScrollRows_003
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadScrollRows_004
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS

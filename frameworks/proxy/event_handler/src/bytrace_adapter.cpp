@@ -305,6 +305,16 @@ void BytraceAdapter::StopHandleInput()
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
+void BytraceAdapter::StartHandleTracker(int32_t pointerId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "pointerId:" + std::to_string(pointerId));
+}
+
+void BytraceAdapter::StopHandleTracker()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
 void BytraceAdapter::StartConsumer(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
