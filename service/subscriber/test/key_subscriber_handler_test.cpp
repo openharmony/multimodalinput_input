@@ -64,6 +64,7 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
     CALL_TEST_DEBUG;
     KeySubscriberHandler keySubscriberHandler;
     auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     keySubscriberHandler.HandleKeyEvent(keyEvent);
     auto pointerEvent = PointerEvent::Create();
     keySubscriberHandler.HandlePointerEvent(pointerEvent);
@@ -71,7 +72,6 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
     keySubscriberHandler.RemoveSubscriberKeyUpTimer(1);
     std::vector<std::string> args = {};
     keySubscriberHandler.Dump(1, args);
-
     UDSServer udsServer;
     SessionPtr sess = udsServer.GetSessionByPid(1);
     std::shared_ptr<KeyOption> keyOption = nullptr;
