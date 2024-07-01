@@ -1265,6 +1265,7 @@ void InputManagerImpl::OnConnected()
         return;
     }
     SendDisplayInfo();
+    SendWindowInfo();
     PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     SendEnhanceConfig();
