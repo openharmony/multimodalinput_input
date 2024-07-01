@@ -17,6 +17,7 @@
 #define I_MULTIMODAL_INPUT_CONNECT_H
 
 #include "iremote_broker.h"
+#include "system_ability_definition.h"
 
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -24,18 +25,17 @@
 #endif // OHOS_BUILD_ENABLE_ANCO
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
-#include "mmi_event_observer.h"
+#include "infrared_frequency_info.h"
 #include "input_device.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
+#include "mmi_event_observer.h"
+#include "multimodalinput_ipc_interface_code.h"
+#include "nap_process.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
-#include "system_ability_definition.h"
 #include "window_info.h"
-#include "nap_process.h"
-#include "multimodalinput_ipc_interface_code.h"
-#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -139,6 +139,8 @@ public:
     virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
     virtual int32_t SetMoveEventFilters(bool flag) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
+    virtual int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) = 0;
     virtual int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) = 0;
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
     virtual int32_t EnableHardwareCursorStats(bool enable) = 0;

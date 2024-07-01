@@ -763,18 +763,32 @@ int32_t MultimodalInputConnectManager::SetPixelMapData(int32_t infoId, void* pix
     return multimodalInputConnectService_->SetPixelMapData(infoId, pixelMap);
 }
 
-int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMoveEventFilters(flag);
-}
-
 int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCurrentUser(userId);
+}
+
+int32_t MultimodalInputConnectManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMoveEventFilters(flag);
 }
 
 int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
