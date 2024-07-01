@@ -27,9 +27,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using ::testing::NiceMock;
 using namespace testing;
-const std::string KEYBOARD_FILE_NAME { "keyboard_settings.xml" };
 } // namespace
 
 class KeyAutoRepeatExTest : public testing::Test {

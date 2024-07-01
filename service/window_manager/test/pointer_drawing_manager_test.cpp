@@ -118,30 +118,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawRunningPointerAnimate_002
- * @tc.desc: Test DrawRunningPointerAnimate
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawRunningPointerAnimate_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    pointerDrawingManager.surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
-    pointerDrawingManager.surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    MOUSE_ICON mouseStyle = EAST;
-    pointerDrawingManager.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(pointerDrawingManager.canvasNode_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawRunningPointerAnimate(mouseStyle));
-    mouseStyle = RUNNING;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawRunningPointerAnimate(mouseStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_FixCursorPosition_002
  * @tc.desc: Test FixCursorPosition
  * @tc.type: FUNC

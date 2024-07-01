@@ -18,6 +18,7 @@
 #include <linux/input.h>
 
 #include "input_windows_manager.h"
+#include "mmi_matrix3.h"
 #include "mock.h"
 #include "window_info.h"
 
@@ -1727,6 +1728,58 @@ HWTEST_F(InputWindowsManagerTest, DispatchTouch_005, TestSize.Level1)
 }
 
 /**
+ * @tc.name: DispatchTouch_006
+ * @tc.desc: Test the function DispatchTouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DispatchTouch_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    ASSERT_NE(inputWindowsManager->udsServer_, nullptr);
+
+    inputWindowsManager->lastTouchEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager->lastTouchEvent_, nullptr);
+
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+}
+
+/**
+ * @tc.name: DispatchTouch_007
+ * @tc.desc: Test the function DispatchTouch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DispatchTouch_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    UDSServer udsServer;
+    inputWindowsManager->udsServer_ = &udsServer;
+    ASSERT_NE(inputWindowsManager->udsServer_, nullptr);
+
+    inputWindowsManager->lastTouchEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsManager->lastTouchEvent_, nullptr);
+
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchTouch(pointerAction));
+}
+
+/**
  * @tc.name: TransformWindowXY_001
  * @tc.desc: Test the function TransformWindowXY
  * @tc.type: FUNC
@@ -1761,6 +1814,58 @@ HWTEST_F(InputWindowsManagerTest, TransformWindowXY_002, TestSize.Level1)
     window.transform = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 };
     double logicX = 1.1;
     double logicY = 1.1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformWindowXY(window, logicX, logicY));
+}
+
+/**
+ * @tc.name: TransformWindowXY_003
+ * @tc.desc: Test the function TransformWindowXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, TransformWindowXY_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    WindowInfo window;
+    window.transform = { 1.0, 2.0, 3.0 };
+    Matrix3f transforms(window.transform);
+
+    EXPECT_TRUE(window.transform.size() == 3);
+    bool ret = transforms.IsIdentity();
+    EXPECT_FALSE(ret);
+
+    double logicX = 1.1;
+    double logicY = 2.1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformWindowXY(window, logicX, logicY));
+}
+
+/**
+ * @tc.name: TransformWindowXY_004
+ * @tc.desc: Test the function TransformWindowXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, TransformWindowXY_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    WindowInfo window;
+    window.transform = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
+    Matrix3f transforms(window.transform);
+
+    EXPECT_TRUE(window.transform.size() == 9);
+    bool ret = transforms.IsIdentity();
+    EXPECT_FALSE(ret);
+
+    double logicX = 3.2;
+    double logicY = 5.1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TransformWindowXY(window, logicX, logicY));
 }
 
@@ -1864,6 +1969,56 @@ HWTEST_F(InputWindowsManagerTest, IsValidZorderWindow_005, TestSize.Level1)
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(6.6);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->IsValidZorderWindow(window, pointerEvent));
+}
+
+/**
+ * @tc.name: IsValidZorderWindow_006
+ * @tc.desc: Test the function IsValidZorderWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsValidZorderWindow_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    uint32_t flag;
+    WindowInfo window;
+    window.zOrder = 1.1;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    flag = InputEvent::EVENT_FLAG_SIMULATE;
+    EXPECT_FALSE(pointerEvent->HasFlag(flag));
+
+    bool ret = inputWindowsManager->IsValidZorderWindow(window, pointerEvent);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: IsValidZorderWindow_007
+ * @tc.desc: Test the function IsValidZorderWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, IsValidZorderWindow_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+
+    uint32_t flag;
+    WindowInfo window;
+    window.zOrder = 3.2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    flag = InputEvent::EVENT_FLAG_TOUCHPAD_POINTER;
+    EXPECT_FALSE(pointerEvent->HasFlag(flag));
+
+    bool ret = inputWindowsManager->IsValidZorderWindow(window, pointerEvent);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -2135,6 +2290,69 @@ HWTEST_F(InputWindowsManagerTest, HandleWindowInputType_012, TestSize.Level1)
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(1);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->HandleWindowInputType(window, pointerEvent));
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_001
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    inputWindowsManager->knuckleDrawMgr_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_002
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    inputWindowsManager->knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(inputWindowsManager->knuckleDrawMgr_, nullptr);
+    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: DrawTouchGraphic_003
+ * @tc.desc: Test the function DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    inputWindowsManager->knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(inputWindowsManager->knuckleDrawMgr_, nullptr);
+
+    inputWindowsManager->knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+    ASSERT_NE(inputWindowsManager->knuckleDynamicDrawingManager_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
