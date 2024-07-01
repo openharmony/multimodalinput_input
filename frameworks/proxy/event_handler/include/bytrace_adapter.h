@@ -64,6 +64,9 @@ public:
     static void StartLaunchAbility(int32_t type, const std::string &bundleName);
     static void StopLaunchAbility();
 
+    static void StartHandleTracker(int32_t pointerId);
+    static void StopHandleTracker();
+
     static void StartConsumer(std::shared_ptr<PointerEvent> pointerEvent);
     static void StartConsumer(std::shared_ptr<KeyEvent> key);
     static void StopConsumer();

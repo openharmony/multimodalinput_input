@@ -1570,6 +1570,32 @@ napi_value JsPointerContext::GetTouchpadRotateSwitch(napi_env env, napi_callback
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::SetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadThreeFingersTapSwitch(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadThreeFingersTapSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadThreeFingersTapSwitch(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::EnableHardwareCursorStats(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1613,8 +1639,8 @@ napi_value JsPointerContext::GetHardwareCursorStats(napi_env env, napi_callback_
 napi_value JsPointerContext::SetTouchpadScrollRows(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = INPUT_PARAMETER;
-    napi_value argv[INPUT_PARAMETER];
+    size_t argc = 2;
+    napi_value argv[2];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
@@ -1719,6 +1745,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
         DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadThreeFingersTapSwitch", SetTouchpadThreeFingersTapSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadThreeFingersTapSwitch", GetTouchpadThreeFingersTapSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("enableHardwareCursorStats", EnableHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollRows", SetTouchpadScrollRows),

@@ -171,8 +171,6 @@ void InputWindowsManager::Init(UDSServer& udsServer)
     udsServer_->AddSessionDeletedCallback([this] (SessionPtr session) { return this->OnSessionLost(session); });
     InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
-    INPUT_DEV_MGR->SetInputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
     INPUT_DEV_MGR->SetInputStatusChangeCallback(
         [this] (int32_t deviceId, const std::string &sysUid, const std::string devStatus) {
             return this->DeviceStatusChanged(deviceId, sysUid, devStatus);
@@ -792,11 +790,9 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
-        if (!isDragBorder_) {
-            GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-            MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
-                info.windowPid, info.windowId, pointerStyle.id);
-        }
+        GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+        MMI_HILOGD("get pointer style, pid:%{public}d, windowid:%{public}d, style:%{public}d",
+            info.windowPid, info.windowId, pointerStyle.id);
         if (!dragFlag_) {
             SetMouseFlag(lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP);
             isDragBorder_ = SelectPointerChangeArea(*windowInfo, pointerStyle, logicX, logicY);
@@ -1039,7 +1035,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction, int32_t windowI
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
-    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
     auto filter = InputHandler->GetFilterHandler();
     filter->HandlePointerEvent(pointerEvent);
 }
@@ -2477,7 +2473,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
     // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
     if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
-        MMI_HILOG_DISPATCHI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+        MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
             "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
             "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
             "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
@@ -2526,7 +2522,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
         touchItemDownInfos_[pointerId] = windowInfoEX;
-        MMI_HILOG_DISPATCHI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
+        MMI_HILOG_FREEZEI("PointerId:%{public}d, touchWindow:%{public}d", pointerId, touchWindow->id);
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOG_DISPATCHD("Clear extra data");
         pointerEvent->ClearBuffer();
@@ -2626,7 +2622,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
         return;
     }
 
-    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {
@@ -3298,7 +3294,7 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
         MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
         return;
     }
-    Coordinate2D matrix;
+    Coordinate2D matrix { 0.0, 0.0 };
     ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);

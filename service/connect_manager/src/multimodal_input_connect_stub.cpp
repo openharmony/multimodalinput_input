@@ -39,6 +39,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
@@ -389,6 +391,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
             ret = StubRemoveVirtualInputDevice(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH):
+            ret = StubSetTouchpadThreeFingersTapSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH):
+            ret = StubGetTouchpadThreeFingersTapSwitch(data, reply);
             break;
 #ifdef OHOS_BUILD_ENABLE_ANCO
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL):
@@ -2321,6 +2329,40 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetTouchpadThreeFingersTapSwitch Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool threeFingersTapSwitch = true;
+    READBOOL(data, threeFingersTapSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetTouchpadThreeFingersTapSwitch(threeFingersTapSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubSetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool switchFlag = true;
+    int32_t ret = GetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubGetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
+    } else {
+        WRITEBOOL(reply, switchFlag);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2365,13 +2407,13 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadScrollRows(MessageParcel& dat
     }
     int32_t rows = TOUCHPAD_SCROLL_ROWS;
     READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetTouchpadScrollRows(rows);
+    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
+    int32_t ret = SetTouchpadScrollRows(newRows);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetTouchpadScrollRows failed ret:%{public}d", ret);
-        return ret;
+        MMI_HILOGE("Call SetTouchpadScrollRows failed ret:%{public}d, pid:%{public}d", ret, GetCallingPid());
     }
-    MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", rows, GetCallingPid());
-    return RET_OK;
+    MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", newRows, GetCallingPid());
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
@@ -2387,6 +2429,10 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& dat
     }
     int32_t rows = TOUCHPAD_SCROLL_ROWS;
     int32_t ret = GetTouchpadScrollRows(rows);
+    if (rows < MIN_ROWS || rows > MAX_ROWS) {
+        MMI_HILOGD("Invalid touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
+        return ret;
+    }
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetTouchpadScrollRows failed ret:%{public}d", ret);
         return ret;

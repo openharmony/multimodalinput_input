@@ -318,7 +318,7 @@ int libinput_has_event_led_type(struct libinput_device *device)
 
 const char* libinput_device_get_name(struct libinput_device *device)
 {
-    return (device != nullptr ? device->name.c_str() : nullptr);
+    return g_instance->DeviceGetName(device);
 }
 
 unsigned int libinput_device_get_id_bustype(struct libinput_device *device)

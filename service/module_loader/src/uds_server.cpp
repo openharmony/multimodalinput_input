@@ -274,7 +274,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             if (!buf.Write(szBuf, size)) {
                 MMI_HILOGW("Write data failed. size:%{public}zu", size);
             }
-            OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
+            OnReadPackets(buf, [this, fd] (NetPacket& pkt) { return this->OnPacket(fd, pkt); });
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu, errno:%{public}d",

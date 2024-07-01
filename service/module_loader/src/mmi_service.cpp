@@ -988,7 +988,7 @@ int32_t MMIService::OnGetDeviceIds(std::vector<int32_t> &ids)
 
 int32_t MMIService::GetDeviceIds(std::vector<int32_t> &ids)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &ids] {
             return this->OnGetDeviceIds(ids);
@@ -1014,7 +1014,7 @@ int32_t MMIService::OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &
 
 int32_t MMIService::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, deviceId, &inputDevice] {
             return this->OnGetDevice(deviceId, inputDevice);
@@ -2511,6 +2511,28 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     return RET_OK;
 }
 
+int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadThreeFingersTapSwitch,
+                                                        TOUCH_EVENT_HDR, switchFlag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::GetTouchpadThreeFingersTapSwitch,
+                                                        TOUCH_EVENT_HDR, std::ref(switchFlag)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     CALL_DEBUG_ENTER;
@@ -2581,9 +2603,12 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
 int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
 {
     CALL_INFO_TRACE;
-#if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadScrollRows,
-        TOUCH_EVENT_HDR, rows));
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [rows] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(rows);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Set the number of touchpad scrolling rows failed, return %{public}d", ret);
         return ret;
@@ -2604,9 +2629,14 @@ int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadScrollRows, this, std::ref(rows)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &rows] {
+            return this->ReadTouchpadScrollRows(rows);
+        }
+        );
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the number of touchpad scrolling rows failed, return %{public}d", ret);
+        MMI_HILOGE("Get the number of touchpad scrolling rows failed, return %{public}d, pid:%{public}d", ret,
+            GetCallingPid());
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER

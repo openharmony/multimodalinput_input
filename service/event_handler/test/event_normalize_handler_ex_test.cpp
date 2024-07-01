@@ -22,6 +22,7 @@
 #include "event_normalize_handler.h"
 #include "event_resample.h"
 #include "general_touchpad.h"
+#include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "libinput_mock.h"
 #include "libinput_wrapper.h"
@@ -141,5 +142,144 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_GestureIdentif
     ASSERT_NO_FATAL_FAILURE(handler.GestureIdentify(&event));
 }
 
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_TerminateAxis_001
+ * @tc.desc: Test the function TerminateAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TerminateAxis_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateAxis(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateAxis(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_AXIS));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateAxis(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_TAP));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateAxis(&event));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_TerminateRotate_001
+ * @tc.desc: Test the function TerminateRotate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_TerminateRotate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    GestureHandler gestureHandler;
+    gestureHandler.isStartRotate_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
+    gestureHandler.isStartRotate_ = true;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_AXIS));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_TAP));
+    ASSERT_NO_FATAL_FAILURE(handler.TerminateRotate(&event));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_ResetTouchUpEvent_001
+ * @tc.desc: Test the function ResetTouchUpEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_ResetTouchUpEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCH_UP));
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, &event));
+    PointerEvent::PointerItem testPointerItem;
+    pointerEvent->pointers_.push_back(PointerEvent::PointerItem());
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, &event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCH_DOWN));
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, &event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCH_MOTION));
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, &event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCH_CANCEL));
+    ASSERT_NO_FATAL_FAILURE(handler.ResetTouchUpEvent(pointerEvent, &event));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandleMouseEvent_001
+ * @tc.desc: Test the function HandleMouseEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_device device {};
+    libinput_event_pointer pointerEvent {};
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&device));
+    EXPECT_CALL(libinputMock, DeviceGetName).WillRepeatedly(Return(const_cast<char*>("rotary_crown")));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_POINTER_AXIS));
+    EXPECT_CALL(libinputMock, LibinputGetPointerEvent).WillRepeatedly(Return(&pointerEvent));
+    EXPECT_CALL(libinputMock, GetAxisSource).WillRepeatedly(Return(LIBINPUT_POINTER_AXIS_SOURCE_WHEEL));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(&event));
+    EXPECT_CALL(libinputMock, GetAxisSource).WillRepeatedly(Return(LIBINPUT_POINTER_AXIS_SOURCE_FINGER));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleMouseEvent(&event));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandleGestureEvent_001
+ * @tc.desc: Test the function HandleGestureEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleGestureEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
+    handler.SetNext(handler.nextHandler_);
+    libinput_event event {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    libinput_device device {};
+    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&device));
+    MouseEventNormalize mouseEventNormalize;
+    mouseEventNormalize.processors_.insert(std::make_pair(1, nullptr));
+    InputDeviceManager inputDevice;
+    InputDeviceManager::InputDeviceInfo inDevice;
+    int32_t deviceId = 2;
+    inDevice.isPointerDevice = false;
+    inDevice.enable = false;
+    inputDevice.inputDevice_.insert(std::make_pair(deviceId, inDevice));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_GESTURE_SWIPE_END));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_GESTURE_PINCH_END));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem testPointerItem;
+    pointerEvent->pointers_.push_back(PointerEvent::PointerItem());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_GESTURE_PINCH_UPDATE));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+}
 } // namespace MMI
 } // namespace OHOS

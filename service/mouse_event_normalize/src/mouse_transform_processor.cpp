@@ -35,6 +35,7 @@
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "timer_manager.h"
+#include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -344,6 +345,8 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
@@ -353,6 +356,8 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
@@ -652,10 +657,10 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 
 void MouseTransformProcessor::DumpInner()
 {
-    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
+    aggregator_.Record(MMI_LOG_FREEZE, "Pointer event created by: " + device->GetName() + ", target window: " +
         std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
         std::to_string(pointerEvent_->GetId()));
 }
