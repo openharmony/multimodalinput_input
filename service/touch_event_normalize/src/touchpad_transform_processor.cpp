@@ -41,11 +41,13 @@ constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
+constexpr int32_t FINGER_TAP_THREE { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
+std::string THREE_FINGER_TAP_KEY = "touchpadThreeFingerTap";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -323,6 +325,12 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         MMI_HILOGE("Finger count is invalid");
         return RET_ERR;
     }
+    if (fingerCount == FINGER_TAP_THREE) {
+        GetTouchpadThreeFingersTapSwitch(tpSwipeSwitch);
+        if (!tpSwipeSwitch) {
+            return RET_OK;
+        }
+    }
     pointerEvent_->SetFingerCount(fingerCount);
 
     if (fingerCount == 0) {
@@ -330,13 +338,29 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
         return RET_ERR;
     }
 
+    AddItemForEventWhileSetSwipeData(time, gesture, fingerCount);
+    
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
+        MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
+        DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
+    }
+
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture,
+                                                                     int32_t fingerCount)
+{
     int32_t sumX = 0;
     int32_t sumY = 0;
+    if (fingerCount == 0) {
+        MMI_HILOGD("There is no finger in swipe action");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < fingerCount; i++) {
         sumX += libinput_event_gesture_get_device_coords_x(gesture, i);
         sumY += libinput_event_gesture_get_device_coords_y(gesture, i);
     }
-
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
@@ -347,12 +371,6 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-
-    if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
-        MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
-        DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
-    }
-
     return RET_OK;
 }
 
@@ -619,6 +637,7 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
             return RET_OK;
         }
     }
+
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
         multiFingersState_ = static_cast<MulFingersTap>(upCnt);
         MMI_HILOGD("This is multifinger tap event, finger count:%{public}d", upCnt);
@@ -699,6 +718,23 @@ bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *ev
         pointerMaps[seatSlot] = {-1.0F, -1.0F};
         return true;
     }
+}
+
+int32_t TouchPadTransformProcessor::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    if (PutConfigDataToDatabase(THREE_FINGER_TAP_KEY, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad three fingers switch flag to mem.");
+        return RET_ERR;
+    }
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_PINCH_SETTING,
+        switchFlag);
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    GetConfigDataFromDatabase(THREE_FINGER_TAP_KEY, switchFlag);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -2511,6 +2511,28 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
     return RET_OK;
 }
 
+int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadThreeFingersTapSwitch,
+                                                        TOUCH_EVENT_HDR, switchFlag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::GetTouchpadThreeFingersTapSwitch,
+                                                        TOUCH_EVENT_HDR, std::ref(switchFlag)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     CALL_DEBUG_ENTER;

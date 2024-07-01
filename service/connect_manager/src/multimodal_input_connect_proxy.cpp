@@ -2122,6 +2122,51 @@ int32_t MultimodalInputConnectProxy::RemoveVirtualInputDevice(int32_t deviceId)
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEBOOL(data, switchFlag, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::SetTouchpadSwitch Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
+    } else {
+        READBOOL(reply, switchFlag);
+    }
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectProxy::AncoAddChannel(sptr<IAncoChannel> channel)
 {
