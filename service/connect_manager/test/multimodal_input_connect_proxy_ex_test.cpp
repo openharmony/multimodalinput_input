@@ -69,7 +69,7 @@ void MultimodalInputConnectProxyTest::TearDownTestCase()
 class MockPointerEvent : public PointerEvent {
 public:
     int32_t eventType;
-    MockPointerEvent(int32_t eventType) : PointerEvent(eventType), eventType(eventType) {}
+    explicit MockPointerEvent(int32_t eventType) : PointerEvent(eventType), eventType(eventType) {}
     MOCK_METHOD(bool, WriteToParcel, (Parcel& data));
 };
 
