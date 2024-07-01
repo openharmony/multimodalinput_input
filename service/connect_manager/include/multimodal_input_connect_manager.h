@@ -129,6 +129,8 @@ public:
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);

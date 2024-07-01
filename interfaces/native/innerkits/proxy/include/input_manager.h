@@ -858,7 +858,25 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
     int32_t SetCurrentUser(int32_t userId);
+    
+    /**
+     * @brief Set the switch of touchpad three finger tap.
+     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     *  true: user can use three finger function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
 
+    /**
+     * @brief Get the switch of touchpad three finger tap.
+     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     * true: user can use three finger function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+    
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     
     /**
