@@ -431,6 +431,11 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+        bool threeFingerSwitch = false;
+        TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
+        if (!threeFingerSwitch) {
+            return RET_OK;
+        }
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
     }
