@@ -466,6 +466,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_CloneKeyEvent_001, T
     CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     ASSERT_TRUE(handler.CloneKeyEvent(keyEvent));
     handler.keyEvent_ = nullptr;
     ASSERT_TRUE(handler.CloneKeyEvent(keyEvent));
@@ -482,6 +483,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyUpSubscribe
     CALL_TEST_DEBUG;
     KeySubscriberHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
     bool handled = false;
     handler.NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
