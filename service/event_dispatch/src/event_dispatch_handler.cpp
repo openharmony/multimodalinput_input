@@ -280,7 +280,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+        MMI_HILOG_FREEZEI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {

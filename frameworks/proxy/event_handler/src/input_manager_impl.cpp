@@ -483,7 +483,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_DISPATCHI("id:%{public}d recv", pointerEvent->GetId());
+        MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
@@ -2132,6 +2132,26 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch, ret:%{public}d", ret);
     }
     return ret;
 }

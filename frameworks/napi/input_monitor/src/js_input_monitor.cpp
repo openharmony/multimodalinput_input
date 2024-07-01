@@ -1413,7 +1413,11 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_SWIPE: {
-                if (!IsThreeFingersSwipe(pointerEvent)) {
+                bool canUse = false;
+                if (IsThreeFingersSwipe(pointerEvent)) {
+                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
+                }
+                if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
@@ -1429,7 +1433,13 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
-                if (!IsThreeFingersTap(pointerEvent)) {
+                bool canUse = false;
+                if (IsThreeFingersTap(pointerEvent)) {
+                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
+                }
+                if (!canUse) {
+                    napi_close_handle_scope(jsEnv_, scope);
+                    continue;
                 }
                 ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                 break;
