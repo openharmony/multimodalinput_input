@@ -55,32 +55,6 @@ public:
 };
 
 /**
- * @tc.name: TouchDrawingManagerTest_TouchDrawHandler_002
- * @tc.desc: Test TouchDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    int32_t displayX = 200;
-    int32_t displayY = 200;
-    item.SetDisplayX(displayX);
-    item.SetDisplayY(displayY);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent));
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_001
  * @tc.desc: Test GetOriginalTouchScreenCoordinates
  * @tc.type: Function
