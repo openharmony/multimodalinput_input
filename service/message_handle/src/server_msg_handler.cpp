@@ -283,8 +283,9 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
             MouseTransformProcessor::GetTouchpadSpeed(), static_cast<int32_t>(DeviceType::DEVICE_KLV));
     } else {
-        ret = HandleMotionAccelerate(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, MouseTransformProcessor::GetPointerSpeed());
+        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y,
+            MouseTransformProcessor::GetPointerSpeed(), static_cast<int32_t>(DeviceType::DEVICE_KLV));
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to accelerate pointer motion, error:%{public}d", ret);
