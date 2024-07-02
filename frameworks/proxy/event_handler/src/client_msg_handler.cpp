@@ -374,13 +374,15 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t pid = 0;
+    int32_t eventId = 0;
     pkt >> pid;
+    pkt >> eventId;
     if (pkt.ChkRWError()) {
         MMI_HILOG_ANRDETECTE("Packet read data failed");
         return RET_ERR;
     }
-    MMI_HILOG_ANRDETECTI("Client pid:%{public}d", pid);
-    InputMgrImpl.OnAnr(pid);
+    MMI_HILOG_ANRDETECTI("Client pid:%{public}d eventId:%{public}d", pid, eventId);
+    InputMgrImpl.OnAnr(pid, eventId);
     return RET_OK;
 }
 } // namespace MMI

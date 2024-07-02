@@ -176,7 +176,7 @@ public:
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    void OnAnr(int32_t pid);
+    void OnAnr(int32_t pid, int32_t eventId);
 
     int32_t EnterCaptureMode(int32_t windowId);
     int32_t LeaveCaptureMode(int32_t windowId);
