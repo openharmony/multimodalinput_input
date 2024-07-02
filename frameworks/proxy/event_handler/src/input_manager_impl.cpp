@@ -1529,7 +1529,7 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     }
 }
 
-void InputManagerImpl::OnAnr(int32_t pid)
+void InputManagerImpl::OnAnr(int32_t pid, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -1537,10 +1537,10 @@ void InputManagerImpl::OnAnr(int32_t pid)
         std::lock_guard<std::mutex> guard(mtx_);
         for (const auto &observer : anrObservers_) {
             CHKPC(observer);
-            observer->OnAnr(pid);
+            observer->OnAnr(pid, eventId);
         }
     }
-    MMI_HILOG_ANRDETECTI("ANR noticed pid:%{public}d", pid);
+    MMI_HILOG_ANRDETECTI("ANR noticed pid:%{public}d eventId:%{public}d", pid, eventId);
 }
 
 bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
