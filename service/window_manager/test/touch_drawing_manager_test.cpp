@@ -1047,7 +1047,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_007, Te
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_007, TestSize.Level1)
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_008, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     TOUCH_DRAWING_MGR->isChangedRotation_ = false;
