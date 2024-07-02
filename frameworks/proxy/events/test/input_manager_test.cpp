@@ -2946,5 +2946,107 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_EnableHardwareCursorStats_001
+ * @tc.desc: Enable hardware cursor stats
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    ASSERT_EQ(ret, RET_OK);
+#else
+    auto ret = InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+    ret = InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
+ * @tc.name: InputManagerTest_GetHardwareCursorStats_001
+ * @tc.desc: get hardware cursor stats
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetHardwareCursorStats_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t frameCount = 1;
+    uint32_t vsyncCount = 1;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(frameCount, 0);
+    ASSERT_EQ(vsyncCount, 0);
+#else
+    auto ret = InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
+ * @tc.name: InputManagerTest_AppendExtraData_001
+ * @tc.desc: Append Extra Data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AppendExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ExtraData data;
+    data.buffer.resize(1025);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
+    data.buffer.resize(512);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadScrollRows_001
+ * @tc.desc: SetTouchpadScrollRows and GetTouchpadScrollRows interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    int32_t result = InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(rows, 1);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadScrollRows_002
+ * @tc.desc: SetTouchpadScrollRows and GetTouchpadScrollRows interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = -1;
+    InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    int32_t result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(rows, 1);
+    ASSERT_EQ(result, RET_OK);
+    rows = 101;
+    InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(rows, 100);
+    ASSERT_EQ(result, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
