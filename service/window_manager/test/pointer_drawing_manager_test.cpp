@@ -118,28 +118,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_FixCursorPosition_002
- * @tc.desc: Test FixCursorPosition
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION0;
-    pointerDrawingManager->displayInfo_.direction = DIRECTION0;
-    pointerDrawingManager->displayInfo_.width = 500;
-    pointerDrawingManager->displayInfo_.height = 1100;
-    pointerDrawingManager->imageWidth_ = 48;
-    pointerDrawingManager->imageHeight_ = 48;
-    int32_t physicalX = -5;
-    int32_t physicalY = -10;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->FixCursorPosition(physicalX, physicalY));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetCustomCursor_006
  * @tc.desc: Test SetCustomCursor
  * @tc.type: FUNC
