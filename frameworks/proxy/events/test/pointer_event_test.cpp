@@ -1533,5 +1533,35 @@ HWTEST_F(PointerEventTest, PointerEventTest_ActionToShortStr_004, TestSize.Level
     ret = pointerEvent->ActionToShortStr(action);
     ASSERT_EQ(ret, "P:?:");
 }
+
+/**
+ * @tc.name: PointerEventTest_SetTiltX_001
+ * @tc.desc: Test the funcation SetTiltX and GetTiltX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetTiltX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double x = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetTiltX(x));
+    ASSERT_EQ(item.GetTiltX(), x);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetTiltY_001
+ * @tc.desc: Test the funcation SetTiltY and GetTiltY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetTiltY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    double y = 10.0;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetTiltY(y));
+    ASSERT_EQ(item.GetTiltY(), y);
+}
 } // namespace MMI
 } // namespace OHOS
