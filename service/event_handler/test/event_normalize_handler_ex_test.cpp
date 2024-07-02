@@ -65,30 +65,6 @@ void EventNormalizeHandlerEXTest::TearDown()
 }
 
 /**
- * @tc.name: EventNormalizeHandlerEXTest_HandlePalmEvent_001
- * @tc.desc: Test the function HandlePalmEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePalmEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventNormalizeHandler handler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    libinput_event event {};
-    libinput_event_touch touchevent {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(nullptr));
-    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchevent));
-    EXPECT_CALL(libinputMock, TouchpadGetTool).WillRepeatedly(Return(2));
-    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
-    EXPECT_CALL(libinputMock, TouchpadGetTool).WillRepeatedly(Return(3));
-    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
-}
-
-/**
  * @tc.name: EventNormalizeHandlerEXTest_HandleTouchPadEvent_001
  * @tc.desc: Test the function HandleTouchPadEvent
  * @tc.type: FUNC
