@@ -1089,6 +1089,7 @@ ohos_unittest("SubscriberTest") {
     "ability_base:want",
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
+    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
   ]
