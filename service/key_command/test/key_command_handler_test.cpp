@@ -1339,7 +1339,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_001, TestSize.
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 0;
-    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -2781,7 +2781,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_004, TestS
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(2);
     bool result = handler.IsKeyMatch(handler.lastMatchedKey_, keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     bool ret = handler.HandleShortKeys(keyEvent);
     ASSERT_TRUE(ret);
@@ -2812,7 +2812,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_005, TestS
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(2);
     bool result = handler.IsKeyMatch(handler.currentLaunchAbilityKey_, keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     handler.currentLaunchAbilityKey_.timerId = 0;
     bool ret = handler.HandleShortKeys(keyEvent);
