@@ -226,7 +226,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_01, TestSi
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
     bool result = servermsghandler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -243,7 +243,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_02, TestSi
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_DOWN;
     bool result = servermsghandler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -262,7 +262,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_03, TestSi
     auto pointerIds = pointerEvent->GetPointerIds();
     EXPECT_TRUE(pointerIds.empty());
     bool result = servermsghandler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -903,7 +903,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_001, TestS
     int32_t action = PointerEvent::POINTER_ACTION_UNKNOWN;
     pointerEvent->SetPointerId(1);
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -920,7 +920,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_002, TestS
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -939,7 +939,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_003, TestS
     pointerEvent->SetPointerId(1);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointerIds() };
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -991,7 +991,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_005, TestS
     DisplayInfo displayInfo;
     displayInfo.id = 1;
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**

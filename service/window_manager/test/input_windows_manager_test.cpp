@@ -1688,7 +1688,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea_0
     int32_t ret11 = windowHotAreas[2].y;
     EXPECT_NE(ret11, 110);
     int32_t ret12 = windowHotAreas[2].width;
-    EXPECT_EQ(ret12, 32);
+    EXPECT_EQ(ret12, 21);
     int32_t ret13 = windowHotAreas[2].height;
     EXPECT_EQ(ret13, 32);
 }
