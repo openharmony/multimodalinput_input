@@ -59,7 +59,7 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_RemoveDeviceConfig, TestSize.L
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 10;
-    EXPECT_CALL(*messageParcelMock_, FindInputDeviceId(_)).WillOnce(Return(deviceId));
+    EXPECT_CALL(*messageParcelMock_, FindInputDeviceId(_)).WillRepeatedly(Return(deviceId));
     KeyAutoRepeat keyAutoRepeat;
     libinput_device device {};
     EXPECT_NO_FATAL_FAILURE(keyAutoRepeat.RemoveDeviceConfig(&device));
@@ -75,7 +75,7 @@ HWTEST_F(KeyAutoRepeatExTest, KeyAutoRepeatExTest_RemoveDeviceConfig_001, TestSi
 {
     CALL_TEST_DEBUG;
     int32_t deviceId = 15;
-    EXPECT_CALL(*messageParcelMock_, FindInputDeviceId(_)).WillOnce(Return(deviceId));
+    EXPECT_CALL(*messageParcelMock_, FindInputDeviceId(_)).WillRepeatedly(Return(deviceId));
     KeyAutoRepeat keyAutoRepeat;
     libinput_device device {};
     DeviceConfig deviceConfig;
