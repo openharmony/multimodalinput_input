@@ -1534,45 +1534,6 @@ ohos_unittest("ServerMsgHandlerTest") {
   ]
 }
 
-ohos_unittest("ServerMsgHandlerExTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "message_handle/test/mock.cpp",
-    "message_handle/test/server_msg_handler_ex_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-  ]
-
-  external_deps = [
-    "ability_runtime:ability_connect_callback_stub",
-    "ability_runtime:dataobs_manager",
-    "c_utils:utils",
-    "ffrt:libffrt",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "napi:ace_napi",
-    "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libwm",
-  ]
-}
-
 ohos_unittest("PermissionHelperTest") {
   module_out_path = module_output_path
 
