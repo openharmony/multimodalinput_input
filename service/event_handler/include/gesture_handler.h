@@ -54,6 +54,7 @@ private:
     double initialAngle_ { 0.0 };
     double lastAngle_ { 0.0 };
     double rotateAngle_ { 0.0 };
+    int32_t numberOfTouchPadFingerDown_ {-1};
 };
 
 #define GESTURE_HANDLER ::OHOS::DelayedSingleton<GestureHandler>::GetInstance()
