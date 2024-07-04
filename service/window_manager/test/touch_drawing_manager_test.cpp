@@ -994,7 +994,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_006, Te
     CALL_TEST_DEBUG;
     TOUCH_DRAWING_MGR->isChangedRotation_ = false;
     TOUCH_DRAWING_MGR->isChangedMode_ = true;
-    TOUCH_DRAWING_MGR->displayInfo_.displayMode = DisplayMode::FULL;
     TOUCH_DRAWING_MGR->pointerMode_.isShow = true;
     TOUCH_DRAWING_MGR->bubbleMode_.isShow = true;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
@@ -1011,9 +1010,22 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_007, Te
     CALL_TEST_DEBUG;
     TOUCH_DRAWING_MGR->isChangedRotation_ = false;
     TOUCH_DRAWING_MGR->isChangedMode_ = true;
-    TOUCH_DRAWING_MGR->displayInfo_.displayMode = DisplayMode::FULL;
     TOUCH_DRAWING_MGR->pointerMode_.isShow = false;
     TOUCH_DRAWING_MGR->bubbleMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_008
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isChangedRotation_ = false;
+    TOUCH_DRAWING_MGR->isChangedMode_ = false;
     EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
 }
 
