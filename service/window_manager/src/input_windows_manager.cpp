@@ -2130,7 +2130,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int64_t beginTime = GetSysClockTime();
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
+    int32_t currentAction = pointerEvent->GetPointerAction();
+    if (currentAction != PointerEvent::POINTER_ACTION_LEAVE_WINDOW &&
+        currentAction != PointerEvent::POINTER_ACTION_ENTER_WINDOW &&
+        currentAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW &&
+        currentAction != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
+        IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
+            dragPointerStyle_, direction);
+    }
     int64_t endTime = GetSysClockTime();
     if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
         MMI_HILOGW("Rs process timeout");
