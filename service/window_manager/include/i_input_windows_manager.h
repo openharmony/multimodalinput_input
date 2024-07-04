@@ -129,6 +129,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
+    static void DestroyInstance();
 
 private:
     static std::mutex mutex_;

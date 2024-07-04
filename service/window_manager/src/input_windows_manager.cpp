@@ -112,6 +112,12 @@ std::shared_ptr<IInputWindowsManager> IInputWindowsManager::GetInstance()
     return instance_;
 }
 
+void IInputWindowsManager::DestroyInstance()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    instance_.reset();
+}
+
 InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 {
     MMI_HILOGI("Bind cfg file name:%{public}s", BIND_CFG_FILE_NAME.c_str());
