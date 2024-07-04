@@ -193,6 +193,7 @@ group("mmi_tests") {
     "service:event_resample_test",
     "service:mmi-service-tests",
     "service:rust_mmi_test",
+    "service/crown_transform_processor/test:CrownTransformProcessorExTest",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
     "service/mouse_event_normalize/test:MouseTransformProcessorMockTest",
