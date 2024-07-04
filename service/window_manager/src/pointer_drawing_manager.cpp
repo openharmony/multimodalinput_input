@@ -58,7 +58,7 @@ const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
-constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 25 };
+constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS { 40 };
 constexpr int32_t POINTER_WINDOW_INIT_SIZE { 64 };
 constexpr int32_t DEFAULT_POINTER_SIZE { 1 };

@@ -35,7 +35,7 @@ constexpr int32_t RIGHT_CLICK_TYPE { 1 };
 constexpr int32_t POINTER_COLOR { -1 };
 constexpr int32_t POINTER_SIZE { 1 };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-constexpr int32_t MAGIC_POINTER_SIZE { 3 };
+constexpr int32_t MAGIC_POINTER_SIZE { 1 };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t POINTER_STYLE { 0 };
 constexpr int32_t ERROR_DELAY_VALUE { -1000 };
