@@ -151,6 +151,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             MMI_HILOGD("Unknown pointer action:%{public}d", touchEvent->GetPointerAction());
             break;
     }
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    HandleKnuckleGestureEvent(touchEvent);
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
 
 void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -190,11 +193,6 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-        HandleKnuckleGestureTouchMove(touchEvent);
-    }
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     if (!twoFingerGesture_.active) {
         return;
     }
@@ -304,9 +302,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    HandleKnuckleGestureTouchDown(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
 
 void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -316,9 +311,6 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     size_t pointercnt = touchEvent->GetPointerIds().size();
     if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-        HandleKnuckleGestureTouchUp(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
@@ -563,6 +555,53 @@ int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    int32_t id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE) {
+        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
+        ResetKnuckleGesture();
+        return;
+    }
+    int32_t touchAction = touchEvent->GetPointerAction();
+    if (IsValidAction(touchAction) && !singleKnuckleGesture_.state) {
+        switch (touchAction) {
+            case PointerEvent::POINTER_ACTION_CANCEL:
+            case PointerEvent::POINTER_ACTION_UP: {
+                HandleKnuckleGestureTouchUp(touchEvent);
+                break;
+            }
+            case PointerEvent::POINTER_ACTION_MOVE: {
+                HandleKnuckleGestureTouchMove(touchEvent);
+                break;
+            }
+            case PointerEvent::POINTER_ACTION_DOWN: {
+                HandleKnuckleGestureTouchDown(touchEvent);
+                break;
+            }
+            default:
+                MMI_HILOGD("Unknown pointer action:%{public}d", touchAction);
+                break;
+        }
+    }
+}
+
+bool KeyCommandHandler::IsValidAction(int32_t action)
+{
+    CALL_DEBUG_ENTER;
+    if (action == PointerEvent::POINTER_ACTION_DOWN ||
+        ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) && !gesturePoints_.empty())) {
+        return true;
+    }
+    return false;
+}
+
 void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;

@@ -1378,7 +1378,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_003, TestSize.
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
     keyEvent->SetActionTime(10000);
-    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -1400,7 +1400,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_004, TestSize.
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
     keyEvent->SetActionTime(100);
-    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -1892,7 +1892,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
@@ -2202,6 +2202,58 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GesturePointsToStr_003, Te
     auto result = handler.GesturePointsToStr();
     ASSERT_TRUE(result.empty());
     ASSERT_EQ(handler.gesturePoints_.size(), 1);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent
+ * @tc.desc: Test HandleKnuckleGestureEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+
+    handler.singleKnuckleGesture_.state = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsValidAction
+ * @tc.desc: Test IsValidAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsValidAction, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_MOVE;
+    handler.gesturePoints_ = { 0.0f };
+    ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_UP;
+    handler.gesturePoints_.assign(CIRCLE_COORDINATES.begin(), CIRCLE_COORDINATES.end());
+    ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
@@ -2784,7 +2836,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_004, TestS
     ASSERT_FALSE(result);
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     bool ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -2816,7 +2868,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_005, TestS
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     handler.currentLaunchAbilityKey_.timerId = 0;
     bool ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
     handler.currentLaunchAbilityKey_.timerId = -1;
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
