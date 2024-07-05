@@ -1311,6 +1311,33 @@ ohos_unittest("InterceptorTest") {
   external_deps = [ "hilog:libhilog" ]
 }
 
+ohos_unittest("EventInterceptorHandlerExTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "interceptor/test/event_interceptor_handler_ex_test.cpp",
+    "interceptor/test/mock.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [ "hilog:libhilog" ]
+}
+
 ohos_unittest("KeyAutoRepeatExTest") {
   module_out_path = module_output_path
 
