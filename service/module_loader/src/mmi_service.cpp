@@ -2610,7 +2610,7 @@ int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
         MMI_HILOGE("Get the pointer snapshot failed, ret: %{public}d", ret);
         return ret;
     }
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
