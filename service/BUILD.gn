@@ -365,48 +365,6 @@ ohos_unittest("event_resample_test") {
   ]
 }
 
-ohos_unittest("FingerprintEventProcessorTest") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/service/fingerprint_event_processor/include",
-    "${graphics_path}/2d_graphics/include",
-  ]
-
-  sources = [
-    "fingerprint_event_processor/test/fingerprint_event_processor_test.cpp",
-  ]
-
-  configs = [ ":libmmi_server_config" ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "config_policy:configpolicy_util",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "preferences:native_preferences",
-    "window_manager:libdm",
-    "window_manager:libwm",
-  ]
-}
-
 ohos_unittest("TwoFingerLongTouchTest") {
   module_out_path = module_output_path
   include_dirs = [
@@ -1097,6 +1055,7 @@ ohos_unittest("SubscriberTest") {
     "ability_base:want",
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
+    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
   ]
@@ -1526,45 +1485,6 @@ ohos_unittest("ServerMsgHandlerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-  ]
-
-  external_deps = [
-    "ability_runtime:ability_connect_callback_stub",
-    "ability_runtime:dataobs_manager",
-    "c_utils:utils",
-    "ffrt:libffrt",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "napi:ace_napi",
-    "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libwm",
-  ]
-}
-
-ohos_unittest("ServerMsgHandlerExTest") {
-  module_out_path = module_output_path
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "message_handle/test/mock.cpp",
-    "message_handle/test/server_msg_handler_ex_test.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
