@@ -47,7 +47,7 @@ MMIClient::~MMIClient()
 void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
-    eventHandler_ = eventHandler;
+    // use the new thread untill eventhandler use poll thread
 }
 
 void MMIClient::MarkIsEventHandlerChanged(EventHandlerPtr eventHandler)
