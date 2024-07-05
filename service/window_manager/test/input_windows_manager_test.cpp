@@ -4573,5 +4573,130 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowBySy
     newDisplayInfo.windowsInfo.push_back(windowInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PrintChangedWindowBySync(newDisplayInfo));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_003
+ * @tc.desc: Test the funcation GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_003, TestSize.Level1)
+{
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    WindowInfoEX windowInfoEX;
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 5;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    windowInfoEX.window = windows [0];
+    windowInfoEX.flag = false;
+    pointerEvent->pointerId_ = 1;
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, windowInfoEX));
+    int32_t ret = inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(ret, -1);
+    windowInfoEX.flag = true;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 5;
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(10, windowInfoEX));
+    ret = inputWindowsManager.GetClientFd(pointerEvent);
+    EXPECT_EQ(ret, -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_001
+ * @tc.desc: Test the funcation FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    WindowInfoEX windowInfoEX;
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 6;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    windowInfoEX.window = windows [0];
+    windowInfoEX.flag = false;
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, windowInfoEX));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+    pointerEvent->pointerId_ = 2;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 3;
+    DisplayInfo displayInfo;
+    displayInfo.id = 3;
+    displayInfo.displayDirection = DIRECTION0;
+    displayInfo.direction = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+    inputEvent->targetDisplayId_ = 30;
+    inputWindowsManager.lastDirection_ = static_cast<Direction>(1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPidAndUpdateTarget_003
+ * @tc.desc: Test the funcation GetPidAndUpdateTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 10;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 10;
+    int32_t ret = inputWindowsManager.GetPidAndUpdateTarget(keyEvent);
+    EXPECT_EQ(ret, RET_ERR);
+    inputEvent->targetDisplayId_ = 18;
+    ret = inputWindowsManager.GetPidAndUpdateTarget(keyEvent);
+    EXPECT_EQ(ret, RET_ERR);
+    WindowGroupInfo windowGroupInfo;
+    WindowInfo windowInfo;
+    windowInfo.id = 10;
+    windowInfo.pid = 11;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    windowInfo.id = 10;
+    windowInfo.pid = 11;
+    windowInfo.agentWindowId = 12;
+    windowGroupInfo.windowsInfo.push_back(windowInfo);
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(10, windowGroupInfo));
+    ret = inputWindowsManager.GetPidAndUpdateTarget(keyEvent);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_002
+ * @tc.desc: Test the funcation IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 1;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = -11;
+    bool ret = inputWindowsManager.IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+    inputEvent->targetDisplayId_ = 11;
+    EXPECT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
