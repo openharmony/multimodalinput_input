@@ -1968,6 +1968,8 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
         }
         if (displayX >= window.area.x && displayX <= rightDownX &&
             displayY >= window.area.y && displayY <= rightDownY) {
+                MMI_HILOGI("In input method area, windowId:%{public}d, windowType:%{public}d",
+                    window.id, window.windowType);
                 return true;
         }
     }
