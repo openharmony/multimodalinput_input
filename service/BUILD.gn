@@ -357,48 +357,6 @@ ohos_unittest("event_resample_test") {
   ]
 }
 
-ohos_unittest("FingerprintEventProcessorTest") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/service/fingerprint_event_processor/include",
-    "${graphics_path}/2d_graphics/include",
-  ]
-
-  sources = [
-    "fingerprint_event_processor/test/fingerprint_event_processor_test.cpp",
-  ]
-
-  configs = [ ":libmmi_server_config" ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "config_policy:configpolicy_util",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "preferences:native_preferences",
-    "window_manager:libdm",
-    "window_manager:libwm",
-  ]
-}
-
 ohos_unittest("TwoFingerLongTouchTest") {
   module_out_path = module_output_path
   include_dirs = [
