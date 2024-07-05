@@ -764,7 +764,7 @@ public:
 
     /**
      * @brief Get the pointer snapshot.
-     * @param pixelMapPtr Indicates the image resouce for this mouse icon. which realtype must be
+     * @param pixelMapPtr Indicates the image resource for this mouse icon. which realtype must be
      * std::shared_ptr<OHOS::Media::PixelMap>*.
      * @return if success; returns a non-0 value otherwise.
      * @since 12

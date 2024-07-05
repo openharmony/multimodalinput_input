@@ -1955,13 +1955,13 @@ int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSnapshot(pixelMapPtr);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the pointer snapshot failed, ret = %{public}d", ret);
+        MMI_HILOGE("Get the pointer snapshot failed, ret:%{public}d", ret);
     }
     return ret;
 #else
     MMI_HILOGW("Pointer device module does not support");
     return ERROR_UNSUPPORT;
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
