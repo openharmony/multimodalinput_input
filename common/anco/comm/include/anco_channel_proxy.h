@@ -13,31 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef SHORTCUT_HANDLER_H
-#define SHORTCUT_HANDLER_H
+#ifndef ANCO_CHANNEL_PROXY_H
+#define ANCO_CHANNEL_PROXY_H
 
-#include <set>
-
-#include "key_command_handler.h"
-#include "key_option.h"
+#include "iremote_object.h"
+#include "iremote_proxy.h"
 #include "nocopyable.h"
+
+#include "i_anco_channel.h"
 
 namespace OHOS {
 namespace MMI {
-class ShortcutHandler final {
+class AncoChannelProxy final : public IRemoteProxy<IAncoChannel> {
 public:
-    ShortcutHandler() = default;
-    ~ShortcutHandler() = default;
-    DISALLOW_COPY_AND_MOVE(ShortcutHandler);
+    explicit AncoChannelProxy(const sptr<IRemoteObject> &remoteObj);
+    ~AncoChannelProxy() override = default;
+    DISALLOW_COPY_AND_MOVE(AncoChannelProxy);
 
-    bool HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
-    void UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
-    void MarkShortcutConsumed(const ShortcutKey &shortcut);
-    void MarkShortcutConsumed(const KeyOption &shortcut);
+    int32_t SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t UpdateWindowInfo(std::shared_ptr<AncoWindows> windows) override;
 
 private:
-    std::set<int32_t> shortcutConsumed_;
+    static inline BrokerDelegator<AncoChannelProxy> delegator_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // SHORTCUT_HANDLER_H
+#endif // ANCO_CHANNEL_PROXY_H

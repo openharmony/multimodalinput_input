@@ -25,6 +25,7 @@ ohos_shared_library("oh_input_manager") {
     debug = false
   }
   include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/frameworks/native/input/",
     "${mmi_path}/interfaces/kits/c/input/",
     "${mmi_path}/interfaces/native/innerkits/",

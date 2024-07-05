@@ -14,6 +14,7 @@
  */
 
 #include "touch_drawing_manager.h"
+#include "bytrace_adapter.h"
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
@@ -148,6 +149,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
+    isChangedMode_ = displayInfo.displayMode == displayInfo_.displayMode ? false : true;
     scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
     scaleH_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
     displayInfo_ = displayInfo;
@@ -233,7 +235,11 @@ void TouchDrawingManager::UpdateBubbleData()
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (isChangedRotation_ && IsWindowRotation()) {
+    if (!isChangedRotation_ && !isChangedMode_) {
+        return;
+    }
+
+    if (IsWindowRotation()) {
         if (pointerMode_.isShow) {
             RotationCanvasNode(trackerCanvasNode_);
             RotationCanvasNode(crosshairCanvasNode_);
@@ -241,17 +247,24 @@ void TouchDrawingManager::RotationScreen()
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
+    } else if (isChangedMode_) {
+        if (pointerMode_.isShow) {
+            ResetCanvasNode(trackerCanvasNode_);
+            ResetCanvasNode(crosshairCanvasNode_);
+        }
+        if (bubbleMode_.isShow) {
+            ResetCanvasNode(bubbleCanvasNode_);
+        }
     }
 
-    if (pointerMode_.isShow && isChangedRotation_) {
+    if (pointerMode_.isShow) {
         if (!lastPointerItem_.empty() || stopRecord_) {
             Snapshot();
         } else if (!stopRecord_) {
             UpdateLabels();
         }
-        Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::CreateObserver()
@@ -369,6 +382,15 @@ void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode
         canvasNode->SetRotation(ROTATION_ANGLE_0);
         canvasNode->SetTranslateX(0);
     }
+    canvasNode->SetTranslateY(0);
+}
+
+void TouchDrawingManager::ResetCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(canvasNode);
+    canvasNode->SetRotation(ROTATION_ANGLE_0);
+    canvasNode->SetTranslateX(0);
     canvasNode->SetTranslateY(0);
 }
 
@@ -577,6 +599,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         return;
     }
     CHKPV(trackerCanvasNode_);
+    BytraceAdapter::StartHandleTracker(pointerId);
     auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
     Rosen::Drawing::Pen pen;
@@ -603,6 +626,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         canvas->DetachPen();
     }
     trackerCanvasNode_->FinishRecording();
+    BytraceAdapter::StopHandleTracker();
 }
 
 void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y)

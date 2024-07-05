@@ -168,6 +168,7 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadRotateSwitch(preRotateSwitch_);
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
+    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
 }
 
 void InputManagerPointerTest::TearDown()
@@ -188,6 +189,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
+    InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
 }
 
 std::string InputManagerPointerTest::GetEventDump()
@@ -1836,6 +1838,19 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, T
     } else {
         ASSERT_TRUE(false);
     }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Set touchpad ThreeFingers Tap switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag) == RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

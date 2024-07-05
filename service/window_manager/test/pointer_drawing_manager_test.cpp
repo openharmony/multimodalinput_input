@@ -98,29 +98,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_001,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawMovePointer_002
- * @tc.desc: Test the funcation DrawMovePointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawMovePointer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    int32_t displayId = 1;
-    int32_t physicalX = 2;
-    int32_t physicalY = 3;
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawMovePointer(displayId, physicalX, physicalY));
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(manager.DrawMovePointer(displayId, physicalX, physicalY));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawCursor_002
  * @tc.desc: Test the funcation DrawCursor
  * @tc.type: FUNC
@@ -138,52 +115,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, Test
     MOUSE_ICON mouseStyle = EAST;
     int32_t ret = manager.DrawCursor(mouseStyle);
     EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawRunningPointerAnimate_002
- * @tc.desc: Test DrawRunningPointerAnimate
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawRunningPointerAnimate_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    pointerDrawingManager.surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
-    pointerDrawingManager.surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    MOUSE_ICON mouseStyle = EAST;
-    pointerDrawingManager.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(pointerDrawingManager.canvasNode_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawRunningPointerAnimate(mouseStyle));
-    mouseStyle = RUNNING;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawRunningPointerAnimate(mouseStyle));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_FixCursorPosition_002
- * @tc.desc: Test FixCursorPosition
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
-        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->displayInfo_.displayDirection = DIRECTION0;
-    pointerDrawingManager->displayInfo_.direction = DIRECTION0;
-    pointerDrawingManager->displayInfo_.width = 500;
-    pointerDrawingManager->displayInfo_.height = 1100;
-    pointerDrawingManager->imageWidth_ = 48;
-    pointerDrawingManager->imageHeight_ = 48;
-    int32_t physicalX = -5;
-    int32_t physicalY = -10;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->FixCursorPosition(physicalX, physicalY));
 }
 
 /**

@@ -39,7 +39,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
-using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -384,6 +383,20 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE):
             ret = StubRemoveVirtualInputDevice(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_THREE_GINGERS_TAPSWITCH):
+            ret = StubSetTouchpadThreeFingersTapSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH):
+            ret = StubGetTouchpadThreeFingersTapSwitch(data, reply);
+            break;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL):
+            ret = StubAncoAddChannel(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_ANCO_CHANNEL):
+            ret = StubAncoRemoveChannel(data, reply);
+            break;
+#endif // OHOS_BUILD_ENABLE_ANCO
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2307,6 +2320,40 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetTouchpadThreeFingersTapSwitch Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool threeFingersTapSwitch = true;
+    READBOOL(data, threeFingersTapSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetTouchpadThreeFingersTapSwitch(threeFingersTapSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubSetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubGetTouchpadThreeFingersTapSwitch Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    bool switchFlag = true;
+    int32_t ret = GetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubGetTouchpadThreeFingersTapSwitch ret:%{public}d", ret);
+    } else {
+        WRITEBOOL(reply, switchFlag);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2377,5 +2424,45 @@ int32_t MultimodalInputConnectStub::StubRemoveVirtualInputDevice(MessageParcel& 
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t MultimodalInputConnectStub::StubAncoAddChannel(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+    CHKPR(remoteObj, ERR_INVALID_VALUE);
+    sptr<IAncoChannel> channel = iface_cast<IAncoChannel>(remoteObj);
+    CHKPR(channel, ERROR_NULL_POINTER);
+    int32_t ret = AncoAddChannel(channel);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AncoAddChannel fail, error:%{public}d", ret);
+    }
+    WRITEINT32(reply, ret);
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+    CHKPR(remoteObj, ERR_INVALID_VALUE);
+    sptr<IAncoChannel> channel = iface_cast<IAncoChannel>(remoteObj);
+    CHKPR(channel, ERROR_NULL_POINTER);
+    int32_t ret = AncoRemoveChannel(channel);
+    if (ret != RET_OK) {
+        MMI_HILOGE("AncoRemoveChannel fail, error:%{public}d", ret);
+    }
+    WRITEINT32(reply, ret);
+    return ret;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS

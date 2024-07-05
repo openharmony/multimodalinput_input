@@ -119,9 +119,9 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
         if (curInfo != nullptr && point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
             point->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             windowInfo = std::make_optional(*curInfo);
-            MMI_HILOG_DISPATCHI("Touch event send cancel");
+            MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
         } else {
-            MMI_HILOGE("WindowInfo id nullptr");
+            MMI_HILOGE("Window:%{public}d is nullptr", windowId);
             return false;
         }
     }
@@ -158,12 +158,20 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         }
     }
     for (auto windowId : windowIds) {
+        auto pointerEvent = std::make_shared<PointerEvent>(*point);
         auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
-        if (!ReissueEvent(point, windowId, windowInfo)) {
+        if (!ReissueEvent(pointerEvent, windowId, windowInfo)) {
             continue;
         }
-        auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
-        auto pointerEvent = std::make_shared<PointerEvent>(*point);
+        if (!windowInfo) {
+            continue;
+        }
+        auto fd = WIN_MGR->GetClientFd(pointerEvent, windowInfo->id);
+        if (fd < 0) {
+            auto udsServer = InputHandler->GetUDSServer();
+            CHKPV(udsServer);
+            udsServer->GetClientFd(windowInfo->id);
+        }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
         int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
@@ -191,7 +199,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, programName, pid, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -272,7 +280,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+        MMI_HILOG_FREEZEI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
             pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {

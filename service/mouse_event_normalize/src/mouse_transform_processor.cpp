@@ -107,15 +107,15 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
+    DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        ret = HandleMotionAccelerate(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
+        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
@@ -652,10 +652,10 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 
 void MouseTransformProcessor::DumpInner()
 {
-    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_HEADER);
+    EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    aggregator_.Record(MMI_LOG_HEADER, "Pointer event created by: " + device->GetName() + ", target window: " +
+    aggregator_.Record(MMI_LOG_FREEZE, "Pointer event created by: " + device->GetName() + ", target window: " +
         std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
         std::to_string(pointerEvent_->GetId()));
 }
