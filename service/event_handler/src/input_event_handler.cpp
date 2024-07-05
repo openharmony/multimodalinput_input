@@ -61,7 +61,6 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
         return;
     }
 
-    CHKPV(event);
     idSeed_ += 1;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
@@ -93,14 +92,14 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event* event)
     if (touchpad != nullptr) {
         int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
         if (toolType == MT_TOOL_PALM) {
-            MMI_HILOGD("touchpad event is palm");
+            MMI_HILOGD("Touchpad event is palm");
             return false;
         }
     }
 
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        MMI_HILOGD("touchpad event is button");
+        MMI_HILOGD("Touchpad event is button");
         return false;
     }
 
@@ -120,7 +119,7 @@ bool InputEventHandler::IsTouchpadMistouch(libinput_event* event)
                 CALL_DEBUG_ENTER;
                 auto sharedPtr = weakPtr.lock();
                 CHKPV(sharedPtr);
-                MMI_HILOGD("mistouch timer:%{public}d", sharedPtr->timerId_);
+                MMI_HILOGD("Mistouch timer:%{public}d", sharedPtr->timerId_);
                 sharedPtr->timerId_ = -1;
                 sharedPtr->isTyping_ = false;
             });

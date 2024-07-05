@@ -22,6 +22,9 @@
 #include "libinput.h"
 
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "i_anco_channel.h"
+#endif
 #include "key_event.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
@@ -120,7 +123,13 @@ public:
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
+    virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
+#endif // OHOS_BUILD_ENABLE_ANCO
+
     static std::shared_ptr<IInputWindowsManager> GetInstance();
+    static void DestroyInstance();
 
 private:
     static std::mutex mutex_;

@@ -836,8 +836,10 @@ void InputDeviceManager::InitSessionLostCallback()
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
-    udsServerPtr->AddSessionDeletedCallback(std::bind(
-        &InputDeviceManager::OnSessionLost, this, std::placeholders::_1));
+    udsServerPtr->AddSessionDeletedCallback([this] (SessionPtr session) {
+        return this->OnSessionLost(session);
+    }
+    );
     sessionLostCallbackInitialized_ = true;
     MMI_HILOGD("The callback on session deleted is registered successfully");
 }

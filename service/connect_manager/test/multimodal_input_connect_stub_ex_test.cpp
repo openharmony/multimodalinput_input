@@ -150,6 +150,15 @@ public:
     {
         return subscribeId;
     }
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override
+    {
+        return static_cast<int32_t>(switchFlag);
+    }
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override
+    {
+        switchFlag = true;
+        return static_cast<int32_t>(switchFlag);
+    }
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
@@ -241,6 +250,10 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override { return deviceId; }
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
+#endif // OHOS_BUILD_ENABLE_ANCO
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -271,6 +284,7 @@ public:
     bool hasIrEmitter_ = false;
     int32_t retAddVirtualInputDevice_ = 0;
     int32_t retSetPixelMapData_ = 0;
+    int32_t retChannel_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -6887,6 +6901,97 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddVirtualInputDevice_004, TestSize
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubAddVirtualInputDevice(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadThreeFingersTapSwitch_002
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubGetTouchpadThreeFingersTapSwitch_003
+ * @tc.desc: Test the function StubGetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadThreeFingersTapSwitch_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the function StubSetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadThreeFingersTapSwitch(data, reply));
+}
+
+/**
+ * @tc.name: StubSetTouchpadThreeFingersTapSwitch_002
+ * @tc.desc: Test the function StubSetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadThreeFingersTapSwitch_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadThreeFingersTapSwitch(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS

@@ -770,6 +770,20 @@ int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
 
+int32_t MultimodalInputConnectManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
 int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
@@ -795,5 +809,21 @@ int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
 }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+int32_t MultimodalInputConnectManager::AncoAddChannel(sptr<IAncoChannel> channel)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AncoAddChannel(channel);
+}
+
+int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> channel)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AncoRemoveChannel(channel);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS

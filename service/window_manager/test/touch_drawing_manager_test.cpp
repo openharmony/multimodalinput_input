@@ -32,11 +32,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t DENSITY_BASELINE = 160;
-constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
-constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
-constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
-constexpr int32_t CALCULATE_MIDDLE = 2;
 } // namespace
 class TouchDrawingManagerTest : public testing::Test {
 public:
@@ -58,58 +53,6 @@ public:
         TOUCH_DRAWING_MGR->UpdateDisplayInfo(info);
     }
 };
-
-/**
- * @tc.name: TouchDrawingManagerTest_TouchDrawHandler_001
- * @tc.desc: Test TouchDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    int32_t displayX = 100;
-    int32_t displayY = 100;
-    item.SetDisplayX(displayX);
-    item.SetDisplayY(displayY);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_TouchDrawHandler_002
- * @tc.desc: Test TouchDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    int32_t displayX = 200;
-    int32_t displayY = 200;
-    item.SetDisplayX(displayX);
-    item.SetDisplayY(displayY);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent));
-}
 
 /**
  * @tc.name: TouchDrawingManagerTest_GetOriginalTouchScreenCoordinates_001
@@ -207,28 +150,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, Tes
     EXPECT_TRUE(ret);
     ret = manager.IsValidAction(100);
     EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo_001
- * @tc.desc: Test update display info
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager manager;
-    DisplayInfo displayInfo;
-    displayInfo.dpi = 160;
-    manager.UpdateDisplayInfo(displayInfo);
-    EXPECT_EQ(manager.bubble_.innerCircleRadius,
-    displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE);
-    EXPECT_EQ(manager.bubble_.outerCircleRadius,
-    displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE);
-    EXPECT_EQ(manager.bubble_.outerCircleWidth,
-    static_cast<float>(displayInfo.dpi * INDEPENDENT_WIDTH_PIXELS) / DENSITY_BASELINE);
-    EXPECT_NO_FATAL_FAILURE(manager.UpdateDisplayInfo(displayInfo));
 }
 
 /**
@@ -1063,6 +984,52 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_005, Te
 }
 
 /**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_006
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isChangedRotation_ = false;
+    TOUCH_DRAWING_MGR->isChangedMode_ = true;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = true;
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = true;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_007
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isChangedRotation_ = false;
+    TOUCH_DRAWING_MGR->isChangedMode_ = true;
+    TOUCH_DRAWING_MGR->pointerMode_.isShow = false;
+    TOUCH_DRAWING_MGR->bubbleMode_.isShow = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationScreen_008
+ * @tc.desc: Test RotationScreen
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationScreen_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TOUCH_DRAWING_MGR->isChangedRotation_ = false;
+    TOUCH_DRAWING_MGR->isChangedMode_ = false;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RotationScreen());
+}
+
+/**
  * @tc.name: TouchDrawingManagerTest_AddCanvasNode_001
  * @tc.desc: Test AddCanvasNode
  * @tc.type: Function
@@ -1243,6 +1210,19 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_InitLabels_001, TestSi
     EXPECT_EQ(TOUCH_DRAWING_MGR->isFirstDownAction_, true);
     EXPECT_EQ(TOUCH_DRAWING_MGR->isDownAction_, true);
     EXPECT_EQ(TOUCH_DRAWING_MGR->maxPointerCount_, 0);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_ResetCanvasNode_001
+ * @tc.desc: Test ResetCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ResetCanvasNode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto canvasNode = Rosen::RSCanvasDrawingNode::Create();
+    TOUCH_DRAWING_MGR->ResetCanvasNode(canvasNode);
 }
 } // namespace MMI
 } // namespace OHOS

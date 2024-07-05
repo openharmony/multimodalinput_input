@@ -123,10 +123,17 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override;
+    
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
+    int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

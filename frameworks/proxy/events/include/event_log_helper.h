@@ -41,9 +41,9 @@ static constexpr std::string_view DebugTrackingDict =
         "Debug-InputTracking-Dict: "
         "A-Action, AST-ActionStartTime, B-Buffer, BC-BufferCount, BI-ButtonId, BAV-BrakeAbsValue, F-Flag,"
         " GAV-GenericAxisValue, HAV-HorizontalAxisValue, HXAV-Hat0xAbsValue, HYAV-Hat0yAbsValue, KI-KeyIntention,"
-        " ME-MarkEnabled, PAV-PinchAxisValue, PC-PointerCount, RAV-RzAbsValue, SIT-SensorInputTime, "
+        " ME-MarkEnabled, PAV-PinchAxisValue, PC-PointerCount, RZAV-RzAbsValue, SIT-SensorInputTime, "
         "TAV-ThrottleAbsValue, TX-TiltX, TY-TiltY, VAV-VerticalAxisValue, W-Width, WX-WindowX, WY-WindowY,"
-        " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue";
+        " XAV-XAbsValue, YAV-YAbsValue, ZAV-ZAbsValue, RAV-RotateAxisValue";
 
 class EventLogHelper final {
 public:
@@ -145,7 +145,7 @@ private:
         PrintInfoDict();
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string isSimulate = event->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) ? "true" : "false";
-        MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
+        MMI_HILOGD("See InputTracking-Dict I:%{public}d, ET:%{public}s, AT:%{public}" PRId64
             ", PA:%{public}s, ST:%{public}s, DI:%{public}d, WI:%{public}d, DPT:%{public}d"
             ", SI:%{public}s, PBS:%{public}zu",
             event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
@@ -170,10 +170,11 @@ private:
             }
             MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, "
                 "DY:%{public}d, P:%{public}.2f, LA:%{public}d, SA:%{public}d, WI:%{public}d, DXP:%{public}f,"
-                "DYP:%{public}f, WXP:%{public}f, WYP:%{public}f, OPI:%{public}d", pointerId, item.GetDownTime(),
-                item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(), item.GetPressure(), item.GetLongAxis(),
-                item.GetShortAxis(), item.GetTargetWindowId(), item.GetDisplayXPos(), item.GetDisplayYPos(),
-                item.GetWindowXPos(), item.GetWindowYPos(), item.GetOriginPointerId());
+                "DYP:%{public}f, WXP:%{public}f, WYP:%{public}f, OPI:%{public}d, SI:%{public}s",
+                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
+                item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
+                item.GetOriginPointerId(), isSimulate.c_str());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -197,17 +198,19 @@ private:
         }
         MMI_HILOG_HEADER(LOG_DEBUG, lh, "ET:%{public}s, AT:%{public}" PRId64 ", SIT:%{public}" PRIu64 ", A:%{public}d, "
             "AST:%{public}" PRId64 ", F:%{public}d, PA:%{public}s, ST:%{public}s, BI:%{public}d, VAV:%{public}.5f, "
-            "HAV:%{public}.5f, PAV:%{public}.5f, XAV:%{public}.5f, YAV:%{public}.5f, ZAV:%{public}.5f, "
-            "RAV:%{public}.5f, GAV:%{public}.5f, BAV:%{public}.5f, HXAV:%{public}.5f, HYAV:%{public}.5f, "
-            "TAV:%{public}.5f,PI:%{public}d, PC:%{public}zu, EN:%{public}d, BC:%{public}zu, B:%{public}s, "
-            "ME:%{public}d", InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
+            "HAV:%{public}.5f, PAV:%{public}.5f, PAV:%{public}.5f, XAV:%{public}.5f, YAV:%{public}.5f, "
+            "ZAV:%{public}.5f, RZAV:%{public}.5f, GAV:%{public}.5f, BAV:%{public}.5f, HXAV:%{public}.5f, "
+            "HYAV:%{public}.5f, TAV:%{public}.5f,PI:%{public}d, PC:%{public}zu, EN:%{public}d, BC:%{public}zu, "
+            "B:%{public}s, ME:%{public}d",
+            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->GetSensorInputTime(), event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ROTATE),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_BRAKE),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),

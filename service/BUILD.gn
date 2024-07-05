@@ -108,7 +108,10 @@ config("libmmi_server_config") {
   }
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+    include_dirs += [
+      "${mmi_ext_path}/anco_uds_manager/include",
+      "${mmi_path}/common/anco/comm/include",
+    ]
   }
 
   if (input_ext_feature_magiccursor) {
@@ -169,7 +172,6 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_keyboard) {
     sources += [
       "display_state_manager/src/display_event_monitor.cpp",
-      "key_command/src/shortcut_handler.cpp",
       "key_event_normalize/src/key_event_normalize.cpp",
       "key_event_normalize/src/key_unicode_transformation.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
@@ -246,6 +248,10 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/util:libmmi-util",
     "//third_party/cJSON:cjson",
   ]
+
+  if (input_ext_feature_anco) {
+    deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
+  }
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
@@ -411,10 +417,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
 
   configs = [ ":libmmi_server_config" ]
 
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
+  cflags = [ "-DUNIT_TEST" ]
 
   sources = [
     "key_command/src/key_command_handler.cpp",
@@ -973,6 +976,8 @@ ohos_unittest("InputWindowsManagerTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1537,6 +1542,45 @@ ohos_unittest("ServerMsgHandlerTest") {
   ]
 }
 
+ohos_unittest("ServerMsgHandlerExTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "message_handle/test/mock.cpp",
+    "message_handle/test/server_msg_handler_ex_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:dataobs_manager",
+    "c_utils:utils",
+    "ffrt:libffrt",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "napi:ace_napi",
+    "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libwm",
+  ]
+}
+
 ohos_unittest("PermissionHelperTest") {
   module_out_path = module_output_path
 
@@ -1708,7 +1752,11 @@ ohos_unittest("ConnectManagerTest") {
 ohos_unittest("ConnectManagerProxyEXTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "connect_manager/test" ]
+  include_dirs = [
+    "connect_manager/test",
+    "${mmi_path}/common/anco/comm/include",
+    "interfaces/native/innerkits/proxy/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -1721,6 +1769,9 @@ ohos_unittest("ConnectManagerProxyEXTest") {
   ]
 
   sources = [
+    "${mmi_path}/common/anco/comm/src/anco_channel_death_recipient.cpp",
+    "${mmi_path}/common/anco/comm/src/anco_channel_proxy.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
     "connect_manager/src/multimodal_input_connect_proxy.cpp",
     "connect_manager/test/message_parcel_mock.cpp",

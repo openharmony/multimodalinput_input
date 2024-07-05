@@ -26,19 +26,20 @@
 
 #include "error_multimodal.h"
 #include "extra_data.h"
+#include "i_anco_consumer.h"
 #include "i_anr_observer.h"
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
 #include "i_input_service_watcher.h"
-#include "mmi_event_observer.h"
 #include "i_window_checker.h"
+#include "infrared_frequency_info.h"
 #include "input_device.h"
+#include "input_handler_type.h"
 #include "key_option.h"
+#include "mmi_event_observer.h"
 #include "pointer_style.h"
 #include "window_info.h"
-#include "infrared_frequency_info.h"
-#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -771,13 +772,6 @@ public:
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
 
     /**
-     * @brief Sets a window input event consumer that runs on the specified thread.
-     * @param inputEventConsumer Indicates the consumer to set.
-     * @since 9
-     */
-    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
-
-    /**
      * @brief Sets whether shield key event interception, only support shield key event.
      * @param shieldMode Indicates shield mode.
      * @param isShield Indicates whether key event handler chain is shield. The value <b>true</b> indicates that
@@ -864,7 +858,25 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
 
     int32_t SetCurrentUser(int32_t userId);
+    
+    /**
+     * @brief Set the switch of touchpad three finger tap.
+     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     *  true: user can use three finger function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
 
+    /**
+     * @brief Get the switch of touchpad three finger tap.
+     * @param switchFlag Indicates the touchpad three finger tap switch state.
+     * true: user can use three finger function. otherwise can't use
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
+    
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     
     /**
@@ -883,6 +895,9 @@ public:
      * @since 12
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
+
+    int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
 
 private:
     InputManager() = default;
