@@ -3642,7 +3642,5 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_003, TestSize
     handler.repeatKey_.keyCode = 2;
     ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
 }
-
-
 } // namespace MMI
 } // namespace OHOS
