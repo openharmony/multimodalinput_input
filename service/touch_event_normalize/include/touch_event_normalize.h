@@ -19,8 +19,9 @@
 #include <map>
 #include <memory>
 
-#include "proto.h"
 #include "singleton.h"
+
+#include "proto.h"
 #include "transform_processor.h"
 
 namespace OHOS {
