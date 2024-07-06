@@ -18,11 +18,12 @@
 
 #include "draw/canvas.h"
 #include "nocopyable.h"
-#include "pointer_event.h"
 #include "singleton.h"
 #include "transaction/rs_transaction.h"
 #include "ui/rs_canvas_drawing_node.h"
 #include "ui/rs_surface_node.h"
+
+#include "pointer_event.h"
 #include "window_info.h"
 
 namespace OHOS {
