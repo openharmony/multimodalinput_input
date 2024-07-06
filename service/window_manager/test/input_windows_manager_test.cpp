@@ -4698,5 +4698,113 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_002
     inputEvent->targetDisplayId_ = 11;
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_003
+ * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t logicalX = 200;
+    int32_t logicalY = 200;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    inputWindowsManager.firstBtnDownWindowId_ = -1;
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.targetWindowId_ = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerItem.targetWindowId_ = 2;
+    WindowInfo windowInfo;
+    windowInfo.flags = WindowInfo::FLAG_BIT_UNTOUCHABLE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
+    pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    inputWindowsManager.extraData_.appended = true;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    windowInfo.pointerHotAreas.push_back({ 150, 250, 300, 500 });
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    inputWindowsManager.extraData_.appended = false;
+    inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_IN_WINDOW;
+    pointerItem.targetWindowId_ = -2;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_AXIS_END;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerItem.targetWindowId_ = 10;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 11;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN;
+    inputWindowsManager.firstBtnDownWindowId_ = 1;
+    inputEvent->targetDisplayId_ = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateCrownTarget_001
+ * @tc.desc: Test the funcation UpdateCrownTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCrownTarget_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = -1;
+    inputWindowsManager.displayGroupInfo_.focusWindowId = -1;
+    int32_t ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
+    EXPECT_NE(ret, RET_OK);
+    inputEvent->targetDisplayId_ = 5;
+    ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
+    EXPECT_NE(ret, RET_OK);
+    inputWindowsManager.displayGroupInfo_.focusWindowId = 5;
+    ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_PrintChangedWindowByEvent_001
+ * @tc.desc: Test the funcation PrintChangedWindowByEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowByEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t eventType = 1;
+    WindowInfo newWindowInfo;
+    newWindowInfo.id = 6;
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 5;
+    windowInfo.uid = 1;
+    inputWindowsManager.lastMatchedWindow_.insert(std::make_pair(1, windowInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintChangedWindowByEvent(eventType, newWindowInfo));
+    eventType = 10;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintChangedWindowByEvent(eventType, newWindowInfo));
+    newWindowInfo.id = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintChangedWindowByEvent(eventType, newWindowInfo));
+}
 } // namespace MMI
 } // namespace OHOS
