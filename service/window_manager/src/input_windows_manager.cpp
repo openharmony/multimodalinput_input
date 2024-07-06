@@ -2417,7 +2417,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     break;
                 }
             }
-            oss << iter->second.pid;
+            oss << iter->second.pid << " ";
         }
         if (!oss.str().empty()) {
             MMI_HILOG_DISPATCHI("Pre search window %{public}d %{public}s",targetWindowId, oss.str().c_str());
