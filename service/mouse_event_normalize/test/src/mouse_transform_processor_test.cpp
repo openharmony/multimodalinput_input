@@ -177,7 +177,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_DeletePressedB
 
 /**
  * @tc.name: MouseTransformProcessorTest_HandleAxisAccelateTouchPad_001
- * @tc.desc: Test DeletePressedButton
+ * @tc.desc: Test HandleAxisAccelateTouchPad
  * @tc.type: FUNC
  * @tc.require:
  */
