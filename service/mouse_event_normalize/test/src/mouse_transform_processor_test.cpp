@@ -146,6 +146,20 @@ void MouseTransformProcessorTest::TearDown()
 }
 
 /**
+ * @tc.name: MouseTransformProcessorTest_DeletePressedButton_001
+ * @tc.desc: Test DeletePressedButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_DeletePressedButton_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t originButton = 1;
+    ASSERT_NO_FATAL_FAILURE(processor.DeletePressedButton(originButton));
+}
+
+/**
  * @tc.name: MouseTransformProcessorTest_DeletePressedButton_002
  * @tc.desc: Test DeletePressedButton
  * @tc.type: FUNC
