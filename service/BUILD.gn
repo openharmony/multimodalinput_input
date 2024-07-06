@@ -26,13 +26,6 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
   part_name = "input"
 }
 
-ohos_prebuilt_etc("multimodalinput.para") {
-  source = "${mmi_path}/etc/multimodalinput.para"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-  module_install_dir = "etc/param"
-}
-
 config("libmmi_server_config") {
   if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
       enhanced_opt) {
@@ -240,7 +233,6 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":mmi_device_config.ini",
     ":mmi_rust",
-    ":multimodalinput.para",
     "${mmi_path}/etc/mouse_icon:input_mouse_icon",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
