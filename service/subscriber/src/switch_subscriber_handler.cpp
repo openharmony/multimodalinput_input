@@ -127,7 +127,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
     }
     if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_PRIVACY) {
         std::string value = OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "");
-        if (value == "None" || value == "false") {
+        if (value.empty() || value == "false") {
             OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "true");
         } else {
             OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "false");
