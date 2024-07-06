@@ -78,6 +78,7 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     virtual int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid) = 0;
