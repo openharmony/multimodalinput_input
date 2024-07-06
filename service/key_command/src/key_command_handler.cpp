@@ -1105,6 +1105,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         return true;
     }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+        MMI_HILOGI("Handle power key DownStart:%{public}d", isDownStart_);
+    }
     if (!isDownStart_) {
         HandleRepeatKeys(key);
         return false;
@@ -1239,9 +1242,11 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         if (!statusValue) {
             return false;
         }
+        MMI_HILOGI("Repeat key matched keycode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
         LaunchAbility(item.ability);
         BytraceAdapter::StopLaunchAbility();
+
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
