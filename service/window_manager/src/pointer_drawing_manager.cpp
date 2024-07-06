@@ -1019,7 +1019,6 @@ int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
         *newPixelMapPtr = MAGIC_CURSOR->GetPixelMap();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    CHKPR(newPixelMapPtr, ERROR_NULL_POINTER);
     CHKPR(*newPixelMapPtr, ERROR_NULL_POINTER);
     return RET_OK;
 }
