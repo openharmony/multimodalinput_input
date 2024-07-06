@@ -32,6 +32,7 @@
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "i_preference_manager.h"
+#include "parameters.h"
 #include "pipeline/rs_recording_canvas.h"
 #include "preferences.h"
 #include "preferences_errno.h"
@@ -56,6 +57,8 @@ const std::string POINTER_COLOR { "pointerColor" };
 const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
@@ -504,7 +507,13 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         Rosen::RSNode::Animate(
             protocol,
             Rosen::RSAnimationTimingCurve::LINEAR,
-            [this]() { RotateDegree(currentDirection_); });
+            [this]() {
+                if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+                    RotateDegree(DIRECTION0);
+                    return;
+                }
+                RotateDegree(currentDirection_);
+            });
         MMI_HILOGE("current pointer is not loading");
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
@@ -846,7 +855,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (displayInfo_.displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
                 physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
@@ -863,17 +872,11 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
             }
         }
     } else {
-        int32_t width = displayInfo_.width;
-        int32_t height = displayInfo_.height;
-        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            height = displayInfo_.width;
-            width = displayInfo_.height;
+        if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+            physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }
-        if (physicalX > (width - imageWidth_ / cursorUnit)) {
-            physicalX = width - imageWidth_ / cursorUnit;
-        }
-        if (physicalY > (height - imageHeight_ / cursorUnit)) {
-            physicalY = height - imageHeight_ / cursorUnit;
+        if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+            physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
         }
     }
 }
@@ -1327,7 +1330,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = DIRECTION0;
-    if (displayInfo_.displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         direction = displayInfo_.direction;
     }
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
@@ -1426,7 +1429,7 @@ void PointerDrawingManager::DrawManager()
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         Direction direction = DIRECTION0;
-        if (displayInfo_.displayDirection == DIRECTION0) {
+        if (ROTATE_POLICY == WINDOW_ROTATE) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
@@ -1770,7 +1773,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
-        if (displayInfo_.displayDirection == DIRECTION0) {
+        if (ROTATE_POLICY == WINDOW_ROTATE) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
