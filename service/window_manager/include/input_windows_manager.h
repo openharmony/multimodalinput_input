@@ -90,6 +90,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
