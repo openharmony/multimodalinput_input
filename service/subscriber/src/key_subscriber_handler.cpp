@@ -100,7 +100,11 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
-    AddSubscriber(subscriber, keyOption);
+    if (keyGestureMgr_.ShouldIntercept(keyOption)) {
+        AddKeyGestureSubscriber(subscriber, keyOption);
+    } else {
+        AddSubscriber(subscriber, keyOption);
+    }
     InitSessionDeleteCallback();
     return RET_OK;
 }
@@ -109,7 +113,11 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
-    return RemoveSubscriber(sess, subscribeId);
+    int32_t ret = RemoveSubscriber(sess, subscribeId);
+    if (ret != RET_OK) {
+        ret = RemoveKeyGestureSubscriber(sess, subscribeId);
+    }
+    return ret;
 }
 
 int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
@@ -128,6 +136,49 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 subscribers.erase(it);
                 return RET_OK;
             }
+        }
+    }
+    return RET_ERR;
+}
+
+void KeySubscriberHandler::AddKeyGestureSubscriber(
+    std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_INFO_TRACE;
+    subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(keyOption,
+        [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
+            NotifySubscriber(keyEvent, subscriber);
+        });
+
+    PrintKeyOption(keyOption);
+    for (auto &iter : keyGestures_) {
+        if (IsEqualKeyOption(keyOption, iter.first)) {
+            iter.second.push_back(subscriber);
+            return;
+        }
+    }
+    keyGestures_[keyOption] = { subscriber };
+}
+
+int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
+        auto &subscribers = iter->second;
+
+        for (auto innerIter = subscribers.begin(); innerIter != subscribers.end(); ++innerIter) {
+            auto subscriber = *innerIter;
+
+            if ((subscriber->id_ != subscribeId) || (subscriber->sess_ != sess)) {
+                continue;
+            }
+            keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
+            auto option = subscriber->keyOption_;
+            MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
+                "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
+                option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
+            subscribers.erase(innerIter);
+            return RET_OK;
         }
     }
     return RET_ERR;
@@ -324,6 +375,10 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("Repeat KeyEvent, skip");
+        return true;
+    }
+    if (keyGestureMgr_.Intercept(keyEvent)) {
+        MMI_HILOGD("Key gesture recognized");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
