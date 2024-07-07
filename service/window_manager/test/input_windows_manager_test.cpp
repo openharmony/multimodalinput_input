@@ -180,6 +180,25 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTarget_003, Test
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_HandleKeyEventWindowId_003
+ * @tc.desc: Test HandleKeyEventWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleKeyEventWindowId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    UDSServer udsServer;
+    WIN_MGR->Init(udsServer);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(1);
+    keyEvent->SetTargetWindowId(1);
+    keyEvent->SetAgentWindowId(1);
+    WIN_MGR->HandleKeyEventWindowId(keyEvent);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateWindow_002
  * @tc.desc: Test UpdateWindow
  * @tc.type: FUNC
