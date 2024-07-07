@@ -191,6 +191,7 @@ private:
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
+    bool IsMouseDrawing(int32_t currentAction);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
