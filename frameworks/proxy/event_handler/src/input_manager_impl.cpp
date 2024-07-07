@@ -853,13 +853,13 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    if (event->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        event->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
-        event->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
-        event->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        event->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-        event->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-        event->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+    if (keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
         MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
@@ -909,7 +909,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-    MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+        MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
