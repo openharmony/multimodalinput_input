@@ -52,6 +52,7 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     MOCK_METHOD(int32_t, UpdateTarget, (std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandleKeyEventWindowId, (std::shared_ptr<KeyEvent>));
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
