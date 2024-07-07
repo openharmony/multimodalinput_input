@@ -853,15 +853,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    if (keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
-        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
-        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
-        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
-        keyEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
-        MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
-    }
+    MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
