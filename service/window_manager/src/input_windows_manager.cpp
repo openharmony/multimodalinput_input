@@ -399,17 +399,14 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     int32_t focusWindowId = displayGroupInfo_.focusWindowId;
-    WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
         if (item.id == focusWindowId) {
-            windowInfo = &item;
-            break;
+            keyEvent->SetTargetWindowId(item.id);
+            keyEvent->SetAgentWindowId(item.agentWindowId);
+            return;
         }
     }
-    CHKPV(windowInfo);
-    keyEvent->SetTargetWindowId(windowInfo->id);
-    keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
