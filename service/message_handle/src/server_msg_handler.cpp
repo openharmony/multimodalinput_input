@@ -22,6 +22,7 @@
 #include "authorization_dialog.h"
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
+#include "client_death_handler.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -81,7 +82,7 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
             continue;
         }
     }
-    AUTHORIZE_HELPER->Init(udsServer);
+    AUTHORIZE_HELPER->Init(clientDeathHandler_);
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
@@ -111,15 +112,21 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-            if (AUTHORIZE_HELPER->IsAuthorizing()) {
-                MMI_HILOGI("There has a process been authorizing, authorize pid:%{public}d, inject pid:%{public}d",
-                    AUTHORIZE_HELPER->GetAuthorizePid(), pid);
+            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+            if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+                MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
+                    state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
                 return COMMON_PERMISSION_CHECK_ERROR;
             }
             CurrentPID_ = pid;
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
+                [&] (int32_t pid) {
+                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+                }
+                );
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -179,9 +186,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-            if (AUTHORIZE_HELPER->IsAuthorizing()) {
-                MMI_HILOGI("There has a process been authorizing, authorize pid:%{public}d, inject pid:%{public}d",
-                    AUTHORIZE_HELPER->GetAuthorizePid(), pid);
+            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+            if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+                MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
+                    state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
                 return COMMON_PERMISSION_CHECK_ERROR;
             }
             CurrentPID_ = pid;
@@ -730,7 +738,9 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         noticeInfo.pid = CurrentPID_;
         AddInjectNotice(noticeInfo);
         auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            std::bind(&ServerMsgHandler::CloseInjectNotice, this, std::placeholders::_1));
+            [&] (int32_t pid) {
+                CloseInjectNotice(pid);
+        });
         if (result != RET_OK) {
             MMI_HILOGI("Authorize process failed, pid:%{public}d", CurrentPID_);
         }
@@ -763,7 +773,8 @@ int32_t ServerMsgHandler::OnCancelInjection()
     if (iter != authorizationCollection_.end()) {
         authorizationCollection_.erase(iter);
         AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
-        if (AUTHORIZE_HELPER->IsAuthorizing()) {
+        auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+        if (state != AuthorizeState::STATE_UNAUTHORIZE) {
             CloseInjectNotice(CurrentPID_);
         }
         MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
@@ -840,9 +851,9 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("submit begin");
+    MMI_HILOGD("SendNotice submit  begin");
     ffrt::submit([this, noticeInfo] {
-        MMI_HILOGD("submit enter");
+        MMI_HILOGD("SendNotice submit enter");
         CHKPV(injectNotice_);
         auto pConnect = injectNotice_->GetConnection();
         CHKPV(pConnect);
@@ -858,7 +869,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
             timeSecond += 1;
             sleep(1);
         }
-        MMI_HILOGD("submit leave");
+        MMI_HILOGD("SendNotice submit leave");
     });
     return true;
 }
@@ -871,11 +882,11 @@ bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("submit begin");
+    MMI_HILOGD("CloseNotice submit begin");
     InjectNoticeInfo noticeInfo;
     noticeInfo.pid = pid;
     ffrt::submit([this, noticeInfo] {
-        MMI_HILOGD("submit enter");
+        MMI_HILOGD("CloseNotice submit enter");
         CHKPV(injectNotice_);
         auto pConnect = injectNotice_->GetConnection();
         CHKPV(pConnect);
@@ -891,9 +902,20 @@ bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
             timeSecond += 1;
             sleep(1);
         }
-        MMI_HILOGD("submit leave");
+        MMI_HILOGD("CloseNotice submit leave");
     });
     return true;
+}
+
+int32_t ServerMsgHandler::OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    bool bRet = clientDeathHandler_.RegisterClientDeathRecipient(binderClientObject, pid);
+    if (!bRet) {
+        MMI_HILOGE("Failed to registerClientDeathRecipient");
+        return RET_ERR;
+    }
+    return ERR_OK;
 }
 } // namespace MMI
 } // namespace OHOS
