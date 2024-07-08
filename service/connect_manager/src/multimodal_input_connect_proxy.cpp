@@ -2219,5 +2219,29 @@ int32_t MultimodalInputConnectProxy::AncoRemoveChannel(sptr<IAncoChannel> channe
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectProxy::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEREMOTEOBJECT(data, binderClientObject, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
