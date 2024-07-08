@@ -254,6 +254,7 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override { return RET_OK; }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;

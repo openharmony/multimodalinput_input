@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -148,6 +148,7 @@ public:
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
+    virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
