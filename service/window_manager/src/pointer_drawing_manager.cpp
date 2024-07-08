@@ -41,6 +41,7 @@
 #include "scene_board_judgement.h"
 #include "setting_datashare.h"
 #include "util.h"
+#include "dfx_hisysevent.h"
 #include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -315,8 +316,10 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
         direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
+        MAGIC_CURSOR->EnableCursorInversion();
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
     } else {
+        MAGIC_CURSOR->DisableCursorInversion();
         CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -349,6 +352,9 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     ErrCode ret =
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(magicCursorChangeObserver);
     if (ret != ERR_OK) {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        DfxHisysevent::ReportMagicCursorFault(dynamicallyKey, "Register setting observer failed");
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         MMI_HILOGE("Register magic cursor change observer failed, ret:%{public}d", ret);
         magicCursorChangeObserver = nullptr;
     }
@@ -418,6 +424,9 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        DfxHisysevent::ReportMagicCursorFault(item.name, "Register setting observer failed");
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
         return RET_ERR;
