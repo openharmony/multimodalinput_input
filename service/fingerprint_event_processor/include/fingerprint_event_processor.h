@@ -33,17 +33,17 @@ public:
     bool IsFingerprintEvent(struct libinput_event* event);
     int32_t HandleFingerprintEvent(struct libinput_event* event);
 
-    static constexpr int32_t FINGERPRINT_CODE_DOWN = 121;
-    static constexpr int32_t FINGERPRINT_CODE_UP = 122;
-    static constexpr int32_t FINGERPRINT_CODE_CLICK = 123;
-    static constexpr int32_t FINGERPRINT_CODE_RETOUCH = 124;
+    static constexpr int32_t FINGERPRINT_CODE_DOWN { 121 };
+    static constexpr int32_t FINGERPRINT_CODE_UP { 122 };
+    static constexpr int32_t FINGERPRINT_CODE_CLICK { 123 };
+    static constexpr int32_t FINGERPRINT_CODE_RETOUCH { 124 };
 
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
     int32_t AnalysePointEvent(struct libinput_event *event);
 
-    const std::string FINGERPRINT_SOURCE_KEY = "fingerprint";
-    const std::string FINGERPRINT_SOURCE_POINT = "hw_fingerprint_mouse";
+    const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
+    const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
 };
 #define FingerprintEventHdr ::OHOS::DelayedSingleton<FingerprintEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT

@@ -18,16 +18,16 @@
 
 #include <vector>
 
+#include "display_manager.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
+#include "window_manager_lite.h"
 
-#include "display_manager.h"
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
 #include "knuckle_drawing_manager.h"
 #include "knuckle_dynamic_drawing_manager.h"
-#include "window_manager_lite.h"
 
 namespace OHOS {
 namespace MMI {
@@ -90,6 +90,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
@@ -191,6 +192,7 @@ private:
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
+    bool IsMouseDrawing(int32_t currentAction);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);

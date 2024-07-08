@@ -19,8 +19,9 @@
 #include <map>
 #include <memory>
 
-#include "proto.h"
 #include "singleton.h"
+
+#include "proto.h"
 #include "transform_processor.h"
 
 namespace OHOS {
@@ -57,6 +58,8 @@ public:
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch) const;
     void GetTouchpadRotateSwitch(bool &rotateSwitch) const;
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) const;
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) const;
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(

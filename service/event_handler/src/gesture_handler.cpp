@@ -45,6 +45,7 @@ void GestureHandler::InitRotateGesture()
     initialAngle_ = 0.0;
     lastAngle_ = 0.0;
     rotateAngle_ = 0.0;
+    numberOfTouchPadFingerDown_ = -1;
 }
 
 int32_t GestureHandler::GestureIdentify(int32_t originType, int32_t seatSlot, double logicalX, double logicalY)
@@ -52,6 +53,7 @@ int32_t GestureHandler::GestureIdentify(int32_t originType, int32_t seatSlot, do
     int32_t gestureType = PointerEvent::POINTER_ACTION_UNKNOWN;
     switch (originType) {
         case LIBINPUT_EVENT_TOUCHPAD_DOWN: {
+            numberOfTouchPadFingerDown_++;
             gestureType = HandleTouchPadDownEvent(seatSlot, logicalX, logicalY);
             break;
         }
@@ -102,6 +104,17 @@ int32_t GestureHandler::HandleTouchPadMoveEvent(int32_t seatSlot, double logical
 {
     if (!isReady_) {
         MMI_HILOGD("Gesture event is not identified");
+        return PointerEvent::POINTER_ACTION_UNKNOWN;
+    }
+    if (numberOfTouchPadFingerDown_ < FIRST_FINGER || numberOfTouchPadFingerDown_ > SECOND_FINGER) {
+        if (isStartRotate_) {
+            MMI_HILOGI("Exceed two fingers, rotate is end");
+            return PointerEvent::POINTER_ACTION_UNKNOWN;
+        }
+        if (isReady_) {
+            InitRotateGesture();
+        }
+        MMI_HILOGD("seatSlot is invalid");
         return PointerEvent::POINTER_ACTION_UNKNOWN;
     }
 

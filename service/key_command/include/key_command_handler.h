@@ -27,12 +27,13 @@
 #include <vector>
 
 #include "nocopyable.h"
-#include "i_input_event_handler.h"
-#include "key_event.h"
-#include "struct_multimodal.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
+
+#include "i_input_event_handler.h"
+#include "key_event.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -280,12 +281,14 @@ private:
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    void HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent> touchEvent);
     void ProcessKnuckleGestureTouchUp(NotifyType type);
     void ResetKnuckleGesture();
     std::string GesturePointsToStr() const;
+    bool IsValidAction(int32_t action);
     void ReportIfNeed();
     void ReportRegionGesture();
     void ReportLetterGesture();

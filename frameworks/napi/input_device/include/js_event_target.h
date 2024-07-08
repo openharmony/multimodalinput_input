@@ -23,7 +23,6 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-
 #include "input_manager.h"
 #include "js_util.h"
 

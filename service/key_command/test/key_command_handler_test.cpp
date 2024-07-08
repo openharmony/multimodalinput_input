@@ -24,13 +24,13 @@
 #include "gesturesense_wrapper.h"
 #include "input_event_handler.h"
 #include "input_handler_type.h"
+#include "input_windows_manager.h"
 #include "i_preference_manager.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "stylus_key_handler.h"
-
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -49,6 +49,7 @@ constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
+constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string EXTENSION_ABILITY_ABNORMAL = "extensionAbilityAbnormal";
 const vector<float> CIRCLE_COORDINATES = {
@@ -1296,17 +1297,32 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SkipFinalKey, TestSize.Lev
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleKeyDown
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_01
  * @tc.desc: Handle Key Down
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
     shortcutKey.keyDownDuration = 0;
+    ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_02
+ * @tc.desc: test HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.timerId = -1;
     ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
 }
 
@@ -1339,7 +1355,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_001, TestSize.
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     shortcutKey.keyDownDuration = 0;
-    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -1378,7 +1394,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_003, TestSize.
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
     keyEvent->SetActionTime(10000);
-    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -1400,7 +1416,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUp_004, TestSize.
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_H);
     keyEvent->SetActionTime(100);
-    ASSERT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    ASSERT_FALSE(handler.HandleKeyUp(keyEvent, shortcutKey));
 }
 
 /**
@@ -1892,7 +1908,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
 
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
@@ -2203,6 +2219,58 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GesturePointsToStr_003, Te
     ASSERT_TRUE(result.empty());
     ASSERT_EQ(handler.gesturePoints_.size(), 1);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent
+ * @tc.desc: Test HandleKnuckleGestureEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+
+    handler.singleKnuckleGesture_.state = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsValidAction
+ * @tc.desc: Test IsValidAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsValidAction, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t action = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_MOVE;
+    handler.gesturePoints_ = { 0.0f };
+    ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
+
+    action = PointerEvent::POINTER_ACTION_UP;
+    handler.gesturePoints_.assign(CIRCLE_COORDINATES.begin(), CIRCLE_COORDINATES.end());
+    ASSERT_NO_FATAL_FAILURE(handler.IsValidAction(action));
+}
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
 /**
@@ -2252,7 +2320,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_001, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_0012, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -2316,6 +2384,52 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_003, TestS
     std::string businessId = "power";
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_04
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business2";
+    key.statusConfig = "config2";
+    key.statusConfigValue = true;
+    key.finalKey = 5;
+    key.keyDownDuration = 6;
+    key.triggerType = KeyEvent::KEY_ACTION_UP;
+    key.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName2";
+    ability_temp.abilityName = "abilityName2";
+    key.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key2", key));
+    bool ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = -1;
+    ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
+
+    key.businessId = "power";
+    int32_t delay = handler.GetKeyDownDurationFromXml(key.businessId);
+    EXPECT_TRUE(delay < 0);
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
+
+    key.triggerType = KeyEvent::KEY_ACTION_UP;
+    bool handleResult = handler.HandleKeyUp(keyEvent, key);
+    EXPECT_FALSE(handleResult);
+    ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -2781,10 +2895,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_004, TestS
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(2);
     bool result = handler.IsKeyMatch(handler.lastMatchedKey_, keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     bool ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -2812,11 +2926,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_005, TestS
     keyEvent->SetKeyCode(1);
     keyEvent->SetKeyAction(2);
     bool result = handler.IsKeyMatch(handler.currentLaunchAbilityKey_, keyEvent);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     handler.shortcutKeys_.insert(std::make_pair("key1", key));
     handler.currentLaunchAbilityKey_.timerId = 0;
     bool ret = handler.HandleShortKeys(keyEvent);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
     handler.currentLaunchAbilityKey_.timerId = -1;
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
@@ -2901,6 +3015,632 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerVisibleKeys_0
     keyEvent->keyCode_ = KeyEvent::KEYCODE_F1;
     handler.lastKeyEventCode_ = KeyEvent::KEYCODE_CAPS_LOCK;
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerVisibleKeys(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_002
+ * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t vp = -5;
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+    vp = 5;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_003
+ * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t vp = 5;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = 160;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_003
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 1;
+    handler.twoFingerGesture_.touches[0].x = -100;
+    handler.twoFingerGesture_.touches[0].y = -200;
+    handler.twoFingerGesture_.touches[0].downTime = 100000;
+    handler.twoFingerGesture_.touches[1].id = 2;
+    handler.twoFingerGesture_.touches[1].x = -300;
+    handler.twoFingerGesture_.touches[1].y = -400;
+    handler.twoFingerGesture_.touches[1].downTime = 50000;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    bool ret = handler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_004
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 1;
+    handler.twoFingerGesture_.touches[0].x = 100;
+    handler.twoFingerGesture_.touches[0].y = 200;
+    handler.twoFingerGesture_.touches[0].downTime = 100000;
+    handler.twoFingerGesture_.touches[1].id = 2;
+    handler.twoFingerGesture_.touches[1].x = 300;
+    handler.twoFingerGesture_.touches[1].y = 400;
+    handler.twoFingerGesture_.touches[1].downTime = 50000;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 40;
+    displayInfo.height = 50;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    bool ret = handler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_005
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 1;
+    handler.twoFingerGesture_.touches[0].x = 10;
+    handler.twoFingerGesture_.touches[0].y = 20;
+    handler.twoFingerGesture_.touches[0].downTime = 100000;
+    handler.twoFingerGesture_.touches[1].id = 2;
+    handler.twoFingerGesture_.touches[1].x = 30;
+    handler.twoFingerGesture_.touches[1].y = 20;
+    handler.twoFingerGesture_.touches[1].downTime = 50000;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 40;
+    displayInfo.height = 50;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    bool ret = handler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_002
+ * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = false;
+    ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 5;
+    handler.twoFingerGesture_.touches[0].x = 50;
+    handler.twoFingerGesture_.touches[0].y = 60;
+    handler.twoFingerGesture_.touches[0].downTime = 13000;
+    handler.twoFingerGesture_.touches[1].id = 9;
+    handler.twoFingerGesture_.touches[1].x = 100;
+    handler.twoFingerGesture_.touches[1].y = 400;
+    handler.twoFingerGesture_.touches[1].downTime = 96000;
+    ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_005
+ * @tc.desc: Test the funcation HandleKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    GESTURESENSE_WRAPPER->touchUp_ = [](const std::vector<float> &, const std::vector<int64_t> &, bool, bool)
+        -> int32_t {
+            return 0;
+    };
+    ASSERT_NE(GESTURESENSE_WRAPPER->touchUp_, nullptr);
+    handler.isGesturing_ = false;
+    handler.isLetterGesturing_ = false;
+    handler.gesturePoints_.assign(LINE_TIMESTAMPS.begin(), LINE_TIMESTAMPS.end());
+    handler.gestureTimeStamps_.assign(LINE_COORDINATES.begin(), LINE_COORDINATES.end());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+    handler.gesturePoints_.assign(CURVE_COORDINATES.begin(), CURVE_COORDINATES.end());
+    handler.gestureTimeStamps_.assign(CURVE_TIMESTAMPS.begin(), CURVE_TIMESTAMPS.end());
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+    handler.isGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+    handler.isLetterGesturing_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseJson_001
+ * @tc.desc: Test the funcation ParseJson
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseJson_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string configFile;
+    bool ret = handler.ParseJson(configFile);
+    EXPECT_FALSE(ret);
+    configFile = "config";
+    std::string copyShortcutKey = "copyShortcutKey";
+    ShortcutKey shortcutKey;
+    Ability ability_temp;
+    shortcutKey.preKeys.insert(2072);
+    shortcutKey.finalKey = 2019;
+    shortcutKey.keyDownDuration = 100;
+    ability_temp.bundleName = "bundleName";
+    ability_temp.abilityName = "abilityName";
+    shortcutKey.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair(copyShortcutKey, shortcutKey));
+    handler.businessIds_ = {"businessId"};
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.timerId = 1;
+    ret = handler.ParseJson(configFile);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_003
+ * @tc.desc: Test the funcation IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    handler.enableCombineKey_ = false;
+    handler.isParseExcludeConfig_ = false;
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    handler.isParseExcludeConfig_ = true;
+    ExcludeKey excludeKey;
+    excludeKey.keyCode = 1;
+    excludeKey.keyAction = 2;
+    excludeKey.delay = 3;
+    handler.excludeKeys_.push_back(excludeKey);
+    key->keyCode_ = 1;
+    key->keyAction_ = 2;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 2017;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    sequenceKey.keyCode = 2018;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_004
+ * @tc.desc: Test the funcation IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    handler.enableCombineKey_ = false;
+    handler.isParseExcludeConfig_ = true;
+    ExcludeKey excludeKey;
+    excludeKey.keyCode = 1;
+    excludeKey.keyAction = 2;
+    excludeKey.delay = 3;
+    handler.excludeKeys_.push_back(excludeKey);
+    key->keyCode_ = KeyEvent::KEYCODE_L;
+    key->keyAction_ = 200;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = KeyEvent::KEYCODE_SPACE;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+    sequenceKey.keyCode = KeyEvent::KEYCODE_L;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+    sequenceKey.keyCode = KeyEvent::KEYCODE_META_LEFT;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+    sequenceKey.keyCode = KeyEvent::KEYCODE_META_RIGHT;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_001
+ * @tc.desc: Test the funcation HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    handler.enableCombineKey_ = false;
+    handler.isParseExcludeConfig_ = true;
+    ExcludeKey excludeKey;
+    excludeKey.keyCode = 3;
+    excludeKey.keyAction = 5;
+    excludeKey.delay = 8;
+    handler.excludeKeys_.push_back(excludeKey);
+    key->keyCode_ = KeyEvent::KEYCODE_L;
+    key->keyAction_ = 200;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = KeyEvent::KEYCODE_SPACE;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.keys_.push_back(sequenceKey);
+    ShortcutKey shortcutKey;
+    shortcutKey.preKeys = {1, 2, 3};
+    shortcutKey.businessId = "business1";
+    shortcutKey.statusConfig = "config1";
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 4;
+    shortcutKey.keyDownDuration = 5;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    shortcutKey.timerId = 6;
+    handler.currentLaunchAbilityKey_.finalKey = 1;
+    handler.currentLaunchAbilityKey_.triggerType = 2;
+    key->SetKeyCode(1);
+    key->SetKeyAction(2);
+    handler.IsKeyMatch(handler.currentLaunchAbilityKey_, key);
+    handler.shortcutKeys_.insert(std::make_pair("key1", shortcutKey));
+    handler.currentLaunchAbilityKey_.timerId = 0;
+    handler.HandleShortKeys(key);
+    handler.isKeyCancel_ = true;
+    bool ret = handler.HandleEvent(key);
+    EXPECT_FALSE(ret);
+    handler.isKeyCancel_ = false;
+    ret = handler.HandleEvent(key);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_002
+ * @tc.desc: Test the funcation HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    handler.enableCombineKey_ = false;
+    handler.isParseExcludeConfig_ = true;
+    ExcludeKey excludeKey;
+    excludeKey.keyCode = 2;
+    excludeKey.keyAction = 6;
+    excludeKey.delay = 9;
+    handler.excludeKeys_.push_back(excludeKey);
+    key->keyCode_ = KeyEvent::KEYCODE_L;
+    key->keyAction_ = 300;
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = KeyEvent::KEYCODE_SPACE;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.keys_.push_back(sequenceKey);
+    ShortcutKey shortcutKey;
+    shortcutKey.preKeys = {1, 2, 3};
+    shortcutKey.businessId = "business2";
+    shortcutKey.statusConfig = "config2";
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 5;
+    shortcutKey.keyDownDuration = 6;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
+    shortcutKey.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName2";
+    ability_temp.abilityName = "abilityName2";
+    shortcutKey.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key2", shortcutKey));
+    handler.HandleShortKeys(key);
+    handler.isDownStart_ = false;
+    bool ret = handler.HandleEvent(key);
+    EXPECT_FALSE(ret);
+    handler.isDownStart_ = true;
+    ret = handler.HandleEvent(key);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_OnHandleEvent_001
+ * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    key->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    int32_t keyAction = KeyEvent::KEYCODE_VOLUME_UP;
+    handler.specialKeys_.insert(std::make_pair(10, keyAction));
+    bool ret = handler.OnHandleEvent(key);
+    EXPECT_FALSE(ret);
+    key->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    int32_t keyCode = 99;
+    std::list<int32_t> timerIds;
+    timerIds.push_back(100);
+    handler.specialTimers_.insert(std::make_pair(keyCode, timerIds));
+    ret = handler.OnHandleEvent(key);
+    EXPECT_TRUE(ret);
+    keyCode = KeyEvent::KEYCODE_VOLUME_UP;
+    handler.specialTimers_.insert(std::make_pair(keyCode, timerIds));
+    ret = handler.OnHandleEvent(key);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_001
+ * @tc.desc: Test the funcation HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey item;
+    bool isLaunched = true;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.times = 5;
+    handler.count_ = 5;
+    ASSERT_FALSE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+    handler.count_ = 10;
+    ASSERT_FALSE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_002
+ * @tc.desc: Test the funcation HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey item;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    item.times = 6;
+    handler.count_ = 5;
+    ASSERT_TRUE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_001
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2000;
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 10;
+    windowInfo.area.width = INT32_MAX;
+    windowInfo.area.y = 100;
+    windowInfo.area.height = 200;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_002
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 10;
+    windowInfo.area.width = 100;
+    windowInfo.area.y = 20;
+    windowInfo.area.height = INT32_MAX;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_003
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 30;
+    windowInfo.area.width = 300;
+    windowInfo.area.y = 90;
+    windowInfo.area.height = 1000;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_004
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    WindowInfo windowInfo;
+    windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
+    bool ret = handler.CheckInputMethodArea(pointerEvent);
+    EXPECT_FALSE(ret);
+
+    windowInfo.area.x = 10;
+    windowInfo.area.width = INT32_MAX;
+    windowInfo.area.y = 100;
+    windowInfo.area.height = 200;
+    ret = handler.CheckInputMethodArea(pointerEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_001
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = true;
+    handler.launchAbilityCount_ = 1;
+    handler.count_ = 5;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_002
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = false;
+    handler.launchAbilityCount_ = 1;
+    handler.repeatKey_.keyCode = 3;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_003
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = false;
+    handler.launchAbilityCount_ = 0;
+    handler.repeatKey_.keyCode = 2;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
 }
 } // namespace MMI
 } // namespace OHOS

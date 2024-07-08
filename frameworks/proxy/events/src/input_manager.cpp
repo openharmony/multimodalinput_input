@@ -568,6 +568,16 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
     return InputMgrImpl.SetCurrentUser(userId);
 }
 
+int32_t InputManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
+}
+
 int32_t InputManager::GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount)
 {
     return InputMgrImpl.GetWinSyncBatchSize(maxAreasCount, displayCount);
