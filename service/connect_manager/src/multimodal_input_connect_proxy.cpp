@@ -249,7 +249,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, ERR_INVALID_VALUE);
@@ -264,7 +264,6 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId,
         return ERR_INVALID_VALUE;
     }
     pixelMapPtr->Marshalling(data);
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     MMI_HILOGD("Send windowId:%{public}d", windowId);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
 
