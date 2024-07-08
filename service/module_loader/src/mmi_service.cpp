@@ -344,7 +344,16 @@ void MMIService::OnStart()
             MMI_HILOGD("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Timeout happened");
+            MMI_HILOGI("WatchDog happened");
+            std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+            if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_WARN_TIME);
+                WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
+                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_BLOCK_TIME);
+                WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+            } else {
+                MMI_HILOGI("Screen off, WatchDog stop, Timeout");
+            }
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
