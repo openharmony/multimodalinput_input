@@ -66,7 +66,7 @@ public:
     {
         return pid;
     }
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override { return pid; }
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override { return 1; }
     int32_t SetPointerSize(int32_t size) override
     {
         size_ = size;

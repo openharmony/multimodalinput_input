@@ -145,11 +145,11 @@ int32_t MultimodalInputConnectManager::SetCustomCursor(int32_t pid, int32_t wind
     return multimodalInputConnectService_->SetCustomCursor(pid, windowId, focusX, focusY, pixelMap);
 }
 
-int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetMouseIcon(pid, windowId, pixelMap);
+    return multimodalInputConnectService_->SetMouseIcon(windowId, pixelMap);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseHotSpot(
