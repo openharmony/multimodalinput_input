@@ -538,6 +538,13 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode << item.windowType;
+        uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
+        pkt << uiExtentionWindowInfoNum;
+        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
+        if (!item.uiExtentionWindowInfo.empty()) {
+            PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
+            PrintWindowInfo(item.uiExtentionWindowInfo);
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -563,6 +570,23 @@ int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
+int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : windowsInfo) {
+        pkt << item.id << item.pid << item.uid << item.area
+            << item.defaultHotAreas << item.pointerHotAreas
+            << item.agentWindowId << item.flags << item.action
+            << item.displayId << item.zOrder << item.pointerChangeAreas
+            << item.transform << item.windowInputType << item.privacyMode << item.windowType << item.privacyUIFlag;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write windows data failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -577,6 +601,13 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
+            uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
+            pkt << uiExtentionWindowInfoNum;
+            MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
+            if (!item.uiExtentionWindowInfo.empty()) {
+                PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
+                PrintWindowInfo(item.uiExtentionWindowInfo);
+            }
             continue;
         }
         OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
@@ -587,6 +618,13 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
             MMI_HILOGE("Failed to set pixel map");
         }
         pkt << byteCount;
+        uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
+        pkt << uiExtentionWindowInfoNum;
+        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
+        if (!item.uiExtentionWindowInfo.empty()) {
+            PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
+            PrintWindowInfo(item.uiExtentionWindowInfo);
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
