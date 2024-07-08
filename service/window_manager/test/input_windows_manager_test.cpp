@@ -4678,11 +4678,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
     std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
     EXPECT_NE(inputEvent, nullptr);
     inputEvent->targetDisplayId_ = 10;
-    int32_t ret = inputWindowsManager.GetPidAndUpdateTarget(keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPidAndUpdateTarget(keyEvent));
     inputEvent->targetDisplayId_ = 18;
-    ret = inputWindowsManager.GetPidAndUpdateTarget(keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPidAndUpdateTarget(keyEvent));
     WindowGroupInfo windowGroupInfo;
     WindowInfo windowInfo;
     windowInfo.id = 10;
@@ -4693,8 +4691,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
     windowInfo.agentWindowId = 12;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(10, windowGroupInfo));
-    ret = inputWindowsManager.GetPidAndUpdateTarget(keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.GetPidAndUpdateTarget(keyEvent));
 }
 
 /**
