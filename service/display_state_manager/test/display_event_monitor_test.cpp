@@ -27,6 +27,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+using namespace testing;
 } // namespace
 
 class DisplayEventMonitorTest : public testing::Test {
@@ -91,7 +92,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetCurrentShieldMode()).WillOnce(testing::Return(SHIELD_MODE::FACTORY_MODE));
+    EXPECT_CALL(*messageParcelMock_, GetCurrentShieldMode()).WillRepeatedly(Return(SHIELD_MODE::FACTORY_MODE));
     DisplayEventMonitor displayEventMonitor;
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
 }
@@ -105,7 +106,7 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnSc
 HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetCurrentShieldMode()).WillOnce(testing::Return(SHIELD_MODE::UNSET_MODE));
+    EXPECT_CALL(*messageParcelMock_, GetCurrentShieldMode()).WillRepeatedly(Return(SHIELD_MODE::UNSET_MODE));
     DisplayEventMonitor displayEventMonitor;
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
 }
