@@ -49,6 +49,7 @@ constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
+constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string EXTENSION_ABILITY_ABNORMAL = "extensionAbilityAbnormal";
 const vector<float> CIRCLE_COORDINATES = {
@@ -1296,17 +1297,32 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SkipFinalKey, TestSize.Lev
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleKeyDown
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_01
  * @tc.desc: Handle Key Down
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
     ShortcutKey shortcutKey;
     shortcutKey.keyDownDuration = 0;
+    ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKeyDown_02
+ * @tc.desc: test HandleKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyDown_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    ShortcutKey shortcutKey;
+    shortcutKey.timerId = -1;
     ASSERT_TRUE(handler.HandleKeyDown(shortcutKey));
 }
 
@@ -2304,7 +2320,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_001, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_0012, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -2368,6 +2384,52 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_003, TestS
     std::string businessId = "power";
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_04
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {1, 2, 3};
+    key.businessId = "business2";
+    key.statusConfig = "config2";
+    key.statusConfigValue = true;
+    key.finalKey = 5;
+    key.keyDownDuration = 6;
+    key.triggerType = KeyEvent::KEY_ACTION_UP;
+    key.timerId = 6;
+    Ability ability_temp;
+    ability_temp.bundleName = "bundleName2";
+    ability_temp.abilityName = "abilityName2";
+    key.ability = ability_temp;
+    handler.shortcutKeys_.insert(std::make_pair("key2", key));
+    bool ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = -1;
+    ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
+
+    key.businessId = "power";
+    int32_t delay = handler.GetKeyDownDurationFromXml(key.businessId);
+    EXPECT_TRUE(delay < 0);
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
+
+    key.triggerType = KeyEvent::KEY_ACTION_UP;
+    bool handleResult = handler.HandleKeyUp(keyEvent, key);
+    EXPECT_FALSE(handleResult);
+    ret = handler.HandleShortKeys(keyEvent);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -3505,6 +3567,80 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_003, 
     windows.push_back(windowInfo);
     bool ret = handler.CheckInputMethodArea(touchEvent);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_004
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    WindowInfo windowInfo;
+    windowInfo.windowType = WINDOW_INPUT_METHOD_TYPE;
+    bool ret = handler.CheckInputMethodArea(pointerEvent);
+    EXPECT_FALSE(ret);
+
+    windowInfo.area.x = 10;
+    windowInfo.area.width = INT32_MAX;
+    windowInfo.area.y = 100;
+    windowInfo.area.height = 200;
+    ret = handler.CheckInputMethodArea(pointerEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_001
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = true;
+    handler.launchAbilityCount_ = 1;
+    handler.count_ = 5;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_002
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = false;
+    handler.launchAbilityCount_ = 1;
+    handler.repeatKey_.keyCode = 3;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_003
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = false;
+    handler.launchAbilityCount_ = 0;
+    handler.repeatKey_.keyCode = 2;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
 }
 } // namespace MMI
 } // namespace OHOS
