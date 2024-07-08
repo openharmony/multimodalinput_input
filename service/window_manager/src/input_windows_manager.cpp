@@ -39,6 +39,7 @@
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
 #include "i_preference_manager.h"
+#include "parameters.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "timer_manager.h"
@@ -85,6 +86,8 @@ const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr int32_t WINDOW_ROTATE { 0 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -356,7 +359,7 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     auto displayId = pointerEvent->GetTargetDisplayId();
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    if (physicDisplayInfo->displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         MMI_HILOG_DISPATCHD("Not in the unfolded state of the folding screen");
         return;
     }
@@ -2137,7 +2140,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         isDragBorder_ = false;
     }
     Direction direction = DIRECTION0;
-    if (physicalDisplayInfo->displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = physicalDisplayInfo->direction;
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
@@ -2899,20 +2902,20 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
 
 void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height)
 {
-    if (displayInfo->displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
             width = displayInfo->width;
             height = displayInfo->height;
         } else {
+            if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+                width = displayInfo->width;
+                height = displayInfo->height;
+                return;
+            }
             height = displayInfo->width;
             width = displayInfo->height;
         }
     } else {
-        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            height = displayInfo->width;
-            width = displayInfo->height;
-            return;
-        }
         width = displayInfo->width;
         height = displayInfo->height;
     }
@@ -2980,7 +2983,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
 
-    if (displayInfo->displayDirection == DIRECTION0 && isRealData) {
+    if (ROTATE_POLICY == WINDOW_ROTATE && isRealData) {
         PhysicalCoordinate coord {
             .x = integerX,
             .y = integerY,
@@ -2996,7 +2999,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
     cursorPos_.displayId = displayId;
-    if (displayInfo->displayDirection == DIRECTION0 && !isRealData) {
+    if (ROTATE_POLICY == WINDOW_ROTATE && !isRealData) {
         ReverseRotateScreen(*displayInfo, x, y, cursorPos_.cursorPos);
         return;
     }
