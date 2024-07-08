@@ -2364,27 +2364,27 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isHotArea = false;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     bool isFirstSpecialWindow = false;
-    static std::unordered_map<int32_t, int32_t> winMap;
+    static std::unordered_map<int32_t, WindowInfo> winMap;
     for (auto &item : windowsInfo) {
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
             MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
                 "window:%{public}d, flags:%{public}d", item.id, item.flags);
-            winMap.insert({item.id, item.zOrder});
+            winMap.insert({item.id, item});
             continue;
         }
         if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
             MMI_HILOG_DISPATCHE("It's an abnormal window and touchscreen find the next window");
-            winMap.insert({item.id, item.zOrder});
+            winMap.insert({item.id, item});
             continue;
         }
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
-            winMap.insert({item.id, item.zOrder});
+            winMap.insert({item.id, item});
             continue;
         }
         if (SkipNavigationWindow(item.windowInputType, pointerItem.GetToolType())) {
-            winMap.insert({item.id, item.zOrder});
+            winMap.insert({item.id, item});
             continue;
         }
 
@@ -2399,7 +2399,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 touchWindow = &item;
                 break;
             } else {
-                winMap.insert({item.id, item.zOrder});
+                winMap.insert({item.id, item});
                 continue;
             }
         }
@@ -2435,13 +2435,29 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 break;
             }
         } else {
-            winMap.insert({item.id, item.zOrder});
+            winMap.insert({item.id, item});
+        }
+    }
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        std::ostringstream oss;
+        for (auto iter = winMap.begin(); iter != winMap.end(); iter++) {
+            oss << iter->first << "|" << iter->second.zOrder << "|";
+            int32_t searchHotAreaCount = 0;
+            int32_t searchHotAreaMaxCount = 4;
+            for (auto &hotArea : iter->second.defaultHotAreas) {
+                searchHotAreaCount++;
+                oss << hotArea.x << "|" << hotArea.y << "|" << hotArea.width << "|" << hotArea.height << "|";
+                if (searchHotAreaCount >= searchHotAreaMaxCount) {
+                    break;
+                }
+            }
+            oss << iter->second.pid << " ";
+        }
+        if (!oss.str().empty()) {
+            MMI_HILOG_DISPATCHI("Pre search window %{public}d %{public}s", targetWindowId, oss.str().c_str());
         }
     }
     if (touchWindow == nullptr) {
-        for (auto iter = winMap.begin(); iter != winMap.end(); iter++) {
-            MMI_HILOG_DISPATCHE("id:%{public}d, zOrder:%{public}d", iter->first, iter->second);
-        }
         auto it = touchItemDownInfos_.find(pointerId);
         if (it == touchItemDownInfos_.end() ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
@@ -2463,6 +2479,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         MMI_HILOG_DISPATCHD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            MMI_HILOG_DISPATCHI("In Anco, WI:%{public}d, SI:%{public}d SW:%{public}d",
+                touchWindow->id, isCompensatePointer, isFirstSpecialWindow);
+        }
         if (isCompensatePointer || isFirstSpecialWindow) {
             SimulatePointerExt(pointerEvent);
             isFirstSpecialWindow = false;
