@@ -16,17 +16,16 @@
 #ifndef KNUCKLE_GIVERGENT_POINT_H
 #define KNUCKLE_GIVERGENT_POINT_H
 
-#include "image/bitmap.h"
 #include "draw/canvas.h"
-#include "utils/matrix.h"
+#include "image/bitmap.h"
 #include "pipeline/rs_recording_canvas.h"
 #include "render/rs_pixel_map_util.h"
-
+#include "utils/matrix.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t DEFAULT_LIFESPAN = -1;
+constexpr int32_t DEFAULT_LIFESPAN { -1 };
 } // namespace
 
 class KnuckleDivergentPoint {
