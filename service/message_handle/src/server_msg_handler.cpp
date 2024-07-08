@@ -417,7 +417,6 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    MMI_HILOGE("num:%{public}d", num);
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo extensionInfo;
         pkt >> extensionInfo.id >> extensionInfo.pid >> extensionInfo.uid >> extensionInfo.area

@@ -540,7 +540,7 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.transform << item.windowInputType << item.privacyMode << item.windowType;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
-        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", item.uiExtentionWindowInfo.size());
+        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
         if (!item.uiExtentionWindowInfo.empty()) {
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
@@ -603,7 +603,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
             pkt << byteCount;
             uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
             pkt << uiExtentionWindowInfoNum;
-            MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", item.uiExtentionWindowInfo.size());
+            MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
             if (!item.uiExtentionWindowInfo.empty()) {
                 PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
                 PrintWindowInfo(item.uiExtentionWindowInfo);
@@ -620,7 +620,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
         pkt << byteCount;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
         pkt << uiExtentionWindowInfoNum;
-        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", item.uiExtentionWindowInfo.size());
+        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
         if (!item.uiExtentionWindowInfo.empty()) {
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
