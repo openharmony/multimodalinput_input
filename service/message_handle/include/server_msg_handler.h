@@ -122,7 +122,7 @@ private:
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void CalculateOffset(Direction direction, Offset &offset);
     bool CloseInjectNotice(int32_t pid);
-
+    int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
