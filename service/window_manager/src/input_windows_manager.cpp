@@ -2400,6 +2400,18 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
     return false;
 }
 
+void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo,
+    WindowInfo **touchWindow, bool &isUiExtentionWindow)
+{
+    for (auto &windowinfo : uiExtentionWindowInfo) {
+        if (windowinfo.id == windowId) {
+            *touchWindow = &windowinfo;
+            isUiExtentionWindow = true;
+            break;
+        }
+    }
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2487,13 +2499,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         if (targetWindowId >= 0) {
             bool isUiExtentionWindow = false;
-            for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
-                if (uiExtentionWindowInfo.id == targetWindowId) {
-                    touchWindow = &uiExtentionWindowInfo;
-                    isUiExtentionWindow = true;
-                    break;
-                }
-            }
+            GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, &touchWindow, isUiExtentionWindow);
             if (isUiExtentionWindow) {
                 break;
             }
@@ -2507,12 +2513,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             touchWindow = &item;
             CheckUIExtentionWindowDefaultHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
                 item.uiExtentionWindowInfo, windowId);
+            bool isUiExtentionWindow = false;
             if (windowId > 0) {
-                for (auto &windowinfo : item.uiExtentionWindowInfo) {
-                    if (windowinfo.id == windowId) {
-                        touchWindow = &windowinfo;
-                    }
-                }
+                GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, &touchWindow, isUiExtentionWindow);
+            }
+            if (isUiExtentionWindow) {
+                break;
             }
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
@@ -2581,17 +2587,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_ANCO
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
-    MMI_HILOG_DISPATCHI("WX:%{public}f,WY:%{public}f,DX:%{public}f,"
-        "DY:%{public}f,ax:%{public}d,ay:%{public}d,pid:%{public}d,id:%{public}d",
-        windowX, windowY, logicalX, logicalY, touchWindow->area.x, touchWindow->area.y, touchWindow->pid, touchWindow->id);
     if (!(touchWindow->transform.empty())) {
         auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-    MMI_HILOG_DISPATCHI("transform,WX:%{public}f,WY:%{public}f,DX:%{public}f,"
-        "DY:%{public}f,ax:%{public}d,ay:%{public}d,pid:%{public}d,id:%{public}d",
-        windowX, windowY, logicalX, logicalY, touchWindow->area.x, touchWindow->area.y, touchWindow->pid, touchWindow->id);
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
@@ -3564,6 +3564,7 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems)
 {
+    CALL_DEBUG_ENTER;
     for (const auto &item : keyItems) {
         if (item.GetKeyCode() == pressedKey && item.IsPressed()) {
             return true;
@@ -3574,6 +3575,7 @@ bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent:
 
 bool InputWindowsManager::IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPR(keyEvent, false);
     for (const auto &item : vecWhiteList_) {
         if (item.keyCode == keyEvent->GetKeyCode()) {
