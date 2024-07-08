@@ -1,0 +1,44 @@
+{
+  "whiteList": [
+    {
+      "keyCode": 2049,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2049,
+      "pressedKey": 2047
+    },
+    {
+      "keyCode": 2049,
+      "pressedKey": 2048
+    },
+    {
+      "keyCode": 2070,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2012,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2013,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2014,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2015,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2081,
+      "pressedKey": -1
+    },
+    {
+      "keyCode": 2082,
+      "pressedKey": -1
+    }
+  ]
+}
