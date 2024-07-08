@@ -17,6 +17,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr uint64_t MAX_UNMARSHAL_VECTOR_SIZE { 512 };
+}
 
 template<typename T>
 static bool MarshalVector(const std::vector<T> &data, Parcel &parcel, bool (*writeOne)(const T &arg, Parcel &parcel))
@@ -44,6 +47,10 @@ static bool UnmarshalVector(Parcel &parcel, std::vector<T> &data, bool (*readOne
     }
     uint64_t nItems {};
     if (!parcel.ReadUint64(nItems)) {
+        return false;
+    }
+    if (nItems > MAX_UNMARSHAL_VECTOR_SIZE) {
+        MMI_HILOGE("The nItems:%{public}d, exceeds maximum allowed size:%{public}d", nItems, MAX_UNMARSHAL_VECTOR_SIZE);
         return false;
     }
     data.resize(nItems);
