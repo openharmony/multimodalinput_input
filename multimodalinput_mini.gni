@@ -376,5 +376,6 @@ if (input_ext_feature_magiccursor) {
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
     "${mmi_ext_path}/magic_cursor/src/lru_cache.cpp",
+    "${mmi_ext_path}/magic_cursor/src/animation_controller.cpp",    
   ]
 }
