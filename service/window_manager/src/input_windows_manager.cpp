@@ -21,6 +21,7 @@
 #include <linux/input.h>
 #include <unordered_map>
 
+#include "cJSON.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "fingersense_wrapper.h"
@@ -295,6 +296,18 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
+        bool checkUIExtentionWindow = false;
+        for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
+            if (uiExtentionWindowInfo.id == pointerEvent->GetTargetWindowId()) {
+                MMI_HILOGD("Find windowInfo by window id %{public}d", uiExtentionWindowInfo.id);
+                windowInfo = &uiExtentionWindowInfo;
+                checkUIExtentionWindow = true;
+                break;
+            }
+        }
+        if (checkUIExtentionWindow) {
+            break;
+        }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -380,21 +393,34 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
+std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::UpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(keyEvent, INVALID_FD);
     CALL_DEBUG_ENTER;
-    int32_t pid = GetPidAndUpdateTarget(keyEvent);
-    if (pid <= 0) {
-        MMI_HILOG_DISPATCHE("Invalid pid");
-        return INVALID_FD;
+    if (!isParseConfig_) {
+        ParseConfig();
+        isParseConfig_ = true;
     }
-    int32_t fd = udsServer_->GetClientFd(pid);
-    if (fd < 0) {
-        MMI_HILOG_DISPATCHE("Invalid fd");
-        return INVALID_FD;
+    std::vector<std::pair<int32_t, TargetInfo>> vecTarget;
+    if (keyEvent == nullptr) {
+        MMI_HILOG_DISPATCHE("keyEvent is nullptr");
+        return vecTarget;
     }
-    return fd;
+    auto vecData = GetPidAndUpdateTarget(keyEvent);
+    for (const auto &item : vecData) {
+        int32_t fd = INVALID_FD;
+        int32_t pid = item.first;
+        if (pid <= 0) {
+            MMI_HILOG_DISPATCHE("Invalid pid");
+            continue;
+        }
+        fd = udsServer_->GetClientFd(pid);
+        if (fd < 0) {
+            MMI_HILOG_DISPATCHE("Invalid fd");
+            continue;
+        }
+        vecTarget.emplace_back(std::make_pair(fd, item.second));
+    }
+    return vecTarget;
 }
 
 void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent)
@@ -435,6 +461,18 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     const WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowInfos) {
+        bool checkUIExtentionWindow = false;
+        for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
+            if (uiExtentionWindowInfo.id == windowId) {
+                MMI_HILOGD("Find windowInfo by window id %{public}d", uiExtentionWindowInfo.id);
+                windowInfo = &uiExtentionWindowInfo;
+                checkUIExtentionWindow = true;
+                break;
+            }
+        }
+        if (checkUIExtentionWindow) {
+            break;
+        }
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
         if (checkWindow) {
@@ -457,31 +495,52 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
+std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdateTarget(
+    std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(keyEvent, INVALID_PID);
+    std::vector<std::pair<int32_t, TargetInfo>> vecData;
+    if (keyEvent == nullptr) {
+        MMI_HILOG_DISPATCHE("keyEvent is nullptr");
+        return vecData;
+    }
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
-    for (auto &item : windowsInfo) {
-        if (item.id == focusWindowId) {
-            windowInfo = &item;
+    bool isUIExtention = false;
+    auto iter = windowsInfo.begin();
+    for (; iter != windowsInfo.end(); ++iter) {
+        if (iter->id == focusWindowId) {
+            windowInfo = &(*iter);
+            if (!iter->uiExtentionWindowInfo.empty() && !IsOnTheWhitelist(keyEvent)) {
+                isUIExtention = true;
+            }
             break;
         }
     }
-    CHKPR(windowInfo, INVALID_PID);
+    if (windowInfo == nullptr) {
+        MMI_HILOG_DISPATCHE("windowInfo is nullptr");
+        return vecData;
+    }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
-        return INVALID_PID;
+        return vecData;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    SetPrivacyModeFlag(windowInfo->privacyMode, keyEvent);
-    keyEvent->SetTargetWindowId(windowInfo->id);
-    keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
-    MMI_HILOG_DISPATCHD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
-    return windowInfo->pid;
+    TargetInfo targetInfo = { windowInfo->privacyMode, windowInfo->id, windowInfo->agentWindowId };
+    vecData.emplace_back(std::make_pair(windowInfo->pid, targetInfo));
+    if (isUIExtention) {
+        for (auto &item : iter->uiExtentionWindowInfo) {
+            if (item.privacyUIFlag) {
+                targetInfo.privacyMode = item.privacyMode;
+                targetInfo.id = item.id;
+                targetInfo.agentWindowId = item.agentWindowId;
+                vecData.emplace_back(std::make_pair(item.pid, targetInfo));
+            }
+        }
+    }
+    return vecData;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -1140,6 +1199,9 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
         while (std::getline(stream, line, '\n')) {
             MMI_HILOGD("%{public}s", line.c_str());
         }
+        if (!item.uiExtentionWindowInfo.empty()) {
+            PrintWindowInfo(item.uiExtentionWindowInfo);
+        }
     }
     window += StringPrintf("]\n");
     MMI_HILOGI("%{public}s", window.c_str());
@@ -1791,6 +1853,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     continue;
                 }
                 firstBtnDownWindowId_ = item.id;
+                if (!item.uiExtentionWindowInfo.empty()) {
+                    CheckUIExtentionWindowPointerHotArea(logicalX, logicalY,
+                        item.uiExtentionWindowInfo, firstBtnDownWindowId_);
+                }
                 MMI_HILOG_DISPATCHD("Find out the dispatch window of this pointer event when the targetWindowId "
                     "hasn't been set up yet, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
                 bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
@@ -1825,11 +1891,27 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     }
     MMI_HILOG_DISPATCHD("firstBtnDownWindowId_:%{public}d", firstBtnDownWindowId_);
     for (const auto &item : windowsInfo) {
+        for (const auto &windowInfo : item.uiExtentionWindowInfo) {
+            if (windowInfo.id == firstBtnDownWindowId_) {
+                return std::make_optional(windowInfo);
+            }
+        }
         if (item.id == firstBtnDownWindowId_) {
             return std::make_optional(item);
         }
     }
     return std::nullopt;
+}
+
+void InputWindowsManager::CheckUIExtentionWindowPointerHotArea(int32_t logicalX, int32_t logicalY,
+    const std::vector<WindowInfo>& windowInfos, int32_t& windowId)
+{
+    for (auto it = windowInfos.rbegin(); it != windowInfos.rend(); ++it) {
+        if (IsInHotArea(logicalX, logicalY, it->pointerHotAreas, *it)) {
+            windowId = it->id;
+            break;
+        }
+    }
 }
 
 std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, int32_t logicalY)
@@ -2318,6 +2400,18 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
     return false;
 }
 
+void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
+    WindowInfo **touchWindow, bool &isUiExtentionWindow)
+{
+    for (auto &windowinfo : uiExtentionWindowInfo) {
+        if (windowinfo.id == windowId) {
+            *touchWindow = &windowinfo;
+            isUiExtentionWindow = true;
+            break;
+        }
+    }
+}
+
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -2404,13 +2498,28 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         }
         if (targetWindowId >= 0) {
+            bool isUiExtentionWindow = false;
+            GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, targetWindowId, &touchWindow, isUiExtentionWindow);
+            if (isUiExtentionWindow) {
+                break;
+            }
             if (item.id == targetWindowId) {
                 touchWindow = &item;
                 break;
             }
         } else if (IsInHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
             item.defaultHotAreas, item)) {
+            int32_t windowId = 0;
             touchWindow = &item;
+            CheckUIExtentionWindowDefaultHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
+                item.uiExtentionWindowInfo, windowId);
+            bool isUiExtentionWindow = false;
+            if (windowId > 0) {
+                GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, windowId, &touchWindow, isUiExtentionWindow);
+            }
+            if (isUiExtentionWindow) {
+                break;
+            }
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
@@ -2617,6 +2726,17 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         ClearExtraData();
     }
     return ERR_OK;
+}
+
+void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(int32_t logicalX, int32_t logicalY,
+    const std::vector<WindowInfo>& windowInfos, int32_t& windowId)
+{
+    for (auto it = windowInfos.rbegin(); it != windowInfos.rend(); ++it) {
+        if (IsInHotArea(logicalX, logicalY, it->defaultHotAreas, *it)) {
+            windowId = it->id;
+            break;
+        }
+    }
 }
 
 void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
@@ -3438,5 +3558,87 @@ void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDi
         }
     }
 }
+
+bool InputWindowsManager::ParseConfig()
+{
+    std::string defaultConfig = "/system/etc/multimodalinput/white_list_config.json";
+    return ParseJson(defaultConfig);
+}
+
+bool InputWindowsManager::ParseJson(const std::string &configFile)
+{
+    CALL_DEBUG_ENTER;
+    std::string jsonStr = ReadJsonFile(configFile);
+    if (jsonStr.empty()) {
+        MMI_HILOGE("Read configFile failed");
+        return false;
+    }
+    cJSON* jsonData = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData, "whiteList");
+    if (!cJSON_IsArray(whiteList)) {
+        MMI_HILOGE("whiteList number must be array");
+        return false;
+    }
+    int32_t whiteListSize = cJSON_GetArraySize(whiteList);
+    for (int32_t i = 0; i < whiteListSize; ++i) {
+        cJSON *whiteListJson = cJSON_GetArrayItem(whiteList, i);
+        if (!cJSON_IsObject(whiteListJson)) {
+            MMI_HILOGE("whiteListJson is not object");
+            continue;
+        }
+        SwitchFocusKey switchFocusKey;
+        cJSON *keyCodeJson = cJSON_GetObjectItemCaseSensitive(whiteListJson, "keyCode");
+        if (!cJSON_IsNumber(keyCodeJson)) {
+            MMI_HILOGE("keyCodeJson is not number");
+            continue;
+        }
+        switchFocusKey.keyCode = keyCodeJson->valueint;
+        cJSON *pressedKeyJson = cJSON_GetObjectItemCaseSensitive(whiteListJson, "pressedKey");
+        if (!cJSON_IsNumber(pressedKeyJson)) {
+            MMI_HILOGE("pressedKeyJson is not number");
+            continue;
+        }
+        switchFocusKey.pressedKey = pressedKeyJson->valueint;
+        vecWhiteList_.push_back(switchFocusKey);
+    }
+    return true;
+}
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : keyItems) {
+        if (item.GetKeyCode() == pressedKey && item.IsPressed()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool InputWindowsManager::IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(keyEvent, false);
+    for (const auto &item : vecWhiteList_) {
+        if (item.keyCode == keyEvent->GetKeyCode()) {
+            auto keyItems = keyEvent->GetKeyItems();
+            if (item.pressedKey == -1 && keyItems.size() == 1) {
+                return true;
+            }
+            bool flag = ((item.pressedKey != -1) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) &&
+                (keyItems.size() == 2) && IsKeyPressed(item.pressedKey, keyItems));
+            if (flag) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS

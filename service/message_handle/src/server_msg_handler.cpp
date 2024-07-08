@@ -409,6 +409,30 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo extensionInfo;
+        pkt >> extensionInfo.id >> extensionInfo.pid >> extensionInfo.uid >> extensionInfo.area
+            >> extensionInfo.defaultHotAreas >> extensionInfo.pointerHotAreas >> extensionInfo.agentWindowId
+            >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
+            >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
+            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag;
+        info.uiExtentionWindowInfo.push_back(extensionInfo);
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read extention window info failed");
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -434,6 +458,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             MMI_HILOGD("byteCount:%{public}d", byteCount);
             SetWindowInfo(info.id, info);
         }
+        OnUiExtentionWindowInfo(pkt, info);
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -494,6 +519,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType;
+        OnUiExtentionWindowInfo(pkt, info);
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
