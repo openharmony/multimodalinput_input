@@ -2400,7 +2400,7 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
     return false;
 }
 
-void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo,
+void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
     WindowInfo **touchWindow, bool &isUiExtentionWindow)
 {
     for (auto &windowinfo : uiExtentionWindowInfo) {
@@ -2499,7 +2499,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         if (targetWindowId >= 0) {
             bool isUiExtentionWindow = false;
-            GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, &touchWindow, isUiExtentionWindow);
+            GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, targetWindowId, &touchWindow, isUiExtentionWindow);
             if (isUiExtentionWindow) {
                 break;
             }
@@ -2515,7 +2515,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 item.uiExtentionWindowInfo, windowId);
             bool isUiExtentionWindow = false;
             if (windowId > 0) {
-                GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, &touchWindow, isUiExtentionWindow);
+                GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, windowId, &touchWindow, isUiExtentionWindow);
             }
             if (isUiExtentionWindow) {
                 break;
