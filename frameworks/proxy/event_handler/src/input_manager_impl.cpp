@@ -1016,12 +1016,7 @@ int32_t InputManagerImpl::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t winPid = GetWindowPid(windowId);
-    if (winPid == -1) {
-        MMI_HILOGE("winPid is invalid return -1");
-        return RET_ERR;
-    }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseIcon(winPid, windowId, pixelMap);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseIcon(windowId, pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Set the number of mouse scrolling rows failed, ret:%{public}d", ret);
     }
