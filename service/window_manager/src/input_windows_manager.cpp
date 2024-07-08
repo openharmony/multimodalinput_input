@@ -352,7 +352,7 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     CHKPV(pointerEvent);
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
     if (iter == touchItemDownInfos_.end()) {
-        MMI_HILOG_DISPATCHE("Unable to find finger information for touch.pointerId:%{public}d",
+        MMI_HILOG_DISPATCHD("Unable to find finger information for touch.pointerId:%{public}d",
             pointerEvent->GetPointerId());
         return;
     }
@@ -2414,7 +2414,15 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
             if (!isFirstSpecialWindow) {
                 isFirstSpecialWindow = isSpecialWindow;
-                MMI_HILOG_DISPATCHI("the first special window status:%{public}d", isFirstSpecialWindow);
+                if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+                    pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+                    MMI_HILOG_DISPATCHI("the first special window status:%{public}d", isFirstSpecialWindow);
+                }
             }
             if (isSpecialWindow) {
                 AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
@@ -2511,18 +2519,37 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
     // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
-    if (PointerEvent::POINTER_ACTION_PULL_MOVE != pointerAction && PointerEvent::POINTER_ACTION_MOVE != pointerAction) {
-        MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
-            "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
-            "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
-            "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
-            "flags:%{public}d,DID:%{public}d"
-            "AWI:%{public}d,zOrder:%{public}1f",
-            pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
-            displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
-            physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-            touchWindow->area.y, touchWindow->flags, displayId,
-            pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+    if ((pointerAction != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerAction != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+        pointerAction != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+        pointerAction != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerAction != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerAction != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerAction != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE)) {
+        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+                "FWI:%{public}d,EID:%{public}d,"
+                "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                "flags:%{public}d,DID:%{public}d"
+                "AWI:%{public}d,zOrder:%{public}1f",
+                pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
+                displayGroupInfo_.focusWindowId, pointerEvent->GetId(),
+                touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+                touchWindow->area.y, touchWindow->flags, displayId,
+                pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+        } else {
+            MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+                "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
+                "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
+                "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                "flags:%{public}d,DID:%{public}d"
+                "AWI:%{public}d,zOrder:%{public}1f",
+                pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
+                displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
+                physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+                touchWindow->area.y, touchWindow->flags, displayId,
+                pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+        }
     }
     bool gestureInject = false;
     if ((pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) && MMI_GNE(pointerEvent->GetZOrder(), 0.0f)) {
