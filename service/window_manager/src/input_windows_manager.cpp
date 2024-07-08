@@ -1469,17 +1469,12 @@ int32_t InputWindowsManager::UpdatePoinerStyle(int32_t pid, int32_t windowId, Po
         return RET_OK;
     }
 
-    for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
-        if (windowId == windowInfo.id && pid == windowInfo.pid) {
-            auto iterator = it->second.insert(std::make_pair(windowId, pointerStyle));
-            if (!iterator.second) {
-                MMI_HILOG_CURSORW("The window type is duplicated");
-            }
-            return RET_OK;
-        }
+    auto [iterator, sign] = it->second.insert(std::make_pair(windowId, pointerStyle));
+    if (!sign) {
+        MMI_HILOG_CURSORW("The window type is duplicated");
+        return COMMON_PARAMETER_ERROR;
     }
-    MMI_HILOG_CURSORE("The window id is invalid");
-    return COMMON_PARAMETER_ERROR;
+    return RET_OK;
 }
 
 int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,

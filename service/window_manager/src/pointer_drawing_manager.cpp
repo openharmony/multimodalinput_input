@@ -1131,10 +1131,6 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
         return RET_ERR;
     }
-    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("windowId not in right pid");
-        return RET_ERR;
-    }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     userIcon_.reset(pixelMapPtr);
     mouseIconUpdate_ = true;

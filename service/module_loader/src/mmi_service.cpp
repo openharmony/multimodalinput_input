@@ -524,10 +524,11 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
