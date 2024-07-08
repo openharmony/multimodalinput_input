@@ -12,3 +12,4 @@
 # limitations under the License.
 
 input.pointer.device = input:input:0755
+persist.input.switch = input:input:0755

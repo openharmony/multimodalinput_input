@@ -16,12 +16,13 @@
 #ifndef TOUCH_TRANSFORM_PROCESSOR_H
 #define TOUCH_TRANSFORM_PROCESSOR_H
 
-#include "aggregator.h"
 #include "nocopyable.h"
-#include "transform_processor.h"
+
+#include "aggregator.h"
 #include "fingersense_manager.h"
 #include "struct_multimodal.h"
 #include "timer_manager.h"
+#include "transform_processor.h"
 
 namespace OHOS {
 namespace MMI {

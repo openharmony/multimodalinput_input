@@ -83,6 +83,8 @@ public:
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     int32_t SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus);
+    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
+    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -174,7 +176,7 @@ public:
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    void OnAnr(int32_t pid);
+    void OnAnr(int32_t pid, int32_t eventId);
 
     int32_t EnterCaptureMode(int32_t windowId);
     int32_t LeaveCaptureMode(int32_t windowId);

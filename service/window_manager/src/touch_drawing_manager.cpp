@@ -14,6 +14,7 @@
  */
 
 #include "touch_drawing_manager.h"
+#include "bytrace_adapter.h"
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
@@ -234,7 +235,7 @@ void TouchDrawingManager::UpdateBubbleData()
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (!isChangedRotation_) {
+    if (!isChangedRotation_ && !isChangedMode_) {
         return;
     }
 
@@ -246,7 +247,7 @@ void TouchDrawingManager::RotationScreen()
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
-    } else if (isChangedMode_ && displayInfo_.displayMode == DisplayMode::FULL) {
+    } else if (isChangedMode_) {
         if (pointerMode_.isShow) {
             ResetCanvasNode(trackerCanvasNode_);
             ResetCanvasNode(crosshairCanvasNode_);
@@ -401,8 +402,8 @@ void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction directio
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
         } else if (direction == Direction::DIRECTION180) {
-            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_MIDDLE,
-                displayInfo_.height / CALCULATE_MIDDLE);
+            canvas->Rotate(ROTATION_ANGLE_180, static_cast<float>(displayInfo_.width) / CALCULATE_MIDDLE,
+                static_cast<float>(displayInfo_.height) / CALCULATE_MIDDLE);
         } else if (direction == Direction::DIRECTION270) {
             canvas->Translate(displayInfo_.height, 0);
             canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
@@ -598,6 +599,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         return;
     }
     CHKPV(trackerCanvasNode_);
+    BytraceAdapter::StartHandleTracker(pointerId);
     auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
     Rosen::Drawing::Pen pen;
@@ -624,6 +626,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
         canvas->DetachPen();
     }
     trackerCanvasNode_->FinishRecording();
+    BytraceAdapter::StopHandleTracker();
 }
 
 void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y)

@@ -483,7 +483,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_DISPATCHI("id:%{public}d recv", pointerEvent->GetId());
+        MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
@@ -901,7 +901,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-    MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+        MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
@@ -1265,6 +1273,7 @@ void InputManagerImpl::OnConnected()
         return;
     }
     SendDisplayInfo();
+    SendWindowInfo();
     PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     SendEnhanceConfig();
@@ -1528,7 +1537,7 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     }
 }
 
-void InputManagerImpl::OnAnr(int32_t pid)
+void InputManagerImpl::OnAnr(int32_t pid, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -1536,10 +1545,10 @@ void InputManagerImpl::OnAnr(int32_t pid)
         std::lock_guard<std::mutex> guard(mtx_);
         for (const auto &observer : anrObservers_) {
             CHKPC(observer);
-            observer->OnAnr(pid);
+            observer->OnAnr(pid, eventId);
         }
     }
-    MMI_HILOG_ANRDETECTI("ANR noticed pid:%{public}d", pid);
+    MMI_HILOG_ANRDETECTI("ANR noticed pid:%{public}d eventId:%{public}d", pid, eventId);
 }
 
 bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
@@ -2132,6 +2141,26 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadThreeFingersTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch, ret:%{public}d", ret);
     }
     return ret;
 }

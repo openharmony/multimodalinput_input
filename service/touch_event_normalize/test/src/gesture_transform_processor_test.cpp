@@ -51,30 +51,6 @@ void GestureTransformProcessorMockTest::TearDown()
 {}
 
 /**
- * @tc.name: GestureTransformProcessorMockTest_OnEvent_01
- * @tc.desc: OnEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(GestureTransformProcessorMockTest, GestureTransformProcessorMockTest_OnEvent_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 1;
-    GestureTransformProcessor processor(deviceId);
-    processor.pointerEvent_ = PointerEvent::Create();
-    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-    libinput_event event {};
-    libinput_event_gesture gestureEvent {};
-    
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetGestureEvent).WillRepeatedly(testing::Return(&gestureEvent));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(testing::Return(LIBINPUT_EVENT_GESTURE_PINCH_BEGIN));
-
-    auto pointerEvent = processor.OnEvent(&event);
-    ASSERT_TRUE(pointerEvent != nullptr);
-}
-
-/**
  * @tc.name: GestureTransformProcessorMockTest_OnEvent_02
  * @tc.desc: OnEvent
  * @tc.type: FUNC

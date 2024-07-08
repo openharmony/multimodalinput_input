@@ -16,12 +16,14 @@
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
-#include "singleton.h"
+#include <map>
+
 #include "nocopyable.h"
+#include "singleton.h"
+
 #include "aggregator.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
-#include <map>
 
 namespace OHOS {
 namespace MMI {
@@ -75,7 +77,8 @@ public:
     ~TouchPadTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
     std::shared_ptr<PointerEvent> GetPointerEvent() override;
-
+    static int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag);
+    static int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     static int32_t SetTouchpadPinchSwitch(bool switchFlag);
     static void GetTouchpadPinchSwitch(bool &switchFlag);
     static int32_t SetTouchpadSwipeSwitch(bool switchFlag);
@@ -91,6 +94,7 @@ private:
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
+    int32_t AddItemForEventWhileSetSwipeData(int64_t time, libinput_event_gesture *gesture, int32_t fingerCount);
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
