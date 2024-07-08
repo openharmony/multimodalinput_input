@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,9 +114,10 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_THREE_GINGERS_TAPSWITCH = 92,
     GET_THREE_GINGERS_TAPSWITCH = 93,
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    ADD_ANCO_CHANNEL,
-    REMOVE_ANCO_CHANNEL,
+    ADD_ANCO_CHANNEL = 94,
+    REMOVE_ANCO_CHANNEL = 95,
 #endif // OHOS_BUILD_ENABLE_ANCO
+    TRANSFER_BINDER_CLIENT_SERVICE = 96,
 };
 
 enum class MultimodalinputEventObserverCode {

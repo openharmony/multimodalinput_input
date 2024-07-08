@@ -21,6 +21,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
+#include "input_binder_client_server.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_death_recipient.h"
 #include "multimodal_input_connect_define.h"
@@ -486,6 +487,9 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     }
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     CHKPF(multimodalInputConnectService_);
+    sptr<IRemoteObject> remoteObject = INPUT_BINDER_CLIENT_SERVICE->GetClientSrv();
+    CHKPF(remoteObject);
+    multimodalInputConnectService_->TransferBinderClientSrv(remoteObject);
     MMI_HILOGI("Get multimodalinput service successful");
     return true;
 }

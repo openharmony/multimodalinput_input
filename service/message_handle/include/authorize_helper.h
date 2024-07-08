@@ -16,18 +16,20 @@
 #ifndef AUTHORIZE_HELPER_H
 #define AUTHORIZE_HELPER_H
 
+#include <atomic>
 #include <mutex>
 #include <memory>
 #include <functional>
 
 #include "nocopyable.h"
-#include "uds_server.h"
+#include "client_death_handler.h"
 
 namespace OHOS {
 namespace MMI {
 enum class AuthorizeState : int32_t {
     STATE_AUTHORIZE = 0,
     STATE_UNAUTHORIZE = 1,
+    STATE_SELECTION_AUTHORIZE = 2,
 };
 
 using AuthorizeExitCallback = std::function<void(int32_t)>;
@@ -37,21 +39,25 @@ public:
     AuthorizeHelper();
     ~AuthorizeHelper();
     DISALLOW_COPY_AND_MOVE(AuthorizeHelper);
-    void Init(UDSServer& udsServer);
+    void Init(ClientDeathHandler& clientDeathHandler);
     void CancelAuthorize(int32_t pid);
     int32_t GetAuthorizePid();
     int32_t AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback);
-    bool IsAuthorizing();
+    inline AuthorizeState GetAuthorizeState()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return state_;
+    };
     static std::shared_ptr<AuthorizeHelper> GetInstance();
 
 protected:
-    void OnSessionLost(SessionPtr session);
+    void OnClientDeath(int32_t pid);
     void AuthorizeProcessExit();
 
 private:
     int32_t pid_;
     AuthorizeState state_ { AuthorizeState::STATE_UNAUTHORIZE };
-    UDSServer *udsServer_ { nullptr };
+    std::atomic_bool isInit_  { false };
     AuthorizeExitCallback exitCallback_ { nullptr };
     static std::mutex mutex_;
     static std::shared_ptr<AuthorizeHelper> instance_;
