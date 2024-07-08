@@ -27,29 +27,32 @@ class SettingDataShare : public NoCopyable {
 public:
     ~SettingDataShare() override;
     static SettingDataShare& GetInstance(int32_t systemAbilityId);
-    ErrCode GetStringValue(const std::string& key, std::string& value);
-    ErrCode GetIntValue(const std::string& key, int32_t& value);
-    ErrCode GetLongValue(const std::string& key, int64_t& value);
-    ErrCode GetBoolValue(const std::string& key, bool& value);
-    ErrCode PutStringValue(const std::string& key, const std::string& value, bool needNotify = true);
-    ErrCode PutIntValue(const std::string& key, int32_t value, bool needNotify = true);
-    ErrCode PutLongValue(const std::string& key, int64_t value, bool needNotify = true);
-    ErrCode PutBoolValue(const std::string& key, bool value, bool needNotify = true);
-    bool IsValidKey(const std::string& key);
+    ErrCode GetStringValue(const std::string& key, std::string& value, const std::string &strUri = std::string());
+    ErrCode GetIntValue(const std::string& key, int32_t& value, const std::string &strUri = std::string());
+    ErrCode GetLongValue(const std::string& key, int64_t& value, const std::string &strUri = std::string());
+    ErrCode GetBoolValue(const std::string& key, bool& value, const std::string &strUri = std::string());
+    ErrCode PutStringValue(const std::string& key, const std::string& value,
+        bool needNotify = true, const std::string &strUri = std::string());
+    ErrCode PutIntValue(const std::string& key, int32_t value,
+        bool needNotify = true, const std::string &strUri = std::string());
+    ErrCode PutLongValue(const std::string& key, int64_t value,
+        bool needNotify = true, const std::string &strUri = std::string());
+    ErrCode PutBoolValue(const std::string& key, bool value,
+        bool needNotify = true, const std::string &strUri = std::string());
+    bool IsValidKey(const std::string& key, const std::string &strUri = std::string());
     sptr<SettingObserver> CreateObserver(const std::string& key, SettingObserver::UpdateFunc& func);
     static void ExecRegisterCb(const sptr<SettingObserver>& observer);
-    ErrCode RegisterObserver(const sptr<SettingObserver>& observer);
-    ErrCode UnregisterObserver(const sptr<SettingObserver>& observer);
+    ErrCode RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri = std::string());
+    ErrCode UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri = std::string());
 
 private:
     static std::shared_ptr<SettingDataShare> instance_;
     static std::mutex mutex_;
     static sptr<IRemoteObject> remoteObj_;
 
-    static void Initialize(int32_t systemAbilityId);
-    static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper();
+    static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &strUri);
     static bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper>& helper);
-    static Uri AssembleUri(const std::string& key);
+    static Uri AssembleUri(const std::string& key, const std::string &strUri);
 };
 }
 } // namespace OHOS

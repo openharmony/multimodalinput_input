@@ -73,6 +73,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbeget_proxy",
