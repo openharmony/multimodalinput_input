@@ -139,7 +139,12 @@ private:
     static void PrintInfoLog(const std::shared_ptr<PointerEvent> event, const LogHeader &lh)
     {
         if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
-            event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE) {
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE ||
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_UPDATE ||
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
             return;
         }
         PrintInfoDict();

@@ -64,6 +64,7 @@ private:
     int32_t pointerColor_ { -1 };
     int32_t pointerSize_ { 1 };
     int32_t pointerStyle_ { 0 };
+    int32_t touchpadScrollRows_ { 3 };
     const std::string strKeyboardRepeatRate_ = "keyboardRepeatRate";
     const std::string strKeyboardRepeatDelay_ = "keyboardRepeatDelay";
     const std::string strMouseScrollRows_ = "rows";
@@ -84,9 +85,10 @@ private:
     const std::string strPointerSize_ = "pointerSize";
     const std::string strPointerStyle_ = "pointerStyle";
     const std::string strTouchpadThreeFingerTapSwitch_ = "touchpadThreeFingerTap";
+    const std::string strTouchpadScrollRows_ = "touchpadScrollRows";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t magicPointerColor_ { -1 };
-    int32_t magicPointerSize_ { 3 };
+    int32_t magicPointerSize_ { 1 };
     const std::string strMagicPointerColor_ = "magicPointerColor";
     const std::string strMagicPointerSize_ = "magicPointerSize";
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR

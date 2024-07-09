@@ -581,7 +581,7 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
     for (auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
             item = pointerItem;
-            MMI_HILOGI("Pointer:%{public}d is already exists", pointerId);
+            MMI_HILOGD("Pointer:%{public}d is already exists", pointerId);
             return;
         }
     }
@@ -596,7 +596,7 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
-    MMI_HILOGI("Pointer:%{public}d is not found", pointerId);
+    MMI_HILOGD("Pointer:%{public}d is not found", pointerId);
     AddPointerItem(pointerItem);
 }
 

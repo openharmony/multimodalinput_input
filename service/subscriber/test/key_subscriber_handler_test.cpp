@@ -20,10 +20,12 @@
 
 #include "key_option.h"
 #include "key_subscriber_handler.h"
+#include "call_manager_client.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "device_event_monitor.h"
+#include "input_event_handler.h"
 #include "key_event.h"
 #include "mmi_log.h"
 #include "nap_process.h"
@@ -45,6 +47,7 @@ constexpr int32_t UDS_UID = 100;
 constexpr int32_t UDS_PID = 100;
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 } // namespace
 
 class KeySubscriberHandlerTest : public testing::Test {
@@ -1810,6 +1813,143 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_01, T
 }
 
 /**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_02
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler keySubscriberHandler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
+
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
+    auto callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+    callManagerClientPtr = nullptr;
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_03
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler keySubscriberHandler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
+
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
+    auto callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+    EXPECT_NE(callManagerClientPtr, nullptr);
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
+    auto ret = callManagerClientPtr->MuteRinger();
+    EXPECT_NE(ret, ERR_OK);
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_04
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler keySubscriberHandler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
+
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
+    auto callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+    EXPECT_NE(callManagerClientPtr, nullptr);
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_05
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler keySubscriberHandler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_DOWN;
+
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
+    auto callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+    EXPECT_NE(callManagerClientPtr, nullptr);
+    DEVICE_MONITOR->hasHandleRingMute_ = false;
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_CALL;
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_06
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler keySubscriberHandler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
+
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
+    auto callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+    EXPECT_NE(callManagerClientPtr, nullptr);
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleRingMute_07
+ * @tc.desc: Test ring mute
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleRingMute_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler keySubscriberHandler;
+
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_VOLUME_UP;
+
+    DEVICE_MONITOR->callState_ = StateType::CALL_STATUS_INCOMING;
+    auto callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
+    EXPECT_NE(callManagerClientPtr, nullptr);
+    DEVICE_MONITOR->hasHandleRingMute_ = true;
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_CAMERA;
+    ASSERT_FALSE(keySubscriberHandler.HandleRingMute(keyEvent));
+}
+
+/**
  * @tc.name: KeySubscriberHandlerTest_OnSubscribeKeyEvent_004
  * @tc.desc: Test the funcation OnSubscribeKeyEvent
  * @tc.type: FUNC
@@ -1870,6 +2010,58 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_003
     item.SetKeyCode(KeyEvent::KEYCODE_CAMERA);
     keyEvent->AddKeyItem(item);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_CAMERA);
+    ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_004
+ * @tc.desc: Test NotifySubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    std::shared_ptr<KeyOption> keyOption;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    ASSERT_NE(subscriber, nullptr);
+
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
+    ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_005
+ * @tc.desc: Test NotifySubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t fd = 2;
+    SessionPtr sess;
+    std::shared_ptr<KeyOption> keyOption;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    ASSERT_NE(subscriber, nullptr);
+
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_CALL;
+    NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
+    EXPECT_FALSE(pkt.ChkRWError());
+
+    auto udsServerPtr = InputHandler->udsServer_;
+    ASSERT_NE(udsServerPtr, nullptr);
+
+    EXPECT_FALSE(udsServerPtr->SendMsg(fd, pkt));
     ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
 }
 
@@ -1964,6 +2156,31 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_
     napProcess.napClientPid_ = UNOBSERVED;
     ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
     napProcess.napClientPid_ = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_SubscriberNotifyNap_003
+ * @tc.desc: Test the funcation SubscriberNotifyNap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    std::shared_ptr<KeyOption> keyOption;
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    ASSERT_NE(subscriber, nullptr);
+
+    NapProcess napProcess;
+    napProcess.napClientPid_ = ACTIVE_EVENT;
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = 2;
+    napData.uid = 3;
+    napData.bundleName = "programName";
+    EXPECT_FALSE(napProcess.IsNeedNotify(napData));
     ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
 }
 } // namespace MMI
