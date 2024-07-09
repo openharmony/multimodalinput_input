@@ -56,8 +56,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
 std::string BytraceAdapter::GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPS(keyEvent);
-    std::string traceStr = KeyEvent::ActionToString(keyEvent->GetKeyAction());
-    return traceStr;
+    return KeyEvent::ActionToString(keyEvent->GetKeyAction());
 }
 
 std::string BytraceAdapter::GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent)

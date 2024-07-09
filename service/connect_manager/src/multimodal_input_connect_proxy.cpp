@@ -249,7 +249,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, ERR_INVALID_VALUE);
@@ -264,7 +264,6 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId,
         return ERR_INVALID_VALUE;
     }
     pixelMapPtr->Marshalling(data);
-    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     MMI_HILOGD("Send windowId:%{public}d", windowId);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
 
@@ -2244,5 +2243,29 @@ int32_t MultimodalInputConnectProxy::AncoRemoveChannel(sptr<IAncoChannel> channe
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectProxy::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEREMOTEOBJECT(data, binderClientObject, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

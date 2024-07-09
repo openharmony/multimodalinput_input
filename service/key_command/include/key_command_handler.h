@@ -281,12 +281,14 @@ private:
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    void HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent> touchEvent);
     void ProcessKnuckleGestureTouchUp(NotifyType type);
     void ResetKnuckleGesture();
     std::string GesturePointsToStr() const;
+    bool IsValidAction(int32_t action);
     void ReportIfNeed();
     void ReportRegionGesture();
     void ReportLetterGesture();

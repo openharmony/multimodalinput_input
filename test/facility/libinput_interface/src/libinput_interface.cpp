@@ -93,7 +93,7 @@ uint64_t libinput_event_get_sensortime(struct libinput_event *event)
 
 struct libinput_event_keyboard* libinput_event_get_keyboard_event(struct libinput_event *event)
 {
-    return (event != nullptr ? reinterpret_cast<libinput_event_keyboard *>(event) : nullptr);
+    return g_instance->LibinputEventGetKeyboardEvent(event);
 }
 
 struct libinput_event_pointer* libinput_event_get_pointer_event(struct libinput_event *event)
@@ -128,7 +128,7 @@ uint64_t libinput_event_keyboard_get_time_usec(struct libinput_event_keyboard *e
 
 uint32_t libinput_event_keyboard_get_key(struct libinput_event_keyboard *event)
 {
-    return (event != nullptr ? event->key : 0);
+    return g_instance->LibinputEventKeyboardGetKey(event);
 }
 
 int libinput_device_keyboard_has_key(struct libinput_device *device, uint32_t code)
@@ -138,7 +138,7 @@ int libinput_device_keyboard_has_key(struct libinput_device *device, uint32_t co
 
 enum libinput_key_state libinput_event_keyboard_get_key_state(struct libinput_event_keyboard *event)
 {
-    return (event != nullptr ? event->keyState : LIBINPUT_KEY_STATE_RELEASED);
+    return g_instance->LibinputEventKeyboardGetKeyState(event);
 }
 
 enum libinput_button_state libinput_event_pointer_get_button_state(struct libinput_event_pointer *event)

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <parameters.h>
 #include "switch_subscriber_handler.h"
 
 #include "bytrace_adapter.h"
@@ -124,7 +125,16 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
             handled = true;
         }
     }
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_PRIVACY) {
+        std::string value = OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "");
+        if (value.empty() || value == "false") {
+            OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "true");
+        } else {
+            OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "false");
+        }
+    }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
+    MMI_HILOGD("SUPER_PRIVACY_SWITCH: %{public}s", OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "").c_str());
     return handled;
 }
 
