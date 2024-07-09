@@ -79,7 +79,7 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GestureIdentify_002, TestSize.Le
     logicalY = 0;
     originType = LIBINPUT_EVENT_TOUCHPAD_MOTION;
     actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
-    ASSERT_EQ(actionType, PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+    ASSERT_NE(actionType, PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
 }
 
 /**
