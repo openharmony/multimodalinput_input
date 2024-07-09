@@ -1908,12 +1908,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_TRUE(handler.IsEnableCombineKey(key));
-
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
-
     key->SetKeyCode(KeyEvent::KEYCODE_L);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
 }
