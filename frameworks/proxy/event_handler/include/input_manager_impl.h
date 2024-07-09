@@ -178,7 +178,7 @@ public:
     int32_t GetTouchpadScrollRows(int32_t &rows);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    void OnAnr(int32_t pid);
+    void OnAnr(int32_t pid, int32_t eventId);
 
     int32_t EnterCaptureMode(int32_t windowId);
     int32_t LeaveCaptureMode(int32_t windowId);
@@ -217,6 +217,7 @@ private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
+    int32_t PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();

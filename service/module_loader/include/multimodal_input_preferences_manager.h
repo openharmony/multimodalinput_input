@@ -82,7 +82,7 @@ private:
     const std::string strTouchpadScrollRows_ = "touchpadScrollRows";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t magicPointerColor_ { -1 };
-    int32_t magicPointerSize_ { 3 };
+    int32_t magicPointerSize_ { 1 };
     const std::string strMagicPointerColor_ = "magicPointerColor";
     const std::string strMagicPointerSize_ = "magicPointerSize";
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR

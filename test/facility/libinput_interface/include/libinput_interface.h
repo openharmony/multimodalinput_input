@@ -135,6 +135,9 @@ public:
     virtual struct libinput_event_touch* GetTouchpadEvent(struct libinput_event *event) = 0;
     virtual int32_t TouchpadGetTool(struct libinput_event_touch *event) = 0;
     virtual char* DeviceGetName(struct libinput_device *device) = 0;
+    virtual struct libinput_event_keyboard* LibinputEventGetKeyboardEvent (struct libinput_event *event) = 0;
+    virtual uint32_t LibinputEventKeyboardGetKey (struct libinput_event_keyboard *event) = 0;
+    virtual enum libinput_key_state LibinputEventKeyboardGetKeyState (struct libinput_event_keyboard *event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

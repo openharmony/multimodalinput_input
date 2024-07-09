@@ -1026,7 +1026,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetAnrObserver, TestSize.Level1)
         {}
         virtual ~IAnrObserverTest()
         {}
-        void OnAnr(int32_t pid) const override
+        void OnAnr(int32_t pid, int32_t eventId) const override
         {
             MMI_HILOGD("Set anr success");
         };
@@ -2945,6 +2945,70 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
     std::vector<int64_t> pattern = { 10, 20, 30 };
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_EnableHardwareCursorStats_001
+ * @tc.desc: Enable hardware cursor stats
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    ASSERT_EQ(ret, RET_OK);
+#else
+    auto ret = InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+    ret = InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
+ * @tc.name: InputManagerTest_GetHardwareCursorStats_001
+ * @tc.desc: get hardware cursor stats
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetHardwareCursorStats_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t frameCount = 1;
+    uint32_t vsyncCount = 1;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    auto ret = InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_EQ(frameCount, 0);
+    ASSERT_EQ(vsyncCount, 0);
+#else
+    auto ret = InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
+ * @tc.name: InputManagerTest_AppendExtraData_001
+ * @tc.desc: Append Extra Data
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AppendExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ExtraData data;
+    data.buffer.resize(1025);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
+    data.buffer.resize(512);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
 }
 } // namespace MMI
 } // namespace OHOS

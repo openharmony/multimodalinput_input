@@ -26,6 +26,7 @@
 
 #include "i_input_event_handler.h"
 #include "key_event.h"
+#include "key_gesture_manager.h"
 #include "key_option.h"
 #include "uds_server.h"
 #include "nap_process.h"
@@ -91,6 +92,8 @@ private:
     void SubscriberNotifyNap(const std::shared_ptr<Subscriber> subscriber);
     bool IsEqualKeyOption(std::shared_ptr<KeyOption> newOption, std::shared_ptr<KeyOption> oldOption);
     bool IsEqualPreKeys(const std::set<int32_t> &preKeys, const std::set<int32_t> &pressedKeys);
+    void AddKeyGestureSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
+    int32_t RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId);
     void AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
     bool IsMatchForegroundPid(std::list<std::shared_ptr<Subscriber>> subs, std::set<int32_t> foregroundPids);
@@ -108,6 +111,8 @@ private:
 
 private:
     std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>> subscriberMap_;
+    std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>> keyGestures_;
+    KeyGestureManager keyGestureMgr_;
     bool callbackInitialized_ { false };
     bool hasEventExecuting_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
