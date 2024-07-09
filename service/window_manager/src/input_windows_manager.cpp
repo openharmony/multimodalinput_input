@@ -89,6 +89,7 @@ const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/De
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -290,9 +291,11 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     CHKPR(pointerEvent, INVALID_FD);
     const WindowInfo* windowInfo = nullptr;
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
-        MMI_HILOG_DISPATCHD("Drop event");
-        return INVALID_FD;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
+            MMI_HILOG_DISPATCHD("Drop event");
+            return INVALID_FD;
+        }
     }
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
@@ -329,7 +332,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
-        FoldScreenRotation(pointerEvent);
+        if (ROTATE_POLICY == FOLDABLE_DEVICE) {
+            FoldScreenRotation(pointerEvent);
+        }
         MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
@@ -364,10 +369,12 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    if (iter == touchItemDownInfos_.end()) {
-        MMI_HILOG_DISPATCHD("Unable to find finger information for touch.pointerId:%{public}d",
-            pointerEvent->GetPointerId());
-        return;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (iter == touchItemDownInfos_.end()) {
+            MMI_HILOG_DISPATCHD("Unable to find finger information for touch.pointerId:%{public}d",
+                pointerEvent->GetPointerId());
+            return;
+        }
     }
     auto displayId = pointerEvent->GetTargetDisplayId();
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
@@ -378,18 +385,32 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     }
     if (lastDirection_ == static_cast<Direction>(-1)) {
         lastDirection_ = physicDisplayInfo->direction;
-    } else {
-        if (physicDisplayInfo->direction != lastDirection_) {
-            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-                int32_t pointerAction = pointerEvent->GetPointerAction();
-                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-                pointerEvent->SetOriginPointerAction(pointerAction);
-                MMI_HILOG_DISPATCHI("touch event send cancel");
+        return;
+    }
+    if (physicDisplayInfo->direction != lastDirection_) {
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+            PointerEvent::PointerItem item;
+            if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+                MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+                lastDirection_ = physicDisplayInfo->direction;
+                return;
+            }
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE && !(item.IsPressed())) {
+                lastDirection_ = physicDisplayInfo->direction;
+                return;
+            }
+        }
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+            int32_t pointerAction = pointerEvent->GetPointerAction();
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            pointerEvent->SetOriginPointerAction(pointerAction);
+            MMI_HILOG_DISPATCHI("touch event send cancel");
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
                 iter->second.flag = false;
             }
         }
-        lastDirection_ = physicDisplayInfo->direction;
     }
+    lastDirection_ = physicDisplayInfo->direction;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2563,11 +2584,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     if (touchWindow == nullptr) {
         auto it = touchItemDownInfos_.find(pointerId);
-        if (it == touchItemDownInfos_.end() ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
-                "logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
-            return RET_ERR;
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            if (it == touchItemDownInfos_.end() ||
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
+                    "logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
+                return RET_ERR;
+            }
         }
         touchWindow = &it->second.window;
         if (it->second.flag) {
