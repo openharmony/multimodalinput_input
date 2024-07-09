@@ -807,6 +807,18 @@ int32_t MultimodalInputConnectManager::GetPointerSnapshot(void *pixelMapPtr)
     return multimodalInputConnectService_->GetPointerSnapshot(pixelMapPtr);
 }
 
+int32_t MultimodalInputConnectManager::SetTouchpadScrollRows(int32_t rows)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadScrollRows(rows);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadScrollRows(int32_t &rows)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadScrollRows(rows);
+}
+
 int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
 {
     std::lock_guard<std::mutex> guard(lock_);
