@@ -174,6 +174,8 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+    int32_t SetTouchpadScrollRows(int32_t rows);
+    int32_t GetTouchpadScrollRows(int32_t &rows);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid, int32_t eventId);

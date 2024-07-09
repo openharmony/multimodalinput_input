@@ -250,6 +250,12 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override { return deviceId; }
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
+    int32_t SetTouchpadScrollRows(int32_t rows) override
+    {
+        touchpadScrollRows_ = rows;
+        return touchpadScrollRows_;
+    }
+    int32_t GetTouchpadScrollRows(int32_t &rows) override { return touchpadScrollRows_; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -275,6 +281,7 @@ public:
     bool directionState_ = false;
     bool tapSwitchFlag_ = false;
     int32_t touchpadSpeed_ = 0;
+    int32_t touchpadScrollRows_ = 0;
     int32_t delay_ = 0;
     int32_t rate_ = 0;
     bool pinchSwitchFlag_ = false;
