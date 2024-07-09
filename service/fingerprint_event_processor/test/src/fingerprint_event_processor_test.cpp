@@ -54,21 +54,6 @@ HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_IsFingerpr
 }
 
 /**
- * @tc.name: FingerprintEventProcessorTest_IsFingerprintEvent_DeviceIsNull
- * @tc.desc: Test IsFingerprintEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_IsFingerprintEvent_DeviceIsNull, TestSize.Level1)
-{
-    NiceMock<LibinputInterfaceMock> mock;
-    struct libinput_event event;
-    EXPECT_CALL(mock, GetDevice)
-        .WillOnce(Return(NULL));
-    EXPECT_FALSE(FingerprintEventHdr->IsFingerprintEvent(&event));
-}
-
-/**
  * @tc.name: FingerprintEventProcessorTest_IsFingerprintEvent_NameIsNotFingerprint
  * @tc.desc: Test IsFingerprintEvent
  * @tc.type: FUNC

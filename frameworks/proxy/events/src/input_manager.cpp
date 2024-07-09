@@ -493,6 +493,11 @@ int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsy
     return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
+int32_t InputManager::GetPointerSnapshot(void *pixelMapPtr)
+{
+    return InputMgrImpl.GetPointerSnapshot(pixelMapPtr);
+}
+
 int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
 {
     return InputMgrImpl.SetTouchpadScrollRows(rows);

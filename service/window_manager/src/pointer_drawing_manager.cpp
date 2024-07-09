@@ -993,6 +993,7 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
         image = ExtractDrawingImage(userIcon_);
+        SetPixelMap(userIcon_);
     } else {
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
@@ -1001,6 +1002,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         }
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
+        if (mouseStyle == MOUSE_ICON::DEFAULT) {
+            SetPixelMap(pixelmap);
+        }
         MMI_HILOGI("Set mouseicon to system");
     }
     CHKPV(image);
@@ -1009,6 +1013,26 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     canvas.DrawBackground(brush);
     canvas.DrawImage(*image, IMAGE_PIXEL, IMAGE_PIXEL, Rosen::Drawing::SamplingOptions());
     MMI_HILOGD("Canvas draw image, success");
+}
+
+void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    pixelMap_ = pixelMap;
+}
+ 
+int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    *newPixelMapPtr = pixelMap_;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor()) {
+        MMI_HILOGE("magic pixelmap");
+        *newPixelMapPtr = MAGIC_CURSOR->GetPixelMap();
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    CHKPR(*newPixelMapPtr, ERROR_NULL_POINTER);
+    return RET_OK;
 }
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)

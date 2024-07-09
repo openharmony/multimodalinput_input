@@ -120,7 +120,8 @@ enum class MultimodalinputConnectInterfaceCode {
     TRANSFER_BINDER_CLIENT_SERVICE = 96,
     SET_TOUCHPAD_SCROLL_ROWS = 97,
     GET_TOUCHPAD_SCROLL_ROWS = 98,
-    SET_MOVE_EVENT_FILTERS = 99,
+    GET_POINTER_SNAPSHOT = 99,
+    SET_MOVE_EVENT_FILTERS = 100,
 };
 
 enum class MultimodalinputEventObserverCode {
