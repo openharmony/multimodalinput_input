@@ -1990,6 +1990,38 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetTouchpadScrollRows(int32_t rows)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the number of touchpad scrolling rows failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadScrollRows(int32_t &rows)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the number of touchpad scrolling rows failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, const std::string &bundleName, int32_t napStatus)
 {
     CALL_INFO_TRACE;

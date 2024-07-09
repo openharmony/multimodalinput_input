@@ -493,6 +493,16 @@ int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsy
     return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
+int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
+{
+    return InputMgrImpl.SetTouchpadScrollRows(rows);
+}
+
+int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
+{
+    return InputMgrImpl.GetTouchpadScrollRows(rows);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);

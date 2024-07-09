@@ -150,6 +150,8 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
+    int32_t SetTouchpadScrollRows(int32_t rows) override;
+    int32_t GetTouchpadScrollRows(int32_t &rows) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
@@ -184,6 +186,7 @@ protected:
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t ReadTouchpadScrollRows(int32_t &rows);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
