@@ -498,6 +498,16 @@ int32_t InputManager::GetPointerSnapshot(void *pixelMapPtr)
     return InputMgrImpl.GetPointerSnapshot(pixelMapPtr);
 }
 
+int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
+{
+    return InputMgrImpl.SetTouchpadScrollRows(rows);
+}
+
+int32_t InputManager::GetTouchpadScrollRows(int32_t &rows)
+{
+    return InputMgrImpl.GetTouchpadScrollRows(rows);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);

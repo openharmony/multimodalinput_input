@@ -131,6 +131,8 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
+    int32_t SetTouchpadScrollRows(int32_t rows) override;
+    int32_t GetTouchpadScrollRows(int32_t &rows) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;

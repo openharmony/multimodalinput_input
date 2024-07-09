@@ -118,7 +118,9 @@ enum class MultimodalinputConnectInterfaceCode {
     REMOVE_ANCO_CHANNEL = 95,
 #endif // OHOS_BUILD_ENABLE_ANCO
     TRANSFER_BINDER_CLIENT_SERVICE = 96,
-    GET_POINTER_SNAPSHOT = 97,
+    SET_TOUCHPAD_SCROLL_ROWS = 97,
+    GET_TOUCHPAD_SCROLL_ROWS = 98,
+    GET_POINTER_SNAPSHOT = 99,
 };
 
 enum class MultimodalinputEventObserverCode {
