@@ -356,6 +356,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define WRITEREMOTEOBJECT(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteRemoteObject(data)) { \
+            MMI_HILOGE("WriteRemoteObject "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \

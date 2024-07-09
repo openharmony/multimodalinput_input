@@ -45,8 +45,8 @@ void AddInterceptorFuzzTest(const uint8_t* data, size_t /* size */)
     inceptorId = InputManager::GetInstance()->AddInterceptor(fun);
     InputManager::GetInstance()->RemoveInterceptor(inceptorId);
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

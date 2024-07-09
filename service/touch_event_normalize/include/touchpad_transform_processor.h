@@ -16,12 +16,14 @@
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
-#include "singleton.h"
+#include <map>
+
 #include "nocopyable.h"
+#include "singleton.h"
+
 #include "aggregator.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
-#include <map>
 
 namespace OHOS {
 namespace MMI {

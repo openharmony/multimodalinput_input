@@ -58,7 +58,7 @@ public:
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napState) override;
@@ -150,7 +150,7 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
-
+    int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();

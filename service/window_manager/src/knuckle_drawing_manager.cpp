@@ -138,7 +138,7 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
         }
         return false;
     }
-    MMI_HILOGI("Touch tool type is single knuckle");
+    MMI_HILOGD("Touch tool type is single knuckle");
     return true;
 }
 
@@ -332,6 +332,9 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
     if (pointerInfos_.size() == MAX_POINTER_NUM) {
         pointerInfos_[POINT_INDEX3].x = (pointerInfos_[POINT_INDEX2].x + pointerInfos_[POINT_INDEX4].x) / MID_POINT;
         pointerInfos_[POINT_INDEX3].y = (pointerInfos_[POINT_INDEX2].y + pointerInfos_[POINT_INDEX4].y) / MID_POINT;
+    } else {
+        MMI_HILOGD("Can't get enough pointers to draw");
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -342,7 +345,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
     CHKPR(touchEvent, RET_ERR);
     CHKPR(canvasNode_, RET_ERR);
     if (GetPointerPos(touchEvent) != RET_OK) {
-        MMI_HILOGE("GetPointerPos failed");
+        MMI_HILOGD("GetPointerPos failed");
         return RET_ERR;
     }
 #ifndef USE_ROSEN_DRAWING
@@ -354,10 +357,6 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
 #endif // USE_ROSEN_DRAWING
     CHKPR(canvas, RET_ERR);
     if (!isActionUp_) {
-        if (pointerInfos_.size() != MAX_POINTER_NUM) {
-            MMI_HILOGD("Size of pointerInfos_:%{public}zu", pointerInfos_.size());
-            return RET_ERR;
-        }
         path_.MoveTo(pointerInfos_[POINT_INDEX0].x, pointerInfos_[POINT_INDEX0].y);
         path_.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,

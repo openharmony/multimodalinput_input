@@ -17,6 +17,7 @@
 
 #include "proto.h"
 
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "mmi_service.h"
 #include "udp_wrap.h"
@@ -34,6 +35,154 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
+
+/**
+ * @tc.name: MMIServerTest_OnThread_01
+ * @tc.desc: Test OnThread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnThread_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    EpollEventType epollType;
+    epollType = EPOLL_EVENT_INPUT;
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnThread());
+}
+
+/**
+ * @tc.name: MMIServerTest_OnThread_02
+ * @tc.desc: Test OnThread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnThread_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    EpollEventType epollType;
+    epollType = EPOLL_EVENT_SOCKET;
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnThread());
+}
+
+/**
+ * @tc.name: MMIServerTest_OnThread_03
+ * @tc.desc: Test OnThread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnThread_03, TestSize.Level1)
+{
+    MMIService mmiService;
+    EpollEventType epollType;
+    epollType = EPOLL_EVENT_SIGNAL;
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnThread());
+}
+
+/**
+ * @tc.name: MMIServerTest_OnThread_04
+ * @tc.desc: Test OnThread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnThread_04, TestSize.Level1)
+{
+    MMIService mmiService;
+    EpollEventType epollType;
+    epollType = EPOLL_EVENT_ETASK;
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnThread());
+}
+
+/**
+ * @tc.name: MMIServerTest_EnableInputDevice_01
+ * @tc.desc: Test EnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_EnableInputDevice_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool enable = true;
+    int32_t ret = mmiService.EnableInputDevice(enable);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_EnableInputDevice_02
+ * @tc.desc: Test EnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_EnableInputDevice_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool enable = false;
+    int32_t ret = mmiService.EnableInputDevice(enable);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_OnDisconnected_01
+ * @tc.desc: Test OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnDisconnected_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    SessionPtr session;
+    auto ret1 = mmiService.RemoveInputEventFilter(-1);
+    EXPECT_EQ(ret1, ETASKS_POST_SYNCTASK_FAIL);
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnDisconnected(session));
+}
+
+/**
+ * @tc.name: MMIServerTest_OnDisconnected_02
+ * @tc.desc: Test OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnDisconnected_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    SessionPtr session;
+    auto ret1 = mmiService.RemoveInputEventFilter(2);
+    EXPECT_EQ(ret1, ETASKS_POST_SYNCTASK_FAIL);
+    ASSERT_NO_FATAL_FAILURE(mmiService.OnDisconnected(session));
+}
+
+/**
+ * @tc.name: MMIServerTest_AddInputHandler_01
+ * @tc.desc: Test the function AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_AddInputHandler_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    InputHandlerType handlerType = InputHandlerType::MONITOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    int32_t priority = 1;
+    uint32_t deviceTags = 3;
+    int32_t ret = mmiService.AddInputHandler(handlerType, eventType, priority, deviceTags);
+    EXPECT_NE(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIServerTest_RemoveInputHandler_01
+ * @tc.desc: Test the function RemoveInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_RemoveInputHandler_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    InputHandlerType handlerType = InputHandlerType::INTERCEPTOR;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_POINTER;
+    int32_t priority = 1;
+    uint32_t deviceTags = 2;
+    int32_t ret = mmiService.RemoveInputHandler(handlerType, eventType, priority, deviceTags);
+    EXPECT_NE(ret, RET_ERR);
+}
 
 /**
  * @tc.name: AddEpollAndDelEpoll_001
@@ -167,10 +316,9 @@ HWTEST_F(MMIServerTest, SetCustomCursor_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetMouseIcon_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t pid = 1;
     int32_t windowId = 1;
     void* pixelMap = nullptr;
-    int32_t ret = mmiService.SetMouseIcon(pid, windowId, pixelMap);
+    int32_t ret = mmiService.SetMouseIcon(windowId, pixelMap);
     EXPECT_EQ(ret, RET_ERR);
 }
 

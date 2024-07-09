@@ -325,6 +325,10 @@ struct WindowInfo {
     SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
 
     int32_t windowType;
+
+    bool privacyUIFlag { false };
+
+    std::vector<WindowInfo> uiExtentionWindowInfo;
 };
 
 /**

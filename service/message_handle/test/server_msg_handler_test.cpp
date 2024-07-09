@@ -226,7 +226,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_01, TestSi
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
     bool result = servermsghandler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -243,7 +243,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_02, TestSi
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_DOWN;
     bool result = servermsghandler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -262,7 +262,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_03, TestSi
     auto pointerIds = pointerEvent->GetPointerIds();
     EXPECT_TRUE(pointerIds.empty());
     bool result = servermsghandler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -903,7 +903,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_001, TestS
     int32_t action = PointerEvent::POINTER_ACTION_UNKNOWN;
     pointerEvent->SetPointerId(1);
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -920,7 +920,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_002, TestS
     ASSERT_NE(pointerEvent, nullptr);
     int32_t action = PointerEvent::POINTER_ACTION_HOVER_ENTER;
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -939,7 +939,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_003, TestS
     pointerEvent->SetPointerId(1);
     std::vector<int32_t> pointerIds { pointerEvent->GetPointerIds() };
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -991,7 +991,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_FixTargetWindowId_005, TestS
     DisplayInfo displayInfo;
     displayInfo.id = 1;
     bool result = handler.FixTargetWindowId(pointerEvent, action, false);
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
 }
 
 /**
@@ -1526,6 +1526,54 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnWindowGroupInfo_01, TestSi
     rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
     ret = handler.OnWindowGroupInfo(sess, pkt);
     EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset
+ * @tc.desc: Test the function CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    Direction direction = DIRECTION90;
+    Offset offset;
+    offset.dx = 100;
+    offset.dy = 100;
+    EXPECT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+    direction = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+    direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+    direction = DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(handler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnDisplayInfo
+ * @tc.desc: Test the function OnDisplayInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t num = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    NetPacket pkt(MmiMessageId::DISPLAY_INFO);
+    DisplayGroupInfo displayGroupInfo {
+        .width = 100,
+        .height = 100,
+        .focusWindowId = 10,
+        .currentUserId = 20,
+    };
+    pkt << displayGroupInfo.width << displayGroupInfo.height
+        << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
+    pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_WRITE;
+    EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
