@@ -19,14 +19,13 @@
 #include <iostream>
 #include <list>
 
-#include <ui/rs_canvas_node.h>
-#include <ui/rs_surface_node.h>
-#include <transaction/rs_transaction.h>
-#include <transaction/rs_interfaces.h>
-
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
+#include "transaction/rs_transaction.h"
+#include "transaction/rs_interfaces.h"
+#include "ui/rs_canvas_node.h"
+#include "ui/rs_surface_node.h"
 #include "window.h"
 
 #include "device_observer.h"

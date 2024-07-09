@@ -16,13 +16,13 @@
 #ifndef KNUCKLE_DYNAMIC_DRAWING_MANAGER_H
 #define KNUCKLE_DYNAMIC_DRAWING_MANAGER_H
 
+#include "draw/canvas.h"
+#include "include/core/SkPaint.h"
+#include "include/core/SkPath.h"
+#include "transaction/rs_transaction.h"
 #include "ui/rs_canvas_drawing_node.h"
 #include "ui/rs_surface_node.h"
-#include "transaction/rs_transaction.h"
 
-#include "draw/canvas.h"
-#include "include/core/SkPath.h"
-#include "include/core/SkPaint.h"
 #include "knuckle_drawing_manager.h"
 #include "knuckle_glow_trace_system.h"
 #include "pointer_event.h"

@@ -17,6 +17,7 @@
 #define GESTURE_TRANSFORM_PROCESSOR_H
 
 #include "nocopyable.h"
+
 #include "transform_processor.h"
 
 namespace OHOS {

@@ -140,5 +140,15 @@ int32_t TouchEventNormalize::GetTouchpadThreeFingersTapSwitch(bool &switchFlag) 
 {
     return TouchPadTransformProcessor::GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
+
+int32_t TouchEventNormalize::SetTouchpadScrollRows(int32_t rows)
+{
+    return TouchPadTransformProcessor::SetTouchpadScrollRows(rows);
+}
+
+int32_t TouchEventNormalize::GetTouchpadScrollRows() const
+{
+    return TouchPadTransformProcessor::GetTouchpadScrollRows();
+}
 } // namespace MMI
 } // namespace OHOS

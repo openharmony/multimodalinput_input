@@ -60,23 +60,22 @@ int32_t AuthorizeHelper::GetAuthorizePid()
     return pid;
 }
 
-void AuthorizeHelper::Init(UDSServer& udsServer)
+void AuthorizeHelper::Init(ClientDeathHandler &clientDeathHandler)
 {
     CALL_DEBUG_ENTER;
-    if (udsServer_ != nullptr) {
-        MMI_HILOGI("Already initialized, no need to initialize again");
+    if (isInit_) {
+        MMI_HILOGD("Already initialized, no need to initialize again");
         return;
     }
-    udsServer_ = &udsServer;
-    CHKPV(udsServer_);
-    udsServer_->AddSessionDeletedCallback(std::bind(&AuthorizeHelper::OnSessionLost, this, std::placeholders::_1));
+
+    clientDeathHandler.AddClientDeathCallback(CallBackType::CALLBACK_TYPE_AUTHORIZE_HELPER,
+        [&](int32_t pid) -> void { OnClientDeath(pid); });
+    isInit_ = true;
 }
 
-void AuthorizeHelper::OnSessionLost(SessionPtr session)
+void AuthorizeHelper::OnClientDeath(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(session);
-    int32_t pid = session->GetPid();
     if (pid != pid_) {
         MMI_HILOGD("Cancel process is inconsistent with authorize, cancel pid:%{public}d, authorize pid:%{public}d",
             pid, pid_);
@@ -94,29 +93,45 @@ void AuthorizeHelper::AuthorizeProcessExit()
         MMI_HILOGI("Exit callback function will be called, authorize pid:%{public}d", pid_);
         exitCallback_(pid_);
     }
+    pid_ = INVALID_AUTHORIZE_PID;
 }
 
 int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback)
 {
     CALL_DEBUG_ENTER;
+    if (!isInit_) {
+        MMI_HILOGI("Not init");
+        return RET_ERR;
+    }
+
     if (pid <= 0) {
         MMI_HILOGI("Invalid process id, pid:%{public}d", pid);
         return RET_ERR;
     }
-    CHKPR(udsServer_, RET_ERR);
-    if (exitCallback == nullptr) {
-        MMI_HILOGI("Authorize process exit callback function is NULL");
-    }
+
     std::lock_guard<std::mutex> lock(mutex_);
-    if (state_ == AuthorizeState::STATE_AUTHORIZE) {
-        if (pid != pid_) {
-            MMI_HILOGI("A process is authorizing, and the second process cannot be authorized at the same time");
+    if (state_ == AuthorizeState::STATE_UNAUTHORIZE) {
+        if (pid_ != INVALID_AUTHORIZE_PID) {
+            MMI_HILOGI("Failed to authorize helper state.state:%{public}d,pid_:%{public}d,pid:%{public}d",
+                state_, pid_, pid);
             return RET_ERR;
         }
+        pid_ = pid;
+        state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+        exitCallback_ = exitCallback;
+        MMI_HILOGD("A process enters the authorization select state %{public}d", state_);
+        return RET_OK;
     }
-    pid_ = pid;
+    if (pid_ != pid) {
+        MMI_HILOGI("The process that has been authorized is different from input.pid_:%{public}d,pid:%{public}d",
+            pid_, pid);
+        return RET_ERR;
+    }
+    if (state_ == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
+        state_ = AuthorizeState::STATE_AUTHORIZE;
+    }
     exitCallback_ = exitCallback;
-    MMI_HILOGI("A process will be authorized, authorize pid:%{public}d", pid_);
+    MMI_HILOGD("A process will be authorized, authorize pid:%{public}d", pid_);
     return RET_OK;
 }
 
@@ -129,17 +144,12 @@ void AuthorizeHelper::CancelAuthorize(int32_t pid)
     }
     std::lock_guard<std::mutex> lock(mutex_);
     if (pid != pid_) {
-        MMI_HILOGI("Cancel pid isn't the authorized process id, cancel pid:%{public}d, authorize pid:%{public}d",
-            pid, pid_);
+        MMI_HILOGI("Cancel pid isn't the authorized process id, cancel pid:%{public}d, authorize pid:%{public}d", pid,
+            pid_);
     }
     state_ = AuthorizeState::STATE_UNAUTHORIZE;
+    pid_ = INVALID_AUTHORIZE_PID;
     exitCallback_ = nullptr;
-}
-
-bool AuthorizeHelper::IsAuthorizing()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    return (state_ == AuthorizeState::STATE_AUTHORIZE) ? true : false;
 }
 } // namespace MMI
 } // namespace OHOS

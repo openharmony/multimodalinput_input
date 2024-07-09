@@ -16,12 +16,14 @@
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
 
-#include "singleton.h"
+#include <map>
+
 #include "nocopyable.h"
+#include "singleton.h"
+
 #include "aggregator.h"
 #include "timer_manager.h"
 #include "transform_processor.h"
-#include <map>
 
 namespace OHOS {
 namespace MMI {
@@ -83,6 +85,8 @@ public:
     static void GetTouchpadSwipeSwitch(bool &switchFlag);
     static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     static void GetTouchpadRotateSwitch(bool &rotateSwitch);
+    static int32_t SetTouchpadScrollRows(int32_t rows);
+    static int32_t GetTouchpadScrollRows();
 
 private:
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);

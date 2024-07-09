@@ -34,7 +34,9 @@
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
+#include "scene_board_judgement.h"
 #include "timer_manager.h"
+#include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -65,6 +67,8 @@ constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
@@ -101,21 +105,21 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (displayInfo->displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
+    DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
         pointerEvent_->AddFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        DeviceType deviceType = CheckDeviceType(displayInfo->width, displayInfo->height);
         ret = HandleMotionAccelerateTouchpad(&offset, WIN_MGR->GetMouseIsCaptureMode(),
             &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed(), static_cast<int32_t>(deviceType));
     } else {
         pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_TOUCHPAD_POINTER);
-        ret = HandleMotionAccelerate(&offset, WIN_MGR->GetMouseIsCaptureMode(),
-            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
+        ret = HandleMotionAccelerateMouse(&offset, WIN_MGR->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_, static_cast<int32_t>(deviceType));
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
@@ -306,7 +310,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGI("Libinput event axis source type is finger");
+        MMI_HILOGD("Libinput event axis source type is finger");
         if (!isAxisBegin_) {
             return RET_ERR;
         }
@@ -344,6 +348,8 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
@@ -353,6 +359,8 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;

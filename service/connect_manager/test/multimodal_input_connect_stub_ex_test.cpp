@@ -66,7 +66,7 @@ public:
     {
         return pid;
     }
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override { return pid; }
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override { return 1; }
     int32_t SetPointerSize(int32_t size) override
     {
         size_ = size;
@@ -251,10 +251,17 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
     int32_t SetMoveEventFilters(bool flag) { return 0; }
+    int32_t SetTouchpadScrollRows(int32_t rows) override
+    {
+        touchpadScrollRows_ = rows;
+        return touchpadScrollRows_;
+    }
+    int32_t GetTouchpadScrollRows(int32_t &rows) override { return touchpadScrollRows_; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override { return RET_OK; }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -275,6 +282,7 @@ public:
     bool directionState_ = false;
     bool tapSwitchFlag_ = false;
     int32_t touchpadSpeed_ = 0;
+    int32_t touchpadScrollRows_ = 0;
     int32_t delay_ = 0;
     int32_t rate_ = 0;
     bool pinchSwitchFlag_ = false;

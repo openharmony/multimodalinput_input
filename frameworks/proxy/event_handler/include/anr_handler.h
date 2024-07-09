@@ -38,9 +38,9 @@ public:
 
 private:
     struct ANREvent {
-        bool sendStatus{ false };
-        int32_t lastEventId{ -1 };
-        int32_t lastReportId{ -1 };
+        bool sendStatus { false };
+        int32_t lastEventId { -1 };
+        int32_t lastReportId { -1 };
     };
     ANREvent event_[ANR_EVENT_TYPE_NUM];
     int32_t lastEventId_ { 0 };
