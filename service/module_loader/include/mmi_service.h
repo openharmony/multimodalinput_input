@@ -149,6 +149,7 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+    int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;

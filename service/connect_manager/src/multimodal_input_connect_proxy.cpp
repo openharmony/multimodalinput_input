@@ -2052,6 +2052,30 @@ int32_t MultimodalInputConnectProxy::GetHardwareCursorStats(uint32_t &frameCount
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pixelMapPtr, ERR_INVALID_VALUE);
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    (*newPixelMapPtr).reset(Media::PixelMap::Unmarshalling(reply));
+    CHKPR(*newPixelMapPtr, RET_ERR);
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::SetTouchpadScrollRows(int32_t rows)
 {
     CALL_DEBUG_ENTER;

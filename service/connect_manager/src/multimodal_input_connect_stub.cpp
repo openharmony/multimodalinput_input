@@ -386,6 +386,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS):
             ret = StubGetTouchpadScrollRows(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
+            ret = StubGetPointerSnapshot(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
             break;
@@ -2440,6 +2443,28 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& dat
     }
     WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap;
+    int32_t ret = GetPointerSnapshot(&pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPointerSnapshot failed ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
+    if (pixelMap->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
+        return ERR_INVALID_VALUE;
+    }
+    pixelMap->Marshalling(reply);
     return RET_OK;
 }
 
