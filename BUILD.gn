@@ -168,6 +168,7 @@ group("mmi_tests") {
     "service:InputDisplayBindHelperTest",
     "service:InputWindowsManagerEXTest",
     "service:InputWindowsManagerTest",
+    "service:InterceptorExTest",
     "service:InterceptorTest",
     "service:KeyAutoRepeatExTest",
     "service:KeyCommandTest",
