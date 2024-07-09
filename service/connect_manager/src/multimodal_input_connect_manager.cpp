@@ -800,6 +800,13 @@ int32_t MultimodalInputConnectManager::GetHardwareCursorStats(uint32_t &frameCou
     return multimodalInputConnectService_->GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
+int32_t MultimodalInputConnectManager::GetPointerSnapshot(void *pixelMapPtr)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetPointerSnapshot(pixelMapPtr);
+}
+
 int32_t MultimodalInputConnectManager::SetTouchpadScrollRows(int32_t rows)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

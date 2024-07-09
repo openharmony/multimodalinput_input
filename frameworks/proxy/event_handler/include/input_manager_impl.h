@@ -174,6 +174,7 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+    int32_t GetPointerSnapshot(void *pixelMapPtr);
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows(int32_t &rows);
 

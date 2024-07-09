@@ -763,6 +763,15 @@ public:
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 
     /**
+     * @brief Get the pointer snapshot.
+     * @param pixelMapPtr Indicates the image resource for this mouse icon. which realtype must be
+     * std::shared_ptr<OHOS::Media::PixelMap>*.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t GetPointerSnapshot(void *pixelMapPtr);
+
+    /**
      * @brief Sets the number of the touchpad scrolling rows.
      * @param rows Indicates the number of the touchpad scrolling rows.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.

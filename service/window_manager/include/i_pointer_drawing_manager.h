@@ -131,6 +131,10 @@ public:
     {
         return 0;
     }
+    virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
+    {
+        return 0;
+    }
     virtual void ForceClearPointerVisiableStatus();
     virtual void InitPointerObserver() {}
 public:

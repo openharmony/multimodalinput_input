@@ -144,6 +144,7 @@ public:
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
     virtual int32_t EnableHardwareCursorStats(bool enable) = 0;
     virtual int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) = 0;
+    virtual int32_t GetPointerSnapshot(void *pixelMapPtr) = 0;
     virtual int32_t SetTouchpadScrollRows(int32_t rows) = 0;
     virtual int32_t GetTouchpadScrollRows(int32_t &rows) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
