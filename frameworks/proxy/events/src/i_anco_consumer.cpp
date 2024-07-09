@@ -15,6 +15,11 @@
 
 #include "i_anco_consumer.h"
 
+#include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "IAncoConsumer"
+
 namespace OHOS {
 namespace MMI {
 namespace {
