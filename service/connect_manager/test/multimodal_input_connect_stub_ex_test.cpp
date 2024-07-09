@@ -251,6 +251,7 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
     int32_t SetMoveEventFilters(bool flag) { return 0; }
+    int32_t GetPointerSnapshot(void *pixelMap) override { return retSnapshot_; }
     int32_t SetTouchpadScrollRows(int32_t rows) override
     {
         touchpadScrollRows_ = rows;
@@ -277,6 +278,7 @@ public:
     int32_t retMmiSubscribedEvents_ = 0;
     int32_t retKeyState_ = 0;
     int32_t retCursorStats_ = 0;
+    int32_t retSnapshot_ = 0;
     int32_t retFrequencies_ = 0;
     bool switchFlag_ = false;
     bool directionState_ = false;

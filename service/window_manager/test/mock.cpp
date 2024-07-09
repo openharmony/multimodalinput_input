@@ -332,6 +332,10 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     return 0;
 }
+int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMap)
+{
+    return 0;
+}
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
 void PointerDrawingManager::InitPointerCallback()

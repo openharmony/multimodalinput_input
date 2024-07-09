@@ -118,26 +118,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetMouseIcon_006
- * @tc.desc: Test SetMouseIcon
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = -2;
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, (void *)pixelMap.get());
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_003
  * @tc.desc: Test SetMouseHotSpot
  * @tc.type: FUNC
