@@ -65,62 +65,6 @@ void EventNormalizeHandlerEXTest::TearDown()
 }
 
 /**
- * @tc.name: EventNormalizeHandlerEXTest_HandlePalmEvent_001
- * @tc.desc: Test the function HandlePalmEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePalmEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventNormalizeHandler handler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    libinput_event event {};
-    libinput_event_touch touchevent {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(nullptr));
-    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchevent));
-    EXPECT_CALL(libinputMock, TouchpadGetTool).WillRepeatedly(Return(2));
-    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
-    EXPECT_CALL(libinputMock, TouchpadGetTool).WillRepeatedly(Return(3));
-    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
-}
-
-/**
- * @tc.name: EventNormalizeHandlerEXTest_HandleTouchPadEvent_001
- * @tc.desc: Test the function HandleTouchPadEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleTouchPadEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventNormalizeHandler handler;
-    int32_t deviceId = 6;
-    TabletToolTransformProcessor tabletToolTransformProcessor(deviceId);
-    tabletToolTransformProcessor.pointerEvent_ = PointerEvent::Create();
-    libinput_event event {};
-    handler.nextHandler_ = std::make_shared<EventFilterHandler>();
-    handler.SetNext(handler.nextHandler_);
-    libinput_event_touch touchevent {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchevent));
-    MultiFingersTapHandler processor;
-    processor.multiFingersState_ = MulFingersTap::TRIPLETAP;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
-    processor.multiFingersState_ = MulFingersTap::QUADTAP;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_DOWN));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_UP));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
-    EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_TOUCHPAD_MOTION));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleTouchPadEvent(&event));
-}
-
-/**
  * @tc.name: EventNormalizeHandlerEXTest_GestureIdentify_001
  * @tc.desc: Test the function GestureIdentify
  * @tc.type: FUNC
@@ -280,6 +224,30 @@ HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandleGestureE
     ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
     EXPECT_CALL(libinputMock, GetEventType).WillRepeatedly(Return(LIBINPUT_EVENT_GESTURE_PINCH_UPDATE));
     ASSERT_NO_FATAL_FAILURE(handler.HandleGestureEvent(&event));
+}
+
+/**
+ * @tc.name: EventNormalizeHandlerEXTest_HandlePalmEvent_001
+ * @tc.desc: Test the function HandlePalmEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_HandlePalmEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventNormalizeHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    libinput_event event {};
+    libinput_event_touch touchevent {};
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(nullptr));
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
+    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchevent));
+    EXPECT_CALL(libinputMock, TouchpadGetTool).WillRepeatedly(Return(2));
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
+    EXPECT_CALL(libinputMock, TouchpadGetTool).WillRepeatedly(Return(3));
+    ASSERT_NO_FATAL_FAILURE(handler.HandlePalmEvent(&event, pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS

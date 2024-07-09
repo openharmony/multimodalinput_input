@@ -192,7 +192,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
     CHKPV(session_);
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
-    auto currentTime = GetSysClockTime();
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;

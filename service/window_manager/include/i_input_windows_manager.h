@@ -50,6 +50,12 @@ struct CursorPosition {
     Coordinate2D cursorPos {};
 };
 
+struct TargetInfo {
+    SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
+    int32_t id { -1 };
+    int32_t agentWindowId { -1 };
+};
+
 class IInputWindowsManager {
 public:
     IInputWindowsManager() = default;
@@ -77,7 +83,8 @@ public:
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    virtual int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     virtual int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid) = 0;
@@ -129,6 +136,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
+    static void DestroyInstance();
 
 private:
     static std::mutex mutex_;

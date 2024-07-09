@@ -406,6 +406,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubAncoRemoveChannel(data, reply);
             break;
 #endif // OHOS_BUILD_ENABLE_ANCO
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
+            ret = StubTransferBinderClientService(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -555,10 +558,8 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t windowId = 0;
-    int32_t winPid = -1;
     OHOS::Media::PixelMap *pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
-    READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("Reading windowid the tlv count:%{public}d", windowId);
     if (windowId <= 0) {
@@ -566,7 +567,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         return RET_ERR;
     }
 
-    int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
+    int32_t ret = SetMouseIcon(windowId, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMouseIcon failed:%{public}d", ret);
         return ret;
@@ -2434,7 +2435,7 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& dat
         return ret;
     }
     if (ret != RET_OK) {
-        MMI_HILOGE("Call GetTouchpadScrollRows failed ret:%{public}d", ret);
+        MMI_HILOGE("Call GetTouchpadScrollRows failed, ret:%{public}d", ret);
         return ret;
     }
     WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
@@ -2521,5 +2522,19 @@ int32_t MultimodalInputConnectStub::StubAncoRemoveChannel(MessageParcel& data, M
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+    CHKPR(remoteObj, ERROR_NULL_POINTER);
+    int32_t ret = TransferBinderClientSrv(remoteObj);
+    if (ret != RET_OK) {
+        MMI_HILOGE("TransferBinderClientSrv failed");
+        return ret;
+    }
+    WRITEINT32(reply, ret);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -43,6 +43,11 @@ ohos_source_set("mmi_connect_manager_service") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
   ]
+
+  sources += [
+    "${mmi_connect_manager_path}/src/input_binder_client_death_recipient.cpp",
+  ]
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -98,6 +103,11 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_manager.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
+  ]
+
+  sources += [
+    "${mmi_connect_manager_path}/src/input_binder_client_server.cpp",
+    "${mmi_connect_manager_path}/src/input_binder_client_stub.cpp",
   ]
 
   configs = [ ":mmi_connect_manager_config" ]

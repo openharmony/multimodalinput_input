@@ -31,120 +31,128 @@ static mut COMPENSATE_VALUEX: f64 = 0.0;
 static mut COMPENSATE_VALUEY: f64 = 0.0;
 
 struct CurveItem {
-    pub speeds: Vec<i32>,
-    pub slopes: Vec<f64>,
-    pub diff_nums: Vec<f64>,
-}
-struct CurveItemTouchpad {
     pub speeds: Vec<f64>,
     pub slopes: Vec<f64>,
     pub diff_nums: Vec<f64>,
 }
-struct AxisCurveItemTouchpad {
-    pub speeds: Vec<f64>,
-    pub slopes: Vec<f64>,
-    pub diff_nums: Vec<f64>,
-}
-struct AccelerateCurves {
+
+struct KLVMouseAccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct AccelerateCurvesKLV {
-    data: Vec<CurveItemTouchpad>,
+struct SoftHardenMouseAccelerateCurves {
+    data: Vec<CurveItem>,
 }
-struct AccelerateCurvesSoftHarden {
-    data: Vec<CurveItemTouchpad>,
+struct HardHardenMouseAccelerateCurves {
+    data: Vec<CurveItem>,
 }
-struct AccelerateCurvesHardHarden {
-    data: Vec<CurveItemTouchpad>,
+struct KLVTouchpadAccelerateCurves {
+    data: Vec<CurveItem>,
+}
+struct SoftHardenTouchpadAccelerateCurves {
+    data: Vec<CurveItem>,
+}
+struct HardHardenTouchpadAccelerateCurves {
+    data: Vec<CurveItem>,
 }
 struct AxisAccelerateCurvesTouchpad {
-    data: Vec<AxisCurveItemTouchpad>,
+    data: Vec<CurveItem>,
 }
-impl AccelerateCurves {
-    fn get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+impl KLVMouseAccelerateCurves {
+    fn klv_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl AccelerateCurvesKLV {
-    fn get_curve_by_speed_klv(&self, speed: usize) -> &CurveItemTouchpad {
+impl SoftHardenMouseAccelerateCurves {
+    fn soft_harden_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl AccelerateCurvesSoftHarden {
-    fn get_curve_by_speed_soft_harden(&self, speed: usize) -> &CurveItemTouchpad {
+impl HardHardenMouseAccelerateCurves {
+    fn hard_harden_mouse_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl AccelerateCurvesHardHarden {
-    fn get_curve_by_speed_hard_harden(&self, speed: usize) -> &CurveItemTouchpad {
+impl KLVTouchpadAccelerateCurves {
+    fn klv_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+        &self.data[speed - 1]
+    }
+}
+impl SoftHardenTouchpadAccelerateCurves {
+    fn soft_harden_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+        &self.data[speed - 1]
+    }
+}
+impl HardHardenTouchpadAccelerateCurves {
+    fn hard_harden_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
 impl AxisAccelerateCurvesTouchpad {
-    fn get_axis_curve_by_speed_touchpad(&self, device_type: usize) -> &AxisCurveItemTouchpad {
+    fn get_axis_curve_by_speed_touchpad(&self, device_type: usize) -> &CurveItem {
         &self.data[device_type - 1]
     }
 }
-impl AccelerateCurves {
-    fn get_instance() -> &'static AccelerateCurves {
-        static mut GLOBAL_CURVES: Option<AccelerateCurves> = None;
+
+impl KLVMouseAccelerateCurves {
+    fn get_instance() -> &'static KLVMouseAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<KLVMouseAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(AccelerateCurves {
+            GLOBAL_CURVES = Some(KLVMouseAccelerateCurves {
                 data: vec![
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![0.16, 0.30, 0.56],
                         diff_nums: vec![0.0, -1.12, -9.44],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![0.32, 0.60, 1.12],
                         diff_nums: vec![0.0, -2.24, -18.88],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![0.64, 1.2, 2.24],
                         diff_nums: vec![0.0, -4.48, -37.76],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![0.80, 1.50, 2.80],
                         diff_nums: vec![0.0, -5.6, -47.2],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![0.92, 2.40, 4.48],
                         diff_nums: vec![0.0, -11.84, -78.4],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![1.04, 3.30, 6.16],
                         diff_nums: vec![0.0, -18.08, -109.60],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![1.10, 3.75, 7.00],
                         diff_nums: vec![0.0, -21.2, -125.20],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![1.16, 4.20, 7.84],
                         diff_nums: vec![0.0, -24.32, -140.8],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![1.22, 4.65, 8.68],
                         diff_nums: vec![0.0, -27.44, -156.40],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![1.28, 5.1, 9.52],
                         diff_nums: vec![0.0, -30.56, -172.00],
                     },
                     CurveItem {
-                        speeds: vec![8, 32, 128],
+                        speeds: vec![8.0, 32.0, 128.0],
                         slopes: vec![1.34, 5.55, 10.36],
                         diff_nums: vec![0.0, -33.68, -187.6],
                     },
@@ -155,65 +163,205 @@ impl AccelerateCurves {
     }
 }
 
-impl AccelerateCurvesKLV {
-    fn get_instance() -> &'static AccelerateCurvesKLV {
-        static mut GLOBAL_CURVES: Option<AccelerateCurvesKLV> = None;
+impl SoftHardenMouseAccelerateCurves {
+    fn get_instance() -> &'static SoftHardenMouseAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<SoftHardenMouseAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(AccelerateCurvesKLV {
+            GLOBAL_CURVES = Some(SoftHardenMouseAccelerateCurves {
                 data: vec![
-                    CurveItemTouchpad {
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![0.22, 0.41, 0.77],
+                        diff_nums: vec![0.0, -1.54, -12.99],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![0.44, 0.83, 1.54],
+                        diff_nums: vec![0.0, -3.08, -25.97],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![0.88, 1.65, 3.08],
+                        diff_nums: vec![0.0, -6.16, -51.94],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.10, 2.06, 3.85],
+                        diff_nums: vec![0.0, -7.70, -64.93],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.27, 3.30, 6.16],
+                        diff_nums: vec![0.0, -16.29, -107.85],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.43, 4.54, 8.47],
+                        diff_nums: vec![0.0, -24.87, -150.77],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.51, 5.16, 9.63],
+                        diff_nums: vec![0.0, -29.16, -172.23],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.60, 5.78, 10.79],
+                        diff_nums: vec![0.0, -33.46, -193.69],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.68, 6.40, 11.94],
+                        diff_nums: vec![0.0, -37.75, -215.15],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.76, 7.02, 13.10],
+                        diff_nums: vec![0.0, -42.04, -236.61],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.84, 7.63, 14.25],
+                        diff_nums: vec![0.0, -46.33, -258.07],
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
+impl HardHardenMouseAccelerateCurves {
+    fn get_instance() -> &'static HardHardenMouseAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<HardHardenMouseAccelerateCurves> = None;
+        static ONCE: Once = Once::new();
+
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(HardHardenMouseAccelerateCurves {
+                data: vec![
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![0.20, 0.38, 0.71],
+                        diff_nums: vec![0.0, -1.42, -11.98],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![0.41, 0.76, 1.42],
+                        diff_nums: vec![0.0, -2.84, -23.97],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![0.81, 1.52, 2.84],
+                        diff_nums: vec![0.0, -5.69, -47.94],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.02, 1.90, 3.55],
+                        diff_nums: vec![0.0, -7.11, -59.92],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.17, 3.05, 5.69],
+                        diff_nums: vec![0.0, -15.03, -99.53],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.32, 4.19, 7.82],
+                        diff_nums: vec![0.0, -22.95, -139.14],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.40, 4.76, 8.89],
+                        diff_nums: vec![0.0, -26.91, -158.95],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.47, 5.33, 9.95],
+                        diff_nums: vec![0.0, -30.88, -178.75],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.55, 5.90, 11.02],
+                        diff_nums: vec![0.0, -34.84, -198.56],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.63, 6.47, 12.09],
+                        diff_nums: vec![0.0, -38.80, -218.36],
+                    },
+                    CurveItem {
+                        speeds: vec![8.0, 32.0, 128.0],
+                        slopes: vec![1.70, 7.05, 13.15],
+                        diff_nums: vec![0.0, -42.76, -238.17],
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
+impl KLVTouchpadAccelerateCurves {
+    fn get_instance() -> &'static KLVTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<KLVTouchpadAccelerateCurves> = None;
+        static ONCE: Once = Once::new();
+
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(KLVTouchpadAccelerateCurves {
+                data: vec![
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.14, 0.25, 0.53, 1.03],
                         diff_nums: vec![0.0, -0.14, -3.74, -13.19]
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.19, 0.33, 0.71, 1.37],
                         diff_nums: vec![0.0, -0.18, -4.98, -17.58],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.24, 0.41, 0.88, 1.71],
                         diff_nums: vec![0.0, -0.21, -5.91, -20.88],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.28, 0.49, 1.06, 2.05],
                         diff_nums: vec![0.0, -0.27, -7.47, -26.37],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.38, 0.66, 1.41, 2.73],
                         diff_nums: vec![0.0, -0.36, -9.96, -35.16],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.47, 0.82, 1.77, 3.42],
                         diff_nums: vec![0.0, -0.45, -12.45, -43.95],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.57, 0.99, 2.12, 4.10],
                         diff_nums: vec![0.0, -0.54, -14.94, -52.74],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.71, 1.24, 2.65, 5.13],
                         diff_nums: vec![0.0, -0.68, -18.68, -65.93],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![0.90, 1.57, 3.36, 6.49],
                         diff_nums: vec![0.0, -0.86, -23.66, -83.51],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![1.08, 1.90, 4.07, 7.86],
                         diff_nums: vec![0.0, -1.04, -28.64, -101.09],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
                         slopes: vec![1.27, 2.23, 4.77, 9.23],
                         diff_nums: vec![0.0, -1.22, -33.62, -118.67],
@@ -225,65 +373,65 @@ impl AccelerateCurvesKLV {
     }
 }
 
-impl AccelerateCurvesSoftHarden {
-    fn get_instance() -> &'static AccelerateCurvesSoftHarden {
-        static mut GLOBAL_CURVES: Option<AccelerateCurvesSoftHarden> = None;
+impl SoftHardenTouchpadAccelerateCurves {
+    fn get_instance() -> &'static SoftHardenTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<SoftHardenTouchpadAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(AccelerateCurvesSoftHarden {
+            GLOBAL_CURVES = Some(SoftHardenTouchpadAccelerateCurves {
                 data: vec![
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.10, 0.18, 0.39, 0.75],
                         diff_nums: vec![0.0, -0.19, -5.25, -18.52]
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.14, 0.24, 0.52, 1.00],
                         diff_nums: vec![0.0, -0.25, -6.99, -24.69],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.17, 0.30, 0.64, 1.25],
                         diff_nums: vec![0.0, -0.32, -8.74, -30.86],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.21, 0.36, 0.77, 1.50],
                         diff_nums: vec![0.0, -0.38, -10.49, -37.03],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.28, 0.48, 1.03, 1.99],
                         diff_nums: vec![0.0, -0.51, -13.99, -49.38],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.34, 0.60, 1.29, 2.49],
                         diff_nums: vec![0.0, -0.63, -17.48, -61.72],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.41, 0.72, 1.55, 2.99],
                         diff_nums: vec![0.0, -0.76, -20.98, -74.06],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.52, 0.90, 1.93, 3.74],
                         diff_nums: vec![0.0, -0.95, -26.23, -92.58],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.65, 1.14, 2.45, 4.74],
                         diff_nums: vec![0.0, -0.86, -23.66, -83.51],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.79, 1.38, 2.96, 5.73],
                         diff_nums: vec![0.0, -1.45, -40.21, -141.96],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.93, 1.62, 3.48, 6.73],
                         diff_nums: vec![0.0, -1.71, -47.21, -166.64],
@@ -295,65 +443,65 @@ impl AccelerateCurvesSoftHarden {
     }
 }
 
-impl AccelerateCurvesHardHarden {
-    fn get_instance() -> &'static AccelerateCurvesHardHarden {
-        static mut GLOBAL_CURVES: Option<AccelerateCurvesHardHarden> = None;
+impl HardHardenTouchpadAccelerateCurves {
+    fn get_instance() -> &'static HardHardenTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<HardHardenTouchpadAccelerateCurves> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(AccelerateCurvesHardHarden {
+            GLOBAL_CURVES = Some(HardHardenTouchpadAccelerateCurves {
                 data: vec![
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.10, 0.17, 0.36, 0.69],
                         diff_nums: vec![0.0, -0.18, -4.84, -17.09]
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.13, 0.22, 0.48, 0.92],
                         diff_nums: vec![0.0, -0.23, -6.46, -22.79],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.16, 0.28, 0.59, 1.15],
                         diff_nums: vec![0.0, -0.29, -8.07, -28.49],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.19, 0.33, 0.71, 1.38],
                         diff_nums: vec![0.0, -0.35, -9.68, -34.18],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.25, 0.44, 0.95, 1.84],
                         diff_nums: vec![0.0, -0.47, -12.91, -45.58],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.32, 0.56, 1.19, 2.30],
                         diff_nums: vec![0.0, -0.58, -16.14, -56.97],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.38, 0.67, 1.43, 2.76],
                         diff_nums: vec![0.0, -0.70, -19.37, -68.37],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.48, 0.83, 1.78, 3.45],
                         diff_nums: vec![0.0, -0.88, -24.21, -85.46],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.60, 1.06, 2.26, 4.37],
                         diff_nums: vec![0.0, -1.11, -30.66, -108.25],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.73, 1.28, 2.74, 5.29],
                         diff_nums: vec![0.0, -1.34, -37.12, -131.04],
                     },
-                    CurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![2.45, 24.51, 36.77, 156.87],
                         slopes: vec![0.86, 1.50, 3.21, 6.21],
                         diff_nums: vec![0.0, -1.58, -43.58, -153.83],
@@ -373,12 +521,12 @@ impl AxisAccelerateCurvesTouchpad {
         ONCE.call_once(|| unsafe {
             GLOBAL_CURVES = Some(AxisAccelerateCurvesTouchpad {
                 data: vec![
-                    AxisCurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![3.0, 5.0, 6.0, 8.0, 10.0, 41.0],
                         slopes: vec![1.07, 0.80, 0.65, 0.55, 0.52, 0.81],
                         diff_nums: vec![0.0, 0.81, 1.56, 2.16, 2.4, -0.5]
                     },
-                    AxisCurveItemTouchpad {
+                    CurveItem {
                         speeds: vec![1.0, 3.0, 5.0, 6.0, 7.0, 8.0, 41.0],
                         slopes: vec![1.52, 0.96, 0.71, 0.57, 0.47, 0.67, 0.75],
                         diff_nums: vec![0.0, 0.56, 1.31, 2.01, 2.61, 1.21, 0.57]
@@ -394,13 +542,13 @@ impl AxisAccelerateCurvesTouchpad {
 #[link(name = "m")]
 extern {
     fn fabs(z: f64) -> f64;
-    fn ceil(z: f64) -> f64;
     fn fmax(a: f64, b: f64) -> f64;
     fn fmin(a: f64, b: f64) -> f64;
 }
 
-fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
-    debug!(LOG_LABEL, "get_speed_gain enter vin is set to {} speed {} ", @public(vin), @public(speed));
+fn get_speed_gain_mouse(vin: f64, gain: *mut f64, speed: i32, device_type: i32) -> bool {
+    debug!(LOG_LABEL, "get_speed_gain_mouse enter vin is set to {} speed {}, device_type {}",
+        @public(vin), @public(speed), @public(device_type));
     unsafe {
         if fabs(vin) < DOUBLE_ZERO {
             error!(LOG_LABEL, "{} less that the limit", DOUBLE_ZERO);
@@ -411,9 +559,14 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
         return false;
     }
-    let item = AccelerateCurves::get_instance().get_curve_by_speed(speed as usize);
+    let item = match device_type {  
+        1 => KLVMouseAccelerateCurves::get_instance().klv_mouse_get_curve_by_speed(speed as usize),  
+        2 => SoftHardenMouseAccelerateCurves::get_instance().soft_harden_mouse_get_curve_by_speed(speed as usize),  
+        3 => HardHardenMouseAccelerateCurves::get_instance().hard_harden_mouse_get_curve_by_speed(speed as usize),  
+        _ => KLVMouseAccelerateCurves::get_instance().klv_mouse_get_curve_by_speed(speed as usize),
+    };
     unsafe {
-        let num: i32 = ceil(fabs(vin)) as i32;
+        let num: f64 = fabs(vin);
         for i in 0..3 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
@@ -424,7 +577,7 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         *gain = (item.slopes[2] * vin + item.diff_nums[2]) / vin;
         debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[2])/ vin));
     }
-    debug!(LOG_LABEL, "get_speed_gain leave");
+    debug!(LOG_LABEL, "get_speed_gain_mouse leave");
     true
 }
 
@@ -443,10 +596,10 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         return false;
     }
     let item = match device_type {  
-        1 => AccelerateCurvesKLV::get_instance().get_curve_by_speed_klv(speed as usize),  
-        2 => AccelerateCurvesSoftHarden::get_instance().get_curve_by_speed_soft_harden(speed as usize),  
-        3 => AccelerateCurvesHardHarden::get_instance().get_curve_by_speed_hard_harden(speed as usize),  
-        _ => AccelerateCurvesKLV::get_instance().get_curve_by_speed_klv(speed as usize),
+        1 => KLVTouchpadAccelerateCurves::get_instance().klv_touchpad_get_curve_by_speed(speed as usize),  
+        2 => SoftHardenTouchpadAccelerateCurves::get_instance().soft_harden_touchpad_get_curve_by_speed(speed as usize),  
+        3 => HardHardenTouchpadAccelerateCurves::get_instance().hard_harden_touchpad_get_curve_by_speed(speed as usize),  
+        _ => KLVTouchpadAccelerateCurves::get_instance().klv_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {
         let num: f64 = fabs(vin);
@@ -499,15 +652,16 @@ pub struct Offset {
 }
 
 /// # Safety
-/// HandleMotionAccelerate is the origin C++ function name
+/// HandleMotionAccelerateMouse is the origin C++ function name
 /// C++ will call for rust realization using this name
 #[no_mangle]
-pub unsafe extern "C" fn HandleMotionAccelerate (
+pub unsafe extern "C" fn HandleMotionAccelerateMouse (
     offset: *const Offset,
     mode: bool,
     abs_x: *mut f64,
     abs_y: *mut f64,
     speed: i32,
+    device_type: i32
 ) -> i32 {
     let mut gain = 0.0;
     let vin: f64;
@@ -527,7 +681,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
             @public(dy),
             @public(gain)
         );
-        if !get_speed_gain(vin, &mut gain as *mut f64, speed) {
+        if !get_speed_gain_mouse(vin, &mut gain as *mut f64, speed, device_type) {
             error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
             return RET_ERR;
         }
@@ -636,7 +790,7 @@ fn test_handle_motion_accelerate_normal()
     let mut abs_y: f64 = 0.0;
     let ret: i32;
     unsafe {
-        ret = HandleMotionAccelerate(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2);
+        ret = HandleMotionAccelerateMouse(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 0);
     }
     assert_eq!(ret, RET_OK);
 }
@@ -649,7 +803,7 @@ fn test_handle_motion_accelerate_mini_limit()
     let mut abs_y: f64 = 0.0;
     let ret: i32;
     unsafe {
-        ret = HandleMotionAccelerate(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2);
+        ret = HandleMotionAccelerateMouse(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 0);
     }
     assert_eq!(ret, RET_ERR);
 }
@@ -662,7 +816,7 @@ fn test_handle_motion_accelerate_capture_mode_false()
     let mut abs_y: f64 = 0.0;
     let ret: i32;
     unsafe {
-        ret = HandleMotionAccelerate(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2);
+        ret = HandleMotionAccelerateMouse(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 0);
     }
     assert_eq!(ret, RET_OK);
     assert_eq!(abs_x, 0.0);

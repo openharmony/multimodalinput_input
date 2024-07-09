@@ -1067,7 +1067,6 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-        delete asyncContext;
         return nullptr;
     }
     asyncContext->reserve << ReturnType::NUMBER << rows;
@@ -1077,7 +1076,6 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
         CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
         if (napi_get_undefined(env, &promise) != napi_ok) {
             CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
-            delete asyncContext;
             return nullptr;
         }
     } else {

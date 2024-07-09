@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "pixel_map.h"
+
 #include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"

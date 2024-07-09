@@ -524,10 +524,11 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
@@ -2637,7 +2638,7 @@ int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
     if (ret != RET_OK) {
         MMI_HILOGE("Get the number of touchpad scrolling rows failed, return %{public}d, pid:%{public}d", ret,
             GetCallingPid());
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -2666,5 +2667,24 @@ int32_t MMIService::AncoRemoveChannel(sptr<IAncoChannel> channel)
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    bool execRet = false;
+    int32_t ret =
+        delegateTasks_.PostSyncTask(
+            [this, pid, binderClientObject, &execRet] {
+                execRet = sMsgHandler_.OnTransferBinderClientSrv(binderClientObject, pid);
+                return execRet;
+            }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("TransferBinderClientSrv failed:%{public}d", ret);
+    }
+    MMI_HILOGE("TransferBinderClientSrv result:%{public}d", execRet);
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

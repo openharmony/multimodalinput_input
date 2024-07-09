@@ -143,6 +143,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     }
     MMI_HILOG_DISPATCHD("Key event dispatcher of client, Fd:%{public}d", fd);
     MMI_HILOG_DISPATCHI("InputTracking id:%{public}d KeyEvent ReceivedMsg", key->GetId());
+    EventLogHelper::PrintEventData(key, MMI_LOG_HEADER);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -184,8 +185,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
+    std::string eventinfo = std::to_string(pointerEvent->GetId()) + "(" + std::to_string(item.GetDisplayX()) +
+        "," + std::to_string(item.GetDisplayY()) + ")";
     aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
-        std::to_string(pointerEvent->GetId()));
+        eventinfo.c_str());
     EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
@@ -374,13 +379,15 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t pid = 0;
+    int32_t eventId = 0;
     pkt >> pid;
+    pkt >> eventId;
     if (pkt.ChkRWError()) {
         MMI_HILOG_ANRDETECTE("Packet read data failed");
         return RET_ERR;
     }
-    MMI_HILOG_ANRDETECTI("Client pid:%{public}d", pid);
-    InputMgrImpl.OnAnr(pid);
+    MMI_HILOG_ANRDETECTI("Client pid:%{public}d eventId:%{public}d", pid, eventId);
+    InputMgrImpl.OnAnr(pid, eventId);
     return RET_OK;
 }
 } // namespace MMI

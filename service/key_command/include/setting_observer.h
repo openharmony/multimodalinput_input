@@ -35,6 +35,6 @@ private:
     std::string key_ {};
     UpdateFunc update_ = nullptr;
 };
-}
-} // OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // SETTING_OBSERVER_H

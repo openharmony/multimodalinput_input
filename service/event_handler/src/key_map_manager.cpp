@@ -58,7 +58,7 @@ void KeyMapManager::RemoveKeyValue(struct libinput_device *device)
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     auto iter = configKeyValue_.find(deviceId);
     if (iter == configKeyValue_.end()) {
-        MMI_HILOGI("Device config file does not exist");
+        MMI_HILOGD("Device config file does not exist");
         return;
     }
     configKeyValue_.erase(iter);
