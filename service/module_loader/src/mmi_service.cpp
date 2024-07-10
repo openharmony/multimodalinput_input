@@ -351,7 +351,8 @@ void MMIService::OnStart()
             if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
                 std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_WARNTIME);
                 WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
-                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_BLOCKTIME);
+                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
+                    WATCHDOG_BLOCKTIME);
                 WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
             } else {
                 MMI_HILOGI("Screen off, WatchDog stop, Timeout");
