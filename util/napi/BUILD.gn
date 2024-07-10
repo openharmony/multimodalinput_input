@@ -14,14 +14,15 @@
 import("../../multimodalinput_mini.gni")
 
 config("napi_config") {
-  visibility = [ ":*" ]
-
   include_dirs = [
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/napi/include",
   ]
 
-  defines = input_default_defines
+  if (!input_feature_coverage && is_ohos && is_clang &&
+      (target_cpu == "arm" || target_cpu == "arm64") && enhanced_opt) {
+    ldflags = [ "-Wl,-Bsymbolic" ]
+  }
 }
 
 ohos_shared_library("libmmi-napi") {
@@ -53,8 +54,7 @@ ohos_shared_library("libmmi-napi") {
     "napi:ace_napi",
   ]
 
-  relative_install_dir = "module/multimodalinput"
-
+  innerapi_tags = [ "platformsdk" ]
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
