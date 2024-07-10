@@ -349,7 +349,8 @@ void MMIService::OnStart()
             MMI_HILOGI("WatchDog happened");
             std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
             if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_WARNTIME);
+                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
+                    WATCHDOG_WARNTIME);
                 WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
                 std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
                     WATCHDOG_BLOCKTIME);
