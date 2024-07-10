@@ -79,6 +79,8 @@ const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
+constexpr int32_t WATCHDOG_WARN_TIME { 2000 };
+constexpr int32_t WATCHDOG_BLOCK_TIME { 1000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
@@ -353,7 +355,7 @@ void MMIService::OnStart()
                 WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
             } else {
                 MMI_HILOGI("Screen off, WatchDog stop, Timeout");
-            }
+        }
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
