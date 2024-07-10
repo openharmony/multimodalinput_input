@@ -54,6 +54,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "${mmi_path}/service/event_handler/src/input_event_handler.cpp",
     "${mmi_path}/service/fingerprint_event_processor/src/fingerprint_event_processor.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
+    "${mmi_path}/service/subscriber/src/key_gesture_manager.cpp",
     "${mmi_path}/util/common/src/input_event_data_transformation.cpp",
     "${mmi_path}/util/network/src/stream_buffer.cpp",
     "src/fingerprint_event_processor_test.cpp",
