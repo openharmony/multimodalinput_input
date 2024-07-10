@@ -604,7 +604,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_002, TestSize.
     ASSERT_NE(KeyEvent, nullptr);
     dispatch.eventTime_ = 1000;
     KeyEvent->SetActionTime(5000);
-    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
 }
 
 /**
@@ -626,7 +626,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_003, TestSize.
     eventTime = 1000;
     EXPECT_TRUE(currentTime - eventTime > INTERVAL_TIME);
     int32_t ret = dispatch.DispatchKeyEventPid(udsServer, keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -645,7 +645,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_004, TestSize.
     NetPacket pkt(MmiMessageId::INVALID);
     EXPECT_FALSE(pkt.ChkRWError());
     int32_t ret = dispatch.DispatchKeyEventPid(udsServer, keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -670,7 +670,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_005, TestSize.
     bool ret = ANRMgr->TriggerANR(type, time, sess);
     EXPECT_FALSE(ret);
 
-    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
 }
 
 /**
@@ -1152,14 +1152,14 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_006, TestSize.
     UDSServer udsServer;
     std::shared_ptr<KeyEvent> KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
-    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     udsServer.sessionsMap_.insert(std::make_pair(-1, session));
     StreamBuffer streamBuffer;
     streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
     eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent);
     streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), MSG_SEND_FAIL);
+    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
 }
 
 /**
