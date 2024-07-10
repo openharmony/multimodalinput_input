@@ -199,7 +199,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, programName, pid, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -280,8 +280,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_FREEZEI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
-            pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
+            session->GetProgramName().c_str(), session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);

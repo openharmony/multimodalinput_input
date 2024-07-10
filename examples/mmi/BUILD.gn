@@ -29,6 +29,7 @@ ohos_executable("mmi-server") {
   }
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",

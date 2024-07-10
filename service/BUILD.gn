@@ -927,6 +927,7 @@ ohos_unittest("InputWindowsManagerTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "graphic_2d:2d_graphics",
@@ -1050,6 +1051,7 @@ ohos_unittest("SubscriberTest") {
     "c_utils:utils",
     "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_consumer",
     "hilog:libhilog",
   ]
 
@@ -1108,6 +1110,7 @@ ohos_unittest("MonitorTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1150,6 +1153,7 @@ ohos_unittest("ModuleLoaderTest") {
   external_deps = [
     "ability_runtime:app_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1312,7 +1316,7 @@ ohos_unittest("InterceptorTest") {
   external_deps = [ "hilog:libhilog" ]
 }
 
-ohos_unittest("EventInterceptorHandlerExTest") {
+ohos_unittest("InterceptorExTest") {
   module_out_path = module_output_path
 
   configs = [
@@ -1326,17 +1330,22 @@ ohos_unittest("EventInterceptorHandlerExTest") {
   ]
 
   sources = [
+    "interceptor/src/event_interceptor_handler.cpp",
     "interceptor/test/event_interceptor_handler_ex_test.cpp",
     "interceptor/test/mock.cpp",
   ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "preferences:native_preferences",
+  ]
 }
 
 ohos_unittest("KeyAutoRepeatExTest") {
@@ -1404,6 +1413,7 @@ ohos_unittest("EventHandlerTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1441,6 +1451,7 @@ ohos_unittest("EventHandlerEXTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1474,6 +1485,7 @@ ohos_unittest("EventDispatchTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -1511,6 +1523,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "ffrt:libffrt",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1679,6 +1692,7 @@ ohos_unittest("ConnectManagerTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "image_framework:image_native",
@@ -1768,6 +1782,7 @@ ohos_unittest("ConnectManagerEXTest") {
   external_deps = [
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1803,6 +1818,7 @@ ohos_unittest("EventDumpTest") {
   ]
 
   external_deps = [
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",

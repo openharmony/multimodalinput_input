@@ -117,6 +117,7 @@ declare_args() {
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/authorization_dialog.cpp",
     "message_handle/src/authorize_helper.cpp",
+    "message_handle/src/client_death_handler.cpp",
     "message_handle/src/inject_notice_manager.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",

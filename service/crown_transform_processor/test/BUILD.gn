@@ -41,6 +41,7 @@ ohos_unittest("CrownTransformProcessorTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -78,6 +79,7 @@ ohos_unittest("CrownTransformProcessorExTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
