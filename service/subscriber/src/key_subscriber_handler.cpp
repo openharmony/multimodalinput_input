@@ -149,7 +149,7 @@ void KeySubscriberHandler::AddKeyGestureSubscriber(
         [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
             NotifySubscriber(keyEvent, subscriber);
         });
-
+    MMI_HILOGI("Handler(%{public}d) of key gesture was added", subscriber->timerId_);
     PrintKeyOption(keyOption);
     for (auto &iter : keyGestures_) {
         if (IsEqualKeyOption(keyOption, iter.first)) {
@@ -172,6 +172,7 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
             if ((subscriber->id_ != subscribeId) || (subscriber->sess_ != sess)) {
                 continue;
             }
+            MMI_HILOGI("Removing handler(%{public}d) of key gesture", subscriber->timerId_);
             keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
             auto option = subscriber->keyOption_;
             MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"

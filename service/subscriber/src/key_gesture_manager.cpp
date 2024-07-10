@@ -16,8 +16,11 @@
 #include "key_gesture_manager.h"
 
 #include <algorithm>
+#include <system_ability_definition.h>
 
 #include "define_multimodal.h"
+#include "display_event_monitor.h"
+#include "setting_datashare.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -31,20 +34,14 @@ namespace MMI {
 namespace {
 constexpr int32_t COMBINATION_KEY_TIMEOUT { 150 };
 constexpr int32_t REPEAT_ONCE { 1 };
+constexpr int32_t RETRY_COOLING_TIME { 500 }; // 500ms
+constexpr int32_t DEFAULT_LONG_PRESS_TIME { 3000 }; // 3s
 constexpr size_t SINGLE_KEY_PRESSED { 1 };
-}
-
-void KeyGestureManager::KeyGestureId::Dump(std::ostringstream &output) const
-{
-    output << "[";
-    auto iter = keys_.begin();
-    if (iter != keys_.end()) {
-        output << *iter;
-        for (++iter; iter != keys_.end(); ++iter) {
-            output << "," << *iter;
-        }
-    }
-    output << "]";
+const std::string ACC_SHORTCUT_ENABLED { "accessibility_shortcut_enabled" };
+const std::string ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN { "accessibility_shortcut_enabled_on_lock_screen" };
+const std::string ACC_SHORTCUT_TIMEOUT { "accessibility_shortcut_timeout" };
+const std::string SECURE_SETTING_URI_PROXY {
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true" };
 }
 
 bool KeyGestureManager::KeyGesture::IsWorking()
@@ -66,6 +63,7 @@ bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
     for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter) {
         if (iter->GetId() == id) {
             handlers_.erase(iter);
+            MMI_HILOGI("Handler(%{public}d) of key gesture was removed", iter->GetId());
             return true;
         }
     }
@@ -73,6 +71,12 @@ bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
 }
 
 void KeyGestureManager::KeyGesture::Reset()
+{
+    MarkActive(false);
+    ResetTimer();
+}
+
+void KeyGestureManager::KeyGesture::ResetTimer()
 {
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
@@ -89,30 +93,27 @@ bool KeyGestureManager::LongPressSingleKey::ShouldIntercept(std::shared_ptr<KeyO
 bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> keyEvent)
 {
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
-        if (timerId_ >= 0) {
-            if (!TimerMgr->IsExist(timerId_) && !handlers_.empty()) {
+        if (IsActive()) {
+            ResetTimer();
+            if (!handlers_.empty()) {
                 handlers_.rbegin()->Run(keyEvent);
             }
         } else {
             if (handlers_.empty()) {
                 return false;
             }
-            timerId_ = TimerMgr->AddTimer(handlers_.rbegin()->GetDownDuration(), REPEAT_ONCE,
-                [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-                    handlers_.rbegin()->Run(tKeyEvent);
-                });
+            TriggerHandler(handlers_.rbegin()->GetLongPressTime(), keyEvent);
         }
         return true;
     }
-    if (timerId_ >= 0) {
-        if (TimerMgr->IsExist(timerId_)) {
+    if (IsActive()) {
+        if ((timerId_ >= 0) && TimerMgr->IsExist(timerId_)) {
             TimerMgr->RemoveTimer(timerId_);
             if (!handlers_.empty()) {
                 handlers_.rbegin()->Run(keyEvent);
             }
         }
-        TimerMgr->RemoveTimer(timerId_);
-        timerId_ = -1;
+        Reset();
     }
     return false;
 }
@@ -120,14 +121,24 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
 void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) const
 {
     output << "[" << keyCode_ << "] --> {";
-    auto iter = handlers_.begin();
-    if (iter != handlers_.end()) {
-        output << iter->GetDownDuration();
+    if (auto iter = handlers_.begin(); iter != handlers_.end()) {
+        output << iter->GetLongPressTime();
         for (++iter; iter != handlers_.end(); ++iter) {
-            output << "," << iter->GetDownDuration();
+            output << "," << iter->GetLongPressTime();
         }
     }
     output << "}";
+}
+
+void KeyGestureManager::LongPressSingleKey::TriggerHandler(int32_t delay, std::shared_ptr<KeyEvent> keyEvent)
+{
+    MarkActive(true);
+    timerId_ = TimerMgr->AddTimer(delay, REPEAT_ONCE,
+        [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
+            if (!handlers_.empty()) {
+                handlers_.rbegin()->Run(tKeyEvent);
+            }
+        });
 }
 
 bool KeyGestureManager::LongPressCombinationKey::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
@@ -141,20 +152,23 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
 {
     if ((keys_.find(keyEvent->GetKeyCode()) != keys_.end()) &&
         (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
-        if (timerId_ >= 0) {
-            std::ostringstream output("LongPressCombinationKey::Intercept ");
+        if (IsActive()) {
+            std::ostringstream output;
+            output << "[LongPressCombinationKey] ";
             Dump(output);
             MMI_HILOGI("%{public}s is active now", output.str().c_str());
             return true;
         }
         if (!IsWorking()) {
-            std::ostringstream output("LongPressCombinationKey::Intercept, Switch off ");
+            std::ostringstream output;
+            output << "[LongPressCombinationKey] Switch off ";
             Dump(output);
             MMI_HILOGI("%{public}s", output.str().c_str());
             return false;
         }
         if (handlers_.empty()) {
-            std::ostringstream output("LongPressCombinationKey::Intercept, No handler for ");
+            std::ostringstream output;
+            output << "[LongPressCombinationKey] No handler for ";
             Dump(output);
             MMI_HILOGI("%{public}s", output.str().c_str());
             return false;
@@ -169,16 +183,12 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
                     (now < (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))));
         });
         if (isMatch) {
-            std::ostringstream output("LongPressCombinationKey::Intercept, trigger ");
-            Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
-            Trigger(handlers_.rbegin()->GetDownDuration(), keyEvent);
+            TriggerHandler(handlers_.rbegin()->GetLongPressTime(), keyEvent);
             return true;
         }
     }
-    if (timerId_ >= 0) {
-        TimerMgr->RemoveTimer(timerId_);
-        timerId_ = -1;
+    if (IsActive()) {
+        Reset();
     }
     return false;
 }
@@ -186,44 +196,159 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
 void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output) const
 {
     output << "[";
-    auto keyIter = keys_.begin();
-    if (keyIter != keys_.end()) {
+    if (auto keyIter = keys_.begin(); keyIter != keys_.end()) {
         output << *keyIter;
         for (++keyIter; keyIter != keys_.end(); ++keyIter) {
             output << "," << *keyIter;
         }
     }
     output << "] --> {";
-    auto iter = handlers_.begin();
-    if (iter != handlers_.end()) {
-        output << iter->GetDownDuration();
+    if (auto iter = handlers_.begin(); iter != handlers_.end()) {
+        output << "(ID:" << iter->GetId() << ",T:" << iter->GetLongPressTime() << ")";
         for (++iter; iter != handlers_.end(); ++iter) {
-            output << "," << iter->GetDownDuration();
+            output << ",(ID:" << iter->GetId() << ",T:" << iter->GetLongPressTime() << ")";
         }
     }
     output << "}";
 }
 
-void KeyGestureManager::LongPressCombinationKey::Trigger(int32_t delay, std::shared_ptr<KeyEvent> keyEvent)
+void KeyGestureManager::LongPressCombinationKey::TriggerHandler(int32_t delay, std::shared_ptr<KeyEvent> keyEvent)
 {
+    MarkActive(true);
+    std::ostringstream output;
+    output << "[LongPressCombinationKey] trigger ";
+    Dump(output);
+    MMI_HILOGI("%{public}s", output.str().c_str());
     timerId_ = TimerMgr->AddTimer(delay, REPEAT_ONCE,
         [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-            if (!handlers_.empty()) {
+            if (IsWorking() && !handlers_.empty()) {
                 handlers_.rbegin()->Run(tKeyEvent);
             }
         });
 }
 
+KeyGestureManager::PullUpAccessibility::PullUpAccessibility()
+    : LongPressCombinationKey(std::set({ KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP }))
+{
+    InitializeSetting();
+}
+
+KeyGestureManager::PullUpAccessibility::~PullUpAccessibility()
+{
+    auto &setting = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    if (switchObserver_ != nullptr) {
+        setting.UnregisterObserver(switchObserver_);
+    }
+    if (onScreenLockedSwitchObserver_ != nullptr) {
+        setting.UnregisterObserver(onScreenLockedSwitchObserver_);
+    }
+    if (configObserver_ != nullptr) {
+        setting.UnregisterObserver(configObserver_);
+    }
+}
+
 bool KeyGestureManager::PullUpAccessibility::IsWorking()
 {
-    return true;
+    return ((DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) &&
+            (DISPLAY_MONITOR->GetScreenLocked() ? setting_.enableOnScreenLocked : setting_.enable));
+}
+
+int32_t KeyGestureManager::PullUpAccessibility::AddHandler(
+    int32_t downDuration, std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    if (!handlers_.empty()) {
+        MMI_HILOGE("Expected only one handler for PullUpAccessibility");
+        return -1;
+    }
+    return KeyGesture::AddHandler(DEFAULT_LONG_PRESS_TIME, callback);
+}
+
+sptr<SettingObserver> KeyGestureManager::PullUpAccessibility::RegisterSettingObserver(
+    const std::string &key, SettingObserver::UpdateFunc onUpdate)
+{
+    MMI_HILOGI("[PullUpAccessibility] Registering observer of '%{public}s'", key.c_str());
+    auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
+    sptr<SettingObserver> settingObserver = settingHelper.CreateObserver(key, onUpdate);
+    ErrCode ret = settingHelper.RegisterObserver(settingObserver, SECURE_SETTING_URI_PROXY);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("[PullUpAccessibility] Failed to register '%{public}s' observer, error:%{public}d",
+            key.c_str(), ret);
+        return nullptr;
+    }
+    return settingObserver;
+}
+
+void KeyGestureManager::PullUpAccessibility::InitializeSetting()
+{
+    if (switchObserver_ == nullptr) {
+        switchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED, [this](const std::string &key) {
+            setting_.enable = ReadSwitchStatus(key, setting_.enable);
+        });
+        setting_.enable = ReadSwitchStatus(ACC_SHORTCUT_ENABLED, setting_.enable);
+    }
+    if (onScreenLockedSwitchObserver_ == nullptr) {
+        onScreenLockedSwitchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN,
+            [this](const std::string &key) {
+                setting_.enableOnScreenLocked = ReadSwitchStatus(key, setting_.enableOnScreenLocked);
+            });
+        setting_.enableOnScreenLocked = ReadSwitchStatus(
+            ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN, setting_.enableOnScreenLocked);
+    }
+    if (configObserver_ == nullptr) {
+        configObserver_ = RegisterSettingObserver(ACC_SHORTCUT_TIMEOUT,
+            [this](const std::string &key) {
+                ReadLongPressTime();
+            });
+        ReadLongPressTime();
+    }
+    if ((switchObserver_ == nullptr) || (onScreenLockedSwitchObserver_ == nullptr) || (configObserver_ == nullptr)) {
+        TimerMgr->AddTimer(RETRY_COOLING_TIME, REPEAT_ONCE, [this]() {
+            InitializeSetting();
+        });
+    }
+}
+
+bool KeyGestureManager::PullUpAccessibility::ReadSwitchStatus(const std::string &key, bool currentSwitchStatus)
+{
+    bool switchOn = true;
+    auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(
+        key, switchOn, SECURE_SETTING_URI_PROXY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("[PullUpAccessibility] Failed to acquire '%{public}s', error:%{public}d", key.c_str(), ret);
+        return currentSwitchStatus;
+    }
+    MMI_HILOGI("[PullUpAccessibility] '%{public}s' switch %{public}s", key.c_str(), switchOn ? "on" : "off");
+    return switchOn;
+}
+
+void KeyGestureManager::PullUpAccessibility::ReadLongPressTime()
+{
+    int32_t longPressTime {};
+    auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetIntValue(
+        ACC_SHORTCUT_TIMEOUT, longPressTime, SECURE_SETTING_URI_PROXY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("[PullUpAccessibility] Failed to acquire '%{public}s', error:%{public}d",
+            ACC_SHORTCUT_TIMEOUT.c_str(), ret);
+        longPressTime = DEFAULT_LONG_PRESS_TIME;
+    }
+    if (longPressTime < COMBINATION_KEY_TIMEOUT) {
+        longPressTime = COMBINATION_KEY_TIMEOUT;
+    }
+    MMI_HILOGI("[PullUpAccessibility] '%{public}s' setting: %{public}d",
+        ACC_SHORTCUT_TIMEOUT.c_str(), longPressTime);
+    if (!handlers_.empty()) {
+        Handler handler { *handlers_.rbegin() };
+        handlers_.clear();
+        handler.SetLongPressTime(longPressTime);
+        auto [iter, _] = handlers_.insert(handler);
+        MMI_HILOGI("[PullUpAccessibility] '%{public}s' was set to %{public}d",
+            ACC_SHORTCUT_TIMEOUT.c_str(), iter->GetLongPressTime());
+    }
 }
 
 KeyGestureManager::KeyGestureManager()
 {
-    keyGestures_.push_back(std::make_unique<PullUpAccessibility>(std::set({
-        KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP
-    })));
+    keyGestures_.push_back(std::make_unique<PullUpAccessibility>());
     keyGestures_.push_back(std::make_unique<LongPressSingleKey>(KeyEvent::KEYCODE_VOLUME_DOWN));
     keyGestures_.push_back(std::make_unique<LongPressSingleKey>(KeyEvent::KEYCODE_VOLUME_UP));
 }
