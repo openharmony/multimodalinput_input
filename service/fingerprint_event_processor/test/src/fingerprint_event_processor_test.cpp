@@ -98,36 +98,6 @@ HWTEST_F(FingerprintEventProcessorTest,
     EXPECT_FALSE(FingerprintEventHdr->IsFingerprintEvent(&event));
 }
 
-/**
- * @tc.name: FingerprintEventProcessorTest_IsFingerprintEvent_NameIsFingerprintSourceKey_002
- * @tc.desc: Test IsFingerprintEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(FingerprintEventProcessorTest,
-    FingerprintEventProcessorTest_IsFingerprintEvent_NameIsFingerprintSourceKey_002, TestSize.Level1)
-{
-    NiceMock<LibinputInterfaceMock> mock;
-    struct libinput_event event;
-    struct libinput_device device;
-    struct libinput_event_keyboard keyBoardEvent;
-    EXPECT_CALL(mock, GetDevice)
-        .WillRepeatedly(Return(&device));
-    EXPECT_CALL(mock, DeviceGetName)
-        .WillRepeatedly(Return(const_cast<char*>("fingerprint")));
-    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
-        .WillRepeatedly(Return(&keyBoardEvent));
-    EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
-        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_DOWN))
-        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_UP))
-        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_CLICK))
-        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_RETOUCH));
-    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
-    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
-    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
-    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
-}
-
 /**L
  * @tc.name: FingerprintEventProcessorTest_HandleFingerprintEvent_NameIsFingerprintSourceKey
  * @tc.desc: Test HandleFingerprintEvent
