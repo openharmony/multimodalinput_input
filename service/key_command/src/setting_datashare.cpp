@@ -25,6 +25,7 @@
 #include "mmi_log.h"
 #include "rdb_errno.h"
 #include "result_set.h"
+#include "system_ability_definition.h"
 #include "uri.h"
 
 #undef MMI_LOG_DOMAIN
@@ -53,16 +54,15 @@ SettingDataShare& SettingDataShare::GetInstance(int32_t systemAbilityId)
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = std::make_shared<SettingDataShare>();
-            Initialize(systemAbilityId);
         }
     }
     return *instance_;
 }
 
-ErrCode SettingDataShare::GetIntValue(const std::string& key, int32_t& value)
+ErrCode SettingDataShare::GetIntValue(const std::string& key, int32_t& value, const std::string &strUri)
 {
     int64_t valueLong;
-    ErrCode ret = GetLongValue(key, valueLong);
+    ErrCode ret = GetLongValue(key, valueLong, strUri);
     if (ret != ERR_OK) {
         MMI_HILOGE("Get int value fail");
         return ret;
@@ -71,10 +71,10 @@ ErrCode SettingDataShare::GetIntValue(const std::string& key, int32_t& value)
     return ERR_OK;
 }
 
-ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value)
+ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value, const std::string &strUri)
 {
     std::string valueStr;
-    ErrCode ret = GetStringValue(key, valueStr);
+    ErrCode ret = GetStringValue(key, valueStr, strUri);
     if (ret != ERR_OK) {
         MMI_HILOGE("Get long value fail");
         return ret;
@@ -83,10 +83,10 @@ ErrCode SettingDataShare::GetLongValue(const std::string& key, int64_t& value)
     return ERR_OK;
 }
 
-ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value)
+ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, const std::string &strUri)
 {
     std::string valueStr;
-    ErrCode ret = GetStringValue(key, valueStr);
+    ErrCode ret = GetStringValue(key, valueStr, strUri);
     if (ret != ERR_OK) {
         MMI_HILOGE("Get bool value fail");
         return ret;
@@ -95,26 +95,29 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value)
     return ERR_OK;
 }
 
-ErrCode SettingDataShare::PutIntValue(const std::string& key, int32_t value, bool needNotify)
+ErrCode SettingDataShare::PutIntValue(
+    const std::string& key, int32_t value, bool needNotify, const std::string &strUri)
 {
-    return PutStringValue(key, std::to_string(value), needNotify);
+    return PutStringValue(key, std::to_string(value), needNotify, strUri);
 }
 
-ErrCode SettingDataShare::PutLongValue(const std::string& key, int64_t value, bool needNotify)
+ErrCode SettingDataShare::PutLongValue(
+    const std::string& key, int64_t value, bool needNotify, const std::string &strUri)
 {
-    return PutStringValue(key, std::to_string(value), needNotify);
+    return PutStringValue(key, std::to_string(value), needNotify, strUri);
 }
 
-ErrCode SettingDataShare::PutBoolValue(const std::string& key, bool value, bool needNotify)
+ErrCode SettingDataShare::PutBoolValue(
+    const std::string& key, bool value, bool needNotify, const std::string &strUri)
 {
     std::string valueStr = value ? "true" : "false";
-    return PutStringValue(key, valueStr, needNotify);
+    return PutStringValue(key, valueStr, needNotify, strUri);
 }
 
-bool SettingDataShare::IsValidKey(const std::string& key)
+bool SettingDataShare::IsValidKey(const std::string& key, const std::string &strUri)
 {
     std::string value;
-    ErrCode ret = GetStringValue(key, value);
+    ErrCode ret = GetStringValue(key, value, strUri);
     return (ret != ERR_NAME_NOT_FOUND) && (!value.empty());
 }
 
@@ -133,12 +136,12 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
     observer->OnChange();
 }
 
-ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
+ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto uri = AssembleUri(observer->GetKey());
-    auto helper = CreateDataShareHelper();
+    auto uri = AssembleUri(observer->GetKey(), strUri);
+    auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NO_INIT;
@@ -152,12 +155,12 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
     return ERR_OK;
 }
 
-ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer)
+ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     CHKPR(observer, RET_ERR);
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto uri = AssembleUri(observer->GetKey());
-    auto helper = CreateDataShareHelper();
+    auto uri = AssembleUri(observer->GetKey(), strUri);
+    auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NO_INIT;
@@ -168,19 +171,10 @@ ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observ
     return ERR_OK;
 }
 
-void SettingDataShare::Initialize(int32_t systemAbilityId)
-{
-    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    CHKPV(sam);
-    auto remoteObj = sam->CheckSystemAbility(systemAbilityId);
-    CHKPV(remoteObj);
-    remoteObj_ = remoteObj;
-}
-
-ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value)
+ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& value, const std::string &strUri)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper();
+    auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NO_INIT;
@@ -188,7 +182,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     std::vector<std::string> columns = {SETTING_COLUMN_VALUE};
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    Uri uri(AssembleUri(key));
+    Uri uri(AssembleUri(key, strUri));
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
@@ -213,10 +207,11 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     return ERR_OK;
 }
 
-ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::string& value, bool needNotify)
+ErrCode SettingDataShare::PutStringValue(
+    const std::string& key, const std::string& value, bool needNotify, const std::string &strUri)
 {
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
-    auto helper = CreateDataShareHelper();
+    auto helper = CreateDataShareHelper(strUri);
     if (helper == nullptr) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NO_INIT;
@@ -228,23 +223,33 @@ ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::stri
     bucket.Put(SETTING_COLUMN_VALUE, valueObj);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    Uri uri(AssembleUri(key));
+    Uri uri(AssembleUri(key, strUri));
     if (helper->Update(uri, predicates, bucket) <= 0) {
         helper->Insert(uri, bucket);
     }
     if (needNotify) {
-        helper->NotifyChange(AssembleUri(key));
+        helper->NotifyChange(AssembleUri(key, strUri));
     }
     ReleaseDataShareHelper(helper);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     return ERR_OK;
 }
 
-std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper()
+std::shared_ptr<DataShare::DataShareHelper> SettingDataShare::CreateDataShareHelper(const std::string &strUri)
 {
-    auto helper = DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
-    CHKPP(helper);
-    return helper;
+    if (remoteObj_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (remoteObj_ == nullptr) {
+            auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+            CHKPP(sam);
+            remoteObj_ = sam->CheckSystemAbility(MULTIMODAL_INPUT_SERVICE_ID);
+        }
+    }
+    if (strUri.empty()) {
+        return DataShare::DataShareHelper::Creator(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI.c_str());
+    } else {
+        return DataShare::DataShareHelper::Creator(remoteObj_, strUri);
+    }
 }
 
 bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper>& helper)
@@ -255,10 +260,13 @@ bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataSha
     return true;
 }
 
-Uri SettingDataShare::AssembleUri(const std::string& key)
+Uri SettingDataShare::AssembleUri(const std::string& key, const std::string &strUri)
 {
-    Uri uri(SETTING_URI_PROXY + "&key=" + key);
-    return uri;
+    if (strUri.empty()) {
+        return Uri(SETTING_URI_PROXY + "&key=" + key);
+    } else {
+        return Uri(strUri + "&key=" + key);
+    }
 }
 }
 } // namespace OHOS
