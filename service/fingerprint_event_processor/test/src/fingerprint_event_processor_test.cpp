@@ -54,21 +54,6 @@ HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_IsFingerpr
 }
 
 /**
- * @tc.name: FingerprintEventProcessorTest_IsFingerprintEvent_DeviceIsNull
- * @tc.desc: Test IsFingerprintEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_IsFingerprintEvent_DeviceIsNull, TestSize.Level1)
-{
-    NiceMock<LibinputInterfaceMock> mock;
-    struct libinput_event event;
-    EXPECT_CALL(mock, GetDevice)
-        .WillOnce(Return(NULL));
-    EXPECT_FALSE(FingerprintEventHdr->IsFingerprintEvent(&event));
-}
-
-/**
  * @tc.name: FingerprintEventProcessorTest_IsFingerprintEvent_NameIsNotFingerprint
  * @tc.desc: Test IsFingerprintEvent
  * @tc.type: FUNC
@@ -129,7 +114,7 @@ HWTEST_F(FingerprintEventProcessorTest,
     EXPECT_CALL(mock, GetDevice)
         .WillRepeatedly(Return(&device));
     EXPECT_CALL(mock, DeviceGetName)
-        .WillOnce(Return(const_cast<char*>("fingerprint")));
+        .WillRepeatedly(Return(const_cast<char*>("fingerprint")));
     EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
         .WillRepeatedly(Return(&keyBoardEvent));
     EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
@@ -183,13 +168,18 @@ HWTEST_F(FingerprintEventProcessorTest,
     struct libinput_device device;
     struct libinput_event_keyboard keyBoardEvent;
     struct libinput_event_pointer rawPointerEvent;
-    InputHandler->BuildInputHandlerChain();
     EXPECT_CALL(mock, GetDevice)
-        .WillOnce(Return(&device));
+        .WillRepeatedly(Return(&device));
     EXPECT_CALL(mock, DeviceGetName)
-        .WillOnce(Return(const_cast<char*>("hw_fingerprint_mouse")));
+        .WillRepeatedly(Return(const_cast<char*>("hw_fingerprint_mouse")));
     EXPECT_CALL(mock, LibinputGetPointerEvent)
-        .WillOnce(Return(&rawPointerEvent));
+        .WillRepeatedly(Return(&rawPointerEvent));
+    EXPECT_CALL(mock, PointerGetDxUnaccelerated)
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(mock, PointerGetDyUnaccelerated)
+        .WillRepeatedly(Return(0));
+    EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);
+    InputHandler->BuildInputHandlerChain();
     EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);
 }
 

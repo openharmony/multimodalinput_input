@@ -332,6 +332,10 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     return 0;
 }
+int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMap)
+{
+    return 0;
+}
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
 void PointerDrawingManager::InitPointerCallback()
@@ -445,13 +449,12 @@ SettingDataShare& SettingDataShare::GetInstance(int32_t systemAbilityId)
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = std::make_shared<SettingDataShare>();
-            Initialize(systemAbilityId);
         }
     }
     return *instance_;
 }
 
-ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value)
+ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, const std::string &strUri)
 {
     return ERR_OK;
 }
@@ -461,13 +464,10 @@ sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, S
     return nullptr;
 }
 
-ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
+ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     return ERR_OK;
 }
-
-void SettingDataShare::Initialize(int32_t systemAbilityId)
-{}
 
 FingersenseWrapper::FingersenseWrapper() {}
 
