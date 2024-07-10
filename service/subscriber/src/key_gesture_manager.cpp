@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <system_ability_definition.h>
 
+#include "app_state_observer.h"
 #include "define_multimodal.h"
 #include "display_event_monitor.h"
 #include "setting_datashare.h"
@@ -33,6 +34,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t COMBINATION_KEY_TIMEOUT { 150 };
+constexpr int32_t INVALID_ENTITY_ID { -1 };
 constexpr int32_t REPEAT_ONCE { 1 };
 constexpr int32_t RETRY_COOLING_TIME { 500 }; // 500ms
 constexpr int32_t DEFAULT_LONG_PRESS_TIME { 3000 }; // 3s
@@ -44,18 +46,26 @@ const std::string SECURE_SETTING_URI_PROXY {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true" };
 }
 
+void KeyGestureManager::Handler::ResetTimer()
+{
+    if (timerId_ >= 0) {
+        TimerMgr->RemoveTimer(timerId_);
+        timerId_ = INVALID_ENTITY_ID;
+    }
+}
+
 bool KeyGestureManager::KeyGesture::IsWorking()
 {
     return true;
 }
 
-int32_t KeyGestureManager::KeyGesture::AddHandler(int32_t downDuration,
+int32_t KeyGestureManager::KeyGesture::AddHandler(int32_t pid, int32_t longPressTime,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
     static int32_t baseId { 0 };
 
-    auto ret = handlers_.emplace(++baseId, std::max(downDuration, COMBINATION_KEY_TIMEOUT), callback);
-    return ret.first->GetId();
+    longPressTime = std::max(longPressTime, COMBINATION_KEY_TIMEOUT);
+    return handlers_.emplace_back(++baseId, pid, longPressTime, callback).GetId();
 }
 
 bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
@@ -73,14 +83,68 @@ bool KeyGestureManager::KeyGesture::RemoveHandler(int32_t id)
 void KeyGestureManager::KeyGesture::Reset()
 {
     MarkActive(false);
-    ResetTimer();
+    ResetTimers();
 }
 
-void KeyGestureManager::KeyGesture::ResetTimer()
+void KeyGestureManager::KeyGesture::ResetTimers()
 {
-    if (timerId_ >= 0) {
-        TimerMgr->RemoveTimer(timerId_);
-        timerId_ = -1;
+    for (auto &handler : handlers_) {
+        handler.ResetTimer();
+    }
+}
+
+std::set<int32_t> KeyGestureManager::KeyGesture::GetForegroundPids() const
+{
+    std::set<int32_t> pids;
+    std::vector<AppExecFwk::AppStateData> appStates = APP_OBSERVER_MGR->GetForegroundAppData();
+    std::for_each(appStates.cbegin(), appStates.cend(), [&pids](auto &appState) {
+        pids.insert(appState.pid);
+    });
+    return pids;
+}
+
+bool KeyGestureManager::KeyGesture::HaveForegroundHandler(const std::set<int32_t> &foregroundApps) const
+{
+    return std::any_of(handlers_.cbegin(), handlers_.cend(), [&foregroundApps](const auto &handler) {
+        return (foregroundApps.find(handler.GetPid()) != foregroundApps.cend());
+    });
+}
+
+void KeyGestureManager::KeyGesture::TriggerHandlers(std::shared_ptr<KeyEvent> keyEvent)
+{
+    std::set<int32_t> foregroundPids = GetForegroundPids();
+    bool haveForeground = HaveForegroundHandler(foregroundPids);
+
+    for (auto &handler : handlers_) {
+        if (!haveForeground || (foregroundPids.find(handler.GetPid()) != foregroundPids.end())) {
+            auto timerId = TimerMgr->AddTimer(handler.GetLongPressTime(), REPEAT_ONCE,
+                [this, handlerId = handler.GetId(), tKeyEvent = KeyEvent::Clone(keyEvent)]() {
+                    RunHandler(handlerId, tKeyEvent);
+                });
+            handler.SetTimerId(timerId);
+        }
+    }
+}
+
+void KeyGestureManager::KeyGesture::RunHandler(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
+{
+    for (auto &handler : handlers_) {
+        if (handler.GetId() == handlerId) {
+            handler.Run(keyEvent);
+            break;
+        }
+    }
+}
+
+void KeyGestureManager::KeyGesture::NotifyHandlers(std::shared_ptr<KeyEvent> keyEvent)
+{
+    std::set<int32_t> foregroundPids = GetForegroundPids();
+    bool haveForeground = HaveForegroundHandler(foregroundPids);
+
+    for (auto &handler : handlers_) {
+        if (!haveForeground || (foregroundPids.find(handler.GetPid()) != foregroundPids.end())) {
+            handler.Run(keyEvent);
+        }
     }
 }
 
@@ -94,26 +158,22 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
 {
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
         if (IsActive()) {
-            ResetTimer();
-            if (!handlers_.empty()) {
-                handlers_.rbegin()->Run(keyEvent);
+            int32_t now = GetSysClockTime();
+            if (now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
+                NotifyHandlers(keyEvent);
             }
         } else {
-            if (handlers_.empty()) {
-                return false;
-            }
-            TriggerHandler(handlers_.rbegin()->GetLongPressTime(), keyEvent);
+            firstDownTime_ = GetSysClockTime();
+            MarkActive(true);
+            TriggerHandlers(keyEvent);
         }
         return true;
     }
     if (IsActive()) {
-        if ((timerId_ >= 0) && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->RemoveTimer(timerId_);
-            if (!handlers_.empty()) {
-                handlers_.rbegin()->Run(keyEvent);
-            }
-        }
         Reset();
+        if (keyEvent->GetKeyCode() == keyCode_) {
+            NotifyHandlers(keyEvent);
+        }
     }
     return false;
 }
@@ -128,17 +188,6 @@ void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) con
         }
     }
     output << "}";
-}
-
-void KeyGestureManager::LongPressSingleKey::TriggerHandler(int32_t delay, std::shared_ptr<KeyEvent> keyEvent)
-{
-    MarkActive(true);
-    timerId_ = TimerMgr->AddTimer(delay, REPEAT_ONCE,
-        [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-            if (!handlers_.empty()) {
-                handlers_.rbegin()->Run(tKeyEvent);
-            }
-        });
 }
 
 bool KeyGestureManager::LongPressCombinationKey::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
@@ -173,17 +222,8 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             MMI_HILOGI("%{public}s", output.str().c_str());
             return false;
         }
-        if (keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) {
-            firstDownTime_ = GetSysClockTime();
-        }
-        int32_t now = GetSysClockTime();
-        bool isMatch = std::all_of(keys_.cbegin(), keys_.cend(), [this, keyEvent, now](auto keyCode) {
-            auto itemOpt = keyEvent->GetKeyItem(keyCode);
-            return (itemOpt && itemOpt->IsPressed() &&
-                    (now < (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))));
-        });
-        if (isMatch) {
-            TriggerHandler(handlers_.rbegin()->GetLongPressTime(), keyEvent);
+        if (RecognizeGesture(keyEvent)) {
+            TriggerAll(keyEvent);
             return true;
         }
     }
@@ -212,19 +252,27 @@ void KeyGestureManager::LongPressCombinationKey::Dump(std::ostringstream &output
     output << "}";
 }
 
-void KeyGestureManager::LongPressCombinationKey::TriggerHandler(int32_t delay, std::shared_ptr<KeyEvent> keyEvent)
+bool KeyGestureManager::LongPressCombinationKey::RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) {
+        firstDownTime_ = GetSysClockTime();
+    }
+    int32_t now = GetSysClockTime();
+    return std::all_of(keys_.cbegin(), keys_.cend(), [this, keyEvent, now](auto keyCode) {
+        auto itemOpt = keyEvent->GetKeyItem(keyCode);
+        return (itemOpt && itemOpt->IsPressed() &&
+                (now < (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))));
+    });
+}
+
+void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyEvent> keyEvent)
 {
     MarkActive(true);
     std::ostringstream output;
     output << "[LongPressCombinationKey] trigger ";
     Dump(output);
     MMI_HILOGI("%{public}s", output.str().c_str());
-    timerId_ = TimerMgr->AddTimer(delay, REPEAT_ONCE,
-        [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-            if (IsWorking() && !handlers_.empty()) {
-                handlers_.rbegin()->Run(tKeyEvent);
-            }
-        });
+    TriggerHandlers(keyEvent);
 }
 
 KeyGestureManager::PullUpAccessibility::PullUpAccessibility()
@@ -253,14 +301,10 @@ bool KeyGestureManager::PullUpAccessibility::IsWorking()
             (DISPLAY_MONITOR->GetScreenLocked() ? setting_.enableOnScreenLocked : setting_.enable));
 }
 
-int32_t KeyGestureManager::PullUpAccessibility::AddHandler(
-    int32_t downDuration, std::function<void(std::shared_ptr<KeyEvent>)> callback)
+int32_t KeyGestureManager::PullUpAccessibility::AddHandler(int32_t pid,
+    int32_t longPressTime, std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    if (!handlers_.empty()) {
-        MMI_HILOGE("Expected only one handler for PullUpAccessibility");
-        return -1;
-    }
-    return KeyGesture::AddHandler(DEFAULT_LONG_PRESS_TIME, callback);
+    return KeyGesture::AddHandler(pid, DEFAULT_LONG_PRESS_TIME, callback);
 }
 
 sptr<SettingObserver> KeyGestureManager::PullUpAccessibility::RegisterSettingObserver(
@@ -337,12 +381,11 @@ void KeyGestureManager::PullUpAccessibility::ReadLongPressTime()
     MMI_HILOGI("[PullUpAccessibility] '%{public}s' setting: %{public}d",
         ACC_SHORTCUT_TIMEOUT.c_str(), longPressTime);
     if (!handlers_.empty()) {
-        Handler handler { *handlers_.rbegin() };
-        handlers_.clear();
-        handler.SetLongPressTime(longPressTime);
-        auto [iter, _] = handlers_.insert(handler);
+        for (auto &handler : handlers_) {
+            handler.SetLongPressTime(longPressTime);
+        }
         MMI_HILOGI("[PullUpAccessibility] '%{public}s' was set to %{public}d",
-            ACC_SHORTCUT_TIMEOUT.c_str(), iter->GetLongPressTime());
+            ACC_SHORTCUT_TIMEOUT.c_str(), longPressTime);
     }
 }
 
@@ -363,16 +406,17 @@ bool KeyGestureManager::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) co
         });
 }
 
-int32_t KeyGestureManager::AddKeyGesture(std::shared_ptr<KeyOption> keyOption,
+int32_t KeyGestureManager::AddKeyGesture(int32_t pid, std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
+    CHKPR(keyOption, INVALID_ENTITY_ID);
     for (auto &keyGesture : keyGestures_) {
         if (keyGesture->ShouldIntercept(keyOption)) {
             auto downDuration = std::max(keyOption->GetFinalKeyDownDuration(), COMBINATION_KEY_TIMEOUT);
-            return keyGesture->AddHandler(downDuration, callback);
+            return keyGesture->AddHandler(pid, downDuration, callback);
         }
     }
-    return -1;
+    return INVALID_ENTITY_ID;
 }
 
 void KeyGestureManager::RemoveKeyGesture(int32_t id)

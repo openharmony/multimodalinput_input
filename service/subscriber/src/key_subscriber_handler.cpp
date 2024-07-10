@@ -145,7 +145,9 @@ void KeySubscriberHandler::AddKeyGestureSubscriber(
     std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_INFO_TRACE;
-    subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(keyOption,
+    CHKPV(subscriber);
+    CHKPV(subscriber->sess_);
+    subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(subscriber->sess_->GetPid(), keyOption,
         [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
             NotifySubscriber(keyEvent, subscriber);
         });
