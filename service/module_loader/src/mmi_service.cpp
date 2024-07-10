@@ -20,6 +20,7 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <cstdlib>
 #include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -355,9 +356,10 @@ void MMIService::OnStart()
                 std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
                     WATCHDOG_BLOCKTIME);
                 WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+                exit(-1);
             } else {
                 MMI_HILOGI("Screen off, WatchDog stop, Timeout");
-        }
+            }
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
