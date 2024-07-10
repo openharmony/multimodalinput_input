@@ -1312,7 +1312,7 @@ ohos_unittest("InterceptorTest") {
   external_deps = [ "hilog:libhilog" ]
 }
 
-ohos_unittest("EventInterceptorHandlerExTest") {
+ohos_unittest("InterceptorExTest") {
   module_out_path = module_output_path
 
   configs = [
@@ -1326,17 +1326,21 @@ ohos_unittest("EventInterceptorHandlerExTest") {
   ]
 
   sources = [
+    "interceptor/src/event_interceptor_handler.cpp",
     "interceptor/test/event_interceptor_handler_ex_test.cpp",
     "interceptor/test/mock.cpp",
   ]
 
   deps = [
-    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "preferences:native_preferences",
+  ]
 }
 
 ohos_unittest("KeyAutoRepeatExTest") {
