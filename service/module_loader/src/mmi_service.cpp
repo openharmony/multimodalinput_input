@@ -79,8 +79,8 @@ const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
-constexpr int32_t WATCHDOG_WARN_TIME { 6000 };
-constexpr int32_t WATCHDOG_BLOCK_TIME { 3000 };
+constexpr int32_t WATCHDOG_WARNTIME { 6000 };
+constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
@@ -349,9 +349,9 @@ void MMIService::OnStart()
             MMI_HILOGI("WatchDog happened");
             std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
             if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_WARN_TIME);
+                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_WARNTIME);
                 WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
-                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_BLOCK_TIME);
+                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / WATCHDOG_BLOCKTIME);
                 WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
             } else {
                 MMI_HILOGI("Screen off, WatchDog stop, Timeout");
