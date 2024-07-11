@@ -20,6 +20,7 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <cstdlib>
 #include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -79,6 +80,8 @@ const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
+constexpr int32_t WATCHDOG_WARNTIME { 6000 };
+constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
@@ -344,7 +347,19 @@ void MMIService::OnStart()
             MMI_HILOGD("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Timeout happened");
+            MMI_HILOGI("WatchDog happened");
+            std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+            if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
+                    WATCHDOG_WARNTIME);
+                WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
+                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
+                    WATCHDOG_BLOCKTIME);
+                WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+                exit(-1);
+            } else {
+                MMI_HILOGI("Screen off, WatchDog stop, Timeout");
+            }
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
