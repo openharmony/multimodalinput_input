@@ -76,7 +76,7 @@ public:
 private:
     static int32_t infoDictCount_;
     static int32_t debugDictCount_;
-    static std::string userType_;
+    static thread_local std::string userType_;
     static constexpr int32_t printRate_ = 50;
 
     static void PrintInfoDict()
