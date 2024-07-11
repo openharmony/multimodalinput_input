@@ -50,6 +50,7 @@ constexpr int32_t KEYBOARD_TYPE_SIZE = 20;
 constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
 constexpr uint32_t MAX_WINDOW_NUMS = 15;
+constexpr int32_t MOUSE_ICON_SIZE = 64;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr uint32_t SHELL_FLAGS_VALUE = 2;
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -63,6 +64,7 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+    std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
 
 private:
     int32_t keyboardRepeatRate_ { 50 };
@@ -115,6 +117,121 @@ void InputManagerTest::TearDown()
 std::string InputManagerTest::GetEventDump()
 {
     return TestUtil->GetEventDump();
+}
+
+std::unique_ptr<OHOS::Media::PixelMap> InputManagerTest::SetMouseIconTest(const std::string iconPath)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Media::SourceOptions opts;
+    opts.formatHint = "image/svg+xml";
+    uint32_t ret = 0;
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iconPath, opts, ret);
+    CHKPP(imageSource);
+    std::set<std::string> formats;
+    ret = imageSource->GetSupportedFormats(formats);
+    MMI_HILOGD("Get supported format ret:%{public}u", ret);
+
+    OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {.width = MOUSE_ICON_SIZE, .height = MOUSE_ICON_SIZE};
+
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+    CHKPL(pixelMap);
+    return pixelMap;
+}
+
+/**
+ * @tc.name: InputManagerTest_SetKeyDownDuration_01
+ * @tc.desc: Test SetKeyDownDuration
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string businessId = "";
+    int32_t delay = 4500;
+    int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetKeyDownDuration_02
+ * @tc.desc: Test SetKeyDownDuration
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string businessId = "";
+    int32_t delay = 0;
+    int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
+    EXPECT_EQ(ret, PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon_01
+ * @tc.desc: Test SetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 2;
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerTest::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+
+    int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_EnableHardwareCursorStats_01
+ * @tc.desc: Test EnableHardwareCursorStats
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool enable = true;
+    int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_EnableHardwareCursorStats_02
+ * @tc.desc: Test EnableHardwareCursorStats
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableHardwareCursorStats_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool enable = false;
+    int32_t ret = InputManager::GetInstance()->EnableHardwareCursorStats(enable);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseHotSpot_01
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 8;
+    int32_t hotSpotX = 3;
+    int32_t hotSpotY = 5;
+
+    int32_t winPid = InputManager::GetInstance()->GetWindowPid(windowId);
+    EXPECT_FALSE(winPid != -1);
+    int32_t ret = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
