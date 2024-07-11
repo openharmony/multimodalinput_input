@@ -2673,28 +2673,38 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerAction != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
         pointerAction != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerAction != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE)) {
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
-                "FWI:%{public}d,EID:%{public}d,"
-                "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
-                "flags:%{public}d,DID:%{public}d"
-                "AWI:%{public}d,zOrder:%{public}d",
+                "FWI:%{public}d,EID:%{public}d, flags:%{public}d,DID:%{public}d"
+                "AWI:%{public}d,zOrder:%{public}1f",
                 pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
-                displayGroupInfo_.focusWindowId, pointerEvent->GetId(),
-                touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-                touchWindow->area.y, touchWindow->flags, displayId,
-                pointerEvent->GetAgentWindowId(), static_cast<int32_t>(touchWindow->zOrder));
+                displayGroupInfo_.focusWindowId, pointerEvent->GetId(), touchWindow->flags,
+                displayId, pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
         } else {
-            MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
-                "FWI:%{public}d,EID:%{public}d,LX:%{public}d,LY:%{public}d,"
-                "WX:%{public}d,WY:%{public}d,W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
-                "flags:%{public}d,DID:%{public}d,AWI:%{public}d,zOrder:%{public}d",
-                pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
-                displayGroupInfo_.focusWindowId, pointerEvent->GetId(), static_cast<int32_t>(logicalX),
-                static_cast<int32_t>(logicalY), static_cast<int32_t>(windowX), static_cast<int32_t>(windowY),
-                touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-                touchWindow->area.y, touchWindow->flags, displayId,
-                pointerEvent->GetAgentWindowId(), static_cast<int32_t>(touchWindow->zOrder));
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+                    "FWI:%{public}d,EID:%{public}d,"
+                    "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                    "flags:%{public}d,DID:%{public}d"
+                    "AWI:%{public}d,zOrder:%{public}1f",
+                    pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
+                    displayGroupInfo_.focusWindowId, pointerEvent->GetId(),
+                    touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+                    touchWindow->area.y, touchWindow->flags, displayId,
+                    pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+            } else {
+                MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+                    "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
+                    "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
+                    "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                    "flags:%{public}d,DID:%{public}d"
+                    "AWI:%{public}d,zOrder:%{public}1f",
+                    pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
+                    displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
+                    physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+                    touchWindow->area.y, touchWindow->flags, displayId,
+                    pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+            }
         }
     }
     bool gestureInject = false;

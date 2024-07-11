@@ -352,6 +352,7 @@ ohos_unittest("event_resample_test") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "preferences:native_preferences",
     "window_manager:libdm",
     "window_manager:libwm",
@@ -394,6 +395,7 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "preferences:native_preferences",
     "window_manager:libdm",
     "window_manager:libwm",
@@ -429,6 +431,7 @@ ohos_unittest("EventFilterDeathRecipientTest") {
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "preferences:native_preferences",
     "window_manager:libwm",
   ]
@@ -472,6 +475,7 @@ ohos_unittest("EventFilterHandlerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "preferences:native_preferences",
     "window_manager:libdm",
@@ -514,6 +518,7 @@ ohos_unittest("ApplicationStateObserverTest") {
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
@@ -551,6 +556,7 @@ ohos_unittest("TimerManagerTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hilog:libhilog",
+    "init:libbegetutil",
   ]
 }
 
@@ -593,6 +599,7 @@ ohos_unittest("InputDisplayBindHelperTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -638,6 +645,7 @@ ohos_unittest("KnuckleGlowPointTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -683,6 +691,7 @@ ohos_unittest("KnuckleDivergentPointTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -728,6 +737,7 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -773,6 +783,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -818,6 +829,7 @@ ohos_unittest("TouchDrawingManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -858,6 +870,7 @@ ohos_unittest("KnuckleDrawingManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -898,6 +911,7 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -934,6 +948,7 @@ ohos_unittest("InputWindowsManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -1053,6 +1068,7 @@ ohos_unittest("SubscriberTest") {
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "hilog:libhilog",
+    "init:libbegetutil",
   ]
 
   if (input_feature_switch) {
@@ -1084,7 +1100,10 @@ ohos_unittest("NapProcessTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "init:libbegetutil",
+  ]
 }
 
 ohos_unittest("MonitorTest") {
@@ -1115,6 +1134,7 @@ ohos_unittest("MonitorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1158,6 +1178,7 @@ ohos_unittest("ModuleLoaderTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",
@@ -1192,6 +1213,7 @@ ohos_unittest("KeyEventNormalizeTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1233,6 +1255,7 @@ ohos_unittest("KeyCommandTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1290,6 +1313,7 @@ ohos_unittest("InfraredEmitterTest") {
   external_deps = [
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "init:libbegetutil",
   ]
 }
 
@@ -1313,7 +1337,10 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+  ]
 }
 
 ohos_unittest("InterceptorExTest") {
@@ -1344,6 +1371,7 @@ ohos_unittest("InterceptorExTest") {
   external_deps = [
     "data_share:datashare_consumer",
     "hilog:libhilog",
+    "init:libbegetutil",
     "preferences:native_preferences",
   ]
 }
@@ -1378,6 +1406,7 @@ ohos_unittest("KeyAutoRepeatExTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
   ]
 }
 
@@ -1418,6 +1447,7 @@ ohos_unittest("EventHandlerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1456,6 +1486,7 @@ ohos_unittest("EventHandlerEXTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1489,6 +1520,7 @@ ohos_unittest("EventDispatchTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -1528,6 +1560,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "napi:ace_napi",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
@@ -1560,6 +1593,7 @@ ohos_unittest("PermissionHelperTest") {
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "security_component_manager:libsecurity_component_sdk",
   ]
 }
@@ -1594,6 +1628,7 @@ ohos_unittest("DisplayStateManagerTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1622,7 +1657,10 @@ ohos_unittest("DeviceManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+  ]
 }
 
 ohos_unittest("DeviceConfigTest") {
@@ -1667,7 +1705,10 @@ ohos_unittest("DelegateTaskTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+  ]
 }
 
 ohos_unittest("ConnectManagerTest") {
@@ -1696,6 +1737,7 @@ ohos_unittest("ConnectManagerTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
@@ -1744,6 +1786,7 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
@@ -1787,6 +1830,7 @@ ohos_unittest("ConnectManagerEXTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
@@ -1823,6 +1867,7 @@ ohos_unittest("EventDumpTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -1851,7 +1896,10 @@ ohos_unittest("DfxHisysEventTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "init:libbegetutil",
+  ]
 }
 
 group("mmi-service-tests") {
