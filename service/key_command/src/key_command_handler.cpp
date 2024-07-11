@@ -67,6 +67,7 @@ const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbili
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 } // namespace
 
+static struct KnuckleSwitch knuckleSwitch_;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -110,6 +111,11 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return knuckleSwitch_.statusConfigValue;
+}
+
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -131,6 +137,10 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
         SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
+    }
+    if (!isKnuckleSwitchConfig_) {
+        CreateStatusConfigObserver(knuckleSwitch_);
+        isKnuckleSwitchConfig_ = true;
     }
 
     switch (touchEvent->GetPointerAction()) {
@@ -169,7 +179,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
         case PointerEvent::TOOL_TYPE_FINGER: {
-            isKnuckleState_ = false;
             HandleFingerGestureDownEvent(touchEvent);
             break;
         }
@@ -179,7 +188,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         default: {
-            isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
         }
@@ -283,7 +291,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
     }
-    if (singleKnuckleGesture_.statusConfigValue) {
+    if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
@@ -339,7 +347,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    isKnuckleState_ = true;
     if (knuckleGesture.lastPointerDownEvent == nullptr) {
         MMI_HILOGI("Knuckle gesture first down Event");
         knuckleGesture.lastPointerDownEvent = touchEvent;
@@ -566,6 +573,10 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
         touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         ResetKnuckleGesture();
+        return;
+    }
+    if (knuckleSwitch_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
         return;
     }
     int32_t touchAction = touchEvent->GetPointerAction();
@@ -851,7 +862,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
-    singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -1002,7 +1013,6 @@ void KeyCommandHandler::ParseStatusConfigObserver()
         }
         CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
     }
-    CreateStatusConfigObserver<KnuckleGesture>(singleKnuckleGesture_);
 }
 
 template <class T>
