@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,14 +13,11 @@
 
 import("../../../device_status.gni")
 
-config("intention_cooperate_client_public_config") {
-  include_dirs = [
-    "include",
-    "${device_status_interfaces_path}/innerkits/interaction/include",
-  ]
+config("intention_cooperate_server_public_config") {
+  include_dirs = [ "include" ]
 }
 
-ohos_source_set("intention_cooperate_client") {
+ohos_source_set("intention_cooperate_server") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -32,33 +29,29 @@ ohos_source_set("intention_cooperate_client") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [
-    "include",
-    "${device_status_interfaces_path}/innerkits/interaction/include",
-  ]
+  include_dirs = [ "include" ]
 
-  sources = [ "src/cooperate_client.cpp" ]
+  sources = [ "src/cooperate_server.cpp" ]
 
-  public_configs = [ ":intention_cooperate_client_public_config" ]
+  public_configs = [ ":intention_cooperate_server_public_config" ]
 
   defines = device_status_default_defines
 
   deps = [
     "${device_status_root_path}/intention/cooperate/data:intention_cooperate_data",
     "${device_status_root_path}/intention/data:intention_data",
-    "${device_status_root_path}/intention/dfx:cooperate_dfx",
-    "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
-    "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_client",
     "${device_status_root_path}/intention/prototype:intention_prototype",
     "${device_status_root_path}/utils/common:devicestatus_util",
     "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
   external_deps = [
-    "c_utils:utils",
+    "access_token:libtokenid_sdk",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "input:libmmi-client",
+    "window_manager:libdm",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"
