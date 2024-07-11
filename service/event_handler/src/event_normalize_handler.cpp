@@ -263,12 +263,18 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
             return;
         }
-        MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
-            "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
-            "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
-            item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
-            item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-            item.GetDeviceId());
+        if (!EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGI("MouseEvent Item Normalization Results, IsPressed:%{public}d, Pressure:%{public}f"
+                       ", Device:%{public}d",
+                static_cast<int32_t>(item.IsPressed()), item.GetPressure(), item.GetDeviceId());
+        } else {
+            MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
+                "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
+                "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
+                item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
+                item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+                item.GetDeviceId());
+        }
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
