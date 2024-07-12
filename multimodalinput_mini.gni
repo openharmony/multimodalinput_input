@@ -45,7 +45,6 @@ declare_args() {
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = true
-  input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
 
   if (defined(global_parts_info) &&
