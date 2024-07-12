@@ -327,10 +327,19 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
   ]
 
   sources = [
+    "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
+    "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
+    "${mmi_path}/service/connect_manager/src/multimodal_input_connect_manager.cpp",
+    "${mmi_path}/service/filter/src/event_filter_service.cpp",
+    "${mmi_path}/service/filter/src/event_filter_stub.cpp",
+    "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/key_event_input_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
@@ -354,10 +363,12 @@ ohos_unittest("InputManagerImplTest") {
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
