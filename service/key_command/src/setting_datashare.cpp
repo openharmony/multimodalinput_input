@@ -91,7 +91,7 @@ ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, cons
         MMI_HILOGE("Get bool value fail");
         return ret;
     }
-    value = (valueStr == "true");
+    value = ((valueStr == "true") || (valueStr == "1"));
     return ERR_OK;
 }
 
