@@ -2965,7 +2965,7 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
 
-    if (!KeyCommandHandler::GetKnuckleSwitchValue()) {
+    if (!OHOS::MMI::KeyCommandHandler::GetKnuckleSwitchValue()) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
         knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
         knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
