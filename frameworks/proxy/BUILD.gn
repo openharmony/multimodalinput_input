@@ -68,6 +68,7 @@ ohos_source_set("libmmi-common") {
     "c_utils:utils",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "init:libbegetutil",
   ]
 
   part_name = "input"
@@ -311,6 +312,7 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -354,6 +356,7 @@ ohos_unittest("InputManagerImplTest") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -400,6 +403,7 @@ ohos_unittest("InputManagerTest") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -443,6 +447,7 @@ ohos_unittest("InputManagerInjectTest") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "window_manager:libwm",
     "window_manager:libwsutils",

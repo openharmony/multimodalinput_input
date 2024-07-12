@@ -22,6 +22,7 @@
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "net_packet.h"
@@ -572,8 +573,12 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(sess);
     int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
-        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    if (!EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
+    } else {
+        MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
+            subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;

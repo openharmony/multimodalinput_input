@@ -55,8 +55,8 @@ static bool UnmarshalVector(Parcel &parcel, std::vector<T> &data, bool (*readOne
         return false;
     }
     if (nItems > MAX_UNMARSHAL_VECTOR_SIZE) {
-        MMI_HILOGE("The nItems:%{public}llu, exceeds maximum allowed size:%{public}llu",
-            nItems, MAX_UNMARSHAL_VECTOR_SIZE);
+        MMI_HILOGE("The nItems:%{public}" PRIu64 ", exceeds maximum allowed size:%{public}"
+            PRIu64, nItems, MAX_UNMARSHAL_VECTOR_SIZE);
         return false;
     }
     data.resize(nItems);

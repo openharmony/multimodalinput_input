@@ -54,6 +54,8 @@ public:
     virtual bool WriteUint32(uint32_t value) = 0;
     virtual bool ReadUint64(uint64_t &value) = 0;
     virtual bool VerifySystemApp() = 0;
+    virtual bool CheckMouseCursor() = 0;
+    virtual bool CheckInputEventFilter() = 0;
     virtual bool CheckInterceptor() = 0;
     virtual bool CheckMonitor() = 0;
     virtual bool CheckDispatchControl() = 0;
@@ -97,6 +99,8 @@ public:
     MOCK_METHOD1(WriteUint32, bool(uint32_t value));
     MOCK_METHOD1(ReadUint64, bool(uint64_t &value));
     MOCK_METHOD0(VerifySystemApp, bool());
+    MOCK_METHOD0(CheckMouseCursor, bool());
+    MOCK_METHOD0(CheckInputEventFilter, bool());
     MOCK_METHOD0(CheckInterceptor, bool());
     MOCK_METHOD0(CheckMonitor, bool());
     MOCK_METHOD0(CheckDispatchControl, bool());

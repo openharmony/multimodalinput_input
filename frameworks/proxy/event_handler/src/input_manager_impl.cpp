@@ -27,6 +27,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"
+#include "event_log_helper.h"
 #include "input_scene_board_judgement.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -891,7 +892,11 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (!EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
+    } else {
+        MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }

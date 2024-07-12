@@ -36,6 +36,7 @@
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
+#include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #include "fingersense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -1413,12 +1414,14 @@ int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerE
         int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
         pointerItem.SetDisplayX(destX);
         pointerItem.SetDisplayY(destY);
-        MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
-            "Screen resolution width:%{public}d, height:%{public}d first got,"
-            "Screen resolution width:%{public}d, height:%{public}d current got,"
-            "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
-            sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
-            displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+        if (EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
+                "Screen resolution width:%{public}d, height:%{public}d first got,"
+                "Screen resolution width:%{public}d, height:%{public}d current got,"
+                "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
+                sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
+                displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+        }
     }
     return RET_OK;
 }

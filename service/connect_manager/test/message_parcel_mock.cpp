@@ -163,6 +163,16 @@ bool PermissionHelper::VerifySystemApp()
     return DfsMessageParcel::messageParcel->VerifySystemApp();
 }
 
+bool PermissionHelper::CheckMouseCursor()
+{
+    return DfsMessageParcel::messageParcel->CheckMouseCursor();
+}
+
+bool PermissionHelper::CheckInputEventFilter()
+{
+    return DfsMessageParcel::messageParcel->CheckInputEventFilter();
+}
+
 bool PermissionHelper::CheckInterceptor()
 {
     return DfsMessageParcel::messageParcel->CheckInterceptor();
