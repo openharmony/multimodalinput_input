@@ -13,11 +13,14 @@
 
 import("../../../device_status.gni")
 
-config("intention_cooperate_data_public_config") {
-  include_dirs = [ "include" ]
+config("intention_drag_client_public_config") {
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
+  ]
 }
 
-ohos_source_set("intention_cooperate_data") {
+ohos_source_set("intention_drag_client") {
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -29,21 +32,32 @@ ohos_source_set("intention_cooperate_data") {
 
   branch_protector_ret = "pac_ret"
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${device_status_root_path}/interfaces/innerkits/interaction/include",
+  ]
 
-  sources = [ "src/cooperate_params.cpp" ]
+  sources = [ "src/drag_client.cpp" ]
 
-  public_configs = [ ":intention_cooperate_data_public_config" ]
+  public_configs = [ ":intention_drag_client_public_config" ]
+
+  defines = device_status_default_defines
 
   deps = [
+    "${device_status_root_path}/intention/data:intention_data",
+    "${device_status_root_path}/intention/drag/data:intention_drag_data",
+    "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
+    "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_client",
     "${device_status_root_path}/intention/prototype:intention_prototype",
-    "${device_status_utils_path}:devicestatus_util",
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
-    "ipc:ipc_core",
+    "image_framework:image_native",
   ]
 
   subsystem_name = "${device_status_subsystem_name}"

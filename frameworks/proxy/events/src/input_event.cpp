@@ -33,6 +33,8 @@ int64_t g_nextEventId = 1;
 constexpr uint32_t DATA_LENGTH_LIMIT { 1024 }; // 1024: max length
 } // namespace
 
+thread_local std::string  EventLogHelper::userType_ = "";
+
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
     Reset();
