@@ -28,6 +28,7 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
+#include "key_command_handler.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
 #include "preferences.h"
@@ -2964,8 +2965,9 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-
-    if (!OHOS::MMI::KeyCommandHandler::GetKnuckleSwitchValue()) {
+    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
+    auto knuckleSwitch = InputHandler->GetKeyCommandHandler()->GetKnuckleSwitchValue();
+    if (!knuckleSwitch) {
         knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
         knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
         knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
