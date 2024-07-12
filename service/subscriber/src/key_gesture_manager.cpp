@@ -297,8 +297,14 @@ KeyGestureManager::PullUpAccessibility::~PullUpAccessibility()
 
 bool KeyGestureManager::PullUpAccessibility::IsWorking()
 {
-    return ((DISPLAY_MONITOR->GetScreenStatus() != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) &&
-            (DISPLAY_MONITOR->GetScreenLocked() ? setting_.enableOnScreenLocked : setting_.enable));
+    if ((DISPLAY_MONITOR->GetScreenStatus() == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF)) {
+        return false;
+    }
+    if (DISPLAY_MONITOR->GetScreenLocked()) {
+        return ReadSwitchStatus(ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN, false);
+    } else {
+        return ReadSwitchStatus(ACC_SHORTCUT_ENABLED, false);
+    }
 }
 
 int32_t KeyGestureManager::PullUpAccessibility::AddHandler(int32_t pid,
