@@ -2284,6 +2284,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    DispatchUIExtentionPointerEvent(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
@@ -2424,6 +2425,42 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
             *touchWindow = &windowinfo;
             isUiExtentionWindow = true;
             break;
+        }
+    }
+}
+
+void InputWindowsManager::SendUIExtentionPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t pid)
+{
+    auto fd = udsServer_->GetClientFd(pid);
+    auto sess = udsServer_->GetSession(fd);
+    CHKPRV(sess, "The last window has disappeared");
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
+}
+
+void InputWindowsManager::DispatchUIExtentionPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    auto windowId = pointerEvent->GetTargetWindowId();
+    for (const auto& item : windowsInfo) {
+        if (windowId == item.id) {
+            return;
+        }
+        for (const auto& windowInfo : item.uiExtentionWindowInfo) {
+            if (windowInfo.id == windowId) {
+                pointerEvent->SetAgentWindowId(item.agentWindowId);
+                pointerEvent->SetTargetWindowId(item.id);
+                SendUIExtentionPointerEvent(pointerEvent, windowInfo.pid);
+                pointerEvent->SetAgentWindowId(windowInfo.agentWindowId);
+                pointerEvent->SetTargetWindowId(windowInfo.id);
+                pointerEvent->UpdateId();
+                return;
+            }
         }
     }
 }
@@ -2662,6 +2699,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
+    DispatchUIExtentionPointerEvent(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
