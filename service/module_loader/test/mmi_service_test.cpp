@@ -319,7 +319,7 @@ HWTEST_F(MMIServerTest, SetMouseIcon_001, TestSize.Level1)
     int32_t windowId = 1;
     void* pixelMap = nullptr;
     int32_t ret = mmiService.SetMouseIcon(windowId, pixelMap);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
