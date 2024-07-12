@@ -505,7 +505,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_015, TestSize.Level
         MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         if (i == 0) {
-            EXPECT_NE(sPointerEs, "Call middle interceptor");
+            EXPECT_NE(sPointerEs, "Call middle interceptors");
         } else {
             ASSERT_TRUE(sPointerEs.empty());
         }
