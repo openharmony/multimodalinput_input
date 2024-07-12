@@ -67,7 +67,6 @@ const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbili
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 } // namespace
 
-static struct KnuckleSwitch knuckleSwitch_;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {

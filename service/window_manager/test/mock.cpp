@@ -407,6 +407,11 @@ std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandl
     return nullptr;
 }
 
+std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
+{
+    return eventKeyCommandHandler_;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {}

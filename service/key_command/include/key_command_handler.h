@@ -183,7 +183,7 @@ public:
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
-    static bool GetKnuckleSwitchValue();
+    bool GetKnuckleSwitchValue();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -321,6 +321,7 @@ private:
     bool isTimeConfig_ { false };
     bool isDistanceConfig_ { false };
     bool isKnuckleSwitchConfig_ { false };
+    struct KnuckleSwitch knuckleSwitch_;
     int32_t checkAdjustIntervalTimeCount_ { 0 };
     int32_t checkAdjustDistanceCount_ { 0 };
     int64_t downToPrevUpTimeConfig_ { 0 };
