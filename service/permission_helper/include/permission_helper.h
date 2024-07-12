@@ -41,6 +41,7 @@ public:
     bool RequestFromShell();
     bool CheckMouseCursor();
     bool CheckInputEventFilter();
+    bool CheckAuthorize();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
