@@ -2431,9 +2431,10 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
 
 void InputWindowsManager::SendUIExtentionPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t pid)
 {
+    MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,pid:%{public}d", pid);
     auto fd = udsServer_->GetClientFd(pid);
     auto sess = udsServer_->GetSession(fd);
-    CHKPRV(sess, "The last window has disappeared");
+    CHKPRV(sess, "The window has disappeared");
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {
@@ -2453,6 +2454,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(std::shared_ptr<Pointe
         }
         for (const auto& windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == windowId) {
+                MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
                 pointerEvent->SetAgentWindowId(item.agentWindowId);
                 pointerEvent->SetTargetWindowId(item.id);
                 SendUIExtentionPointerEvent(pointerEvent, windowInfo.pid);
