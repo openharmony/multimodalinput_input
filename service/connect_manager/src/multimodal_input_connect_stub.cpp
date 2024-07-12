@@ -2206,6 +2206,10 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     bool isAuthorize { false };
     READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = Authorize(isAuthorize);
