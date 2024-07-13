@@ -361,7 +361,6 @@ void MMIService::OnStart()
             } else {
                 MMI_HILOGI("Screen off, WatchDog stop, Timeout");
             }
-            MMI_HILOGI(" MMI-SERVER Timeout");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
