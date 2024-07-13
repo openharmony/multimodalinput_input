@@ -1433,8 +1433,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
-                if (!IsThreeFingersTap(pointerEvent)) {
-                }
                 bool canUse = false;
                 InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                 if (canUse) {
