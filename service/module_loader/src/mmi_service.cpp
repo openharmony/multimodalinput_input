@@ -27,6 +27,7 @@
 #endif // OHOS_RSS_CLIENT
 
 #include "ability_manager_client.h"
+#include "account_manager.h"
 #include "anr_manager.h"
 #include "app_debug_listener.h"
 #include "app_state_observer.h"
@@ -301,6 +302,7 @@ int32_t MMIService::Init()
         return SASERVICE_INIT_FAIL;
     }
     MMI_HILOGI("Set para input.pointer.device false");
+    ACCOUNT_MGR->Initialize(&delegateTasks_);
     return RET_OK;
 }
 
