@@ -24,6 +24,7 @@ namespace OHOS {
 namespace MMI {
 template<typename T>
 class IdFactory {
+    
 public:
     IdFactory() : IdFactory(1) {}
     explicit IdFactory(T seed) : seed_(seed) {}
