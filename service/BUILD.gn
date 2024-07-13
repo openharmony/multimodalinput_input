@@ -45,6 +45,7 @@ config("libmmi_server_config") {
     }
   }
   include_dirs = [
+    "account_manager/include",
     "app_state_manager/include",
     "device_config/include",
     "device_manager/include",
@@ -154,6 +155,7 @@ ohos_shared_library("libmmi-server") {
     debug = false
   }
   sources += [
+    "account_manager/src/account_manager.cpp",
     "window_manager/src/knuckle_divergent_point.cpp",
     "window_manager/src/knuckle_drawing_manager.cpp",
     "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
