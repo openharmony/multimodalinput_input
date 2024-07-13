@@ -203,7 +203,7 @@ private:
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
     void SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
-        std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo& windowInfo);
+        const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent);
     void DispatchUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
         std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_POINTER
