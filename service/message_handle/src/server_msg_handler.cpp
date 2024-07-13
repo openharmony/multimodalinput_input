@@ -39,7 +39,6 @@
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #include "touch_drawing_manager.h"
-#include "util_napi_error.h"
 #include "authorize_helper.h"
 
 #undef MMI_LOG_DOMAIN
@@ -51,10 +50,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
+constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-constexpr int32_t SEND_NOTICE_OVERTIME = 5;
-constexpr int32_t DEFAULT_POINTER_ID = 10000;
+constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
+constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)

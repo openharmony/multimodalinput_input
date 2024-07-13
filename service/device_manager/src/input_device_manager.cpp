@@ -32,7 +32,6 @@
 #include "pointer_drawing_manager.h"
 #include "proto.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -48,6 +47,7 @@ const std::string UNKNOWN_SCREEN_ID { "" };
 const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
 constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
 constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM { 128 };
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
