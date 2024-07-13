@@ -340,12 +340,12 @@ void MMIService::OnStart()
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
     PREFERENCES_MGR->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
-        MMI_HILOGD("Set thread status flag to true");
+        MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     });
     auto taskFunc = [this]() {
         if (threadStatusFlag_) {
-            MMI_HILOGD("Set thread status flag to false");
+            MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
             MMI_HILOGI("WatchDog happened");
