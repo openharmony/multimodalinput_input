@@ -2535,7 +2535,8 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(switchFlag);
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
+                switchFlag);
         }
         );
     if (ret != RET_OK) {
@@ -2549,7 +2550,8 @@ int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
-            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchFlag);
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
+                switchFlag);
         }
         );
     if (ret != RET_OK) {
