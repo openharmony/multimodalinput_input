@@ -16,12 +16,11 @@
 #include "key_gesture_manager.h"
 
 #include <algorithm>
-#include <system_ability_definition.h>
 
+#include "account_manager.h"
 #include "app_state_observer.h"
 #include "define_multimodal.h"
 #include "display_event_monitor.h"
-#include "setting_datashare.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -36,14 +35,12 @@ namespace {
 constexpr int32_t COMBINATION_KEY_TIMEOUT { 150 };
 constexpr int32_t INVALID_ENTITY_ID { -1 };
 constexpr int32_t REPEAT_ONCE { 1 };
-constexpr int32_t RETRY_COOLING_TIME { 500 }; // 500ms
-constexpr int32_t DEFAULT_LONG_PRESS_TIME { 3000 }; // 3s
 constexpr size_t SINGLE_KEY_PRESSED { 1 };
-const std::string ACC_SHORTCUT_ENABLED { "accessibility_shortcut_enabled" };
-const std::string ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN { "accessibility_shortcut_enabled_on_lock_screen" };
-const std::string ACC_SHORTCUT_TIMEOUT { "accessibility_shortcut_timeout" };
-const std::string SECURE_SETTING_URI_PROXY {
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true" };
+}
+
+KeyGestureManager::Handler::~Handler()
+{
+    ResetTimer();
 }
 
 void KeyGestureManager::Handler::ResetTimer()
@@ -51,6 +48,18 @@ void KeyGestureManager::Handler::ResetTimer()
     if (timerId_ >= 0) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = INVALID_ENTITY_ID;
+    }
+}
+
+void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
+{
+    MMI_HILOGI("[Handler] Handler will run after %{public}dms", GetLongPressTime());
+    timerId_ = TimerMgr->AddTimer(GetLongPressTime(), REPEAT_ONCE,
+        [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
+            Run(tKeyEvent);
+        });
+    if (timerId_ < 0) {
+        MMI_HILOGI("[Handler] AddTimer fail");
     }
 }
 
@@ -117,11 +126,7 @@ void KeyGestureManager::KeyGesture::TriggerHandlers(std::shared_ptr<KeyEvent> ke
 
     for (auto &handler : handlers_) {
         if (!haveForeground || (foregroundPids.find(handler.GetPid()) != foregroundPids.end())) {
-            auto timerId = TimerMgr->AddTimer(handler.GetLongPressTime(), REPEAT_ONCE,
-                [this, handlerId = handler.GetId(), tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-                    RunHandler(handlerId, tKeyEvent);
-                });
-            handler.SetTimerId(timerId);
+            handler.Trigger(keyEvent);
         }
     }
 }
@@ -130,6 +135,7 @@ void KeyGestureManager::KeyGesture::RunHandler(int32_t handlerId, std::shared_pt
 {
     for (auto &handler : handlers_) {
         if (handler.GetId() == handlerId) {
+            handler.ResetTimer();
             handler.Run(keyEvent);
             break;
         }
@@ -272,28 +278,13 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     output << "[LongPressCombinationKey] trigger ";
     Dump(output);
     MMI_HILOGI("%{public}s", output.str().c_str());
+    OnTriggerAll(keyEvent);
     TriggerHandlers(keyEvent);
 }
 
 KeyGestureManager::PullUpAccessibility::PullUpAccessibility()
     : LongPressCombinationKey(std::set({ KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::KEYCODE_VOLUME_UP }))
-{
-    InitializeSetting();
-}
-
-KeyGestureManager::PullUpAccessibility::~PullUpAccessibility()
-{
-    auto &setting = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-    if (switchObserver_ != nullptr) {
-        setting.UnregisterObserver(switchObserver_);
-    }
-    if (onScreenLockedSwitchObserver_ != nullptr) {
-        setting.UnregisterObserver(onScreenLockedSwitchObserver_);
-    }
-    if (configObserver_ != nullptr) {
-        setting.UnregisterObserver(configObserver_);
-    }
-}
+{}
 
 bool KeyGestureManager::PullUpAccessibility::IsWorking()
 {
@@ -301,97 +292,24 @@ bool KeyGestureManager::PullUpAccessibility::IsWorking()
         return false;
     }
     if (DISPLAY_MONITOR->GetScreenLocked()) {
-        return ReadSwitchStatus(ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN, false);
+        return ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutEnabledOnScreenLocked();
     } else {
-        return ReadSwitchStatus(ACC_SHORTCUT_ENABLED, false);
+        return ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutEnabled();
     }
 }
 
 int32_t KeyGestureManager::PullUpAccessibility::AddHandler(int32_t pid,
     int32_t longPressTime, std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    return KeyGesture::AddHandler(pid, DEFAULT_LONG_PRESS_TIME, callback);
+    return KeyGesture::AddHandler(pid, ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout(), callback);
 }
 
-sptr<SettingObserver> KeyGestureManager::PullUpAccessibility::RegisterSettingObserver(
-    const std::string &key, SettingObserver::UpdateFunc onUpdate)
+void KeyGestureManager::PullUpAccessibility::OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGI("[PullUpAccessibility] Registering observer of '%{public}s'", key.c_str());
-    auto &settingHelper = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID);
-    sptr<SettingObserver> settingObserver = settingHelper.CreateObserver(key, onUpdate);
-    ErrCode ret = settingHelper.RegisterObserver(settingObserver, SECURE_SETTING_URI_PROXY);
-    if (ret != ERR_OK) {
-        MMI_HILOGE("[PullUpAccessibility] Failed to register '%{public}s' observer, error:%{public}d",
-            key.c_str(), ret);
-        return nullptr;
-    }
-    return settingObserver;
-}
-
-void KeyGestureManager::PullUpAccessibility::InitializeSetting()
-{
-    if (switchObserver_ == nullptr) {
-        switchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED, [this](const std::string &key) {
-            setting_.enable = ReadSwitchStatus(key, setting_.enable);
-        });
-        setting_.enable = ReadSwitchStatus(ACC_SHORTCUT_ENABLED, setting_.enable);
-    }
-    if (onScreenLockedSwitchObserver_ == nullptr) {
-        onScreenLockedSwitchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN,
-            [this](const std::string &key) {
-                setting_.enableOnScreenLocked = ReadSwitchStatus(key, setting_.enableOnScreenLocked);
-            });
-        setting_.enableOnScreenLocked = ReadSwitchStatus(
-            ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN, setting_.enableOnScreenLocked);
-    }
-    if (configObserver_ == nullptr) {
-        configObserver_ = RegisterSettingObserver(ACC_SHORTCUT_TIMEOUT,
-            [this](const std::string &key) {
-                ReadLongPressTime();
-            });
-        ReadLongPressTime();
-    }
-    if ((switchObserver_ == nullptr) || (onScreenLockedSwitchObserver_ == nullptr) || (configObserver_ == nullptr)) {
-        TimerMgr->AddTimer(RETRY_COOLING_TIME, REPEAT_ONCE, [this]() {
-            InitializeSetting();
-        });
-    }
-}
-
-bool KeyGestureManager::PullUpAccessibility::ReadSwitchStatus(const std::string &key, bool currentSwitchStatus)
-{
-    bool switchOn = true;
-    auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue(
-        key, switchOn, SECURE_SETTING_URI_PROXY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("[PullUpAccessibility] Failed to acquire '%{public}s', error:%{public}d", key.c_str(), ret);
-        return currentSwitchStatus;
-    }
-    MMI_HILOGI("[PullUpAccessibility] '%{public}s' switch %{public}s", key.c_str(), switchOn ? "on" : "off");
-    return switchOn;
-}
-
-void KeyGestureManager::PullUpAccessibility::ReadLongPressTime()
-{
-    int32_t longPressTime {};
-    auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetIntValue(
-        ACC_SHORTCUT_TIMEOUT, longPressTime, SECURE_SETTING_URI_PROXY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("[PullUpAccessibility] Failed to acquire '%{public}s', error:%{public}d",
-            ACC_SHORTCUT_TIMEOUT.c_str(), ret);
-        longPressTime = DEFAULT_LONG_PRESS_TIME;
-    }
-    if (longPressTime < COMBINATION_KEY_TIMEOUT) {
-        longPressTime = COMBINATION_KEY_TIMEOUT;
-    }
-    MMI_HILOGI("[PullUpAccessibility] '%{public}s' setting: %{public}d",
-        ACC_SHORTCUT_TIMEOUT.c_str(), longPressTime);
-    if (!handlers_.empty()) {
-        for (auto &handler : handlers_) {
-            handler.SetLongPressTime(longPressTime);
-        }
-        MMI_HILOGI("[PullUpAccessibility] '%{public}s' was set to %{public}d",
-            ACC_SHORTCUT_TIMEOUT.c_str(), longPressTime);
+    MMI_HILOGI("[PullUpAccessibility] Current AccShortcutTimeout setting: %{public}dms",
+        ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout());
+    for (auto &handler : handlers_) {
+        handler.SetLongPressTime(ACCOUNT_MGR->GetCurrentAccountSetting().GetAccShortcutTimeout());
     }
 }
 
