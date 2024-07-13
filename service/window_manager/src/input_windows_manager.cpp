@@ -2485,7 +2485,6 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
                 SendUIExtentionPointerEvent(logicalX, logicalY, item, pointerEvent);
                 pointerEvent->SetAgentWindowId(windowInfo.agentWindowId);
                 pointerEvent->SetTargetWindowId(windowInfo.id);
-                pointerEvent->UpdateId();
                 return;
             }
         }
