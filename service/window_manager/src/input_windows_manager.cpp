@@ -2261,6 +2261,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
@@ -2284,7 +2285,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    DispatchUIExtentionPointerEvent(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
@@ -2429,10 +2429,34 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
     }
 }
 
-void InputWindowsManager::SendUIExtentionPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t pid)
+void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+    std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo& windowInfo)
 {
-    MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,pid:%{public}d", pid);
-    auto fd = udsServer_->GetClientFd(pid);
+    MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    auto windowX = logicalX - windowInfo.area.x;
+    auto windowY = logicalY - windowInfo.area.y;
+    if (!(windowInfo.transform.empty())) {
+    auto windowXY = TransformWindowXY(windowInfo, logicalX, logicalY);
+        windowX = windowXY.first;
+        windowY = windowXY.second;
+    }
+    auto physicDisplayInfo = GetPhysicalDisplay(pointerEvent->GetTargetDisplayId());
+    CHKPV(physicDisplayInfo);
+    double physicalX = logicalX - physicDisplayInfo->x;
+    double physicalY = logicalY - physicDisplayInfo->y;
+    pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
+    pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
+    pointerItem.SetWindowX(static_cast<int32_t>(windowX));
+    pointerItem.SetWindowY(static_cast<int32_t>(windowY));
+    pointerItem.SetTargetWindowId(windowInfo.id);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+    auto fd = udsServer_->GetClientFd(windowInfo.pid);
     auto sess = udsServer_->GetSession(fd);
     CHKPRV(sess, "The window has disappeared");
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
@@ -2443,7 +2467,8 @@ void InputWindowsManager::SendUIExtentionPointerEvent(std::shared_ptr<PointerEve
     }
 }
 
-void InputWindowsManager::DispatchUIExtentionPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+    std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
@@ -2457,7 +2482,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(std::shared_ptr<Pointe
                 MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
                 pointerEvent->SetAgentWindowId(item.agentWindowId);
                 pointerEvent->SetTargetWindowId(item.id);
-                SendUIExtentionPointerEvent(pointerEvent, windowInfo.pid);
+                SendUIExtentionPointerEvent(logicalX, logicalY, pointerEvent, item);
                 pointerEvent->SetAgentWindowId(windowInfo.agentWindowId);
                 pointerEvent->SetTargetWindowId(windowInfo.id);
                 pointerEvent->UpdateId();
@@ -2680,6 +2705,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    DispatchUIExtentionPointerEvent(logicalX, logicalX, pointerEvent);
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
     pointerItem.SetWindowX(static_cast<int32_t>(windowX));
@@ -2701,7 +2727,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
-    DispatchUIExtentionPointerEvent(pointerEvent);
     int32_t pointerAction = pointerEvent->GetPointerAction();
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
