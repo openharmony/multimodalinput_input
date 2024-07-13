@@ -2430,7 +2430,7 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
 }
 
 void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
-    std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo& windowInfo)
+    const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
     int32_t pointerId = pointerEvent->GetPointerId();
@@ -2482,7 +2482,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
                 MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
                 pointerEvent->SetAgentWindowId(item.agentWindowId);
                 pointerEvent->SetTargetWindowId(item.id);
-                SendUIExtentionPointerEvent(logicalX, logicalY, pointerEvent, item);
+                SendUIExtentionPointerEvent(logicalX, logicalY, item, pointerEvent);
                 pointerEvent->SetAgentWindowId(windowInfo.agentWindowId);
                 pointerEvent->SetTargetWindowId(windowInfo.id);
                 pointerEvent->UpdateId();
