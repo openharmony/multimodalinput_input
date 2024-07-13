@@ -21,7 +21,6 @@
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
-#include "util_napi_error.h"
 
 #include "define_multimodal.h"
 #include "image_source.h"
@@ -48,6 +47,7 @@ constexpr int32_t CAPS_LOCK_FUNCTION_KEY = 1;
 constexpr int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
+constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
