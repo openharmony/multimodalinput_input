@@ -3608,6 +3608,7 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
     cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData, "whiteList");
     if (!cJSON_IsArray(whiteList)) {
         MMI_HILOGE("whiteList number must be array");
+        cJSON_Delete(jsonData);
         return false;
     }
     int32_t whiteListSize = cJSON_GetArraySize(whiteList);
@@ -3632,6 +3633,7 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         switchFocusKey.pressedKey = pressedKeyJson->valueint;
         vecWhiteList_.push_back(switchFocusKey);
     }
+    cJSON_Delete(jsonData);
     return true;
 }
 
