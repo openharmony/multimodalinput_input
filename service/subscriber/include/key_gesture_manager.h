@@ -24,7 +24,6 @@
 
 #include "key_event.h"
 #include "key_option.h"
-#include "setting_observer.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,6 +34,7 @@ class KeyGestureManager final {
         Handler(int32_t id, int32_t pid, int32_t longPressTime,
                 std::function<void(std::shared_ptr<KeyEvent>)> callback)
             : id_(id), pid_(pid), longPressTime_(longPressTime), callback_(callback) {}
+        ~Handler();
 
         int32_t GetId() const
         {
@@ -46,18 +46,6 @@ class KeyGestureManager final {
             return pid_;
         }
 
-        int32_t GetTimerId() const
-        {
-            return timerId_;
-        }
-
-        void SetTimerId(int32_t timerId)
-        {
-            timerId_ = timerId;
-        }
-
-        void ResetTimer();
-
         int32_t GetLongPressTime() const
         {
             return longPressTime_;
@@ -67,6 +55,9 @@ class KeyGestureManager final {
         {
             longPressTime_ = longPressTime;
         }
+
+        void ResetTimer();
+        void Trigger(std::shared_ptr<KeyEvent> keyEvent);
 
         void Run(std::shared_ptr<KeyEvent> keyEvent) const
         {
@@ -134,6 +125,9 @@ class KeyGestureManager final {
         bool Intercept(std::shared_ptr<KeyEvent> keyEvent) override;
         void Dump(std::ostringstream &output) const override;
 
+    protected:
+        virtual void OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent) {}
+
     private:
         bool RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent);
         void TriggerAll(std::shared_ptr<KeyEvent> keyEvent);
@@ -143,29 +137,14 @@ class KeyGestureManager final {
     };
 
     class PullUpAccessibility final : public LongPressCombinationKey {
-        struct Setting {
-            bool enable;
-            bool enableOnScreenLocked;
-        };
-
     public:
         PullUpAccessibility();
-        ~PullUpAccessibility();
+        ~PullUpAccessibility() = default;
 
         bool IsWorking() override;
         int32_t AddHandler(int32_t pid, int32_t longPressTime,
             std::function<void(std::shared_ptr<KeyEvent>)> callback) override;
-
-    private:
-        sptr<SettingObserver> RegisterSettingObserver(const std::string &key, SettingObserver::UpdateFunc onUpdate);
-        void InitializeSetting();
-        bool ReadSwitchStatus(const std::string &key, bool currentSwitchStatus);
-        void ReadLongPressTime();
-
-        sptr<SettingObserver> switchObserver_;
-        sptr<SettingObserver> onScreenLockedSwitchObserver_;
-        sptr<SettingObserver> configObserver_;
-        Setting setting_ {};
+        void OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent) override;
     };
 
 public:
