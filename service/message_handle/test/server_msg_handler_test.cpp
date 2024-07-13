@@ -21,7 +21,6 @@
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
-#include "util_napi_error.h"
 
 #include "define_multimodal.h"
 #include "image_source.h"
