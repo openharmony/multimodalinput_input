@@ -31,10 +31,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t INVALID_ACCOUNT_ID { -1 };
 constexpr int32_t MAIN_ACCOUNT_ID { 100 };
 constexpr int32_t REPEAT_ONCE { 1 };
-constexpr int32_t NO_WAIT { 0 };
 constexpr int32_t REPEAT_COOLING_TIME { 1000 };
 constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
 const std::string ACC_SHORTCUT_ENABLED { "accessibility_shortcut_enabled" };
@@ -364,14 +362,12 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
 {
     int32_t accountId = data.GetCode();
     MMI_HILOGI("Switch to account(%{public}d)", accountId);
-    if (currentAccountId_ == accountId) {
-        return;
-    }
-    if (auto iter = accounts_.find(accountId); iter != accounts_.end()) {
+    if (currentAccountId_ != accountId) {
+        if (auto iter = accounts_.find(accountId); iter == accounts_.end()) {
+            accounts_.emplace(accountId, std::make_unique<AccountSetting>(scheduler_, accountId));
+        }
         currentAccountId_ = accountId;
         MMI_HILOGI("Switched to account(%{public}d)", currentAccountId_);
-    } else {
-        MMI_HILOGW("No account(%{public}d)", accountId);
     }
 }
 } // namespace MMI
