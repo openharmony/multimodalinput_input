@@ -68,8 +68,8 @@ void AccountManager::CommonEventSubscriber::OnReceiveEvent(const EventFwk::Commo
     });
 }
 
-AccountManager::AccountSetting::AccountSetting(DelegateTasks *scheduler, int32_t accountId)
-    : scheduler_(scheduler), accountId_(accountId)
+AccountManager::AccountSetting::AccountSetting(int32_t accountId)
+    : accountId_(accountId)
 {
     InitializeSetting();
 }
@@ -88,6 +88,54 @@ AccountManager::AccountSetting::~AccountSetting()
     }
     if (configObserver_ != nullptr) {
         setting.UnregisterObserver(configObserver_);
+    }
+}
+
+AccountManager::AccountSetting::AccountSetting(const AccountSetting &other)
+    : accountId_(other.accountId_), accShortcutTimeout_(other.accShortcutTimeout_),
+      accShortcutEnabled_(other.accShortcutEnabled_),
+      accShortcutEnabledOnScreenLocked_(other.accShortcutEnabledOnScreenLocked_)
+{}
+
+AccountManager::AccountSetting& AccountManager::AccountSetting::operator=(const AccountSetting &other)
+{
+    accountId_ = other.accountId_;
+    accShortcutTimeout_ = other.accShortcutTimeout_;
+    accShortcutEnabled_ = other.accShortcutEnabled_;
+    accShortcutEnabledOnScreenLocked_ = other.accShortcutEnabledOnScreenLocked_;
+    return *this;
+}
+
+void AccountManager::AccountSetting::AccShortcutTimeout(int32_t accountId, const std::string &key)
+{
+    auto accountMgr = ACCOUNT_MGR;
+    std::lock_guard<std::mutex> guard { accountMgr->lock_ };
+    if (auto iter = accountMgr->accounts_.find(accountId); iter != accountMgr->accounts_.end()) {
+        iter->second->OnAccShortcutTimeoutChanged(key);
+    } else {
+        MMI_HILOGW("No account(%{public}d)", accountId);
+    }
+}
+
+void AccountManager::AccountSetting::AccShortcutEnabled(int32_t accountId, const std::string &key)
+{
+    auto accountMgr = ACCOUNT_MGR;
+    std::lock_guard<std::mutex> guard { accountMgr->lock_ };
+    if (auto iter = accountMgr->accounts_.find(accountId); iter != accountMgr->accounts_.end()) {
+        iter->second->OnAccShortcutEnabled(key);
+    } else {
+        MMI_HILOGW("No account(%{public}d)", accountId);
+    }
+}
+
+void AccountManager::AccountSetting::AccShortcutEnabledOnScreenLocked(int32_t accountId, const std::string &key)
+{
+    auto accountMgr = ACCOUNT_MGR;
+    std::lock_guard<std::mutex> guard { accountMgr->lock_ };
+    if (auto iter = accountMgr->accounts_.find(accountId); iter != accountMgr->accounts_.end()) {
+        iter->second->OnAccShortcutEnabledOnScreenLocked(key);
+    } else {
+        MMI_HILOGW("No account(%{public}d)", accountId);
     }
 }
 
@@ -115,20 +163,21 @@ void AccountManager::AccountSetting::InitializeSetting()
 {
     CALL_INFO_TRACE;
     if (switchObserver_ == nullptr) {
-        switchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED, [this](const std::string &key) {
-            OnAccShortcutEnabled(key);
-        });
+        switchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED,
+            [accountId = accountId_](const std::string &key) {
+                AccountManager::AccountSetting::AccShortcutEnabled(accountId, key);
+            });
     }
     if (onScreenLockedSwitchObserver_ == nullptr) {
         onScreenLockedSwitchObserver_ = RegisterSettingObserver(ACC_SHORTCUT_ENABLED_ON_LOCK_SCREEN,
-            [this](const std::string &key) {
-                OnAccShortcutEnabledOnScreenLocked(key);
+            [accountId = accountId_](const std::string &key) {
+                AccountManager::AccountSetting::AccShortcutEnabledOnScreenLocked(accountId, key);
             });
     }
     if (configObserver_ == nullptr) {
         configObserver_ = RegisterSettingObserver(ACC_SHORTCUT_TIMEOUT,
-            [this](const std::string &key) {
-                OnAccShortcutTimeoutChanged(key);
+            [accountId = accountId_](const std::string &key) {
+                AccountManager::AccountSetting::AccShortcutTimeout(accountId, key);
             });
     }
     if ((switchObserver_ == nullptr) || (onScreenLockedSwitchObserver_ == nullptr) || (configObserver_ == nullptr)) {
@@ -145,41 +194,20 @@ void AccountManager::AccountSetting::InitializeSetting()
 
 void AccountManager::AccountSetting::OnAccShortcutTimeoutChanged(const std::string &key)
 {
-    if (scheduler_ == nullptr) {
-        MMI_HILOGE("Account manager is not initialized");
-        return;
-    }
-    scheduler_->PostSyncTask([&] {
-        MMI_HILOGI("[AccountSetting][%{public}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
-        ReadLongPressTime();
-        return RET_OK;
-    });
+    MMI_HILOGI("[AccountSetting][%{public}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
+    ReadLongPressTime();
 }
 
 void AccountManager::AccountSetting::OnAccShortcutEnabled(const std::string &key)
 {
-    if (scheduler_ == nullptr) {
-        MMI_HILOGE("Account manager is not initialized");
-        return;
-    }
-    scheduler_->PostSyncTask([&] {
-        MMI_HILOGI("[AccountSetting][%{public}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
-        accShortcutEnabled_ = ReadSwitchStatus(key, accShortcutEnabled_);
-        return RET_OK;
-    });
+    MMI_HILOGI("[AccountSetting][%{public}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
+    accShortcutEnabled_ = ReadSwitchStatus(key, accShortcutEnabled_);
 }
 
 void AccountManager::AccountSetting::OnAccShortcutEnabledOnScreenLocked(const std::string &key)
 {
-    if (scheduler_ == nullptr) {
-        MMI_HILOGE("Account manager is not initialized");
-        return;
-    }
-    scheduler_->PostSyncTask([&] {
-        MMI_HILOGI("[AccountSetting][%{public}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
-        accShortcutEnabledOnScreenLocked_ = ReadSwitchStatus(key, accShortcutEnabledOnScreenLocked_);
-        return RET_OK;
-    });
+    MMI_HILOGI("[AccountSetting][%{public}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
+    accShortcutEnabledOnScreenLocked_ = ReadSwitchStatus(key, accShortcutEnabledOnScreenLocked_);
 }
 
 bool AccountManager::AccountSetting::ReadSwitchStatus(const std::string &key, bool currentSwitchStatus)
@@ -246,33 +274,31 @@ AccountManager::AccountManager()
             },
         }
     };
-    SubscribeCommonEvent();
 }
 
 AccountManager::~AccountManager()
 {
+    std::lock_guard<std::mutex> guard { lock_ };
     UnsubscribeCommonEvent();
+    accounts_.clear();
 }
 
 void AccountManager::Initialize(DelegateTasks *scheduler)
 {
     MMI_HILOGI("Initialize account manager");
+    std::lock_guard<std::mutex> guard { lock_ };
     scheduler_ = scheduler;
     SetupMainAccount();
+    SubscribeCommonEvent();
 }
 
-const AccountManager::AccountSetting& AccountManager::GetCurrentAccountSetting()
+AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
 {
+    std::lock_guard<std::mutex> guard { lock_ };
     if (auto iter = accounts_.find(currentAccountId_); iter != accounts_.end()) {
         return *iter->second;
     }
-    MMI_HILOGW("No data of account(%{public}d)", currentAccountId_);
-    currentAccountId_ = MAIN_ACCOUNT_ID;
-    if (auto iter = accounts_.find(MAIN_ACCOUNT_ID); iter != accounts_.end()) {
-        return *iter->second;
-    }
-    auto [iter, _] = accounts_.emplace(MAIN_ACCOUNT_ID,
-        std::make_unique<AccountSetting>(scheduler_, MAIN_ACCOUNT_ID));
+    auto [iter, _] = accounts_.emplace(currentAccountId_, std::make_unique<AccountSetting>(currentAccountId_));
     return *iter->second;
 }
 
@@ -317,8 +343,7 @@ void AccountManager::SetupMainAccount()
 {
     MMI_HILOGI("Setup main account(%{public}d)", MAIN_ACCOUNT_ID);
     currentAccountId_ = MAIN_ACCOUNT_ID;
-    auto [_, isNew] = accounts_.emplace(MAIN_ACCOUNT_ID,
-        std::make_unique<AccountSetting>(scheduler_, MAIN_ACCOUNT_ID));
+    auto [_, isNew] = accounts_.emplace(MAIN_ACCOUNT_ID, std::make_unique<AccountSetting>(MAIN_ACCOUNT_ID));
     if (!isNew) {
         MMI_HILOGW("Account(%{public}d) has existed", MAIN_ACCOUNT_ID);
     }
@@ -339,8 +364,7 @@ void AccountManager::OnAddUser(const EventFwk::CommonEventData &data)
 {
     int32_t accountId = data.GetCode();
     MMI_HILOGI("Add account(%{public}d)", accountId);
-    auto [_, isNew] = accounts_.emplace(accountId,
-        std::make_unique<AccountSetting>(scheduler_, accountId));
+    auto [_, isNew] = accounts_.emplace(accountId, std::make_unique<AccountSetting>(accountId));
     if (!isNew) {
         MMI_HILOGW("Account(%{public}d) has existed", accountId);
     }
@@ -364,7 +388,7 @@ void AccountManager::OnSwitchUser(const EventFwk::CommonEventData &data)
     MMI_HILOGI("Switch to account(%{public}d)", accountId);
     if (currentAccountId_ != accountId) {
         if (auto iter = accounts_.find(accountId); iter == accounts_.end()) {
-            accounts_.emplace(accountId, std::make_unique<AccountSetting>(scheduler_, accountId));
+            accounts_.emplace(accountId, std::make_unique<AccountSetting>(accountId));
         }
         currentAccountId_ = accountId;
         MMI_HILOGI("Switched to account(%{public}d)", currentAccountId_);
