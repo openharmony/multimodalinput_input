@@ -43,9 +43,11 @@ class AccountManager final {
 public:
     class AccountSetting final {
     public:
-        AccountSetting(DelegateTasks *scheduler, int32_t accountId);
+        AccountSetting(int32_t accountId);
         ~AccountSetting();
-        DISALLOW_COPY_AND_MOVE(AccountSetting);
+        DISALLOW_MOVE(AccountSetting);
+        AccountSetting(const AccountSetting &other);
+        AccountSetting& operator=(const AccountSetting &other);
 
         int32_t GetAccountId() const;
         bool GetAccShortcutEnabled() const;
@@ -53,6 +55,9 @@ public:
         int32_t GetAccShortcutTimeout() const;
 
     private:
+        static void AccShortcutTimeout(int32_t accountId, const std::string &key);
+        static void AccShortcutEnabled(int32_t accountId, const std::string &key);
+        static void AccShortcutEnabledOnScreenLocked(int32_t accountId, const std::string &key);
         sptr<SettingObserver> RegisterSettingObserver(const std::string &key, SettingObserver::UpdateFunc onUpdate);
         void InitializeSetting();
         void OnAccShortcutTimeoutChanged(const std::string &key);
@@ -61,7 +66,6 @@ public:
         bool ReadSwitchStatus(const std::string &key, bool currentSwitchStatus);
         void ReadLongPressTime();
 
-        DelegateTasks *scheduler_ { nullptr };
         int32_t accountId_ { -1 };
         int32_t timerId_ { -1 };
         int32_t accShortcutTimeout_ { 3000 }; // 3s
@@ -79,7 +83,7 @@ public:
     DISALLOW_COPY_AND_MOVE(AccountManager);
 
     void Initialize(DelegateTasks *scheduler);
-    const AccountSetting& GetCurrentAccountSetting();
+    AccountSetting GetCurrentAccountSetting();
 
 private:
     void SubscribeCommonEvent();
@@ -92,6 +96,7 @@ private:
 
     static std::shared_ptr<AccountManager> instance_;
     static std::mutex mutex_;
+    std::mutex lock_;
     DelegateTasks *scheduler_ { nullptr };
     int32_t currentAccountId_ { -1 };
     std::shared_ptr<CommonEventSubscriber> subscriber_;
