@@ -197,7 +197,7 @@ bool PermissionHelper::CheckMouseCursor()
 bool PermissionHelper::CheckInputEventFilter()
 {
     CALL_DEBUG_ENTER;
-    std::string filterPermissionCode = "ohos.permission.INPUT_EVENT_FILTER";
+    std::string filterPermissionCode = "ohos.permission.FILTER_INPUT_EVENT";
     return CheckHapPermission(filterPermissionCode);
 }
 } // namespace MMI
