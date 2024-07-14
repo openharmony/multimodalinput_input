@@ -1750,11 +1750,11 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                CalculateFuntionRunningTime([this, &event](){ this->OnEpollEvent(event); }, "EPOLL_EVENT_SOCKET");
+                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
-                CalculateFuntionRunningTime([this, &event](){ this->OnDelegateTask(event); }, "EPOLL_EVENT_ETASK");
+                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "EPOLL_EVENT_ETASK");
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
