@@ -17,6 +17,7 @@ config("napi_config") {
   include_dirs = [
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/napi/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
   ]
 
   if (!input_feature_coverage && is_ohos && is_clang &&
