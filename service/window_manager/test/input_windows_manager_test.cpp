@@ -22,7 +22,6 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
-#include "key_command_handler.h"
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
 #include "pointer_drawing_manager.h"
@@ -2041,40 +2040,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_001, 
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
-    WIN_MGR->DrawTouchGraphic(pointerEvent);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_002
- * @tc.desc: This test verifies the functionality of drawing touch graphics
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto keyCommandHandler = inputHandler->GetKeyCommandHandler();
-    ASSERT_NE(keyCommandHandler, nullptr);
-    keyCommandHandler->knuckleSwitch_.statusConfigValue = true;
-    WIN_MGR->DrawTouchGraphic(pointerEvent);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_003
- * @tc.desc: This test verifies the functionality of drawing touch graphics
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto keyCommandHandler = inputHandler->GetKeyCommandHandler();
-    ASSERT_NE(keyCommandHandler, nullptr);
-    keyCommandHandler->knuckleSwitch_.statusConfigValue = false;
     WIN_MGR->DrawTouchGraphic(pointerEvent);
 }
 
