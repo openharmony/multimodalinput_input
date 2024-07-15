@@ -22,7 +22,6 @@
 #include <common_event_subscriber.h>
 #include <nocopyable.h>
 
-#include "delegate_tasks.h"
 #include "setting_observer.h"
 
 namespace OHOS {
@@ -30,14 +29,11 @@ namespace MMI {
 class AccountManager final {
     class CommonEventSubscriber : public EventFwk::CommonEventSubscriber {
     public:
-        CommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo, AccountManager &accountMgr)
-            : EventFwk::CommonEventSubscriber(subscribeInfo), accountMgr_(accountMgr) {}
+        CommonEventSubscriber(const EventFwk::CommonEventSubscribeInfo &subscribeInfo)
+            : EventFwk::CommonEventSubscriber(subscribeInfo) {}
         ~CommonEventSubscriber() = default;
 
         void OnReceiveEvent(const EventFwk::CommonEventData &data);
-
-    private:
-        AccountManager &accountMgr_;
     };
 
 public:
@@ -82,7 +78,7 @@ public:
     ~AccountManager();
     DISALLOW_COPY_AND_MOVE(AccountManager);
 
-    void Initialize(DelegateTasks *scheduler);
+    void Initialize();
     AccountSetting GetCurrentAccountSetting();
 
 private:
@@ -97,7 +93,7 @@ private:
     static std::shared_ptr<AccountManager> instance_;
     static std::mutex mutex_;
     std::mutex lock_;
-    DelegateTasks *scheduler_ { nullptr };
+    int32_t timerId_ { -1 };
     int32_t currentAccountId_ { -1 };
     std::shared_ptr<CommonEventSubscriber> subscriber_;
     std::map<int32_t, std::unique_ptr<AccountSetting>> accounts_;
