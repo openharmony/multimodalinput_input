@@ -300,6 +300,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+        MMI_HILOGI("The current event is finger");
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -350,6 +351,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     CHKPV(keyEvent);
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
+        MMI_HILOGI("The current mode is factory");
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
         eventDispatchHandler->HandleKeyEvent(keyEvent);

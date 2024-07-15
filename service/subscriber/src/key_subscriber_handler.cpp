@@ -378,11 +378,11 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         return false;
     }
     if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("Repeat KeyEvent, skip");
+        MMI_HILOGI("Repeat KeyEvent, skip");
         return true;
     }
     if (keyGestureMgr_.Intercept(keyEvent)) {
-        MMI_HILOGD("Key gesture recognized");
+        MMI_HILOGI("Key gesture recognized");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
@@ -506,8 +506,10 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}d", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
+        MMI_HILOGI("Subscribe id : %{public}d", subscriber->id_);
         auto sess = subscriber->sess_;
         CHKPC(sess);
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
@@ -523,8 +525,10 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}d", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
+        MMI_HILOGI("Subscribe id : %{public}d", subscriber->id_);
         auto sess = subscriber->sess_;
         CHKPC(sess);
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
