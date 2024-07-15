@@ -134,7 +134,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEvent_04, TestSize.Leve
 
     auto currentTime1 = GetSysClockTime();
     auto session = udsServer.GetSession(fd);
-
     bool ret1 = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime1, session);
     EXPECT_FALSE(ret1);
     int32_t ret2 = dispatch.DispatchKeyEvent(fd, udsServer, keyEvent);
@@ -156,10 +155,8 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEvent_05, TestSize.Leve
     ASSERT_NE(keyEvent, nullptr);
     auto currentTime = GetSysClockTime();
     auto session = udsServer.GetSession(fd);
-
     bool ret1 = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
     EXPECT_FALSE(ret1);
-
     NetPacket pkt(MmiMessageId::INVALID);
     EXPECT_FALSE(pkt.ChkRWError());
     EXPECT_FALSE(udsServer.SendMsg(fd, pkt));
