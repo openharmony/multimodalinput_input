@@ -77,6 +77,9 @@ constexpr int32_t MIN_PINCH_FINGER = 2;
 constexpr int32_t MAX_PINCH_FINGER = 5;
 constexpr int32_t MIN_ACTION_FINGER = 2;
 constexpr int32_t MAX_ACTION_FINGER = 5;
+constexpr int32_t TOUCH_MOVE_ARGC = 8;
+constexpr int32_t FINGER_LOCATION_NUMS = 4;
+
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -954,34 +957,61 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:k", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if (argc < moveArgcSeven) {
-                                std::cout << "argc:" << argc << std::endl;
+                            std::cout << "argc:" << argc << std::endl;
+                            if ((argc < TOUCH_MOVE_ARGC) ||
+                                ((argc - FINGER_LOCATION_NUMS) % FINGER_LOCATION_NUMS != 0)) {
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
-                                totalTimeMs = TOTAL_TIME_MS;
-                                if ((!StrToInt(optarg, px1)) ||
-                                    (!StrToInt(argv[optind], py1)) ||
-                                    (!StrToInt(argv[optind + 1], px2)) ||
-                                    (!StrToInt(argv[optind + 2], py2))) {
+                            struct FingerInfo {
+                                int32_t startX = 0;
+                                int32_t startY = 0;
+                                int32_t endX = 0;
+                                int32_t endY = 0;
+                            }
+                            int32_t startX = 0;
+                            int32_t startY = 0;
+                            int32_t endX = 0;
+                            int32_t endY = 0;
+                            std::vector<FingerInfo> fingerList;
+                            int32_t fingerCount = (argc - FINGER_LOCATION_NUMS) / FINGER_LOCATION_NUMS;
+                            for (int32_t i = 0; i < fingerCount; i++) {
+                                if ((!StrToInt(argv[optind - 1], startX)) ||
+                                    (!StrToInt(argv[optind], startX)) ||
+                                    (!StrToInt(argv[optind + 1], endX)) ||
+                                    (!StrToInt(argv[optind + 2], endY))) {
                                         std::cout << "invalid coordinate value" << std::endl;
                                         return EVENT_REG_FAIL;
                                 }
+                                if ((startX < 0) || (startX < 0) || (endX < 0) || (endY < 0)) {
+                                    std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
+                                    return RET_ERR;
+                                }
+                                FingerInfo fingerInfoTemp {
+                                    .startX = startX,
+                                    .startY = startY,
+                                    .endX = endX,
+                                    .endY = endY
+                                }
+                                fingerList.push_back(fingerInfoTemp);
+                                optind += 4;
+                            }
+
+                            for (const auto &finger : fingerList) {
+                                std::cout << "startX:" << finger.startX << ", startY:" << finger.startY <<
+                                ", endX:" << finger.endX << ", endY:" << finger.endY << std::endl;
+                            }
+                            int32_t totalTimeMs = 0;
+                            if (argv[optind - 1] == nullptr || argv[optind - 1][0] == "-") {
+                                totalTimeMs = TOTAL_TIME_MS;
                             } else {
-                                if ((!StrToInt(optarg, px1)) ||
-                                    (!StrToInt(argv[optind], py1)) ||
-                                    (!StrToInt(argv[optind + 1], px2)) ||
-                                    (!StrToInt(argv[optind + 2], py2)) ||
-                                    (!StrToInt(argv[optind + 3], totalTimeMs))) {
-                                        std::cout << "invalid coordinate value or total times" << std::endl;
-                                        return EVENT_REG_FAIL;
+                                if (!(StrToInt(argv[optind - 1], totalTimeMs))) {
+                                    std::cout << "invalid coordinate value or total times" << std::endl;
+                                    return EVENT_REG_FAIL;
                                 }
                             }
-                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
-                                return RET_ERR;
-                            }
+                            std::cout << "totalTimeMs:" << totalTimeMs <<std::endl;
+
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
@@ -990,9 +1020,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            std::cout << "start coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
-                            std::cout << "  end coordinate: ("<< px2 << ", "  << py2 << ")" << std::endl;
-                            std::cout << "     total times: " << totalTimeMs << " ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
