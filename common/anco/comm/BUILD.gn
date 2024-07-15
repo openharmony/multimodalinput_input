@@ -11,15 +11,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+import("//build/test.gni")
 import("../../../multimodalinput_mini.gni")
+
+module_output_path = "multimodalinput/mmi_unit_out"
 
 config("mmi_anco_channel_config") {
   include_dirs = [
     "include",
-    "${mmi_ext_path}/anco_uds_manager/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
+  }
 }
 
 ohos_source_set("mmi_anco_channel_proxy") {
@@ -84,4 +91,36 @@ ohos_source_set("mmi_anco_channel_stub") {
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"
+}
+
+ohos_unittest("AncoChannelStubTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  sources = [
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
+    "src/anco_channel_stub.cpp",
+    "test/anco_channel_stub_ex_test.cpp",
+    "test/mock.cpp",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
 }
