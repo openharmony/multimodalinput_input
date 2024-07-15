@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <common_event_support.h>
 #include <system_ability_definition.h>
 
+#include "display_event_monitor.h"
 #include "setting_datashare.h"
 #include "timer_manager.h"
 
@@ -51,6 +52,7 @@ std::shared_ptr<AccountManager> AccountManager::GetInstance()
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = std::make_shared<AccountManager>();
+            instance_->Initialize();
         }
     }
     return instance_;
@@ -58,14 +60,7 @@ std::shared_ptr<AccountManager> AccountManager::GetInstance()
 
 void AccountManager::CommonEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
-    if (accountMgr_.scheduler_ == nullptr) {
-        MMI_HILOGE("Account manager is not initialized");
-        return;
-    }
-    accountMgr_.scheduler_->PostSyncTask([&]() {
-        accountMgr_.OnCommonEvent(data);
-        return RET_OK;
-    });
+    AccountManager::GetInstance()->OnCommonEvent(data);
 }
 
 AccountManager::AccountSetting::AccountSetting(int32_t accountId)
@@ -272,6 +267,26 @@ AccountManager::AccountManager()
             [this](const EventFwk::CommonEventData &data) {
                 OnSwitchUser(data);
             },
+        }, {
+            EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
+            [this](const EventFwk::CommonEventData &data) {
+                DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+            },
+        }, {
+            EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
+            [this](const EventFwk::CommonEventData &data) {
+                DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+            },
+        }, {
+            EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
+            [this](const EventFwk::CommonEventData &data) {
+                DISPLAY_MONITOR->SetScreenLocked(true);
+            },
+        }, {
+            EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
+            [this](const EventFwk::CommonEventData &data) {
+                DISPLAY_MONITOR->SetScreenLocked(false);
+            },
         }
     };
 }
@@ -280,14 +295,16 @@ AccountManager::~AccountManager()
 {
     std::lock_guard<std::mutex> guard { lock_ };
     UnsubscribeCommonEvent();
+    if (timerId_ >= 0) {
+        TimerMgr->RemoveTimer(timerId_);
+    }
     accounts_.clear();
 }
 
-void AccountManager::Initialize(DelegateTasks *scheduler)
+void AccountManager::Initialize()
 {
     MMI_HILOGI("Initialize account manager");
     std::lock_guard<std::mutex> guard { lock_ };
-    scheduler_ = scheduler;
     SetupMainAccount();
     SubscribeCommonEvent();
 }
@@ -305,25 +322,26 @@ AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
 void AccountManager::SubscribeCommonEvent()
 {
     CALL_INFO_TRACE;
-    if (subscriber_ == nullptr) {
-        EventFwk::MatchingSkills matchingSkills;
+    EventFwk::MatchingSkills matchingSkills;
 
-        for (auto &item : handlers_) {
-            MMI_HILOGD("Add event: %{public}s", item.first.c_str());
-            matchingSkills.AddEvent(item.first);
-        }
-        EventFwk::CommonEventSubscribeInfo subscribeInfo { matchingSkills };
-        subscriber_ = std::make_shared<CommonEventSubscriber>(subscribeInfo, *this);
+    for (auto &item : handlers_) {
+        MMI_HILOGD("Add event: %{public}s", item.first.c_str());
+        matchingSkills.AddEvent(item.first);
     }
+    EventFwk::CommonEventSubscribeInfo subscribeInfo { matchingSkills };
+    subscriber_ = std::make_shared<CommonEventSubscriber>(subscribeInfo);
+
     if (EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber_)) {
+        timerId_ = -1;
         MMI_HILOGI("SubscribeCommonEvent succeed");
         return;
     }
+    subscriber_ = nullptr;
     MMI_HILOGI("SubscribeCommonEvent fail, retry later");
-    int32_t timerId = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
+    timerId_ = TimerMgr->AddTimer(REPEAT_COOLING_TIME, REPEAT_ONCE, [this]() {
         SubscribeCommonEvent();
     });
-    if (timerId < 0) {
+    if (timerId_ < 0) {
         MMI_HILOGE("AddTimer fail, SubscribeCommonEvent fail");
     }
 }
@@ -351,6 +369,7 @@ void AccountManager::SetupMainAccount()
 
 void AccountManager::OnCommonEvent(const EventFwk::CommonEventData &data)
 {
+    std::lock_guard<std::mutex> guard { lock_ };
     std::string action = data.GetWant().GetAction();
     MMI_HILOGI("Receive common event: %{public}s", action.c_str());
     if (auto iter = handlers_.find(action); iter != handlers_.end()) {
