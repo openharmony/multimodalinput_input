@@ -88,6 +88,7 @@ constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
+constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -1743,14 +1744,15 @@ void MMIService::OnThread()
             }
             std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
+            epoll_event event = ev[i];
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(ev[i]);
+                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
-                OnDelegateTask(ev[i]);
+                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "EPOLL_EVENT_ETASK");
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
@@ -2726,5 +2728,20 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
     MMI_HILOGE("TransferBinderClientSrv result:%{public}d", execRet);
     return ret;
 }
+
+void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
+{
+    auto startTime = std::chrono::steady_clock::now();
+    func();
+    auto endTime = std::chrono::steady_clock::now();
+    auto duration = endTime - startTime;
+    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
+        (duration).count();
+    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
+        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
+            flag.c_str(), durationTime);
+    }
+}
+
 } // namespace MMI
 } // namespace OHOS
