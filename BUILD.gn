@@ -139,6 +139,7 @@ group("ut_mmi_debug_tools") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "common/anco/comm:AncoChannelStubTest",
     "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerImplTest",
