@@ -20,11 +20,13 @@ config("gestureEvent_config") {
     "${mmi_path}/frameworks/napi/gesture_event/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/util/napi/include",
   ]
 }
 
 ohos_shared_library("gestureevent") {
   sources = [
+    "${mmi_path}/util/napi/src/util_napi.cpp",
     "src/js_gesture_event.cpp",
     "src/native_register_module.cpp",
   ]

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2024-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,27 +11,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../../../multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 
-config("inputeventclient_config") {
-  visibility = [ ":*" ]
-
+config("napi_config") {
   include_dirs = [
     "${mmi_path}/util/common/include",
-    "${mmi_path}/frameworks/napi/input_event_client/include",
-    "${mmi_path}/tools/event_inject/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/frameworks/napi/joystick_event/include",
     "${mmi_path}/util/napi/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
   ]
+
+  if (!input_feature_coverage && is_ohos && is_clang &&
+      (target_cpu == "arm" || target_cpu == "arm64") && enhanced_opt) {
+    ldflags = [ "-Wl,-Bsymbolic" ]
+  }
 }
 
-ohos_shared_library("inputeventclient") {
+ohos_shared_library("libmmi-napi") {
   sources = [
-    "${mmi_path}/util/napi/src/util_napi.cpp",
-    "${mmi_path}/util/napi/src/util_napi_error.cpp",
-    "src/js_register_module.cpp",
-    "src/js_register_util.cpp",
+    "src/key_event_napi.cpp",
+    "src/util_napi.cpp",
+    "src/util_napi_error.cpp",
+    "src/util_napi_value.cpp",
   ]
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -43,24 +43,18 @@ ohos_shared_library("inputeventclient") {
     debug = false
   }
 
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":inputeventclient_config",
-  ]
+  configs = [ "${mmi_path}:coverage_flags" ]
 
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
-  ]
+  public_configs = [ ":napi_config" ]
+
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
   external_deps = [
-    "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
   ]
 
-  relative_install_dir = "module/multimodalinput"
-
+  innerapi_tags = [ "platformsdk" ]
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
