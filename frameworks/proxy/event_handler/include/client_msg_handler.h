@@ -79,8 +79,7 @@ private:
         [](int32_t timerId) -> int32_t
         {
             return 0;
-        },
-        30
+        }
     };
 };
 } // namespace MMI
