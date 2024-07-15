@@ -155,7 +155,7 @@ struct RepeatKey {
 
 struct KnuckleSwitch {
     std::string statusConfig { nullptr };
-    bool statusConfigValue { true };
+    bool statusConfigValue { false };
 };
 
 class KeyCommandHandler final : public IInputEventHandler {
