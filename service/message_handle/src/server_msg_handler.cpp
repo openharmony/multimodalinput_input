@@ -41,7 +41,6 @@
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #include "touch_drawing_manager.h"
-#include "util_napi_error.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -58,6 +57,7 @@ constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
 constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)

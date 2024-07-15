@@ -59,7 +59,6 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 #include "watchdog_task.h"
 #include "xcollie/watchdog.h"
 #ifdef OHOS_RSS_CLIENT
@@ -89,6 +88,7 @@ constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
 constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
