@@ -42,10 +42,9 @@ ohos_shared_library("libmmi-napi") {
     debug = false
   }
 
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":napi_config",
-  ]
+  configs = [ "${mmi_path}:coverage_flags" ]
+
+  public_configs = [ ":napi_config" ]
 
   deps = [ "${mmi_path}/util:libmmi-util" ]
 
