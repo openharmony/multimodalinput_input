@@ -1957,9 +1957,13 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t displayY = item.GetDisplayY();
     int32_t displayId = touchEvent->GetTargetDisplayId();
     auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
+    int32_t tragetWindowId = touchEvent->GetTargetWindowId();
     for (auto window : windows) {
         if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
             continue;
+        }
+        if (window.id != tragetWindowId) {
+            return false;
         }
         int32_t rightDownX;
         int32_t rightDownY;
