@@ -1904,15 +1904,15 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE("businessId or businessIds_ is empty");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
         MMI_HILOGE("%{public}s not in the config file", businessId.c_str());
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("Delay is not in valid range");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
