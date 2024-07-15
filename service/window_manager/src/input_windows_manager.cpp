@@ -34,6 +34,7 @@
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "util.h"
+#include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
@@ -3600,15 +3601,15 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    cJSON* jsonData = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("jsonData is not object");
+    JsonParser jsonData;
+    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.json_)) {
+        MMI_HILOGE("jsonData.json_ is not object");
         return false;
     }
-    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData, "whiteList");
+    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "whiteList");
     if (!cJSON_IsArray(whiteList)) {
         MMI_HILOGE("whiteList number must be array");
-        cJSON_Delete(jsonData);
         return false;
     }
     int32_t whiteListSize = cJSON_GetArraySize(whiteList);
@@ -3633,7 +3634,6 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         switchFocusKey.pressedKey = pressedKeyJson->valueint;
         vecWhiteList_.push_back(switchFocusKey);
     }
-    cJSON_Delete(jsonData);
     return true;
 }
 
