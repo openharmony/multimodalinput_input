@@ -154,7 +154,7 @@ struct RepeatKey {
 };
 
 struct KnuckleSwitch {
-    std::string statusConfig { nullptr };
+    std::string statusConfig;
     bool statusConfigValue { false };
 };
 
