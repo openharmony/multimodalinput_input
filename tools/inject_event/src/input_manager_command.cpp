@@ -1020,17 +1020,22 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
+
+                            std::cout << "Start down" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
-                            PointerEvent::PointerItem item;
-                            item.SetDisplayY(py1);
-                            item.SetDisplayX(px1);
-                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-                            pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            for (int32_t i = 0; i < fingerCount; i++) {
+                                PointerEvent::PointerItem item;
+                                item.SetDisplayX(fingerList[i].startX);
+                                item.SetDisplayY(fingerList[i].startY);
+                                item.SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
+                                pointerEvent->AddPointerItem(item);
+                                pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            }
+                            std::cout << "End down" << std::endl;
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
                             int64_t startTimeMs = startTimeUs / TIME_TRANSITION;
@@ -1043,6 +1048,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int64_t nowSysTimeUs = 0;
                             int64_t nowSysTimeMs = 0;
                             int64_t sleepTimeMs = 0;
+
+                            std::cout << "Start move" << std::endl;
+                            std::vector<int32_t> pointerIds = pointerEvent->GetPointerIds();
+                            if (pointerIds.size() != fingerCount) {
+                                std::cout << "pointerIds size is error" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            
                             while (currentTimeMs < endTimeMs) {
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
