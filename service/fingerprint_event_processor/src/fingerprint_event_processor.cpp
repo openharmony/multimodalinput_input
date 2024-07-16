@@ -67,9 +67,9 @@ void FingerprintEventProcessor::SetPowerKeyState(struct libinput_event* event)
     CALL_DEBUG_ENTER;
     CHKPV(event);
     auto device = libinput_event_get_device(event);
-    CHPV(device);
+    CHKPV(device);
     auto data = libinput_event_get_keyboard_event(event);
-    CHPKV(data);
+    CHKPV(data);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     if (keyCode != KEY_POWER) {
         MMI_HILOGD("current keycode is not power, return");
@@ -96,7 +96,7 @@ int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event*
         auto duration = currentTime - lastUpTime_;
         auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
         if (durationMs < POWER_KEY_UP_TIME) {
-            MMI_HILOGD("Dont report beacause time diff < 1s");
+            MMI_HILOGD("Dont report because time diff < 1s");
             return 0;
         } else {
             powerKeyState_ = POWER_KEY_INIT;
