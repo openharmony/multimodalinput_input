@@ -179,6 +179,7 @@ group("mmi_tests") {
     "service:KnuckleDynamicDrawingManagerTest",
     "service:KnuckleGlowPointTest",
     "service:KnuckleGlowTraceSystemTest",
+    "service:LibinputAdapterTest",
     "service:ModuleLoaderExTest",
     "service:ModuleLoaderTest",
     "service:MonitorTest",
