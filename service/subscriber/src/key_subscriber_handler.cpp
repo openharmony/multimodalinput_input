@@ -377,12 +377,12 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
     }
-    if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("Repeat KeyEvent, skip");
-        return true;
-    }
     if (keyGestureMgr_.Intercept(keyEvent)) {
         MMI_HILOGD("Key gesture recognized");
+        return true;
+    }
+    if (IsRepeatedKeyEvent(keyEvent)) {
+        MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
