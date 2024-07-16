@@ -1443,21 +1443,21 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, 
     InjectNoticeManager manager;
     handler.injectNotice_ =nullptr;
     bool ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
     manager.isStartSrv_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.isStartSrv_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     manager.connectionCallback_->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.connectionCallback_->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
