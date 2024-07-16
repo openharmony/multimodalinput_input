@@ -43,8 +43,8 @@ void EnableInputDeviceFuzzTest(const uint8_t *data, size_t size)
     bool enable = (random % 2) ? false : true;
     InputManager::GetInstance()->EnableInputDevice(enable);
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
