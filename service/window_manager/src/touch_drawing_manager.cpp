@@ -354,6 +354,8 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
+    RotationCanvasNode(canvasNode);
+
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -361,7 +363,6 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
 #endif
     canvasNode->SetCornerRadius(1);
     canvasNode->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    canvasNode->SetRotation(0);
     surfaceNode_->AddChild(canvasNode, DEFAULT_VALUE);
 }
 
