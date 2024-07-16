@@ -79,6 +79,8 @@ constexpr int32_t MIN_ACTION_FINGER = 2;
 constexpr int32_t MAX_ACTION_FINGER = 5;
 constexpr int32_t TOUCH_MOVE_ARGC = 8;
 constexpr int32_t FINGER_LOCATION_NUMS = 4;
+constexpr int32_t MOVE_POS_ONE = 1;
+constexpr int32_t MOVE_POS_TWO = 2;
 
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
@@ -968,7 +970,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 int32_t startY = 0;
                                 int32_t endX = 0;
                                 int32_t endY = 0;
-                            }
+                            };
                             int32_t startX = 0;
                             int32_t startY = 0;
                             int32_t endX = 0;
@@ -976,10 +978,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::vector<FingerInfo> fingerList;
                             int32_t fingerCount = (argc - FINGER_LOCATION_NUMS) / FINGER_LOCATION_NUMS;
                             for (int32_t i = 0; i < fingerCount; i++) {
-                                if ((!StrToInt(argv[optind - 1], startX)) ||
+                                if ((!StrToInt(argv[optind - MOVE_POS_ONE], startX)) ||
                                     (!StrToInt(argv[optind], startX)) ||
-                                    (!StrToInt(argv[optind + 1], endX)) ||
-                                    (!StrToInt(argv[optind + 2], endY))) {
+                                    (!StrToInt(argv[optind + MOVE_POS_ONE], endX)) ||
+                                    (!StrToInt(argv[optind + MOVE_POS_TWO], endY))) {
                                         std::cout << "invalid coordinate value" << std::endl;
                                         return EVENT_REG_FAIL;
                                 }
@@ -992,9 +994,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     .startY = startY,
                                     .endX = endX,
                                     .endY = endY
-                                }
+                                };
                                 fingerList.push_back(fingerInfoTemp);
-                                optind += 4;
+                                optind += FINGER_LOCATION_NUMS;
                             }
 
                             for (const auto &finger : fingerList) {
@@ -1002,10 +1004,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 ", endX:" << finger.endX << ", endY:" << finger.endY << std::endl;
                             }
                             int32_t totalTimeMs = 0;
-                            if (argv[optind - 1] == nullptr || argv[optind - 1][0] == "-") {
+                            if (argv[optind - MOVE_POS_ONE] == nullptr || argv[optind - MOVE_POS_ONE][0] == '-') {
                                 totalTimeMs = TOTAL_TIME_MS;
                             } else {
-                                if (!(StrToInt(argv[optind - 1], totalTimeMs))) {
+                                if (!(StrToInt(argv[optind - MOVE_POS_ONE], totalTimeMs))) {
                                     std::cout << "invalid coordinate value or total times" << std::endl;
                                     return EVENT_REG_FAIL;
                                 }
@@ -1051,13 +1053,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             std::cout << "Start move" << std::endl;
                             std::vector<int32_t> pointerIds = pointerEvent->GetPointerIds();
-                            if (pointerIds.size() != fingerCount) {
+                            if (pointerIds.size() != static_cast<size_t>(fingerCount)) {
                                 std::cout << "pointerIds size is error" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             
                             while (currentTimeMs < endTimeMs) {
-                                for (int32_t i = 0; i < pointerIds.size(); i++) {
+                                for (size_t i = 0; i < pointerIds.size(); i++) {
                                     int32_t pointerId = pointerIds[i];
                                     PointerEvent::PointerItem item;
                                     if (!pointerEvent->GetPointerItem(pointerId, item)) {
@@ -1082,15 +1084,15 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 currentTimeMs += BLOCK_TIME_MS;
                             }
 
-                            for (int32_t i = 0; i < pointerIds.size(); i++) {
+                            for (size_t i = 0; i < pointerIds.size(); i++) {
                                 int32_t pointerId = pointerIds[i];
                                 PointerEvent::PointerItem item;
                                 if (!pointerEvent->GetPointerItem(pointerId, item)) {
                                     std::cout << "Invalid pointer:" << pointerId << std::endl;
                                     return EVENT_REG_FAIL;
                                 }
-                                item.SetDisplayX(fingerList[i].endX));
-                                item.SetDisplayY(fingerList[i].endY));
+                                item.SetDisplayX(fingerList[i].endX);
+                                item.SetDisplayY(fingerList[i].endY);
                                 pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             }
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1102,7 +1104,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::cout << "Start up" << std::endl;
                             pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-                            for (int32_t i = 0; i < pointerIds.size(); i++) {
+                            for (size_t i = 0; i < pointerIds.size(); i++) {
                                 int32_t pointerId = pointerIds[i];
                                 PointerEvent::PointerItem item;
                                 if (!pointerEvent->GetPointerItem(pointerId, item)) {
