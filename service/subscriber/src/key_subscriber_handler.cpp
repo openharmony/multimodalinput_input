@@ -970,9 +970,9 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
+    mprintf(fd, "subscribers: count = %zu", subscriberMap_.size());
     for (const auto &item : foregroundPids_) {
-        mprintf(fd, "Foreground Pids: %s", item);
+        mprintf(fd, "Foreground Pids: %d", item);
     }
     mprintf(fd,
             "enableCombineKey: %s | isForegroundExits: %s"
