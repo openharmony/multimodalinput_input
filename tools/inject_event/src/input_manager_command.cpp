@@ -979,7 +979,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t fingerCount = (argc - FINGER_LOCATION_NUMS) / FINGER_LOCATION_NUMS;
                             for (int32_t i = 0; i < fingerCount; i++) {
                                 if ((!StrToInt(argv[optind - MOVE_POS_ONE], startX)) ||
-                                    (!StrToInt(argv[optind], startX)) ||
+                                    (!StrToInt(argv[optind], startY)) ||
                                     (!StrToInt(argv[optind + MOVE_POS_ONE], endX)) ||
                                     (!StrToInt(argv[optind + MOVE_POS_TWO], endY))) {
                                         std::cout << "invalid coordinate value" << std::endl;
@@ -1072,7 +1072,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         fingerList[i].startY, fingerList[i].endY));
                                     std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
                                         << ", DisplayY:" << item.GetDisplayY() << std::endl;
-                                    pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                    pointerEvent->UpdatePointerItem(pointerId, item);
                                 }
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1093,7 +1093,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 item.SetDisplayX(fingerList[i].endX);
                                 item.SetDisplayY(fingerList[i].endY);
-                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                pointerEvent->UpdatePointerItem(pointerId, item);
                             }
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1113,7 +1113,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
                                         << ", DisplayY:" << item.GetDisplayY() << std::endl;
-                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                pointerEvent->UpdatePointerItem(pointerId, item);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 pointerEvent->RemovePointerItem(pointerId);
                             }
