@@ -20,11 +20,14 @@ config("pointer_config") {
     "${mmi_path}/frameworks/napi/pointer/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/util/napi/include",
   ]
 }
 
 ohos_shared_library("pointer") {
   sources = [
+    "${mmi_path}/util/napi/src/util_napi.cpp",
+    "${mmi_path}/util/napi/src/util_napi_error.cpp",
     "src/js_pointer_context.cpp",
     "src/js_pointer_manager.cpp",
     "src/js_pointer_module.cpp",

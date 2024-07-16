@@ -20,11 +20,14 @@ config("shortKey_config") {
     "${mmi_path}/frameworks/napi/short_key/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/util/napi/include",
   ]
 }
 
 ohos_shared_library("shortkey") {
   sources = [
+    "${mmi_path}/util/napi/src/util_napi.cpp",
+    "${mmi_path}/util/napi/src/util_napi_error.cpp",
     "src/js_short_key_context.cpp",
     "src/js_short_key_manager.cpp",
     "src/native_register_module.cpp",

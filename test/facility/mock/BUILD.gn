@@ -56,7 +56,10 @@ ohos_source_set("mmi_mock_sources") {
     "${mmi_path}/test/facility/libinput_interface:libinput_interface_sources",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"
