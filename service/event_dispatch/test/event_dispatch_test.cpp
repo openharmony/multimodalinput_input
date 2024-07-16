@@ -40,6 +40,174 @@ public:
 };
 
 /**
+ * @tc.name: EventDispatchTest_DispatchKeyEventPid_01
+ * @tc.desc: Test DispatchKeyEventPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_01, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::vector<std::pair<int32_t, TargetInfo>> vecTarget;
+
+    TargetInfo target1;
+    target1.privacyMode = SecureFlag::PRIVACY_MODE;
+    target1.id = 1;
+    target1.agentWindowId = 3;
+    vecTarget.push_back(std::make_pair(1, target1));
+
+    TargetInfo target2;
+    target2.privacyMode = SecureFlag::PRIVACY_MODE;
+    target2.id = 2;
+    target2.agentWindowId = 5;
+    vecTarget.push_back(std::make_pair(2, target2));
+
+    int32_t ret = dispatch.DispatchKeyEventPid(udsServer, keyEvent);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchKeyEventPid_02
+ * @tc.desc: Test DispatchKeyEventPid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_02, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    std::vector<std::pair<int32_t, TargetInfo>> vecTarget;
+
+    TargetInfo target1;
+    target1.privacyMode = SecureFlag::DEFAULT_MODE;
+    target1.id = 2;
+    target1.agentWindowId = 5;
+    vecTarget.push_back(std::make_pair(1, target1));
+
+    TargetInfo target2;
+    target2.privacyMode = SecureFlag::DEFAULT_MODE;
+    target2.id = 3;
+    target2.agentWindowId = 6;
+    vecTarget.push_back(std::make_pair(2, target2));
+
+    int32_t ret = dispatch.DispatchKeyEventPid(udsServer, keyEvent);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DispatchPointerEventInner_01
+ * @tc.desc: Test DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, DispatchPointerEventInner_01, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    int32_t fd = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto currentTime = GetSysClockTime();
+    auto session = udsServer.GetSession(fd);
+    bool ret = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
+    EXPECT_FALSE(ret);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: DispatchPointerEventInner_02
+ * @tc.desc: Test DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, DispatchPointerEventInner_02, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    int32_t fd = 3;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto currentTime = GetSysClockTime();
+    auto session = udsServer.GetSession(fd);
+    bool ret = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
+    EXPECT_FALSE(ret);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: DispatchPointerEventInner_03
+ * @tc.desc: Test DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, DispatchPointerEventInner_03, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    int32_t fd = 3;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto currentTime = GetSysClockTime();
+    auto session = udsServer.GetSession(fd);
+    bool ret = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
+    EXPECT_FALSE(ret);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: DispatchPointerEventInner_04
+ * @tc.desc: Test DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, DispatchPointerEventInner_04, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    int32_t fd = 3;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto currentTime = GetSysClockTime();
+    auto session = udsServer.GetSession(fd);
+    bool ret = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
+    EXPECT_FALSE(ret);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: DispatchPointerEventInner_05
+ * @tc.desc: Test DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, DispatchPointerEventInner_05, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    UDSServer udsServer;
+    int32_t fd = 3;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    auto currentTime = GetSysClockTime();
+    auto session = udsServer.GetSession(fd);
+    bool ret = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
+    EXPECT_FALSE(ret);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+
+    NetPacket pkt(MmiMessageId::INVALID);
+    EXPECT_FALSE(udsServer.SendMsg(fd, pkt));
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
  * @tc.name: EventDispatchTest_DispatchKeyEvent_01
  * @tc.desc: Test DispatchKeyEvent
  * @tc.type: FUNC
