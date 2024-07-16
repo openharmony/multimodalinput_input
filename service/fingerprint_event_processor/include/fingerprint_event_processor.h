@@ -50,7 +50,7 @@ private:
     // powerKeyState_ { 0 } init;
     // powerKeyState_ { 1 } down;
     // powerKeyState_ { 2 } up;
-    int32_t powerkeyState_ { 0 };
+    int32_t powerKeyState_ { 0 };
     std::chrono::time_point<std::chrono::steady_clock> lastUpTime_ =
         std::chrono::high_resolution_clock::now();
 };
