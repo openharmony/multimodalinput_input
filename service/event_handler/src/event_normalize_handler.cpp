@@ -299,6 +299,7 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    FingerprintEventHdr->SetPowerKeyState(event);
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
