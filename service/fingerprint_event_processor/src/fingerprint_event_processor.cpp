@@ -78,10 +78,10 @@ void FingerprintEventProcessor::SetPowerKeyState(struct libinput_event* event)
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        powerkeyState_ = POWER_KEY_DOWN;
+        powerKeyState_ = POWER_KEY_DOWN;
     } else {
-        powerkeyState_ = POWER_KEY_UP;
-        lastUpTime_ = std::chrono::steady_clock_now();
+        powerKeyState_ = POWER_KEY_UP;
+        lastUpTime_ = std::chrono::steady_clock::now();
     }
 }
 
