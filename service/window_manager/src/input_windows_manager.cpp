@@ -78,6 +78,7 @@ constexpr int32_t BOTTOM_LEFT_AREA { 6 };
 constexpr int32_t LEFT_AREA { 7 };
 constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
 constexpr int32_t RS_PROCESS_TIMEOUT { 500 * 1000 };
+constexpr int32_t HICAR_MIN_DISPLAY_ID { 1000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -643,9 +644,11 @@ void InputWindowsManager::UpdateDisplayIdAndName()
             ++it;
         }
     }
-    const auto &displayInfo = displayGroupInfo_.displaysInfo[0];
-    bindInfo_.AddLocalDisplay(displayInfo.id, displayInfo.uniq);
     for (const auto &item : newInfo) {
+        if (item.first >= HICAR_MIN_DISPLAY_ID) {
+            MMI_HILOGI("Displayinfo id:%{public}d name:%{public}s", item.first, item.second.c_str());
+            continue;
+        }
         if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
             bindInfo_.AddDisplay(item.first, item.second);
         }
