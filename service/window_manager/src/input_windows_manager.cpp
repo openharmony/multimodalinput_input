@@ -3323,7 +3323,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d "
+                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
                 "| action:%d | displayId:%d | zOrder:%f \t",
                 item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
                 item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
@@ -3356,7 +3356,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         mprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
-                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%d \t",
+                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%u \t",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode);
     }

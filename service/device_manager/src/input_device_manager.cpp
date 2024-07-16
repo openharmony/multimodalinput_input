@@ -605,8 +605,8 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Device information:\t");
-    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
-    mprintf(fd, "Virtual input devices: count=%d", virtualInputDevices_.size());
+    mprintf(fd, "Input devices: count=%zu", inputDevice_.size());
+    mprintf(fd, "Virtual input devices: count=%zu", virtualInputDevices_.size());
     std::vector<int32_t> deviceIds = GetInputDeviceIds();
     for (auto deviceId : deviceIds) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(deviceId, false);
@@ -618,7 +618,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
             inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
             inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d", axisinfo.size());
+        mprintf(fd, "axis: count=%zu", axisinfo.size());
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
@@ -636,7 +636,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 {
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%d, Device list:\t", int32_t{ ids.size() });
+    mprintf(fd, "Total device:%zu, Device list:\t", ids.size());
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
         CHKPV(inputDevice);
