@@ -365,7 +365,7 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Interceptor information:\t");
-    mprintf(fd, "interceptors: count=%d", interceptors_.size());
+    mprintf(fd, "interceptors: count=%zu", interceptors_.size());
     for (const auto &item : interceptors_) {
         SessionPtr session = item.session_;
         CHKPV(session);
