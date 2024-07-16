@@ -139,12 +139,12 @@
           "type": "so"
         },
         {
-          "name": "//foundation/multimodalinput/input/util:libmmi-util",
+          "name": "//foundation/multimodalinput/input/util/napi:libmmi-napi",
           "header": {
             "header_files": [
               "key_event_napi.h"
             ],
-            "header_base": "//foundation/multimodalinput/input/util/common/include"
+            "header_base": "//foundation/multimodalinput/input/util/napi/include"
           },
           "type": "so"
         }

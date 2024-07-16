@@ -247,12 +247,8 @@ declare_args() {
 
   libmmi_util_sources = [
     "common/src/input_event_data_transformation.cpp",
-    "common/src/key_event_napi.cpp",
     "common/src/klog.cpp",
     "common/src/util.cpp",
-    "common/src/util_napi.cpp",
-    "common/src/util_napi_error.cpp",
-    "common/src/util_napi_value.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
     "network/src/stream_buffer.cpp",

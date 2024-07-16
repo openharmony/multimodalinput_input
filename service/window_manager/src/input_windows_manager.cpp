@@ -37,7 +37,6 @@
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
 #include "i_preference_manager.h"
@@ -84,6 +83,7 @@ constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 constexpr double HALF_RATIO { 0.5 };
 constexpr int32_t TWOFOLD { 2 };
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput/display_bind.cfg" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
