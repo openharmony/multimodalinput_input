@@ -193,6 +193,65 @@ bool MMIService::IsRunning() const
     return (state_ == ServiceRunningState::STATE_RUNNING);
 }
 
+void MMIService::RegisterFoldStatusListener()
+{
+    CALL_INFO_TRACE;
+    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        MMI_HILOG_HANDLERW("No need register fold status listener");
+        return;
+    }
+    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(this);
+    CHKPV(foldStatusListener_);
+    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOG_HANDLERE("Failed to register fold status listener");
+        foldStatusListener_ = nullptr;
+    } else {
+        MMI_HILOG_HANDLERI("Register fold status listener successed");
+    }
+}
+
+void MMIService::UnregisterFoldStatusListener()
+{
+    CALL_INFO_TRACE;
+    CHKPV(foldStatusListener_);
+    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
+    }
+}
+
+MMIService::FoldStatusLisener::~FoldStatusLisener()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    server_ = nullptr;
+}
+
+void MMIService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
+{
+    MMI_HILOG_HANDLERI("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
+    if (lastFoldStatus_ == foldStatus) {
+        MMI_HILOG_HANDLERD("No need to set foldStatus");
+        return;
+    }
+    lastFoldStatus_ = foldStatus;
+    std::lock_guard<std::mutex> lock(mutex_);
+    CHKPV(server_);
+    server_->OnFoldStatusChanged(foldStatus);
+}
+
+void MMIService::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
+{
+    int32_t ret = delegateTasks_.PostSyncTask([foldStatus]() {
+        WIN_MGR->OnFoldStatusChanged(foldStatus);
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to report the cancel event during the fold status change, ret: %{public}d",
+            ret);
+    }
+}
+
 bool MMIService::InitLibinputService()
 {
     if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
@@ -335,6 +394,7 @@ void MMIService::OnStart()
     APP_OBSERVER_MGR->InitAppStateObserver();
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
+    AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -374,6 +434,8 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
+    RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+    UnregisterFoldStatusListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1479,6 +1541,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == RENDER_SERVICE) {
         MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
+    }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        MMI_HILOGI("Init render service state observer start");
+        RegisterFoldStatusListener();
     }
 }
 

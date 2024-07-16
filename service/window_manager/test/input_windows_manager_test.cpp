@@ -4226,64 +4226,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged
- * @tc.desc: Test UpdateAndAdjustMouseLocation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager::FoldStatusLisener foldStatusLisener(*g_instance);
-    Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
-    EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
-    foldStatus = Rosen::FoldStatus::EXPAND;
-    WIN_MGR->lastPointerEventForFold_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
-    WIN_MGR->lastPointerEventForFold_ = PointerEvent::Create();
-    ASSERT_NE(WIN_MGR->lastPointerEventForFold_, nullptr);
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UnregisterFoldStatusListener
- * @tc.desc: Test UnregisterFoldStatusListener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UnregisterFoldStatusListener, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.foldStatusListener_ = new (std::nothrow) InputWindowsManager::FoldStatusLisener(*g_instance);
-    ASSERT_NE(inputWindowsManager.foldStatusListener_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UnregisterFoldStatusListener());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
- * @tc.desc: Test UpdateAndAdjustMouseLocation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
-    inputWindowsManager.lastPointerEventForFold_ = PointerEvent::Create();
-    ASSERT_NE(inputWindowsManager.lastPointerEventForFold_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPressed(false);
-    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
-    item.SetPressed(true);
-    item.SetPointerId(1);
-    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnFoldStatusChanged(foldStatus));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation
  * @tc.desc: Test FoldScreenRotation
  * @tc.type: FUNC
