@@ -1057,11 +1057,23 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             
                             while (currentTimeMs < endTimeMs) {
-                                item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
+                                for (int32_t i = 0; i < pointerIds.size(); i++) {
+                                    int32_t pointerId = pointerIds[i];
+                                    PointerEvent::PointerItem item;
+                                    if (!pointerEvent->GetPointerItem(pointerId, item)) {
+                                        std::cout << "Invalid pointer:" << pointerId << std::endl;
+                                        return EVENT_REG_FAIL;
+                                    }
+                                    item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
+                                        fingerList[i].startX, fingerList[i].endX));
+                                    item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
+                                        fingerList[i].startY, fingerList[i].endY));
+                                    std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
+                                        << ", DisplayY:" << item.GetDisplayY() << std::endl;
+                                    pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                }
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 nowSysTimeUs = GetSysClockTime();
                                 nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
@@ -1070,20 +1082,40 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 currentTimeMs += BLOCK_TIME_MS;
                             }
 
-                            item.SetDisplayY(py2);
-                            item.SetDisplayX(px2);
-                            pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
+                            for (int32_t i = 0; i < pointerIds.size(); i++) {
+                                int32_t pointerId = pointerIds[i];
+                                PointerEvent::PointerItem item;
+                                if (!pointerEvent->GetPointerItem(pointerId, item)) {
+                                    std::cout << "Invalid pointer:" << pointerId << std::endl;
+                                    return EVENT_REG_FAIL;
+                                }
+                                item.SetDisplayX(fingerList[i].endX));
+                                item.SetDisplayY(fingerList[i].endY));
+                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                            }
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                            pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+                            std::cout << "End move" << std::endl;
 
-                            item.SetDisplayX(px2);
-                            item.SetDisplayY(py2);
-                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                            std::cout << "Start up" << std::endl;
                             pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            for (int32_t i = 0; i < pointerIds.size(); i++) {
+                                int32_t pointerId = pointerIds[i];
+                                PointerEvent::PointerItem item;
+                                if (!pointerEvent->GetPointerItem(pointerId, item)) {
+                                    std::cout << "Invalid pointer:" << pointerId << std::endl;
+                                    return EVENT_REG_FAIL;
+                                }
+                                std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
+                                        << ", DisplayY:" << item.GetDisplayY() << std::endl;
+                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                pointerEvent->RemovePointerItem(pointerId);
+                            }
+                            std::cout << "End up" << std::endl;
                             optind = optind + THREE_MORE_COMMAND;
                             break;
                         }
