@@ -171,7 +171,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
             CHKPV(udsServer);
-            udsServer->GetClientFd(windowInfo->id);
+            udsServer->GetClientFd(windowInfo->pid);
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
