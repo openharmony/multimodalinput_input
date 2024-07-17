@@ -52,6 +52,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 const std::string POINTER_COLOR { "pointerColor" };
@@ -90,7 +91,8 @@ constexpr int32_t MOUSE_STYLE_OPT { 0 };
 constexpr int32_t MAGIC_STYLE_OPT { 1 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 bool g_isRsRemoteDied { false };
-constexpr uint64_t FOLD_SCREEN_ID { 5 };
+constexpr uint64_t FOLD_SCREEN_ID_FULL { 0 };
+constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
 std::mutex mutex_;
@@ -100,6 +102,12 @@ std::mutex mutex_;
 
 namespace OHOS {
 namespace MMI {
+
+static bool IsSingleDisplayFoldDevice()
+{
+    return (!FOLD_SCREEN_FLAG.empty() && FOLD_SCREEN_FLAG[0] == '1');
+}
+
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
@@ -894,9 +902,11 @@ void PointerDrawingManager::AttachToDisplay()
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
-    if ((WIN_MGR->GetDisplayMode() == DisplayMode::MAIN) && (screenId_ == 0)) {
-        screenId_ = FOLD_SCREEN_ID;
+    if (IsSingleDisplayFoldDevice() && (WIN_MGR->GetDisplayMode() == DisplayMode::MAIN)
+        && (screenId_ == FOLD_SCREEN_ID_FULL)) {
+        screenId_ = FOLD_SCREEN_ID_MAIN;
     }
+    MMI_HILOGI("screenId_: %{public}" PRIu64"", screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
 }
 
