@@ -466,7 +466,8 @@ void TouchDrawingManager::DrawBubble()
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
         if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
                 pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
@@ -810,7 +811,8 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
 {
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
-        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) {
         return true;
     }
     return false;
