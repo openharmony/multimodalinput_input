@@ -184,7 +184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
