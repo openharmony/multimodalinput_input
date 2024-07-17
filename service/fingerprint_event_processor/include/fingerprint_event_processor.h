@@ -32,11 +32,13 @@ public:
     DISALLOW_COPY_AND_MOVE(FingerprintEventProcessor);
     bool IsFingerprintEvent(struct libinput_event* event);
     int32_t HandleFingerprintEvent(struct libinput_event* event);
+    void SetPowerKeyState(struct libinput_event* event);
 
     static constexpr int32_t FINGERPRINT_CODE_DOWN { 121 };
     static constexpr int32_t FINGERPRINT_CODE_UP { 122 };
     static constexpr int32_t FINGERPRINT_CODE_CLICK { 123 };
     static constexpr int32_t FINGERPRINT_CODE_RETOUCH { 124 };
+    static constexpr int32_t KEY_POWER { 116 };
 
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
@@ -44,6 +46,13 @@ private:
 
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
     const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
+
+    // powerKeyState_ { 0 } init;
+    // powerKeyState_ { 1 } down;
+    // powerKeyState_ { 2 } up;
+    int32_t powerKeyState_ { 0 };
+    std::chrono::time_point<std::chrono::steady_clock> lastUpTime_ =
+        std::chrono::high_resolution_clock::now();
 };
 #define FingerprintEventHdr ::OHOS::DelayedSingleton<FingerprintEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
