@@ -563,13 +563,14 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE) {
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE ||
+        singleKnuckleGesture_.state) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         ResetKnuckleGesture();
         return;
     }
     int32_t touchAction = touchEvent->GetPointerAction();
-    if (IsValidAction(touchAction) && !singleKnuckleGesture_.state) {
+    if (IsValidAction(touchAction)) {
         switch (touchAction) {
             case PointerEvent::POINTER_ACTION_CANCEL:
             case PointerEvent::POINTER_ACTION_UP: {
@@ -606,6 +607,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEve
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    ResetKnuckleGesture();
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -681,7 +683,6 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
             break;
         }
     }
-    ResetKnuckleGesture();
 }
 
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
