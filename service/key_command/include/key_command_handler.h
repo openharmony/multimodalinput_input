@@ -130,8 +130,6 @@ struct KnuckleGesture {
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
     float doubleClickDistance { 0.0f };
-    std::string statusConfig;
-    bool statusConfigValue { false };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -153,6 +151,11 @@ struct RepeatKey {
     std::string statusConfig;
     bool statusConfigValue { true };
     Ability ability;
+};
+
+struct KnuckleSwitch {
+    std::string statusConfig { "" };
+    bool statusConfigValue { false };
 };
 
 class KeyCommandHandler final : public IInputEventHandler {
@@ -180,6 +183,7 @@ public:
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
+    bool GetKnuckleSwitchValue();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -314,9 +318,10 @@ private:
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
     MultiFingersTap threeFingersTap_;
-    bool isKnuckleState_ { false };
     bool isTimeConfig_ { false };
     bool isDistanceConfig_ { false };
+    bool isKnuckleSwitchConfig_ { false };
+    struct KnuckleSwitch knuckleSwitch_;
     int32_t checkAdjustIntervalTimeCount_ { 0 };
     int32_t checkAdjustDistanceCount_ { 0 };
     int64_t downToPrevUpTimeConfig_ { 0 };
