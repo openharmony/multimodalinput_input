@@ -977,6 +977,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
   ]
 
   sources = [
+    "key_command/src/key_command_handler.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/test/input_windows_manager_ex_test.cpp",
     "window_manager/test/mock.cpp",
