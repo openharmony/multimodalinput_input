@@ -164,7 +164,7 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
 {
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
         if (IsActive()) {
-            int32_t now = GetSysClockTime();
+            int64_t now = GetSysClockTime();
             if (now < (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
                 return false;
             }
@@ -264,7 +264,7 @@ bool KeyGestureManager::LongPressCombinationKey::RecognizeGesture(std::shared_pt
     if (keyEvent->GetPressedKeys().size() == SINGLE_KEY_PRESSED) {
         firstDownTime_ = GetSysClockTime();
     }
-    int32_t now = GetSysClockTime();
+    int64_t now = GetSysClockTime();
     return std::all_of(keys_.cbegin(), keys_.cend(), [this, keyEvent, now](auto keyCode) {
         auto itemOpt = keyEvent->GetKeyItem(keyCode);
         return (itemOpt && itemOpt->IsPressed() &&
