@@ -192,7 +192,7 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Uds_server information:\t");
-    mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
+    mprintf(fd, "uds_server: count=%zu", sessionsMap_.size());
     for (const auto &item : sessionsMap_) {
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);

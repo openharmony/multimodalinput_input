@@ -242,7 +242,7 @@ void CrownTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     mprintf(fd, "Crown device state information:\t");
     mprintf(fd,
             "PointerId:%{public}d | SourceType:%{public}s | PointerAction:%{public}s | ActionTime:%{public}" PRId64
-            " | Velocity:%{public}f | AxisValue:%{public}s | AgentWindowId:%{public}d | TargetWindowId:%{public}d\t",
+            " | Velocity:%{public}f | AxisValue:%{public}f | AgentWindowId:%{public}d | TargetWindowId:%{public}d\t",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             pointerEvent_->GetActionTime(), pointerEvent_->GetVelocity(),
             pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),

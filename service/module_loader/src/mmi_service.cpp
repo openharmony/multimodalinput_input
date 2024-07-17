@@ -59,7 +59,6 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 #include "watchdog_task.h"
 #include "xcollie/watchdog.h"
 #ifdef OHOS_RSS_CLIENT
@@ -89,6 +88,7 @@ constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
 constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -349,19 +349,7 @@ void MMIService::OnStart()
             MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGI("WatchDog happened");
-            std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-            if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-                std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
-                    WATCHDOG_WARNTIME);
-                WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
-                std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME /
-                    WATCHDOG_BLOCKTIME);
-                WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
-                exit(-1);
-            } else {
-                MMI_HILOGI("Screen off, WatchDog stop, Timeout");
-            }
+            MMI_HILOGI("Mmi-server Timeout");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
