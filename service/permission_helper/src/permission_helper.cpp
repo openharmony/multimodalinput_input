@@ -107,6 +107,13 @@ bool PermissionHelper::CheckInfraredEmmit()
     return CheckHapPermission(infraredEmmitPermissionCode);
 }
 
+bool PermissionHelper::CheckAuthorize()
+{
+    CALL_DEBUG_ENTER;
+    std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
+    return CheckHapPermission(injectPermissionCode);
+}
+
 bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
 {
     CALL_DEBUG_ENTER;
