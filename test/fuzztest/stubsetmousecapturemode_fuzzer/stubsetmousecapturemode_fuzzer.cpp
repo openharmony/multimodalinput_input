@@ -36,7 +36,7 @@ bool StubSetMouseCaptureModeFuzzTest(const uint8_t* data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
+    MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::SET_CAPTURE_MODE), datas, reply, option);
     DelayedSingleton<IInputWindowsManager>::DestroyInstance();
     return true;

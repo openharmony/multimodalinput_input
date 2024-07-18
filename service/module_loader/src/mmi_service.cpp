@@ -75,6 +75,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+std::mutex g_instanceMutex;
+MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
@@ -91,7 +93,7 @@ constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
-const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
+const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
 
 template <class... Ts> void CheckDefineOutput(const char *fmt, Ts... args)
 {
@@ -131,7 +133,25 @@ static void CheckDefine()
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
-MMIService::~MMIService() {}
+MMIService::~MMIService()
+{
+    if (g_MMIService != nullptr) {
+        g_MMIService = nullptr;
+    }
+    MMI_HILOGI("~MMIService");
+}
+
+MMIService* MMIService::GetInstance()
+{
+    if (g_MMIService == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (g_MMIService == nullptr) {
+            MMI_HILOGI("new MMIService");
+            g_MMIService = new MMIService();
+        }
+    }
+    return g_MMIService;
+}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
