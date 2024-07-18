@@ -3165,5 +3165,17 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Lev
     ASSERT_EQ(rows, 100);
     ASSERT_EQ(result, RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    void *pixelMap = nullptr;
+    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
