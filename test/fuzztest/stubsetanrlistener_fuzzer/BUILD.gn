@@ -52,7 +52,6 @@ ohos_fuzztest("StubSetAnrListenerFuzzTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -67,6 +66,7 @@ ohos_fuzztest("StubSetAnrListenerFuzzTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",

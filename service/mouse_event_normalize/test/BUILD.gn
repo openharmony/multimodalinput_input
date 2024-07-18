@@ -36,7 +36,6 @@ ohos_unittest("MouseEventNormalizeTest") {
   ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
@@ -49,6 +48,7 @@ ohos_unittest("MouseEventNormalizeTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "libinput:libinput-third-mmi",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
