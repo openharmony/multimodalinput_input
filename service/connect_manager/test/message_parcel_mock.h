@@ -60,6 +60,7 @@ public:
     virtual bool CheckMonitor() = 0;
     virtual bool CheckDispatchControl() = 0;
     virtual bool CheckInfraredEmmit() = 0;
+    virtual bool CheckAuthorize() = 0;
     virtual bool WriteBoolVector(const std::vector<bool> &val) = 0;
     virtual bool WriteInt32Vector(const std::vector<int32_t> &val) = 0;
     virtual int64_t ReadInt64() = 0;
@@ -105,6 +106,7 @@ public:
     MOCK_METHOD0(CheckMonitor, bool());
     MOCK_METHOD0(CheckDispatchControl, bool());
     MOCK_METHOD0(CheckInfraredEmmit, bool());
+    MOCK_METHOD0(CheckAuthorize, bool());
     MOCK_METHOD1(WriteBoolVector, bool(const std::vector<bool> &val));
     MOCK_METHOD1(WriteInt32Vector, bool(const std::vector<int32_t> &val));
     MOCK_METHOD0(ReadInt64, int64_t());
