@@ -54,12 +54,31 @@ void KeyGestureManager::Handler::ResetTimer()
 void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGI("[Handler] Handler will run after %{public}dms", GetLongPressTime());
+    keyEvent_ = KeyEvent::Clone(keyEvent);
     timerId_ = TimerMgr->AddTimer(GetLongPressTime(), REPEAT_ONCE,
-        [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-            Run(tKeyEvent);
+        [this]() {
+            CHKPV(keyEvent_);
+            Run(keyEvent_);
+            keyEvent_ = nullptr;
+            timerId_ = INVALID_ENTITY_ID;
         });
     if (timerId_ < 0) {
         MMI_HILOGI("[Handler] AddTimer fail");
+    }
+}
+
+void KeyGestureManager::Handler::Run(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    if (callback_ != nullptr) {
+        callback_(keyEvent);
+    }
+}
+
+void KeyGestureManager::Handler::RunPending()
+{
+    if (keyEvent_ != nullptr) {
+        Run(keyEvent_);
+        keyEvent_ = nullptr;
     }
 }
 
@@ -157,7 +176,10 @@ void KeyGestureManager::KeyGesture::NotifyHandlers(std::shared_ptr<KeyEvent> key
 bool KeyGestureManager::LongPressSingleKey::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
 {
     std::set<int32_t> keys = keyOption->GetPreKeys();
-    return (keys.empty() && (keyOption->GetFinalKey() == keyCode_));
+    return (keys.empty() &&
+            (keyOption->GetFinalKey() == keyCode_) &&
+            keyOption->IsFinalKeyDown() &&
+            (keyOption->GetFinalKeyDownDuration() < COMBINATION_KEY_TIMEOUT));
 }
 
 bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> keyEvent)
@@ -169,18 +191,17 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
                 return false;
             }
             NotifyHandlers(keyEvent);
+            return true;
         } else {
             firstDownTime_ = GetSysClockTime();
             MarkActive(true);
             TriggerHandlers(keyEvent);
         }
-        return true;
+        return false;
     }
     if (IsActive()) {
         Reset();
-        if (keyEvent->GetKeyCode() == keyCode_) {
-            NotifyHandlers(keyEvent);
-        }
+        RunPendingHandlers();
     }
     return false;
 }
@@ -195,6 +216,18 @@ void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) con
         }
     }
     output << "}";
+}
+
+void KeyGestureManager::LongPressSingleKey::RunPendingHandlers()
+{
+    std::set<int32_t> foregroundPids = GetForegroundPids();
+    bool haveForeground = HaveForegroundHandler(foregroundPids);
+
+    for (auto &handler : handlers_) {
+        if (!haveForeground || (foregroundPids.find(handler.GetPid()) != foregroundPids.end())) {
+            handler.RunPending();
+        }
+    }
 }
 
 bool KeyGestureManager::LongPressCombinationKey::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
