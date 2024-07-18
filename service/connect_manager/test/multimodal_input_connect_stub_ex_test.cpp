@@ -42,6 +42,12 @@ public:
     {
         return (state_ == ServiceRunningState::STATE_RUNNING);
     }
+
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override
+    {
+        return;
+    }
+
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override
     {

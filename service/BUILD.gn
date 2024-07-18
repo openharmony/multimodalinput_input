@@ -249,7 +249,10 @@ ohos_shared_library("libmmi-server") {
     deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
   }
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "window_manager:libdm",
+  ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm_lite" ]
   }
@@ -1420,6 +1423,7 @@ ohos_unittest("InterceptorExTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "preferences:native_preferences",
+    "window_manager:libdm",
   ]
 }
 
