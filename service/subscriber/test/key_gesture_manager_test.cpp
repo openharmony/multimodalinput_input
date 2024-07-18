@@ -27,7 +27,7 @@
 #include "want.h"
 
 #undef MMI_LOG_TAG
-#define MMI_LOG_TAG "KeyCommandHandlerTest"
+#define MMI_LOG_TAG "KeyGestureManagerTest"
 
 namespace OHOS {
 namespace MMI {
