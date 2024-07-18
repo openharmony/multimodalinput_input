@@ -114,28 +114,6 @@ group("input_jsapi_group") {
   }
 }
 
-group("mmi_debug_tools") {
-  deps = [
-    "patch/diff_libinput_mmi:libinput-analyze-mmi",
-    "patch/diff_libinput_mmi:libinput-debug-mmi",
-    "patch/diff_libinput_mmi:libinput-list-mmi",
-    "patch/diff_libinput_mmi:libinput-measure-mmi",
-    "patch/diff_libinput_mmi:libinput-quirks-mmi",
-    "patch/diff_libinput_mmi:libinput-record-mmi",
-    "patch/diff_libinput_mmi:libinput-tablet-mmi",
-    "tools/event_inject:mmi-event-injection",
-    "tools/vuinput:vuinput",
-  ]
-}
-
-group("ut_mmi_debug_tools") {
-  testonly = true
-  deps = [
-    "tools/event_inject:ut-event-injection-out",
-    "tools/vuinput:ut-virtual-device-out",
-  ]
-}
-
 group("mmi_tests") {
   testonly = true
   deps = [

@@ -62,7 +62,6 @@ ohos_unittest("FingerprintEventProcessorTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
@@ -79,6 +78,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
+    "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
