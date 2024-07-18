@@ -133,7 +133,8 @@ static void CheckDefine()
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
-MMIService::~MMIService() {
+MMIService::~MMIService()
+{
     if (g_MMIService != nullptr) {
         g_MMIService = nullptr;
     }
