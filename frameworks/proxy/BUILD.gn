@@ -331,6 +331,9 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   sources = [
+    "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
+    "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
