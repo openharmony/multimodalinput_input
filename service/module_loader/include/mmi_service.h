@@ -21,7 +21,6 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "singleton.h"
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
@@ -40,13 +39,12 @@ namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
-    DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
-    DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
     void OnStart() override;
     void OnStop() override;
+    static MMIService* GetInstance();
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
@@ -235,7 +233,9 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
-
+private:
+    MMIService();
+    ~MMIService();
 private:
     class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
     public:
