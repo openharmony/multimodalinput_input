@@ -36,7 +36,7 @@ bool StubUnsubscribeKeyEventFuzzTest(const uint8_t *data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
+    MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT), datas, reply, option);
     return true;
 }
