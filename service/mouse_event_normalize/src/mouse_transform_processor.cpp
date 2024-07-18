@@ -352,7 +352,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
-            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
@@ -363,7 +363,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
-            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
