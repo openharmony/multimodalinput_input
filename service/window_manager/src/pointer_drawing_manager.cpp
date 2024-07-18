@@ -484,7 +484,10 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
         MMI_HILOGE("Pointer window destroy success");
         return RET_ERR;
     }
-
+    if (!isInit_) {
+        layer->SetQueueSize(5);
+        isInit_ = true;
+    }
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
         MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
@@ -978,6 +981,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
         .strideAlignment = 0x8,
         .format = GRAPHIC_PIXEL_FMT_RGBA_8888,
         .usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA,
+        .timeout = 100,
     };
 
     OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
