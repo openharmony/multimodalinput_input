@@ -1068,11 +1068,11 @@ ohos_unittest("AccountManagerTest") {
     "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
-    "hilog:libhilog",
-    "init:libbegetutil",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
   ]
 }
 
