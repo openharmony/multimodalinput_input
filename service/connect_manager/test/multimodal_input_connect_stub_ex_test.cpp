@@ -31,6 +31,12 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace testing;
+constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
+constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
+constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
+constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
+constexpr int32_t INT32_BYTE { 4 };
 class MMIServiceTest : public MultimodalInputConnectStub {
 public:
     MMIServiceTest() = default;
@@ -256,7 +262,12 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override { return deviceId; }
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
-    int32_t GetPointerSnapshot(void *pixelMap) override { return retSnapshot_; }
+    int32_t GetPointerSnapshot(void *pixelMap) override
+    {
+        std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+        *(static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMap)) = pixelMapPtr;
+        return retSnapshot_;
+    }
     int32_t SetTouchpadScrollRows(int32_t rows) override
     {
         touchpadScrollRows_ = rows;
@@ -268,6 +279,7 @@ public:
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override { return RET_OK; }
+    std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -334,6 +346,37 @@ void MultimodalInputConnectStubTest::TearDownTestCase()
 {
     MessageParcelMock::messageParcel = nullptr;
     messageParcelMock_ = nullptr;
+}
+
+std::shared_ptr<Media::PixelMap> MMIServiceTest::CreatePixelMap(int32_t width, int32_t height)
+{
+    CALL_DEBUG_ENTER;
+    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+        return nullptr;
+    }
+    Media::InitializationOptions opts;
+    opts.size.height = height;
+    opts.size.width = width;
+    opts.pixelFormat = Media::PixelFormat::BGRA_8888;
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
+
+    int32_t colorLen = width * height;
+    uint32_t *pixelColors = new (std::nothrow) uint32_t[colorLen];
+    CHKPP(pixelColors);
+    int32_t colorByteCount = colorLen * INT32_BYTE;
+    errno_t ret = memset_s(pixelColors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    if (ret != EOK) {
+        delete[] pixelColors;
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(pixelColors, colorLen, opts);
+    if (pixelMap == nullptr) {
+        delete[] pixelColors;
+        return nullptr;
+    }
+    delete[] pixelColors;
+    return pixelMap;
 }
 
 /**
@@ -7161,6 +7204,211 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_004, TestSize
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubSetTouchpadScrollRows(data, reply));
     EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSnapshot
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerSnapshot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSnapshot(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSnapshot_001
+ * @tc.desc: Cover if (ret != RET_OK) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetPointerSnapshot_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_RUNNING;
+    service->retSnapshot_ = RET_ERR;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSnapshot(data, reply));
+}
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAncoAddChannel
+ * @tc.desc: Cover if (!PER_HELPER->VerifySystemApp()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoAddChannel, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAncoAddChannel(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAncoAddChannel_001
+ * @tc.desc: Cover if (ret != RET_OK) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoAddChannel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retChannel_ = RET_ERR;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAncoAddChannel(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAncoAddChannel_002
+ * @tc.desc: Cover the else branch of if (ret != RET_OK)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoAddChannel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retChannel_ = RET_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAncoAddChannel(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAncoRemoveChannel
+ * @tc.desc: Cover if (!PER_HELPER->VerifySystemApp()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoRemoveChannel, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAncoRemoveChannel(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAncoRemoveChannel_001
+ * @tc.desc: Cover if (ret != RET_OK) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoRemoveChannel_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retChannel_ = RET_ERR;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAncoRemoveChannel(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubAncoRemoveChannel_002
+ * @tc.desc: Cover the else branch of if (ret != RET_OK)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoRemoveChannel_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retChannel_ = RET_OK;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubAncoRemoveChannel(data, reply));
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubTransferBinderClientService
+ * @tc.desc: Cover if (ret != RET_OK) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest,
+    MultimodalInputConnectStubTest_StubTransferBinderClientService, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retChannel_ = RET_ERR;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubTransferBinderClientService(data, reply));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubTransferBinderClientService_001
+ * @tc.desc: Cover the else branch of if (ret != RET_OK)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest,
+    MultimodalInputConnectStubTest_StubTransferBinderClientService_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->retChannel_ = RET_ERR;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubTransferBinderClientService(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS
