@@ -370,7 +370,7 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "handlerType:%d | eventType:%u | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s | ProgramName:%s \t",
                 item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
