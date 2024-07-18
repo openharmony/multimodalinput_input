@@ -149,6 +149,7 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
@@ -236,6 +237,21 @@ protected:
     int32_t OnCancelInjection();
 
 private:
+    class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
+    public:
+        FoldStatusLisener(sptr<MultimodalInputConnectStub> server) : server_(server) {}
+        ~FoldStatusLisener();
+        DISALLOW_COPY_AND_MOVE(FoldStatusLisener);
+        // FoldStatus: UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
+        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+
+    private:
+        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
+        sptr<MultimodalInputConnectStub> server_ { nullptr };
+        std::mutex mutex_;
+    };
+    void RegisterFoldStatusListener();
+    void UnregisterFoldStatusListener();
     int32_t CheckPidPermission(int32_t pid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
@@ -250,8 +266,8 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
     sptr<AppDebugListener> appDebugListener_;
-
     std::atomic_bool threadStatusFlag_ { false };
+    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

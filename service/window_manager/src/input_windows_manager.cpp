@@ -161,9 +161,6 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 InputWindowsManager::~InputWindowsManager()
 {
     CALL_INFO_TRACE;
-    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        UnregisterFoldStatusListener();
-    }
 }
 
 void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus)
@@ -190,50 +187,6 @@ void InputWindowsManager::Init(UDSServer& udsServer)
             return this->DeviceStatusChanged(deviceId, sysUid, devStatus);
         }
         );
-    TimerMgr->AddTimer(WAIT_TIME_FOR_REGISTER, 1, [this]() {
-        MMI_HILOG_HANDLERD("Timer callback");
-        RegisterFoldStatusListener();
-    });
-}
-
-void InputWindowsManager::RegisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        MMI_HILOG_HANDLERD("The device is not foldable");
-        return;
-    }
-    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(*this);
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to register fold status listener");
-        foldStatusListener_ = nullptr;
-    } else {
-        MMI_HILOG_HANDLERD("Register fold status listener successed");
-    }
-}
-
-void InputWindowsManager::UnregisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
-    }
-}
-
-void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    CALL_INFO_TRACE;
-    MMI_HILOG_HANDLERD("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
-    if (lastFoldStatus_ == foldStatus) {
-        MMI_HILOG_HANDLERD("No need to set foldStatus");
-        return;
-    }
-    lastFoldStatus_ = foldStatus;
-    winMgr_.OnFoldStatusChanged(foldStatus);
 }
 
 void InputWindowsManager::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
