@@ -80,7 +80,8 @@
         "graphic_2d_ext",
         "hdf_core",
         "bounds_checking_function",
-        "call_manager"
+        "call_manager",
+        "libinput"
       ],
       "third_party": [
         "cJSON",
@@ -105,7 +106,8 @@
           "//foundation/multimodalinput/input:multimodalinput_mmi_service",
           "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
           "//foundation/multimodalinput/input:multimodalinput.rc",
-          "//foundation/multimodalinput/input/patch:patch_packages",
+          "//third_party/libinput:libinput-third-mmi",
+          "//third_party/mtdev:libmtdev-third-mmi",
           "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc"
@@ -147,6 +149,9 @@
             "header_base": "//foundation/multimodalinput/input/util/napi/include"
           },
           "type": "so"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/libudev:mmi_libudev"
         }
       ],
       "test": [
