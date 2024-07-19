@@ -256,6 +256,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
         bool checkUIExtentionWindow = false;
+        // Determine whether it is a safety sub window
         for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
             if (uiExtentionWindowInfo.id == pointerEvent->GetTargetWindowId()) {
                 MMI_HILOGD("Find windowInfo by window id %{public}d", uiExtentionWindowInfo.id);
@@ -439,6 +440,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowInfos) {
         bool checkUIExtentionWindow = false;
+        // Determine whether it is a safety sub window
         for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
             if (uiExtentionWindowInfo.id == windowId) {
                 MMI_HILOGD("Find windowInfo by window id %{public}d", uiExtentionWindowInfo.id);
@@ -1828,6 +1830,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 }
                 firstBtnDownWindowId_ = item.id;
                 if (!item.uiExtentionWindowInfo.empty()) {
+                    // Determine whether the landing point is a safety sub window
                     CheckUIExtentionWindowPointerHotArea(logicalX, logicalY,
                         item.uiExtentionWindowInfo, firstBtnDownWindowId_);
                 }
@@ -2390,7 +2393,7 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
 void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
     const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
+    MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,pid:%{public}d", windowInfo.pid);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
@@ -2400,7 +2403,7 @@ void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t 
     auto windowX = logicalX - windowInfo.area.x;
     auto windowY = logicalY - windowInfo.area.y;
     if (!(windowInfo.transform.empty())) {
-    auto windowXY = TransformWindowXY(windowInfo, logicalX, logicalY);
+        auto windowXY = TransformWindowXY(windowInfo, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
@@ -2437,7 +2440,8 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
         }
         for (const auto& windowInfo : item.uiExtentionWindowInfo) {
             if (windowInfo.id == windowId) {
-                MMI_HILOG_DISPATCHE("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
+                MMI_HILOG_DISPATCHI("Dispatch uiExtention pointer Event,windowId:%{public}d", item.id);
+                // If the event is sent to the security sub window, then a copy needs to be sent to the host window
                 pointerEvent->SetAgentWindowId(item.agentWindowId);
                 pointerEvent->SetTargetWindowId(item.id);
                 SendUIExtentionPointerEvent(logicalX, logicalY, item, pointerEvent);
@@ -2551,6 +2555,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             item.defaultHotAreas, item)) {
             int32_t windowId = 0;
             touchWindow = &item;
+            // Determine whether the landing point is a safety sub window
             CheckUIExtentionWindowDefaultHotArea(static_cast<int32_t>(logicalX), static_cast<int32_t>(logicalY),
                 item.uiExtentionWindowInfo, windowId);
             bool isUiExtentionWindow = false;
