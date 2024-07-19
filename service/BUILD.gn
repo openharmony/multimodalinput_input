@@ -252,9 +252,7 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (input_ext_feature_magiccursor) {
-    external_deps += [
-      "eventhandler:libeventhandler",
-    ]
+    external_deps += [ "eventhandler:libeventhandler" ]
   }
 
   if (security_component_enable) {
