@@ -38,6 +38,20 @@ public:
 };
 
 /**
+ * @tc.name: AccountManagerTest_GetInstance_01
+ * @tc.desc: Test the funcation GetInstance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_GetInstance_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AccountManager accountManager;
+    accountManager.instance_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(accountManager.GetInstance());
+}
+
+/**
  * @tc.name: AccountManagerTest_SubscribeCommonEvent_01
  * @tc.desc: Test the funcation SubscribeCommonEvent
  * @tc.type: FUNC
@@ -181,6 +195,123 @@ HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_02, TestSize.Level1
     accountId = 2;
     accountManager.currentAccountId_ = -1;
     ASSERT_NO_FATAL_FAILURE(accountManager.OnSwitchUser(data));
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitializeSetting_01
+ * @tc.desc: Test the funcation InitializeSetting
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 1;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.switchObserver_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitializeSetting_02
+ * @tc.desc: Test the funcation InitializeSetting
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 2;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.onScreenLockedSwitchObserver_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+}
+
+/**
+ * @tc.name: AccountManagerTest_InitializeSetting_03
+ * @tc.desc: Test the funcation InitializeSetting
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_InitializeSetting_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 3;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.configObserver_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.InitializeSetting());
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_01
+ * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 3;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accountId_ = -1;
+    std::string key = "down";
+    bool currentSwitchStatus = true;
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadSwitchStatus_02
+ * @tc.desc: Test the funcation ReadSwitchStatus
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadSwitchStatus_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 5;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accountId_ = 2;
+    std::string key = "down";
+    bool currentSwitchStatus = false;
+
+    char buf[DEFAULT_BUFFER_LENGTH] {};
+    EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
+    bool ret = accountSetting.ReadSwitchStatus(key, currentSwitchStatus);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_01
+ * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 3;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accountId_ = -1;
+    ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
+}
+
+/**
+ * @tc.name: AccountManagerTest_ReadLongPressTime_02
+ * @tc.desc: Test the funcation ReadLongPressTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, AccountManagerTest_ReadLongPressTime_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t accountId = 3;
+    AccountManager::AccountSetting accountSetting(accountId);
+    accountSetting.accountId_ = 2;
+
+    char buf[DEFAULT_BUFFER_LENGTH] {};
+    EXPECT_FALSE(sprintf_s(buf, sizeof(buf), SECURE_SETTING_URI_PROXY.c_str(), accountSetting.accountId_) > 0);
+    ASSERT_NO_FATAL_FAILURE(accountSetting.ReadLongPressTime());
 }
 } // namespace MMI
 } // namespace OHOS
