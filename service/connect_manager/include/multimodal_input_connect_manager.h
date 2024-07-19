@@ -53,7 +53,7 @@ public:
     int32_t SetPointerSize(int32_t size);
     int32_t GetPointerSize(int32_t &size);
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap);
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
@@ -133,8 +133,11 @@ public:
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+    int32_t GetPointerSnapshot(void *pixelMapPtr);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
+    int32_t SetTouchpadScrollRows(int32_t rows);
+    int32_t GetTouchpadScrollRows(int32_t &rows);
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);

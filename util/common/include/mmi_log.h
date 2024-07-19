@@ -120,22 +120,48 @@ void ResetLogTrace();
         HILOG_IMPL(LOG_CORE, level, lh.domain, lh.tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID lh.func, lh.line, \
         ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_HEADER_NO_RELEASE(level, lh, fmt, ...) do { \
+        HILOG_IMPL(LOG_ONLY_PRERELEASE, level, lh.domain, lh.tag, MMI_FUNC_FMT fmt, MMI_TRACE_ID lh.func, lh.line, \
+        ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOGD(fmt, ...) do { \
     if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOGD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DOMAIN, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOGI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOGI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOGW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOGW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOGE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOGE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOGF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOGF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_DOMAIN, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_SERVERD(fmt, ...) do { \
@@ -143,17 +169,38 @@ void ResetLogTrace();
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOG_SERVERD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_SERVER, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOG_SERVERI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_SERVERI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_SERVERW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_SERVERW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_SERVERE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_SERVERE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_SERVERF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_SERVERF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_SERVER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_HANDLERD(fmt, ...) do { \
@@ -161,17 +208,38 @@ void ResetLogTrace();
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOG_HANDLERD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_HANDLER, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOG_HANDLERI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_HANDLERI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_HANDLERW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_HANDLERW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_HANDLERE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_HANDLERE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_HANDLERF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_HANDLERF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_HANDLER, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_WINDOWD(fmt, ...) do { \
@@ -179,17 +247,38 @@ void ResetLogTrace();
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOG_WINDOWD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_WINDOW, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOG_WINDOWI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_WINDOWI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_WINDOWW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_WINDOWW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_WINDOWE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_WINDOWE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_WINDOWF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_WINDOWF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_WINDOW, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_CURSORD(fmt, ...) do { \
@@ -197,17 +286,38 @@ void ResetLogTrace();
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOG_CURSORD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_CURSOR, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOG_CURSORI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_CURSORI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_CURSORW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_CURSORW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_CURSORE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_CURSORE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_CURSORF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_CURSORF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_CURSOR, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_DISPATCHD(fmt, ...) do { \
@@ -215,23 +325,52 @@ void ResetLogTrace();
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOG_DISPATCHD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOG_DISPATCHI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_DISPATCHI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_DISPATCHW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_DISPATCHW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_DISPATCHE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_DISPATCHE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_DISPATCHF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_DISPATCHF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_DISPATCH, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_FREEZEI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_FREEZEI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_FREEZEE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_FREEZEE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_DISPATCH, INPUT_KEY_FLOW, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOG_ANRDETECTD(fmt, ...) do { \
@@ -239,17 +378,38 @@ void ResetLogTrace();
         MMI_HILOG_BASE(LOG_CORE, LOG_DEBUG, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
     } \
 } while (0)
+#define MMI_HILOG_ANRDETECTD_NO_RELEASE(fmt, ...) do { \
+    if (HiLogIsLoggable(MMI_LOG_DISPATCH, MMI_LOG_TAG, LOG_DEBUG)) { \
+        MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_DEBUG, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+    } \
+} while (0)
+
 #define MMI_HILOG_ANRDETECTI(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_INFO, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_ANRDETECTI_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_INFO, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_ANRDETECTW(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_WARN, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_ANRDETECTW_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_WARN, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_ANRDETECTE(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_ERROR, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
+#define MMI_HILOG_ANRDETECTE_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_ERROR, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+
 #define MMI_HILOG_ANRDETECTF(fmt, ...) do { \
     MMI_HILOG_BASE(LOG_CORE, LOG_FATAL, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
+} while (0)
+#define MMI_HILOG_ANRDETECTF_NO_RELEASE(fmt, ...) do { \
+    MMI_HILOG_BASE(LOG_ONLY_PRERELEASE, LOG_FATAL, MMI_LOG_ANRDETECT, MMI_LOG_TAG, fmt, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \

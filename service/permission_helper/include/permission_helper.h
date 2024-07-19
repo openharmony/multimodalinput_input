@@ -39,14 +39,14 @@ public:
     bool VerifySystemApp();
     bool CheckInfraredEmmit();
     bool RequestFromShell();
+    bool CheckMouseCursor();
+    bool CheckInputEventFilter();
+    bool CheckAuthorize();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
     bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
     bool CheckHapPermission(std::string permissionCode);
-    bool CheckMonitorPermission(uint32_t tokenId);
-    bool CheckInterceptorPermission(uint32_t tokenId);
-    bool CheckDispatchControlPermission(uint32_t tokenId);
 };
 
 #define PER_HELPER ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()

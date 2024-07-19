@@ -1440,5 +1440,157 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_IsMatchKeys_001, TestSiz
     EXPECT_FALSE(ret1);
 }
 
+/**
+ * @tc.name: InputDeviceManagerTest_OnInputDeviceAdded_Test_01
+ * @tc.desc: Test the function OnInputDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceAdded_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceMgr;
+    int32_t deviceId = 3;
+    struct libinput_device *inputDevice = nullptr;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.inputDeviceOrigin = nullptr;
+    deviceMgr.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+    EXPECT_TRUE(deviceInfo.inputDeviceOrigin == inputDevice);
+    ASSERT_NO_FATAL_FAILURE(deviceMgr.OnInputDeviceAdded(inputDevice));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_OnInputDeviceAdded_Test_02
+ * @tc.desc: Test the function OnInputDeviceAdded
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_OnInputDeviceAdded_Test_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceMgr;
+    int32_t deviceId = 3;
+    struct libinput_device *inputDevice = nullptr;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = false;
+    deviceInfo.isPointerDevice = true;
+    deviceInfo.enable = true;
+    deviceMgr.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+    ASSERT_NO_FATAL_FAILURE(deviceMgr.OnInputDeviceAdded(inputDevice));
+}
+
+/**
+ * @tc.name: OnInputDeviceRemoved_Test_01
+ * @tc.desc: Test the function OnInputDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, OnInputDeviceRemoved_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceMgr;
+    int32_t deviceId = 5;
+    struct libinput_device *inputDevice = nullptr;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.inputDeviceOrigin = nullptr;
+    deviceMgr.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+    EXPECT_TRUE(deviceInfo.inputDeviceOrigin == inputDevice);
+    ASSERT_NO_FATAL_FAILURE(deviceMgr.OnInputDeviceRemoved(inputDevice));
+}
+
+/**
+ * @tc.name: OnInputDeviceRemoved_Test_02
+ * @tc.desc: Test the function OnInputDeviceRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, OnInputDeviceRemoved_Test_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceMgr;
+    int32_t deviceId = 5;
+    struct libinput_device *inputDevice = nullptr;
+
+    InputDeviceManager::InputDeviceInfo deviceInfo;
+    deviceInfo.isRemote = false;
+    deviceInfo.isPointerDevice = true;
+    deviceMgr.inputDevice_.insert(std::make_pair(deviceId, deviceInfo));
+
+    std::string sysUid;
+    EXPECT_TRUE(sysUid.empty());
+    ASSERT_NO_FATAL_FAILURE(deviceMgr.OnInputDeviceRemoved(inputDevice));
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetKeyboardDevice_Test_01
+ * @tc.desc: Test the function GetKeyboardDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardDevice_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceMgr;
+    struct libinput_device *device = nullptr;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+
+    bool ret1 = INPUT_DEV_MGR->IsMatchKeys(device, keyCodes);
+    EXPECT_FALSE(ret1);
+    auto ret2 = deviceMgr.GetKeyboardDevice();
+    EXPECT_EQ(ret2, nullptr);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetKeyboardDevice_Test_02
+ * @tc.desc: Test the function GetKeyboardDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetKeyboardDevice_Test_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDeviceManager deviceMgr;
+    struct libinput_device *device = nullptr;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+    INPUT_DEV_MGR->inputDevice_.clear();
+    bool ret1 = INPUT_DEV_MGR->IsMatchKeys(device, keyCodes);
+    EXPECT_FALSE(ret1);
+    auto ret2 = deviceMgr.GetKeyboardDevice();
+    EXPECT_EQ(ret2, nullptr);
+}
+
+/**
+ * @tc.name: InputDeviceManagerTest_GetDeviceSupportKey_Test_01
+ * @tc.desc: Test the function GetDeviceSupportKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_GetDeviceSupportKey_Test_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<int32_t> keyCodes;
+    int32_t deviceId = 1;
+    int32_t keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
+    std::vector<bool> supportKey;
+    int32_t returnCode1 = 401;
+
+    InputDeviceManager inputDevice;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_HOME);
+    keyCodes.push_back(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyCodes.push_back(KeyEvent::KEYCODE_F2);
+
+    int32_t ret = INPUT_DEV_MGR->SupportKeys(deviceId, keyCodes, supportKey);
+    EXPECT_NE(ret, RET_OK);
+    int32_t ret2 = inputDevice.GetDeviceSupportKey(deviceId, keyboardType);
+    EXPECT_EQ(ret2, returnCode1);
+}
 } // namespace MMI
 } // namespace OHOS

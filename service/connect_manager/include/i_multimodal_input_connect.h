@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,7 +58,7 @@ public:
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
     virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
-    virtual int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) = 0;
+    virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
     virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) = 0;
     virtual int32_t GetPointerSize(int32_t &size) = 0;
@@ -144,10 +144,14 @@ public:
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
     virtual int32_t EnableHardwareCursorStats(bool enable) = 0;
     virtual int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) = 0;
+    virtual int32_t GetPointerSnapshot(void *pixelMapPtr) = 0;
+    virtual int32_t SetTouchpadScrollRows(int32_t rows) = 0;
+    virtual int32_t GetTouchpadScrollRows(int32_t &rows) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
+    virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
