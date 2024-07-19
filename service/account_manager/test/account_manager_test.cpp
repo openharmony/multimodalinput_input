@@ -38,21 +38,6 @@ public:
 };
 
 /**
- * @tc.name: KeyGestureManagerTest_UnsubscribeCommonEvent_01
- * @tc.desc: Test the funcation UnsubscribeCommonEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_UnsubscribeCommonEvent_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    AccountManager accountManager;
-    ASSERT_NO_FATAL_FAILURE(accountManager.SubscribeCommonEvent());
-    accountManager.subscriber_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(accountManager.UnsubscribeCommonEvent());
-}
-
-/**
  * @tc.name: KeyGestureManagerTest_SubscribeCommonEvent_01
  * @tc.desc: Test the funcation SubscribeCommonEvent
  * @tc.type: FUNC
@@ -65,6 +50,21 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SubscribeCommonEvent_01, Test
     accountManager.subscriber_ = nullptr;
     accountManager.timerId_ = -1;
     ASSERT_NO_FATAL_FAILURE(accountManager.SubscribeCommonEvent());
+}
+
+/**
+ * @tc.name: KeyGestureManagerTest_UnsubscribeCommonEvent_01
+ * @tc.desc: Test the funcation UnsubscribeCommonEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AccountManagerTest, KeyGestureManagerTest_UnsubscribeCommonEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    AccountManager accountManager;
+    ASSERT_NO_FATAL_FAILURE(accountManager.SubscribeCommonEvent());
+    accountManager.subscriber_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(accountManager.UnsubscribeCommonEvent());
 }
 
 /**
