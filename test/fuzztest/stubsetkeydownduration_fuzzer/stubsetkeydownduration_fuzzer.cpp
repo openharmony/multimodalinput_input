@@ -36,7 +36,7 @@ bool StubSetKeyDownDurationFuzzTest(const uint8_t* data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
+    MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::SET_KEY_DOWN_DURATION), datas, reply, option);
     return true;
 }

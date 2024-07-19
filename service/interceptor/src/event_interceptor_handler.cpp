@@ -365,12 +365,12 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Interceptor information:\t");
-    mprintf(fd, "interceptors: count=%d", interceptors_.size());
+    mprintf(fd, "interceptors: count=%zu", interceptors_.size());
     for (const auto &item : interceptors_) {
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "handlerType:%d | eventType:%u | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s | ProgramName:%s \t",
                 item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),

@@ -465,14 +465,14 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Monitor information:\t");
-    mprintf(fd, "monitors: count=%d", monitors_.size());
+    mprintf(fd, "monitors: count=%zu", monitors_.size());
     for (const auto &item : monitors_) {
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s "
-                "| EventType:%s | ProgramName:%s \t",
+                "| EventType:%u | ProgramName:%s \t",
                 item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str(),

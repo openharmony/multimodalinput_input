@@ -27,6 +27,12 @@
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+namespace {
+constexpr int32_t POWER_KEY_INIT { 0 };
+constexpr int32_t POWER_KEY_DOWN { 1 };
+constexpr int32_t POWER_KEY_UP { 2 };
+constexpr int32_t POWER_KEY_UP_TIME { 1000 }; // 1000ms
+}
 FingerprintEventProcessor::FingerprintEventProcessor()
 {}
 
@@ -56,10 +62,46 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
     }
     return true;
 }
+void FingerprintEventProcessor::SetPowerKeyState(struct libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(event);
+    auto device = libinput_event_get_device(event);
+    CHKPV(device);
+    auto data = libinput_event_get_keyboard_event(event);
+    CHKPV(data);
+    int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
+    if (keyCode != KEY_POWER) {
+        MMI_HILOGD("current keycode is not power, return");
+        return;
+    }
+    int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
+        (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+        powerKeyState_ = POWER_KEY_DOWN;
+    } else {
+        powerKeyState_ = POWER_KEY_UP;
+        lastUpTime_ = std::chrono::steady_clock::now();
+    }
+}
 
 int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
+    if (powerKeyState_ == POWER_KEY_DOWN) {
+        MMI_HILOGD("Dont report because current state is powerkey down");
+        return 0;
+    } else if (powerKeyState_ == POWER_KEY_UP) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto duration = currentTime - lastUpTime_;
+        auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+        if (durationMs < POWER_KEY_UP_TIME) {
+            MMI_HILOGD("Dont report because time diff < 1s");
+            return 0;
+        } else {
+            powerKeyState_ = POWER_KEY_INIT;
+        }
+    }
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, PARAM_INPUT_INVALID);

@@ -257,7 +257,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         pointerEvent_->GetPointerIds().size(), MMI_LOG_FREEZE);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    aggregator_.Record(MMI_LOG_FREEZE, "Pointer event created by: " + device->GetName() + ", target window: " +
+    aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
         std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
         std::to_string(pointerEvent_->GetId()));
 

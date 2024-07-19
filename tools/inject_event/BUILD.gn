@@ -37,6 +37,7 @@ ohos_source_set("input-manager") {
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
+    "init:libbegetutil",
   ]
   subsystem_name = "multimodalinput"
   part_name = "input"

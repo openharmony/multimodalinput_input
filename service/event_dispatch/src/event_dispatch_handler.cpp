@@ -27,6 +27,7 @@
 #include "bytrace_adapter.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "i_input_windows_manager.h"
@@ -170,7 +171,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
             CHKPV(udsServer);
-            udsServer->GetClientFd(windowInfo->id);
+            udsServer->GetClientFd(windowInfo->pid);
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
@@ -280,8 +281,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_FREEZEI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
-            pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
+            session->GetProgramName().c_str(), session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
@@ -330,9 +331,15 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("The key event does not report normally, application not response."
-            "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
-            key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+        if (!EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGW("The key event does not report normally, application not response."
+                "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
+                key->GetDeviceId(), key->GetKeyAction());
+        } else {
+            MMI_HILOGW("The key event does not report normally, application not response."
+                "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+                key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+        }
         return RET_OK;
     }
 

@@ -29,41 +29,35 @@ namespace OHOS {
 namespace MMI {
 
 class KeyGestureManager final {
-    class KeyGestureId {
-    public:
-        KeyGestureId(const std::set<int32_t> &keys) : keys_(keys) {}
-        ~KeyGestureId() = default;
-
-        bool operator<(const KeyGestureId &other) const
-        {
-            return (keys_ < other.keys_);
-        }
-
-        void Dump(std::ostringstream &output) const;
-
-    private:
-        std::set<int32_t> keys_;
-    };
-
     class Handler final {
     public:
-        Handler(int32_t id, int32_t downDuration, std::function<void(std::shared_ptr<KeyEvent>)> callback)
-            : id_(id), downDuration_(downDuration), callback_(callback) {}
-
-        bool operator<(const Handler &other) const
-        {
-            return (downDuration_ < other.downDuration_);
-        }
+        Handler(int32_t id, int32_t pid, int32_t longPressTime,
+                std::function<void(std::shared_ptr<KeyEvent>)> callback)
+            : id_(id), pid_(pid), longPressTime_(longPressTime), callback_(callback) {}
+        ~Handler();
 
         int32_t GetId() const
         {
             return id_;
         }
 
-        int32_t GetDownDuration() const
+        int32_t GetPid() const
         {
-            return downDuration_;
+            return pid_;
         }
+
+        int32_t GetLongPressTime() const
+        {
+            return longPressTime_;
+        }
+
+        void SetLongPressTime(int32_t longPressTime)
+        {
+            longPressTime_ = longPressTime;
+        }
+
+        void ResetTimer();
+        void Trigger(std::shared_ptr<KeyEvent> keyEvent);
 
         void Run(std::shared_ptr<KeyEvent> keyEvent) const
         {
@@ -74,7 +68,9 @@ class KeyGestureManager final {
 
     private:
         int32_t id_ { -1 };
-        int32_t downDuration_ { -1 };
+        int32_t pid_ { -1 };
+        int32_t longPressTime_ { -1 };
+        int32_t timerId_ {};
         std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
 
@@ -87,14 +83,24 @@ class KeyGestureManager final {
         virtual bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const = 0;
         virtual bool Intercept(std::shared_ptr<KeyEvent> KeyEvent) = 0;
         virtual void Dump(std::ostringstream &output) const = 0;
-        int32_t AddHandler(int32_t downDuration, std::function<void(std::shared_ptr<KeyEvent>)> callback);
+        virtual int32_t AddHandler(int32_t pid, int32_t longPressTime,
+            std::function<void(std::shared_ptr<KeyEvent>)> callback);
         bool RemoveHandler(int32_t id);
         void Reset();
+        bool IsActive() const;
+        void MarkActive(bool active);
 
     protected:
-        int32_t timerId_ { -1 };
+        void ResetTimers();
+        std::set<int32_t> GetForegroundPids() const;
+        bool HaveForegroundHandler(const std::set<int32_t> &foregroundApps) const;
+        void TriggerHandlers(std::shared_ptr<KeyEvent> keyEvent);
+        void RunHandler(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
+        void NotifyHandlers(std::shared_ptr<KeyEvent> keyEvent);
+
+        bool active_ { false };
         std::set<int32_t> keys_;
-        std::set<Handler> handlers_;
+        std::vector<Handler> handlers_;
     };
 
     class LongPressSingleKey : public KeyGesture {
@@ -106,8 +112,8 @@ class KeyGestureManager final {
         bool Intercept(std::shared_ptr<KeyEvent> KeyEvent) override;
         void Dump(std::ostringstream &output) const override;
 
-    private:
         int32_t keyCode_ { -1 };
+        int64_t firstDownTime_ {};
     };
 
     class LongPressCombinationKey : public KeyGesture {
@@ -116,11 +122,15 @@ class KeyGestureManager final {
         ~LongPressCombinationKey() = default;
 
         bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const override;
-        bool Intercept(std::shared_ptr<KeyEvent> KeyEvent) override;
+        bool Intercept(std::shared_ptr<KeyEvent> keyEvent) override;
         void Dump(std::ostringstream &output) const override;
 
+    protected:
+        virtual void OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent) {}
+
     private:
-        void Trigger(int32_t delay, std::shared_ptr<KeyEvent> keyEvent);
+        bool RecognizeGesture(std::shared_ptr<KeyEvent> keyEvent);
+        void TriggerAll(std::shared_ptr<KeyEvent> keyEvent);
 
         int64_t firstDownTime_ {};
         std::set<int32_t> keys_;
@@ -128,10 +138,13 @@ class KeyGestureManager final {
 
     class PullUpAccessibility final : public LongPressCombinationKey {
     public:
-        PullUpAccessibility(const std::set<int32_t> &keys) : LongPressCombinationKey(keys) {}
+        PullUpAccessibility();
         ~PullUpAccessibility() = default;
 
         bool IsWorking() override;
+        int32_t AddHandler(int32_t pid, int32_t longPressTime,
+            std::function<void(std::shared_ptr<KeyEvent>)> callback) override;
+        void OnTriggerAll(std::shared_ptr<KeyEvent> keyEvent) override;
     };
 
 public:
@@ -140,7 +153,7 @@ public:
     DISALLOW_COPY_AND_MOVE(KeyGestureManager);
 
     bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const;
-    int32_t AddKeyGesture(std::shared_ptr<KeyOption> keyOption,
+    int32_t AddKeyGesture(int32_t pid, std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     void RemoveKeyGesture(int32_t id);
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent);
@@ -149,6 +162,16 @@ public:
 private:
     std::vector<std::unique_ptr<KeyGesture>> keyGestures_;
 };
+
+inline bool KeyGestureManager::KeyGesture::IsActive() const
+{
+    return active_;
+}
+
+inline void KeyGestureManager::KeyGesture::MarkActive(bool active)
+{
+    active_ = active;
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_GESTURE_MANAGER_H

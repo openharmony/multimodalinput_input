@@ -20,7 +20,6 @@
 #include <memory>
 #include <mutex>
 
-#include "event_handler.h"
 #include "nocopyable.h"
 #include "singleton.h"
 

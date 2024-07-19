@@ -110,6 +110,11 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return knuckleSwitch_.statusConfigValue;
+}
+
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -131,6 +136,10 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
         SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
+    }
+    if (!isKnuckleSwitchConfig_) {
+        CreateStatusConfigObserver(knuckleSwitch_);
+        isKnuckleSwitchConfig_ = true;
     }
 
     switch (touchEvent->GetPointerAction()) {
@@ -169,7 +178,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
         case PointerEvent::TOOL_TYPE_FINGER: {
-            isKnuckleState_ = false;
             HandleFingerGestureDownEvent(touchEvent);
             break;
         }
@@ -179,7 +187,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         default: {
-            isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
         }
@@ -283,7 +290,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
     }
-    if (singleKnuckleGesture_.statusConfigValue) {
+    if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
@@ -339,7 +346,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    isKnuckleState_ = true;
     if (knuckleGesture.lastPointerDownEvent == nullptr) {
         MMI_HILOGI("Knuckle gesture first down Event");
         knuckleGesture.lastPointerDownEvent = touchEvent;
@@ -563,13 +569,18 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE) {
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE ||
+        singleKnuckleGesture_.state) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         ResetKnuckleGesture();
         return;
     }
+    if (knuckleSwitch_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
     int32_t touchAction = touchEvent->GetPointerAction();
-    if (IsValidAction(touchAction) && !singleKnuckleGesture_.state) {
+    if (IsValidAction(touchAction)) {
         switch (touchAction) {
             case PointerEvent::POINTER_ACTION_CANCEL:
             case PointerEvent::POINTER_ACTION_UP: {
@@ -606,6 +617,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEve
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    ResetKnuckleGesture();
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -681,7 +693,6 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
             break;
         }
     }
-    ResetKnuckleGesture();
 }
 
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
@@ -851,7 +862,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
-    singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -1002,7 +1013,6 @@ void KeyCommandHandler::ParseStatusConfigObserver()
         }
         CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
     }
-    CreateStatusConfigObserver<KnuckleGesture>(singleKnuckleGesture_);
 }
 
 template <class T>
@@ -1166,6 +1176,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
+    MMI_HILOGE("Handle event failed");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1903,15 +1914,15 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE("businessId or businessIds_ is empty");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
         MMI_HILOGE("%{public}s not in the config file", businessId.c_str());
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("Delay is not in valid range");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
@@ -1957,9 +1968,13 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t displayY = item.GetDisplayY();
     int32_t displayId = touchEvent->GetTargetDisplayId();
     auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
+    int32_t tragetWindowId = touchEvent->GetTargetWindowId();
     for (auto window : windows) {
         if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
             continue;
+        }
+        if (window.id != tragetWindowId) {
+            return false;
         }
         int32_t rightDownX;
         int32_t rightDownY;

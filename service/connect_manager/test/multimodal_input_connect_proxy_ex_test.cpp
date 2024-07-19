@@ -31,6 +31,12 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace testing;
+constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
+constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
+constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
+constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
+constexpr int32_t INT32_BYTE { 4 };
 
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -49,6 +55,7 @@ class MultimodalInputConnectProxyTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase();
+    static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
     void SetUp() {}
     void TearDown() {}
 
@@ -64,6 +71,37 @@ void MultimodalInputConnectProxyTest::TearDownTestCase()
 {
     MessageParcelMock::messageParcel = nullptr;
     messageParcelMock_ = nullptr;
+}
+
+std::shared_ptr<Media::PixelMap> MultimodalInputConnectProxyTest::CreatePixelMap(int32_t width, int32_t height)
+{
+    CALL_DEBUG_ENTER;
+    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+        return nullptr;
+    }
+    Media::InitializationOptions opts;
+    opts.size.height = height;
+    opts.size.width = width;
+    opts.pixelFormat = Media::PixelFormat::BGRA_8888;
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
+
+    int32_t colorLen = width * height;
+    uint32_t *pixelColors = new (std::nothrow) uint32_t[colorLen];
+    CHKPP(pixelColors);
+    int32_t colorByteCount = colorLen * INT32_BYTE;
+    errno_t ret = memset_s(pixelColors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    if (ret != EOK) {
+        delete[] pixelColors;
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(pixelColors, colorLen, opts);
+    if (pixelMap == nullptr) {
+        delete[] pixelColors;
+        return nullptr;
+    }
+    delete[] pixelColors;
+    return pixelMap;
 }
 
 class MockPointerEvent : public PointerEvent {
@@ -327,6 +365,22 @@ HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_OnRemo
     OHOS::sptr<OHOS::IRemoteObject> object;
     auto remoteObjectWptr = wptr<OHOS::IRemoteObject>(object);
     EXPECT_NO_FATAL_FAILURE(recipient.OnRemoteDied(remoteObjectWptr));
+}
+
+/**
+ * @tc.name: MultimodalInputConnectProxyTest_GetPointerSnapshot
+ * @tc.desc: Test the function GetPointerSnapshot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectProxyTest, MultimodalInputConnectProxyTest_GetPointerSnapshot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, WriteInterfaceToken(_)).WillRepeatedly(Return(false));
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    MultimodalInputConnectProxy proxy(remote);
+    std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    EXPECT_EQ(proxy.GetPointerSnapshot((void *)pixelMapPtr.get()), ERR_INVALID_VALUE);
 }
 } // namespace MMI
 } // namespace OHOS
