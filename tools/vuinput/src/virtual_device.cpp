@@ -260,6 +260,12 @@ static void StartCrown()
     virtualCrown.SetUp();
 }
 
+static void StartUwbRemoteControl()
+{
+    static VirtualUwbRemoteControl virtualUwbRemoteControl;
+    virtualUwbRemoteControl.SetUp();
+}
+
 using VirtualFun = void (*)();
 std::map<std::string, VirtualFun> mapFun = {
     {"mouse", &StartMouse},
@@ -275,7 +281,8 @@ std::map<std::string, VirtualFun> mapFun = {
     {"touchscreen", &StartTouchScreen},
     {"pen", &StartPen},
     {"fingerprint", &StartFingerprint},
-    {"crown", &StartCrown}
+    {"crown", &StartCrown},
+    {"uwbremotecontrol", &StartUwbRemoteControl}
 };
 
 static void StartAllDevices()
@@ -447,6 +454,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"V-Pencil",                     "pen"},
         {"V-Pencil-mouse",               "pen"},
         {"V-Pencil-keyboard",            "pen"},
+        {"Virtual UWB RemoteControl",    "uwbremotecontrol"}
     };
     std::string deviceType = typeDevice.find(deviceName)->second;
     phys.append(deviceType).append(g_pid).append("/").append(g_pid);
