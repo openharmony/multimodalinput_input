@@ -249,6 +249,7 @@ private:
         Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
         sptr<MultimodalInputConnectStub> server_ { nullptr };
         std::mutex mutex_;
+        std::mutex g_instanceMutex;
     };
     void RegisterFoldStatusListener();
     void UnregisterFoldStatusListener();
