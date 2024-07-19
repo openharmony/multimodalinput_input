@@ -1830,7 +1830,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 }
                 firstBtnDownWindowId_ = item.id;
                 if (!item.uiExtentionWindowInfo.empty()) {
-                    // Determine whether the landing point is a safety sub window
+                    // Determine whether the landing point as a safety sub window
                     CheckUIExtentionWindowPointerHotArea(logicalX, logicalY,
                         item.uiExtentionWindowInfo, firstBtnDownWindowId_);
                 }
