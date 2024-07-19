@@ -2238,6 +2238,21 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
     return ret;
 }
 
+int32_t InputManagerImpl::SetMoveEventFilters(bool flag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set move event filters failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Set move event filters does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+}
+
 int32_t InputManagerImpl::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_DEBUG_ENTER;

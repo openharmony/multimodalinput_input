@@ -47,6 +47,7 @@ declare_args() {
   input_feature_fingerprint = false
   input_feature_crown = true
   input_feature_infrared_emitter = true
+  input_feature_move_event_filters = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -277,6 +278,7 @@ print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
 print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
 
@@ -341,6 +343,10 @@ if (input_ext_feature_fingersense) {
 
 if (input_ext_feature_gesturesense) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
+}
+
+if (input_feature_move_event_filters) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS" ]
 }
 
 if (input_ext_feature_anco) {

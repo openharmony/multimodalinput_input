@@ -419,7 +419,7 @@ void MMIService::OnStart()
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
-    PREFERENCES_MGR->InitPreferences();
+    InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -2588,6 +2588,31 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
         MMI_HILOGE("Failed to set pixelmap, ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+void MMIService::InitPreferences()
+{
+    PREFERENCES_MGR->InitPreferences();
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t ret = SetMoveEventFilters(PREFERENCES_MGR->GetBoolValue("moveEventFilterFlag", false));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read moveEventFilterFlag, ret:%{public}d", ret);
+    }
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+}
+
+int32_t MMIService::SetMoveEventFilters(bool flag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputEventHandler::SetMoveEventFilters, InputHandler, flag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set move event filter flag, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     return RET_OK;
 }
 
