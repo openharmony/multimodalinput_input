@@ -465,7 +465,10 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
@@ -491,6 +494,10 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
     }
     int32_t filterId = -1;
     READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1320,7 +1327,10 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
+    if (!PER_HELPER->CheckMouseCursor()) {
+        MMI_HILOGE("Mouse cursor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1550,6 +1560,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubSetPointerLocation Verify system APP failed");
         return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckMouseCursor()) {
+        MMI_HILOGE("Mouse cursor permission check failed");
+        return ERROR_NO_PERMISSION;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
@@ -2195,6 +2209,10 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     bool isAuthorize { false };
     READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = Authorize(isAuthorize);
@@ -2241,7 +2259,7 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
         return ERROR_NOT_SYSAPI;
     }
     if (!PER_HELPER->CheckInfraredEmmit()) {
-        MMI_HILOGE("MulmodalConStub::StubGetInfr permi check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
+        MMI_HILOGE("Infrared permission check failed");
         return ERROR_NO_PERMISSION;
     }
     std::vector<InfraredFrequency> requencys;

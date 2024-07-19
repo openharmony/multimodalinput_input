@@ -36,7 +36,7 @@ bool StubGetDeviceIdsFuzzTest(const uint8_t *data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
+    MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE_IDS), datas, reply, option);
     return true;
 }

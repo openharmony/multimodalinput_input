@@ -2036,31 +2036,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_004
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_005
- * @tc.desc: Test NotifySubscriber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    int32_t fd = 2;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> keyOption;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    ASSERT_NE(subscriber, nullptr);
-    keyEvent->keyCode_ = KeyEvent::KEYCODE_CALL;
-    NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
-    EXPECT_FALSE(pkt.ChkRWError());
-    auto udsServerPtr = InputHandler->udsServer_;
-    EXPECT_FALSE(udsServerPtr->SendMsg(fd, pkt));
-    ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_AddTimer_002
  * @tc.desc: Test the funcation AddTimer
  * @tc.type: FUNC

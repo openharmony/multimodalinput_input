@@ -407,6 +407,11 @@ std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandl
     return nullptr;
 }
 
+std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
+{
+    return eventKeyCommandHandler_;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {}
@@ -449,13 +454,12 @@ SettingDataShare& SettingDataShare::GetInstance(int32_t systemAbilityId)
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = std::make_shared<SettingDataShare>();
-            Initialize(systemAbilityId);
         }
     }
     return *instance_;
 }
 
-ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value)
+ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, const std::string &strUri)
 {
     return ERR_OK;
 }
@@ -465,13 +469,10 @@ sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, S
     return nullptr;
 }
 
-ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
+ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     return ERR_OK;
 }
-
-void SettingDataShare::Initialize(int32_t systemAbilityId)
-{}
 
 FingersenseWrapper::FingersenseWrapper() {}
 

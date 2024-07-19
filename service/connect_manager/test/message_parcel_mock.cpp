@@ -163,6 +163,16 @@ bool PermissionHelper::VerifySystemApp()
     return DfsMessageParcel::messageParcel->VerifySystemApp();
 }
 
+bool PermissionHelper::CheckMouseCursor()
+{
+    return DfsMessageParcel::messageParcel->CheckMouseCursor();
+}
+
+bool PermissionHelper::CheckInputEventFilter()
+{
+    return DfsMessageParcel::messageParcel->CheckInputEventFilter();
+}
+
 bool PermissionHelper::CheckInterceptor()
 {
     return DfsMessageParcel::messageParcel->CheckInterceptor();
@@ -181,6 +191,11 @@ bool PermissionHelper::CheckDispatchControl()
 bool PermissionHelper::CheckInfraredEmmit()
 {
     return DfsMessageParcel::messageParcel->CheckInfraredEmmit();
+}
+
+bool PermissionHelper::CheckAuthorize()
+{
+    return DfsMessageParcel::messageParcel->CheckAuthorize();
 }
 
 bool Parcel::WriteBoolVector(const std::vector<bool> &val)

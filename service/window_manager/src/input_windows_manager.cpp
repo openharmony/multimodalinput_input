@@ -28,15 +28,16 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
+#include "key_command_handler.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "util.h"
+#include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
 #include "i_preference_manager.h"
@@ -78,17 +79,20 @@ constexpr int32_t BOTTOM_LEFT_AREA { 6 };
 constexpr int32_t LEFT_AREA { 7 };
 constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
 constexpr int32_t RS_PROCESS_TIMEOUT { 500 * 1000 };
+constexpr int32_t HICAR_MIN_DISPLAY_ID { 1000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT { 1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 constexpr double HALF_RATIO { 0.5 };
 constexpr int32_t TWOFOLD { 2 };
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 const std::string BIND_CFG_FILE_NAME { "/data/service/el1/public/multimodalinput/display_bind.cfg" };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -157,9 +161,6 @@ InputWindowsManager::InputWindowsManager() : bindInfo_(BIND_CFG_FILE_NAME)
 InputWindowsManager::~InputWindowsManager()
 {
     CALL_INFO_TRACE;
-    if (Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        UnregisterFoldStatusListener();
-    }
 }
 
 void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus)
@@ -186,50 +187,6 @@ void InputWindowsManager::Init(UDSServer& udsServer)
             return this->DeviceStatusChanged(deviceId, sysUid, devStatus);
         }
         );
-    TimerMgr->AddTimer(WAIT_TIME_FOR_REGISTER, 1, [this]() {
-        MMI_HILOG_HANDLERD("Timer callback");
-        RegisterFoldStatusListener();
-    });
-}
-
-void InputWindowsManager::RegisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        MMI_HILOG_HANDLERD("The device is not foldable");
-        return;
-    }
-    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(*this);
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to register fold status listener");
-        foldStatusListener_ = nullptr;
-    } else {
-        MMI_HILOG_HANDLERD("Register fold status listener successed");
-    }
-}
-
-void InputWindowsManager::UnregisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
-    }
-}
-
-void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    CALL_INFO_TRACE;
-    MMI_HILOG_HANDLERD("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
-    if (lastFoldStatus_ == foldStatus) {
-        MMI_HILOG_HANDLERD("No need to set foldStatus");
-        return;
-    }
-    lastFoldStatus_ = foldStatus;
-    winMgr_.OnFoldStatusChanged(foldStatus);
 }
 
 void InputWindowsManager::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
@@ -290,9 +247,11 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     CHKPR(pointerEvent, INVALID_FD);
     const WindowInfo* windowInfo = nullptr;
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
-        MMI_HILOG_DISPATCHD("Drop event");
-        return INVALID_FD;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
+            MMI_HILOG_DISPATCHD("Drop event");
+            return INVALID_FD;
+        }
     }
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
@@ -329,7 +288,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
-        FoldScreenRotation(pointerEvent);
+        if (ROTATE_POLICY == FOLDABLE_DEVICE) {
+            FoldScreenRotation(pointerEvent);
+        }
         MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
@@ -364,10 +325,12 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    if (iter == touchItemDownInfos_.end()) {
-        MMI_HILOG_DISPATCHD("Unable to find finger information for touch.pointerId:%{public}d",
-            pointerEvent->GetPointerId());
-        return;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (iter == touchItemDownInfos_.end()) {
+            MMI_HILOG_DISPATCHD("Unable to find finger information for touch.pointerId:%{public}d",
+                pointerEvent->GetPointerId());
+            return;
+        }
     }
     auto displayId = pointerEvent->GetTargetDisplayId();
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
@@ -378,18 +341,32 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     }
     if (lastDirection_ == static_cast<Direction>(-1)) {
         lastDirection_ = physicDisplayInfo->direction;
-    } else {
-        if (physicDisplayInfo->direction != lastDirection_) {
-            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-                int32_t pointerAction = pointerEvent->GetPointerAction();
-                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-                pointerEvent->SetOriginPointerAction(pointerAction);
-                MMI_HILOG_DISPATCHI("touch event send cancel");
+        return;
+    }
+    if (physicDisplayInfo->direction != lastDirection_) {
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+            PointerEvent::PointerItem item;
+            if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
+                MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+                lastDirection_ = physicDisplayInfo->direction;
+                return;
+            }
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE && !(item.IsPressed())) {
+                lastDirection_ = physicDisplayInfo->direction;
+                return;
+            }
+        }
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+            int32_t pointerAction = pointerEvent->GetPointerAction();
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            pointerEvent->SetOriginPointerAction(pointerAction);
+            MMI_HILOG_DISPATCHI("touch event send cancel");
+            if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
                 iter->second.flag = false;
             }
         }
-        lastDirection_ = physicDisplayInfo->direction;
     }
+    lastDirection_ = physicDisplayInfo->direction;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -621,9 +598,11 @@ void InputWindowsManager::UpdateDisplayIdAndName()
             ++it;
         }
     }
-    const auto &displayInfo = displayGroupInfo_.displaysInfo[0];
-    bindInfo_.AddLocalDisplay(displayInfo.id, displayInfo.uniq);
     for (const auto &item : newInfo) {
+        if (item.first >= HICAR_MIN_DISPLAY_ID) {
+            MMI_HILOGI("Displayinfo id:%{public}d name:%{public}s", item.first, item.second.c_str());
+            continue;
+        }
         if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
             bindInfo_.AddDisplay(item.first, item.second);
         }
@@ -2525,7 +2504,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                     pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
                     pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
                     pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
-                    MMI_HILOG_DISPATCHI("the first special window status:%{public}d", isFirstSpecialWindow);
+                    MMI_HILOG_DISPATCHD("the first special window status:%{public}d", isFirstSpecialWindow);
                 }
             }
             if (isSpecialWindow) {
@@ -2563,11 +2542,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     if (touchWindow == nullptr) {
         auto it = touchItemDownInfos_.find(pointerId);
-        if (it == touchItemDownInfos_.end() ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-            MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
-                "logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
-            return RET_ERR;
+        if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            if (it == touchItemDownInfos_.end() ||
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
+                    "logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
+                return RET_ERR;
+            }
         }
         touchWindow = &it->second.window;
         if (it->second.flag) {
@@ -2650,29 +2631,38 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerAction != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
         pointerAction != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
         pointerAction != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE)) {
-        if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        if (!EventLogHelper::IsBetaVersion()) {
             MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
-                "FWI:%{public}d,EID:%{public}d,"
-                "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
-                "flags:%{public}d,DID:%{public}d"
+                "FWI:%{public}d,EID:%{public}d, flags:%{public}d,DID:%{public}d"
                 "AWI:%{public}d,zOrder:%{public}1f",
                 pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
-                displayGroupInfo_.focusWindowId, pointerEvent->GetId(),
-                touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-                touchWindow->area.y, touchWindow->flags, displayId,
-                pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+                displayGroupInfo_.focusWindowId, pointerEvent->GetId(), touchWindow->flags,
+                displayId, pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
         } else {
-            MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
-                "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
-                "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
-                "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
-                "flags:%{public}d,DID:%{public}d"
-                "AWI:%{public}d,zOrder:%{public}1f",
-                pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
-                displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
-                physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
-                touchWindow->area.y, touchWindow->flags, displayId,
-                pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+                    "FWI:%{public}d,EID:%{public}d,"
+                    "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                    "flags:%{public}d,DID:%{public}d"
+                    "AWI:%{public}d,zOrder:%{public}1f",
+                    pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
+                    displayGroupInfo_.focusWindowId, pointerEvent->GetId(),
+                    touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+                    touchWindow->area.y, touchWindow->flags, displayId,
+                    pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+            } else {
+                MMI_HILOG_FREEZEI("PA:%{public}s,Pid:%{public}d,TWI:%{public}d,"
+                    "FWI:%{public}d,EID:%{public}d,LX:%{public}1f,LY:%{public}1f,"
+                    "DX:%{public}1f,DY:%{public}1f,WX:%{public}1f,WY:%{public}1f,"
+                    "W:%{public}d,H:%{public}d,AX:%{public}d,AY:%{public}d,"
+                    "flags:%{public}d,DID:%{public}d"
+                    "AWI:%{public}d,zOrder:%{public}1f",
+                    pointerEvent->DumpPointerAction(), touchWindow->pid, touchWindow->id,
+                    displayGroupInfo_.focusWindowId, pointerEvent->GetId(), logicalX, logicalY, physicalX,
+                    physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+                    touchWindow->area.y, touchWindow->flags, displayId,
+                    pointerEvent->GetAgentWindowId(), touchWindow->zOrder);
+            }
         }
     }
     bool gestureInject = false;
@@ -2932,11 +2922,14 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-
-    knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
-    knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
-    knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
-    knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
+    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
+    auto knuckleSwitch = InputHandler->GetKeyCommandHandler()->GetKnuckleSwitchValue();
+    if (!knuckleSwitch) {
+        knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
+        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
+        knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
+        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
+    }
 
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
@@ -3290,7 +3283,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
-                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d "
+                "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%u "
                 "| action:%d | displayId:%d | zOrder:%f \t",
                 item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
                 item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
@@ -3323,7 +3316,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         mprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
-                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%d \t",
+                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%u \t",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode);
     }
@@ -3568,12 +3561,13 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
         MMI_HILOGE("Read configFile failed");
         return false;
     }
-    cJSON* jsonData = cJSON_Parse(jsonStr.c_str());
-    if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("jsonData is not object");
+    JsonParser jsonData;
+    jsonData.json_ = cJSON_Parse(jsonStr.c_str());
+    if (!cJSON_IsObject(jsonData.json_)) {
+        MMI_HILOGE("jsonData.json_ is not object");
         return false;
     }
-    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData, "whiteList");
+    cJSON* whiteList = cJSON_GetObjectItemCaseSensitive(jsonData.json_, "whiteList");
     if (!cJSON_IsArray(whiteList)) {
         MMI_HILOGE("whiteList number must be array");
         return false;

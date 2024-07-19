@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/multimodalinput/cursor_config.gni")
 import("//build/ohos.gni")
 
 mmi_part_name = "input"
@@ -45,7 +46,6 @@ declare_args() {
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = true
-  input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
   input_feature_move_event_filters = false
 
@@ -165,7 +165,9 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/evdev-tablet-pad.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-tablet.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-totem.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-wheel.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-custom.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-flat.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-low-dpi.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-mouse.c",
@@ -173,6 +175,7 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/filter-touchpad-flat.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-touchpad-x230.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-touchpad.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-trackpoint-flat.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-trackpoint.c",
     root_out_dir + "/diff_libinput_mmi/src/filter.c",
     root_out_dir + "/diff_libinput_mmi/src/libinput-util.c",
@@ -248,12 +251,8 @@ declare_args() {
 
   libmmi_util_sources = [
     "common/src/input_event_data_transformation.cpp",
-    "common/src/key_event_napi.cpp",
     "common/src/klog.cpp",
     "common/src/util.cpp",
-    "common/src/util_napi.cpp",
-    "common/src/util_napi_error.cpp",
-    "common/src/util_napi_value.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
     "network/src/stream_buffer.cpp",
@@ -379,6 +378,7 @@ if (input_ext_feature_magiccursor) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
   libmmi_service_sources += [
     "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
+    "${mmi_ext_path}/magic_cursor/src/lru_cache.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",

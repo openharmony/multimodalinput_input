@@ -36,7 +36,7 @@ bool StubSetTouchpadRightClickTypeFuzzTest(const uint8_t* data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
+    MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::SET_TP_RIGHT_CLICK_TYPE), datas, reply, option);
     return true;
 }

@@ -38,7 +38,6 @@ ohos_unittest("TouchEventNormalizeTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
@@ -48,6 +47,7 @@ ohos_unittest("TouchEventNormalizeTest") {
   external_deps = [
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "libinput:libinput-third-mmi",
     "window_manager:libdm",
     "window_manager:libwm",
   ]

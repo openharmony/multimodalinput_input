@@ -27,6 +27,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"
+#include "event_log_helper.h"
 #include "input_scene_board_judgement.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -891,7 +892,11 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (!EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
+    } else {
+        MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
@@ -1356,6 +1361,8 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
+    std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
+        PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
     if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
@@ -1363,6 +1370,11 @@ void InputManagerImpl::OnDisconnected()
 
     if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
         MMI_HILOGE("Pull up event for service exception re-sending");
+        return;
+    }
+
+    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        MMI_HILOGE("Swipe end event for service exception re-sending");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
