@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <fstream>
 #include <list>
 #include <gtest/gtest.h>
+#include <securec.h>
 
 #include "account_manager.h"
 #include "key_event.h"
@@ -29,6 +31,8 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t MAIN_ACCOUNT_ID { 100 };
+constexpr size_t DEFAULT_BUFFER_LENGTH { 512 };
+const std::string SECURE_SETTING_URI_PROXY {""};
 } // namespace
 
 class AccountManagerTest : public testing::Test {
