@@ -32,7 +32,6 @@
 #include "pointer_drawing_manager.h"
 #include "proto.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -48,6 +47,7 @@ const std::string UNKNOWN_SCREEN_ID { "" };
 const std::string INPUT_VIRTUAL_DEVICE_NAME { "DistributedInput " };
 constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID { 1000 };
 constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM { 128 };
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
@@ -605,8 +605,8 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Device information:\t");
-    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
-    mprintf(fd, "Virtual input devices: count=%d", virtualInputDevices_.size());
+    mprintf(fd, "Input devices: count=%zu", inputDevice_.size());
+    mprintf(fd, "Virtual input devices: count=%zu", virtualInputDevices_.size());
     std::vector<int32_t> deviceIds = GetInputDeviceIds();
     for (auto deviceId : deviceIds) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(deviceId, false);
@@ -618,7 +618,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
             inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
             inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d", axisinfo.size());
+        mprintf(fd, "axis: count=%zu", axisinfo.size());
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
@@ -636,7 +636,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 {
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%d, Device list:\t", int32_t{ ids.size() });
+    mprintf(fd, "Total device:%zu, Device list:\t", ids.size());
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
         CHKPV(inputDevice);

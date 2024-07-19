@@ -180,6 +180,8 @@ public:
 
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 32;
 
+    static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.

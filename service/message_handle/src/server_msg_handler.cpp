@@ -22,6 +22,7 @@
 #include "authorization_dialog.h"
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
+#include "client_death_handler.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -36,10 +37,10 @@
 #include "key_event_value_transformation.h"
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
+#include "parameters.h"
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 #include "touch_drawing_manager.h"
-#include "util_napi_error.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -54,6 +55,9 @@ constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
 constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer &udsServer)
@@ -78,7 +82,7 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
             continue;
         }
     }
-    AUTHORIZE_HELPER->Init(udsServer);
+    AUTHORIZE_HELPER->Init(clientDeathHandler_);
 }
 
 void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
@@ -108,15 +112,21 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-            if (AUTHORIZE_HELPER->IsAuthorizing()) {
-                MMI_HILOGI("There has a process been authorizing, authorize pid:%{public}d, inject pid:%{public}d",
-                    AUTHORIZE_HELPER->GetAuthorizePid(), pid);
+            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+            if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+                MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
+                    state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
                 return COMMON_PERMISSION_CHECK_ERROR;
             }
             CurrentPID_ = pid;
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
+                [&] (int32_t pid) {
+                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+                }
+                );
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -176,9 +186,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-            if (AUTHORIZE_HELPER->IsAuthorizing()) {
-                MMI_HILOGI("There has a process been authorizing, authorize pid:%{public}d, inject pid:%{public}d",
-                    AUTHORIZE_HELPER->GetAuthorizePid(), pid);
+            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+            if (state != AuthorizeState::STATE_UNAUTHORIZE) {
+                MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
+                    state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
                 return COMMON_PERMISSION_CHECK_ERROR;
             }
             CurrentPID_ = pid;
@@ -272,7 +283,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (displayInfo->displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -406,6 +417,30 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info)
+{
+    uint32_t num = 0;
+    pkt >> num;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo extensionInfo;
+        pkt >> extensionInfo.id >> extensionInfo.pid >> extensionInfo.uid >> extensionInfo.area
+            >> extensionInfo.defaultHotAreas >> extensionInfo.pointerHotAreas >> extensionInfo.agentWindowId
+            >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
+            >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
+            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag;
+        info.uiExtentionWindowInfo.push_back(extensionInfo);
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read extention window info failed");
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
+}
+
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -431,6 +466,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             MMI_HILOGD("byteCount:%{public}d", byteCount);
             SetWindowInfo(info.id, info);
         }
+        OnUiExtentionWindowInfo(pkt, info);
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -491,6 +527,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType;
+        OnUiExtentionWindowInfo(pkt, info);
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -701,7 +738,9 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         noticeInfo.pid = CurrentPID_;
         AddInjectNotice(noticeInfo);
         auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            std::bind(&ServerMsgHandler::CloseInjectNotice, this, std::placeholders::_1));
+            [&] (int32_t pid) {
+                CloseInjectNotice(pid);
+        });
         if (result != RET_OK) {
             MMI_HILOGI("Authorize process failed, pid:%{public}d", CurrentPID_);
         }
@@ -734,7 +773,8 @@ int32_t ServerMsgHandler::OnCancelInjection()
     if (iter != authorizationCollection_.end()) {
         authorizationCollection_.erase(iter);
         AUTHORIZE_HELPER->CancelAuthorize(CurrentPID_);
-        if (AUTHORIZE_HELPER->IsAuthorizing()) {
+        auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+        if (state != AuthorizeState::STATE_UNAUTHORIZE) {
             CloseInjectNotice(CurrentPID_);
         }
         MMI_HILOGD("Cancel application authorization,pid:%{public}d", CurrentPID_);
@@ -811,9 +851,9 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("submit begin");
+    MMI_HILOGD("SendNotice submit  begin");
     ffrt::submit([this, noticeInfo] {
-        MMI_HILOGD("submit enter");
+        MMI_HILOGD("SendNotice submit enter");
         CHKPV(injectNotice_);
         auto pConnect = injectNotice_->GetConnection();
         CHKPV(pConnect);
@@ -829,7 +869,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
             timeSecond += 1;
             sleep(1);
         }
-        MMI_HILOGD("submit leave");
+        MMI_HILOGD("SendNotice submit leave");
     });
     return true;
 }
@@ -842,11 +882,11 @@ bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("submit begin");
+    MMI_HILOGD("CloseNotice submit begin");
     InjectNoticeInfo noticeInfo;
     noticeInfo.pid = pid;
     ffrt::submit([this, noticeInfo] {
-        MMI_HILOGD("submit enter");
+        MMI_HILOGD("CloseNotice submit enter");
         CHKPV(injectNotice_);
         auto pConnect = injectNotice_->GetConnection();
         CHKPV(pConnect);
@@ -862,9 +902,20 @@ bool ServerMsgHandler::CloseInjectNotice(int32_t pid)
             timeSecond += 1;
             sleep(1);
         }
-        MMI_HILOGD("submit leave");
+        MMI_HILOGD("CloseNotice submit leave");
     });
     return true;
+}
+
+int32_t ServerMsgHandler::OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    bool bRet = clientDeathHandler_.RegisterClientDeathRecipient(binderClientObject, pid);
+    if (!bRet) {
+        MMI_HILOGE("Failed to registerClientDeathRecipient");
+        return RET_ERR;
+    }
+    return ERR_OK;
 }
 } // namespace MMI
 } // namespace OHOS

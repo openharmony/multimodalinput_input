@@ -24,6 +24,7 @@
 #include "window_info.h"
 #include "mouse_device_state.h"
 #include "input_device_manager.h"
+#include "input_windows_manager.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
 
@@ -143,6 +144,60 @@ void MouseTransformProcessorTest::TearDown()
     g_processor_.SetTouchpadScrollSwitch(preScrollSwitch_);
     g_processor_.SetTouchpadScrollDirection(preScrollDirection_);
     g_processor_.SetTouchpadTapSwitch(preTapSwitch_);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_DeletePressedButton_001
+ * @tc.desc: Test DeletePressedButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_DeletePressedButton_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t originButton = 1;
+    ASSERT_NO_FATAL_FAILURE(processor.DeletePressedButton(originButton));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_DeletePressedButton_002
+ * @tc.desc: Test DeletePressedButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_DeletePressedButton_002, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t originButton = 1;
+    int32_t mappedButton = 2;
+    processor.buttonMapping_[originButton] = mappedButton;
+    ASSERT_NO_FATAL_FAILURE(processor.DeletePressedButton(originButton));
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_HandleAxisAccelateTouchPad_001
+ * @tc.desc: Test HandleAxisAccelateTouchPad
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleAxisAccelateTouchPad_001, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    double axisValue = 2.0;
+    auto inputWindowsManager = std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    inputWindowsManager->captureModeInfo_.isCaptureMode = true;
+    double ret = processor.HandleAxisAccelateTouchPad(axisValue);
+    ASSERT_EQ(ret, 2.0);
+    inputWindowsManager->captureModeInfo_.isCaptureMode = false;
+    ret = processor.HandleAxisAccelateTouchPad(axisValue);
+    ASSERT_EQ(ret, 2.14);
+    axisValue = -5.0;
+    ret = processor.HandleAxisAccelateTouchPad(axisValue);
+    ASSERT_NE(ret, -5.0);
 }
 
 /**

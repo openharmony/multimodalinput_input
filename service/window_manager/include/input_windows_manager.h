@@ -36,24 +36,12 @@ struct WindowInfoEX {
     bool flag { false };
 };
 
+struct SwitchFocusKey {
+    int32_t keyCode { -1 };
+    int32_t pressedKey { -1 };
+};
+
 class InputWindowsManager final : public IInputWindowsManager {
-private:
-    class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
-    public:
-        FoldStatusLisener(InputWindowsManager &winMgr) : winMgr_(winMgr) {}
-        ~FoldStatusLisener() = default;
-        DISALLOW_COPY_AND_MOVE(FoldStatusLisener);
-
-        /**
-        * @param FoldStatus; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
-        */
-        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
-
-    private:
-        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
-        InputWindowsManager &winMgr_;
-    };
-
 public:
     InputWindowsManager();
     ~InputWindowsManager();
@@ -88,8 +76,11 @@ public:
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
-    int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    bool IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems);
+    bool IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent);
+    void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckWindowIdPermissionByPid(int32_t windowId, int32_t pid);
 
@@ -186,11 +177,12 @@ private:
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
-    void RegisterFoldStatusListener();
-    void UnregisterFoldStatusListener();
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
+    bool IsMouseDrawing(int32_t currentAction);
+    bool ParseConfig();
+    bool ParseJson(const std::string &configFile);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -206,6 +198,8 @@ private:
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
+    void CheckUIExtentionWindowPointerHotArea(int32_t logicalX, int32_t logicalY,
+        const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
     std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY);
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
@@ -233,6 +227,10 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
         const DisplayInfo& info, EventTouch& touchInfo);
     void SetAntiMisTake(bool state);
     void SetAntiMisTakeStatus(bool state);
+    void CheckUIExtentionWindowDefaultHotArea(int32_t logicalX, int32_t logicalY,
+        const std::vector<WindowInfo>& windowInfos, int32_t& windowId);
+    void GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
+        WindowInfo **touchWindow, bool &isUiExtentionWindow);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -308,10 +306,11 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
+    std::vector<SwitchFocusKey> vecWhiteList_;
+    bool isParseConfig_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

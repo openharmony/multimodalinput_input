@@ -51,7 +51,8 @@ public:
     void ClearTargetWindowId(int32_t pointerId) override {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    MOCK_METHOD(int32_t, UpdateTarget, (std::shared_ptr<KeyEvent>));
+    MOCK_METHOD((std::vector<std::pair<int32_t, TargetInfo>>), UpdateTarget, (std::shared_ptr<KeyEvent>));
+    MOCK_METHOD(void, HandleKeyEventWindowId, (std::shared_ptr<KeyEvent>));
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));

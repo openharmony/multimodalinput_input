@@ -613,11 +613,10 @@ void Aggregator::FlushRecords(const LogHeader &lh, const std::string &key, const
         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch).count() % microToMilli;
         oss << '.' << std::setfill('0') << std::setw(milliSecondWidth) << millis << "ms)";
 
-        for (size_t i = 1; i < records_.size(); ++i) {
+        if (records_.size() > 1) {
+            size_t i = records_.size() - 1;
             const auto &recordInfo = records_[i];
-            auto timeDiff = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    recordInfo.timestamp - firstTime).count();
-            oss << ", " << recordInfo.record << "+" << timeDiff;
+            oss << ", " << recordInfo.record;
         }
         records_.clear();
         oss << ", count: " << recordCount;

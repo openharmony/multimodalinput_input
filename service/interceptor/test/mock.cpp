@@ -16,6 +16,29 @@
 
 namespace OHOS {
 namespace MMI {
+std::shared_ptr<InputDeviceManager> InputDeviceManager::instance_ = nullptr;
+std::mutex InputDeviceManager::mutex_;
+
+std::shared_ptr<InputDeviceManager> InputDeviceManager::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<InputDeviceManager>();
+        }
+    }
+    return instance_;
+}
+
+void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
+{}
+
+void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
+{}
+
+void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisible, bool isHotPlug)
+{}
+
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);

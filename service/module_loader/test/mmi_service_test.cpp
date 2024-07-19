@@ -316,11 +316,10 @@ HWTEST_F(MMIServerTest, SetCustomCursor_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, SetMouseIcon_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t pid = 1;
     int32_t windowId = 1;
     void* pixelMap = nullptr;
-    int32_t ret = mmiService.SetMouseIcon(pid, windowId, pixelMap);
-    EXPECT_EQ(ret, RET_ERR);
+    int32_t ret = mmiService.SetMouseIcon(windowId, pixelMap);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**

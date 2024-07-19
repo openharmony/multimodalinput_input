@@ -36,7 +36,7 @@ bool StubSetAnrListenerFuzzTest(const uint8_t *data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<MMIService>::GetInstance()->OnRemoteRequest(
+    MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_ANR_OBSERVER), datas, reply, option);
     return true;
 }

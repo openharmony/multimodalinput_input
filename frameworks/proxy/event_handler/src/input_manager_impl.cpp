@@ -27,6 +27,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "event_filter_service.h"
+#include "event_log_helper.h"
 #include "input_scene_board_judgement.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -538,6 +539,13 @@ int32_t InputManagerImpl::PackWindowGroupInfo(NetPacket &pkt)
             << item.agentWindowId << item.flags << item.action
             << item.displayId << item.zOrder << item.pointerChangeAreas
             << item.transform << item.windowInputType << item.privacyMode << item.windowType;
+        uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
+        pkt << uiExtentionWindowInfoNum;
+        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
+        if (!item.uiExtentionWindowInfo.empty()) {
+            PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
+            PrintWindowInfo(item.uiExtentionWindowInfo);
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -563,6 +571,23 @@ int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
+int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : windowsInfo) {
+        pkt << item.id << item.pid << item.uid << item.area
+            << item.defaultHotAreas << item.pointerHotAreas
+            << item.agentWindowId << item.flags << item.action
+            << item.displayId << item.zOrder << item.pointerChangeAreas
+            << item.transform << item.windowInputType << item.privacyMode << item.windowType << item.privacyUIFlag;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write windows data failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -577,6 +602,13 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 
         if (item.pixelMap == nullptr) {
             pkt << byteCount;
+            uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
+            pkt << uiExtentionWindowInfoNum;
+            MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
+            if (!item.uiExtentionWindowInfo.empty()) {
+                PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
+                PrintWindowInfo(item.uiExtentionWindowInfo);
+            }
             continue;
         }
         OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(item.pixelMap);
@@ -587,6 +619,13 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
             MMI_HILOGE("Failed to set pixel map");
         }
         pkt << byteCount;
+        uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
+        pkt << uiExtentionWindowInfoNum;
+        MMI_HILOGD("uiExtentionWindowInfoNum:%{public}u", uiExtentionWindowInfoNum);
+        if (!item.uiExtentionWindowInfo.empty()) {
+            PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
+            PrintWindowInfo(item.uiExtentionWindowInfo);
+        }
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -853,7 +892,11 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (!EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
+    } else {
+        MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
     }
@@ -901,7 +944,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPV(pointerEvent);
-    MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE) {
+        MMI_HILOGI("Pointer event action:%{public}d", pointerEvent->GetPointerAction());
+    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
 #ifndef OHOS_BUILD_ENABLE_POINTER
@@ -970,12 +1021,7 @@ int32_t InputManagerImpl::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t winPid = GetWindowPid(windowId);
-    if (winPid == -1) {
-        MMI_HILOGE("winPid is invalid return -1");
-        return RET_ERR;
-    }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseIcon(winPid, windowId, pixelMap);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseIcon(windowId, pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Set the number of mouse scrolling rows failed, ret:%{public}d", ret);
     }
@@ -1315,6 +1361,8 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
+    std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
+        PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
     if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
@@ -1322,6 +1370,11 @@ void InputManagerImpl::OnDisconnected()
 
     if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
         MMI_HILOGE("Pull up event for service exception re-sending");
+        return;
+    }
+
+    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        MMI_HILOGE("Swipe end event for service exception re-sending");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -1942,6 +1995,54 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
         MMI_HILOGE("Get hardware cursor stats failed");
     }
     MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSnapshot(pixelMapPtr);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the pointer snapshot failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::SetTouchpadScrollRows(int32_t rows)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetTouchpadScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the number of touchpad scrolling rows failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadScrollRows(int32_t &rows)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetTouchpadScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the number of touchpad scrolling rows failed");
+    }
     return ret;
 #else
     MMI_HILOGW("Pointer device does not support");

@@ -523,6 +523,41 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_04, T
 }
 
 /**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_05
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    BindInfo bindInfo;
+    bindInfo.displayId_ = -1;
+    bindInfo.displayName_ = "";
+    bool ret = bindInfo.AddDisplay(1, "hp 223");
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddDisplay_06
+ * @tc.desc: Test AddDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+
+    int32_t id = 3;
+    std::string name = "display";
+    std::string deviceName = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_TRUE(deviceName.empty());
+    ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.AddDisplay(id, name));
+}
+
+/**
  * @tc.name: InputDisplayBindHelperTest_GetDesc_01
  * @tc.desc: Test GetDesc
  * @tc.type: FUNC
@@ -737,6 +772,63 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceBy
 }
 
 /**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_05
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+
+    int32_t id = 5;
+    std::string inputNodeName = inputDisplayBindHelper.GetInputNodeNameByCfg(id);
+    EXPECT_TRUE(inputNodeName.empty());
+
+    std::string inputNode = inputDisplayBindHelper.GetInputNode(inputNodeName);
+    EXPECT_TRUE(inputNode.empty());
+
+    std::string ret = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputDeviceById_06
+ * @tc.desc: Test GetInputDeviceById
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputDeviceById_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+
+    int32_t id = 0;
+    std::string ret1 = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_EQ(ret1, "");
+
+
+    std::string inputNodeName = "mouse";
+    EXPECT_FALSE(inputNodeName.empty());
+    std::string ret2 = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_EQ(ret2, "");
+
+    std::string inputNode = "keyboard";
+    EXPECT_FALSE(inputNode.empty());
+    std::string ret3 = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_EQ(ret3, "");
+
+    std::string inputEvent = inputNode;
+    size_t pos = inputEvent.find("input");
+    EXPECT_TRUE(pos == std::string::npos);
+    std::string ret4 = inputDisplayBindHelper.GetInputDeviceById(id);
+    EXPECT_EQ(ret4, "");
+}
+
+/**
  * @tc.name: InputDisplayBindHelperTest_GetInputNodeNameByCfg_02
  * @tc.desc: Test GetInputNodeNameByCfg
  * @tc.type: FUNC
@@ -748,6 +840,48 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
     InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
     InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
     ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.GetInputNodeNameByCfg(0));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputNodeNameByCfg_03
+ * @tc.desc: Test GetInputNodeNameByCfg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeNameByCfg_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+
+    int32_t id = 2;
+    std::string displayId = "";
+    std::string inputNodeName = "";
+    size_t pos;
+    pos = std::string::npos;
+    std::string ret = inputDisplayBindHelper.GetInputNodeNameByCfg(id);
+    EXPECT_EQ(ret, "");
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_GetInputNodeNameByCfg_04
+ * @tc.desc: Test GetInputNodeNameByCfg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeNameByCfg_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputDisplayBindHelperTest::WriteConfigFile("mouse<=>hp 223\nkeyboard<=>think 123\n");
+    InputDisplayBindHelper inputDisplayBindHelper(InputDisplayBindHelperTest::GetCfgFileName());
+
+    int32_t id = 2;
+    std::string displayId = "hp223";
+    std::string inputNodeName = "nodeName";
+    size_t pos;
+    pos = 3;
+    std::string ret = inputDisplayBindHelper.GetInputNodeNameByCfg(id);
+    EXPECT_EQ(ret, "");
 }
 
 /**
@@ -1073,6 +1207,23 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_SetDisplayBind_1
     int32_t displayId = 1;
     std::string msg = "touch";
     ASSERT_NO_FATAL_FAILURE(inputDisplayBindHelper.SetDisplayBind(deviceId, displayId, msg));
+}
+
+/**
+ * @tc.name: InputDisplayBindHelperTest_AddLocalDisplay_01
+ * @tc.desc: Test AddLocalDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddLocalDisplay_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isStore;
+    int32_t id = 3;
+    std::string name = "localDisplay";
+    InputDisplayBindHelper idh("/data/service/el1/public/multimodalinput/0.txt");
+    isStore = false;
+    ASSERT_NO_FATAL_FAILURE(idh.AddLocalDisplay(id, name));
 }
 } // namespace MMI
 } // namespace OHOS

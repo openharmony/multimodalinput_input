@@ -19,14 +19,13 @@
 #include <iostream>
 #include <list>
 
-#include <ui/rs_canvas_node.h>
-#include <ui/rs_surface_node.h>
-#include <transaction/rs_transaction.h>
-#include <transaction/rs_interfaces.h>
-
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
+#include "transaction/rs_transaction.h"
+#include "transaction/rs_interfaces.h"
+#include "ui/rs_canvas_node.h"
+#include "ui/rs_surface_node.h"
 #include "window.h"
 
 #include "device_observer.h"
@@ -103,6 +102,7 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+    int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     void InitPointerCallback() override;
     void InitPointerObserver() override;
 
@@ -147,6 +147,7 @@ private:
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
 
 private:
@@ -182,9 +183,11 @@ private:
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
+    bool isInit_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
