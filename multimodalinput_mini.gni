@@ -374,6 +374,7 @@ if (input_ext_feature_magiccursor) {
     "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/lru_cache.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
