@@ -112,6 +112,9 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     magicPointerSize_ = mousePref->GetInt(strMagicPointerSize_, MAGIC_POINTER_SIZE);
     magicPointerColor_ = mousePref->GetInt(strMagicPointerColor_, POINTER_COLOR);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    moveEventFilterFlag_ = mousePref->GetBool(strMoveEventFilterFlag_, BOOL_DEFAULT);
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(PATH + MOUSE_FILE_NAME);
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(PATH + KEYBOARD_FILE_NAME);
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(PATH + TOUCHPAD_FILE_NAME);
@@ -143,6 +146,9 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap_[strMagicPointerSize_] = {MOUSE_FILE_NAME, magicPointerSize_};
     preferencesMap_[strMagicPointerColor_] = {MOUSE_FILE_NAME, magicPointerColor_};
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    preferencesMap_[strMoveEventFilterFlag_] = {MOUSE_FILE_NAME, static_cast<int32_t>(moveEventFilterFlag_)};
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     return RET_OK;
 }
 
