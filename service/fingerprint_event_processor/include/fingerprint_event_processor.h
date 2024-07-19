@@ -47,9 +47,6 @@ private:
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
     const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
 
-    // powerKeyState_ { 0 } init;
-    // powerKeyState_ { 1 } down;
-    // powerKeyState_ { 2 } up;
     int32_t powerKeyState_ { 0 };
     std::chrono::time_point<std::chrono::steady_clock> lastUpTime_ =
         std::chrono::high_resolution_clock::now();
