@@ -183,7 +183,10 @@ private:
     bool IsMouseDrawing(int32_t currentAction);
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
-
+    void SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+        const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent);
+    void DispatchUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
+        std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
