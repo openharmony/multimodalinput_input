@@ -31,12 +31,12 @@ ohos_source_set("libinput_wrapper_sources") {
 
   public_configs = [ ":libinput_wrapper_sources_public_config" ]
 
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/util:libmmi-util",
-  ]
+  deps = [ "${mmi_path}/util:libmmi-util" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "libinput:libinput-third-mmi",
+  ]
 
   part_name = "${mmi_part_name}"
   subsystem_name = "${mmi_subsystem_name}"

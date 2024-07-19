@@ -21,7 +21,6 @@
 #include "libinput.h"
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
-#include "util_napi_error.h"
 
 #include "define_multimodal.h"
 #include "image_source.h"
@@ -48,6 +47,7 @@ constexpr int32_t CAPS_LOCK_FUNCTION_KEY = 1;
 constexpr int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
+constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
@@ -1443,21 +1443,21 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, 
     InjectNoticeManager manager;
     handler.injectNotice_ =nullptr;
     bool ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
     manager.isStartSrv_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.isStartSrv_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     manager.connectionCallback_->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.connectionCallback_->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**

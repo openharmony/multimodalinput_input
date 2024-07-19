@@ -193,6 +193,11 @@ bool PermissionHelper::CheckInfraredEmmit()
     return DfsMessageParcel::messageParcel->CheckInfraredEmmit();
 }
 
+bool PermissionHelper::CheckAuthorize()
+{
+    return DfsMessageParcel::messageParcel->CheckAuthorize();
+}
+
 bool Parcel::WriteBoolVector(const std::vector<bool> &val)
 {
     return DfsMessageParcel::messageParcel->WriteBoolVector(val);

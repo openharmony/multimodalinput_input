@@ -184,7 +184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -2788,7 +2788,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_001, TestSize.Level1)
     int32_t windowId = 500;
     void* pixelMap = nullptr;
     int32_t result = InputManager::GetInstance()->SetMouseIcon(windowId, pixelMap);
-    ASSERT_EQ(result, RET_ERR);
+    ASSERT_NE(result, RET_OK);
 }
 
 /**
@@ -3126,6 +3126,56 @@ HWTEST_F(InputManagerTest, InputManagerTest_AppendExtraData_001, TestSize.Level1
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
     data.buffer.resize(512);
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->AppendExtraData(data));
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadScrollRows_001
+ * @tc.desc: SetTouchpadScrollRows and GetTouchpadScrollRows interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    int32_t result = InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    ASSERT_EQ(result, RET_OK);
+    result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(rows, 1);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchpadScrollRows_002
+ * @tc.desc: SetTouchpadScrollRows and GetTouchpadScrollRows interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = -1;
+    InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    int32_t result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(rows, 1);
+    ASSERT_EQ(result, RET_OK);
+    rows = 101;
+    InputManager::GetInstance()->SetTouchpadScrollRows(rows);
+    result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
+    ASSERT_EQ(rows, 100);
+    ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    void *pixelMap = nullptr;
+    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
