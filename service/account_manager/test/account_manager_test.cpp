@@ -38,12 +38,12 @@ public:
 };
 
 /**
- * @tc.name: KeyGestureManagerTest_SubscribeCommonEvent_01
+ * @tc.name: AccountManagerTest_SubscribeCommonEvent_01
  * @tc.desc: Test the funcation SubscribeCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SubscribeCommonEvent_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_SubscribeCommonEvent_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -53,12 +53,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SubscribeCommonEvent_01, Test
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_UnsubscribeCommonEvent_01
+ * @tc.name: AccountManagerTest_UnsubscribeCommonEvent_01
  * @tc.desc: Test the funcation UnsubscribeCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_UnsubscribeCommonEvent_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_UnsubscribeCommonEvent_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -68,12 +68,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_UnsubscribeCommonEvent_01, Te
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_SubscribeCommonEvent_02
+ * @tc.name: AccountManagerTest_SubscribeCommonEvent_02
  * @tc.desc: Test the funcation SubscribeCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SubscribeCommonEvent_02, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_SubscribeCommonEvent_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -83,12 +83,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SubscribeCommonEvent_02, Test
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_SetupMainAccount_01
+ * @tc.name: AccountManagerTest_SetupMainAccount_01
  * @tc.desc: Test the funcation SetupMainAccount
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SetupMainAccount_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_SetupMainAccount_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -100,12 +100,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_SetupMainAccount_01, TestSize
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_OnAddUser_01
+ * @tc.name: AccountManagerTest_OnAddUser_01
  * @tc.desc: Test the funcation OnAddUser
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnAddUser_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnAddUser_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -119,12 +119,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnAddUser_01, TestSize.Level1
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_OnRemoveUser_01
+ * @tc.name: AccountManagerTest_OnRemoveUser_01
  * @tc.desc: Test the funcation OnRemoveUser
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnRemoveUser_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnRemoveUser_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -136,12 +136,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnRemoveUser_01, TestSize.Lev
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_OnCommonEvent_01
+ * @tc.name: AccountManagerTest_OnCommonEvent_01
  * @tc.desc: Test the funcation OnCommonEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnCommonEvent_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnCommonEvent_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -150,12 +150,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnCommonEvent_01, TestSize.Le
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_OnSwitchUser_01
+ * @tc.name: AccountManagerTest_OnSwitchUser_01
  * @tc.desc: Test the funcation OnSwitchUser
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnSwitchUser_01, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
@@ -167,12 +167,12 @@ HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnSwitchUser_01, TestSize.Lev
 }
 
 /**
- * @tc.name: KeyGestureManagerTest_OnSwitchUser_02
+ * @tc.name: AccountManagerTest_OnSwitchUser_02
  * @tc.desc: Test the funcation OnSwitchUser
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AccountManagerTest, KeyGestureManagerTest_OnSwitchUser_02, TestSize.Level1)
+HWTEST_F(AccountManagerTest, AccountManagerTest_OnSwitchUser_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     AccountManager accountManager;
