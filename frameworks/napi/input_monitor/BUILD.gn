@@ -22,6 +22,7 @@ config("inputmonitor_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/frameworks/napi/touch_event/include",
     "${mmi_path}/frameworks/napi/joystick_event/include",
+    "${mmi_path}/util/napi/include",
   ]
 
   defines = input_default_defines
@@ -29,6 +30,12 @@ config("inputmonitor_config") {
 
 ohos_shared_library("inputmonitor") {
   sources = inputmonitor_sources
+  sources += [
+    "${mmi_path}/util/napi/src/key_event_napi.cpp",
+    "${mmi_path}/util/napi/src/util_napi.cpp",
+    "${mmi_path}/util/napi/src/util_napi_error.cpp",
+    "${mmi_path}/util/napi/src/util_napi_value.cpp",
+  ]
   branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true

@@ -17,7 +17,6 @@ import("../../multimodalinput_mini.gni")
 ohos_executable("mmi-server") {
   sources = [ "src/mmi_service_main.cpp" ]
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -32,6 +31,7 @@ ohos_executable("mmi-server") {
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

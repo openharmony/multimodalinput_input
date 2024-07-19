@@ -169,6 +169,7 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
+    InputManager::GetInstance()->GetTouchpadScrollRows(preScrollRows_);
 }
 
 void InputManagerPointerTest::TearDown()
@@ -190,6 +191,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
     InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
+    InputManager::GetInstance()->SetTouchpadScrollRows(preScrollRows_);
 }
 
 std::string InputManagerPointerTest::GetEventDump()
@@ -1851,6 +1853,36 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadThreeFinger
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetTouchpadScrollRows_001
+ * @tc.desc: Sets touchpad scroll rows
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadScrollRows(rows) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetTouchpadScrollRows_001
+ * @tc.desc: Sets touchpad scroll rows
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 50;
+    int32_t newRows = 3;
+    if (InputManager::GetInstance()->SetTouchpadScrollRows(rows) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollRows(newRows) == RET_OK);
+        ASSERT_EQ(rows, newRows);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

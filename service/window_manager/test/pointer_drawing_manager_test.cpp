@@ -1747,5 +1747,19 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPixelMap
+ * @tc.desc: Test SetPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPixelMap, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.SetPixelMap(pixelMap));
+}
 } // namespace MMI
 } // namespace OHOS

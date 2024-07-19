@@ -107,6 +107,13 @@ bool PermissionHelper::CheckInfraredEmmit()
     return CheckHapPermission(infraredEmmitPermissionCode);
 }
 
+bool PermissionHelper::CheckAuthorize()
+{
+    CALL_DEBUG_ENTER;
+    std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
+    return CheckHapPermission(injectPermissionCode);
+}
+
 bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
 {
     CALL_DEBUG_ENTER;
@@ -197,7 +204,7 @@ bool PermissionHelper::CheckMouseCursor()
 bool PermissionHelper::CheckInputEventFilter()
 {
     CALL_DEBUG_ENTER;
-    std::string filterPermissionCode = "ohos.permission.INPUT_EVENT_FILTER";
+    std::string filterPermissionCode = "ohos.permission.FILTER_INPUT_EVENT";
     return CheckHapPermission(filterPermissionCode);
 }
 } // namespace MMI

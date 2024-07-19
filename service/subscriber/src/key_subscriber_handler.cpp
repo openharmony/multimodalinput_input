@@ -377,12 +377,12 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
     }
-    if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("Repeat KeyEvent, skip");
-        return true;
-    }
     if (keyGestureMgr_.Intercept(keyEvent)) {
         MMI_HILOGD("Key gesture recognized");
+        return true;
+    }
+    if (IsRepeatedKeyEvent(keyEvent)) {
+        MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
@@ -506,6 +506,7 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
@@ -523,6 +524,7 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
@@ -968,9 +970,9 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
+    mprintf(fd, "subscribers: count = %zu", subscriberMap_.size());
     for (const auto &item : foregroundPids_) {
-        mprintf(fd, "Foreground Pids: %s", item);
+        mprintf(fd, "Foreground Pids: %d", item);
     }
     mprintf(fd,
             "enableCombineKey: %s | isForegroundExits: %s"

@@ -56,9 +56,7 @@ public:
 
     static std::string GetBetaUserType()
     {
-        if (userType_ == "") {
-            userType_ = OHOS::system::GetParameter("const.logsystem.versiontype", "default");
-        }
+        std::call_once(betaFlag_, []() { SetBetaUserType(); });
         if (userType_ == "beta") {
             return "DEVICE_BETA_USER";
         } else if (userType_ == "default") {
@@ -73,10 +71,16 @@ public:
         return GetBetaUserType() == "DEVICE_BETA_USER";
     }
 
+    static void SetBetaUserType()
+    {
+        userType_ = OHOS::system::GetParameter("const.logsystem.versiontype", "default");
+    }
+
 private:
     static int32_t infoDictCount_;
     static int32_t debugDictCount_;
-    static thread_local std::string userType_;
+    static std::string userType_;
+    static std::once_flag betaFlag_;
     static constexpr int32_t printRate_ = 50;
 
     static void PrintInfoDict()
