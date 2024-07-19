@@ -33,6 +33,8 @@ ohos_source_set("libmmi-virtual-device") {
   }
   configs = [ ":libmmi_virtual_device_config" ]
 
+  deps = [ "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi" ]
+
   public_configs = [ ":virtual_device_public_config" ]
 
   part_name = "input"
