@@ -301,6 +301,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     int32_t ret = RET_OK;
+    // 1.Determine whether the key event is a focus type event or an operation type event,
+    // 2.Determine whether the current focus window has a safety sub window.
     auto vecTarget = WIN_MGR->UpdateTarget(key);
     for (const auto &item : vecTarget) {
         key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
