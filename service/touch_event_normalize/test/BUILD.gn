@@ -66,6 +66,13 @@ ohos_unittest("GestureTransformTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -213,6 +220,13 @@ ohos_unittest("TabletToolTranformTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
@@ -802,6 +816,8 @@ group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
+    ":GestureTransformTest",
+    ":TabletToolTranformTest",
     ":TouchEventNormalizeTest",
     ":TouchPadTransformProcessorMockTest",
     ":TransformPointTest",
