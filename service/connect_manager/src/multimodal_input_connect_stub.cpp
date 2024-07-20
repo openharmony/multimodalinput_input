@@ -42,6 +42,7 @@ constexpr int32_t MAX_AXIS_INFO { 64 };
 constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
+constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -2365,6 +2366,11 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t callingUid = GetCallingUid();
+    if (callingUid / UID_TRANSFORM_DIVISOR != userId) {
+        MMI_HILOGE("Invalid CalllingUid:%{public}d", callingUid);
+        return RET_ERR;
+    }
     int32_t ret = SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);
