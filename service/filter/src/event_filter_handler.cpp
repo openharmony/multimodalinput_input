@@ -45,7 +45,6 @@ void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> 
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
-        MMI_HILOGD("Pointer event is filtered");
         return;
     }
     CHKPV(nextHandler_);
