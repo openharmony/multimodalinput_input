@@ -1505,7 +1505,6 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
-    AdaptScreenResolution(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject, isShell);
 #else
