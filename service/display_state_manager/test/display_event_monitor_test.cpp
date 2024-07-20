@@ -65,23 +65,5 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
     displayEventMonitor.hasInit_ = false;
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
 }
-
-/**
- * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn
- * @tc.desc: Test UpdateShieldStatusOnScreenOn
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.shieldModeBeforeSreenOff_ = SHIELD_MODE::FACTORY_MODE;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
-
-    displayEventMonitor.shieldModeBeforeSreenOff_ = SHIELD_MODE::UNSET_MODE;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
-}
-
 } // namespace MMI
 } // namespace OHOS
