@@ -1152,12 +1152,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (keepTimeMs > 0) {
                                 std::cout << "Start keep" << std::endl;
                                 currentTimeMs = GetSysClockTime() / TIME_TRANSITION;
-                                int64_t keepEndTimeMS = 0;
-                                if (!AddInt64(currentTimeMs, keepTimeMs, keepEndTimeMS)) {
+                                int64_t keepEndTimeMs = 0;
+                                if (!AddInt64(currentTimeMs, keepTimeMs, keepEndTimeMs)) {
                                     std::cout << "system time error." << std::endl;
                                     return EVENT_REG_FAIL;
                                 }
-                                while (currentTimeMs < keepEndTimeMS) {
+                                while (currentTimeMs < keepEndTimeMs) {
                                     for (size_t i = 0; i < pointerIds.size(); i++) {
                                         int32_t pointerId = pointerIds[i];
                                         PointerEvent::PointerItem item;
