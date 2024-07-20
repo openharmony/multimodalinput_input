@@ -4888,12 +4888,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsOnTheWhitelist_003, 
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsKeyPressed_001
+ * @tc.name: InputWindowsManagerTest_IsKeyPressed_002
  * @tc.desc: Test IsKeyPressed
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsKeyPressed_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsKeyPressed_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyEvent::KeyItem item;
