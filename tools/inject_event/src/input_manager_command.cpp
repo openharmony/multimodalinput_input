@@ -997,7 +997,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 if (argv[startPos + MOVE_POS_TWO] == nullptr) {
                                     totalTimeMs = TOTAL_TIME_MS;
-                                    if (strlen(argv[startPos] != NUM_KEPP_ARGC) ||
+                                    if (strlen(argv[startPos]) != NUM_KEEP_ARGC) ||
                                         (argv[startPos][0] != '-') ||
                                         (argv[startPos][1] != 'k') ||
                                         (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs)) {
@@ -1008,7 +1008,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     break;
                                 }
                                 if (argv[startPos + MOVE_POS_THREE] == nullptr) {
-                                    if (strlen(argv[startPos] == NUM_KEEP_ARGC)) {
+                                    if (strlen(argv[startPos]) == NUM_KEEP_ARGC) {
                                         if ((argv[startPos][0] != '-') ||
                                             (argv[startPos][1] != 'k') ||
                                             (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs))) {
@@ -1112,7 +1112,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int64_t nowSysTimeMs = 0;
                             int64_t sleepTimeMs = 0;
 
-                            
                             std::vector<int32_t> pointerIds = pointerEvent->GetPointerIds();
                             if (pointerIds.size() != static_cast<size_t>(fingerCount)) {
                                 std::cout << "pointerIds size is error" << std::endl;
