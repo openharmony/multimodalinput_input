@@ -1008,16 +1008,28 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     break;
                                 }
                                 if (argv[startPos + MOVE_POS_THREE] == nullptr) {
-                                    if (strlen(argv[startPos] != NUM_KEPP_ARGC) ||
-                                        (argv[startPos][0] != '-') ||
-                                        (argv[startPos][1] != 'k') ||
-                                        (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs)) {
-                                        std::cout << "invalid keep times" << std::endl;
-                                        return EVENT_REG_FAIL;
-                                    }
-                                    if (!StrToInt(argv[startPos + MOVE_POS_TWO], totalTimeMs) {
-                                        std::cout << "invalid total times" << std::endl;
-                                        return EVENT_REG_FAIL;
+                                    if (strlen(argv[startPos] == NUM_KEPP_ARGC)) {
+                                        if ((argv[startPos][0] != '-') ||
+                                            (argv[startPos][1] != 'k') ||
+                                            (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs)) {
+                                            std::cout << "invalid keep times" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
+                                        if (!StrToInt(argv[startPos + MOVE_POS_TWO], totalTimeMs) {
+                                            std::cout << "invalid total times" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
+                                    } else {
+                                        if (!StrToInt(argv[startPos], totalTimeMs) {
+                                            std::cout << "invalid total times" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
+                                        if ((argv[startPos + MOVE_POS_ONE][0] != '-') ||
+                                            (argv[startPos + MOVE_POS_ONE][1] != 'k') ||
+                                            (!StrToInt(argv[startPos + MOVE_POS_TWO], keepTimeMs)) {
+                                            std::cout << "invalid keep times" << std::endl;
+                                            return EVENT_REG_FAIL;
+                                        }
                                     }
                                     optind = startPos + MOVE_POS_THREE;
                                     break;
