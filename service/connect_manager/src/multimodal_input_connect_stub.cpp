@@ -2366,8 +2366,9 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (GetCalllingUid() / UID_TRANSFORM_DIVISOR != userId) {
-        MMI_HILOGE("Invalid CalllingUid Uid:%{public}d", GetCalllingUid());
+    int32_t CallingUid = GetCallingUid();
+    if (CallingUid / UID_TRANSFORM_DIVISOR != userId) {
+        MMI_HILOGE("Invalid CalllingUid:%{public}d", CallingUid);
         return RET_ERR;
     }
     int32_t ret = SetCurrentUser(userId);
