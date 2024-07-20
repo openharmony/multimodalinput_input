@@ -1008,25 +1008,25 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     break;
                                 }
                                 if (argv[startPos + MOVE_POS_THREE] == nullptr) {
-                                    if (strlen(argv[startPos] == NUM_KEPP_ARGC)) {
+                                    if (strlen(argv[startPos] == NUM_KEEP_ARGC)) {
                                         if ((argv[startPos][0] != '-') ||
                                             (argv[startPos][1] != 'k') ||
-                                            (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs)) {
+                                            (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs))) {
                                             std::cout << "invalid keep times" << std::endl;
                                             return EVENT_REG_FAIL;
                                         }
-                                        if (!StrToInt(argv[startPos + MOVE_POS_TWO], totalTimeMs) {
+                                        if (!StrToInt(argv[startPos + MOVE_POS_TWO], totalTimeMs)) {
                                             std::cout << "invalid total times" << std::endl;
                                             return EVENT_REG_FAIL;
                                         }
                                     } else {
-                                        if (!StrToInt(argv[startPos], totalTimeMs) {
+                                        if (!StrToInt(argv[startPos], totalTimeMs)) {
                                             std::cout << "invalid total times" << std::endl;
                                             return EVENT_REG_FAIL;
                                         }
                                         if ((argv[startPos + MOVE_POS_ONE][0] != '-') ||
                                             (argv[startPos + MOVE_POS_ONE][1] != 'k') ||
-                                            (!StrToInt(argv[startPos + MOVE_POS_TWO], keepTimeMs)) {
+                                            (!StrToInt(argv[startPos + MOVE_POS_TWO], keepTimeMs))) {
                                             std::cout << "invalid keep times" << std::endl;
                                             return EVENT_REG_FAIL;
                                         }
@@ -2086,9 +2086,18 @@ void InputManagerCommand::PrintTouchUsage()
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
-    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
+    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [-k keep time] [smooth time]      --smooth movement, keep time:keep time";
+    std::cout << std::endl;
+    std::cout << "                                                             after moving, the max value is 60000 ";
+    std::cout << std::endl;
+    std::cout << "                                                             ms, default value is 0; smooth time:";
+    std::cout << std::endl;
+    std::cout << "                                                             move time, default value is 1000 ms";
+    std::cout << std::endl;
+    std::cout << "   Support for multiple finger movements at the same time, for example:" << std::endl;
+    std::cout << "   uinput -T -m 300 900 600 900 900 900 600 900, (300, 900) move to (600, 900), (900, 900) move to";
+    std::cout << std::endl;
+    std::cout << "   (600, 900)" << std::endl;
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
     std::cout << "-k --knuckle                                                  " << std::endl;
     std::cout << "commands for knucle:                                          " << std::endl;
