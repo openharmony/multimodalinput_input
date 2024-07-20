@@ -988,7 +988,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     break;
                                 }
                                 if (argv[startPos + MOVE_POS_ONE] == nullptr) {
-                                    if (!StrToInt(argv[startPos], totalTimeMs) {
+                                    if (!StrToInt(argv[startPos], totalTimeMs)) {
                                         std::cout << "invalid total times" << std::endl;
                                         return EVENT_REG_FAIL;
                                     }
