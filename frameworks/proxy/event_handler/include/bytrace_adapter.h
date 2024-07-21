@@ -78,7 +78,7 @@ public:
     static void StartMarkedTracker(int32_t eventId);
     static void StopMarkedTracker();
 
-    static void StartTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    static void StartTouchEvent(int32_t pointerId);
     static void StopTouchEvent();
 
 private:

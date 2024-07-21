@@ -294,7 +294,7 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
     DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WIN_MGR->UpdateTargetPointer(pointerEvent);
-    BytraceAdapter::StartTouchEvent(pointerEvent);
+    BytraceAdapter::StartTouchEvent(pointerEvent->GetId());
     nextHandler_->HandleTouchEvent(pointerEvent);
     BytraceAdapter::StopTouchEvent();
     DfxHisysevent::CalcPointerDispTimes();
