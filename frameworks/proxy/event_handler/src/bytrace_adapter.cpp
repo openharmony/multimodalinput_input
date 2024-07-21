@@ -371,24 +371,22 @@ void BytraceAdapter::StopLaunchAbility()
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
-void StartMarkedTracker(int32_t eventId)
+void BytraceAdapter::StartMarkedTracker(int32_t eventId)
 {
     StartTrace(HITRACE_TAG_MULTIMODALINPUT, "markProcessed eventId:" + std::to_string(eventId));
 }
 
-void StopMarkedTracker()
+void BytraceAdapter::StopMarkedTracker()
 {
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
-void StartTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void BytraceAdapter::StartTouchEvent(int32_t pointerId)
 {
-    CHKPV(pointerEvent);
-    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchEvent pointerEventId:" +
-        std::to_string(pointerEvent->GetId()));
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchEvent pointerId:" + std::to_string(pointerId));
 }
 
-void StopTouchEvent()
+void BytraceAdapter::StopTouchEvent()
 {
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
