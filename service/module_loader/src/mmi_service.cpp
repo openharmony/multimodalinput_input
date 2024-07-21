@@ -75,8 +75,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-
-MMIService* g_MMIService = nullptr;
+std::mutex g_instanceMutex;
+MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
