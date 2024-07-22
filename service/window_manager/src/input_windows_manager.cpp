@@ -28,12 +28,7 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
-#include "key_command_handler.h"
 #include "mouse_event_normalize.h"
-#include "pointer_drawing_manager.h"
-#include "preferences.h"
-#include "preferences_errno.h"
-#include "preferences_helper.h"
 #include "util.h"
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
@@ -44,11 +39,8 @@
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
-#include "timer_manager.h"
 #include "touch_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
-#include "res_sched_client.h"
-#include "res_type.h"
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 #include "magic_pointer_velocity_tracker.h"
@@ -441,7 +433,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     for (const auto &item : windowInfos) {
         bool checkUIExtentionWindow = false;
         // Determine whether it is a safety sub window
-        for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
+        for (const auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
             if (uiExtentionWindowInfo.id == windowId) {
                 MMI_HILOGD("Find windowInfo by window id %{public}d", uiExtentionWindowInfo.id);
                 windowInfo = &uiExtentionWindowInfo;
@@ -510,7 +502,7 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     TargetInfo targetInfo = { windowInfo->privacyMode, windowInfo->id, windowInfo->agentWindowId };
     vecData.emplace_back(std::make_pair(windowInfo->pid, targetInfo));
     if (isUIExtention) {
-        for (auto &item : iter->uiExtentionWindowInfo) {
+        for (const auto &item : iter->uiExtentionWindowInfo) {
             if (item.privacyUIFlag) {
                 targetInfo.privacyMode = item.privacyMode;
                 targetInfo.id = item.id;
@@ -1165,13 +1157,13 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
         window += StringPrintf("%d,", item.id);
         std::string dump;
         dump += StringPrintf("pointChangeAreas:[");
-        for (auto it : item.pointerChangeAreas) {
+        for (const auto &it : item.pointerChangeAreas) {
             dump += StringPrintf("%d,", it);
         }
         dump += StringPrintf("]\n");
 
         dump += StringPrintf("transform:[");
-        for (auto it : item.transform) {
+        for (const auto &it : item.transform) {
             dump += StringPrintf("%f,", it);
         }
         dump += StringPrintf("]\n");
@@ -1221,7 +1213,7 @@ void InputWindowsManager::PrintDisplayInfo()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
-    for (auto &it : displayGroupInfo_.displaysInfo) {
+    for (const auto &it : displayGroupInfo_.displaysInfo) {
         if (it.id == id) {
             return &it;
         }
@@ -1234,7 +1226,7 @@ const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
 {
-    for (auto &it : displayGroupInfo_.displaysInfo) {
+    for (const auto &it : displayGroupInfo_.displaysInfo) {
         if (it.uniq == uniq) {
             return &it;
         }
@@ -1860,8 +1852,8 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         }
         if ((firstBtnDownWindowId_ < 0) && (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) &&
             (pointerEvent->GetPressedButtons().size() == 1)) {
-            for (auto iter = winId2ZorderMap.begin(); iter != winId2ZorderMap.end(); iter++) {
-                MMI_HILOG_DISPATCHI("%{public}d, %{public}d", iter->first, iter->second);
+            for (const auto &iter : winId2ZorderMap) {
+                MMI_HILOG_DISPATCHI("%{public}d, %{public}d", iter.first, iter.second);
             }
         }
         winId2ZorderMap.clear();
@@ -1883,9 +1875,9 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
 void InputWindowsManager::CheckUIExtentionWindowPointerHotArea(int32_t logicalX, int32_t logicalY,
     const std::vector<WindowInfo>& windowInfos, int32_t& windowId)
 {
-    for (auto it = windowInfos.rbegin(); it != windowInfos.rend(); ++it) {
-        if (IsInHotArea(logicalX, logicalY, it->pointerHotAreas, *it)) {
-            windowId = it->id;
+    for (const auto &it : windowInfos) {
+        if (IsInHotArea(logicalX, logicalY, it.pointerHotAreas, it)) {
+            windowId = it.id;
             break;
         }
     }
@@ -2788,9 +2780,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 void InputWindowsManager::CheckUIExtentionWindowDefaultHotArea(int32_t logicalX, int32_t logicalY,
     const std::vector<WindowInfo>& windowInfos, int32_t& windowId)
 {
-    for (auto it = windowInfos.rbegin(); it != windowInfos.rend(); ++it) {
-        if (IsInHotArea(logicalX, logicalY, it->defaultHotAreas, *it)) {
-            windowId = it->id;
+    for (const auto& it : windowInfos) {
+        if (IsInHotArea(logicalX, logicalY, it.defaultHotAreas, it)) {
+            windowId = it.id;
             break;
         }
     }
@@ -3583,6 +3575,8 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
         MMI_HILOGE("Failed to read pixelmap");
         return false;
     }
+    MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
+        dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     return dst == RET_OK;
 }
 
