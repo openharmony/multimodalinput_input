@@ -3165,7 +3165,7 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
             MMI_HILOGD("direction is DIRECTION90");
             cursorPos.y = static_cast<double>(info.width) - x;
             cursorPos.x = y;
-            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{v}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
