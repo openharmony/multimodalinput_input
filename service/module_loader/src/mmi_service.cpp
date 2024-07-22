@@ -61,6 +61,8 @@
 #include "util_ex.h"
 #include "watchdog_task.h"
 #include "xcollie/watchdog.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -1821,11 +1823,11 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "EPOLL_EVENT_SOCKET");
+                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "MMI:EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
-                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "EPOLL_EVENT_ETASK");
+                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "MMI:EPOLL_EVENT_ETASK");
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
@@ -2829,16 +2831,9 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    auto startTime = std::chrono::steady_clock::now();
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
-    auto endTime = std::chrono::steady_clock::now();
-    auto duration = endTime - startTime;
-    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
-        (duration).count();
-    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
-        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
-            flag.c_str(), durationTime);
-    }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
 } // namespace MMI
