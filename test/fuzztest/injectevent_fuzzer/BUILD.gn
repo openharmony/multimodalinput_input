@@ -104,7 +104,6 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "window_manager:libwm",
     "window_manager:libwsutils",

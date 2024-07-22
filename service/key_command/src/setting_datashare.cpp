@@ -198,7 +198,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     const int32_t tmpRow = 0;
     resultSet->GoToRow(tmpRow);
     int32_t ret = resultSet->GetString(tmpRow, value);
-    if (ret != NativeRdb::E_OK) {
+    if (ret != RET_OK) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_VALUE;
     }
