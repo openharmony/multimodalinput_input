@@ -997,7 +997,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 if (argv[startPos + MOVE_POS_TWO] == nullptr) {
                                     totalTimeMs = TOTAL_TIME_MS;
-                                    if (strlen(argv[startPos]) != NUM_KEEP_ARGC) ||
+                                    if ((strlen(argv[startPos]) != NUM_KEEP_ARGC) ||
                                         (argv[startPos][0] != '-') ||
                                         (argv[startPos][1] != 'k') ||
                                         (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs)) {
@@ -1134,9 +1134,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
                                         << ", DisplayY:" << item.GetDisplayY() << std::endl;
                                     pointerEvent->UpdatePointerItem(pointerId, item);
+                                    pointerEvent->SetPointerId(pointerId);
+                                    pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 }
-                                pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 nowSysTimeUs = GetSysClockTime();
                                 nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
                                 sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - nowSysTimeMs;
@@ -1154,9 +1155,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetDisplayX(fingerList[i].endX);
                                 item.SetDisplayY(fingerList[i].endY);
                                 pointerEvent->UpdatePointerItem(pointerId, item);
+                                pointerEvent->SetPointerId(pointerId);
+                                pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             }
-                            pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
                             std::cout << "End move" << std::endl;
 
@@ -1181,9 +1183,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
                                         << ", DisplayY:" << item.GetDisplayY() << std::endl;
                                         pointerEvent->UpdatePointerItem(pointerId, item);
+                                        pointerEvent->SetPointerId(pointerId);
+                                        pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                     }
-                                    pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                     nowSysTimeUs = GetSysClockTime();
                                     nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
                                     sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - nowSysTimeMs;
@@ -1205,6 +1208,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
                                         << ", DisplayY:" << item.GetDisplayY() << std::endl;
                                 pointerEvent->UpdatePointerItem(pointerId, item);
+                                pointerEvent->SetPointerId(pointerId);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 pointerEvent->RemovePointerItem(pointerId);
                             }
