@@ -98,7 +98,37 @@ HWTEST_F(FingerprintEventProcessorTest,
     EXPECT_FALSE(FingerprintEventHdr->IsFingerprintEvent(&event));
 }
 
-/**L
+/**
+ * @tc.name: FingerprintEventProcessorTest_IsFingerprintEvent_NameIsFingerprintSourceKey_002
+ * @tc.desc: Test IsFingerprintEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FingerprintEventProcessorTest,
+    FingerprintEventProcessorTest_IsFingerprintEvent_NameIsFingerprintSourceKey_002, TestSize.Level1)
+{
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, GetDevice)
+        .WillRepeatedly(Return(&device));
+    EXPECT_CALL(mock, DeviceGetName)
+        .WillRepeatedly(Return(const_cast<char*>("fingerprint")));
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillRepeatedly(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
+        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_DOWN))
+        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_UP))
+        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_CLICK))
+        .WillOnce(Return(FingerprintEventProcessor::FINGERPRINT_CODE_RETOUCH));
+    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
+    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
+    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
+    EXPECT_TRUE(FingerprintEventHdr->IsFingerprintEvent(&event));
+}
+
+/**
  * @tc.name: FingerprintEventProcessorTest_HandleFingerprintEvent_NameIsFingerprintSourceKey
  * @tc.desc: Test HandleFingerprintEvent
  * @tc.type: FUNC
@@ -223,6 +253,74 @@ HWTEST_F(FingerprintEventProcessorTest,
     EXPECT_EQ(FingerprintEventHdr->AnalyseKeyEvent(&event), ERR_OK);
     EXPECT_EQ(FingerprintEventHdr->AnalyseKeyEvent(&event), MMI::UNKNOWN_EVENT);
 }
+
+/**
+ * @tc.name: FingerprintEventProcessorTest_SetPowerKeyState_001
+ * @tc.desc: Test HandleFingerprintEvent (keyCode != KEY_POWER) Branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerKeyState_001, TestSize.Level1)
+{
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, GetDevice)
+        .WillOnce(Return(&device));
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillOnce(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
+        .WillOnce(Return(100));
+    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerKeyState(&event));
+}
+
+/**
+ * @tc.name: FingerprintEventProcessorTest_SetPowerKeyState_002
+ * @tc.desc: Test HandleFingerprintEvent (keyAction == KeyEvent::KEY_ACTION_DOWN) Branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerKeyState_002, TestSize.Level1)
+{
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, GetDevice)
+        .WillOnce(Return(&device));
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillOnce(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
+        .WillOnce(Return(116));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
+        .WillOnce(Return(LIBINPUT_KEY_STATE_PRESSED));
+    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerKeyState(&event));
+}
+
+/**
+ * @tc.name: FingerprintEventProcessorTest_SetPowerKeyState_003
+ * @tc.desc: Test HandleFingerprintEvent (keyAction != KeyEvent::KEY_ACTION_DOWN) Branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FingerprintEventProcessorTest, FingerprintEventProcessorTest_SetPowerKeyState_003, TestSize.Level1)
+{
+    NiceMock<LibinputInterfaceMock> mock;
+    struct libinput_event event;
+    struct libinput_device device;
+    struct libinput_event_keyboard keyBoardEvent;
+    EXPECT_CALL(mock, GetDevice)
+        .WillOnce(Return(&device));
+    EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
+        .WillOnce(Return(&keyBoardEvent));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
+        .WillOnce(Return(116));
+    EXPECT_CALL(mock, LibinputEventKeyboardGetKeyState)
+        .WillOnce(Return(LIBINPUT_KEY_STATE_RELEASED));
+    ASSERT_NO_FATAL_FAILURE(FingerprintEventHdr->SetPowerKeyState(&event));
+}
+
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 } // namespace MMI
 } // namespace OHOS
