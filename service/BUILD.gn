@@ -1051,7 +1051,10 @@ ohos_unittest("SubscriberTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "subscriber/test/key_subscriber_handler_test.cpp" ]
+  sources = [
+    "subscriber/test/key_gesture_manager_test.cpp",
+    "subscriber/test/key_subscriber_handler_test.cpp",
+  ]
 
   if (input_feature_switch) {
     sources += [ "subscriber/test/switch_subscriber_handler_test.cpp" ]
