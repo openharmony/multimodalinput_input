@@ -40,6 +40,93 @@ public:
 };
 
 /**
+ * @tc.name: DispatchPointerEventInner_06
+ * @tc.desc: Test the funcation DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, DispatchPointerEventInner_06, TestSize.Level1)
+{
+    EventDispatchHandler handler;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    ASSERT_NE(point, nullptr);
+    int32_t fd = -5;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->actionTime_ = 3100;
+    handler.eventTime_ = 10;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    inputEvent->actionTime_ = 200;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    fd = 5;
+    bool status = true;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, 1, 1, 100, 100);
+    session->SetTokenType(TokenType::TOKEN_HAP);
+    session->SetAnrStatus(0, status);
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    status = false;
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_MOVE;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_AXIS_END;
+    ASSERT_NO_FATAL_FAILURE(handler.DispatchPointerEventInner(point, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchKeyEvent_001
+ * @tc.desc: Test the funcation DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEvent_001, TestSize.Level1)
+{
+    EventDispatchHandler handler;
+    int32_t fd = -2;
+    UDSServer udsServer;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->actionTime_ = 4000;
+    handler.eventTime_ = 200;
+    int32_t ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+    inputEvent->actionTime_ = 2000;
+    ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+    fd = 9;
+    bool status = true;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, 1, 1, 100, 100);
+    session->SetTokenType(TokenType::TOKEN_HAP);
+    session->SetAnrStatus(0, status);
+    ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+    status = false;
+    StreamBuffer streamBuffer;
+    streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
+    ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+    streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_OK;
+    udsServer.pid_ = 1;
+    ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+    udsServer.pid_ = -1;
+    ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
  * @tc.name: EventDispatchTest_DispatchKeyEventPid_01
  * @tc.desc: Test DispatchKeyEventPid
  * @tc.type: FUNC
