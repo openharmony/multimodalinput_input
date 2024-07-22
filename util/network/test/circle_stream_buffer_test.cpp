@@ -45,7 +45,7 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CopyDataToBegin_001, Tes
     ASSERT_NO_FATAL_FAILURE(circleStreamBuffer.CopyDataToBegin());
     streamBuffer.wPos_ = 5;
     streamBuffer.rPos_ = 10;
-    ASSERT_NO_FATAL_FAILURE(circleStreamBuffer.CopyDataToBegin()); 
+    ASSERT_NO_FATAL_FAILURE(circleStreamBuffer.CopyDataToBegin());
 }
 
 /**
