@@ -1000,7 +1000,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     if ((strlen(argv[startPos]) != NUM_KEEP_ARGC) ||
                                         (argv[startPos][0] != '-') ||
                                         (argv[startPos][1] != 'k') ||
-                                        (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs)) {
+                                        (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs))) {
                                         std::cout << "invalid keep times" << std::endl;
                                         return EVENT_REG_FAIL;
                                     }
