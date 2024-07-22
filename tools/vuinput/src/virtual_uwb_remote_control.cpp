@@ -29,7 +29,6 @@ constexpr int32_t ABS_MT_ORIENTATION_MIN = -90;
 constexpr int32_t ABS_MT_ORIENTATION_MAX = 90;
 constexpr int32_t ABS_MT_BLOB_ID_MAX = 10;
 constexpr int32_t ABS_MT_TRACKING_ID_MAX = 9;
-constexpr int32_t ABS_TOOL_TYPE_MAX = 15;
 
 AbsInfo absInfos[] = {
     { ABS_X, 0, ABS_MAX_X, 0, 0 },
@@ -52,8 +51,8 @@ VirtualUwbRemoteControl::VirtualUwbRemoteControl() : VirtualDevice("Virtual UWB 
 {
     eventTypes_ = { EV_SYN, EV_KEY, EV_REL, EV_ABS };
     properties_ = { INPUT_PROP_DIRECT };
-    keys_ = { 
-        KEY_HOMEPAGE, KEY_POWER, KEY_BACK, KEY_MENU, KEY_ENTER, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, 
+    keys_ = {
+        KEY_HOMEPAGE, KEY_POWER, KEY_BACK, KEY_MENU, KEY_ENTER, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN,
         KEY_VOICECOMMAND, KEY_VOLUMEDOWN, KEY_VOLUMEUP, BTN_TOUCH, BTN_LEFT, BTN_RIGHT, BTN_TOOL_FINGER
     };
     abs_ = {

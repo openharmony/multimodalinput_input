@@ -48,6 +48,7 @@
 #include "virtual_fingerprint_key.h"
 #include "virtual_fingerprint_mouse.h"
 #include "virtual_crown.h"
+#include "virtual_uwb_remote_control.h"
 
 namespace OHOS {
 namespace MMI {
