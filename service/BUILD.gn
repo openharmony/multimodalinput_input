@@ -1657,6 +1657,8 @@ ohos_unittest("ServerMsgHandlerTest") {
   ]
 
   sources = [
+    "message_handle/test/authorize_helper_test.cpp",
+    "message_handle/test/client_death_handler_test.cpp",
     "message_handle/test/inject_notice_manager_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
   ]
@@ -1676,6 +1678,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
     "security_component_manager:libsecurity_component_sdk",
