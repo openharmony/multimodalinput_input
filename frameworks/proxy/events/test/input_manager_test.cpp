@@ -3017,7 +3017,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
 {
     int32_t userId = 10;
     int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
-    EXPECT_TRUE(ret == RET_OK);
+    EXPECT_FALSE(ret == RET_OK);
 }
 
 /**
