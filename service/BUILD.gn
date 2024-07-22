@@ -268,6 +268,10 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "resource_schedule_service:ressched_client" ]
   }
 
+  if (call_manager_service_enabled) {
+    external_deps += [ "call_manager:tel_call_manager_api" ]
+  }
+
   external_deps += [
     "ability_base:want",
     "ability_base:zuri",
@@ -278,7 +282,6 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -1002,7 +1005,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -1031,6 +1033,10 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (call_manager_service_enabled) {
+    external_deps += [ "call_manager:tel_call_manager_api" ]
+  }
 }
 
 ohos_unittest("AccountManagerTest") {
@@ -1108,13 +1114,16 @@ ohos_unittest("SubscriberTest") {
     "ability_base:want",
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "hilog:libhilog",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
   ]
+
+  if (call_manager_service_enabled) {
+    external_deps += [ "call_manager:tel_call_manager_api" ]
+  }
 
   if (input_feature_switch) {
     external_deps += [

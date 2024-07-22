@@ -25,6 +25,7 @@ c_utils_root = "//commonlibrary/c_utils"
 hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
+  call_manager_service_enabled = false
   resource_schedule_service_enabled = false
   input_feature_product = "default"
   input_feature_enable_pgo = false
@@ -48,6 +49,11 @@ declare_args() {
   input_feature_crown = true
   input_feature_infrared_emitter = true
   input_feature_move_event_filters = false
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_call_manager)) {
+    call_manager_service_enabled = true
+  }
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
