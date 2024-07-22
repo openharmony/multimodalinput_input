@@ -1,0 +1,154 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../device_status.gni")
+
+module_output_path = "${device_status_part_name}/unit_out"
+
+ohos_unittest("CooperateClientTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
+  module_out_path = module_output_path
+  include_dirs = [
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_utils_path}",
+    "${device_status_utils_path}/include",
+    "${device_status_root_path}/intention/cooperate/client/include",
+  ]
+
+  defines = []
+
+  sources = [ "src/cooperate_client_test.cpp" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  configs = []
+
+  deps = [
+    "${device_status_root_path}/intention/cooperate/client:intention_cooperate_client",
+    "${device_status_root_path}/intention/cooperate/data:intention_cooperate_data",
+    "${device_status_root_path}/intention/data:intention_data",
+    "${device_status_root_path}/intention/ipc/socket:intention_socket_connection",
+    "${device_status_root_path}/intention/ipc/tunnel:intention_tunnel_client",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+  ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+}
+
+ohos_unittest("CooperateServerTest") {
+  module_out_path = module_output_path
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  branch_protector_ret = "pac_ret"
+
+  include_dirs = [
+    "include",
+    "${device_status_interfaces_path}/innerkits/interaction/include",
+    "${device_status_interfaces_path}/innerkits/include",
+    "${device_status_utils_path}",
+    "${device_status_utils_path}/include",
+    "${device_status_root_path}/intention/prototype/include",
+    "${device_status_root_path}/services/native/include",
+    "${device_status_root_path}/services/communication/service/include",
+    "${device_status_root_path}/services/communication/base/",
+  ]
+
+  defines = []
+
+  sources = [
+    "src/cooperate_server_test.cpp",
+    "src/test_context.cpp",
+  ]
+
+  configs = []
+
+  defines = device_status_default_defines
+
+  cflags = [ "-Dprivate=public" ]
+
+  deps = [
+    "${device_status_root_path}/intention/adapters/dsoftbus_adapter:intention_dsoftbus_adapter",
+    "${device_status_root_path}/intention/adapters/input_adapter:intention_input_adapter",
+    "${device_status_root_path}/intention/cooperate/data:intention_cooperate_data",
+    "${device_status_root_path}/intention/cooperate/server:intention_cooperate_server",
+    "${device_status_root_path}/intention/data:intention_data",
+    "${device_status_root_path}/intention/ipc/socket:intention_socket_session_manager",
+    "${device_status_root_path}/intention/prototype:intention_prototype",
+    "${device_status_root_path}/intention/scheduler/plugin_manager:intention_plugin_manager",
+    "${device_status_root_path}/intention/scheduler/timer_manager:intention_timer_manager",
+    "${device_status_root_path}/intention/services/device_manager:intention_device_manager",
+    "${device_status_root_path}/services/interaction/drag:interaction_drag",
+    "${device_status_root_path}/utils/common:devicestatus_util",
+    "${device_status_root_path}/utils/ipc:devicestatus_ipc",
+  ]
+  external_deps = [
+    "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken_shared",
+    "access_token:libtokensetproc_shared",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
+    "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "image_framework:image_native",
+    "input:libmmi-client",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+    "window_manager:libdm",
+  ]
+}
+
+group("intention_cooperate_tests") {
+  testonly = true
+  deps = [
+    ":CooperateClientTest",
+    ":CooperateServerTest",
+  ]
+}
