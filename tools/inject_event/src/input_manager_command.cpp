@@ -1063,17 +1063,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "startX:" << finger.startX << ", startY:" << finger.startY <<
                                 ", endX:" << finger.endX << ", endY:" << finger.endY << std::endl;
                             }
-                            std::cout << "fingerCount:" << fingerCount <<std::endl;
-                            std::cout << "keepTimeMs:" << keepTimeMs <<std::endl;
-                            std::cout << "totalTimeMs:" << totalTimeMs <<std::endl;
                             if (keepTimeMs > MAX_KEEP_TIME || keepTimeMs < 0) {
                                 std::cout << "invalid keep times" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            if (totalTimeMs < 0 ) {
+                            if (totalTimeMs < 0) {
                                 std::cout << "invalid total times" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                            std::cout << "fingerCount:" << fingerCount <<std::endl;
+                            std::cout << "keepTimeMs:" << keepTimeMs <<std::endl;
+                            std::cout << "totalTimeMs:" << totalTimeMs <<std::endl;
 
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
@@ -1084,7 +1084,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
 
-                            std::cout << "Start down" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -1098,7 +1097,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             }
-                            std::cout << "End down" << std::endl;
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
                             int64_t startTimeMs = startTimeUs / TIME_TRANSITION;
@@ -1117,7 +1115,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "pointerIds size is error" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            std::cout << "Start move" << std::endl;
+                            
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             while (currentTimeMs < endTimeMs) {
                                 for (size_t i = 0; i < pointerIds.size(); i++) {
@@ -1131,8 +1129,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         fingerList[i].startX, fingerList[i].endX));
                                     item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
                                         fingerList[i].startY, fingerList[i].endY));
-                                    std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
-                                        << ", DisplayY:" << item.GetDisplayY() << std::endl;
                                     pointerEvent->UpdatePointerItem(pointerId, item);
                                     pointerEvent->SetPointerId(pointerId);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1160,10 +1156,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             }
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
-                            std::cout << "End move" << std::endl;
 
                             if (keepTimeMs > 0) {
-                                std::cout << "Start keep" << std::endl;
                                 currentTimeMs = GetSysClockTime() / TIME_TRANSITION;
                                 int64_t keepEndTimeMs = 0;
                                 if (!AddInt64(currentTimeMs, keepTimeMs, keepEndTimeMs)) {
@@ -1180,8 +1174,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         }
                                         item.SetDisplayX(fingerList[i].endX);
                                         item.SetDisplayY(fingerList[i].endY);
-                                        std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
-                                        << ", DisplayY:" << item.GetDisplayY() << std::endl;
                                         pointerEvent->UpdatePointerItem(pointerId, item);
                                         pointerEvent->SetPointerId(pointerId);
                                         pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1193,9 +1185,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
                                     currentTimeMs += BLOCK_TIME_MS;
                                 }
-                                std::cout << "End keep" << std::endl;
                             }
-                            std::cout << "Start up" << std::endl;
+                            
                             pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             for (size_t i = 0; i < pointerIds.size(); i++) {
@@ -1205,14 +1196,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::cout << "Invalid pointer:" << pointerId << std::endl;
                                     return EVENT_REG_FAIL;
                                 }
-                                std::cout << "pointerId:" << pointerId << ", DisplayX" << item.GetDisplayX()
-                                        << ", DisplayY:" << item.GetDisplayY() << std::endl;
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 pointerEvent->RemovePointerItem(pointerId);
                             }
-                            std::cout << "End up" << std::endl;
                             break;
                         }
                         case 'd': {
