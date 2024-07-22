@@ -21,11 +21,14 @@ config("inputconsumer_config") {
     "${mmi_path}/frameworks/napi/input_consumer/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/napi/include",
   ]
 }
 
 ohos_shared_library("inputconsumer") {
   sources = [
+    "${mmi_path}/util/napi/src/util_napi.cpp",
+    "${mmi_path}/util/napi/src/util_napi_error.cpp",
     "src/js_register_module.cpp",
     "src/js_register_util.cpp",
   ]

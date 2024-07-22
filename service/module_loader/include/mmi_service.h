@@ -21,7 +21,6 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "singleton.h"
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
@@ -40,13 +39,12 @@ namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
-    DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
-    DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
     void OnStart() override;
     void OnStop() override;
+    static MMIService* GetInstance();
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
@@ -58,7 +56,7 @@ public:
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
-    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napState) override;
@@ -134,6 +132,7 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
+    int32_t SetMoveEventFilters(bool flag) override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
@@ -149,7 +148,12 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
-
+    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+    int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+    int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
+    int32_t SetTouchpadScrollRows(int32_t rows) override;
+    int32_t GetTouchpadScrollRows(int32_t &rows) override;
+    void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
@@ -184,6 +188,7 @@ protected:
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
     int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t ReadTouchpadScrollRows(int32_t &rows);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
@@ -213,6 +218,7 @@ protected:
     bool InitSignalHandler();
     bool InitDelegateTasks();
     int32_t Init();
+    void InitPreferences();
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
@@ -229,8 +235,25 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
-
 private:
+    MMIService();
+    ~MMIService();
+private:
+    class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
+    public:
+        FoldStatusLisener(sptr<MultimodalInputConnectStub> server) : server_(server) {}
+        ~FoldStatusLisener();
+        DISALLOW_COPY_AND_MOVE(FoldStatusLisener);
+        // FoldStatus: UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
+        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+
+    private:
+        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
+        sptr<MultimodalInputConnectStub> server_ { nullptr };
+        std::mutex mutex_;
+    };
+    void RegisterFoldStatusListener();
+    void UnregisterFoldStatusListener();
     int32_t CheckPidPermission(int32_t pid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
@@ -245,8 +268,8 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
     sptr<AppDebugListener> appDebugListener_;
-
     std::atomic_bool threadStatusFlag_ { false };
+    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

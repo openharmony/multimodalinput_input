@@ -343,6 +343,13 @@ ohos_prebuilt_etc("multimodalinput_config_exclude.json") {
   relative_install_dir = "multimodalinput"
 }
 
+ohos_prebuilt_etc("multimodalinput_config_white.json") {
+  source = "${mmi_path}/etc/white_list_config.json"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput"
+}
+
 ohos_prebuilt_etc("multimodalinput.para.dac") {
   source = "${mmi_path}/etc/multimodalinput.para.dac"
   part_name = "input"
@@ -400,5 +407,6 @@ group("input_mouse_icon") {
     ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
     ":multimodalinput_config_exclude.json",
+    ":multimodalinput_config_white.json",
   ]
 }

@@ -37,7 +37,6 @@ const std::string CROWN_SOURCE { "rotary_crown" };
 const std::string VIRTUAL_CROWN_SOURCE { "Virtual Crown" };
 constexpr double DEGREE_ZERO { 0.0 };
 constexpr double VELOCITY_ZERO { 0.0 };
-constexpr double SCALE_RATIO = static_cast<double>(360) / 532;
 constexpr uint64_t MICROSECONDS_PER_SECOND = 1000 * 1000;
 }
 
@@ -160,9 +159,8 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
     CHKPR(rawPointerEvent, ERROR_NULL_POINTER);
 
     uint64_t currentTime = libinput_event_pointer_get_time_usec(rawPointerEvent);
-    double scrollValue = libinput_event_pointer_get_axis_value_discrete(rawPointerEvent,
+    double degree = libinput_event_pointer_get_axis_value_discrete(rawPointerEvent,
         LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
-    double degree = -scrollValue * SCALE_RATIO;
     double velocity = VELOCITY_ZERO;
     
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
@@ -179,8 +177,8 @@ int32_t CrownTransformProcessor::HandleCrownRotateBeginAndUpdate(struct libinput
         return RET_ERR;
     }
 
-    MMI_HILOGD("Crown scrollValue:%{public}f, degree:%{public}f, velocity:%{public}f, currentTime:%{public}" PRId64
-    " action:%{public}d", scrollValue, degree, velocity, currentTime, action);
+    MMI_HILOGD("Crown degree:%{public}f, velocity:%{public}f, currentTime:%{public}" PRId64
+    " action:%{public}d", degree, velocity, currentTime, action);
     HandleCrownRotatePostInner(velocity, degree, action);
     return RET_OK;
 }
@@ -241,10 +239,10 @@ void CrownTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
     CHKPV(pointerEvent_);
     mprintf(fd, "Crown device state information:\t");
     mprintf(fd,
-            "PointerId:%{public}d | SourceType:%{public}s | PointerAction:%{public}s | ActionTime:%{public}" PRId64
-            " | Velocity:%{public}f | AxisValue:%{public}s | AgentWindowId:%{public}d | TargetWindowId:%{public}d\t",
+            "PointerId:%{public}d | SourceType:%{public}s | PointerAction:%{public}s | ActionTime:%{public}lld"
+            " | Velocity:%{public}f | AxisValue:%{public}f | AgentWindowId:%{public}d | TargetWindowId:%{public}d\t",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
-            pointerEvent_->GetActionTime(), pointerEvent_->GetVelocity(),
+            static_cast<long long>(pointerEvent_->GetActionTime()), pointerEvent_->GetVelocity(),
             pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId());
 }

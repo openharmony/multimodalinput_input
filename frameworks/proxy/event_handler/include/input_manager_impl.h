@@ -174,6 +174,9 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+    int32_t GetPointerSnapshot(void *pixelMapPtr);
+    int32_t SetTouchpadScrollRows(int32_t rows);
+    int32_t GetTouchpadScrollRows(int32_t &rows);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid, int32_t eventId);
@@ -205,6 +208,7 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
+    int32_t SetMoveEventFilters(bool flag);
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
@@ -215,6 +219,7 @@ private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
+    int32_t PackUiExtentionWindowInfo(const std::vector<WindowInfo>& windowsInfo, NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();

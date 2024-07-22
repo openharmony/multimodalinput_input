@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
+#include "display_manager.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
@@ -35,6 +36,7 @@ public:
     virtual ~MultimodalInputConnectStub() = default;
 
     virtual bool IsRunning() const = 0;
+    virtual void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) = 0;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
         MessageOption& options) override;
 
@@ -124,6 +126,7 @@ protected:
     int32_t StubGetInfraredFrequencies(MessageParcel& data, MessageParcel& reply);
     int32_t StubTransmitInfrared(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadThreeFingersTapSwitch(MessageParcel& data, MessageParcel& reply);
@@ -131,10 +134,14 @@ protected:
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t StubAncoAddChannel(MessageParcel& data, MessageParcel& reply);
     int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);
 #endif // OHOS_BUILD_ENABLE_ANCO
+    int32_t StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

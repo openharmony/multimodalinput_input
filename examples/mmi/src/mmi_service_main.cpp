@@ -27,7 +27,7 @@ constexpr int32_t SLEEP_TIME = 10 * 60;
 
 int32_t main(int32_t argc, const char *argv[])
 {
-    auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
+    auto service = OHOS::MMIService::GetInstance();
     service->OnStart();
     while (1) {
         std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));

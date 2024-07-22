@@ -50,7 +50,6 @@ ohos_source_set("event-injection") {
   ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
@@ -60,6 +59,7 @@ ohos_source_set("event-injection") {
   external_deps = [
     "c_utils:utils",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
   ]
 
   part_name = "input"
@@ -127,7 +127,6 @@ ohos_unittest("ut-event-injection-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
@@ -141,6 +140,7 @@ ohos_unittest("ut-event-injection-out") {
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
   ]
 }
 
@@ -155,11 +155,13 @@ ohos_executable("mmi-event-injection") {
   configs = [ ":event_injection_public_config" ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
   ]
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "libinput:libinput-third-mmi",
+  ]
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"

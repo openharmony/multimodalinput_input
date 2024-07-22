@@ -171,8 +171,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     }
     CHKPR(g_keyEvent, INPUT_PARAMETER_ERROR);
     g_keyEvent->ClearFlag();
-    auto preAction = g_keyEvent->GetAction();
-    if (preAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+    if (g_keyEvent->GetAction() == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
         std::optional<OHOS::MMI::KeyEvent::KeyItem> preUpKeyItem = g_keyEvent->GetKeyItem();
         if (preUpKeyItem) {
             g_keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);

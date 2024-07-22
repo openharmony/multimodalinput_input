@@ -32,7 +32,6 @@ ohos_unittest("CrownTransformProcessorTest") {
   sources = [ "src/crown_transform_processor_test.cpp" ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
@@ -41,10 +40,12 @@ ohos_unittest("CrownTransformProcessorTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "libinput:libinput-third-mmi",
     "window_manager:libdm",
     "window_manager:libwm",
   ]
@@ -66,7 +67,6 @@ ohos_unittest("CrownTransformProcessorExTest") {
   sources = [ "src/crown_transform_processor_ex_test.cpp" ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
@@ -78,10 +78,12 @@ ohos_unittest("CrownTransformProcessorExTest") {
 
   external_deps = [
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "libinput:libinput-third-mmi",
     "window_manager:libdm",
     "window_manager:libwm",
   ]

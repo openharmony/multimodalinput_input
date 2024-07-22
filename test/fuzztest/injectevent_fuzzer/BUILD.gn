@@ -74,7 +74,6 @@ ohos_fuzztest("InjectEventFuzzTest") {
   sources = [ "injectevent_fuzzer.cpp" ]
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -102,6 +101,7 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "libinput:libinput-third-mmi",
     "napi:ace_napi",
     "preferences:native_preferences",
     "relational_store:native_rdb",

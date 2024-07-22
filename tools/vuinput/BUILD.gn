@@ -50,12 +50,12 @@ ohos_executable("vuinput") {
   }
   configs = [ ":virtual_device_public_config" ]
 
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/tools/vuinput:libmmi-virtual-device",
-  ]
+  deps = [ "${mmi_path}/tools/vuinput:libmmi-virtual-device" ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "libinput:libinput-third-mmi",
+  ]
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -83,7 +83,6 @@ ohos_unittest("ut-virtual-device-out") {
   ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
@@ -93,5 +92,6 @@ ohos_unittest("ut-virtual-device-out") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "libinput:libinput-third-mmi",
   ]
 }
