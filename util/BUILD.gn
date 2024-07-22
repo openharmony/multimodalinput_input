@@ -123,7 +123,13 @@ ohos_unittest("ut-mmi-util-out") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
   sources = [
+    "network/test/circle_stream_buffer_test.cpp",
     "network/test/net_packet_test.cpp",
     "socket/test/stream_buffer_test.cpp",
     "socket/test/uds_client_test.cpp",
