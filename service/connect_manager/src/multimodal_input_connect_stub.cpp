@@ -39,6 +39,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
+constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -368,6 +372,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS):
+            ret = StubSetMoveEventFilters(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             ret = StubSetCurrentUser(data, reply);
             break;
@@ -376,6 +383,15 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS):
             ret = StubGetHardwareCursorStats(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TOUCHPAD_SCROLL_ROWS):
+            ret = StubSetTouchpadScrollRows(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS):
+            ret = StubGetTouchpadScrollRows(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
+            ret = StubGetPointerSnapshot(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
@@ -397,6 +413,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubAncoRemoveChannel(data, reply);
             break;
 #endif // OHOS_BUILD_ENABLE_ANCO
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
+            ret = StubTransferBinderClientService(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -447,7 +466,10 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
@@ -473,6 +495,10 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckInputEventFilter()) {
+        MMI_HILOGE("Filter permission check failed");
+        return ERROR_NO_PERMISSION;
     }
     int32_t filterId = -1;
     READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -546,10 +572,8 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t windowId = 0;
-    int32_t winPid = -1;
     OHOS::Media::PixelMap *pixelMap = OHOS::Media::PixelMap::Unmarshalling(data);
     CHKPR(pixelMap, RET_ERR);
-    READINT32(data, winPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("Reading windowid the tlv count:%{public}d", windowId);
     if (windowId <= 0) {
@@ -557,7 +581,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         return RET_ERR;
     }
 
-    int32_t ret = SetMouseIcon(winPid, windowId, (void*)pixelMap);
+    int32_t ret = SetMouseIcon(windowId, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMouseIcon failed:%{public}d", ret);
         return ret;
@@ -1304,7 +1328,10 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
+    if (!PER_HELPER->CheckMouseCursor()) {
+        MMI_HILOGE("Mouse cursor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1534,6 +1561,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("StubSetPointerLocation Verify system APP failed");
         return ERROR_NOT_SYSAPI;
+    }
+    if (!PER_HELPER->CheckMouseCursor()) {
+        MMI_HILOGE("Mouse cursor permission check failed");
+        return ERROR_NO_PERMISSION;
     }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
@@ -2179,6 +2210,10 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     bool isAuthorize { false };
     READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = Authorize(isAuthorize);
@@ -2225,7 +2260,7 @@ int32_t MultimodalInputConnectStub::StubGetInfraredFrequencies(MessageParcel& da
         return ERROR_NOT_SYSAPI;
     }
     if (!PER_HELPER->CheckInfraredEmmit()) {
-        MMI_HILOGE("MulmodalConStub::StubGetInfr permi check failed. returnCode:%{public}d", ERROR_NO_PERMISSION);
+        MMI_HILOGE("Infrared permission check failed");
         return ERROR_NO_PERMISSION;
     }
     std::vector<InfraredFrequency> requencys;
@@ -2302,6 +2337,26 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetMoveEventFilters Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool flag = false;
+    READBOOL(data, flag, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMoveEventFilters failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2311,6 +2366,11 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t callingUid = GetCallingUid();
+    if (callingUid / UID_TRANSFORM_DIVISOR != userId) {
+        MMI_HILOGE("Invalid CalllingUid:%{public}d", callingUid);
+        return RET_ERR;
+    }
     int32_t ret = SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);
@@ -2382,6 +2442,76 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t rows = TOUCHPAD_SCROLL_ROWS;
+    READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
+    int32_t ret = SetTouchpadScrollRows(newRows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetTouchpadScrollRows failed ret:%{public}d, pid:%{public}d", ret, GetCallingPid());
+    }
+    MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", newRows, GetCallingPid());
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    int32_t rows = TOUCHPAD_SCROLL_ROWS;
+    int32_t ret = GetTouchpadScrollRows(rows);
+    if (rows < MIN_ROWS || rows > MAX_ROWS) {
+        MMI_HILOGD("Invalid touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
+        return ret;
+    }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadScrollRows failed, ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touchpad scroll rows:%{public}d, ret:%{public}d", rows, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap;
+    int32_t ret = GetPointerSnapshot(&pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPointerSnapshot failed ret:%{public}d", ret);
+        return ret;
+    }
+    CHKPR(pixelMap, ERR_INVALID_VALUE);
+    if (pixelMap->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
+        return ERR_INVALID_VALUE;
+    }
+    pixelMap->Marshalling(reply);
     return RET_OK;
 }
 
@@ -2464,5 +2594,19 @@ int32_t MultimodalInputConnectStub::StubAncoRemoveChannel(MessageParcel& data, M
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    sptr<IRemoteObject> remoteObj = data.ReadRemoteObject();
+    CHKPR(remoteObj, ERROR_NULL_POINTER);
+    int32_t ret = TransferBinderClientSrv(remoteObj);
+    if (ret != RET_OK) {
+        MMI_HILOGE("TransferBinderClientSrv failed");
+        return ret;
+    }
+    WRITEINT32(reply, ret);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

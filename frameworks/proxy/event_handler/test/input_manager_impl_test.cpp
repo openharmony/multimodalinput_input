@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "input_manager_impl.h"
+#include "multimodal_event_handler.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"
@@ -118,6 +119,88 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_RecoverPointerEvent, TestSiz
 
     InputMgrImpl.lastPointerEvent_->SetPointerId(2);
     EXPECT_FALSE(InputMgrImpl.RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_UP));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_OnDisconnected_01
+ * @tc.desc: Test OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.OnDisconnected());
+}
+
+/**
+ * @tc.name: InputManagerImplTest_OnDisconnected_02
+ * @tc.desc: Test OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnDisconnected_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.OnDisconnected());
+}
+
+/**
+ * @tc.name: InputManagerImplTest_OnKeyEvent_01
+ * @tc.desc: Test OnKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_OnKeyEvent_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    EXPECT_NO_FATAL_FAILURE(InputMgrImpl.OnKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_IsValiadWindowAreas_01
+ * @tc.desc: Test IsValiadWindowAreas
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsValiadWindowAreas_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<WindowInfo> windows;
+    WindowInfo window;
+    window.action = WINDOW_UPDATE_ACTION::DEL;
+
+    bool ret = InputMgrImpl.IsValiadWindowAreas(windows);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_IsValiadWindowAreas_02
+ * @tc.desc: Test IsValiadWindowAreas
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsValiadWindowAreas_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<WindowInfo> windows;
+    WindowInfo window;
+    window.action = WINDOW_UPDATE_ACTION::CHANGE;
+
+    bool ret = InputMgrImpl.IsValiadWindowAreas(windows);
+    EXPECT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -36,6 +36,7 @@
 #include "preferences_helper.h"
 #include "scene_board_judgement.h"
 #include "timer_manager.h"
+#include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -347,18 +348,22 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
-            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
-            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }

@@ -876,6 +876,30 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_011, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MultimodalInputConnectStubTest_OnRemoteRequest_012
+ * @tc.desc: Test the function OnRemoteRequest
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_012, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TOUCHPAD_SCROLL_ROWS);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    int32_t ret = stub->OnRemoteRequest(code, data, reply, option);
+    int32_t temp = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+    code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS);
+    data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
+    ret = stub->OnRemoteRequest(code, data, reply, option);
+    temp = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, temp);
+}
+
+/**
  * @tc.name: StubHandleAllocSocketFd_001
  * @tc.desc: Test the function StubHandleAllocSocketFd
  * @tc.type: FUNC
@@ -2443,6 +2467,76 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_001, TestSize.Le
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state_ = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubInjectPointerEvent(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubSetTouchpadScrollRows_001
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollRows_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetTouchpadScrollRows_002
+ * @tc.desc: Test the function StubSetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetTouchpadScrollRows_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubSetTouchpadScrollRows(data, reply);
+    EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubGetTouchpadScrollRows_001
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_001, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t returnCode = 65142800;
+    int32_t ret = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubGetTouchpadScrollRows_002
+ * @tc.desc: Test the function StubGetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_002, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
+    int32_t ret = stub->StubGetTouchpadScrollRows(data, reply);
+    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    state_ = ServiceRunningState::STATE_RUNNING;
+    ret = stub->StubGetTouchpadScrollRows(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
 } // namespace MMI

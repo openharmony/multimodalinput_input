@@ -244,5 +244,17 @@ std::shared_ptr<EventDispatchHandler> InputEventHandler::GetEventDispatchHandler
 {
     return eventDispatchHandler_;
 }
+
+int32_t InputEventHandler::SetMoveEventFilters(bool flag)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    CHKPR(eventNormalizeHandler_, INVALID_HANDLER_ID);
+    return eventNormalizeHandler_->SetMoveEventFilters(flag);
+#else
+    MMI_HILOGW("Set move event filters does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+}
 } // namespace MMI
 } // namespace OHOS

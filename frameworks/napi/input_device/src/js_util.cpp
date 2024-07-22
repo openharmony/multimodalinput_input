@@ -115,7 +115,7 @@ bool JsUtil::GetDeviceAxisInfo(sptr<CallbackInfo> cb, napi_value &object)
     CHKPF(cb->env);
     CHKPF(cb->data.device);
     napi_value sourceType = nullptr;
-    uint32_t types = cb->data.device->GetType();
+    uint32_t types = static_cast<uint32_t>(cb->data.device->GetType());
     for (const auto &item : g_deviceType) {
         if (types &item.typeBit) {
             CHKRF(napi_create_string_utf8(cb->env, item.sourceTypeName.c_str(),
@@ -171,7 +171,7 @@ bool JsUtil::GetDeviceSourceType(sptr<CallbackInfo> cb, napi_value &object)
     CHKPF(cb);
     CHKPF(cb->env);
     CHKPF(cb->data.device);
-    uint32_t types = cb->data.device->GetType();
+    uint32_t types = static_cast<uint32_t>(cb->data.device->GetType());
     std::vector<std::string> sources;
     for (const auto &item : g_deviceType) {
         if (types &item.typeBit) {

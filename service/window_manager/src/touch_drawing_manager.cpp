@@ -354,6 +354,11 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
+    if (IsWindowRotation()) {
+        RotationCanvasNode(canvasNode);
+    } else {
+        canvasNode->SetRotation(0);
+    }
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -361,7 +366,6 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
 #endif
     canvasNode->SetCornerRadius(1);
     canvasNode->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    canvasNode->SetRotation(0);
     surfaceNode_->AddChild(canvasNode, DEFAULT_VALUE);
 }
 
@@ -462,7 +466,8 @@ void TouchDrawingManager::DrawBubble()
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
         if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
                 pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
@@ -806,7 +811,8 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
 {
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
-        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) {
         return true;
     }
     return false;

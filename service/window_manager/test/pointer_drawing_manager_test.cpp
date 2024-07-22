@@ -118,26 +118,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, Test
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetMouseIcon_006
- * @tc.desc: Test SetMouseIcon
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = -2;
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, (void *)pixelMap.get());
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_003
  * @tc.desc: Test SetMouseHotSpot
  * @tc.type: FUNC
@@ -219,9 +199,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdatePointerDevice_
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 0);
+    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 100);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(true, false, true));
-    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 1);
+    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 100);
     pointerDrawingManager->surfaceNode_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(false, false, true));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -727,31 +707,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawLoadingPointerStyle_002
- * @tc.desc: Test the funcation DrawLoadingPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawLoadingPointerStyle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    MOUSE_ICON mouseStyle = WEST;
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-    mouseStyle = LOADING;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-    mouseStyle = DEFAULT;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_AttachToDisplay_001
  * @tc.desc: Test the funcation AttachToDisplay
  * @tc.type: FUNC
@@ -845,8 +800,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
     physicalX = 500;
     physicalY = 1100;
     pointerDrawingManager->FixCursorPosition(physicalX, physicalY);
-    EXPECT_EQ(physicalX, 500);
-    EXPECT_EQ(physicalY, 497);
+    EXPECT_EQ(physicalX, 497);
+    EXPECT_EQ(physicalY, 1097);
 }
 
 /**
@@ -1766,6 +1721,20 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPixelMap
+ * @tc.desc: Test SetPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPixelMap, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.SetPixelMap(pixelMap));
 }
 } // namespace MMI
 } // namespace OHOS

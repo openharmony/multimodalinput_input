@@ -428,7 +428,6 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         pkt << 0;
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
-        MMI_HILOGD("GetPointerEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;
@@ -486,7 +485,6 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Key
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
         pkt << 0;
-        MMI_HILOGD("GetKeyEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;

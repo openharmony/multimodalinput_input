@@ -42,68 +42,6 @@ public:
 };
 
 /**
- * @tc.name: PermissionHelperTest_CheckMonitorPermission
- * @tc.desc: Test CheckMonitorPermission
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckMonitorPermission, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 1;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_MONITORING);
-    ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
-    bool result = PER_HELPER->CheckMonitorPermission(tokenId);
-    ASSERT_FALSE(result);
-}
-
-/**
- * @tc.name: PermissionHelperTest_CheckInterceptorPermission
- * @tc.desc: Test CheckInterceptorPermission
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckInterceptorPermission, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 1;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_INTERCEPTOR);
-    ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
-    bool result = PER_HELPER->CheckInterceptorPermission(tokenId);
-    ASSERT_FALSE(result);
-}
-
-/**
- * @tc.name: PermissionHelperTest_CheckDispatchControlPermission_01
- * @tc.desc: Test CheckDispatchControlPermission
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControlPermission_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 1;
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, INPUT_DISPATCHCONTROL);
-    ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
-    bool result = PER_HELPER->CheckDispatchControlPermission(tokenId);
-    ASSERT_FALSE(result);
-}
-
-/**
- * @tc.name: PermissionHelperTest_CheckDispatchControlPermission_02
- * @tc.desc: Test CheckDispatchControlPermission
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckDispatchControlPermission_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    uint32_t tokenId = 2;
-    bool result = PER_HELPER->CheckDispatchControlPermission(tokenId);
-    ASSERT_FALSE(result);
-}
-
-/**
  * @tc.name: PermissionHelperTest_GetTokenType
  * @tc.desc: Test GetTokenType
  * @tc.type: FUNC

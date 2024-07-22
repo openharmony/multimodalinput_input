@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>
 
+#include "display_manager.h"
 #include "libinput.h"
 
 #include "extra_data.h"
@@ -50,6 +51,12 @@ struct CursorPosition {
     Coordinate2D cursorPos {};
 };
 
+struct TargetInfo {
+    SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
+    int32_t id { -1 };
+    int32_t agentWindowId { -1 };
+};
+
 class IInputWindowsManager {
 public:
     IInputWindowsManager() = default;
@@ -75,9 +82,10 @@ public:
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
+    virtual void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    virtual int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
+    virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

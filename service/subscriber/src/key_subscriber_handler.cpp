@@ -22,6 +22,7 @@
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "net_packet.h"
@@ -145,11 +146,13 @@ void KeySubscriberHandler::AddKeyGestureSubscriber(
     std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_INFO_TRACE;
-    subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(keyOption,
+    CHKPV(subscriber);
+    CHKPV(subscriber->sess_);
+    subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(subscriber->sess_->GetPid(), keyOption,
         [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
             NotifySubscriber(keyEvent, subscriber);
         });
-
+    MMI_HILOGI("Handler(%{public}d) of key gesture was added", subscriber->timerId_);
     PrintKeyOption(keyOption);
     for (auto &iter : keyGestures_) {
         if (IsEqualKeyOption(keyOption, iter.first)) {
@@ -172,6 +175,7 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
             if ((subscriber->id_ != subscribeId) || (subscriber->sess_ != sess)) {
                 continue;
             }
+            MMI_HILOGI("Removing handler(%{public}d) of key gesture", subscriber->timerId_);
             keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
             auto option = subscriber->keyOption_;
             MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
@@ -373,12 +377,12 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
         return false;
     }
-    if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("Repeat KeyEvent, skip");
-        return true;
-    }
     if (keyGestureMgr_.Intercept(keyEvent)) {
         MMI_HILOGD("Key gesture recognized");
+        return true;
+    }
+    if (IsRepeatedKeyEvent(keyEvent)) {
+        MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
@@ -502,6 +506,7 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
@@ -519,6 +524,7 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
@@ -569,8 +575,12 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(sess);
     int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
-        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    if (!EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
+    } else {
+        MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
+            subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
@@ -960,9 +970,9 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count = %d", subscriberMap_.size());
+    mprintf(fd, "subscribers: count = %zu", subscriberMap_.size());
     for (const auto &item : foregroundPids_) {
-        mprintf(fd, "Foreground Pids: %s", item);
+        mprintf(fd, "Foreground Pids: %d", item);
     }
     mprintf(fd,
             "enableCombineKey: %s | isForegroundExits: %s"

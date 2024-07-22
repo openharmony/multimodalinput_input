@@ -212,7 +212,7 @@ void SwitchSubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &a
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count=%d", subscribers_.size());
+    mprintf(fd, "subscribers: count=%zu", subscribers_.size());
     for (const auto &item : subscribers_) {
         std::shared_ptr<Subscriber> subscriber = item;
         CHKPV(subscriber);
