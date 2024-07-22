@@ -3583,8 +3583,6 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
         MMI_HILOGE("Failed to read pixelmap");
         return false;
     }
-    MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
-        dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     return dst == RET_OK;
 }
 
