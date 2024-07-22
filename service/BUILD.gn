@@ -1033,6 +1033,45 @@ ohos_unittest("InputWindowsManagerEXTest") {
   ]
 }
 
+ohos_unittest("AccountManagerTest") {
+  module_out_path = module_output_path
+
+  include_dirs = [
+    "${mmi_path}/service/account_manager/include",
+    "${mmi_service_path}/device_state_manager/include",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "account_manager/test/account_manager_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "ability_runtime:wantagent_innerkits",
+    "c_utils:utils",
+    "call_manager:tel_call_manager_api",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "init:libbegetutil",
+  ]
+}
+
 ohos_unittest("SubscriberTest") {
   module_out_path = module_output_path
 
