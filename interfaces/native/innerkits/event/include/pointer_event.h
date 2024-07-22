@@ -1006,15 +1006,15 @@ public:
         /**
          * @brief Obtains the moveflag in this event.
          * @return Returns the moveflag.
-         * @since 9
+         * @since 12
          */
         int32_t GetMoveFlag() const;
 
         /**
          * @brief Sets the moveflag for this event.
-         * @param pressure Indicates the moveflag to set.
+         * @param moveflag Indicates the moveflag to set.
          * @return void
-         * @since 9
+         * @since 12
          */
         void SetMoveFlag(int32_t moveflag);
 
