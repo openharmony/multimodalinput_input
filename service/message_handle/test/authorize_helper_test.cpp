@@ -39,7 +39,7 @@ void AuthorizeExitFunTest(int32_t) {}
 
 /**
  * @tc.name: AuthorizeHelperTest_OnClientDeath
- * @tc.desc: Test AuthorizeProcessExit
+ * @tc.desc: Test OnClientDeath
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -56,7 +56,7 @@ HWTEST_F(AuthorizeHelperTest, ClientDeathHandlerTest_OnClientDeath, TestSize.Lev
 
 /**
  * @tc.name: AuthorizeHelperTest_AuthorizeProcessExit
- * @tc.desc: Test 
+ * @tc.desc: Test AuthorizeProcessExit
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -70,7 +70,7 @@ HWTEST_F(AuthorizeHelperTest, AuthorizeHelperTest_AuthorizeProcessExit, TestSize
 
 /**
  * @tc.name: AuthorizeHelperTest_AuthorizeProcessExit_001
- * @tc.desc: Test 
+ * @tc.desc: Test AuthorizeProcessExit
  * @tc.type: FUNC
  * @tc.require:
  */
