@@ -1057,7 +1057,6 @@ ohos_unittest("AccountManagerTest") {
   sources = [ "account_manager/test/account_manager_test.cpp" ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
