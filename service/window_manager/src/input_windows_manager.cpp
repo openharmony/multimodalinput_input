@@ -3151,39 +3151,39 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
     Coordinate2D& cursorPos) const
 {
     const Direction direction = info.direction;
-    MMI_HILOGD("X:%{public}.2f, Y:%{public}.2f, info.width:%{public}d, info.height:%{public}d",
+    MMI_HILOGD("X:%{private}.2f, Y:%{private}.2f, info.width:%{private}d, info.height:%{private}d",
         x, y, info.width, info.height);
     switch (direction) {
         case DIRECTION0: {
             MMI_HILOGD("direction is DIRECTION0");
             cursorPos.x = x;
             cursorPos.y = y;
-            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION90: {
             MMI_HILOGD("direction is DIRECTION90");
             cursorPos.y = static_cast<double>(info.width) - x;
             cursorPos.x = y;
-            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
             MMI_HILOGD("direction is DIRECTION180");
             cursorPos.x = static_cast<double>(info.width) - x;
             cursorPos.y = static_cast<double>(info.height) - y;
-            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
             MMI_HILOGD("direction is DIRECTION270");
             cursorPos.x = static_cast<double>(info.height) - y;
             cursorPos.y = x;
-            MMI_HILOGD("physicalX:%{public}.2f, physicalY:%{public}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
             break;
         }
         default: {
-            MMI_HILOGE("direction is invalid, direction:%{public}d", direction);
+            MMI_HILOGE("direction is invalid, direction:%{private}d", direction);
             break;
         }
     }
