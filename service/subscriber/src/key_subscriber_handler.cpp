@@ -50,7 +50,7 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
 {
     CHKPV(keyEvent);
     if (OnSubscribeKeyEvent(keyEvent)) {
-        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return;
     }
@@ -94,7 +94,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     }
 
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
     MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d,"
         "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
@@ -294,7 +294,7 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_RIGHT ||
         keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
-        MMI_HILOGD("Subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("Subscriber mulit swipe keycode is:%{private}d", keyEvent->GetKeyCode());
         return IsEnableCombineKeySwipe(keyEvent);
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
@@ -387,7 +387,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
-    MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
+    MMI_HILOGD("keyCode:%{private}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
         KeyEvent::ActionToString(keyAction));
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
@@ -396,7 +396,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         return true;
     }
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
-        MMI_HILOGD("Pressed KeyCode:%{public}d", keyCode);
+        MMI_HILOGD("Pressed KeyCode:%{private}d", keyCode);
     }
     bool handled = false;
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
@@ -578,7 +578,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
     } else {
-        MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
+        MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{private}d, pid:%{public}d",
             subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
     }
     if (pkt.ChkRWError()) {
@@ -948,7 +948,7 @@ void KeySubscriberHandler::PrintKeyOption(const std::shared_ptr<KeyOption> keyOp
         keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
 }
 
@@ -962,7 +962,7 @@ void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subs
         subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), keyOption->GetFinalKeyUpDelay());
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
     }
 }
 

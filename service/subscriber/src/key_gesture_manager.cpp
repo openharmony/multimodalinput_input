@@ -212,21 +212,21 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             std::ostringstream output;
             output << "[LongPressCombinationKey] ";
             Dump(output);
-            MMI_HILOGI("%{public}s is active now", output.str().c_str());
+            MMI_HILOGI("%{private}s is active now", output.str().c_str());
             return true;
         }
         if (!IsWorking()) {
             std::ostringstream output;
             output << "[LongPressCombinationKey] Switch off ";
             Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            MMI_HILOGI("%{private}s", output.str().c_str());
             return false;
         }
         if (handlers_.empty()) {
             std::ostringstream output;
             output << "[LongPressCombinationKey] No handler for ";
             Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            MMI_HILOGI("%{private}s", output.str().c_str());
             return false;
         }
         if (RecognizeGesture(keyEvent)) {
@@ -278,7 +278,7 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     std::ostringstream output;
     output << "[LongPressCombinationKey] trigger ";
     Dump(output);
-    MMI_HILOGI("%{public}s", output.str().c_str());
+    MMI_HILOGI("%{private}s", output.str().c_str());
     OnTriggerAll(keyEvent);
     TriggerHandlers(keyEvent);
 }
@@ -362,7 +362,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
             std::ostringstream output;
             output << "Intercepted by ";
             (*iter)->Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            MMI_HILOGI("%{private}s", output.str().c_str());
             for (++iter; iter != keyGestures_.end(); ++iter) {
                 (*iter)->Reset();
             }
@@ -377,7 +377,7 @@ void KeyGestureManager::Dump() const
     for (const auto &keyGesture : keyGestures_) {
         std::ostringstream output;
         keyGesture->Dump(output);
-        MMI_HILOGI("%{public}s", output.str().c_str());
+        MMI_HILOGI("%{private}s", output.str().c_str());
     }
 }
 } // namespace MMI

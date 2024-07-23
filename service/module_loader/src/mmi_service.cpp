@@ -1291,7 +1291,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{private}d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1488,10 +1488,10 @@ int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerE
         pointerItem.SetDisplayX(destX);
         pointerItem.SetDisplayY(destY);
         if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
+            MMI_HILOGI("PointerItem's displayX:%{private}d, displayY:%{private}d when first inject,"
                 "Screen resolution width:%{public}d, height:%{public}d first got,"
                 "Screen resolution width:%{public}d, height:%{public}d current got,"
-                "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
+                "PointerItem's displayX:%{private}d, displayY:%{private}d after self adaptaion",
                 sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
                 displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
         }
