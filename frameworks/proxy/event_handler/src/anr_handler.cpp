@@ -20,6 +20,7 @@
 #include "ffrt.h"
 #include "ffrt_inner.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "input_manager_impl.h"
 #include "multimodal_input_connect_manager.h"
@@ -61,6 +62,7 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
 void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
+    BytraceAdapter::StartMarkedTracker(eventId);
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
     {
         std::lock_guard<std::mutex> guard(mutex_);
@@ -75,6 +77,7 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
         }
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(eventType, eventId);
+    BytraceAdapter::StopMarkedTracker();
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }

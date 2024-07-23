@@ -75,6 +75,12 @@ public:
     static void StartPostTaskEvent(std::shared_ptr<KeyEvent> keyEvent);
     static void StopPostTaskEvent();
 
+    static void StartMarkedTracker(int32_t eventId);
+    static void StopMarkedTracker();
+
+    static void StartTouchEvent(int32_t pointerId);
+    static void StopTouchEvent();
+
 private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);
