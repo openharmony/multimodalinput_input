@@ -179,7 +179,6 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
