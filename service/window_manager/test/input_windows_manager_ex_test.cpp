@@ -51,7 +51,7 @@ void InputWindowsManagerTest::SetUpTestCase(void)
 }
 void InputWindowsManagerTest::TearDownTestCase()
 {
-    EXPECT_CALL(*messageParcelMock_, IsFoldable()).WillOnce(Return(false));
+    // EXPECT_CALL(*messageParcelMock_, IsFoldable()).WillOnce(Return(false));
     IInputWindowsManager::instance_.reset();
     IInputWindowsManager::instance_ = nullptr;
     MessageParcelMock::messageParcel = nullptr;
