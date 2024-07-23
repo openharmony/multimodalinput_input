@@ -94,7 +94,7 @@ void EventResample::EventDump(const char *msg, MotionEvent &event)
                msg, event.pointerAction, event.actionTime, event.pointerCount,
                event.sourceType, event.deviceId, event.eventId);
     for (auto &it : event.pointers) {
-        MMI_HILOGD("ID:%{public}d, coordX:%{public}d, coordY:%{public}d, toolType:%{public}d",
+        MMI_HILOGD("ID:%{public}d, coordX:%{private}d, coordY:%{private}d, toolType:%{public}d",
                    it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
     }
 }
@@ -184,7 +184,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
-            MMI_HILOGD("Output event: toolWindowX:%{public}d, toolWindowY:%{public}d", toolWindowX, toolWindowY);
+            MMI_HILOGD("Output event: toolWindowX:%{private}d, toolWindowY:%{private}d", toolWindowX, toolWindowY);
             auto logicX = it.second.coordX;
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);

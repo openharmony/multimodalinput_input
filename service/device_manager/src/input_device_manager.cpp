@@ -377,7 +377,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     }
     if (!inDevice.sysUid.empty()) {
         devCallbacks_(deviceId, inDevice.sysUid, "add");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{private}s, status:add",
             deviceId, inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
@@ -483,7 +483,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     if (!sysUid.empty()) {
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{private}s, status:remove",
             deviceId, sysUid.c_str());
     }
 
@@ -612,7 +612,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(deviceId, false);
         CHKPV(inputDevice);
         mprintf(fd,
-            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
+            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%{private}d | version:%d "
             "| product:%d | vendor:%d | phys:%s\t",
             inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
             inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),

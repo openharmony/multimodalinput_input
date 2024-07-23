@@ -139,7 +139,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
-    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    MMI_HILOGD("Inject keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     return RET_OK;
 }
 
@@ -305,7 +305,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
+    MMI_HILOGD("Cursor move to (x:%{private}.2f,y:%{private}.2f,DisplayId:%{private}d)",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
@@ -387,7 +387,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        MMI_HILOGE("Can't find pointer item, pointer:%{private}d", pointerId);
         return false;
     }
     if (isShell) {
@@ -401,7 +401,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
             targetWindowId = iter->second;
         }
     }
-    MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
+    MMI_HILOGD("TargetWindowId:%{private}d %{private}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
         action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
         MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
