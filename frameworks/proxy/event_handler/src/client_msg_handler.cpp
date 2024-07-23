@@ -45,8 +45,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
-const std::string POINTER_ACTION_AXIS_UPDATE { "axis-update" };
-const std::string POINTER_ACTION_ROTATE_UPDATE { "rotate-update" };
 } // namespace
 void ClientMsgHandler::Init()
 {
