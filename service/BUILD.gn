@@ -1550,6 +1550,37 @@ ohos_unittest("EventHandlerTest") {
   ]
 }
 
+ohos_unittest("EventNormalizeHandlerTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "event_handler/test/event_normalize_handler_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
+    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "libinput:libinput-third-mmi",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
 ohos_unittest("EventHandlerEXTest") {
   module_out_path = module_output_path
 
