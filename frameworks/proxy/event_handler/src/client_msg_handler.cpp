@@ -45,6 +45,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
+const std::string POINTER_ACTION_AXIS_UPDATE { "axis-update" };
+const std::string POINTER_ACTION_ROTATE_UPDATE { "rotate-update" };
 } // namespace
 void ClientMsgHandler::Init()
 {
@@ -184,9 +186,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
-    std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
-    aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
-        std::to_string(pointerEvent->GetId()));
+    std::string dumpPointerAction = pointerEvent->DumpPointerAction();
+    if (dumpPointerAction != POINTER_ACTION_AXIS_UPDATE && dumpPointerAction != POINTER_ACTION_ROTATE_UPDATE) {
+        std::string logInfo = std::string("ac: ") + dumpPointerAction;
+        aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
+            std::to_string(pointerEvent->GetId()));
+    }
     EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
