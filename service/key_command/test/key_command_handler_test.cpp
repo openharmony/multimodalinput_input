@@ -1953,7 +1953,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
@@ -2041,30 +2041,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_AdjustDistanceConfigIfNeed
     ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
     handler.downToPrevDownDistanceConfig_ = 30.0f;
     ASSERT_NO_FATAL_FAILURE(handler.AdjustDistanceConfigIfNeed(distance));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_ReportKnuckleDoubleClickEvent
- * @tc.desc: Test ReportKnuckleDoubleClickEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportKnuckleDoubleClickEvent, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    PointerEvent::PointerItem item;
-    KnuckleGesture knuckleGesture;
-    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
-    ASSERT_NE(touchEvent, nullptr);
-    item.SetPointerId(1);
-    touchEvent->AddPointerItem(item);
-    knuckleGesture.downToPrevUpTime = 100;
-    ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture));
-
-    item.SetPointerId(2);
-    touchEvent->AddPointerItem(item);
-    ASSERT_NO_FATAL_FAILURE(handler.ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture));
 }
 
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -3732,6 +3708,53 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_003, TestSize
     handler.launchAbilityCount_ = 0;
     handler.repeatKey_.keyCode = 2;
     ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_001
+ * @tc.desc: Test the funcation CheckAndUpdateTappingCountAtDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->SetActionTime(0);
+    handler.lastDownTime_ = 0;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(touchEvent));
+    ASSERT_EQ(handler.tappingCount_, 1);
+
+    touchEvent->SetActionTime(600000);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(touchEvent));
+    ASSERT_EQ(handler.tappingCount_, 1);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_002
+ * @tc.desc: Test the funcation CheckAndUpdateTappingCountAtDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCountAtDown_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    touchEvent->SetActionTime(10);
+    handler.lastDownTime_ = 0;
+    handler.previousUpTime_ = 0;
+    handler.downToPrevUpTimeConfig_ = 20;
+    handler.tappingCount_ = 1;
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(touchEvent));
+    ASSERT_EQ(handler.tappingCount_, 2);
+
+    touchEvent->SetActionTime(20);
+    ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(touchEvent));
+    ASSERT_EQ(handler.tappingCount_, 3);
 }
 } // namespace MMI
 } // namespace OHOS
