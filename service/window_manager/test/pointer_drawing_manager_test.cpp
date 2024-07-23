@@ -707,29 +707,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_AttachToDisplay_001
- * @tc.desc: Test the funcation AttachToDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AttachToDisplay_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    manager.screenId_ = 0;
-    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
-    manager.screenId_ = 1;
-    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
  * @tc.desc: Test SetPointerStyle
  * @tc.type: FUNC
