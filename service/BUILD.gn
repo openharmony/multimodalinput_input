@@ -1749,6 +1749,7 @@ ohos_unittest("DisplayStateManagerTest") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
