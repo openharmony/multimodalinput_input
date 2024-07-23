@@ -282,7 +282,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
-        lastPointerEvent_ = std::make_shared<pointerEvent>(*pointerEvent);
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
         consumerCount = GetMonitorConsumerInfos(pointerEvent, consumerInfos);
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
@@ -380,7 +380,7 @@ template<typename T>
 bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
-    CHKPV(lastPointerEvent_);
+    CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
