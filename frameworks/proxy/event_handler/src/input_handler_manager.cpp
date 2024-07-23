@@ -376,7 +376,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-void InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
+template<typename T>
+bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
     CALL_INFO_TRACE;
     CHKPV(lastPointerEvent_);
@@ -388,15 +389,16 @@ void InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
             if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
                 MMI_HILOG_DISPATCHD("Get pointer item failed. pointer:%{public}d",
                     pointerId);
-                return;
+                return false;
             }
             item.SetPressed(false);
             lastPointerEvent_->UpdatePointerItem(pointerId, item);
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
             OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 void InputHandlerManager::OnDisconnected()
@@ -404,8 +406,10 @@ void InputHandlerManager::OnDisconnected()
     CALL_INFO_TRACE;
     std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
         PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
-    RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END);
-    MMI_HILOGE("Swipe end event for service exception re-sending");
+    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        MMI_HILOGE("Swipe end event for service exception re-sending");
+        return;
+    }
 }
 
 void InputHandlerManager::OnConnected()

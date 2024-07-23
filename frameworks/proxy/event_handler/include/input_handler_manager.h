@@ -42,7 +42,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     template<typename T>
-    void RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
+    bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
     void OnConnected();
     void OnDisconnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
