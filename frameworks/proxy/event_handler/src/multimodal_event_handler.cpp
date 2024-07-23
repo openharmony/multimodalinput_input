@@ -54,6 +54,9 @@ void OnDisconnected(const IfMMIClient &client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnDisconnected();
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    IMonitorMgr->OnDisconnected();
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
