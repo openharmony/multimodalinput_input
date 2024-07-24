@@ -3365,7 +3365,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                     win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            mprintf(fd, "\t pointerHotAreas: x:%{private}d | y:{private}%d | width:%d | height:%d \t",
+            mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
 
