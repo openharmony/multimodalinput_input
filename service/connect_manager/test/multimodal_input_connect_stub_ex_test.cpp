@@ -262,6 +262,7 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override { return deviceId; }
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
+    int32_t SetMoveEventFilters(bool flag) { return 0; }
     int32_t GetPointerSnapshot(void *pixelMap) override
     {
         std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);

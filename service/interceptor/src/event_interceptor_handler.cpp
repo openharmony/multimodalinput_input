@@ -33,6 +33,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ACCESSIBILITY_UID { 1103 };
+} // namespace
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -169,6 +172,10 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
 void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
+    CHKPV(session_);
+    if (session_->GetUid() == ACCESSIBILITY_UID) {
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    }
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
     pkt << handlerType_ << deviceTags_;

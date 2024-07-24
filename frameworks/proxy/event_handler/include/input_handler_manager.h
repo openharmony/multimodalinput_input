@@ -41,7 +41,10 @@ public:
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+    template<typename T>
+    bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
     void OnConnected();
+    void OnDisconnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     bool HasHandler(int32_t handlerId);
     virtual InputHandlerType GetHandlerType() const = 0;
@@ -95,6 +98,7 @@ private:
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

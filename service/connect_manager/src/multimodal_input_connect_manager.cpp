@@ -788,6 +788,13 @@ int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &sw
     return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
 
+int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+}
+
 int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

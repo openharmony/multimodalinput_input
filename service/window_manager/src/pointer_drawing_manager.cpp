@@ -126,6 +126,12 @@ void PointerDrawingManager::InitPointerCallback()
     g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor() && surfaceNode_ != nullptr) {
+        surfaceNode_ = nullptr;
+        MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 PointerDrawingManager::PointerDrawingManager()

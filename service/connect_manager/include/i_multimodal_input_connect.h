@@ -137,6 +137,7 @@ public:
     virtual int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) = 0;
     virtual int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) = 0;
     virtual int32_t SetPixelMapData(int32_t infoId, void* pixelMap) = 0;
+    virtual int32_t SetMoveEventFilters(bool flag) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) = 0;
     virtual int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) = 0;

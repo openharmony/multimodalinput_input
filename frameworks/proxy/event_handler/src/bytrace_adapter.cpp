@@ -370,5 +370,25 @@ void BytraceAdapter::StopLaunchAbility()
 {
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
+
+void BytraceAdapter::StartMarkedTracker(int32_t eventId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "markProcessed eventId:" + std::to_string(eventId));
+}
+
+void BytraceAdapter::StopMarkedTracker()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartTouchEvent(int32_t pointerId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT, "startTouchEvent pointerId:" + std::to_string(pointerId));
+}
+
+void BytraceAdapter::StopTouchEvent()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
 } // namespace MMI
 } // namespace OHOS

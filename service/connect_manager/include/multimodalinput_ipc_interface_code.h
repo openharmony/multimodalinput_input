@@ -121,6 +121,7 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_TOUCHPAD_SCROLL_ROWS = 97,
     GET_TOUCHPAD_SCROLL_ROWS = 98,
     GET_POINTER_SNAPSHOT = 99,
+    SET_MOVE_EVENT_FILTERS = 100,
 };
 
 enum class MultimodalinputEventObserverCode {

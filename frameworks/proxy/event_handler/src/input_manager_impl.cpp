@@ -1361,8 +1361,6 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
-    std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
-        PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
     if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
@@ -1370,11 +1368,6 @@ void InputManagerImpl::OnDisconnected()
 
     if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
         MMI_HILOGE("Pull up event for service exception re-sending");
-        return;
-    }
-
-    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
-        MMI_HILOGE("Swipe end event for service exception re-sending");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -2236,6 +2229,21 @@ int32_t InputManagerImpl::SetCurrentUser(int32_t userId)
         MMI_HILOGE("Failed to set userId, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t InputManagerImpl::SetMoveEventFilters(bool flag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set move event filters failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Set move event filters does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 }
 
 int32_t InputManagerImpl::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
