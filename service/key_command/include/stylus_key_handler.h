@@ -26,13 +26,13 @@ namespace MMI {
 struct StylusKey {
     bool lastEventIsStylus { false };
     bool isLaunchAbility { false };
-    std::string statusConfig { "" };
+    std::string statusConfig;
     bool statusConfigValue { false };
     Ability ability;
 };
 
 struct ShortHandTarget {
-    std::string statusConfig { "" };
+    std::string statusConfig;
     bool statusConfigValue { false };
 };
 class StylusKeyHandler final {
