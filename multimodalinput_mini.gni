@@ -47,7 +47,6 @@ declare_args() {
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = true
-  input_feature_infrared_emitter = true
   input_feature_move_event_filters = false
 
   if (defined(global_parts_info) &&
@@ -283,7 +282,6 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
-print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
 print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
