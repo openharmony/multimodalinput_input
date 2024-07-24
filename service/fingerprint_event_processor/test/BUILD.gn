@@ -83,5 +83,6 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
   ]
 }
