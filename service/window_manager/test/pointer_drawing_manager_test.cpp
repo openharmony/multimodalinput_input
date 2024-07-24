@@ -71,6 +71,200 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerTest::SetMouseIconTe
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_01
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = -1;
+    int32_t windowId = 2;
+    int32_t hotSpotX = 3;
+    int32_t hotSpotY = 4;
+    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_02
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = -2;
+    int32_t hotSpotX = 3;
+    int32_t hotSpotY = 4;
+    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_03
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
+    int32_t hotSpotX = 3;
+    int32_t hotSpotY = 4;
+    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_04
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
+    int32_t hotSpotX = -3;
+    int32_t hotSpotY = -4;
+    pointerDrawingManager.userIcon_ = nullptr;
+    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseIcon_01
+ * @tc.desc: Test SetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = -1;
+    int32_t windowId = -2;
+    void* pixelMap = nullptr;
+    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseIcon_02
+ * @tc.desc: Test SetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = -2;
+    void* pixelMap = nullptr;
+    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseIcon_03
+ * @tc.desc: Test SetMouseIcon
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    PointerStyle style;
+    int32_t ret1 = pointerDrawingManager.SetPointerStyle(pid, windowId, style);
+    EXPECT_EQ(ret1, RET_OK);
+
+    void* pixelMap = nullptr;
+    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, pixelMap);
+    ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustMouseFocusByDirection270_01
+ * @tc.desc: Test AdjustMouseFocusByDirection270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDirection270_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ICON_TYPE iconType = ANGLE_SW;
+    int32_t physicalX = 150;
+    int32_t physicalY = 200;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.AdjustMouseFocusByDirection270(iconType, physicalX, physicalY));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustMouseFocusByDirection270_02
+ * @tc.desc: Test AdjustMouseFocusByDirection270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDirection270_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ICON_TYPE iconType = ANGLE_CENTER;
+    int32_t physicalX = 100;
+    int32_t physicalY = 150;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.AdjustMouseFocusByDirection270(iconType, physicalX, physicalY));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustMouseFocusByDirection270_03
+ * @tc.desc: Test AdjustMouseFocusByDirection270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDirection270_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ICON_TYPE iconType = ANGLE_NW_RIGHT;
+    int32_t physicalX = 50;
+    int32_t physicalY = 150;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.AdjustMouseFocusByDirection270(iconType, physicalX, physicalY));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustMouseFocusByDirection270_04
+ * @tc.desc: Test AdjustMouseFocusByDirection270
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocusByDirection270_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ICON_TYPE iconType = ANGLE_NW;
+    int32_t physicalX = 100;
+    int32_t physicalY = 50;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.AdjustMouseFocusByDirection270(iconType, physicalX, physicalY));
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_DrawMovePointer_001
  * @tc.desc: Test the funcation DrawMovePointer
  * @tc.type: FUNC
