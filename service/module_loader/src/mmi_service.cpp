@@ -1488,7 +1488,7 @@ int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerE
         pointerItem.SetDisplayX(destX);
         pointerItem.SetDisplayY(destY);
         if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
+            MMI_HILOGD("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
                 "Screen resolution width:%{public}d, height:%{public}d first got,"
                 "Screen resolution width:%{public}d, height:%{public}d current got,"
                 "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
