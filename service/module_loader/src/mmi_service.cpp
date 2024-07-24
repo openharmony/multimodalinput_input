@@ -59,10 +59,6 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "watchdog_task.h"
-#include "xcollie/watchdog.h"
-#include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -439,8 +435,6 @@ void MMIService::OnStart()
             MMI_HILOGI("Mmi-server Timeout");
         }
     };
-    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
-        WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
 }
 
