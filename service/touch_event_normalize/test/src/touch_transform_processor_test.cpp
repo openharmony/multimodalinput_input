@@ -16,8 +16,6 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "display_manager.h"
-
 #include "define_multimodal.h"
 #include "general_touchscreen.h"
 #include "input_device_manager.h"
@@ -38,7 +36,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void UpdateDisplayInfo();
     
 private:
     static void SetupTouchscreen();
@@ -54,7 +51,6 @@ void TouchTransformProcessorTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupTouchscreen();
-    UpdateDisplayInfo();
 }
 
 void TouchTransformProcessorTest::TearDownTestCase(void)
@@ -78,23 +74,6 @@ void TouchTransformProcessorTest::CloseTouchscreen()
 {
     libinput_.RemovePath(vTouchscreen_.GetDevPath());
     vTouchscreen_.Close();
-}
-
-void TouchTransformProcessorTest::UpdateDisplayInfo()
-{
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    ASSERT_TRUE(display != nullptr);
-    DisplayGroupInfo displays {
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-        .focusWindowId = -1,
-    };
-    displays.displaysInfo.push_back(DisplayInfo {
-        .name = "default display",
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-    });
-    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void TouchTransformProcessorTest::SetUp()

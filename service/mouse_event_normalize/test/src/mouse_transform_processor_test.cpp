@@ -16,8 +16,6 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "display_manager.h"
-
 #include "general_mouse.h"
 #include "general_touchpad.h"
 #include "mouse_transform_processor.h"
@@ -42,7 +40,6 @@ public:
     static void TearDownTestCase(void);
     static void SetupMouse();
     static void CloseMouse();
-    static void UpdateDisplayInfo();
     void SetUp();
     void TearDown();
 
@@ -70,7 +67,6 @@ void MouseTransformProcessorTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupMouse();
-    UpdateDisplayInfo();
 }
 
 void MouseTransformProcessorTest::TearDownTestCase(void)
@@ -102,24 +98,6 @@ void MouseTransformProcessorTest::CloseMouse()
     vMouse_.Close();
     libinput_.RemovePath(vTouchpad_.GetDevPath());
     vTouchpad_.Close();
-}
-
-void MouseTransformProcessorTest::UpdateDisplayInfo()
-{
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    ASSERT_TRUE(display != nullptr);
-
-    DisplayGroupInfo displays {
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-        .focusWindowId = -1,
-    };
-    displays.displaysInfo.push_back(DisplayInfo {
-        .name = "default display",
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-    });
-    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void MouseTransformProcessorTest::SetUp()

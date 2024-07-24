@@ -17,7 +17,6 @@
 #include <gtest/gtest.h>
 
 #include "dfx_hisysevent.h"
-#include "display_manager.h"
 #include "event_filter_handler.h"
 #include "event_normalize_handler.h"
 #include "event_resample.h"
