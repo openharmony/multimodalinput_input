@@ -265,7 +265,6 @@ ohos_unittest("InputHandlerManagerTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "window_manager:libdm",
     "window_manager:libwm_lite",

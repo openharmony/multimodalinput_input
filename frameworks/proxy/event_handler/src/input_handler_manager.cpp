@@ -32,6 +32,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t DEVICE_TAGS { 1 };
+} // namespace
 InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
@@ -279,6 +282,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
         consumerCount = GetMonitorConsumerInfos(pointerEvent, consumerInfos);
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
@@ -372,6 +376,42 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+template<typename T>
+bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPF(lastPointerEvent_);
+    int32_t pointerAction = lastPointerEvent_->GetPointerAction();
+    for (const auto &it : pointerActionEvents) {
+        if (pointerAction == it) {
+            PointerEvent::PointerItem item;
+            int32_t pointerId = lastPointerEvent_->GetPointerId();
+            if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
+                MMI_HILOG_DISPATCHD("Get pointer item failed. pointer:%{public}d",
+                    pointerId);
+                return false;
+            }
+            item.SetPressed(false);
+            lastPointerEvent_->UpdatePointerItem(pointerId, item);
+            lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
+            return true;
+        }
+    }
+    return false;
+}
+
+void InputHandlerManager::OnDisconnected()
+{
+    CALL_INFO_TRACE;
+    std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
+        PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
+    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        MMI_HILOGE("Swipe end event for service exception re-sending");
+        return;
+    }
+}
+
 void InputHandlerManager::OnConnected()
 {
     CALL_DEBUG_ENTER;

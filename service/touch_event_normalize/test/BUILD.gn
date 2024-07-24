@@ -66,6 +66,13 @@ ohos_unittest("GestureTransformTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
@@ -185,7 +192,6 @@ ohos_unittest("GestureTransformTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
@@ -213,6 +219,13 @@ ohos_unittest("TabletToolTranformTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
@@ -333,7 +346,6 @@ ohos_unittest("TabletToolTranformTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
@@ -502,7 +514,6 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
@@ -642,7 +653,6 @@ ohos_unittest("TouchpadGestureTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
@@ -782,7 +792,6 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
@@ -802,6 +811,8 @@ group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
+    ":GestureTransformTest",
+    ":TabletToolTranformTest",
     ":TouchEventNormalizeTest",
     ":TouchPadTransformProcessorMockTest",
     ":TransformPointTest",
