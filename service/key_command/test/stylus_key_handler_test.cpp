@@ -72,6 +72,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_002, TestSiz
     ASSERT_TRUE(keyEvent != nullptr);
     STYLUS_HANDLER->SetLastEventState(true);
     STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
     STYLUS_HANDLER->IsLaunchAbility();
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_TRUE(result);
