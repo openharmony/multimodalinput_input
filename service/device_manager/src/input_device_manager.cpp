@@ -612,7 +612,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(deviceId, false);
         CHKPV(inputDevice);
         mprintf(fd,
-            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%{private}d | version:%d "
+            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
             "| product:%d | vendor:%d | phys:%s\t",
             inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
             inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
