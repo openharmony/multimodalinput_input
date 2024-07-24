@@ -55,6 +55,7 @@ namespace {
 const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
+const std::string CursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string POINTER_COLOR { "pointerColor" };
 const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
@@ -261,8 +262,14 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
-        physicalX, physicalY);
+    std::map<MOUSE_ICON, IconStyle> iconPath = GetMouseIconPath();
+    if (pointerStyle.id == MOUSE_ICON::DEFAULT && iconPath[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
+        AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
+            physicalX, physicalY);   
+    } else {
+        AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
+            physicalX, physicalY);   
+    }
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
         MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
