@@ -360,9 +360,8 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
         if ((*iter)->Intercept(keyEvent)) {
             std::ostringstream output;
-            output << "Intercepted by ";
             (*iter)->Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            MMI_HILOGI("Intercepted by %{public}s", output.str().c_str());
             for (++iter; iter != keyGestures_.end(); ++iter) {
                 (*iter)->Reset();
             }
@@ -370,6 +369,13 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return false;
+}
+
+void KeyGestureManager::ResetAll()
+{
+    for (auto &keyGesture : keyGestures_) {
+        keyGesture->Reset();
+    }
 }
 
 void KeyGestureManager::Dump() const

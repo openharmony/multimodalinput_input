@@ -911,6 +911,7 @@ void KeySubscriberHandler::RemoveSubscriberKeyUpTimer(int32_t keyCode)
             }
         }
     }
+    keyGestureMgr_.ResetAll();
 }
 
 bool KeySubscriberHandler::IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes)
