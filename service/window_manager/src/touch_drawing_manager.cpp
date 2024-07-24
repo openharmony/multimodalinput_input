@@ -14,7 +14,9 @@
  */
 
 #include "touch_drawing_manager.h"
+
 #include "bytrace_adapter.h"
+#include "delegate_interface.h"
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
@@ -207,7 +209,7 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
     }
 }
 
-void TouchDrawingManager::UpdateLabels()
+int32_t TouchDrawingManager::UpdateLabels()
 {
     CALL_DEBUG_ENTER;
     if (pointerMode_.isShow) {
@@ -219,17 +221,19 @@ void TouchDrawingManager::UpdateLabels()
         DestoryTouchWindow();
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
+    return RET_OK;
 }
 
-void TouchDrawingManager::UpdateBubbleData()
+int32_t TouchDrawingManager::UpdateBubbleData()
 {
     if (!bubbleMode_.isShow) {
-        CHKPV(surfaceNode_);
+        CHKPR(surfaceNode_, ERROR_NULL_POINTER);
         surfaceNode_->RemoveChild(bubbleCanvasNode_);
         bubbleCanvasNode_.reset();
         DestoryTouchWindow();
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    return RET_OK;
 }
 
 void TouchDrawingManager::RotationScreen()
@@ -289,14 +293,15 @@ template <class T>
 void TouchDrawingManager::CreateBubbleObserver(T &item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpdateBubbleData();
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -313,14 +318,15 @@ template <class T>
 void TouchDrawingManager::CreatePointerObserver(T &item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpdateLabels();
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateLabels, this));
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)

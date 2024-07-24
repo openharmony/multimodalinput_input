@@ -338,6 +338,11 @@ bool MMIService::InitDelegateTasks()
         EpollClose();
         return false;
     }
+    std::function<int32_t(DTaskCallback)> fun = [this](DTaskCallback cb) -> int32_t {
+        return delegateTasks_.PostSyncTask(cb);
+    };
+    delegateInterface_ = std::make_shared<DelegateInterface>(fun);
+    delegateInterface_->Init();
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }

@@ -24,6 +24,7 @@
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
+#include "delegate_interface.h"
 #include "delegate_tasks.h"
 #include "display_manager.h"
 #include "input_event_handler.h"
@@ -267,6 +268,7 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+    std::shared_ptr<DelegateInterface> delegateInterface_ {nullptr};
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
