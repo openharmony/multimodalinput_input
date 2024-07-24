@@ -181,30 +181,6 @@ void InputWindowsManager::Init(UDSServer& udsServer)
         );
 }
 
-void InputWindowsManager::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    if (lastPointerEventForFold_ == nullptr) {
-        MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
-        return;
-    }
-    auto items = lastPointerEventForFold_->GetAllPointerItems();
-    for (const auto &item : items) {
-        if (!item.IsPressed()) {
-            continue;
-        }
-        int32_t pointerId = item.GetPointerId();
-        auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEventForFold_);
-        pointerEvent->SetPointerId(pointerId);
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-        pointerEvent->SetActionTime(GetSysClockTime());
-        pointerEvent->UpdateId();
-        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
-        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-        CHKPV(inputEventNormalizeHandler);
-        inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-    }
-}
-
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::InitMouseDownInfo()
 {
