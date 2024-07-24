@@ -35,12 +35,19 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
+constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
+constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
+constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
+constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
+constexpr int32_t INT32_BYTE { 4 };
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {};
     static void TearDownTestCase(void) {};
+    static std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
     void SetUp(void)
     {}
     void TearDown(void)
@@ -67,6 +74,37 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerTest::SetMouseIconTe
 
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     CHKPL(pixelMap);
+    return pixelMap;
+}
+
+std::shared_ptr<Media::PixelMap> PointerDrawingManagerTest::CreatePixelMap(int32_t width, int32_t height)
+{
+    CALL_DEBUG_ENTER;
+    if (width <= 0 || width > MAX_PIXEL_MAP_WIDTH || height <= 0 || height > MAX_PIXEL_MAP_HEIGHT) {
+        return nullptr;
+    }
+    Media::InitializationOptions opts;
+    opts.size.height = height;
+    opts.size.width = width;
+    opts.pixelFormat = Media::PixelFormat::BGRA_8888;
+    opts.alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    opts.scaleMode = Media::ScaleMode::FIT_TARGET_SIZE;
+
+    int32_t colorLen = width * height;
+    uint32_t *pixelColors = new (std::nothrow) uint32_t[colorLen];
+    CHKPP(pixelColors);
+    int32_t colorByteCount = colorLen * INT32_BYTE;
+    errno_t ret = memset_s(pixelColors, colorByteCount, DEFAULT_ICON_COLOR, colorByteCount);
+    if (ret != EOK) {
+        delete[] pixelColors;
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMap::Create(pixelColors, colorLen, opts);
+    if (pixelMap == nullptr) {
+        delete[] pixelColors;
+        return nullptr;
+    }
+    delete[] pixelColors;
     return pixelMap;
 }
 
@@ -1906,6 +1944,91 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPixelMap, TestSiz
     PointerDrawingManager manager;
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
     ASSERT_NO_FATAL_FAILURE(manager.SetPixelMap(pixelMap));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_SwitchPointerStyle
+ * @tc.desc: Test SwitchPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SwitchPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    pointerDrawMgr.lastMouseStyle_.id = 2;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SwitchPointerStyle());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_CreateMagicCursorChangeObserver
+ * @tc.desc: Test CreateMagicCursorChangeObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CreateMagicCursorChangeObserver, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateMagicCursorChangeObserver());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_UpdateStyleOptions
+ * @tc.desc: Test UpdateStyleOptions
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_UpdateStyleOptions, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    pointerDrawMgr.pid_ = 100;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.UpdateStyleOptions());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_InitPointerObserver
+ * @tc.desc: Test InitPointerObserver
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_InitPointerObserver, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    pointerDrawMgr.hasInitObserver_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.InitPointerObserver());
+
+    pointerDrawMgr.hasInitObserver_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.InitPointerObserver());
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_AdjustMouseFocusByDirection90
+ * @tc.desc: Test AdjustMouseFocusByDirection90
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AdjustMouseFocusByDirection90, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    ICON_TYPE iconType = ANGLE_SW;
+    int32_t physicalX = 500;
+    int32_t physicalY = 500;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
+    iconType = ANGLE_CENTER;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
+    iconType = ANGLE_NW_RIGHT;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
+    iconType = ANGLE_NW;
+    pointerDrawMgr.userIcon_ = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    ASSERT_NE(pointerDrawMgr.userIcon_, nullptr);
+    pointerDrawMgr.currentMouseStyle_.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
+    pointerDrawMgr.userIcon_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
 }
 } // namespace MMI
 } // namespace OHOS
