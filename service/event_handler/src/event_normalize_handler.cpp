@@ -399,7 +399,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
-        MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
+        MMI_HILOGI("Pressed keyCode:%{private}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
