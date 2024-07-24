@@ -2097,9 +2097,6 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
     tappingCount_++;
     int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
     if (timeDiffToPrevKnuckleUpTime <= downToPrevUpTimeConfig_) {
-        if (tappingCount_ == MAX_TAP_COUNT) {
-            DfxHisysevent::ReportFailIfOneSuccTwoFail();
-        }
         if (tappingCount_ > MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfKnockTooFast();
         }
