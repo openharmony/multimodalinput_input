@@ -299,7 +299,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = -1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = -1;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -312,7 +313,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = 0;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = 0;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -325,7 +327,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = 10;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = 10;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -338,7 +341,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = 10000;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = 10000;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -434,8 +438,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTouchpadSettingState_006, Te
 HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFaildTimes_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t failedTimes = 1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFaildTimes(failedTimes));
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFaildTimes());
 }
 
 /**
@@ -447,8 +450,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFaildTimes_001
 HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleDrawSSuccessTimes_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t successTimes = 1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleDrawSSuccessTimes(successTimes));
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleDrawSSuccessTimes());
 }
 
 /**
@@ -475,6 +477,18 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFromSuccessToF
     CALL_TEST_DEBUG;
     int64_t intervalTime = 1;
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(intervalTime));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfKnockTooFast_001
+ * @tc.desc: ReportFailIfKnockTooFast
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfKnockTooFast_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfKnockTooFast());
 }
 
 } // namespace MMI
