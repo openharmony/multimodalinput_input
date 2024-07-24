@@ -265,10 +265,10 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     std::map<MOUSE_ICON, IconStyle> iconPath = GetMouseIconPath();
     if (pointerStyle.id == MOUSE_ICON::DEFAULT && iconPath[MOUSE_ICON(pointerStyle.id)].iconPath == CursorIconPath) {
         AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(MOUSE_ICON::CURSOR_CIRCLE)].alignmentWay),
-            physicalX, physicalY);   
+            physicalX, physicalY);
     } else {
         AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay),
-            physicalX, physicalY);   
+            physicalX, physicalY);
     }
     // Log printing only occurs when the mouse style changes
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
