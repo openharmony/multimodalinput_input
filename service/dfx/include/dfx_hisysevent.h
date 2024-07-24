@@ -116,7 +116,6 @@ public:
     static void ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime);
     static void ReportScreenRecorderGesture(int32_t intervalTime);
     static void ReportFailIfKnockTooFast();
-    static void ReportFailIfOneSuccTwoFail();
     static std::string GetTpVendorName();
     static std::string GetAccVendorName();
     static std::string GetLcdInfo();

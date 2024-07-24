@@ -491,17 +491,5 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfKnockTooFast_001, Test
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfKnockTooFast());
 }
 
-/**
- * @tc.name: DfxHisysEventTest_ReportFailIfOneSuccTwoFail_001
- * @tc.desc: ReportFailIfOneSuccTwoFail
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfOneSuccTwoFail_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfOneSuccTwoFail());
-}
-
 } // namespace MMI
 } // namespace OHOS
