@@ -2261,12 +2261,19 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         InitMouseDownInfo();
         MMI_HILOGD("Mouse up, clear mouse down info");
     }
-    MMI_HILOGD("pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
-               "logicalX:%{public}d,logicalY:%{public}d,"
-               "displayX:%{private}d,displayY:%{private}d,windowX:%{public}d,windowY:%{public}d",
-               isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
-               touchWindow->id, touchWindow->agentWindowId,
-               logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
+                "logicalX:%{public}d, logicalY:%{public}d,"
+                "displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d",
+                isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
+                touchWindow->id, touchWindow->agentWindowId,
+                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+    } else {
+        MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
+                "logicalX:%{public}d, logicalY:%{public}d, windowX:%{public}d, windowY:%{public}d",
+                isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
+                touchWindow->id, touchWindow->agentWindowId, logicalX, logicalY, windowX, windowY);
+    } 
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
         ClearExtraData();

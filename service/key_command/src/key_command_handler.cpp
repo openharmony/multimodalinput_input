@@ -969,8 +969,12 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
 
     if (IsExcludeKey(key)) {
-        MMI_HILOGD("ExcludekeyCode:%{private}d, ExcludekeyAction:%{public}d",
-                   key->GetKeyCode(), key->GetKeyAction());
+        if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
+                    key->GetKeyCode(), key->GetKeyAction());
+        } else {
+            MMI_HILOGD("ExcludekeyAction:%{public}d", key->GetKeyAction());
+        }
         auto items = key->GetKeyItems();
         MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
@@ -1067,8 +1071,12 @@ std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int
 bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
-    MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
-               key->GetKeyCode(), key->GetKeyAction());
+    if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
+                key->GetKeyCode(), key->GetKeyAction());
+    } else {
+        MMI_HILOGD("KeyEvent occured. keyAction:%{public}d", key->GetKeyAction());
+    }
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
         return false;
@@ -1366,7 +1374,9 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         return true;
     }
     if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
-        MMI_HILOGD("repeat, current key %{private}d has launched ability", currentLaunchAbilityKey_.finalKey);
+        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
+        }
         return true;
     }
     DfxHisysevent::GetComboStartTime();

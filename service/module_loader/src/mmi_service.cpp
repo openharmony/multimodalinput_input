@@ -1487,11 +1487,18 @@ int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerE
         int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
         pointerItem.SetDisplayX(destX);
         pointerItem.SetDisplayY(destY);
-        if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGD("PointerItem's displayX:%{private}d, displayY:%{private}d when first inject,"
+        if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
                 "Screen resolution width:%{public}d, height:%{public}d first got,"
                 "Screen resolution width:%{public}d, height:%{public}d current got,"
-                "PointerItem's displayX:%{private}d, displayY:%{private}d after self adaptaion",
+                "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
+                sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
+                displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+        } else {
+            MMI_HILOGD("PointerItem's displayX:%d, displayY:%d when first inject,"
+                "Screen resolution width:%{public}d, height:%{public}d first got,"
+                "Screen resolution width:%{public}d, height:%{public}d current got,"
+                "PointerItem's displayX:%d, displayY:%d after self adaptaion",
                 sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
                 displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
         }
