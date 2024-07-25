@@ -181,7 +181,12 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
-    MMI_HILOGD("Fingerprint key:%{public}d, ux:%{private}f, uy:%{private}f", pointerEvent->GetPointerAction(), ux, uy);
+    if (EventLogHelper::IsBetaVersion() && !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("Fingerprint key:%{public}d, ux:%{public}f, uy:%{public}f",
+                pointerEvent->GetPointerAction(), ux, uy);
+    } else {
+        MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+    }
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {
         eventMonitorHandler_->OnHandleEvent(pointerEvent);

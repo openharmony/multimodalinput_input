@@ -106,8 +106,8 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d",
+        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_);
         }
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
@@ -122,7 +122,9 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime();
             AddHandleTimer(delayTime);
-            MMI_HILOGD("The end keyboard autorepeat, keyCode:%{private}d", keyEvent_->GetKeyCode());
+            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
+            }
         }
     }
 }
