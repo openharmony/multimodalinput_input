@@ -143,7 +143,6 @@ ohos_shared_library("libmmi-client") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "image_framework:image_native",

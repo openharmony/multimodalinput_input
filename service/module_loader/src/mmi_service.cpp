@@ -59,10 +59,6 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "watchdog_task.h"
-#include "xcollie/watchdog.h"
-#include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -380,8 +376,6 @@ void MMIService::OnStart()
             MMI_HILOGI("Mmi-server Timeout");
         }
     };
-    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
-        WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
 }
 
@@ -2728,9 +2722,16 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    auto startTime = std::chrono::steady_clock::now();
     func();
-    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    auto endTime = std::chrono::steady_clock::now();
+    auto duration = endTime - startTime;
+    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
+        (duration).count();
+    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
+        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
+            flag.c_str(), durationTime);
+    }
 }
 
 } // namespace MMI
