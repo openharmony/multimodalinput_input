@@ -184,7 +184,12 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
-            MMI_HILOGD("Output event: toolWindowX:%{private}d, toolWindowY:%{private}d", toolWindowX, toolWindowY);
+            if (EventLogHelper::IsBetaVersion()) {
+                if (!pointerEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                    MMI_HILOGD("Output event: toolWindowX:%{private}d, toolWindowY:%{private}d",
+                        toolWindowX, toolWindowY);
+                }
+            }
             auto logicX = it.second.coordX;
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);

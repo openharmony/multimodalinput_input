@@ -88,8 +88,13 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             if (!EventLogHelper::IsBetaVersion()) {
                 MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d", timerId_);
             } else {
-                MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{private}d",
-                    timerId_, keyEvent_->GetKeyCode());
+                if (keyEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%d",
+                        timerId_, keyEvent_->GetKeyCode());
+                } else {
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d",
+                        timerId_, keyEvent_->GetKeyCode());
+                }
             }
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;

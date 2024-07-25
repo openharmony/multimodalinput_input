@@ -343,7 +343,11 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
-    MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (EventLogHelper::IsBetaVersion()) {
+        if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        }
+    }
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
