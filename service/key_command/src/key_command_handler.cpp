@@ -29,6 +29,7 @@
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -977,7 +978,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
             MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
                     key->GetKeyCode(), key->GetKeyAction());
         } else {
-            MMI_HILOGD("ExcludekeyAction:%{public}d", key->GetKeyAction());
+            MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
         }
         auto items = key->GetKeyItems();
         MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
@@ -1079,7 +1080,7 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
                 key->GetKeyCode(), key->GetKeyAction());
     } else {
-        MMI_HILOGD("KeyEvent occured. keyAction:%{public}d", key->GetKeyAction());
+        MMI_HILOGD("KeyEvent occured. keyCode:%d, keyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
     }
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
