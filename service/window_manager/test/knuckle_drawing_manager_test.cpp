@@ -453,5 +453,68 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     kceDrawMgr.pointerInfos_.push_back(pointerInfo);
     ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
 }
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DestoryWindow_001
+ * @tc.desc: Test Overrides DestoryWindow function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.canvasNode_ = nullptr;
+    ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_ERR);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_DestoryWindow_002
+ * @tc.desc: Test Overrides DestoryWindow function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.canvasNode_ = nullptr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
+    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
+    ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_OK);
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_CreateObserver_001
+ * @tc.desc: Test Overrides CreateObserver function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateObserver_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.hasScreenReadObserver_ = false;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateObserver());
+}
+
+/**
+ * @tc.name: KnuckleDrawingManagerTest_CreateObserver_002
+ * @tc.desc: Test Overrides CreateObserver function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateObserver_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDrawingManager kceDrawMgr;
+    kceDrawMgr.hasScreenReadObserver_ = true;
+    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateObserver());
+}
 } // namespace MMI
 } // namespace OHOS

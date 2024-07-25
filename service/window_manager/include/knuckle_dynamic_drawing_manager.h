@@ -36,6 +36,7 @@ public:
     ~KnuckleDynamicDrawingManager() = default;
     void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr);
 
 private:
     void StartTouchDraw(std::shared_ptr<PointerEvent> pointerEvent);
@@ -51,10 +52,11 @@ private:
     void UpdateTrackColors();
     std::shared_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
+    void DestoryWindow();
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     Rosen::Drawing::Brush brush_;
@@ -78,6 +80,7 @@ private:
     int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
     int64_t isInDrawingTime_ { 0 };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
