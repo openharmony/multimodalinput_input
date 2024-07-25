@@ -87,7 +87,6 @@ constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
-constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
@@ -2830,9 +2829,16 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    auto startTime = std::chrono::steady_clock::now();
     func();
-    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    auto endTime = std::chrono::steady_clock::now();
+    auto duration = endTime - startTime;
+    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
+        (duration).count();
+    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
+        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
+            flag.c_str(), durationTime);
+    }
 }
 
 } // namespace MMI
