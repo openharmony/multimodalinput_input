@@ -140,6 +140,34 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerTest::SetMouseIconTest(const 
 }
 
 /**
+ * @tc.name: InputManagerTest_SetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the funcation SetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the funcation GetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: InputManagerTest_SetKeyDownDuration_01
  * @tc.desc: Test SetKeyDownDuration
  * @tc.type: FUNC

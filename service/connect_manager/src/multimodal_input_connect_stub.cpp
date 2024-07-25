@@ -114,6 +114,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    ResetLogTrace();
     BytraceAdapter::StartIpcServer(code);
     int32_t ret = RET_ERR;
     switch (code) {

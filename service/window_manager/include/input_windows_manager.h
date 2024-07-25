@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "display_manager.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "window_manager_lite.h"
@@ -127,6 +126,7 @@ public:
     bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
+    void CleanShellWindowIds();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -153,7 +153,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
-    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
+    void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
@@ -309,7 +310,7 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
+    uint32_t lastFoldStatus_ {};
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;

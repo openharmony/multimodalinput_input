@@ -21,10 +21,7 @@
 #include "libinput_mock.h"
 #include "preferences_manager_mock.h"
 #include "mouse_transform_processor.h"
-
 #include "input_device_manager.h"
-
-#include "display_manager.h"
 #include "mouse_device_state.h"
 #include "i_input_windows_manager.h"
 

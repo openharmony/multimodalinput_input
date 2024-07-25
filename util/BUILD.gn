@@ -121,6 +121,9 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "$root_out_dir/diff_libinput_mmi/export_include",
+
+    "${mmi_path}/util/napi",
+    "${mmi_path}/util/napi/include",
   ]
 
   cflags = [
@@ -129,6 +132,8 @@ ohos_unittest("ut-mmi-util-out") {
   ]
 
   sources = [
+    "napi/src/key_event_napi.cpp",
+    "napi\src\util_napi_value.cpp",
     "network/test/circle_stream_buffer_test.cpp",
     "network/test/net_packet_test.cpp",
     "socket/test/stream_buffer_test.cpp",
@@ -147,5 +152,6 @@ ohos_unittest("ut-mmi-util-out") {
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
+    "napi:ace_napi",
   ]
 }

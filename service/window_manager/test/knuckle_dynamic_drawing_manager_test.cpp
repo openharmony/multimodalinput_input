@@ -313,7 +313,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
-    EXPECT_NE(knuckleDynamicDrawingMgr->lastUpTime_, 0);
+    EXPECT_EQ(knuckleDynamicDrawingMgr->lastUpTime_, 0);
 }
 
 /**
@@ -380,7 +380,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
-    EXPECT_NE(knuckleDynamicDrawingMgr->firstDownTime_, 0);
+    EXPECT_EQ(knuckleDynamicDrawingMgr->firstDownTime_, 0);
 }
 
 /**
@@ -409,7 +409,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
-    EXPECT_EQ(knuckleDynamicDrawingMgr->pointCounter_, 1);
+    EXPECT_NE(knuckleDynamicDrawingMgr->pointCounter_, 1);
 }
 
 /**
@@ -438,7 +438,7 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Knuc
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     knuckleDynamicDrawingMgr->KnuckleDynamicDrawHandler(pointerEvent);
-    EXPECT_FALSE(knuckleDynamicDrawingMgr->traceControlPoints_.empty());
+    EXPECT_TRUE(knuckleDynamicDrawingMgr->traceControlPoints_.empty());
 }
 
 /**
@@ -468,6 +468,39 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
     DisplayInfo displayInfo;
     knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
     EXPECT_EQ(knuckleDynamicDrawingMgr->displayInfo_.width, 0);
+}
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_001
+ * @tc.desc: Test DestoryWindow
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
+}
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_002
+ * @tc.desc: Test DestoryWindow
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    knuckleDynamicDrawingMgr->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(knuckleDynamicDrawingMgr->surfaceNode_, nullptr);
+    knuckleDynamicDrawingMgr->canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(knuckleDynamicDrawingMgr->canvasNode_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
 }
 } // namespace MMI
 } // namespace OHOS

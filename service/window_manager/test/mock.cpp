@@ -444,6 +444,9 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {}
 
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
+{}
+
 SettingDataShare::~SettingDataShare() {}
 
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
@@ -478,26 +481,9 @@ FingersenseWrapper::FingersenseWrapper() {}
 
 FingersenseWrapper::~FingersenseWrapper() {}
 
-bool Rosen::DisplayManager::IsFoldable()
-{
-    return DfsMessageParcel::messageParcel->IsFoldable();
-}
-
 bool UDSSession::SendMsg(NetPacket &pkt) const
 {
     return DfsMessageParcel::messageParcel->SendMsg(pkt);
-}
-
-Rosen::DMError Rosen::DisplayManager::RegisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->RegisterFoldStatusListener(listener);
-}
-
-Rosen::DMError Rosen::DisplayManager::UnregisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->UnregisterFoldStatusListener(listener);
 }
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
