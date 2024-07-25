@@ -49,8 +49,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(keyEvent);
     int32_t keyId = keyEvent->GetId();
     StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onKeyEvent, keyId);
-    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report keyId=" + std::to_string(keyId) +
-        " Action: " + GetKeyTraceString(keyEvent));
+    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report keyId=" + std::to_string(keyId));
 }
 
 std::string BytraceAdapter::GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent)
@@ -94,11 +93,11 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onPointerEvent, eventId);
             HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report pointerId:" + std::to_string(eventId) +
-                + ", type: " + pointerEvent->DumpPointerAction() + GetPointerTraceString(pointerEvent));
+                + ", type: " + pointerEvent->DumpPointerAction());
         } else {
             StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onTouchEvent, eventId);
             HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report touchId:" + std::to_string(eventId) +
-                + ", type: " + pointerEvent->DumpPointerAction() + GetPointerTraceString(pointerEvent));
+                + ", type: " + pointerEvent->DumpPointerAction());
         }
     } else {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
@@ -116,23 +115,23 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType han
     std::string checkKeyCode;
     switch (handlerType) {
         case KEY_INTERCEPT_EVENT: {
-            checkKeyCode = "Intercept keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Intercept keyCode";
             break;
         }
         case KEY_LAUNCH_EVENT: {
-            checkKeyCode = "Launch keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Launch keyCode";
             break;
         }
         case KEY_SUBSCRIBE_EVENT: {
-            checkKeyCode = "Subscribe keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Subscribe keyCode";
             break;
         }
         case KEY_DISPATCH_EVENT: {
-            checkKeyCode = "Dispatch keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Dispatch keyCode";
             break;
         }
         default: {
-            checkKeyCode = "Unknown keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Unknown keyCode";
             break;
         }
     }
@@ -150,21 +149,21 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
         switch (handlerType) {
             case KEY_INTERCEPT_EVENT: {
                 StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, keyId);
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "client Intercept keyCode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "client Intercept keyCode");
                 break;
             }
             case KEY_SUBSCRIBE_EVENT: {
                 StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventSubscribe, keyId);
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "client subscribe keyCode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "client subscribe keyCode");
                 break;
             }
             case KEY_DISPATCH_EVENT: {
                 StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventDispatch, keyId);
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "client dispatch keyCode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "client dispatch keyCode");
                 break;
             }
             default: {
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keycode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keyCode");
                 break;
             }
         }
@@ -183,7 +182,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
                 break;
             }
             default: {
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keycode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keyCode");
                 break;
             }
         }
