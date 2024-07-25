@@ -2978,6 +2978,9 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     if (knuckleDynamicDrawingManager_ == nullptr) {
         knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+        if (knuckleDrawMgr_ != nullptr) {
+            knuckleDynamicDrawingManager_->SetKnuckleDrawingManager(knuckleDrawMgr_);
+        }
     }
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
