@@ -322,6 +322,8 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         lastPressedKey = pressedKeys.back();
         if (EventLogHelper::IsBetaVersion() && !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
+        } else {
+            MMI_HILOGD("The last repeat button, keyCode:%d", lastPressedKey);
         }
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
@@ -345,10 +347,10 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     MMI_HILOGI("InputTracking id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
-    if (EventLogHelper::IsBetaVersion()) {
-        if (!keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
-        }
+    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    } else {
+         MMI_HILOGD("keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
 #else
     MMI_HILOGW("Keyboard device does not support");
@@ -407,6 +409,8 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     for (const int32_t& keyCode : pressedKeys) {
         if (EventLogHelper::IsBetaVersion() && !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
+        } else {
+            MMI_HILOGI("Pressed keyCode:%d", keyCode);
         }
     }
     pointerEvent->SetPressedKeys(pressedKeys);

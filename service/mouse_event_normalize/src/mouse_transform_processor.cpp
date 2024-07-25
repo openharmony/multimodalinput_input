@@ -134,6 +134,9 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     if (EventLogHelper::IsBetaVersion() && !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("Change coordinate: x:%{public}.2f, y:%{public}.2f, currentDisplayId:%{public}d",
             cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    } else {
+        MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     }
     return RET_OK;
 }

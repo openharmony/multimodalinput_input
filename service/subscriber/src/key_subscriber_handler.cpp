@@ -52,6 +52,8 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     if (OnSubscribeKeyEvent(keyEvent)) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
+        } else {
+            MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%d", keyEvent->GetKeyCode());
         }
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return;
@@ -298,6 +300,8 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         keyEvent->GetKeyCode() == KeyEvent::KEYCODE_DPAD_LEFT) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Subscriber mulit swipe keycode is:%{public}d", keyEvent->GetKeyCode());
+        } else {
+            MMI_HILOGD("Subscriber mulit swipe keycode is:%d", keyEvent->GetKeyCode());
         }
         return IsEnableCombineKeySwipe(keyEvent);
     }
@@ -406,6 +410,8 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
         if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("Pressed KeyCode:%{public}d", keyCode);
+        } else {
+            MMI_HILOGD("Pressed KeyCode:%d", keyCode);
         }
     }
     bool handled = false;
@@ -964,6 +970,8 @@ void KeySubscriberHandler::PrintKeyOption(const std::shared_ptr<KeyOption> keyOp
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         if (EventLogHelper::IsBetaVersion() && !keyOption->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
+        } else {
+            MMI_HILOGD("keyOption->prekey:%d", keyCode);
         }
     }
 }
@@ -980,6 +988,8 @@ void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subs
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         if (EventLogHelper::IsBetaVersion() && !subscriber->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
+        } else {
+            MMI_HILOGD("keyOption->prekey:%d", keyCode);
         }
     }
 }
