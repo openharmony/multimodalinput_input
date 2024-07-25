@@ -444,6 +444,9 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {}
 
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
+{}
+
 SettingDataShare::~SettingDataShare() {}
 
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
