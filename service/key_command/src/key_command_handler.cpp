@@ -1444,10 +1444,27 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     return false;
 }
 
+bool KeyCommandHandler::IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    return (sequenceOccurred_ && !keys_.empty() &&
+            (keys_.back().keyCode == keyEvent->GetKeyCode()) &&
+            (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN));
+}
+
+void KeyCommandHandler::MarkActiveSequence(bool active)
+{
+    sequenceOccurred_ = active;
+}
+
 bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    if (IsActiveSequenceRepeating(keyEvent)) {
+        MMI_HILOGD("Skip repeating key(%{public}d) in active sequence", keyEvent->GetKeyCode());
+        return true;
+    }
+    MarkActiveSequence(false);
     if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
@@ -1483,6 +1500,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (isLaunchAbility) {
+        MarkActiveSequence(true);
         for (const auto& item : keys_) {
             if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
