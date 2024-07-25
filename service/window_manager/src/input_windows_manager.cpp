@@ -954,7 +954,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
 void InputWindowsManager::UpdateWindowPointerVisible(int32_t pid)
 {
     bool visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible, 0);
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible, 0, false);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1420,7 +1420,7 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     CALL_DEBUG_ENTER;
     CHKPV(session);
     int32_t pid = session->GetPid();
-
+    IPointerDrawingManager::GetInstance()->OnSessionLost(pid);
     auto it = pointerStyle_.find(pid);
     if (it != pointerStyle_.end()) {
         pointerStyle_.erase(it);
@@ -2151,6 +2151,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         pointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
         MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
             pointerStyle.id, lastPointerStyle_.id);
+        IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
+        WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
+        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     } else {
         GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {

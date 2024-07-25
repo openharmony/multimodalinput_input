@@ -244,7 +244,7 @@ bool PointerDrawingManager::Init()
     return true;
 }
 void PointerDrawingManager::DeletePointerVisible(int32_t pid) {}
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
 {
     return 0;
 }
@@ -342,7 +342,8 @@ void PointerDrawingManager::InitPointerCallback()
 {}
 void PointerDrawingManager::InitPointerObserver()
 {}
-
+void PointerDrawingManager::OnSessionLost(int pid)
+{}
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
