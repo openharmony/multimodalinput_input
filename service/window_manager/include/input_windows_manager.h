@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "display_manager.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "window_manager_lite.h"
@@ -153,7 +152,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
-    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();

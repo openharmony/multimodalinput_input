@@ -26,7 +26,6 @@
 #include "app_debug_listener.h"
 #include "delegate_interface.h"
 #include "delegate_tasks.h"
-#include "display_manager.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
@@ -149,7 +148,6 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
-    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
@@ -212,7 +210,6 @@ protected:
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
@@ -240,28 +237,12 @@ private:
     MMIService();
     ~MMIService();
 private:
-    class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
-    public:
-        FoldStatusLisener(sptr<MultimodalInputConnectStub> server) : server_(server) {}
-        ~FoldStatusLisener();
-        DISALLOW_COPY_AND_MOVE(FoldStatusLisener);
-        // FoldStatus: UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
-        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
-
-    private:
-        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
-        sptr<MultimodalInputConnectStub> server_ { nullptr };
-        std::mutex mutex_;
-    };
-    void RegisterFoldStatusListener();
-    void UnregisterFoldStatusListener();
     int32_t CheckPidPermission(int32_t pid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     bool isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
-    sptr<Rosen::Display> displays_[2] = { nullptr, nullptr };
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif // OHOS_RSS_CLIENT
@@ -271,7 +252,6 @@ private:
     std::shared_ptr<DelegateInterface> delegateInterface_ {nullptr};
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };
-    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
