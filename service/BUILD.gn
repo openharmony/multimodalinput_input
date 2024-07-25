@@ -291,7 +291,6 @@ ohos_shared_library("libmmi-server") {
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
     "hdf_core:libhdi",
-    "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
