@@ -125,8 +125,8 @@ private:
                     event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
             } else {
                 MMI_HILOG_HEADER(LOG_INFO, lh, "See InputTracking-Dict, I:%{public}d, KC:%{public}d,"
-                    "AT:%{public} "PRId64" , ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d,"
-                    "KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
+                    "AT:%{public} " PRId64 " , ET:%{public}s, KA:%{public}s, NL:%{public}d, CL:%{public}d, "
+                    "SL:%{public}d, KIC:%{public}zu, DI:%{public}d, IR:%{public}s, SI:%{public}s",
                     event->GetId(), event->GetKeyCode(), event->GetActionTime(),
                     InputEvent::EventTypeToString(event->GetEventType()),
                     KeyEvent::ActionToString(event->GetKeyAction()),
@@ -192,8 +192,8 @@ private:
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
             } else {
                 MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{public}d, KI:%{public}d, AT:%{public}" PRId64 ","
-                    "AST:%{public} PRId64, ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, "
-                    "SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
+                    "AST:%{public}" PRId64 ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, "
+                    "CL:%{public}d, SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
                     InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                     KeyEvent::ActionToString(event->GetKeyAction()),
