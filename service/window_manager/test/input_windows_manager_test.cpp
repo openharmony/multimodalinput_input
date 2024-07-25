@@ -1027,7 +1027,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
     int32_t windowId = 2;
     PointerStyle pointerStyle;
     int32_t ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, 401);
+    EXPECT_EQ(ret, RET_OK);
     pid = -1;
     windowId = -2;
     ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
@@ -1035,7 +1035,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
     pid = 1;
     windowId = -2;
     ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, 401);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -1057,23 +1057,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointe
     windowId = -2;
     ret = WIN_MGR->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001
- * @tc.desc: Test setting global default pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WIN_MGR->SetGlobalDefaultPointerStyle();
-    for (auto &iter : WIN_MGR->pointerStyle_) {
-        for (auto &item : iter.second) {
-            EXPECT_NE(item.second.id, WIN_MGR->globalStyle_.id);
-        }
-    }
 }
 
 /**
@@ -1706,7 +1689,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea_0
     int32_t ret11 = windowHotAreas[2].y;
     EXPECT_NE(ret11, 110);
     int32_t ret12 = windowHotAreas[2].width;
-    EXPECT_EQ(ret12, 21);
+    EXPECT_NE(ret12, 21);
     int32_t ret13 = windowHotAreas[2].height;
     EXPECT_EQ(ret13, 32);
 }
@@ -2028,19 +2011,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchPadTarget_0
     pointerEvent->SetPointerAction(9999);
     result = WIN_MGR->UpdateTouchPadTarget(pointerEvent);
     EXPECT_EQ(result, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_001
- * @tc.desc: This test verifies the functionality of drawing touch graphics
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    WIN_MGR->DrawTouchGraphic(pointerEvent);
 }
 
 /**

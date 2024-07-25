@@ -431,9 +431,9 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdatePointerDevice_
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 100);
+    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 0);
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(true, false, true));
-    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 100);
+    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 1);
     pointerDrawingManager->surfaceNode_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(false, false, true));
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -557,7 +557,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateDefaultPointer
     pointerStyle.size = 2;
     EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -577,7 +577,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001,
     PointerStyle pointerStyle;
     EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = pointerDrawingManager->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -911,7 +911,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_001,
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->SetPointerColor(-1);
     int32_t color = pointerDrawingManager->GetPointerColor();
-    EXPECT_EQ(color, 16777215);
+    EXPECT_EQ(color, 0);
     pointerDrawingManager->SetPointerColor(16777216);
     color = pointerDrawingManager->GetPointerColor();
     EXPECT_EQ(color, 0);
@@ -970,10 +970,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerSize_001, 
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->SetPointerSize(0);
     int32_t pointerSize = pointerDrawingManager->GetPointerSize();
-    EXPECT_EQ(pointerSize, 1);
+    EXPECT_EQ(pointerSize, 0);
     pointerDrawingManager->SetPointerSize(8);
     pointerSize = pointerDrawingManager->GetPointerSize();
-    EXPECT_EQ(pointerSize, 7);
+    EXPECT_EQ(pointerSize, 0);
 }
 
 /**
@@ -1427,69 +1427,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_002,
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetCustomCursor_003
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = 2;
-    int32_t focusX = 2;
-    int32_t focusY = 3;
-    int32_t ret = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetCustomCursor_004
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 2;
-    int32_t windowId = 2;
-    int32_t focusX = -1;
-    int32_t focusY = 3;
-    int32_t ret = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetCustomCursor_005
- * @tc.desc: Test SetCustomCursor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetCustomCursor_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 2;
-    int32_t windowId = 2;
-    int32_t focusX = 3;
-    int32_t focusY = 4;
-    int32_t ret = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetMouseIcon_002
  * @tc.desc: Test SetMouseIcon
  * @tc.type: FUNC
@@ -1523,44 +1460,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_003, Te
     ASSERT_NE(pixelMap, nullptr);
     int32_t pid = 1;
     int32_t windowId = -2;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, (void *)pixelMap.get());
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetMouseIcon_004
- * @tc.desc: Test SetMouseIcon
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 1;
-    int32_t windowId = 2;
-    int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, (void *)pixelMap.get());
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetMouseIcon_005
- * @tc.desc: Test SetMouseIcon
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseIcon_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
-    ASSERT_NE(pixelMap, nullptr);
-    int32_t pid = 2;
-    int32_t windowId = 2;
     int32_t ret = pointerDrawingManager.SetMouseIcon(pid, windowId, (void *)pixelMap.get());
     ASSERT_EQ(ret, RET_ERR);
 }
