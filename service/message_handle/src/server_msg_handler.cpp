@@ -397,9 +397,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        }
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
     }
     if (isShell) {

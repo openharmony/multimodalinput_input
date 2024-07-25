@@ -1210,7 +1210,7 @@ void InputWindowsManager::PrintDisplayInfo()
 
     MMI_HILOGD("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%{private}d,y:%{private}d,"
+        MMI_HILOGD("displayInfos,id:%{public}d,x:%d,y:%d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
@@ -2263,18 +2263,18 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
-                "logicalX:%{public}d, logicalY:%{public}d,"
-                "displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d",
-                isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
-                touchWindow->id, touchWindow->agentWindowId,
-                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+            "logicalX:%{public}d, logicalY:%{public}d,"
+            "displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d",
+            isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
+            touchWindow->id, touchWindow->agentWindowId,
+            logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
     } else {
         MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
-                "logicalX:%d, logicalY:%d,displayX:%d, displayY:%d, windowX:%d, windowY:%d",
-                isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
-                touchWindow->id, touchWindow->agentWindowId,
-                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
-    } 
+            "logicalX:%d, logicalY:%d,displayX:%d, displayY:%d, windowX:%d, windowY:%d",
+            isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
+            touchWindow->id, touchWindow->agentWindowId,
+            logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+    }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
         ClearExtraData();
@@ -3159,39 +3159,39 @@ void InputWindowsManager::ReverseRotateScreen(const DisplayInfo& info, const dou
     Coordinate2D& cursorPos) const
 {
     const Direction direction = info.direction;
-    MMI_HILOGD("X:%{private}.2f, Y:%{private}.2f, info.width:%{private}d, info.height:%{private}d",
+    MMI_HILOGD("X:%.2f, Y:%.2f, info.width:%d, info.height:%d",
         x, y, info.width, info.height);
     switch (direction) {
         case DIRECTION0: {
             MMI_HILOGD("direction is DIRECTION0");
             cursorPos.x = x;
             cursorPos.y = y;
-            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION90: {
             MMI_HILOGD("direction is DIRECTION90");
             cursorPos.y = static_cast<double>(info.width) - x;
             cursorPos.x = y;
-            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION180: {
             MMI_HILOGD("direction is DIRECTION180");
             cursorPos.x = static_cast<double>(info.width) - x;
             cursorPos.y = static_cast<double>(info.height) - y;
-            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
             break;
         }
         case DIRECTION270: {
             MMI_HILOGD("direction is DIRECTION270");
             cursorPos.x = static_cast<double>(info.height) - y;
             cursorPos.y = x;
-            MMI_HILOGD("physicalX:%{private}.2f, physicalY:%{private}.2f", cursorPos.x, cursorPos.y);
+            MMI_HILOGD("physicalX:%.2f, physicalY:%.2f", cursorPos.x, cursorPos.y);
             break;
         }
         default: {
-            MMI_HILOGE("direction is invalid, direction:%{private}d", direction);
+            MMI_HILOGE("direction is invalid, direction:%d", direction);
             break;
         }
     }
