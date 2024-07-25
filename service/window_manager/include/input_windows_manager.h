@@ -126,6 +126,7 @@ public:
     bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
+    void CleanShellWindowIds();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
