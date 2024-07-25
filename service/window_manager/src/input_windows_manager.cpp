@@ -85,6 +85,7 @@ const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hin
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
+constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 } // namespace
 
 enum PointerHotArea : int32_t {
@@ -179,6 +180,46 @@ void InputWindowsManager::Init(UDSServer& udsServer)
             return this->DeviceStatusChanged(deviceId, sysUid, devStatus);
         }
         );
+}
+
+void InputWindowsManager::CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        return;
+    }
+    PointerEvent::PointerItem pointer {};
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer)) {
+        MMI_HILOGE("Corrupted pointer event");
+        return;
+    }
+    /* Fold status is indicated by 27th bit of long axis of touch. */
+    uint32_t longAxis = pointer.GetLongAxis();
+    if ((longAxis ^ lastFoldStatus_) & FOLD_STATUS_MASK) {
+        lastFoldStatus_ = (longAxis & FOLD_STATUS_MASK);
+        MMI_HILOGI("Fold status (0x%{public}x) change", lastFoldStatus_);
+        OnFoldStatusChanged(pointerEvent);
+    }
+}
+
+void InputWindowsManager::OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_INFO_TRACE;
+    auto items = pointerEvent->GetAllPointerItems();
+    for (const auto &item : items) {
+        if (!item.IsPressed()) {
+            continue;
+        }
+        int32_t pointerId = item.GetPointerId();
+        auto tPointerEvent = std::make_shared<PointerEvent>(*pointerEvent);
+        tPointerEvent->SetPointerId(pointerId);
+        tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        tPointerEvent->SetActionTime(GetSysClockTime());
+        tPointerEvent->UpdateId();
+        tPointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleTouchEvent(tPointerEvent);
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -3007,7 +3048,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
-    lastPointerEventForFold_ = pointerEvent;
+    CheckFoldChange(pointerEvent);
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
