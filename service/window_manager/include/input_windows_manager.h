@@ -152,6 +152,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
+    void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
@@ -307,7 +309,7 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
+    uint32_t lastFoldStatus_ {};
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
