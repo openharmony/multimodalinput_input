@@ -87,6 +87,7 @@ constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
+constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
