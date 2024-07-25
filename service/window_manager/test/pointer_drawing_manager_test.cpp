@@ -1950,7 +1950,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_003,
     int32_t color = pointerDrawingManager->GetPointerColor();
     EXPECT_EQ(color, RET_OK);
     pointerDrawingManager->surfaceNode_ = nullptr;
-    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ == nullptr); 
+    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ == nullptr);
     #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->isExistDefaultStyle = false;
     int32_t ret = pointerDrawingManager->SetPointerColor(16777216);
