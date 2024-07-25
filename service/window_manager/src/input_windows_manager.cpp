@@ -1314,7 +1314,7 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         .x = libinput_event_touch_get_x_transformed(touch, width),
         .y = libinput_event_touch_get_y_transformed(touch, height),
     };
-    MMI_HILOGD("width:%{public}d, height:%{public}d, physicalX:%{public}f, physicalY:%{public}f",
+    MMI_HILOGD("width:%{private}d, height:%{private}d, physicalX:%{private}f, physicalY:%{private}f",
         width, height, coord.x, coord.y);
     RotateScreen(info, coord);
     touchInfo.point.x = static_cast<int32_t>(coord.x);
