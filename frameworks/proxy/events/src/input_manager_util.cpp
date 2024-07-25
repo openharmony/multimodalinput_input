@@ -701,7 +701,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent006()
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(POINTER_ITEM_ID_TWO);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_FOUR);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
