@@ -201,7 +201,7 @@ void AccountManager::AccountSetting::OnAccShortcutEnabled(const std::string &key
 
 void AccountManager::AccountSetting::OnAccShortcutEnabledOnScreenLocked(const std::string &key)
 {
-    MMI_HILOGI("[AccountSetting][%{private}d] Setting '%{private}s' has changed", GetAccountId(), key.c_str());
+    MMI_HILOGI("[AccountSetting][%{private}d] Setting '%{public}s' has changed", GetAccountId(), key.c_str());
     accShortcutEnabledOnScreenLocked_ = ReadSwitchStatus(key, accShortcutEnabledOnScreenLocked_);
 }
 
