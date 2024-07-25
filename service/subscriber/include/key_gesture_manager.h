@@ -58,19 +58,15 @@ class KeyGestureManager final {
 
         void ResetTimer();
         void Trigger(std::shared_ptr<KeyEvent> keyEvent);
-
-        void Run(std::shared_ptr<KeyEvent> keyEvent) const
-        {
-            if (callback_ != nullptr) {
-                callback_(keyEvent);
-            }
-        }
+        void Run(std::shared_ptr<KeyEvent> keyEvent) const;
+        void RunPending();
 
     private:
         int32_t id_ { -1 };
         int32_t pid_ { -1 };
         int32_t longPressTime_ { -1 };
         int32_t timerId_ {};
+        std::shared_ptr<KeyEvent> keyEvent_;
         std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
 
@@ -111,6 +107,9 @@ class KeyGestureManager final {
         bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const override;
         bool Intercept(std::shared_ptr<KeyEvent> KeyEvent) override;
         void Dump(std::ostringstream &output) const override;
+
+    private:
+        void RunPendingHandlers();
 
         int32_t keyCode_ { -1 };
         int64_t firstDownTime_ {};
@@ -159,6 +158,7 @@ public:
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent);
     void ResetAll();
     void Dump() const;
+    void RunPendingHandlers();
 
 private:
     std::vector<std::unique_ptr<KeyGesture>> keyGestures_;
