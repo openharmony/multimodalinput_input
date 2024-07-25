@@ -225,6 +225,8 @@ private:
     bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
+    bool IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyEvent) const;
+    void MarkActiveSequence(bool active);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -340,6 +342,7 @@ private:
     int64_t intervalTime_ { 120000 };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
+    bool sequenceOccurred_ { false };
     bool isHandleSequence_ { false };
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
