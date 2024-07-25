@@ -193,6 +193,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
     }
+    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -244,6 +245,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             break;
         }
     }
+    previousUpTime_ = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -311,7 +313,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
-    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -326,7 +327,6 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
-    previousUpTime_ = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
@@ -2117,6 +2117,9 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
     tappingCount_++;
     int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
     if (timeDiffToPrevKnuckleUpTime <= downToPrevUpTimeConfig_) {
+        if (tappingCount_ == MAX_TAP_COUNT) {
+            DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
+        }
         if (tappingCount_ > MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfKnockTooFast();
         }
