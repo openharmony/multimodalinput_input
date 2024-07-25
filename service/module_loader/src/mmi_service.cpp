@@ -508,6 +508,12 @@ void MMIService::OnDisconnected(SessionPtr s)
     if (ret != RET_OK) {
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (s->GetProgramName() == SHELL_ASSISTANT) {
+        MMI_HILOGW("clean all shell windows because of %{public}s", s->GetProgramName().c_str());
+        IInputWindowsManager::GetInstance()->CleanShellWindowIds();
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
