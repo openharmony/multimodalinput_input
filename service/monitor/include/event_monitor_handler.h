@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,10 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    int32_t AddInputHandler(InputHandlerType handlerType,
+        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
+    void RemoveInputHandler(InputHandlerType handlerType,
+        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
     void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
     void MarkConsumed(int32_t eventId, SessionPtr session);
@@ -63,9 +67,10 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
+            SessionPtr session, std::shared_ptr<IInputEventConsumer> cb = nullptr)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session) {}
+              session_(session), callback(cb) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
         bool operator<(const SessionHandler& other) const
@@ -75,6 +80,7 @@ private:
         InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
+        std::shared_ptr<IInputEventConsumer> callback {nullptr};
     };
 
     class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
