@@ -247,7 +247,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
-        MMI_HILOGD("Move pointer, physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
+        MMI_HILOGD("Move pointer, physicalX:%d, physicalY:%d", physicalX, physicalY);
     }
 }
 
@@ -296,8 +296,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         return;
     }
     UpdatePointerVisible();
-    MMI_HILOGI("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
-        displayId, physicalX, physicalY);
+    MMI_HILOGI("Leave, display:%{public}d, physicalX:%d, physicalY:%d", displayId, physicalX, physicalY);
 }
 
 void PointerDrawingManager::UpdateMouseStyle()

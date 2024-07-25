@@ -94,8 +94,8 @@ void EventResample::EventDump(const char *msg, MotionEvent &event)
                msg, event.pointerAction, event.actionTime, event.pointerCount,
                event.sourceType, event.deviceId, event.eventId);
     for (auto &it : event.pointers) {
-        MMI_HILOGD("ID:%{public}d, coordX:%{public}d, coordY:%{public}d, toolType:%{public}d",
-                   it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
+        MMI_HILOGD("ID:%{public}d, coordX:%d, coordY:%d, toolType:%{public}d",
+            it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
     }
 }
 
@@ -184,7 +184,11 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
-            MMI_HILOGD("Output event: toolWindowX:%{public}d, toolWindowY:%{public}d", toolWindowX, toolWindowY);
+            if (EventLogHelper::IsBetaVersion() && !pointerEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGD("Output event: toolWindowX:%{public}d, toolWindowY:%{public}d", toolWindowX, toolWindowY);
+            } else {
+                MMI_HILOGD("Output event: toolWindowX:%d, toolWindowY:%d", toolWindowX, toolWindowY);
+            }
             auto logicX = it.second.coordX;
             auto logicY = it.second.coordY;
             item.SetDisplayX(logicX);
