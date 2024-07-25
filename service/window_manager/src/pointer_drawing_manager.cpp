@@ -1447,8 +1447,11 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
-    windowId_ = info.windowId;
-    pid_ = info.windowPid;
+    if (pid_ != info.windowPid) {
+        windowId_ = info.windowId;
+        pid_ = info.windowPid;
+        UpdatePointerVisible();
+    }
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible,
