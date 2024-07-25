@@ -1929,5 +1929,219 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AdjustMouseFocusBy
     pointerDrawMgr.userIcon_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.AdjustMouseFocusByDirection90(iconType, physicalX, physicalY));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerColor_003
+ * @tc.desc: Test SetPointerColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
+    pointerDrawingManager->SetPointerColor(16777216);
+    int32_t color = pointerDrawingManager->GetPointerColor();
+    EXPECT_EQ(color, RET_OK);
+    pointerDrawingManager->surfaceNode_ = nullptr;
+    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ == nullptr);
+    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    MAGIC_CURSOR->isExistDefaultStyle = false;
+    int32_t ret = pointerDrawingManager->SetPointerColor(16777216);
+    EXPECT_EQ(ret, RET_OK);
+    MAGIC_CURSOR->isExistDefaultStyle = true;
+    ret = pointerDrawingManager->SetPointerColor(16777216);
+    EXPECT_EQ(ret, RET_OK);
+    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerSize_002
+ * @tc.desc: Test SetPointerSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerSize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    pointerDrawingManager->SetPointerSize(0);
+    int32_t pointerSize = pointerDrawingManager->GetPointerSize();
+    EXPECT_EQ(pointerSize, 0);
+    pointerDrawingManager->SetPointerSize(8);
+    pointerSize = pointerDrawingManager->GetPointerSize();
+    EXPECT_EQ(pointerSize, 0);
+    pointerDrawingManager->surfaceNode_ = nullptr;
+    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ == nullptr);
+    pointerDrawingManager->SetPointerSize(5);
+    pointerSize = pointerDrawingManager->GetPointerSize();
+    EXPECT_EQ(pointerSize, 0);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
+    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    MAGIC_CURSOR->isExistDefaultStyle = false;
+    int32_t ret = pointerDrawingManager->SetPointerSize(5);
+    EXPECT_EQ(ret, RET_OK);
+    MAGIC_CURSOR->isExistDefaultStyle = true;
+    ret = pointerDrawingManager->SetPointerSize(5);
+    EXPECT_EQ(ret, RET_OK);
+    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerDevice_003
+ * @tc.desc: Test UpdatePointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdatePointerDevice_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
+        std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
+    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 100);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(true, false, true));
+    pointerDrawingManager->UpdatePointerDevice(true, true, true);
+    EXPECT_EQ(pointerDrawingManager->pidInfos_.size(), 100);
+    pointerDrawingManager->surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(false, false, true));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->UpdatePointerDevice(false, false, true));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawManager_001
+ * @tc.desc: Test DrawManager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    pointerDrawingManager.hasDisplay_ = false;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = false;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.hasDisplay_ = false;
+    pointerDrawingManager.hasPointerDevice_ = false;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.hasDisplay_ = false;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.hasDisplay_ = false;
+    pointerDrawingManager.hasPointerDevice_ = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    pointerDrawingManager.lastPhysicalX_ = -1;
+    pointerDrawingManager.lastPhysicalY_ = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.lastPhysicalX_ = 1;
+    pointerDrawingManager.lastPhysicalY_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.lastPhysicalX_ = -1;
+    pointerDrawingManager.lastPhysicalY_ = -1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    pointerDrawingManager.lastPhysicalX_ = 1;
+    pointerDrawingManager.lastPhysicalY_ = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeletePointerVisible_002
+ * @tc.desc: Test DeletePointerVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DeletePointerVisible_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    pointerDrawingManager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DeletePointerVisible_003
+ * @tc.desc: Test DeletePointerVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DeletePointerVisible_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
+    PointerDrawingManager::PidInfo info = { .pid = 1, .visible = true };
+    pointerDrawingManager.pidInfos_.push_back(info);
+    info = { .pid = 2, .visible = true };
+    pointerDrawingManager.pidInfos_.push_back(info);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
+    pid = 5;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DeletePointerVisible(pid));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDefaultPointerStyle_003
+ * @tc.desc: Test UpdateDefaultPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateDefaultPointerStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 0;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+    bool isUiExtension = true;
+    int32_t ret = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(ret, RET_OK);
+    windowId = -1;
+    ret = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+}
 } // namespace MMI
 } // namespace OHOS
