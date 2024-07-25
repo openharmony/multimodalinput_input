@@ -399,7 +399,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
             KeyEvent::ActionToString(keyAction));
     } else {
-        MMI_HILOGD("keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("keyCode:%d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
     } 
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
@@ -598,7 +598,8 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
             MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
                 subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         } else {
-            MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
+            MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%d, pid:%{public}d",
+                subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
         }
     }
     if (pkt.ChkRWError()) {
@@ -968,11 +969,7 @@ void KeySubscriberHandler::PrintKeyOption(const std::shared_ptr<KeyOption> keyOp
         keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        if (EventLogHelper::IsBetaVersion() && !keyOption->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
-        } else {
-            MMI_HILOGD("keyOption->prekey:%d", keyCode);
-        }
+        MMI_HILOGD("keyOption->prekey:%d", keyCode);
     }
 }
 
@@ -986,11 +983,7 @@ void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subs
         subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), keyOption->GetFinalKeyUpDelay());
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        if (EventLogHelper::IsBetaVersion() && !subscriber->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
-        } else {
-            MMI_HILOGD("keyOption->prekey:%d", keyCode);
-        }
+        MMI_HILOGD("keyOption->prekey:%d", keyCode);
     }
 }
 

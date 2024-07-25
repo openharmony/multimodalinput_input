@@ -1146,7 +1146,7 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
     window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
-            "area.x:%{private}d,area.y:%{private}d,area.width:%{public}d,area.height:%{public}d,"
+            "area.x:%d,area.y:%d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d,action:%{public}d,displayId:%{public}d,"
             "zOrder:%{public}f, privacyMode:%{public}d",
@@ -1154,11 +1154,11 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder, item.privacyMode);
         for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas:x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGD("defaultHotAreas:x:%d, y:%d, width:%{public}d, height:%{public}d",
                 win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas:x:%{private}d,y:%{private}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGD("pointerHotAreas:x:%d, y:%d, width:%{public}d, height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
 
@@ -1267,14 +1267,14 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
             coord.x = info.width - coord.y;
         }
         coord.y = temp;
-        MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f", coord.x, coord.y);
+        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION180) {
         MMI_HILOGD("direction is DIRECTION180");
         coord.x = info.width - coord.x;
         coord.y = info.height - coord.y;
-        MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f", coord.x, coord.y);
+        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
         return;
     }
     if (direction == DIRECTION270) {
@@ -1286,7 +1286,7 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
             coord.y = info.height - coord.x;
         }
         coord.x = temp;
-        MMI_HILOGD("physicalX:%{private}f, physicalY:%{private}f", coord.x, coord.y);
+        MMI_HILOGD("physicalX:%f, physicalY:%f", coord.x, coord.y);
     }
 }
 
@@ -2270,9 +2270,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                 logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
     } else {
         MMI_HILOGD("pid:%{public}d, id:%{public}d, agentWindowId:%{public}d,"
-                "logicalX:%{public}d, logicalY:%{public}d, windowX:%{public}d, windowY:%{public}d",
+                "logicalX:%d, logicalY:%d,displayX:%d, displayY:%d, windowX:%d, windowY:%d",
                 isUiExtension_ ? uiExtensionPid_ : touchWindow->pid, isUiExtension_ ? uiExtensionWindowId_ :
-                touchWindow->id, touchWindow->agentWindowId, logicalX, logicalY, windowX, windowY);
+                touchWindow->id, touchWindow->agentWindowId,
+                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
     } 
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");

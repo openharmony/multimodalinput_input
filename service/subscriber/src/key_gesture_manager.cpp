@@ -21,6 +21,7 @@
 #include "app_state_observer.h"
 #include "define_multimodal.h"
 #include "display_event_monitor.h"
+#include "event_log_helper.h"
 #include "timer_manager.h"
 #include "util.h"
 

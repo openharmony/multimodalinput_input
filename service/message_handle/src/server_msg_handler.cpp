@@ -26,6 +26,7 @@
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
+#include "event_log_helper.h"
 #include "hos_key_event.h"
 #include "input_device_manager.h"
 #include "input_event.h"
@@ -142,7 +143,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
-        MMI_HILOGD("Inject action:%{public}d", keyEvent->GetKeyAction());
+        MMI_HILOGD("Inject keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
     return RET_OK;
 }
@@ -398,8 +399,6 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
-        } else {
-            MMI_HILOGE("Can't find pointer item, pointer:%d", pointerId);
         }
         return false;
     }
@@ -414,11 +413,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
             targetWindowId = iter->second;
         }
     }
-    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
-    } else {
-        MMI_HILOGD("TargetWindowId:%d %d", pointerEvent->GetTargetWindowId(), targetWindowId);
-    }
+    MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
         action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
         MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");

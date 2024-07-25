@@ -94,13 +94,8 @@ void EventResample::EventDump(const char *msg, MotionEvent &event)
                msg, event.pointerAction, event.actionTime, event.pointerCount,
                event.sourceType, event.deviceId, event.eventId);
     for (auto &it : event.pointers) {
-        if (EventLogHelper::IsBetaVersion() && !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("ID:%{public}d, coordX:%{public}d, coordY:%{public}d, toolType:%{public}d",
-                    it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
-        } else {
-            MMI_HILOGD("ID:%{public}d, coordX:%d, coordY:%d, toolType:%{public}d",
-                    it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
-        }
+        MMI_HILOGD("ID:%{public}d, coordX:%d, coordY:%d, toolType:%{public}d",
+            it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
     }
 }
 
