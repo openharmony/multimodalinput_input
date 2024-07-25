@@ -1543,7 +1543,7 @@ bool PointerDrawingManager::IsPointerVisible()
 {
     CALL_DEBUG_ENTER;
     if (!hapPidInfos_.empty()) {
-        for(auto& item : hapPidInfos_) {
+        for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
                 MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
                     item.pid, item.visible ? "true" : "false");
