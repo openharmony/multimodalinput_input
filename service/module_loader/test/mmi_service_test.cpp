@@ -1094,5 +1094,20 @@ HWTEST_F(MMIServerTest, MMIServerTest_InitService, TestSize.Level1)
     service.mmiFd_ = 1000;
     ASSERT_FALSE(service.InitService());
 }
+
+/**
+ * @tc.name: MMIServerTest_OnAppDebugStoped_01
+ * @tc.desc: Test OnAppDebugStoped
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnAppDebugStoped_01, TestSize.Level1)
+{
+    AppDebugListener listener;
+    std::vector<AppExecFwk::AppDebugInfo> debugInfos(-1);
+    ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
+    listener.appDebugPid_ = 4;
+    ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
+}
 } // namespace MMI
 } // namespace OHOS
