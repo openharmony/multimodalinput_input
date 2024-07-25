@@ -312,6 +312,9 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("Cursor move to (x:%{public}.2f, y:%{public}.2f, DisplayId:%{public}d)",
             cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    } else {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     }
     return RET_OK;
 }
@@ -395,6 +398,8 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        } else {
+            MMI_HILOGE("Can't find pointer item, pointer:%d", pointerId);
         }
         return false;
     }
@@ -411,6 +416,8 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     }
     if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
+    } else {
+        MMI_HILOGD("TargetWindowId:%d %d", pointerEvent->GetTargetWindowId(), targetWindowId);
     }
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
         action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {

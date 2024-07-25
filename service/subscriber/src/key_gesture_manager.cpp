@@ -214,6 +214,8 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                 MMI_HILOGI("%{public}s is active now", output.str().c_str());
+            } else {
+                MMI_HILOGI("%s is active now", output.str().c_str());
             }
             return true;
         }
@@ -223,6 +225,8 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                 MMI_HILOGI("%{public}s", output.str().c_str());
+            } else {
+                MMI_HILOGI("%s", output.str().c_str());
             }
             return false;
         }
@@ -232,6 +236,8 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                 MMI_HILOGI("%{public}s", output.str().c_str());
+            } else {
+                MMI_HILOGI("%s", output.str().c_str());
             }
             return false;
         }
@@ -286,6 +292,8 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     Dump(output);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGI("%{public}s", output.str().c_str());
+    } else {
+        MMI_HILOGI("%s", output.str().c_str());
     }
     OnTriggerAll(keyEvent);
     TriggerHandlers(keyEvent);
@@ -371,7 +379,9 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
             output << "Intercepted by ";
             (*iter)->Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("%{public}s", output.str().c_str());
+                MMI_HILOGI("Intercepted by %{public}s", output.str().c_str());
+            } else {
+                MMI_HILOGI("Intercepted by %s", output.str().c_str());
             }
             for (++iter; iter != keyGestures_.end(); ++iter) {
                 (*iter)->Reset();
