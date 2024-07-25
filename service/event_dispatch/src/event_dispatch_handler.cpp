@@ -257,7 +257,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     CHKPV(session);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
+        MMI_HILOGD("InputTracking id:%{public}d, The pointer event does not report normally,"
             "application not response. PointerEvent(deviceid:%{public}d, action:%{public}s)",
             point->GetId(), point->GetDeviceId(), point->DumpPointerAction());
         return;
@@ -280,7 +280,9 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
             static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
             session->GetProgramName().c_str(), session->GetPid());
     }
