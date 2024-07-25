@@ -751,7 +751,7 @@ int32_t MouseTransformProcessor::GetTouchpadSpeed()
 
 int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
 {
-    MMI_HILOGI("SetPointerLocation x:%{private}d, y:%{private}d", x, y);
+    MMI_HILOGI("SetPointerLocation x:%d, y:%d", x, y);
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");

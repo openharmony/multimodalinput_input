@@ -98,7 +98,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     }
 
     for (const auto &keyCode : keyOption->GetPreKeys()) {
-        MMI_HILOGD("keyOption->prekey:%{private}d", keyCode);
+        MMI_HILOGD("keyOption->prekey:%d", keyCode);
     }
     MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d,"
         "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
@@ -400,7 +400,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
             KeyEvent::ActionToString(keyAction));
     } else {
         MMI_HILOGD("keyCode:%d, keyAction:%{public}s", keyEvent->GetKeyCode(), KeyEvent::ActionToString(keyAction));
-    } 
+    }
     if (needSkipPowerKeyUp_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER
         && keyAction == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGD("Skip power key up");
