@@ -823,29 +823,6 @@ HWTEST_F(MMIServerTest, CheckInjectKeyEvent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: CheckInjectKeyEvent_001
- * @tc.desc: Test the function AdaptScreenResolution
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, AdaptScreenResolution_001, TestSize.Level1)
-{
-    MMIService mmiService;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(10000);
-    item.SetDisplayX(360);
-    item.SetDisplayY(500);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerId(10000);
-    int32_t ret = mmiService.AdaptScreenResolution(pointerEvent);
-    EXPECT_NE(ret, RET_ERR);
-    ret = mmiService.AdaptScreenResolution(pointerEvent);
-    EXPECT_NE(ret, RET_ERR);
-}
-
-/**
  * @tc.name: OnAddSystemAbility_001
  * @tc.desc: Test the function OnAddSystemAbility
  * @tc.type: FUNC

@@ -215,65 +215,6 @@ bool MMIService::IsRunning() const
     return (state_ == ServiceRunningState::STATE_RUNNING);
 }
 
-void MMIService::RegisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        MMI_HILOG_HANDLERW("No need register fold status listener");
-        return;
-    }
-    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(this);
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to register fold status listener");
-        foldStatusListener_ = nullptr;
-    } else {
-        MMI_HILOG_HANDLERI("Register fold status listener successed");
-    }
-}
-
-void MMIService::UnregisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
-    }
-}
-
-MMIService::FoldStatusLisener::~FoldStatusLisener()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    server_ = nullptr;
-}
-
-void MMIService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    MMI_HILOG_HANDLERI("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
-    if (lastFoldStatus_ == foldStatus) {
-        MMI_HILOG_HANDLERD("No need to set foldStatus");
-        return;
-    }
-    lastFoldStatus_ = foldStatus;
-    std::lock_guard<std::mutex> lock(mutex_);
-    CHKPV(server_);
-    server_->OnFoldStatusChanged(foldStatus);
-}
-
-void MMIService::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    int32_t ret = delegateTasks_.PostSyncTask([foldStatus]() {
-        WIN_MGR->OnFoldStatusChanged(foldStatus);
-        return RET_OK;
-    });
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to report the cancel event during the fold status change, ret: %{public}d",
-            ret);
-    }
-}
-
 bool MMIService::InitLibinputService()
 {
     if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
@@ -462,7 +403,6 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
-    UnregisterFoldStatusListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1458,53 +1398,6 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointerId:%{public}d", pointerId);
-        return RET_ERR;
-    }
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    CHKPR(display, ERROR_NULL_POINTER);
-    enum ResolutionIndex {
-        FIRST = 0,
-        CURRENT = 1
-    };
-    if (displays_[FIRST] == nullptr) {
-        displays_[FIRST] = display;
-    } else {
-        displays_[CURRENT] = display;
-    }
-    if (displays_[FIRST] != nullptr && displays_[CURRENT] != nullptr) {
-        int32_t sourceX = pointerItem.GetDisplayX();
-        int32_t sourceY = pointerItem.GetDisplayY();
-        if ((displays_[FIRST]->GetWidth() == 0) || (displays_[FIRST]->GetHeight() == 0)) {
-            MMI_HILOGE("Invalid display, screen resolution width:%{public}d, height:%{public}d",
-                displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight());
-            return RET_ERR;
-        }
-        int32_t destX = sourceX * displays_[CURRENT]->GetWidth() / displays_[FIRST]->GetWidth();
-        int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
-        pointerItem.SetDisplayX(destX);
-        pointerItem.SetDisplayY(destY);
-        if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGD("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
-                "Screen resolution width:%{public}d, height:%{public}d first got,"
-                "Screen resolution width:%{public}d, height:%{public}d current got,"
-                "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
-                sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
-                displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
-        }
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -1570,7 +1463,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
-        RegisterFoldStatusListener();
     }
 }
 

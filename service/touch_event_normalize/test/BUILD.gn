@@ -48,7 +48,6 @@ ohos_unittest("TouchEventNormalizeTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -194,7 +193,6 @@ ohos_unittest("GestureTransformTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -348,7 +346,6 @@ ohos_unittest("TabletToolTranformTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -516,7 +513,6 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -655,7 +651,6 @@ ohos_unittest("TouchpadGestureTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -795,7 +790,6 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]

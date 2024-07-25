@@ -248,10 +248,7 @@ ohos_shared_library("libmmi-server") {
     deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
   }
 
-  external_deps = [
-    "c_utils:utils",
-    "window_manager:libdm",
-  ]
+  external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm_lite" ]
   }
@@ -305,7 +302,6 @@ ohos_shared_library("libmmi-server") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
-    "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
@@ -358,7 +354,6 @@ ohos_unittest("event_resample_test") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -401,7 +396,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -482,7 +476,6 @@ ohos_unittest("EventFilterHandlerTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -604,7 +597,6 @@ ohos_unittest("InputDisplayBindHelperTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -650,7 +642,6 @@ ohos_unittest("KnuckleGlowPointTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -696,7 +687,6 @@ ohos_unittest("KnuckleDivergentPointTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -742,7 +732,6 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -788,7 +777,6 @@ ohos_unittest("PointerDrawingManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -834,7 +822,6 @@ ohos_unittest("TouchDrawingManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -875,7 +862,6 @@ ohos_unittest("KnuckleDrawingManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -916,7 +902,6 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -953,7 +938,6 @@ ohos_unittest("InputWindowsManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -1027,7 +1011,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
-    "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
@@ -1187,7 +1170,6 @@ ohos_unittest("MonitorTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1232,7 +1214,6 @@ ohos_unittest("ModuleLoaderTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1276,7 +1257,6 @@ ohos_unittest("ModuleLoaderExTest") {
     "image_framework:image_native",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1310,7 +1290,6 @@ ohos_unittest("KeyEventNormalizeTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1352,7 +1331,6 @@ ohos_unittest("KeyCommandTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1469,7 +1447,6 @@ ohos_unittest("InterceptorExTest") {
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
-    "window_manager:libdm",
   ]
 }
 
@@ -1545,7 +1522,6 @@ ohos_unittest("EventHandlerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1576,7 +1552,6 @@ ohos_unittest("EventNormalizeHandlerTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1615,7 +1590,6 @@ ohos_unittest("EventHandlerEXTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1649,7 +1623,6 @@ ohos_unittest("EventDispatchTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -1787,7 +1760,6 @@ ohos_unittest("DisplayStateManagerTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1896,7 +1868,6 @@ ohos_unittest("ConnectManagerTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1946,7 +1917,6 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -1990,7 +1960,6 @@ ohos_unittest("ConnectManagerEXTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -2025,7 +1994,6 @@ ohos_unittest("EventDumpTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }

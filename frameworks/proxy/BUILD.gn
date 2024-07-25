@@ -266,7 +266,6 @@ ohos_unittest("InputHandlerManagerTest") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
-    "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]

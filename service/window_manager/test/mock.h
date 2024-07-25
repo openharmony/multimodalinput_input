@@ -20,7 +20,6 @@
 #include <gmock/gmock.h>
 
 #include "dfx_hisysevent.h"
-#include "display_manager.h"
 #include "event_filter_handler.h"
 #include "fingersense_wrapper.h"
 #include "input_device_manager.h"
@@ -50,10 +49,7 @@ public:
     virtual std::shared_ptr<InputDevice> GetInputDevice(int32_t deviceId, bool checked) = 0;
     virtual bool GetMouseDisplayState() = 0;
     virtual bool GetBoolValue(const std::string &key, bool defaultValue) = 0;
-    virtual bool IsFoldable() = 0;
     virtual bool SendMsg(NetPacket &pkt) = 0;
-    virtual Rosen::DMError RegisterFoldStatusListener(sptr<Rosen::DisplayManager::IFoldStatusListener> listener) = 0;
-    virtual Rosen::DMError UnregisterFoldStatusListener(sptr<Rosen::DisplayManager::IFoldStatusListener> listener) = 0;
     virtual bool IsSceneBoardEnabled() = 0;
 public:
     static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
@@ -67,12 +63,7 @@ public:
     MOCK_METHOD2(GetInputDevice, std::shared_ptr<InputDevice>(int32_t deviceId, bool checked));
     MOCK_METHOD0(GetMouseDisplayState, bool());
     MOCK_METHOD2(GetBoolValue, bool(const std::string &key, bool defaultValue));
-    MOCK_METHOD0(IsFoldable, bool());
     MOCK_METHOD1(SendMsg, bool(NetPacket &pkt));
-    MOCK_METHOD1(RegisterFoldStatusListener,
-        Rosen::DMError(sptr<Rosen::DisplayManager::IFoldStatusListener> listener));
-    MOCK_METHOD1(UnregisterFoldStatusListener,
-        Rosen::DMError(sptr<Rosen::DisplayManager::IFoldStatusListener> listener));
     MOCK_METHOD0(IsSceneBoardEnabled, bool());
 };
 } // namespace MMI
