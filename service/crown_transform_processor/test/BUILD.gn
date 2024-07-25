@@ -46,7 +46,6 @@ ohos_unittest("CrownTransformProcessorTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -84,7 +83,6 @@ ohos_unittest("CrownTransformProcessorExTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }

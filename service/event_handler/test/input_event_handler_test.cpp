@@ -24,8 +24,6 @@
 #include <functional>
 #include <vector>
 
-#include "display_manager.h"
-
 #include "general_touchpad.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -50,7 +48,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void UpdateDisplayInfo();
     
 private:
     static void SetupTouchpad();
@@ -66,7 +63,6 @@ void InputEventHandlerTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupTouchpad();
-    UpdateDisplayInfo();
 }
 
 void InputEventHandlerTest::TearDownTestCase(void)
@@ -91,23 +87,6 @@ void InputEventHandlerTest::CloseTouchpad()
 {
     libinput_.RemovePath(vTouchpad_.GetDevPath());
     vTouchpad_.Close();
-}
-
-void InputEventHandlerTest::UpdateDisplayInfo()
-{
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    ASSERT_TRUE(display != nullptr);
-    DisplayGroupInfo displays {
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-        .focusWindowId = -1,
-    };
-    displays.displaysInfo.push_back(DisplayInfo {
-        .name = "default display",
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-    });
-    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void InputEventHandlerTest::SetUp()

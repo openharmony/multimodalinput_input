@@ -157,6 +157,7 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     void RemoveKeyGesture(int32_t id);
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent);
+    void ResetAll();
     void Dump() const;
 
 private:

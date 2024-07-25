@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "circle_stream_buffer.h"
+#include "key_event_napi.h"
 #include "stream_buffer.h"
 
 namespace OHOS {
@@ -93,6 +94,78 @@ HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_Write_001, TestSize.Leve
     streamBuffer.wPos_ = 200;
     ret = circleStreamBuffer.Write(buf, size);
     ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name:CircleStreamBufferTest_CreateKeyEvent_001
+ * @tc.desc:Test the funcation CreateKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CreateKeyEvent_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    std::shared_ptr<KeyEvent> in = KeyEvent::Create();
+    ASSERT_NE(in, nullptr);
+    napi_value out = nullptr;
+    napi_status status = napi.CreateKeyEvent(env, in, out);
+    ASSERT_NE(status, napi_ok);
+}
+
+/**
+ * @tc.name:CircleStreamBufferTest_GetKeyEvent_001
+ * @tc.desc:Test the funcation GetKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_GetKeyEvent_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    napi_value in = nullptr;
+    std::shared_ptr<KeyEvent> out = KeyEvent::Create();
+    ASSERT_NE(out, nullptr);
+    napi_status status = napi.GetKeyEvent(env, in, out);
+    ASSERT_NE(status, napi_ok);
+}
+
+/**
+ * @tc.name:CircleStreamBufferTest_CreateKeyItem_001
+ * @tc.desc:Test the funcation CreateKeyItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_CreateKeyItem_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    KeyEvent::KeyItem item;
+    std::optional<KeyEvent::KeyItem> in;
+    item.SetKeyCode(2018);
+    item.SetPressed(false);
+    in.emplace(item);
+    napi_value out = nullptr;
+    napi_status status = napi.CreateKeyItem(env, in, out);
+    ASSERT_NE(status, napi_ok);
+}
+
+/**
+ * @tc.name:CircleStreamBufferTest_GetKeyItem_001
+ * @tc.desc:Test the funcation GetKeyItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CircleStreamBufferTest, CircleStreamBufferTest_GetKeyItem_001, TestSize.Level1)
+{
+    KeyEventNapi napi;
+    napi_env env = nullptr;
+    napi_value in = nullptr;
+    KeyEvent::KeyItem out;
+    out.SetKeyCode(2024);
+    out.SetPressed(false);
+    napi_status status = napi.GetKeyItem(env, in, out);
+    ASSERT_EQ(status, napi_ok);
 }
 } // namespace MMI
 } // namespace OHOS

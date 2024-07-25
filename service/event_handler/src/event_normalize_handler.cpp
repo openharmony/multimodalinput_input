@@ -15,8 +15,6 @@
 
 #include "event_normalize_handler.h"
 
-#include "display_manager.h"
-
 #include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_CROWN
 #include "crown_transform_processor.h"

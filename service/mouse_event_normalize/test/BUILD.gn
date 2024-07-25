@@ -49,7 +49,6 @@ ohos_unittest("MouseEventNormalizeTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -181,7 +180,6 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]

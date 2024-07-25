@@ -60,7 +60,9 @@ constexpr float MIN_GESTURE_STROKE_LENGTH { 200.0f };
 constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
 constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
-constexpr int64_t FREQUENCY = 1000;
+constexpr int64_t FREQUENCY { 1000 };
+constexpr int64_t TAP_DOWN_INTERVAL_MILLIS { 550000 };
+constexpr int32_t MAX_TAP_COUNT { 2 };
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
@@ -314,6 +316,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
+    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -328,6 +331,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
+    previousUpTime_ = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
@@ -367,13 +371,13 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
-        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
+        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
         LaunchAbility(knuckleGesture.ability, NO_DELAY);
         BytraceAdapter::StopLaunchAbility();
         knuckleGesture.state = true;
         if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
-            DfxHisysevent::ReportScreenRecorderGesture(++screenRecordingSuccessCount_, intervalTime);
+            DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
         }
         ReportKnuckleScreenCapture(touchEvent);
     } else {
@@ -457,18 +461,6 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
     MMI_HILOGI("Adjust new double click distance:%{public}f", newDistanceConfig);
     downToPrevDownDistanceConfig_ = newDistanceConfig;
     checkAdjustDistanceCount_ = 0;
-}
-
-void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent,
-    KnuckleGesture &knuckleGesture)
-{
-    CHKPV(touchEvent);
-    size_t pointercnt = touchEvent->GetPointerIds().size();
-    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
-        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(knuckleGesture.downToPrevUpTime);
-        return;
-    }
-    MMI_HILOGW("Current touch event pointercnt:%{public}zu", pointercnt);
 }
 
 void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
@@ -681,20 +673,17 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
     switch (notifyType) {
         case NotifyType::REGIONGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
-            smartShotSuccTimes_++;
             drawOSuccTimestamp_ = touchEvent->GetActionTime();
             ReportRegionGesture();
             break;
         }
         case NotifyType::LETTERGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
-            drawSSuccessCount_++;
             ReportLetterGesture();
             break;
         }
         default: {
             MMI_HILOGW("Not a region gesture or letter gesture, notifyType:%{public}d", notifyType);
-            gestureFailCount_++;
             drawOFailTimestamp_ = touchEvent->GetActionTime();
             ReportIfNeed();
             break;
@@ -755,7 +744,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
 
 void KeyCommandHandler::ReportIfNeed()
 {
-    DfxHisysevent::ReportKnuckleGestureFaildTimes(gestureFailCount_);
+    DfxHisysevent::ReportKnuckleGestureFaildTimes();
     DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
     DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
     if (isLastGestureSucceed_) {
@@ -766,13 +755,13 @@ void KeyCommandHandler::ReportIfNeed()
 
 void KeyCommandHandler::ReportRegionGesture()
 {
-    DfxHisysevent::ReportSmartShotSuccTimes(smartShotSuccTimes_);
+    DfxHisysevent::ReportSmartShotSuccTimes();
     ReportGestureInfo();
 }
 
 void KeyCommandHandler::ReportLetterGesture()
 {
-    DfxHisysevent::ReportKnuckleDrawSSuccessTimes(drawSSuccessCount_);
+    DfxHisysevent::ReportKnuckleDrawSSuccessTimes();
     ReportGestureInfo();
 }
 
@@ -1471,10 +1460,27 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     return false;
 }
 
+bool KeyCommandHandler::IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    return (sequenceOccurred_ && !keys_.empty() &&
+            (keys_.back().keyCode == keyEvent->GetKeyCode()) &&
+            (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN));
+}
+
+void KeyCommandHandler::MarkActiveSequence(bool active)
+{
+    sequenceOccurred_ = active;
+}
+
 bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    if (IsActiveSequenceRepeating(keyEvent)) {
+        MMI_HILOGD("Skip repeating key(%{public}d) in active sequence", keyEvent->GetKeyCode());
+        return true;
+    }
+    MarkActiveSequence(false);
     if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
@@ -1510,6 +1516,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (isLaunchAbility) {
+        MarkActiveSequence(true);
         for (const auto& item : keys_) {
             if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
@@ -2113,5 +2120,23 @@ std::ostream& operator<<(std::ostream& os, const Sequence& seq)
     return os;
 }
 
+void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CHKPV(touchEvent);
+    int64_t currentDownTime = touchEvent->GetActionTime();
+    int64_t downIntervalTime = currentDownTime - lastDownTime_;
+    lastDownTime_ = currentDownTime;
+    if (downIntervalTime <= 0 || downIntervalTime >= TAP_DOWN_INTERVAL_MILLIS) {
+        tappingCount_ = 1;
+        return;
+    }
+    tappingCount_++;
+    int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
+    if (timeDiffToPrevKnuckleUpTime <= downToPrevUpTimeConfig_) {
+        if (tappingCount_ > MAX_TAP_COUNT) {
+            DfxHisysevent::ReportFailIfKnockTooFast();
+        }
+    }
+}
 } // namespace MMI
 } // namespace OHOS
