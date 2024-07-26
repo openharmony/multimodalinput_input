@@ -294,6 +294,7 @@ ohos_shared_library("libmmi-server") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "hicollie:libhicollie",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
