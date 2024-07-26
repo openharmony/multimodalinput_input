@@ -2425,6 +2425,7 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent, std::vector<WindowInfo>& windowsInfo,
     const DisplayInfo& displayInfo)
 {
+    CHKPV(pointerEvent);
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
