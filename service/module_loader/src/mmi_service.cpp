@@ -2730,15 +2730,16 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag);
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    static int32_t BLOCK_TIME = 1;
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
-void MMIService::PrintLog(const std::string &flag)
+void MMIService::PrintLog(const std::string &flag, int32_t duration)
 {
-    MMI_HILOGW("BlockMonitor task name : %{public}s", flag.c_str());
+    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
 
 
