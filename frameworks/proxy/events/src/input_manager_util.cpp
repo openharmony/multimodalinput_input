@@ -670,6 +670,78 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent004()
     return pointerEvent;
 }
 
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent005()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, POINTER_ITEM_ID_ONE);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, POINTER_ITEM_ID_TWO);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_INVALID);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent006()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, POINTER_ITEM_ID_FOUR);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_FOUR);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent007()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, POINTER_ITEM_ID_ONE);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_INVALID);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerUtil::SetupSimulateEvent008()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    PointerEvent::PointerItem item;
+    SetPointerItem(item, POINTER_ITEM_ID_INVALID);
+    pointerEvent->AddPointerItem(item);
+
+    SetPointerItem(item, POINTER_ITEM_ID_ONE);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(POINTER_ITEM_ID_ONE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
 void InputManagerUtil::PrintPointerEventId(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_HILOGI("PointerEvent pointerId:%{public}d", pointerEvent->GetPointerId());
