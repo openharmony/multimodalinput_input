@@ -15,8 +15,6 @@
 
 #include "intention_manager.h"
 
-#include "display_manager.h"
-
 #include "devicestatus_define.h"
 #include "drag_data.h"
 

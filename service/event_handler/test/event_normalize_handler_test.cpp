@@ -15,8 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include "display_manager.h"
-
 #include "dfx_hisysevent.h"
 #include "event_filter_handler.h"
 #include "event_normalize_handler.h"
@@ -40,7 +38,6 @@ class EventNormalizeHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
-    static void UpdateDisplayInfo();
 
 private:
     static void SetupTouchpad();
@@ -57,7 +54,6 @@ void EventNormalizeHandlerTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupTouchpad();
-    UpdateDisplayInfo();
 }
 
 void EventNormalizeHandlerTest::TearDownTestCase(void)
@@ -84,22 +80,6 @@ void EventNormalizeHandlerTest::CloseTouchpad()
     vTouchpad_.Close();
 }
 
-void EventNormalizeHandlerTest::UpdateDisplayInfo()
-{
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    ASSERT_TRUE(display != nullptr);
-    DisplayGroupInfo displays {
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-        .focusWindowId = -1,
-    };
-    displays.displaysInfo.push_back(DisplayInfo {
-        .name = "default display",
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-    });
-    WIN_MGR->UpdateDisplayInfo(displays);
-}
 /**
  * @tc.name: EventNormalizeHandlerTest_HandleEvent_002
  * @tc.desc: Test the function HandleEvent

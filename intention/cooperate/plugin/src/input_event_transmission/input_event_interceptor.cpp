@@ -17,7 +17,6 @@
 
 #include "cooperate_context.h"
 #include "devicestatus_define.h"
-#include "display_manager.h"
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
 

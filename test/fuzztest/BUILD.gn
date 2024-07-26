@@ -76,7 +76,7 @@ group("test") {
     "stubgetkeyboardtype_fuzzer:fuzztest",
     "stubgetmouseprimarybutton_fuzzer:fuzztest",
     "stubgetmousescrollrows_fuzzer:fuzztest",
-    "stubgetpointerspeed_fuzzer:fuzztest",
+    "stubgetpointersnapshot_fuzzer:fuzztest",
     "stubgetpointerspeed_fuzzer:fuzztest",
     "stubgetpointerstyle_fuzzer:fuzztest",
     "stubgettouchpadpinchswitch_fuzzer:fuzztest",

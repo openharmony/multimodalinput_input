@@ -225,6 +225,8 @@ private:
     bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleScreenLocked(Sequence& sequence, bool &isLaunchAbility);
+    bool IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyEvent) const;
+    void MarkActiveSequence(bool active);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -275,7 +277,6 @@ private:
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
-    void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
     void KnuckleGestureProcessor(std::shared_ptr<PointerEvent> touchEvent,
         KnuckleGesture &knuckleGesture, KnuckleType type);
@@ -298,6 +299,7 @@ private:
     void ReportLetterGesture();
     void ReportGestureInfo();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    void CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     Sequence matchedSequence_;
@@ -340,11 +342,11 @@ private:
     int64_t intervalTime_ { 120000 };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
+    bool sequenceOccurred_ { false };
     bool isHandleSequence_ { false };
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
-    int32_t screenRecordingSuccessCount_ { 0 };
     int32_t lastKeyEventCode_ { -1 };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
@@ -355,12 +357,12 @@ private:
     float gestureTrackLength_ { 0.0f };
     std::vector<float> gesturePoints_;
     std::vector<int64_t> gestureTimeStamps_;
-    int32_t smartShotSuccTimes_ { 0 };
-    int32_t gestureFailCount_ { 0 };
-    int32_t drawSSuccessCount_ { 0 };
     int64_t drawOFailTimestamp_ { 0 };
     int64_t drawOSuccTimestamp_ { 0 };
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    int64_t lastDownTime_ { 0 };
+    int64_t previousUpTime_ { 0 };
+    int32_t tappingCount_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

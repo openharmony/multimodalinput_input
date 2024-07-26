@@ -1268,7 +1268,7 @@ int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
             return SCROLL_LOCK_FUNCTION_KEY;
         }
         default: {
-            MMI_HILOGW("Unknown key code:%{public}d", keyCode);
+            MMI_HILOGW("Unknown key code:%d", keyCode);
             return UNKNOWN_FUNCTION_KEY;
         }
     }
