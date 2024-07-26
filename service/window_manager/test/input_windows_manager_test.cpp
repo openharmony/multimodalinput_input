@@ -4560,6 +4560,266 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowByEv
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_TransformDisplayXY_001
+ * @tc.desc: Test the TransformDisplayXY function of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformDisplayXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo info;
+    double logicX = 10.0;
+    double logicY = 20.0;
+    std::pair<double, double> result =WIN_MGR->TransformDisplayXY(info, logicX, logicY);
+    double ret = result.first;
+    EXPECT_EQ(ret, logicX);
+    double ret1 = result.second;
+    EXPECT_EQ(ret1, logicY);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformDisplayXY_002
+ * @tc.desc: Test the TransformDisplayXY function of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformDisplayXY_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo info;
+    std::vector<float> transform = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+    info.transform = transform;
+    double logicX = 10.0;
+    double logicY = 20.0;
+    std::pair<double, double> result =WIN_MGR->TransformDisplayXY(info, logicX, logicY);
+    double ret = result.first;
+    EXPECT_EQ(ret, logicX);
+    double ret1 = result.second;
+    EXPECT_EQ(ret1, logicY);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TransformDisplayXY_003
+ * @tc.desc: Test the TransformDisplayXY function of the input window manager
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformDisplayXY_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayInfo info;
+    std::vector<float> transform = { 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 315.0, 690.0, 1.0};
+    info.transform = transform;
+    double logicX = 10.0;
+    double logicY = 20.0;
+    std::pair<double, double> result =WIN_MGR->TransformDisplayXY(info, logicX, logicY);
+    double ret = result.first;
+    EXPECT_EQ(ret, 320);
+    double ret1 = result.second;
+    EXPECT_EQ(ret1, 700);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsValidNavigationWindow_001
+ * @tc.desc: Test IsValidNavigationWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsValidNavigationWindow_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    double x = 10.0;
+    double y = 20.0;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    EXPECT_TRUE(WIN_MGR->IsValidNavigationWindow(windowInfo, x, y));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsValidNavigationWindow_002
+ * @tc.desc: Test IsValidNavigationWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsValidNavigationWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    double x = 10.0;
+    double y = 20.0;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    EXPECT_TRUE(WIN_MGR->IsValidNavigationWindow(windowInfo, x, y));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsValidNavigationWindow_003
+ * @tc.desc: Test IsValidNavigationWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsValidNavigationWindow_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::NORMAL;
+    double x = 10.0;
+    double y = 20.0;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    EXPECT_FALSE(WIN_MGR->IsValidNavigationWindow(windowInfo, x, y));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsValidNavigationWindow_004
+ * @tc.desc: Test IsValidNavigationWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsValidNavigationWindow_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    double x = -10.0;
+    double y = 20.0;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    EXPECT_FALSE(WIN_MGR->IsValidNavigationWindow(windowInfo, x, y));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsValidNavigationWindow_005
+ * @tc.desc: Test IsValidNavigationWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsValidNavigationWindow_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    double x = 10.0;
+    double y = -20.0;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    EXPECT_FALSE(WIN_MGR->IsValidNavigationWindow(windowInfo, x, y));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTransformDisplayXY_001
+ * @tc.desc: Test UpdateTransformDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplayXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayXPos(10);
+    item.SetDisplayYPos(20);
+    pointerEvent->UpdatePointerItem(0, item);
+    std::vector<WindowInfo> windowsInfo;
+    DisplayInfo info;
+    WIN_MGR->UpdateTransformDisplayXY(pointerEvent, windowsInfo, info);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayX();
+    EXPECT_EQ(physicalX, 10);
+    EXPECT_EQ(physicalY, 20);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTransformDisplayXY_002
+ * @tc.desc: Test UpdateTransformDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplayXY_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayXPos(10);
+    item.SetDisplayYPos(20);
+    pointerEvent->UpdatePointerItem(0, item);
+    std::vector<WindowInfo> windowsInfo;
+    WindowInfo windowInfo;
+    DisplayInfo info;
+    std::vector<float> transform = { 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 315.0, 690.0, 1.0};
+    info.transform = transform;
+    windowInfo.windowInputType = WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    windowsInfo.push_back(windowInfo);
+    WIN_MGR->UpdateTransformDisplayXY(pointerEvent, windowsInfo, info);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayX();
+    EXPECT_EQ(physicalX, 10);
+    EXPECT_EQ(physicalY, 20);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTransformDisplayXY_003
+ * @tc.desc: Test UpdateTransformDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplayXY_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayXPos(10);
+    item.SetDisplayYPos(20);
+    pointerEvent->UpdatePointerItem(0, item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    std::vector<WindowInfo> windowsInfo;
+    WindowInfo windowInfo;
+    DisplayInfo info;
+    std::vector<float> transform = { 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 315.0, 690.0, 1.0};
+    info.transform = transform;
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    windowsInfo.push_back(windowInfo);
+    WIN_MGR->UpdateTransformDisplayXY(pointerEvent, windowsInfo, info);
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayX();
+    EXPECT_EQ(physicalX, 320);
+    EXPECT_EQ(physicalY, 700);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_GetUIExtentionWindowInfo
  * @tc.desc: Test the funcation GetUIExtentionWindowInfo
  * @tc.type: FUNC
