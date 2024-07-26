@@ -59,6 +59,8 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
+#include "xcollie/watchdog.h"
+#include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -2728,17 +2730,16 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    auto startTime = std::chrono::steady_clock::now();
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
-    auto endTime = std::chrono::steady_clock::now();
-    auto duration = endTime - startTime;
-    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
-        (duration).count();
-    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
-        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
-            flag.c_str(), durationTime);
-    }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
+
+void MMIService::PrintLog(const std::string &flag)
+{
+    MMI_HILOGW("long time task : %{public}s", flag.c_str());
+}
+
 
 } // namespace MMI
 } // namespace OHOS
