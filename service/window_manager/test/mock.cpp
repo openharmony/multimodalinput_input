@@ -501,5 +501,8 @@ int32_t InputWindowsManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> c
 {
     return ERR_OK;
 }
+
+void InputWindowsManager::CleanShellWindowIds()
+{}
 #endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace OHOS
