@@ -2110,26 +2110,28 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     pointerEvent->SetTargetDisplayId(displayId);
 
+    auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
+    CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicalDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayY();
     int32_t logicalX = 0;
     int32_t logicalY = 0;
-    if (!AddInt32(pointerItem.GetDisplayX(), physicalDisplayInfo->x, logicalX)) {
+    if (!AddInt32(physicalX, physicalDisplayInfo->x, logicalX)) {
         MMI_HILOGE("The addition of logicalX overflows");
         return RET_ERR;
     }
-    if (!AddInt32(pointerItem.GetDisplayY(), physicalDisplayInfo->y, logicalY)) {
+    if (!AddInt32(physicalY, physicalDisplayInfo->y, logicalY)) {
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
-    int32_t physicalX = pointerItem.GetDisplayX();
-    int32_t physicalY = pointerItem.GetDisplayY();
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
@@ -2407,6 +2409,49 @@ void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiEx
     }
 }
 
+bool InputWindowsManager::IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY)
+{
+    return (touchWindow.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE ||
+            touchWindow.windowInputType == WindowInputType::MIX_BUTTOM_ANTI_AXIS_MOVE) &&
+            IsInHotArea(static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY),
+            touchWindow.defaultHotAreas, touchWindow);
+}
+
+void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
+    std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
+{
+    bool isNavigationWindow = false;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return;
+    }
+    double physicalX = pointerItem.GetDisplayXPos();
+    double physicalY = pointerItem.GetDisplayXPos();
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        for (auto &item : windowsInfo) {
+            if (IsValidNavigationWindow(item, physicalX, physicalY) &&
+                !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION)) {
+                pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION);
+                isNavigationWindow = true;
+                break;
+            }
+        }
+        if (!displayInfo.transform.empty() &&
+            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP && !isNavigationWindow) {
+            auto displayXY = TransformDisplayXY(displayInfo, physicalX, physicalY);
+            physicalX = displayXY.first;
+            physicalY = displayXY.second;
+        }
+    }
+    pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
+    pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
+    pointerItem.SetDisplayXPos(physicalX);
+    pointerItem.SetDisplayYPos(physicalY);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+}
+
 void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t logicalY,
     const WindowInfo& windowInfo, std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -2480,14 +2525,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     pointerEvent->SetTargetDisplayId(displayId);
 
+    auto physicDisplayInfo = GetPhysicalDisplay(displayId);
+    CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    auto physicDisplayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
     double physicalX = 0;
     double physicalY = 0;
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
@@ -2514,7 +2561,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     bool isHotArea = false;
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     bool isFirstSpecialWindow = false;
     static std::unordered_map<int32_t, WindowInfo> winMap;
     for (auto &item : windowsInfo) {
@@ -3430,6 +3476,18 @@ std::pair<double, double> InputWindowsManager::TransformWindowXY(const WindowInf
     Vector3f logicXY(logicX, logicY, 1.0);
     Vector3f windowXY = transform * logicXY;
     return {round(windowXY[0]), round(windowXY[1])};
+}
+
+std::pair<double, double> InputWindowsManager::TransformDisplayXY(const DisplayInfo &info,
+    double logicX, double logicY) const
+{
+    Matrix3f transform(info.transform);
+    if (info.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
+        return {logicX, logicY};
+    }
+    Vector3f logicXY(logicX, logicY, 1.0);
+    Vector3f displayXY = transform * logicXY;
+    return {round(displayXY[0]), round(displayXY[1])};
 }
 
 bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
