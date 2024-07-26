@@ -62,6 +62,7 @@ constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t IN_DRAWING_TIME { 23000 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
+constexpr std::string_view SCREEN_READ_ENABLE { "1" };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -140,26 +141,7 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
         if (!traceControlPoints_.empty()) {
             isStop_ = true;
             isDrawing_ = true;
-            glowTraceSystem_->Clear();
-            CHKPF(canvasNode_);
-#ifndef USE_ROSEN_DRAWING
-            auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
-                BeginRecording(scaleW_, scaleH_));
-#else
-            auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->
-                BeginRecording(scaleW_, scaleH_));
-#endif // USE_ROSEN_DRAWING
-            CHKPF(canvas);
-            canvas->Clear();
-            traceControlPoints_.clear();
-            pointerPath_.Reset();
-            auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-            canvasNode->ResetSurface(scaleW_, scaleH_);
-            canvasNode_->FinishRecording();
-            Rosen::RSTransaction::FlushImplicitTransaction();
-            canvasNode_.reset();
-            CHKPF(surfaceNode_);
-            surfaceNode_.reset();
+            DestoryWindow();
         } else if (isRotate_) {
             isRotate_ = false;
             if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
@@ -174,18 +156,16 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
 bool KnuckleDynamicDrawingManager::CheckPointerAction(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPF(knuckleDrawMgr_);
+    if (knuckleDrawMgr_->GetScreenReadState() == SCREEN_READ_ENABLE) {
+        DestoryWindow();
+    }
     size_t size = pointerEvent->GetPointerIds().size();
     if (size > MIN_POINT_SIZE) {
         pointerPath_.Reset();
         CHKPF(glowTraceSystem_);
         glowTraceSystem_->Clear();
         return false;
-    }
-    if (traceControlPoints_.empty()) {
-        for (int32_t i = 0; i < POINT_TOTAL_SIZE; i++) {
-            Rosen::Drawing::Point point = Rosen::Drawing::Point();
-            traceControlPoints_.emplace_back(point);
-        }
     }
     switch (pointerEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_UP:
@@ -234,30 +214,20 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
         int32_t physicalY = pointerItem.GetDisplayY();
         glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
     }
-#ifndef USE_ROSEN_DRAWING
-            auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
-                BeginRecording(scaleW_, scaleH_));
-#else
-            auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->
-                BeginRecording(scaleW_, scaleH_));
-#endif // USE_ROSEN_DRAWING
-    traceControlPoints_.clear();
-    pointerPath_.Reset();
-    glowTraceSystem_->Clear();
-    CHKPV(canvasNode_);
-    auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-    canvasNode->ResetSurface(scaleW_, scaleH_);
-    Rosen::RSTransaction::FlushImplicitTransaction();
-    canvasNode_.reset();
-    CHKPV(surfaceNode_);
-    surfaceNode_.reset();
     isDrawing_ = true;
+    DestoryWindow();
 }
 
 void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (traceControlPoints_.empty()) {
+        for (int32_t i = 0; i < POINT_TOTAL_SIZE; i++) {
+            Rosen::Drawing::Point point = Rosen::Drawing::Point();
+            traceControlPoints_.emplace_back(point);
+        }
+    }
     int64_t intervalTime = pointerEvent->GetActionTime() - lastUpTime_;
     firstDownTime_ = pointerEvent->GetActionTime();
     bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
@@ -346,6 +316,12 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
     displayInfo_ = displayInfo;
 }
 
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
+{
+    CALL_DEBUG_ENTER;
+    knuckleDrawMgr_ = knuckleDrawMgr;
+}
+
 int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -370,8 +346,7 @@ int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> 
     if (!isDrawing_) {
         glowTraceSystem_->Draw(canvas);
     }
-    auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-    canvasNode->ResetSurface(scaleW_, scaleH_);
+    canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_->FinishRecording();
     return RET_OK;
 }
@@ -409,11 +384,11 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (KnuckleDrawingManager::CheckRotatePolicy(displayInfo_)) {
-        KnuckleDrawingManager::RotationCanvasNode(canvasNode_, displayInfo_);
+    CHKPV(knuckleDrawMgr_);
+    if (knuckleDrawMgr_->CheckRotatePolicy(displayInfo_)) {
+        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
     }
-    auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
-    canvasNode->ResetSurface(scaleW_, scaleH_);
+    canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -433,6 +408,30 @@ void KnuckleDynamicDrawingManager::CreateCanvasNode()
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     canvasNode_->SetRotation(0);
+}
+
+void KnuckleDynamicDrawingManager::DestoryWindow()
+{
+    CALL_DEBUG_ENTER;
+    traceControlPoints_.clear();
+    pointerPath_.Reset();
+    glowTraceSystem_->Clear();
+    CHKPV(canvasNode_);
+#ifndef USE_ROSEN_DRAWING
+    auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
+        BeginRecording(scaleW_, scaleH_));
+#else
+    auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->
+        BeginRecording(scaleW_, scaleH_));
+#endif // USE_ROSEN_DRAWING
+    CHKPV(canvas);
+    canvas->Clear();
+    canvasNode_->FinishRecording();
+    canvasNode_->ResetSurface(scaleW_, scaleH_);
+    canvasNode_.reset();
+    CHKPV(surfaceNode_);
+    surfaceNode_.reset();
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 } // namespace MMI
 } // namespace OHOS

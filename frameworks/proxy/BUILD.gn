@@ -143,7 +143,6 @@ ohos_shared_library("libmmi-client") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
@@ -266,7 +265,6 @@ ohos_unittest("InputHandlerManagerTest") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
-    "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]

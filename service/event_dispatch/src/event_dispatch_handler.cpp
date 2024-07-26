@@ -303,8 +303,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     int32_t ret = RET_OK;
     // 1.Determine whether the key event is a focus type event or an operation type event,
     // 2.Determine whether the current focus window has a safety sub window.
-    auto vecTarget = WIN_MGR->UpdateTarget(key);
-    for (const auto &item : vecTarget) {
+    auto secSubWindowTargets = WIN_MGR->UpdateTarget(key);
+    for (const auto &item : secSubWindowTargets) {
         key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
         if (item.second.privacyMode == SecureFlag::PRIVACY_MODE) {
             key->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);

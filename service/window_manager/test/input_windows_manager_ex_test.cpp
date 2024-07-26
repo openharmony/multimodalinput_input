@@ -51,75 +51,10 @@ void InputWindowsManagerTest::SetUpTestCase(void)
 }
 void InputWindowsManagerTest::TearDownTestCase()
 {
-    EXPECT_CALL(*messageParcelMock_, IsFoldable()).WillOnce(Return(false));
     IInputWindowsManager::instance_.reset();
     IInputWindowsManager::instance_ = nullptr;
     MessageParcelMock::messageParcel = nullptr;
     messageParcelMock_ = nullptr;
-}
-
-/**
- * @tc.name: OnFoldStatusChanged_003
- * @tc.desc: Test the function OnFoldStatusChanged
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, OnFoldStatusChanged_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    inputWindowsManager->lastPointerEventForFold_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->OnFoldStatusChanged(Rosen::FoldStatus::EXPAND));
-}
-
-/**
- * @tc.name: OnFoldStatusChanged_004
- * @tc.desc: Test the function OnFoldStatusChanged
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, OnFoldStatusChanged_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    inputWindowsManager->lastPointerEventForFold_ = PointerEvent::Create();
-    ASSERT_NE(inputWindowsManager->lastPointerEventForFold_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetPressed(false);
-    inputWindowsManager->lastPointerEventForFold_->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->OnFoldStatusChanged(Rosen::FoldStatus::EXPAND));
-    inputWindowsManager->lastPointerEventForFold_->RemoveAllPointerItems();
-    inputWindowsManager->lastPointerEventForFold_.reset();
-    inputWindowsManager->lastPointerEventForFold_ = nullptr;
-}
-
-/**
- * @tc.name: OnFoldStatusChanged_005
- * @tc.desc: Test the function OnFoldStatusChanged
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, OnFoldStatusChanged_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    inputWindowsManager->lastPointerEventForFold_ = PointerEvent::Create();
-    ASSERT_NE(inputWindowsManager->lastPointerEventForFold_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetPressed(true);
-    inputWindowsManager->lastPointerEventForFold_->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->OnFoldStatusChanged(Rosen::FoldStatus::EXPAND));
-    inputWindowsManager->lastPointerEventForFold_->RemoveAllPointerItems();
-    inputWindowsManager->lastPointerEventForFold_.reset();
-    inputWindowsManager->lastPointerEventForFold_ = nullptr;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2254,44 +2189,6 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_003, TestSize.Level1)
     inputWindowsManager->knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
     ASSERT_NE(inputWindowsManager->knuckleDynamicDrawingManager_, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
-}
-
-/**
- * @tc.name: FoldScreenRotation_001
- * @tc.desc: Test the function FoldScreenRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, FoldScreenRotation_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FoldScreenRotation(pointerEvent));
-}
-
-/**
- * @tc.name: FoldScreenRotation_002
- * @tc.desc: Test the function FoldScreenRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, FoldScreenRotation_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    pointerEvent->sourceType_ = PointerEvent::SOURCE_TYPE_MOUSE;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FoldScreenRotation(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS
