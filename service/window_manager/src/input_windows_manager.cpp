@@ -2417,10 +2417,14 @@ bool InputWindowsManager::IsValidNavigationWindow(const WindowInfo& touchWindow,
             touchWindow.defaultHotAreas, touchWindow);
 }
 
-void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
-    std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
+bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHKPV(pointerEvent);
+    return (pointerEvent->GetZOrder() > 0 && pointerEvent->GetTargetWindowId() == -1);
+}
+
+void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent, std::vector<WindowInfo>& windowsInfo,
+    const DisplayInfo& displayInfo)
+{
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -2430,21 +2434,26 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     }
     double physicalX = pointerItem.GetDisplayX();
     double physicalY = pointerItem.GetDisplayY();
-    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-        for (auto &item : windowsInfo) {
-            if (IsValidNavigationWindow(item, physicalX, physicalY) &&
-                !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION)) {
-                pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION);
-                isNavigationWindow = true;
-                break;
-            }
+    for (auto &item : windowsInfo) {
+        if (IsValidNavigationWindow(item, physicalX, physicalY) &&
+            !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION) && pointerEvent->GetZOrder() <= 0) {
+            isNavigationWindow = true;
+            break;
         }
+    }
+    if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) ||
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION) ||
+        IsNavigationWindowInjectEvent(pointerEvent)) {
         if (!displayInfo.transform.empty() &&
-            pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP && !isNavigationWindow) {
+            ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) ||
+            pointerEvent->GetZOrder() > 0) && !isNavigationWindow) {
             auto displayXY = TransformDisplayXY(displayInfo, physicalX, physicalY);
             physicalX = displayXY.first;
             physicalY = displayXY.second;
         }
+    }
+    if (isNavigationWindow && pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION);
     }
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
