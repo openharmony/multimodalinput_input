@@ -54,6 +54,7 @@ public:
     void RemoveSubscriberKeyUpTimer(int32_t keyCode);
     int32_t EnableCombineKey(bool enable);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+
 private:
     struct Subscriber {
         Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
@@ -64,9 +65,12 @@ private:
         int32_t timerId_ { -1 };
         std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     };
-    void InsertSubScriber(std::shared_ptr<Subscriber> subs);
+    using SubscriberCollection = std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>>;
 
-private:
+    size_t CountSubscribers() const;
+    void DumpSubscribers(int32_t fd, const SubscriberCollection &collection) const;
+    void DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber> subscriber) const;
+    void InsertSubScriber(std::shared_ptr<Subscriber> subs);
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
@@ -110,8 +114,8 @@ private:
     void GetForegroundPids(std::set<int32_t> &pidList);
 
 private:
-    std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>> subscriberMap_;
-    std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>> keyGestures_;
+    SubscriberCollection subscriberMap_;
+    SubscriberCollection keyGestures_;
     KeyGestureManager keyGestureMgr_;
     bool callbackInitialized_ { false };
     bool hasEventExecuting_ { false };

@@ -188,17 +188,15 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
         if (IsActive()) {
             int64_t now = GetSysClockTime();
-            if (now < (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
-                return false;
+            if (now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
+                NotifyHandlers(keyEvent);
             }
-            NotifyHandlers(keyEvent);
-            return true;
         } else {
             firstDownTime_ = GetSysClockTime();
             MarkActive(true);
             TriggerHandlers(keyEvent);
         }
-        return false;
+        return true;
     }
     if (IsActive()) {
         Reset();
