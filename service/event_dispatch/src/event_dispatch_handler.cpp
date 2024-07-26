@@ -46,6 +46,7 @@ namespace MMI {
 namespace {
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
+constexpr int32_t THREE_FINGERS { 3 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -244,19 +245,22 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
 
 void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
 {
-    CALL_DEBUG_ENTER;
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
-        MMI_HILOGD("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
+        if (point->GetPointerCount() < THREE_FINGERS &&
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
+        }
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    auto session = udsServer->GetSession(fd);
-    CHKPV(session);
+    auto sess = udsServer->GetSession(fd);
+    CHKPV(sess);
     auto currentTime = GetSysClockTime();
-    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
+    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
         MMI_HILOGD("InputTracking id:%{public}d, The pointer event does not report normally,"
             "application not response. PointerEvent(deviceid:%{public}d, action:%{public}s)",
             point->GetId(), point->GetDeviceId(), point->DumpPointerAction());
@@ -275,21 +279,20 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     int32_t pointerAc = pointerEvent->GetPointerAction();
     if (pointerAc == PointerEvent::POINTER_ACTION_PULL_DOWN || pointerAc == PointerEvent::POINTER_ACTION_UP ||
         pointerAc == PointerEvent::POINTER_ACTION_DOWN || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP) {
-        NotifyPointerEventToRS(pointerAc, session->GetProgramName(),
-            static_cast<uint32_t>(session->GetPid()), pointerEvent->GetPointerCount());
+        NotifyPointerEventToRS(pointerAc, sess->GetProgramName(),
+            static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount());
     }
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
-        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
-            session->GetProgramName().c_str(), session->GetPid());
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d", sess->GetProgramName().c_str(), sess->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
-        MMI_HILOGD("Session pid:%{public}d", session->GetPid());
-        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    if (sess->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
+        MMI_HILOGD("Session pid:%{public}d", sess->GetPid());
+        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, sess);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
