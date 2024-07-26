@@ -615,7 +615,7 @@ int32_t JsInputMonitor::TransformSwipeEvent(std::shared_ptr<PointerEvent> pointe
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetSwipeAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        if (pointerEvent->GetPointerAction != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
             MMI_HILOGE("Get action value failed");
         }
         return RET_ERR;
