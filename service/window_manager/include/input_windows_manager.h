@@ -225,6 +225,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY);
+    bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent, std::vector<WindowInfo>& windowsInfo,
         const DisplayInfo& displayInfo);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
