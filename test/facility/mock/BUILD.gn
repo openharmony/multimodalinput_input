@@ -59,7 +59,6 @@ ohos_source_set("mmi_mock_sources") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "window_manager:libdm",
   ]
 
   part_name = "${mmi_part_name}"

@@ -88,8 +88,13 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             if (!EventLogHelper::IsBetaVersion()) {
                 MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d", timerId_);
             } else {
-                MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d",
-                    timerId_, keyEvent_->GetKeyCode());
+                if (keyEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%d",
+                        timerId_, keyEvent_->GetKeyCode());
+                } else {
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d",
+                        timerId_, keyEvent_->GetKeyCode());
+                }
             }
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
@@ -101,8 +106,11 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        if (EventLogHelper::IsBetaVersion()) {
+        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d",
+                keyEvent_->GetKeyCode(), repeatKeyCode_);
+        } else {
+            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_);
         }
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
@@ -117,7 +125,11 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime();
             AddHandleTimer(delayTime);
-            MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
+            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
+            } else {
+                MMI_HILOGD("The end keyboard autorepeat, keyCode:%d", keyEvent_->GetKeyCode());
+            }
         }
     }
 }

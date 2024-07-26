@@ -65,7 +65,6 @@ ohos_source_set("mmi_connect_manager_service") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
   ]
 
   if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&

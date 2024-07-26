@@ -26,7 +26,14 @@ namespace MMI {
 struct StylusKey {
     bool lastEventIsStylus { false };
     bool isLaunchAbility { false };
+    std::string statusConfig;
+    bool statusConfigValue { false };
     Ability ability;
+};
+
+struct ShortHandTarget {
+    std::string statusConfig;
+    bool statusConfigValue { false };
 };
 class StylusKeyHandler final {
     DECLARE_DELAYED_SINGLETON(StylusKeyHandler);
@@ -36,9 +43,13 @@ public:
     void IsLaunchAbility();
     void SetLastEventState(bool state);
 private:
+    template <class T>
+    void CreateStatusConfigObserver(T& item);
     void LaunchAbility(const Ability &ability);
 private:
     StylusKey stylusKey_;
+    ShortHandTarget shortHandTarget_;
+    bool isShortHandConfig_ { false };
 };
 #define STYLUS_HANDLER ::OHOS::DelayedSingleton<StylusKeyHandler>::GetInstance()
 } // namespace MMI
