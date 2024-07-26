@@ -387,27 +387,27 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::UpdateTarget(st
         ParseConfig();
         isParseConfig_ = true;
     }
-    std::vector<std::pair<int32_t, TargetInfo>> vecTarget;
+    std::vector<std::pair<int32_t, TargetInfo>> secSubWindowTargets;
     if (keyEvent == nullptr) {
         MMI_HILOG_DISPATCHE("keyEvent is nullptr");
-        return vecTarget;
+        return secSubWindowTargets;
     }
-    auto vecData = GetPidAndUpdateTarget(keyEvent);
-    for (const auto &item : vecData) {
+    auto secSubWindows = GetPidAndUpdateTarget(keyEvent);
+    for (const auto &item : secSubWindows) {
         int32_t fd = INVALID_FD;
         int32_t pid = item.first;
         if (pid <= 0) {
-            MMI_HILOG_DISPATCHE("Invalid pid");
+            MMI_HILOG_DISPATCHE("Invalid pid:%{public}d", pid);
             continue;
         }
         fd = udsServer_->GetClientFd(pid);
         if (fd < 0) {
-            MMI_HILOG_DISPATCHE("Invalid fd");
+            MMI_HILOG_DISPATCHE("The windowPid:%{public}d matching fd:%{public}d is invalid", pid, fd);
             continue;
         }
-        vecTarget.emplace_back(std::make_pair(fd, item.second));
+        secSubWindowTargets.emplace_back(std::make_pair(fd, item.second));
     }
-    return vecTarget;
+    return secSubWindowTargets;
 }
 
 void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent)
@@ -487,10 +487,10 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    std::vector<std::pair<int32_t, TargetInfo>> vecData;
+    std::vector<std::pair<int32_t, TargetInfo>> secSubWindows;
     if (keyEvent == nullptr) {
         MMI_HILOG_DISPATCHE("keyEvent is nullptr");
-        return vecData;
+        return secSubWindows;
     }
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
@@ -508,27 +508,28 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
     }
     if (windowInfo == nullptr) {
         MMI_HILOG_DISPATCHE("windowInfo is nullptr");
-        return vecData;
+        return secSubWindows;
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOG_DISPATCHD("focusWindowId:%{public}d is anco window", focusWindowId);
-        return vecData;
+        return secSubWindows;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     TargetInfo targetInfo = { windowInfo->privacyMode, windowInfo->id, windowInfo->agentWindowId };
-    vecData.emplace_back(std::make_pair(windowInfo->pid, targetInfo));
+    secSubWindows.emplace_back(std::make_pair(windowInfo->pid, targetInfo));
     if (isUIExtention) {
         for (const auto &item : iter->uiExtentionWindowInfo) {
             if (item.privacyUIFlag) {
+                MMI_HILOG_DISPATCHD("security sub windowId:%{public}d,pid:%{public}d", item.id, item.pid);
                 targetInfo.privacyMode = item.privacyMode;
                 targetInfo.id = item.id;
                 targetInfo.agentWindowId = item.agentWindowId;
-                vecData.emplace_back(std::make_pair(item.pid, targetInfo));
+                secSubWindows.emplace_back(std::make_pair(item.pid, targetInfo));
             }
         }
     }
-    return vecData;
+    return secSubWindows;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
