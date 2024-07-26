@@ -16,7 +16,6 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
-#include "display_manager.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
@@ -36,7 +35,6 @@ public:
     virtual ~MultimodalInputConnectStub() = default;
 
     virtual bool IsRunning() const = 0;
-    virtual void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) = 0;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
         MessageOption& options) override;
 

@@ -674,11 +674,11 @@ pub unsafe extern "C" fn HandleMotionAccelerateMouse (
         debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
-            @public(*abs_x),
-            @public(*abs_y),
+            @private(*abs_x),
+            @private(*abs_y),
             @public(mode),
-            @public(dx),
-            @public(dy),
+            @private(dx),
+            @private(dy),
             @public(gain)
         );
         if !get_speed_gain_mouse(vin, &mut gain as *mut f64, speed, device_type) {
@@ -691,7 +691,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateMouse (
         }
         debug!(
             LOG_LABEL,
-            "abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
+            "abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
         );
     }
     RET_OK
@@ -722,11 +722,11 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
         debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
-            @public(*abs_x),
-            @public(*abs_y),
+            @private(*abs_x),
+            @private(*abs_y),
             @public(mode),
-            @public(dx),
-            @public(dy),
+            @private(dx),
+            @private(dy),
             @public(gain)
         );
         if !get_speed_gain_touchpad(vin, &mut gain as *mut f64, speed, device_type) {
@@ -743,7 +743,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
         }
         debug!(
             LOG_LABEL,
-            "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
+            "output the abs_x {} and abs_y {}", @private(*abs_x), @private(*abs_y)
         );
     }
     RET_OK

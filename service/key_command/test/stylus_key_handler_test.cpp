@@ -54,6 +54,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_001, TestSiz
     auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
     keyEvent->SetKeyCode(KeyEvent::UNKNOWN_FUNCTION_KEY);
+    STYLUS_HANDLER->isShortHandConfig_ = true;
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
 }
@@ -70,6 +71,8 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_002, TestSiz
     auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
     STYLUS_HANDLER->SetLastEventState(true);
+    STYLUS_HANDLER->isShortHandConfig_ = true;
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
     STYLUS_HANDLER->IsLaunchAbility();
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_TRUE(result);
@@ -86,6 +89,7 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_HandleStylusKey_003, TestSiz
     CALL_TEST_DEBUG;
     auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
+    STYLUS_HANDLER->isShortHandConfig_ = true;
     auto result = STYLUS_HANDLER->HandleStylusKey(keyEvent);
     ASSERT_FALSE(result);
 }
@@ -113,6 +117,23 @@ HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_IsLaunchAbility_002, TestSiz
 {
     CALL_TEST_DEBUG;
     STYLUS_HANDLER->SetLastEventState(true);
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
+    STYLUS_HANDLER->shortHandTarget_.statusConfigValue = true;
+    ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
+}
+
+/**
+ * @tc.name: StylusKeyHandlerTest_IsLaunchAbility_003
+ * @tc.desc: Test IsLaunchAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(StylusKeyHandlerTest, StylusKeyHandlerTest_IsLaunchAbility_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    STYLUS_HANDLER->SetLastEventState(true);
+    STYLUS_HANDLER->stylusKey_.statusConfigValue = true;
+    STYLUS_HANDLER->shortHandTarget_.statusConfigValue = false;
     ASSERT_NO_FATAL_FAILURE(STYLUS_HANDLER->IsLaunchAbility());
 }
 } // namespace MMI

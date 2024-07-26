@@ -100,6 +100,7 @@ declare_args() {
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "$mmi_path/frameworks/proxy/event_handler/src/scene_board_judgement.cpp",
     "app_state_manager/src/app_state_observer.cpp",
+    "delegate_task/src/delegate_interface.cpp",
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
