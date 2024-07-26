@@ -2120,18 +2120,18 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    int32_t physicalX = pointerItem.GetDisplayX();
-    int32_t physicalY = pointerItem.GetDisplayY();
     int32_t logicalX = 0;
     int32_t logicalY = 0;
-    if (!AddInt32(physicalX, physicalDisplayInfo->x, logicalX)) {
+    if (!AddInt32(pointerItem.GetDisplayX(), physicalDisplayInfo->x, logicalX)) {
         MMI_HILOGE("The addition of logicalX overflows");
         return RET_ERR;
     }
-    if (!AddInt32(physicalY, physicalDisplayInfo->y, logicalY)) {
+    if (!AddInt32(pointerItem.GetDisplayY(), physicalDisplayInfo->y, logicalY)) {
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayY();
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
@@ -2420,6 +2420,7 @@ bool InputWindowsManager::IsValidNavigationWindow(const WindowInfo& touchWindow,
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
     std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
 {
+    CHKPV(pointerEvent);
     bool isNavigationWindow = false;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -2427,9 +2428,8 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
         MMI_HILOG_DISPATCHE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-    double physicalX = pointerItem.GetDisplayXPos();
-    double physicalY = pointerItem.GetDisplayXPos();
-    MMI_HILOG_DISPATCHE("physicalX:%{public}f,physicalY:%{public}f", physicalX, physicalY);
+    double physicalX = pointerItem.GetDisplayX();
+    double physicalY = pointerItem.GetDisplayX();
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         for (auto &item : windowsInfo) {
             if (IsValidNavigationWindow(item, physicalX, physicalY) &&
@@ -2446,7 +2446,6 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
             physicalY = displayXY.second;
         }
     }
-    MMI_HILOG_DISPATCHE("updatephysicalX:%{public}f,physicalY:%{public}f", physicalX, physicalY);
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
     pointerItem.SetDisplayXPos(physicalX);
