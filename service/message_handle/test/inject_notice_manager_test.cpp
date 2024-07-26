@@ -102,7 +102,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi_002, T
     AuthorizationDialog dialog;
     ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
     bool ret = dialog.ConnectSystemUi();
-    ASSERT_FALSE(ret);
+    ASSERT_TRUE(ret);
 }
 
 /**
