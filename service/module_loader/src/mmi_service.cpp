@@ -59,7 +59,7 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "xcollie/watchdog.h"
+#include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
