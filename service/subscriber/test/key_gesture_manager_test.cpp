@@ -211,9 +211,9 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_05, TestSize.Lev
 HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility accessibility;
+    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
     DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF;
-    bool ret = accessibility.IsWorking();
+    bool ret = pullUpAccessibility.IsWorking();
     EXPECT_FALSE(ret);
 }
 
@@ -226,10 +226,10 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_01, TestSize.Lev
 HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility accessibility;
+    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
     DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
     DISPLAY_MONITOR->isScreenLocked_ = true;
-    bool ret = accessibility.IsWorking();
+    bool ret = pullUpAccessibility.IsWorking();
     EXPECT_FALSE(ret);
 }
 
@@ -242,10 +242,10 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_02, TestSize.Lev
 HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility accessibility;
+    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
     DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
     DISPLAY_MONITOR->isScreenLocked_ = false;
-    bool ret = accessibility.IsWorking();
+    bool ret = pullUpAccessibility.IsWorking();
     EXPECT_FALSE(ret);
 }
 
@@ -258,10 +258,10 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_03, TestSize.Lev
 HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_OnTriggerAll_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    KeyGestureManager::PullUpAccessibility accessibility;
+    KeyGestureManager::PullUpAccessibility pullUpAccessibility;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    ASSERT_NO_FATAL_FAILURE(accessibility.OnTriggerAll(keyEvent));
+    ASSERT_NO_FATAL_FAILURE(pullUpAccessibility.OnTriggerAll(keyEvent));
 }
 
 /**
