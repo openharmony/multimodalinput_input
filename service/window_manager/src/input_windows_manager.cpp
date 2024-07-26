@@ -2429,6 +2429,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     }
     double physicalX = pointerItem.GetDisplayXPos();
     double physicalY = pointerItem.GetDisplayXPos();
+    MMI_HILOG_DISPATCHE("physicalX:%{public}f,physicalY:%{public}f", physicalX, physicalY);
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         for (auto &item : windowsInfo) {
             if (IsValidNavigationWindow(item, physicalX, physicalY) &&
@@ -2445,6 +2446,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
             physicalY = displayXY.second;
         }
     }
+    MMI_HILOG_DISPATCHE("updatephysicalX:%{public}f,physicalY:%{public}f", physicalX, physicalY);
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
     pointerItem.SetDisplayXPos(physicalX);
