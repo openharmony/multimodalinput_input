@@ -754,6 +754,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
@@ -799,6 +800,7 @@ ohos_unittest("TouchDrawingManagerTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/touch_drawing_manager_test.cpp" ]

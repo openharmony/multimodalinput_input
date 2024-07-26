@@ -70,6 +70,7 @@ ohos_unittest("GestureTransformTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   include_dirs = [
@@ -223,6 +224,7 @@ ohos_unittest("TabletToolTranformTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   include_dirs = [
