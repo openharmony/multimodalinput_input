@@ -19,11 +19,6 @@ config("napi_config") {
     "${mmi_path}/util/napi/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
   ]
-
-  if (!input_feature_coverage && is_ohos && is_clang &&
-      (target_cpu == "arm" || target_cpu == "arm64") && enhanced_opt) {
-    ldflags = [ "-Wl,-Bsymbolic" ]
-  }
 }
 
 ohos_shared_library("libmmi-napi") {
