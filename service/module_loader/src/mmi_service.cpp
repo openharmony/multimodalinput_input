@@ -2738,7 +2738,7 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
 
 void MMIService::PrintLog(const std::string &flag)
 {
-    MMI_HILOGW("long time task : %{public}s", flag.c_str());
+    MMI_HILOGW("BlockMonitor task name : %{public}s", flag.c_str());
 }
 
 
