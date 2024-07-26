@@ -248,7 +248,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
-        MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
+        MMI_HILOGD("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
@@ -272,17 +272,14 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN
-        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
-        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
-        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        int32_t pointerCnt = pointerEvent->GetPointerCount();
-        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
-            static_cast<uint32_t>(session->GetPid()), pointerCnt);
+    int32_t pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc == PointerEvent::POINTER_ACTION_PULL_DOWN || pointerAc == PointerEvent::POINTER_ACTION_UP ||
+        pointerAc == PointerEvent::POINTER_ACTION_DOWN || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP) {
+        NotifyPointerEventToRS(pointerAc, session->GetProgramName(),
+            static_cast<uint32_t>(session->GetPid()), pointerEvent->GetPointerCount());
     }
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
+    if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
             session->GetProgramName().c_str(), session->GetPid());
     }
