@@ -138,7 +138,6 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_02, TestSize.Lev
     keyEvent->keyCode_ = 2;
     longPressSingleKey.keyCode_ = 2;
     keyEvent->keyAction_ = KeyEvent::KEY_ACTION_DOWN;
-
     bool ret = longPressSingleKey.Intercept(keyEvent);
     EXPECT_TRUE(ret);
 }
