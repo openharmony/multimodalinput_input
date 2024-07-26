@@ -46,6 +46,8 @@ ohos_fuzztest("SetPointerColorFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "setpointercolor_fuzzer.cpp" ]
 

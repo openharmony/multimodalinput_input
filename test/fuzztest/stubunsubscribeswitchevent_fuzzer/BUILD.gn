@@ -47,6 +47,8 @@ ohos_fuzztest("StubUnsubscribeSwitchEventFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubunsubscribeswitchevent_fuzzer.cpp" ]
 

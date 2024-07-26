@@ -48,6 +48,8 @@ ohos_fuzztest("StubUnregisterInputDeviceMonitorFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubunregisterinputdevicemonitor_fuzzer.cpp" ]
 
