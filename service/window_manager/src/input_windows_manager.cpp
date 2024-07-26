@@ -2429,7 +2429,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
         return;
     }
     double physicalX = pointerItem.GetDisplayX();
-    double physicalY = pointerItem.GetDisplayX();
+    double physicalY = pointerItem.GetDisplayY();
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
         for (auto &item : windowsInfo) {
             if (IsValidNavigationWindow(item, physicalX, physicalY) &&
