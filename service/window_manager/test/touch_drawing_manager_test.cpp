@@ -1133,5 +1133,149 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_ResetCanvasNode_001, T
     auto canvasNode = Rosen::RSCanvasDrawingNode::Create();
     TOUCH_DRAWING_MGR->ResetCanvasNode(canvasNode);
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_AddCanvasNode
+ * @tc.desc: Test AddCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_AddCanvasNode, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "touch window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    touchDrawingMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    ASSERT_NE(canvasNode, nullptr);
+    bool isTrackerNode = true;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.AddCanvasNode(canvasNode, isTrackerNode));
+
+    canvasNode = nullptr;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.AddCanvasNode(canvasNode, isTrackerNode));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationCanvasNode
+ * @tc.desc: Test RotationCanvasNode
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationCanvasNode, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode = Rosen::RSCanvasNode::Create();
+    ASSERT_NE(canvasNode, nullptr);
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvasNode(canvasNode));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdateDisplayInfo
+ * @tc.desc: Test UpdateDisplayInfo
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    DisplayInfo displayInfo;
+    displayInfo.direction = Direction::DIRECTION0;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION0;
+    displayInfo.width = 700;
+    displayInfo.height = 500;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+
+    displayInfo.direction = Direction::DIRECTION180;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+
+    displayInfo.direction = Direction::DIRECTION270;
+    touchDrawingMgr.displayInfo_.direction = Direction::DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.UpdateDisplayInfo(displayInfo));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_RotationCanvas
+ * @tc.desc: Test RotationCanvas
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RotationCanvas, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    int32_t width = 300;
+    int32_t height = 100;
+    Direction direction = Direction::DIRECTION90;
+    touchDrawingMgr.labelsCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    auto canvas = static_cast<TouchDrawingManager::RosenCanvas *>
+        (touchDrawingMgr.labelsCanvasNode_->BeginRecording(width, height));
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvas(canvas, direction));
+    direction = Direction::DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvas(canvas, direction));
+    direction = Direction::DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvas(canvas, direction));
+    direction = Direction::DIRECTION0;
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.RotationCanvas(canvas, direction));
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubble
+ * @tc.desc: Test DrawBubble
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingMgr.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingMgr.pointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    touchDrawingMgr.pointerEvent_->SetPointerId(1);
+    touchDrawingMgr.pointerEvent_->AddPointerItem(item);
+    touchDrawingMgr.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
+    touchDrawingMgr.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
+    touchDrawingMgr.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubble_003
+ * @tc.desc: Test DrawBubble
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    touchDrawingMgr.bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
+    touchDrawingMgr.pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(touchDrawingMgr.pointerEvent_, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    touchDrawingMgr.pointerEvent_->AddPointerItem(item);
+    touchDrawingMgr.pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    item.SetPointerId(2);
+    touchDrawingMgr.pointerEvent_->SetPointerId(2);
+    touchDrawingMgr.pointerEvent_->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
+}
 } // namespace MMI
 } // namespace OHOS
