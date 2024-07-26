@@ -47,6 +47,8 @@ ohos_fuzztest("StubSetMousePrimaryButtonFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubsetmouseprimarybutton_fuzzer.cpp" ]
 

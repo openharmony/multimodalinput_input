@@ -46,6 +46,8 @@ ohos_fuzztest("StubGetMouseScrollRowsFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubgetmousescrollrows_fuzzer.cpp" ]
 

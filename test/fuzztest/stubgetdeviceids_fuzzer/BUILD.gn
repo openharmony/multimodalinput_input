@@ -47,6 +47,8 @@ ohos_fuzztest("StubGetDeviceIdsFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubgetdeviceids_fuzzer.cpp" ]
 

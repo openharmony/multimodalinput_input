@@ -46,6 +46,8 @@ ohos_fuzztest("StubSetMouseCaptureModeFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubsetmousecapturemode_fuzzer.cpp" ]
 
