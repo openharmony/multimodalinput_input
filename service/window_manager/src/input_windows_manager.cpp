@@ -2705,12 +2705,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
         pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
     checkExtraData = checkExtraData || (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP);
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if ((pointerAction == PointerEvent::POINTER_ACTION_DOWN) && !checkExtraData) {
+        lastTouchLogicX_ = logicalX;
+        lastTouchLogicY_ = logicalY;
+        lastTouchEvent_ = pointerEvent;
+        lastTouchWindowInfo_ = *touchWindow;
+    }
     if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
     }
-    int32_t pointerAction = pointerEvent->GetPointerAction();
     // pointerAction:PA, targetWindowId:TWI, foucsWindowId:FWI, eventId:EID,
     // logicalX:LX, logicalY:LY, displayX:DX, displayX:DY, windowX:WX, windowY:WY,
     // width:W, height:H, area.x:AX, area.y:AY, displayId:DID, AgentWindowId: AWI
