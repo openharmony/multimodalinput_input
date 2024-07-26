@@ -98,6 +98,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
+    MOCK_METHOD(void, CleanShellWindowIds, ());
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
