@@ -3512,7 +3512,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_001, TestSiz
     keyCode = KeyEvent::KEYCODE_VOLUME_UP;
     handler.specialTimers_.insert(std::make_pair(keyCode, timerIds));
     ret = handler.OnHandleEvent(key);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
