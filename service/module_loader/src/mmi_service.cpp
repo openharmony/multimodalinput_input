@@ -2730,7 +2730,8 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
