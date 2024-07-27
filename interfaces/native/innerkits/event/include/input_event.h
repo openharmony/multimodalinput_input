@@ -116,6 +116,13 @@ public:
     static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
     static constexpr uint32_t EVENT_FLAG_ACCESSIBILITY = 0x00000100;
 
+    /**
+     * The multimodal input event from navigation window.
+     *
+     * @since 12
+     */
+    static constexpr uint32_t EVENT_FLAG_SIMULATE_NAVIGATION = 0x00000200;
+
 public:
     /**
      * Copy constructor function for InputEvent
