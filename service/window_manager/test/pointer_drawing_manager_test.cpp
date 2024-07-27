@@ -673,32 +673,32 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     int32_t pid = 1;
     bool visible = true;
     int32_t priority = 0;
-    int32_t ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    int32_t ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_ERR);
     visible = false;
     priority = 0;
-    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
     visible = true;
     priority = 1;
-    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
     visible = false;
     priority = 1;
-    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
     EXPECT_CALL(*WIN_MGR_MOCK, GetExtraData).WillRepeatedly(testing::Return(ExtraData{false}));
     visible = false;
     priority = 0;
-    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
     visible = true;
     priority = 1;
-    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
     visible = false;
     priority = 1;
-    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
 }
 
@@ -1112,11 +1112,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     for (int32_t i = 1; i < 102; i++) {
-        pointerDrawingManager->SetPointerVisible(i, false, 0);
+        pointerDrawingManager->SetPointerVisible(i, false, 0, false);
     }
     bool visible = pointerDrawingManager->GetPointerVisible(1);
     EXPECT_EQ(visible, true);
-    pointerDrawingManager->SetPointerVisible(11, true, 0);
+    pointerDrawingManager->SetPointerVisible(11, true, 0, false);
     visible = pointerDrawingManager->GetPointerVisible(11);
     EXPECT_EQ(visible, true);
 }
