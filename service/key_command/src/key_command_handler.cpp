@@ -1403,7 +1403,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
             bool handleResult = HandleKeyUp(keyEvent, shortcutKey);
             result = handleResult || result;
-            if (handleResult) {
+            if (handleResult && shortcutKey.keyDownDuration > 0) {
                 upAbilities.push_back(shortcutKey);
             }
         } else {
@@ -1422,6 +1422,10 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         BytraceAdapter::StopLaunchAbility();
     }
     if (result) {
+        if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
+            && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            ResetCurrentLaunchAbilityKey();
+        }
         return result;
     }
     return HandleConsumedKeyEvent(keyEvent);
