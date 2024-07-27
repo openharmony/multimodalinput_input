@@ -15,6 +15,8 @@
 
 #include "key_subscriber_handler.h"
 
+#include <sstream>
+
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
 #include "call_manager_client.h"
@@ -442,6 +444,29 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
                 continue;
             }
             ++it;
+        }
+    }
+    for (auto iter = keyGestures_.begin(); iter != keyGestures_.end();) {
+        auto &subscribers = iter->second;
+        for (auto inner = subscribers.begin(); inner != subscribers.end();) {
+            auto subscriber = *inner;
+            if (subscriber->sess_ == sess) {
+                MMI_HILOGI("Removing key-gesture handler(%{public}d) on subscriber(%{public}d) dying",
+                    subscriber->timerId_, sess->GetPid());
+                keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
+                auto option = subscriber->keyOption_;
+                MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
+                    "finalKeyDownDuration:%{public}d, pid:%{public}d", subscriber->id_, option->GetFinalKey(),
+                    option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
+                inner = subscribers.erase(inner);
+            } else {
+                ++inner;
+            }
+        }
+        if (subscribers.empty()) {
+            iter = keyGestures_.erase(iter);
+        } else {
+            ++iter;
         }
     }
 }
@@ -992,38 +1017,62 @@ void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count = %zu", subscriberMap_.size());
+    mprintf(fd, "subscribers: count = %zu", CountSubscribers());
     for (const auto &item : foregroundPids_) {
         mprintf(fd, "Foreground Pids: %d", item);
     }
-    mprintf(fd,
-            "enableCombineKey: %s | isForegroundExits: %s"
-            "| needSkipPowerKeyUp: %s \t",
+    mprintf(fd, "enableCombineKey: %s | isForegroundExits: %s | needSkipPowerKeyUp: %s \t",
             enableCombineKey_ ? "true" : "false", isForegroundExits_ ? "true" : "false",
             needSkipPowerKeyUp_ ? "true" : "false");
-    for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
+    DumpSubscribers(fd, subscriberMap_);
+    DumpSubscribers(fd, keyGestures_);
+}
+
+size_t KeySubscriberHandler::CountSubscribers() const
+{
+    size_t total { 0 };
+
+    for (auto &item : subscriberMap_) {
+        total += item.second.size();
+    }
+    for (auto &item : keyGestures_) {
+        total += item.second.size();
+    }
+    return total;
+}
+
+void KeySubscriberHandler::DumpSubscribers(int32_t fd, const SubscriberCollection &collection) const
+{
+    for (auto iter = collection.begin(); iter != collection.end(); ++iter) {
         auto &subscribers = iter->second;
-        for (auto item = subscribers.begin(); item != subscribers.end(); item++) {
-            std::shared_ptr<Subscriber> subscriber = *item;
-            CHKPV(subscriber);
-            SessionPtr session = subscriber->sess_;
-            CHKPV(session);
-            std::shared_ptr<KeyOption> keyOption = subscriber->keyOption_;
-            CHKPV(keyOption);
-            mprintf(fd,
-                    "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
-                    "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s "
-                    "| ProgramName:%s \t",
-                    subscriber->id_, subscriber->timerId_, session->GetPid(),
-                    session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
-                    keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false",
-                    session->GetProgramName().c_str());
-            std::set<int32_t> preKeys = keyOption->GetPreKeys();
-            for (const auto &preKey : preKeys) {
-                mprintf(fd, "preKeys:%d\t", preKey);
-            }
+        for (auto item = subscribers.begin(); item != subscribers.end(); ++item) {
+            DumpSubscriber(fd, *item);
         }
     }
+}
+
+void KeySubscriberHandler::DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber> subscriber) const
+{
+    CHKPV(subscriber);
+    SessionPtr session = subscriber->sess_;
+    CHKPV(session);
+    std::shared_ptr<KeyOption> keyOption = subscriber->keyOption_;
+    CHKPV(keyOption);
+    std::set<int32_t> preKeys = keyOption->GetPreKeys();
+    std::ostringstream sPrekeys;
+    if (auto keyIter = preKeys.cbegin(); keyIter != preKeys.cend()) {
+        sPrekeys << *keyIter;
+        for (++keyIter; keyIter != preKeys.cend(); ++keyIter) {
+            sPrekeys << "," << *keyIter;
+        }
+    }
+    mprintf(fd,
+            "Subscriber ID:%d | Pid:%d | Uid:%d | Fd:%d | Prekeys:[%s] | FinalKey:%d | "
+            "FinalKeyDownDuration:%d | IsFinalKeyDown:%s | ProgramName:%s",
+            subscriber->id_, session->GetPid(), session->GetUid(), session->GetFd(),
+            sPrekeys.str().c_str(), keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(),
+            keyOption->IsFinalKeyDown() ? "true" : "false",
+            session->GetProgramName().c_str());
 }
 } // namespace MMI
 } // namespace OHOS

@@ -158,7 +158,6 @@ public:
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent);
     void ResetAll();
     void Dump() const;
-    void RunPendingHandlers();
 
 private:
     std::vector<std::unique_ptr<KeyGesture>> keyGestures_;
