@@ -1721,7 +1721,8 @@ void MMIService::OnThread()
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEdIter = epollEventMap_.find(ev[i].data.fd);
             if (mmiEdIter == epollEventMap_.end()) {
-                return;
+                MMI_HILOGW("Invalid event %{public}d %{public}d", ev[i].data.fd, count);
+                continue;
             }
             std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
