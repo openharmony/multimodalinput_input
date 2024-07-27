@@ -615,7 +615,9 @@ int32_t JsInputMonitor::TransformSwipeEvent(std::shared_ptr<PointerEvent> pointe
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetSwipeAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action value failed");
+        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            MMI_HILOGE("Get action value failed");
+        }
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -1482,8 +1484,10 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick" || typeName == "fingerprint";
         if (typeNameFlag) {
-            MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent->GetPointerId(),
-                pointerEvent->DumpPointerAction());
+            if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+                MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent->GetPointerId(),
+                    pointerEvent->DumpPointerAction());
+            }
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
             CheckConsumed(retValue, pointerEvent);

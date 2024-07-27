@@ -37,8 +37,7 @@ constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME { 3500000 };
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
 constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
 constexpr int32_t TIME_TRANSITION { 1000 };
-constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
-constexpr int32_t PRINT_MARK_COUNT { 30 };
+constexpr int32_t PRINT_INTERVAL_COUNT { 30 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -67,11 +66,8 @@ void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
     {
         std::lock_guard<std::mutex> guard(mutex_);
         idList_.push_back(eventId);
-        if (idList_.size() >= PRINT_MARK_COUNT) {
-            std::string idList = "";
-            for (auto e : idList_) {
-                idList += std::to_string(e) + " ";
-            }
+        if (idList_.size() >= PRINT_INTERVAL_COUNT) {
+            std::string idList = std::to_string(idList_.front()) + " " + std::to_string(idList_.back());
             MMI_HILOG_FREEZEI("Ffrt PE: %{public}s", idList.c_str());
             idList_.clear();
         }

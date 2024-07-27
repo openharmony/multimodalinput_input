@@ -458,7 +458,9 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(data);
+    if (data == nullptr) {
+        return false;
+    }
     CHKPF(pointerEvent_);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
@@ -553,7 +555,6 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
-        CHKPL(data);
         CHKPL(pointerEvent_);
         return RET_ERR;
     }
@@ -573,7 +574,6 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
     if (!HandlePostInner(data, pointerItem)) {
-        CHKPL(data);
         CHKPL(pointerEvent_);
         return ERROR_NULL_POINTER;
     }
@@ -663,9 +663,8 @@ void MouseTransformProcessor::DumpInner()
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    aggregator_.Record(MMI_LOG_FREEZE, "Pointer event created by: " + device->GetName() + ", target window: " +
-        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
-        std::to_string(pointerEvent_->GetId()));
+    aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
+        std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
 }
 
 DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t height)

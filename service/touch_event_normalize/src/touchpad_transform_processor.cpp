@@ -127,7 +127,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+        MMI_HILOGD("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
                    seatSlot, PARAM_INPUT_FAIL);
         return RET_ERR;
     }
