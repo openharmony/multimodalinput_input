@@ -269,6 +269,11 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "call_manager:tel_call_manager_api" ]
   }
 
+  if (screenlock_manager_enabled) {
+    defines += [ "SCREENLOCK_MANAGER_ENABLED" ]
+    external_deps += [ "screenlock_mgr:screenlock_client" ]
+  }
+
   external_deps += [
     "ability_base:want",
     "ability_base:zuri",
