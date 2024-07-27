@@ -17,6 +17,10 @@
 
 #include "i_input_event_consumer.h"
 #include "input_handler_manager.h"
+#include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputHandlerManagerTest"
 
 namespace OHOS {
 namespace MMI {
@@ -419,6 +423,58 @@ HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_CheckInputDeviceSource
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_CROWN);
     result = manager.CheckInputDeviceSource(pointerEvent, deviceTags);
     ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_RecoverPointerEvent
+ * @tc.desc: Test RecoverPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_RecoverPointerEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MYInputHandlerManager inputHdlMgr;
+    inputHdlMgr.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputHdlMgr.lastPointerEvent_, nullptr);
+    inputHdlMgr.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_DOWN,
+        PointerEvent::POINTER_ACTION_UP };
+    int32_t pointerActionEvent = PointerEvent::POINTER_ACTION_DOWN;
+    inputHdlMgr.lastPointerEvent_->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    inputHdlMgr.lastPointerEvent_->AddPointerItem(item);
+    EXPECT_FALSE(inputHdlMgr.RecoverPointerEvent(pointerActionEvents, pointerActionEvent));
+
+    inputHdlMgr.lastPointerEvent_->SetPointerId(1);
+    EXPECT_TRUE(inputHdlMgr.RecoverPointerEvent(pointerActionEvents, pointerActionEvent));
+
+    inputHdlMgr.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_FALSE(inputHdlMgr.RecoverPointerEvent(pointerActionEvents, pointerActionEvent));
+}
+
+/**
+ * @tc.name: InputHandlerManagerTest_OnDisconnected
+ * @tc.desc: Test OnDisconnected
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputHandlerManagerTest, InputHandlerManagerTest_OnDisconnected, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MYInputHandlerManager inputHdlMgr;
+    inputHdlMgr.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputHdlMgr.lastPointerEvent_, nullptr);
+    inputHdlMgr.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    inputHdlMgr.lastPointerEvent_->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    inputHdlMgr.lastPointerEvent_->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputHdlMgr.OnDisconnected());
+
+    inputHdlMgr.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(inputHdlMgr.OnDisconnected());
 }
 } // namespace MMI
 } // namespace OHOS
