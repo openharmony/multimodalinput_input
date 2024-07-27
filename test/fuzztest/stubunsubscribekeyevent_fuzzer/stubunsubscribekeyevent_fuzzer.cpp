@@ -36,6 +36,7 @@ bool StubUnsubscribeKeyEventFuzzTest(const uint8_t *data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
+    MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT), datas, reply, option);
     return true;
