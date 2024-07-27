@@ -56,6 +56,7 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "timer_manager.h"
+#include "tokenid_kit.h"
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
@@ -729,11 +730,17 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    bool isHap = false;
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        isHap = true;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [clientPid, visible, priority] {
-            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority);
+        [clientPid, visible, priority, isHap] {
+            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
     if (ret != RET_OK) {

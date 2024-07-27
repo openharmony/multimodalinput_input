@@ -73,7 +73,7 @@ public:
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
-    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
+    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap) override;
     bool GetPointerVisible(int32_t pid) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
         bool isUiExtension = false) override;
@@ -105,6 +105,7 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     void InitPointerCallback() override;
     void InitPointerObserver() override;
+    void OnSessionLost(int32_t pid) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -170,6 +171,7 @@ private:
     int32_t canvasHeight_ = 64;
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
+    std::list<PidInfo> hapPidInfos_;
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
