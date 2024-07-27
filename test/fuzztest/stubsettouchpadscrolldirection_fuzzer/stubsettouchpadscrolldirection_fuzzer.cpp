@@ -36,6 +36,7 @@ bool StubSetTouchpadScrollDirectionFuzzTest(const uint8_t* data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
+    MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_SCROLL_DIRECT_SWITCH), datas, reply, option);
     return true;

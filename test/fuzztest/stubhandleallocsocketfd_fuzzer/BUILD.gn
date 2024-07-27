@@ -47,6 +47,8 @@ ohos_fuzztest("StubHandleAllocSocketFdFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubhandleallocsocketfd_fuzzer.cpp" ]
 

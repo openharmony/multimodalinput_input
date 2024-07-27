@@ -36,6 +36,7 @@ bool StubSetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
     }
     MessageParcel reply;
     MessageOption option;
+    MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MMI::MultimodalinputConnectInterfaceCode::SET_HOVER_SCROLL_STATE), datas, reply, option);
     DelayedSingleton<IInputWindowsManager>::DestroyInstance();

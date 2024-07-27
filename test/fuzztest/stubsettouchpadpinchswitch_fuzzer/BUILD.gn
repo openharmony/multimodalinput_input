@@ -47,6 +47,8 @@ ohos_fuzztest("StubSetTouchpadPinchSwitchFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubsettouchpadpinchswitch_fuzzer.cpp" ]
 
