@@ -103,6 +103,7 @@ class KeyGestureManager final {
         std::vector<Handler> handlers_;
     };
 
+private:
     class LongPressSingleKey : public KeyGesture {
     public:
         LongPressSingleKey(int32_t keyCode) : keyCode_(keyCode) {}
