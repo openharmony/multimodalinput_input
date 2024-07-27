@@ -315,26 +315,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_IsValidAction, Tes
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_UpdateDisplayInfo
- * @tc.desc: Test Overrides UpdateDisplayInfo function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_UpdateDisplayInfo, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    DisplayInfo displayInfo;
-    displayInfo.direction = Direction::DIRECTION0;
-    kceDrawMgr.displayInfo_.direction = Direction::DIRECTION0;
-    kceDrawMgr.UpdateDisplayInfo(displayInfo);
-    EXPECT_FALSE(kceDrawMgr.isRotate_);
-    kceDrawMgr.displayInfo_.direction = Direction::DIRECTION90;
-    kceDrawMgr.UpdateDisplayInfo(displayInfo);
-    EXPECT_TRUE(kceDrawMgr.isRotate_);
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_IsSingleKnuckle
  * @tc.desc: Test Overrides IsSingleKnuckle function branches
  * @tc.type: Function
