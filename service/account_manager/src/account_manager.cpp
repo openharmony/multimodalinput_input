@@ -18,6 +18,9 @@
 #include <securec.h>
 #include <common_event_manager.h>
 #include <common_event_support.h>
+#ifdef SCREENLOCK_MANAGER_ENABLED
+#include <screenlock_manager.h>
+#endif // SCREENLOCK_MANAGER_ENABLED
 #include <system_ability_definition.h>
 
 #include "display_event_monitor.h"
@@ -307,6 +310,9 @@ void AccountManager::Initialize()
     std::lock_guard<std::mutex> guard { lock_ };
     SetupMainAccount();
     SubscribeCommonEvent();
+#ifdef SCREENLOCK_MANAGER_ENABLED
+    InitializeScreenLockStatus();
+#endif // SCREENLOCK_MANAGER_ENABLED
 }
 
 AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
@@ -318,6 +324,15 @@ AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
     auto [iter, _] = accounts_.emplace(currentAccountId_, std::make_unique<AccountSetting>(currentAccountId_));
     return *iter->second;
 }
+
+#ifdef SCREENLOCK_MANAGER_ENABLED
+void AccountManager::InitializeScreenLockStatus()
+{
+    MMI_HILOGI("Initialize screen lock status");
+    DISPLAY_MONITOR->SetScreenLocked(
+        ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked());
+}
+#endif // SCREENLOCK_MANAGER_ENABLED
 
 void AccountManager::SubscribeCommonEvent()
 {
