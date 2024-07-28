@@ -153,6 +153,7 @@ public:
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
     virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
+    virtual int32_t SkipPointerLayer(bool isSkip) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
