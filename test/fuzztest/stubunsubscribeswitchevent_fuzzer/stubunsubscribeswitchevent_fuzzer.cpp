@@ -299,6 +299,22 @@ bool StubGetPointerSnapshotFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
+bool StubSkipPointerLayerFuzzTest(const uint8_t* data, size_t size)
+{
+    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
+        !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
+    MMIService::GetInstance()->OnRemoteRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SKIP_POINTER_LAYER), datas, reply, option);
+    return true;
+}
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 bool StubAncoAddChannelFuzzTest(const uint8_t* data, size_t size)
 {
@@ -358,6 +374,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::StubRemoveVirtualInputDeviceFuzzTest(data, size);
     OHOS::StubTransferBinderClientServiceFuzzTest(data, size);
     OHOS::StubGetPointerSnapshotFuzzTest(data, size);
+    OHOS::StubSkipPointerLayerFuzzTest(data, size);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     OHOS::StubAncoAddChannelFuzzTest(data, size);
     OHOS::StubAncoRemoveChannelFuzzTest(data, size);
