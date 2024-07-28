@@ -281,6 +281,10 @@ public:
         return retTransferBinderClientSrv_;
     }
     std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
+    int32_t SkipPointerLayer(bool isSkip) override
+    {
+        return skipMouseLayer_;
+    }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
@@ -319,6 +323,7 @@ public:
     int32_t retGetTouchpadThreeFingersTapSwitch_ = 0;
     int32_t retTransferBinderClientSrv_ = 0;
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+    int32_t skipMouseLayer_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
