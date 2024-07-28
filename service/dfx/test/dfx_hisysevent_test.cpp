@@ -248,6 +248,14 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidTimeTest_001, T
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime));
+
+    intervalTime = 1000001;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime));
+
+    item.SetPointerId(2);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime));
 }
 
 /**
@@ -489,6 +497,28 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfKnockTooFast_001, Test
 {
     CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfKnockTooFast());
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfOneSuccTwoFail_001
+ * @tc.desc: ReportFailIfOneSuccTwoFail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfOneSuccTwoFail_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDeviceId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfOneSuccTwoFail(pointerEvent));
+
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfOneSuccTwoFail(pointerEvent));
 }
 
 } // namespace MMI
