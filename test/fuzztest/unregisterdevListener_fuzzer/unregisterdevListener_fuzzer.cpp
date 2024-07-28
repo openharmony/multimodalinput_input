@@ -45,8 +45,8 @@ void UnregisterDevListenerFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<InputDeviceListenerTest> listener = std::make_shared<InputDeviceListenerTest>();
     InputManager::GetInstance()->UnregisterDevListener(type, listener);
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
