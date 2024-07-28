@@ -1676,5 +1676,39 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetTiltY_001, TestSize.Level1)
     ASSERT_NO_FATAL_FAILURE(item.SetTiltY(y));
     ASSERT_EQ(item.GetTiltY(), y);
 }
+
+/**
+ * @tc.name: PointerEventTest_SetRawDisplayX_001
+ * @tc.desc: Sets the raw X coordinate.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rawDisplayX = 60;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(8);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetRawDisplayX(rawDisplayX));
+    ASSERT_EQ(item.GetRawDisplayX(), rawDisplayX);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetRawDisplayY_001
+ * @tc.desc: Sets the raw Y coordinate.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDisplayY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rawDisplayY = 60;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(8);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetRawDisplayY(rawDisplayY));
+    ASSERT_EQ(item.GetRawDisplayY(), rawDisplayY);
+}
 } // namespace MMI
 } // namespace OHOS
