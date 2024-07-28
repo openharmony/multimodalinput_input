@@ -351,6 +351,26 @@ void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
     rawDy_ = rawDy;
 }
 
+int32_t PointerEvent::PointerItem::GetRawDisplayX() const
+{
+    return rawDisplayX_;
+}
+ 
+void PointerEvent::PointerItem::SetRawDisplayX(int32_t rawDisplayX)
+{
+    rawDisplayX_ = rawDisplayX;
+}
+ 
+int32_t PointerEvent::PointerItem::GetRawDisplayY() const
+{
+    return rawDisplayY_;
+}
+ 
+void PointerEvent::PointerItem::SetRawDisplayY(int32_t rawDisplayY)
+{
+    rawDisplayY_ = rawDisplayY;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (

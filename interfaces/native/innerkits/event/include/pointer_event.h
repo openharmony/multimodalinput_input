@@ -1123,6 +1123,38 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
+
+         /**
+         * @brief Sets the raw X coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param rawDisplayX Indicates the raw X coordinate to set.
+         * @return void
+         * @since 12
+         */
+        void SetRawDisplayX(int32_t rawDisplayX);
+ 
+        /**
+         * @brief Obtains the raw X coordinate relative to the upper left corner of the screen.
+         * @return Returns the raw X coordinate.
+         * @since 12
+         */
+        int32_t GetRawDisplayX() const;
+ 
+        /**
+         * @brief Sets the raw Y coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param rawDisplayY Indicates the raw Y coordinate to set.
+         * @return void
+         * @since 12
+         */
+ 
+        void SetRawDisplayY(int32_t rawDisplayY);
+        /**
+         * @brief Obtains the raw Y coordinate relative to the upper left corner of the screen..
+         * @return Returns the raw Y coordinate.
+         * @since 12
+         */
+        int32_t GetRawDisplayY() const;
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1154,6 +1186,8 @@ public:
         int32_t originPointerId_ { 0 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
+        int32_t rawDisplayX_ {};
+        int32_t rawDisplayY_ {};
     };
 
 public:
