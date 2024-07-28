@@ -81,7 +81,8 @@
         "hdf_core",
         "bounds_checking_function",
         "call_manager",
-        "libinput"
+        "libinput",
+        "screenlock_mgr"
       ],
       "third_party": [
         "cJSON",

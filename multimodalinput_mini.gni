@@ -27,6 +27,7 @@ hilog_root = "//base/hiviewdfx/hilog"
 declare_args() {
   call_manager_service_enabled = false
   resource_schedule_service_enabled = false
+  screenlock_manager_enabled = false
   input_feature_product = "default"
   input_feature_enable_pgo = false
   input_feature_pgo_path = ""
@@ -57,6 +58,11 @@ declare_args() {
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     resource_schedule_service_enabled = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.theme_screenlock_mgr)) {
+    screenlock_manager_enabled = true
   }
 
   if (is_emulator) {
