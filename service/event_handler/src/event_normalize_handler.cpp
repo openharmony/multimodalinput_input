@@ -427,7 +427,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     }
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
-        MMI_HILOGD("ToolType is MT_TOOL_PALM");
+        MMI_HILOGI("ToolType is MT_TOOL_PALM");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
 }
