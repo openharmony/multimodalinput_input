@@ -106,6 +106,7 @@ public:
     void InitPointerCallback() override;
     void InitPointerObserver() override;
     void OnSessionLost(int32_t pid) override;
+    int32_t SkipPointerLayer(bool isSkip) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);

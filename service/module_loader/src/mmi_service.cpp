@@ -2750,6 +2750,21 @@ void MMIService::PrintLog(const std::string &flag, int32_t duration)
     MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
 
-
+int32_t MMIService::SkipPointerLayer(bool isSkip)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [isSkip] {
+            return IPointerDrawingManager::GetInstance()->SkipPointerLayer(isSkip);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Skip pointer layerfailed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
