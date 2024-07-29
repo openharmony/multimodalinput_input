@@ -35,6 +35,7 @@
 
 namespace OHOS {
 namespace MMI {
+class DelegateInterface;
 class DisplayEventMonitor final {
     DECLARE_DELAYED_SINGLETON(DisplayEventMonitor);
     public:
@@ -60,11 +61,17 @@ class DisplayEventMonitor final {
         {
             return isScreenLocked_;
         }
+        void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
+        {
+            delegateProxy_ = proxy;
+        }
+        void SendCancelEventWhenLock();
     private:
         int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
         std::string screenStatus_;
         bool isScreenLocked_ { true };
+        std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
 };
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()
 } // namespace MMI
