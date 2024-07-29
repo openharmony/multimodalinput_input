@@ -65,6 +65,7 @@ public:
     int32_t UpdateBubbleData();
     void RotationScreen();
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool IsWindowRotation();
     void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
     {
         delegateProxy_ = proxy;
@@ -99,7 +100,6 @@ private:
     std::string FormatNumber(T number, int32_t precision);
     bool IsValidAction(const int32_t action);
     void Snapshot();
-    bool IsWindowRotation();
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
