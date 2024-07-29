@@ -42,7 +42,6 @@ constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
 constexpr int32_t FINGER_TAP_THREE { 3 };
-constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 constexpr int32_t MIN_ROWS { 1 };
@@ -654,13 +653,6 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     } else if ((type == LIBINPUT_EVENT_TOUCHPAD_UP) && !CanUnsetPointerItem(event)) {
         upCnt++;
         tapTrends_ = TapTrends::UPING;
-    } else if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
-        motionCnt++;
-        if ((motionCnt >= FINGER_MOTION_MAX) || IsInvalidMulTapGesture(event)) {
-            MMI_HILOGD("The motion is too much");
-            SetMULTI_FINGERTAP_HDRDefault();
-            return RET_OK;
-        }
     }
 
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
@@ -674,7 +666,6 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
 {
     downCnt = 0;
     upCnt = 0;
-    motionCnt = 0;
     tapTrends_ = TapTrends::BEGIN;
     beginTime = 0;
     lastTime = 0;
@@ -710,27 +701,6 @@ bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *ev
     auto currentY = libinput_event_touchpad_get_y(event);
     pointerMaps[seatSlot] = {currentX, currentY};
     return true;
-}
-
-bool MultiFingersTapHandler::IsInvalidMulTapGesture(struct libinput_event_touch *event)
-{
-    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(event);
-    if (pointerMaps.find(seatSlot) == pointerMaps.end()) {
-        MMI_HILOGD("The pointerMaps can not find the seatSlot");
-        return true;
-    } else if (pointerMaps[seatSlot].first < 0 || pointerMaps[seatSlot].second < 0) {
-        MMI_HILOGD("The value linked by seatSlot is [%{public}f , %{public}f]", pointerMaps[seatSlot].first,
-            pointerMaps[seatSlot].second);
-        return true;
-    }
-    auto currentX = libinput_event_touchpad_get_x(event);
-    auto currentY = libinput_event_touchpad_get_y(event);
-    auto [ lastX, lastY ] = pointerMaps[seatSlot];
-    auto deltaX = abs(currentX - lastX);
-    auto deltaY = abs(currentY - lastY);
-    auto distance = deltaX + deltaY;
-    pointerMaps[seatSlot] = {currentX, currentY};
-    return ((deltaX > distanceThreshold) || (deltaY > distanceThreshold) || (distance > distanceThreshold));
 }
 
 bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *event)
