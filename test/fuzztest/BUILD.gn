@@ -128,5 +128,7 @@ group("test") {
     "supportkeys_fuzzer:fuzztest",
     "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
+    "accountmanager_fuzzer:fuzztest",
+    "inputdevicemanager_fuzzer:fuzztest",
   ]
 }
