@@ -40,14 +40,12 @@ int32_t deviceId = 1;
 uint32_t frameCount = 1;
 uint32_t vsyncCount = 1;
 int64_t infraredFrequency = 1;
-std::vector<int32_t> vec = {1,2,3};
+std::vector<int32_t> vec = {1, 2, 3};
 std::vector<bool> vec_bool = {1};
 std::vector<std::u16string> args = {u"hello", u"worid"};
-std::vector<int64_t> pattern = {1,2,3};
-std::map<int32_t, int32_t> mp = {
-    {1,2},{2,2},{3,2}
-};
-std::vector<InfraredFrequency> requencys = {{1,2},{2,2}};
+std::vector<int64_t> pattern = {1, 2, 3};
+std::map<int32_t, int32_t> mp = {{1, 2}, {2, 2}, {3, 2}};
+std::vector<InfraredFrequency> requencys = {{1, 2}, {2, 2}};
 int tmpdate = 1;
 void* pixelMap = &tmpdate;
 bool isAuthorize = true;
@@ -96,7 +94,6 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->InjectKeyEvent(keyEvent, isNativeInject);
     MMIService::GetInstance()->CheckInjectKeyEvent(keyEvent, tmpfd, isNativeInject);
     MMIService::GetInstance()->OnGetKeyState(vec, mp);
-    MMIService::GetInstance()->AdaptScreenResolution(pointerEvent);
     MMIService::GetInstance()->InjectPointerEvent(pointerEvent, isNativeInject);
     MMIService::GetInstance()->OnAddSystemAbility(tmpfd, "deviceId");
     MMIService::GetInstance()->SubscribeKeyEvent(tmpfd, p_option);
@@ -112,7 +109,7 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->SetKeyDownDuration(businessId, tmpfd);
     MMIService::GetInstance()->ReadTouchpadScrollSwich(switchFlag);
     MMIService::GetInstance()->ReadTouchpadScrollDirection(switchFlag);
-    MMIService::GetInstance()->ReadTouchpadtapSwitch(switchFlag);
+    MMIService::GetInstance()->ReadTouchpadTapSwitch(switchFlag);
     MMIService::GetInstance()->ReadTouchpadPointerSpeed(tmpfd);
     MMIService::GetInstance()->ReadTouchpadPinchSwitch(switchFlag);
     MMIService::GetInstance()->ReadTouchpadSwipeSwitch(switchFlag);

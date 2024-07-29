@@ -34,11 +34,11 @@ bool InputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
     bool hasPointerDevice = true;
     bool isVisible = true;
     bool isHotPlug = true;
-    libinput_device * deviceOrigin = nullptr;
+    libinput_device* deviceOrigin = nullptr;
     std::shared_ptr<InputDevice> inputDevice;
     std::shared_ptr<IDeviceObserver> observer;
-    std::shared_ptr<InputDevice> devicePtr(new InputDevice());
-    struct libinput_device *struct_device = nullptr;
+    std::shared_ptr<InputDevice> devicePtr = std::make_shared<InputDevice>();
+    struct libinput_device* struct_device = nullptr;
     std::vector<int32_t> keyCodes = {1};
     std::vector<bool> keystroke = {true};
     std::vector<std::string> args = {"hello"};
