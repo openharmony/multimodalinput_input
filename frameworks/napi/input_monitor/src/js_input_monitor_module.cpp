@@ -33,7 +33,7 @@ namespace MMI {
 namespace {
 const std::set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
-    "fingerprint"
+    "fingerprint", "swipeInward"
 };
 constexpr int32_t TWO_PARAMETERS { 2 };
 constexpr int32_t THREE_PARAMETERS { 3 };
