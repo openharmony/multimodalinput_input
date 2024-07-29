@@ -136,16 +136,16 @@ HWTEST_F(EventInterceptorHandlerTest, EventInterceptorHandler_Test_008, TestSize
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     uint32_t deviceTags = 4;
-    bool ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
+    bool ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     deviceTags = 2;
-    ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    ret = interceptorHandler.CheckInputDeviceSource(pointerEvent, deviceTags);
+    ret = EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, deviceTags);
     EXPECT_TRUE(ret);
 }
 

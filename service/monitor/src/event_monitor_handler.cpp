@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -90,6 +90,20 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
+{
+    CALL_INFO_TRACE;
+    CHKPR(callback, RET_ERR);
+    if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGE("Invalid event type");
+        return RET_ERR;
+    }
+    InitSessionLostCallback();
+    SessionHandler mon {handlerType, eventType, nullptr, callback};
+    return monitors_.AddMonitor(mon);
+}
+
+int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
@@ -101,6 +115,17 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     InitSessionLostCallback();
     SessionHandler mon { handlerType, eventType, session };
     return monitors_.AddMonitor(mon);
+}
+
+void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
+{
+    CALL_INFO_TRACE;
+    CHKPV(callback);
+    if (handlerType == InputHandlerType::MONITOR) {
+        SessionHandler monitor {handlerType, eventType, nullptr, callback};
+        monitors_.RemoveMonitor(monitor);
+    }
 }
 
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
@@ -176,6 +201,7 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
+    CHKPV(session_);
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -315,6 +341,9 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
         for (const auto &mon : monitors_) {
             OHOS::MMI::NapProcess::NapStatusData napData;
             auto sess = mon.session_;
+            if (!sess) {
+                continue;
+            }
             napData.pid = sess->GetPid();
             napData.uid = sess->GetUid();
             napData.bundleName = sess->GetProgramName();
@@ -422,7 +451,13 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     }
     for (const auto &monitor : monitors_) {
         if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
-            monitor.SendToClient(pointerEvent, pkt);
+            if (monitor.session_) {
+                monitor.SendToClient(pointerEvent, pkt);
+                continue;
+            }
+            if (monitor.callback) {
+                monitor.callback->OnInputEvent(monitor.handlerType_, pointerEvent);
+            }
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
@@ -430,6 +465,9 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         for (const auto &mon : monitors_) {
             OHOS::MMI::NapProcess::NapStatusData napData;
             auto sess = mon.session_;
+            if (!sess) {
+                continue;
+            }
             napData.pid = sess->GetPid();
             napData.uid = sess->GetUid();
             napData.bundleName = sess->GetProgramName();
@@ -468,7 +506,9 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
     mprintf(fd, "monitors: count=%zu", monitors_.size());
     for (const auto &item : monitors_) {
         SessionPtr session = item.session_;
-        CHKPV(session);
+        if (!session) {
+            continue;
+        }
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s "

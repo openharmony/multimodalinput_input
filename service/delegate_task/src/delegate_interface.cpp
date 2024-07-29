@@ -16,6 +16,7 @@
 #include "delegate_interface.h"
 
 #include "error_multimodal.h"
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "touch_drawing_manager.h"
 
@@ -24,7 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 void DelegateInterface::Init()
 {
     TOUCH_DRAWING_MGR->SetDelegateProxy(shared_from_this());
@@ -38,6 +38,165 @@ int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
         MMI_HILOGE("Failed to execute the task, ret: %{public}d", ret);
     }
     return ret;
+}
+
+void DelegateInterface::OnInputEvent(
+    InputHandlerType type, std::shared_ptr<PointerEvent> event) const
+{
+    OnInputEventHandler(type, event);
+}
+
+void DelegateInterface::OnInputEventHandler(
+    InputHandlerType type, std::shared_ptr<PointerEvent> event) const
+{
+    CHKPV(event);
+    for (const auto &handler : handlers) {
+        auto summary = handler.second;
+        if (handler.first != type) {
+            continue;
+        }
+        if (type == InputHandlerType::MONITOR &&
+            (summary.eventType & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+            continue;
+        }
+        uint32_t deviceTags = 0;
+        if (type == InputHandlerType::INTERCEPTOR &&
+            ((deviceTags & summary.deviceTags) == summary.deviceTags) &&
+            !EventInterceptorHandler::CheckInputDeviceSource(event, summary.deviceTags)) {
+            continue;
+        }
+        CHKPV(summary.cb);
+        if (summary.mode == HandlerMode::SYNC) {
+            summary.cb(event);
+        } else {
+            if (OnPostSyncTask(std::bind(summary.cb, event)) != RET_OK) {
+                MMI_HILOGE("Failed to execute the task(%{public}s)", summary.handlerName.c_str());
+            }
+        }
+    }
+}
+
+int32_t DelegateInterface::AddHandler(InputHandlerType type, HandlerSummary summary)
+{
+    CHKPR(summary.cb, ERROR_NULL_POINTER);
+    int32_t ret = RET_OK;
+    for (const auto &handler : handlers) {
+        if (handler.second.handlerName == summary.handlerName) {
+            MMI_HILOGW("The current handler(%{public}s) already exists", summary.handlerName.c_str());
+            return ret;
+        }
+    }
+    const HandleEventType currentType = GetEventType(type);
+    uint32_t currentTags = GetDeviceTags(type);
+    handlers.emplace(type, summary);
+    const HandleEventType newType = GetEventType(type);
+    if (currentType != newType || ((currentTags & summary.deviceTags) != summary.deviceTags)) {
+        uint32_t allDeviceTags = GetDeviceTags(type);
+        if (type == InputHandlerType::INTERCEPTOR) {
+            auto interceptorHandler = InputHandler->GetInterceptorHandler();
+            CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+            ret = interceptorHandler->AddInputHandler(type,
+                newType, summary.priority, allDeviceTags, nullptr);
+        } else if (type == InputHandlerType::MONITOR) {
+            auto monitorHandler = InputHandler->GetMonitorHandler();
+            CHKPR(monitorHandler, ERROR_NULL_POINTER);
+            ret = monitorHandler->AddInputHandler(type,
+                newType, shared_from_this());
+        }
+    }
+    if (ret != RET_OK) {
+        RemoveLocal(type, summary.handlerName, currentTags);
+    } else {
+        MMI_HILOGI("Service Add Monitor Success, size:%{public}zu", handlers.size());
+    }
+    return ret;
+}
+
+HandleEventType DelegateInterface::GetEventType(InputHandlerType type) const
+{
+    uint32_t eventType {HANDLE_EVENT_TYPE_NONE};
+    if (handlers.empty()) {
+        MMI_HILOGW("handlers is empty");
+        return HANDLE_EVENT_TYPE_NONE;
+    }
+    for (const auto &handler : handlers) {
+        if (handler.first == type) {
+            eventType |= handler.second.eventType;
+        }
+    }
+    return eventType;
+}
+
+uint32_t DelegateInterface::GetDeviceTags(InputHandlerType type) const
+{
+    uint32_t deviceTags = 0;
+    if (type == InputHandlerType::MONITOR) {
+        return deviceTags;
+    }
+    if (handlers.empty()) {
+        MMI_HILOGW("handlers is empty");
+        return deviceTags;
+    }
+    for (const auto &handler : handlers) {
+        if (handler.first == type) {
+            deviceTags |= handler.second.deviceTags;
+        }
+    }
+    return deviceTags;
+}
+
+void DelegateInterface::RemoveLocal(InputHandlerType type, std::string name, uint32_t &deviceTags)
+{
+    for (auto it = handlers.cbegin(); it != handlers.cend(); ++it) {
+        if (type != it->first) {
+            continue;
+        }
+        if (it->second.handlerName != name) {
+            continue;
+        }
+        handlers.erase(it);
+        if (type == InputHandlerType::INTERCEPTOR) {
+            deviceTags = it->second.deviceTags;
+        }
+        break;
+    }
+}
+
+int32_t DelegateInterface::GetPriority(InputHandlerType type) const
+{
+    for (auto it = handlers.cbegin(); it != handlers.cend(); ++it) {
+        if (type == it->first) {
+            return it->second.priority;
+        }
+    }
+    return DEFUALT_INTERCEPTOR_PRIORITY;
+}
+
+void DelegateInterface::RemoveHandler(InputHandlerType type, std::string name)
+{
+    const HandleEventType currentType = GetEventType(type);
+    uint32_t currentTags = GetDeviceTags(type);
+    uint32_t deviceTags = 0;
+    RemoveLocal(type, name, deviceTags);
+    const HandleEventType newType = GetEventType(type);
+    const int32_t newLevel = GetPriority(type);
+    const uint64_t newTags = GetDeviceTags(type);
+    if (currentType != newType || ((currentTags & deviceTags) != 0)) {
+        if (type == InputHandlerType::INTERCEPTOR) {
+            auto interceptorHandler = InputHandler->GetInterceptorHandler();
+            CHKPV(interceptorHandler);
+            interceptorHandler->RemoveInputHandler(type,
+                newType, newLevel, newTags, nullptr);
+        }
+        if (type == InputHandlerType::MONITOR) {
+            auto monitorHandler = InputHandler->GetMonitorHandler();
+            CHKPV(monitorHandler);
+            monitorHandler->RemoveInputHandler(type,
+                newType, shared_from_this());
+        }
+    }
+    MMI_HILOGI("Remove Handler:%{public}d:%{public}s-%{public}d:%{public}d, size:%{public}zu", type,
+               name.c_str(), currentType, currentTags, handlers.size());
 }
 } // namespace MMI
 } // namespace OHOS
