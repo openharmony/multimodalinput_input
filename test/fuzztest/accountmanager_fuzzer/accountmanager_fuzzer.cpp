@@ -22,45 +22,12 @@
 namespace OHOS {
 namespace MMI {
 
-
-int32_t accountId = 1;
-std::string key = "hello";
-// int32_t accountId = data.GetCode();
-// accountId = 2;
-// accountManager.currentAccountId_ = -1;
-bool currentSwitchStatus = true;
-
 bool AccountManagerFuzzTest(const uint8_t *data, size_t size)
 {
-    const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
-    MessageParcel datas;
-    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN) ||
-        !datas.WriteBuffer(data, size) || !datas.RewindRead(0)) {
-        return false;
-    }
-    // auto accountManager = ACCOUNT_MGR;
-
-
-    // accountManager->AccShortcutEnabled(accountId, key);
-    // accountManager->AccShortcutEnabledOnScreenLocked(accountId, key);
-    //accountManager->InitializeSetting();
-    // accountManager->OnAccShortcutTimeoutChanged(key);
-    // accountManager->OnAccShortcutEnabled(key);
-    // accountManager->OnAccShortcutEnabledOnScreenLocked(key);
-    // accountManager->ReadSwitchStatus(key, currentSwitchStatus);
-    // accountManager->ReadLongPressTime();
-    // accountManager->AccountManager();
-    
     ACCOUNT_MGR->GetCurrentAccountSetting();
     ACCOUNT_MGR->SubscribeCommonEvent();
     ACCOUNT_MGR->UnsubscribeCommonEvent();
     ACCOUNT_MGR->SetupMainAccount();
-    
-    
-    // accountManager->OnSwitchUser(fuzzdata);
-    // accountManager->OnCommonEvent(fuzzdata);
-    // accountManager->OnAddUser(fuzzdata);
-    // accountManager->OnRemoveUser(fuzzdata);
     return true;
 }
 } // MMI
