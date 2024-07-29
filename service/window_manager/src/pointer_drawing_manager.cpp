@@ -61,7 +61,10 @@ const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
@@ -97,7 +100,6 @@ constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
 constexpr int32_t QUEUE_SIZE { 5 };
-std::mutex mutex_;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -113,7 +115,6 @@ static bool IsSingleDisplayFoldDevice()
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
@@ -123,7 +124,6 @@ void RsRemoteDiedCallback()
 void PointerDrawingManager::InitPointerCallback()
 {
     MMI_HILOGI("Init RS Callback start");
-    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
@@ -878,6 +878,18 @@ bool PointerDrawingManager::GetMouseDisplayState() const
     return mouseDisplayState_;
 }
 
+bool PointerDrawingManager::IsWindowRotation()
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo_.displayMode == DisplayMode::MAIN &&
+        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo_.displayMode == DisplayMode::FULL &&
+        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
+}
+
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
 {
     if (physicalX < 0) {
@@ -888,7 +900,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (IsWindowRotation()) {
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
                 physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
@@ -1386,7 +1398,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = DIRECTION0;
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (IsWindowRotation()) {
         direction = displayInfo_.direction;
     }
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
@@ -1488,7 +1500,7 @@ void PointerDrawingManager::DrawManager()
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         Direction direction = DIRECTION0;
-        if (ROTATE_POLICY == WINDOW_ROTATE) {
+        if (IsWindowRotation()) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
@@ -1859,16 +1871,16 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
     return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate)
 {
     CALL_DEBUG_ENTER;
-    if (hasDisplay_ && hasPointerDevice_) {
+    if (hasDisplay_ && (hasPointerDevice_ || simulate)) {
         if (surfaceNode_ != nullptr) {
             AttachToDisplay();
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
-        if (ROTATE_POLICY == WINDOW_ROTATE) {
+        if (IsWindowRotation()) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
