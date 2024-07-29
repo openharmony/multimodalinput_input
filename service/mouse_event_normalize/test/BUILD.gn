@@ -71,6 +71,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/app_state_manager/include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_state_manager/include",
