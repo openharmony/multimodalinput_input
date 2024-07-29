@@ -73,7 +73,7 @@ public:
     {
         return 0;
     }
-    virtual void DrawPointerStyle(const PointerStyle& pointerStyle) {}
+    virtual void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) {}
     virtual bool IsPointerVisible()
     {
         return false;
