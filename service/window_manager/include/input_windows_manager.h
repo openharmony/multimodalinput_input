@@ -213,6 +213,7 @@ private:
     bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
+    void AdjustDisplayRotation();
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

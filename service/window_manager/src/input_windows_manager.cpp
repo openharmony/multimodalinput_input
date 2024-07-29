@@ -345,7 +345,7 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     auto displayId = pointerEvent->GetTargetDisplayId();
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         MMI_HILOG_DISPATCHD("Not in the unfolded state of the folding screen");
         return;
     }
@@ -800,6 +800,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!displayGroupInfo.displaysInfo.empty() && pointerDrawFlag_) {
+        AdjustDisplayRotation();
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
     }
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -809,6 +810,26 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         NotifyPointerToWindow();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
+void InputWindowsManager::AdjustDisplayRotation()
+{
+    if (!TOUCH_DRAWING_MGR->IsWindowRotation()) {
+        PhysicalCoordinate coord {
+            .x = cursorPos_.cursorPos.x,
+            .y = cursorPos_.cursorPos.y,
+        };
+        auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos_.displayId);
+        CHKPV(displayInfo);
+        if (cursorPos_.direction != displayInfo->direction) {
+            RotateScreen(*displayInfo, coord);
+            cursorPos_.direction = displayInfo->direction;
+            UpdateAndAdjustMouseLocation(cursorPos_.displayId, coord.x, coord.y);
+            IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*displayInfo);
+            IPointerDrawingManager::GetInstance()->SetPointerLocation(
+                static_cast<int32_t>(coord.x), static_cast<int32_t>(coord.y));
+        }
+    }
 }
 
 DisplayMode InputWindowsManager::GetDisplayMode() const
@@ -843,7 +864,10 @@ void InputWindowsManager::UpdateDisplayMode()
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
-    if (INPUT_DEV_MGR->HasPointerDevice()) {
+    CHKPV(lastPointerEvent_);
+    bool simulate = (lastPointerEvent_->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
+        lastPointerEvent_->HasFlag(InputEvent::EVENT_FLAG_SIMULATE));
+    if (INPUT_DEV_MGR->HasPointerDevice() || simulate) {
         MouseLocation mouseLocation = GetMouseInfo();
         int32_t displayId = MouseEventHdr->GetDisplayId();
         displayId = displayId < 0 ? displayGroupInfo_.displaysInfo[0].id : displayId;
@@ -852,7 +876,6 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         int32_t logicX = mouseLocation.physicalX + displayInfo->x;
         int32_t logicY = mouseLocation.physicalY + displayInfo->y;
         std::optional<WindowInfo> windowInfo;
-        CHKPV(lastPointerEvent_);
         if (lastPointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
             lastPointerEvent_->GetPressedButtons().empty()) {
             windowInfo = GetWindowInfo(logicX, logicY);
@@ -882,7 +905,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
-        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_, simulate);
     }
 }
 
@@ -1265,6 +1288,17 @@ void InputWindowsManager::RotateScreen(const DisplayInfo& info, PhysicalCoordina
 {
     const Direction direction = info.direction;
     if (direction == DIRECTION0) {
+        if (!TOUCH_DRAWING_MGR->IsWindowRotation() && cursorPos_.direction != info.direction) {
+            if (cursorPos_.direction == Direction::DIRECTION90) {
+                double temp = coord.y;
+                coord.y = info.height - coord.x;
+                coord.x = temp;
+            } else if (cursorPos_.direction == Direction::DIRECTION270) {
+                double temp = coord.x;
+                coord.x = info.width - coord.y;
+                coord.y = temp;
+            }
+        }
         MMI_HILOGD("direction is DIRECTION0");
         return;
     }
@@ -2214,7 +2248,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         isDragBorder_ = false;
     }
     Direction direction = DIRECTION0;
-    if (ROTATE_POLICY == WINDOW_ROTATE && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation() && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         direction = physicalDisplayInfo->direction;
         TOUCH_DRAWING_MGR->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
@@ -2227,6 +2261,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
+    cursorPos_.direction = physicalDisplayInfo->direction;
     int64_t endTime = GetSysClockTime();
     if ((endTime - beginTime) > RS_PROCESS_TIMEOUT) {
         MMI_HILOGW("Rs process timeout");
@@ -3218,7 +3253,7 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
 
 void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height)
 {
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
             width = displayInfo->width;
             height = displayInfo->height;
@@ -3299,7 +3334,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
 
-    if (ROTATE_POLICY == WINDOW_ROTATE && isRealData) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation() && isRealData) {
         PhysicalCoordinate coord {
             .x = integerX,
             .y = integerY,
@@ -3315,7 +3350,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
     cursorPos_.displayId = displayId;
-    if (ROTATE_POLICY == WINDOW_ROTATE && !isRealData) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation() && !isRealData) {
         ReverseRotateScreen(*displayInfo, x, y, cursorPos_.cursorPos);
         return;
     }

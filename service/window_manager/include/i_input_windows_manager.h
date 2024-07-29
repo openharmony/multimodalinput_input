@@ -46,6 +46,7 @@ struct Coordinate2D {
 
 struct CursorPosition {
     int32_t displayId { -1 };
+    Direction direction { Direction::DIRECTION0 };
     Coordinate2D cursorPos {};
 };
 

@@ -221,6 +221,11 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
     int32_t &physicalX, int32_t &physicalY)
 {}
 
+bool TouchDrawingManager::IsWindowRotation()
+{
+    return false;
+}
+
 PointerDrawingManager::PointerDrawingManager() {}
 
 std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
@@ -274,7 +279,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
 {
     return 0;
 }
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle) {}
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate) {}
 bool PointerDrawingManager::IsPointerVisible()
 {
     return false;
