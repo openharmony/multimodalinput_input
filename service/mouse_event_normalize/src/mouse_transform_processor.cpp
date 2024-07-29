@@ -68,7 +68,10 @@ const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
@@ -105,7 +108,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (IsWindowRotation(displayInfo) && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -134,6 +137,18 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
+}
+
+bool MouseTransformProcessor::IsWindowRotation(const DisplayInfo* displayInfo)
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo->displayMode == DisplayMode::MAIN &&
+        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo->displayMode == DisplayMode::FULL &&
+        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
 }
 
 void MouseTransformProcessor::CalculateOffset(Direction direction, Offset &offset)
@@ -211,6 +226,16 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         buttonMapping_[originButton] = buttonId;
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
+        CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+        if (cursorPos.displayId < 0) {
+            MMI_HILOGE("No display");
+            return RET_ERR;
+        }
+        auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+        CHKPR(displayInfo, ERROR_NULL_POINTER);
+        if (cursorPos.direction != displayInfo->direction) {
+            WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+        }
     } else {
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return RET_ERR;

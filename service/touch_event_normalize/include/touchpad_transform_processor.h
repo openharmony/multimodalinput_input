@@ -51,14 +51,12 @@ public:
     MulFingersTap GetMultiFingersState() const;
     void SetMULTI_FINGERTAP_HDRDefault(bool isAllDefault = true);
     bool ClearPointerItems(std::shared_ptr<PointerEvent> pointer);
-    bool IsInvalidMulTapGesture(struct libinput_event_touch *event);
     bool CanAddToPointerMaps(struct libinput_event_touch *event);
     bool CanUnsetPointerItem(struct libinput_event_touch *event);
 
 private:
     int32_t downCnt = 0;
     int32_t upCnt = 0;
-    int32_t motionCnt = 0;
     TapTrends tapTrends_ = TapTrends::BEGIN;
     MulFingersTap multiFingersState_ = MulFingersTap::NO_TAP;
     uint64_t lastTime = 0;

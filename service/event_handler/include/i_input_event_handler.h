@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "axis_event.h"
 #include "define_multimodal.h"
 #include "key_event.h"
 #include "pointer_event.h"
@@ -29,6 +30,15 @@ namespace OHOS {
 namespace MMI {
 class IInputEventHandler {
 public:
+    struct IInputEventConsumer {
+    public:
+        IInputEventConsumer() = default;
+        virtual ~IInputEventConsumer() = default;
+
+        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<KeyEvent> event) const;
+        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<PointerEvent> event) const;
+        virtual void OnInputEvent(InputHandlerType type, std::shared_ptr<AxisEvent> event) const;
+    };
     IInputEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
