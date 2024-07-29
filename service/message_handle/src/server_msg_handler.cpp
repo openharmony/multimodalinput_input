@@ -290,7 +290,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
