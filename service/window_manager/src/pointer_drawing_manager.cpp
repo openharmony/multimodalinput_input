@@ -97,7 +97,6 @@ constexpr uint64_t FOLD_SCREEN_ID_MAIN { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
 constexpr int32_t QUEUE_SIZE { 5 };
-std::mutex mutex_;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -113,7 +112,6 @@ static bool IsSingleDisplayFoldDevice()
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
@@ -123,7 +121,6 @@ void RsRemoteDiedCallback()
 void PointerDrawingManager::InitPointerCallback()
 {
     MMI_HILOGI("Init RS Callback start");
-    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
