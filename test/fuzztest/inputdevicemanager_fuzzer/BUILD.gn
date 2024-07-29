@@ -40,13 +40,16 @@ ohos_fuzztest("InputDeviceManagerFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
-    "${mmi_path}/service/device_manager/include"
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_config/include"
   ]
   cflags = [
     "-g",
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "inputdevicemanager_fuzzer.cpp" ]
 
