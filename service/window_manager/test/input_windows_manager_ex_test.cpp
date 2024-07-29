@@ -704,7 +704,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_005
     EXPECT_FALSE(displayId < 0);
 
     std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(3, 5);
-    touchWindow->id = GLOBAL_WINDOW_ID;       
+    touchWindow->id = GLOBAL_WINDOW_ID;
     touchWindow->pid = 2;
     touchWindow->uid = 3;
     int32_t windowId = GLOBAL_WINDOW_ID;
