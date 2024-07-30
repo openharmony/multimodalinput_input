@@ -38,7 +38,7 @@ bool InputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
     std::shared_ptr<InputDevice> inputDevice;
     std::shared_ptr<IDeviceObserver> observer;
     std::shared_ptr<InputDevice> devicePtr = std::make_shared<InputDevice>();
-    struct libinput_device* struct_device = nullptr;
+    struct libinput_device* structDevice = nullptr;
     std::vector<int32_t> keyCodes = {1};
     std::vector<bool> keystroke = {true};
     std::vector<std::string> args = {"hello"};
@@ -49,7 +49,7 @@ bool InputDeviceManagerFuzzTest(const uint8_t *data, size_t size)
     INPUT_DEV_MGR->FillInputDevice(inputDevice, deviceOrigin);
     INPUT_DEV_MGR->GetInputDeviceIds();
     INPUT_DEV_MGR->SupportKeys(deviceId, keyCodes, keystroke);
-    INPUT_DEV_MGR->IsMatchKeys(struct_device, keyCodes);
+    INPUT_DEV_MGR->IsMatchKeys(structDevice, keyCodes);
     INPUT_DEV_MGR->GetDeviceConfig(deviceId, keyboardType);
     INPUT_DEV_MGR->GetKeyboardBusMode(deviceId);
     INPUT_DEV_MGR->GetDeviceSupportKey(deviceId, keyboardType);
