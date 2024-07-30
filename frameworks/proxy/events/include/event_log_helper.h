@@ -136,7 +136,7 @@ private:
                     event->GetTargetDisplayId(), isRepeat.c_str(), isSimulate.c_str());
             }
         }
-       
+
         for (const auto &item : eventItems) {
             if (!IsBetaVersion()) {
                 MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d" PRId64
@@ -204,13 +204,12 @@ private:
         }
         for (const auto &item : eventItems) {
             if (!IsBetaVersion()) {
-                MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d, GU:%{public}d",
-                    item.GetDeviceId(), item.IsPressed(), item.GetUnicode());
+                MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d",
+                    item.GetDeviceId(), item.IsPressed());
             } else {
                 if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%d, DT:%{public}" PRId64 ", IP:%{public}d, "
-                        "GU:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed(),
-                        item.GetUnicode());
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d",
+                        item.GetDeviceId(), item.IsPressed());
                 } else {
                     MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{public}d, DT:%{public}" PRId64 ","
                         "IP:%{public}d, GU:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),
