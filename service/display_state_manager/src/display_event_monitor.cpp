@@ -139,7 +139,7 @@ void DisplayEventMonitor::SendCancelEventWhenLock()
     delegateProxy_->OnPostSyncTask([] {
         WIN_MGR->SendCancelEventWhenLock();
         return RET_OK;
-    })
+    });
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
