@@ -1253,9 +1253,7 @@ ohos_unittest("KeyEventValueTransformationTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [
-    "hilog:libhilog",
-  ]
+  external_deps = [ "hilog:libhilog" ]
 }
 
 ohos_unittest("KeyCommandTest") {
