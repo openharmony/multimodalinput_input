@@ -4329,6 +4329,19 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReverseXY, TestSize.Le
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock
+ * @tc.desc: Test SendCancelEventWhenLock
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLock, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_IsTransparentWin_002
  * @tc.desc: Test IsTransparentWin
  * @tc.type: FUNC
