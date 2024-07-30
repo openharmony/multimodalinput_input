@@ -5192,5 +5192,116 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_003
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    displayInfo.id = 100;
+    displayInfo.x = 500;
+    displayInfo.y = 500;
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetPointerId(150);
+    item.SetPointerId(150);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(200);
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    pointerEvent->bitwise_ = 0x00000000;
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    for (int32_t i = 0; i < 4; ++i) {
+        winInfo.defaultHotAreas.push_back(rect);
+    }
+    winInfo.id = 0;
+    winInfo.flags = 6;
+    winInfo.pixelMap = nullptr;
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    winInfo.id = 1;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::NORMAL;
+    winInfo.transform.push_back(100.5f);
+    winInfo.defaultHotAreas.push_back(rect);
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.pointerId = 150;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_004
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    DisplayInfo displayInfo;
+    WindowGroupInfo winGroupInfo;
+    WindowInfo winInfo;
+    Rect rect;
+    PointerEvent::PointerItem item;
+    displayInfo.id = 100;
+    displayInfo.x = 500;
+    displayInfo.y = 500;
+    pointerEvent->SetTargetDisplayId(-1);
+    pointerEvent->SetPointerId(150);
+    item.SetPointerId(150);
+    item.SetDisplayXPos(500);
+    item.SetDisplayYPos(500);
+    item.SetTargetWindowId(-1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_RUBBER);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(15.5f);
+    pointerEvent->bitwise_ = 0x00000000;
+    rect.x = 300;
+    rect.width = INT32_MAX;
+    winInfo.id = 50;
+    winInfo.defaultHotAreas.push_back(rect);
+    winInfo.uiExtentionWindowInfo.push_back(winInfo);
+    rect.x = 300;
+    rect.width = 1200;
+    rect.y = 300;
+    rect.height = 1200;
+    winInfo.id = 1;
+    winInfo.flags = 0;
+    winInfo.pixelMap = nullptr;
+    winInfo.windowInputType = WindowInputType::TRANSMIT_ALL;
+    winInfo.defaultHotAreas.clear();
+    winInfo.defaultHotAreas.push_back(rect);
+    winGroupInfo.windowsInfo.push_back(winInfo);
+    inputWindowsMgr.extraData_.appended = false;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
+    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
