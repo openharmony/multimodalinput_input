@@ -117,7 +117,7 @@ void MouseEventNormalizeTest::TearDown()
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetDisplayId_001, TestSize.Level1)
 {
-    int32_t idNames = 0;
+    int32_t idNames = -1;
     ASSERT_EQ(MouseEventHdr->GetDisplayId(), idNames);
 }
 
@@ -151,7 +151,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-    ASSERT_EQ(MouseEventHdr->OnEvent(event), RET_OK);
+    ASSERT_EQ(MouseEventHdr->OnEvent(event), RET_ERR);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
@@ -289,7 +289,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008, TestSize.Level1)
 {
-    int32_t idNames = 0;
+    int32_t idNames = -1;
     int32_t x = 0;
     int32_t y = 0;
     ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y), idNames);

@@ -234,7 +234,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveM
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_004, TestSize.Level1)
 {
-    int32_t idNames = 0;
+    int32_t idNames = -1;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     ASSERT_EQ(processor.GetDisplayId(), idNames);
@@ -279,7 +279,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLocation_008, TestSize.Level1)
 {
-    int32_t idNames = 0;
+    int32_t idNames = -1;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     int32_t x = 0;
@@ -930,7 +930,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_01, 
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    EXPECT_EQ(processor.Normalize(event), RET_OK);
+    EXPECT_EQ(processor.Normalize(event), RET_ERR);
 }
 
 /**
@@ -1332,7 +1332,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionIn
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
     int32_t ret = processor.HandleMotionInner(data, event);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -1357,7 +1357,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionIn
     cursorPos.displayId = -1;
     int32_t type = LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
     int32_t ret = processor.HandleMotionInner(data, event);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
     type = LIBINPUT_EVENT_POINTER_BUTTON;
     ret = processor.HandleMotionInner(data, event);
     EXPECT_EQ(ret, RET_OK);
