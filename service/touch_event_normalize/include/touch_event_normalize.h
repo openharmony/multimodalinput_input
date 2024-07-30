@@ -59,6 +59,8 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) const;
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadScrollRows(int32_t rows);
+    int32_t GetTouchpadScrollRows() const;
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(
