@@ -2579,7 +2579,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    const std::vector<WindowInfo> &windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -2610,7 +2610,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     double logicalX = physicalX + physicDisplayInfo->x;
     double logicalY = physicalY + physicDisplayInfo->y;
-    WindowInfo *touchWindow = nullptr;
+    const WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     bool isHotArea = false;
     bool isFirstSpecialWindow = false;
@@ -2658,7 +2658,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         if (targetWindowId >= 0) {
             bool isUiExtentionWindow = false;
-            GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, targetWindowId, &touchWindow, isUiExtentionWindow);
+            for (auto &windowinfo : item.uiExtentionWindowInfo) {
+                if (windowinfo.id == targetWindowId) {
+                    touchWindow = &windowinfo;
+                    isUiExtentionWindow = true;
+                    break;
+                }
+            }
             if (isUiExtentionWindow) {
                 break;
             }
@@ -2675,7 +2681,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 item.uiExtentionWindowInfo, windowId);
             bool isUiExtentionWindow = false;
             if (windowId > 0) {
-                GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, windowId, &touchWindow, isUiExtentionWindow);
+                for (auto &windowinfo : item.uiExtentionWindowInfo) {
+                  if (windowinfo.id == windowId) {
+                        touchWindow = &windowinfo;
+                        isUiExtentionWindow = true;
+                        break;
+                  }
+                }
             }
             if (isUiExtentionWindow) {
                 break;
