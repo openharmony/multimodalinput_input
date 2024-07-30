@@ -14,6 +14,8 @@
  */
 
 #include "display_event_monitor.h"
+#include "delegate_interface.h"
+#include "input_windows_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
@@ -70,6 +72,7 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
             MMI_HILOGD("Display screen locked");
             DISPLAY_MONITOR->SetScreenLocked(true);
+            DISPLAY_MONITOR->SendCancelEventWhenLock();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
             MMI_HILOGD("Display screen unlocked");
             DISPLAY_MONITOR->SetScreenLocked(false);
@@ -128,6 +131,15 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
 bool DisplayEventMonitor::IsCommonEventSubscriberInit()
 {
     return hasInit_;
+}
+
+void DisplayEventMonitor::SendCancelEventWhenLock()
+{
+    CHKPV(delegateProxy_);
+    delegateProxy_->OnPostSyncTask([] {
+        WIN_MGR->SendCancelEventWhenLock();
+        return RET_OK;
+    });
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
