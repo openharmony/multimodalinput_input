@@ -3680,6 +3680,10 @@ void InputWindowsManager::SendCancelEventWhenLock()
 {
     CALL_INFO_TRACE;
     CHKPV(lastTouchEventOnBackGesture_);
+    if (lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) {
+            return;
+    }
     lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     lastTouchEventOnBackGesture_->SetActionTime(GetSysClockTime());
     lastTouchEventOnBackGesture_->UpdateId();
