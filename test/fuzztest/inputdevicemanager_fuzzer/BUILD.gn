@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,9 +18,9 @@ import("../../../multimodalinput_mini.gni")
 module_output_path = "input/input"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("StubHandleAllocSocketFdFuzzTest") {
+ohos_fuzztest("InputDeviceManagerFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/stubhandleallocsocketfd_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/inputdevicemanager_fuzzer"
   include_dirs = [
     "${mmi_path}/interfaces/util/common/include",
     "${mmi_path}/service/connect_manager/include",
@@ -40,8 +40,8 @@ ohos_fuzztest("StubHandleAllocSocketFdFuzzTest") {
     "${mmi_path}/service/timer_manager/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/common/anco/comm/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/device_config/include",
   ]
   cflags = [
     "-g",
@@ -51,7 +51,7 @@ ohos_fuzztest("StubHandleAllocSocketFdFuzzTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
-  sources = [ "stubhandleallocsocketfd_fuzzer.cpp" ]
+  sources = [ "inputdevicemanager_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -81,7 +81,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":StubHandleAllocSocketFdFuzzTest",
+    ":InputDeviceManagerFuzzTest",
   ]
 }
 ###############################################################################

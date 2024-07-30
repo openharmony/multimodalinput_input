@@ -17,6 +17,7 @@ group("test") {
   testonly = true
 
   deps = [
+    "accountmanager_fuzzer:fuzztest",
     "addinputeventfilter_fuzzer:fuzztest",
     "addinterceptor_fuzzer:fuzztest",
     "addmonitor_fuzzer:fuzztest",
@@ -40,6 +41,7 @@ group("test") {
     "gettprightclicktype_fuzzer:fuzztest",
     "getwindowpid_fuzzer:fuzztest",
     "injectevent_fuzzer:fuzztest",
+    "inputdevicemanager_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "notifynaponline_fuzzer:fuzztest",
