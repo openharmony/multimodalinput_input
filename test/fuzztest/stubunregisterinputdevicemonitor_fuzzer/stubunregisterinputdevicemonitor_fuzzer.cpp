@@ -41,8 +41,8 @@ bool StubUnregisterInputDeviceMonitorFuzzTest(const uint8_t *data, size_t size)
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNREGISTER_DEV_MONITOR), datas, reply, option);
     return true;
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
