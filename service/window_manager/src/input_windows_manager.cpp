@@ -2682,11 +2682,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             bool isUiExtentionWindow = false;
             if (windowId > 0) {
                 for (auto &windowinfo : item.uiExtentionWindowInfo) {
-                  if (windowinfo.id == windowId) {
+                    if (windowinfo.id == windowId) {
                         touchWindow = &windowinfo;
                         isUiExtentionWindow = true;
                         break;
-                  }
+                    }
                 }
             }
             if (isUiExtentionWindow) {
