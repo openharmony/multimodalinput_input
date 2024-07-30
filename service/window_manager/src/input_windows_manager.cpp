@@ -420,6 +420,9 @@ void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEv
         if (item.id == focusWindowId) {
             keyEvent->SetTargetWindowId(item.id);
             keyEvent->SetAgentWindowId(item.agentWindowId);
+            if (item.privacyMode == SecureFlag::PRIVACY_MODE) {
+                keyEvent->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+            }
             return;
         }
     }
@@ -2775,6 +2778,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
+    if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
+            lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
+        }
+    }
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
@@ -3700,6 +3709,28 @@ void InputWindowsManager::ReverseXY(int32_t &x, int32_t &y)
     ReverseRotateScreen(displayGroupInfo_.displaysInfo.front(), x, y, matrix);
     x = static_cast<int32_t>(matrix.x);
     y = static_cast<int32_t>(matrix.y);
+}
+
+void InputWindowsManager::SendCancelEventWhenLock()
+{
+    CALL_INFO_TRACE;
+    CHKPV(lastTouchEventOnBackGesture_);
+    if (lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN) {
+            return;
+    }
+    lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    lastTouchEventOnBackGesture_->SetActionTime(GetSysClockTime());
+    lastTouchEventOnBackGesture_->UpdateId();
+    lastTouchEventOnBackGesture_->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    MMI_HILOGI("Screen locked, Send cancel event");
+    inputEventNormalizeHandler->HandleTouchEvent(lastTouchEventOnBackGesture_);
+    auto iter = touchItemDownInfos_.find(lastTouchEventOnBackGesture_->GetPointerId());
+    if (iter != touchItemDownInfos_.end()) {
+        iter->second.flag = false;
+    }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

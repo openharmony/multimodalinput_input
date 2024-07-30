@@ -15,6 +15,7 @@
 
 #include "delegate_interface.h"
 
+#include "display_event_monitor.h"
 #include "error_multimodal.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
@@ -28,6 +29,7 @@ namespace MMI {
 void DelegateInterface::Init()
 {
     TOUCH_DRAWING_MGR->SetDelegateProxy(shared_from_this());
+    DISPLAY_MONITOR->SetDelegateProxy(shared_from_this());
 }
 
 int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
