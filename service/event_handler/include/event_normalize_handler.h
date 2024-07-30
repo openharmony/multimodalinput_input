@@ -60,7 +60,7 @@ public:
     static std::string PopEventStr();
     static void WriteEventFile();
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    int32_t InitEventString(int32_t eventType);
+    std::string::size_type InitEventString(int32_t eventType);
     std::string ConvertKeyEventToStr(const std::shared_ptr<KeyEvent> keyEvent);
     std::string ConvertPointerEventToStr(const std::shared_ptr<PointerEvent> pointerEvent);
     std::string ConvertSwitchEventToStr(const std::shared_ptr<SwitchEvent> switchEvent);

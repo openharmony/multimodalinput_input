@@ -129,7 +129,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
     }
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
-    int32_t eventStrLen = InitEventString(static_cast<int32_t>(type));
+    std::string::size_type eventStrLen = InitEventString(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -783,7 +783,7 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
     }
 }
 
-int32_t EventNormalizeHandler::InitEventString(int32_t eventType)
+std::string::size_type EventNormalizeHandler::InitEventString(int32_t eventType)
 {
     auto nowTime = std::chrono::system_clock::now();
     std::time_t timeT = std::chrono::system_clock::to_time_t(nowTime);
@@ -825,8 +825,7 @@ std::string EventNormalizeHandler::ConvertPointerEventToStr(const std::shared_pt
 {
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
-        !EventLogHelper::IsBetaVersion()) {
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
         MMI_HILOGD("PointEvent is filtered");
         return "";
     }
