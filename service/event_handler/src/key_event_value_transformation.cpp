@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -124,7 +124,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {201, {"KEY_MEDIA_PAUSE", 201, 2086, HOS_KEY_MEDIA_PAUSE}},
     {160, {"KEY_MEDIA_CLOSE", 160, 2087, HOS_KEY_MEDIA_CLOSE}},
     {161, {"KEY_MEDIA_EJECT", 161, 2088, HOS_KEY_MEDIA_EJECT}},
-    {167, {"KEY_MEDIA_RECORD", 167, 2089, HOS_KEY_MEDIA_RECORD}},
+    {597, {"KEY_MEDIA_RECORD", 597, 2089, HOS_KEY_MEDIA_RECORD}},
     {59, {"KEY_F1", 59, 2090, HOS_KEY_F1}},
     {60, {"KEY_F2", 60, 2091, HOS_KEY_F2}},
     {61, {"KEY_F3", 61, 2092, HOS_KEY_F3}},
@@ -224,7 +224,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {224, {"KEY_BRIGHTNESS_DOWN", 224, 41, HOS_KEY_BRIGHTNESS_DOWN}},
     {355, {"KEY_CLEAR", 355, 5, HOS_KEY_CLEAR}},
     {528, {"KEY_FOCUS", 528, 7, HOS_KEY_FOCUS}},
-    {217, {"KEY_SEARCH", 217, 9, HOS_KEY_SEARCH}},
+    {594, {"KEY_SEARCH", 594, 9, HOS_KEY_SEARCH}},
     {164, {"KEY_MEDIA_PLAY_PAUSE", 164, 10, HOS_KEY_MEDIA_PLAY_PAUSE}},
     {166, {"KEY_MEDIA_STOP", 166, 11, HOS_KEY_MEDIA_STOP}},
     {163, {"KEY_MEDIA_NEXT", 163, 12, HOS_KEY_MEDIA_NEXT}},
@@ -355,7 +355,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {579, {"KEY_CONTROLPANEL", 579, 2719, HOS_KEY_CONTROLPANEL}},
     {580, {"KEY_APPSELECT", 580, 2720, HOS_KEY_APPSELECT}},
     {581, {"KEY_SCREENSAVER", 581, 2721, HOS_KEY_SCREENSAVER}},
-    {583, {"KEY_ASSISTANT", 583, 2722, HOS_KEY_ASSISTANT}},
+    {251, {"KEY_ASSISTANT", 251, 2722, HOS_KEY_ASSISTANT}},
     {584, {"KEY_KBD_LAYOUT_NEXT", 584, 2723, HOS_KEY_KBD_LAYOUT_NEXT}},
     {592, {"KEY_BRIGHTNESS_MIN", 592, 2724, HOS_KEY_BRIGHTNESS_MIN}},
     {593, {"KEY_BRIGHTNESS_MAX", 593, 2725, HOS_KEY_BRIGHTNESS_MAX}},
@@ -399,7 +399,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {204, {"KEY_DASHBOARD", 204, 2830, HOS_KEY_DASHBOARD}},
     {205, {"KEY_SUSPEND", 205, 2831, HOS_KEY_SUSPEND}},
     {211, {"KEY_HP", 211, 2832, HOS_KEY_HP}},
-    {213, {"KEY_SOUND", 213, 2833, HOS_KEY_SOUND}},
+    {249, {"KEY_SOUND", 249, 2833, HOS_KEY_SOUND}},
     {214, {"KEY_QUESTION", 214, 2834, HOS_KEY_QUESTION}},
     {215, {"KEY_AT", 215, 2065, HOS_KEY_AT}},
     {218, {"KEY_CONNECT", 218, 2836, HOS_KEY_CONNECT}},
@@ -407,7 +407,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {221, {"KEY_SHOP", 221, 2838, HOS_KEY_SHOP}},
     {222, {"KEY_ALTERASE", 222, 2839, HOS_KEY_ALTERASE}},
     {226, {"KEY_HEADSETHOOK", 226, 6, HOS_KEY_HEADSETHOOK}},
-    {227, {"KEY_SWITCHVIDEOMODE", 227, 2841, HOS_KEY_SWITCHVIDEOMODE}},
+    {595, {"KEY_SWITCHVIDEOMODE", 595, 2841, HOS_KEY_SWITCHVIDEOMODE}},
     {236, {"KEY_BATTERY", 236, 2842, HOS_KEY_BATTERY}},
     {237, {"KEY_BLUETOOTH", 237, 2843, HOS_KEY_BLUETOOTH}},
     {238, {"KEY_WLAN", 238, 2844, HOS_KEY_WLAN}},
