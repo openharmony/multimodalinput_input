@@ -83,6 +83,8 @@ public:
     static void GetTouchpadSwipeSwitch(bool &switchFlag);
     static int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     static void GetTouchpadRotateSwitch(bool &rotateSwitch);
+    static int32_t SetTouchpadScrollRows(int32_t rows);
+    static int32_t GetTouchpadScrollRows();
 
 private:
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
