@@ -41,7 +41,7 @@ ohos_fuzztest("InputDeviceManagerFuzzTest") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/device_manager/include",
-    "${mmi_path}/service/device_config/include"
+    "${mmi_path}/service/device_config/include",
   ]
   cflags = [
     "-g",
