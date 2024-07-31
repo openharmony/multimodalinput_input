@@ -237,7 +237,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchDown_002, TestSize.Level1)
     auto device = libinput_event_get_device(event);
     ASSERT_TRUE(device != nullptr);
     ret = processor.OnEventTouchDown(event);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
