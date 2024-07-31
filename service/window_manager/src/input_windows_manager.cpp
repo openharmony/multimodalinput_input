@@ -2150,8 +2150,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    const std::vector<WindowInfo>& windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
-    UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicalDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
