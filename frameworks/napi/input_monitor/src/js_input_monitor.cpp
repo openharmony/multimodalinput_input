@@ -51,6 +51,7 @@ constexpr int32_t FOUR_FINGERS { 4 };
 constexpr int32_t GESTURE_BEGIN { 1 };
 constexpr int32_t GESTURE_UPDATE { 2 };
 constexpr int32_t GESTURE_END { 3 };
+const std::string INVALID_TYPE_NAME { "" };
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 constexpr int32_t FINGERPRINT_DOWN { 0 };
 constexpr int32_t FINGERPRINT_UP { 1 };
@@ -199,21 +200,19 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(mutex_);
-        auto monitor = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_);
-        if (monitor == nullptr) {
+        auto typeName = JS_INPUT_MONITOR_MGR.GetMonitorTypeName(id_, fingers_);
+        if (typeName == INVALID_TYPE_NAME) {
             MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
             return;
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "touch") {
+            if (typeName  != "touch") {
                 return;
             }
             SetConsumeState(pointerEvent);
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "mouse" &&
-                JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "pinch" &&
-                JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "rotate") {
+            if (typeName != "mouse" && typeName != "pinch" && typeName != "rotate") {
                 return;
             }
             SetConsumeState(pointerEvent);
