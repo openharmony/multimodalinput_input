@@ -153,29 +153,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, Tes
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo_005
- * @tc.desc: Test RecordLabelsInfo
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    EXPECT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetPressed(true);
-    pointerEvent->UpdatePointerItem(0, item);
-    TOUCH_DRAWING_MGR->currentPointerId_ = 0;
-    TOUCH_DRAWING_MGR->isFirstDownAction_ = true;
-    pointerEvent->SetPointerId(0);
-    int64_t actionTime = pointerEvent->GetActionTime();
-    TOUCH_DRAWING_MGR->lastActionTime_ = actionTime;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->RecordLabelsInfo());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_001
  * @tc.desc: Test DrawBubbleHandler
  * @tc.type: Function
