@@ -184,6 +184,19 @@ const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t 
     return nullptr;
 }
 
+std::string JsInputMonitorManager::GetMonitorTypeName(int32_t id, int32_t fingers)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if ((item != nullptr) && (item->GetId() == id && item->GetFingers() == fingers)) {
+            return item->GetTypeName();
+        }
+    }
+    MMI_HILOGD("No monitor found");
+    return "";
+}
+
 bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
 {
     CALL_DEBUG_ENTER;
