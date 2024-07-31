@@ -2613,5 +2613,19 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool isSkip = true;
+    READBOOL(data, isSkip, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SkipPointerLayer(isSkip);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

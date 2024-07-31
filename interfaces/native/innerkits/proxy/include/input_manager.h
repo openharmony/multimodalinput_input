@@ -932,6 +932,8 @@ public:
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
 
+    int32_t SkipPointerLayer(bool isSkip);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

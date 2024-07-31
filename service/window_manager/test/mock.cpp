@@ -349,6 +349,10 @@ void PointerDrawingManager::InitPointerObserver()
 {}
 void PointerDrawingManager::OnSessionLost(int pid)
 {}
+int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
+{
+    return 0;
+}
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()

@@ -1998,6 +1998,15 @@ void PointerDrawingManager::RotateDegree(Direction direction)
     surfaceNode_->SetRotation(degree);
 }
 
+int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
+{
+    CALL_INFO_TRACE;
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetSkipLayer(isSkip);
+    }
+    return RET_OK;
+}
+
 void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
