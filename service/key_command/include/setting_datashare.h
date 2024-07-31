@@ -50,7 +50,7 @@ private:
     static std::shared_ptr<SettingDataShare> instance_;
     static std::mutex mutex_;
     static sptr<IRemoteObject> remoteObj_;
-    bool isDataShareReady_ = false;    
+    bool isDataShareReady_ = false;
 
     static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &strUri);
     static bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper>& helper);
