@@ -45,6 +45,9 @@ constexpr int32_t FINGER_TAP_THREE { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
+constexpr int32_t MIN_ROWS { 1 };
+constexpr int32_t MAX_ROWS { 100 };
+constexpr int32_t DEFAULT_ROWS { 3 };
 
 const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 std::string THREE_FINGER_TAP_KEY = "touchpadThreeFingerTap";
@@ -571,6 +574,25 @@ void TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     std::string name = "touchpadRotate";
     GetConfigDataFromDatabase(name, rotateSwitch);
+}
+
+int32_t TouchPadTransformProcessor::SetTouchpadScrollRows(int32_t rows)
+{
+    CALL_DEBUG_ENTER;
+    int32_t newRows = std::clamp(rows, MIN_ROWS, MAX_ROWS);
+    std::string name = "touchpadScrollRows";
+    int32_t ret = PREFERENCES_MGR->SetIntValue(name, TOUCHPAD_FILE_NAME, newRows);
+    MMI_HILOGD("Set touchpad scroll rows successfully, rows:%{public}d", newRows);
+    return ret;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadScrollRows()
+{
+    CALL_DEBUG_ENTER;
+    std::string name = "touchpadScrollRows";
+    int32_t rows = PREFERENCES_MGR->GetIntValue(name, DEFAULT_ROWS);
+    MMI_HILOGD("Get touchpad scroll rows successfully, rows:%{public}d", rows);
+    return rows;
 }
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
