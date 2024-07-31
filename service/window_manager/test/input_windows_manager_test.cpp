@@ -5303,5 +5303,37 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckFoldChange_001
+ * @tc.desc: Test CheckFoldChange
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFoldChange_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckFoldChange(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckFoldChange(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
+ * @tc.desc: Test OnFoldStatusChanged
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnFoldStatusChanged(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
