@@ -481,9 +481,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
-    if (data == nullptr) {
-        return false;
-    }
     CHKPF(pointerEvent_);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
@@ -499,12 +496,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
-    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
-        MMI_HILOGD("ToolType is touchpad");
-    } else {
-        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
-    }
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
     pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
@@ -520,6 +511,15 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+    if (data == nullptr) {
+        return false;
+    }
+    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+        MMI_HILOGD("ToolType is touchpad");
+    } else {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    }
     return true;
 }
 
@@ -598,6 +598,7 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     PointerEvent::PointerItem pointerItem;
     if (!HandlePostInner(data, pointerItem)) {
         CHKPL(pointerEvent_);
+        WIN_MGR->UpdateTargetPointer(pointerEvent_);
         return ERROR_NULL_POINTER;
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
