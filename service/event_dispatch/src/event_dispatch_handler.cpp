@@ -283,7 +283,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     }
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
         pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
-        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d", sess->GetProgramName().c_str(), sess->GetPid());
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d, action:%{public}d",
+            sess->GetProgramName().c_str(), sess->GetPid(), pointerEvent->GetPointerAction());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
