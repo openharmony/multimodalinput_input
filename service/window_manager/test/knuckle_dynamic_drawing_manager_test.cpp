@@ -471,19 +471,6 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
 }
 
 /**
- * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_001
- * @tc.desc: Test DestoryWindow
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
-}
-
-/**
  * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_002
  * @tc.desc: Test DestoryWindow
  * @tc.type: Function

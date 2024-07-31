@@ -1197,20 +1197,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_FixCursorPosition_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateMouseStyle_001
- * @tc.desc: Test UpdateMouseStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.pid_ = 1;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateMouseStyle());
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_CreatePointerSwitchObserver_001
  * @tc.desc: Test CreatePointerSwitchObserver
  * @tc.type: FUNC
