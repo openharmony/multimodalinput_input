@@ -32,6 +32,9 @@ int32_t g_moduleType = 3;
 int32_t g_pid = 0;
 int32_t g_writeFd = -1;
 constexpr size_t MAX_EVENTIDS_SIZE = 1001;
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 } // namespace
 
 class EventMonitorHandlerTest : public testing::Test {
@@ -265,6 +268,74 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_001, TestS
 }
 
 /**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_002
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+
+    NapProcess::GetInstance()->napClientPid_ = ACTIVE_EVENT;
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = 2;
+    napData.uid = 3;
+    napData.bundleName = "programName";
+    EXPECT_FALSE(NapProcess::GetInstance()->IsNeedNotify(napData));
+    bool ret = eventMonitorHandler.monitors_.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_003
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+
+    NapProcess::GetInstance()->napClientPid_ = REMOVE_OBSERVER;
+    bool ret = eventMonitorHandler.monitors_.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_HandleEvent_004
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_HandleEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sessionHandler { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sessionHandler);
+
+    NapProcess::GetInstance()->napClientPid_ = UNOBSERVED;
+    bool ret = eventMonitorHandler.monitors_.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: EventMonitorHandlerTest_Monitor
  * @tc.desc: Test Monitor
  * @tc.type: FUNC
@@ -295,6 +366,49 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor, TestSize.Leve
     pointerEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_FINGERPRINT);
     EventMonitorHandler::SessionHandler sesshdl { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
     eventMonitorHandler.monitors_.monitors_.insert(sesshdl);
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_Monitor_01
+ * @tc.desc: Test Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_Monitor_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetButtonId(1);
+    pointerEvent->SetFingerCount(2);
+    pointerEvent->SetZOrder(100);
+    pointerEvent->SetDispatchTimes(1000);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_FINGERPRINT);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    EventMonitorHandler::SessionHandler sess { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_NONE, session };
+    eventMonitorHandler.monitors_.monitors_.insert(sess);
+
+    NapProcess::GetInstance()->napClientPid_ = ACTIVE_EVENT;
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = 2;
+    napData.uid = 3;
+    napData.bundleName = "programName";
+    EXPECT_FALSE(NapProcess::GetInstance()->IsNeedNotify(napData));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
+
+    NapProcess::GetInstance()->napClientPid_ = REMOVE_OBSERVER;
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
+
+    NapProcess::GetInstance()->napClientPid_ = UNOBSERVED;
     ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.monitors_.Monitor(pointerEvent));
 }
 

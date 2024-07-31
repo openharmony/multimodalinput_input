@@ -812,8 +812,6 @@ group("TouchEventNormalizeTests") {
   testonly = true
 
   deps = [
-    ":GestureTransformTest",
-    ":TabletToolTranformTest",
     ":TouchEventNormalizeTest",
     ":TouchPadTransformProcessorMockTest",
     ":TransformPointTest",

@@ -2150,7 +2150,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    const std::vector<WindowInfo>& windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicalDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -2465,7 +2465,7 @@ bool InputWindowsManager::IsNavigationWindowInjectEvent(std::shared_ptr<PointerE
 }
 
 void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
-    std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
+    const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo)
 {
     CHKPV(pointerEvent);
     bool isNavigationWindow = false;
@@ -2549,7 +2549,7 @@ void InputWindowsManager::DispatchUIExtentionPointerEvent(int32_t logicalX, int3
     std::shared_ptr<PointerEvent> pointerEvent)
 {
     auto displayId = pointerEvent->GetTargetDisplayId();
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    const std::vector<WindowInfo> &windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     auto windowId = pointerEvent->GetTargetWindowId();
     for (const auto& item : windowsInfo) {
         if (windowId == item.id) {
@@ -2582,7 +2582,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
+    const std::vector<WindowInfo> &windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -2613,7 +2613,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     double logicalX = physicalX + physicDisplayInfo->x;
     double logicalY = physicalY + physicDisplayInfo->y;
-    WindowInfo *touchWindow = nullptr;
+    const WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     bool isHotArea = false;
     bool isFirstSpecialWindow = false;
@@ -2661,7 +2661,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         if (targetWindowId >= 0) {
             bool isUiExtentionWindow = false;
-            GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, targetWindowId, &touchWindow, isUiExtentionWindow);
+            for (auto &windowinfo : item.uiExtentionWindowInfo) {
+                if (windowinfo.id == targetWindowId) {
+                    touchWindow = &windowinfo;
+                    isUiExtentionWindow = true;
+                    break;
+                }
+            }
             if (isUiExtentionWindow) {
                 break;
             }
@@ -2678,7 +2684,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 item.uiExtentionWindowInfo, windowId);
             bool isUiExtentionWindow = false;
             if (windowId > 0) {
-                GetUIExtentionWindowInfo(item.uiExtentionWindowInfo, windowId, &touchWindow, isUiExtentionWindow);
+                for (auto &windowinfo : item.uiExtentionWindowInfo) {
+                    if (windowinfo.id == windowId) {
+                        touchWindow = &windowinfo;
+                        isUiExtentionWindow = true;
+                        break;
+                    }
+                }
             }
             if (isUiExtentionWindow) {
                 break;
