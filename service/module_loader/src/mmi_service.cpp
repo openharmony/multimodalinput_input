@@ -1479,7 +1479,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
             IPointerDrawingManager::GetInstance()->InitPointerObserver();
         }
-    }    
+    }
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
