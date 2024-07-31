@@ -137,7 +137,7 @@ bool KnuckleDrawingManager::IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEv
     CHKPF(touchEvent);
     int32_t touchAction = touchEvent->GetPointerAction();
     if (touchAction == PointerEvent::POINTER_ACTION_DOWN) {
-        pointerNum = 0;
+        pointerNum_ = 0;
         firstDownTime_ = touchEvent->GetActionTime();
         int64_t intervalTime = touchEvent->GetActionTime() - lastUpTime_;
         bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
@@ -320,7 +320,7 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
     pointerInfo.x = pointerItem.GetDisplayX();
     pointerInfo.y = pointerItem.GetDisplayY();
     pointerInfos_.push_back(pointerInfo);
-    pointerNum++;
+    pointerNum_++;
 
     if (pointerInfos_.size() == MAX_POINTER_NUM) {
         pointerInfos_[POINT_INDEX3].x = (pointerInfos_[POINT_INDEX2].x + pointerInfos_[POINT_INDEX4].x) / MID_POINT;
@@ -347,8 +347,7 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,
             pointerInfos_[POINT_INDEX3].x, pointerInfos_[POINT_INDEX3].y);
         pointerInfos_.erase(pointerInfos_.begin(), pointerInfos_.begin() + POINT_INDEX3);
-        if (pointerNum < POINTER_NUMBER_TO_DRAW) {
-            canvasNode_->FinishRecording();
+        if (pointerNum_ < POINTER_NUMBER_TO_DRAW) {
             return RET_ERR;
         }
 #ifndef USE_ROSEN_DRAWING

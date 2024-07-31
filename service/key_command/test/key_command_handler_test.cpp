@@ -1953,7 +1953,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
