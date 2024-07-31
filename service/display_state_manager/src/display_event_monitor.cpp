@@ -16,6 +16,9 @@
 #include "display_event_monitor.h"
 #include "delegate_interface.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
+#include "setting_datashare.h"
+#include "system_ability_definition.h"
 
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
 #include "stylus_key_handler.h"
@@ -76,6 +79,10 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
             MMI_HILOGD("Display screen unlocked");
             DISPLAY_MONITOR->SetScreenLocked(false);
+        } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+            if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+                IPointerDrawingManager::GetInstance()->InitPointerObserver();
+            }
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
         }
@@ -123,6 +130,7 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));
