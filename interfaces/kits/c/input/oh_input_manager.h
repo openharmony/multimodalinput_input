@@ -37,6 +37,7 @@
 
 #include <stdint.h>
 
+#include "oh_axis_type.h"
 #include "oh_key_code.h"
 
 #ifdef __cplusplus
@@ -48,7 +49,7 @@ extern "C" {
  *
  * @since 12
  */
-enum Input_KeyStateAction {
+typedef enum {
     /** Default */
     KEY_DEFAULT = -1,
     /** Pressing of a key */
@@ -59,7 +60,7 @@ enum Input_KeyStateAction {
     KEY_SWITCH_ON = 2,
     /** Key switch disabled */
     KEY_SWITCH_OFF = 3
-};
+} Input_KeyStateAction;
 
 /**
  * @brief Enumerates key event types.
@@ -151,31 +152,38 @@ typedef enum {
  *
  * @since 12
  */
-struct Input_KeyState;
+typedef struct Input_KeyState Input_KeyState;
 
 /**
  * @brief The key event to be injected.
  *
  * @since 12
  */
-struct Input_KeyEvent;
+typedef struct Input_KeyEvent Input_KeyEvent;
 
 /**
  * @brief The mouse event to be injected.
  *
  * @since 12
  */
-struct Input_MouseEvent;
+typedef struct Input_MouseEvent Input_MouseEvent;
 
 /**
  * @brief The touch event to be injected.
  *
  * @since 12
  */
-struct Input_TouchEvent;
+typedef struct Input_TouchEvent Input_TouchEvent;
 
 /**
- * @brief Enumerates the error codes.
+ * @brief Enumerates axis events.
+ *
+ * @since 12
+ */
+typedef struct Input_AxisEvent Input_AxisEvent;
+
+/**
+ * @brief Enumerates error codes.
  *
  * @since 12
  */
@@ -187,8 +195,60 @@ typedef enum {
     /** Non-system application */
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
-    INPUT_PARAMETER_ERROR = 401
+    INPUT_PARAMETER_ERROR = 401,
+    /** Service error */
+    INPUT_SERVICE_EXCEPTION = 3800001,
+    /** Interceptor repeatedly created for an application */
+    INPUT_REPEAT_INTERCEPTOR = 4200001
 } Input_Result;
+
+/**
+ * @brief Defines a lifecycle callback for **keyEvent**.
+ * If the callback is triggered, **keyEvent** will be destroyed.
+ * @since 12
+ */
+typedef void (*Input_KeyEventCallback)(const Input_KeyEvent* keyEvent);
+
+/**
+ * @brief Defines a lifecycle callback for **mouseEvent**.
+ * If the callback is triggered, **mouseEvent** will be destroyed.
+ * @since 12
+ */
+typedef void (*Input_MouseEventCallback)(const Input_MouseEvent* mouseEvent);
+
+/**
+ * @brief Defines a lifecycle callback for **touchEvent**.
+ * If the callback is triggered, **touchEvent** will be destroyed.
+ * @since 12
+ */
+typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
+
+/**
+ * @brief Defines a lifecycle callback for **axisEvent**.
+ * If the callback is triggered, **axisEvent** will be destroyed.
+ * @since 12
+ */
+typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
+
+/**
+ * @brief Defines the structure for the interceptor of event callbacks,
+ * including mouseCallback, touchCallback, and axisCallback.
+ * @since 12
+ */
+typedef struct Input_InterceptorEventCallback {
+    /** Defines a lifecycle callback for **mouseEvent**. */
+    Input_MouseEventCallback mouseCallback;
+    /** Defines a lifecycle callback for **touchEvent**. */
+    Input_TouchEventCallback touchCallback;
+    /** Defines a lifecycle callback for **axisEvent**. */
+    Input_AxisEventCallback axisCallback;
+} Input_InterceptorEventCallback;
+
+/**
+ * @brief Defines event interceptor options.
+ * @since 12
+ */
+typedef struct Input_InterceptorOptions Input_InterceptorOptions;
 
 /**
  * @brief Queries the key state.
@@ -681,6 +741,431 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
  */
 void OH_Input_CancelInjection();
 
+/**
+ * @brief Creates an axis event object.
+ *
+ * @return If the operation is successful, a {@Link Input_AxisEvent} object is returned.
+ * If the operation fails, null is returned.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_AxisEvent* OH_Input_CreateAxisEvent(void);
+
+/**
+ * @brief Destroys an axis event object.
+ * 
+ * @param axisEvent Pointer to the axis event object.
+ * @return OH_Input_DestroyAxisEvent function result code.
+ *         {@link INPUT_SUCCESS} Destroys axisEvent success.\n
+ *         {@link INPUT_PARAMETER_ERROR}The axisEvent is NULL or the *axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_DestroyAxisEvent(Input_AxisEvent** axisEvent);
+
+/**
+ * @brief Sets the axis event action.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param action Axis event action. The values are defined in {@link InputEvent_AxisAction}.
+ * @return OH_Input_SetAxisEventAction function result code.
+ *         {@link INPUT_SUCCESS} Sets the axis event action success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventAction(Input_AxisEvent* axisEvent, InputEvent_AxisAction action);
+
+/**
+ * @brief Obtains the axis event action.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param action Axis event action. The values are defined in {@link InputEvent_AxisAction}.
+ * @return OH_Input_GetAxisEventAction function result code.
+ *         {@link INPUT_SUCCESS} Obtains the axis event action success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the action is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventAction(const Input_AxisEvent* axisEvent, InputEvent_AxisAction *action);
+
+/**
+ * @brief Sets the X coordinate of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param displayX X coordinate of the axis event.
+ * @return OH_Input_SetAxisEventDisplayX function result code.
+ *         {@link INPUT_SUCCESS} Sets the X coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventDisplayX(Input_AxisEvent* axisEvent, float displayX);
+
+/**
+ * @brief Obtains the X coordinate of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param displayX X coordinate of the axis event.
+ * @return OH_Input_GetAxisEventDisplayX function result code.
+ *         {@link INPUT_SUCCESS} Obtains the X coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the displayX is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventDisplayX(const Input_AxisEvent* axisEvent, float* displayX);
+
+/**
+ * @brief Sets the Y coordinate of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param displayY Y coordinate of the axis event.
+ * @return OH_Input_SetAxisEventDisplayY function result code.
+ *         {@link INPUT_SUCCESS} Sets the Y coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventDisplayY(Input_AxisEvent* axisEvent, float displayY);
+
+/**
+ * @brief Obtains the Y coordinate of an axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param displayY Y coordinate of the axis event.
+ * @return OH_Input_GetAxisEventDisplayY function result code.
+ *         {@link INPUT_SUCCESS} Obtains the Y coordinate of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the displayY is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventDisplayY(const Input_AxisEvent* axisEvent, float* displayY);
+
+/**
+ * @brief Sets the axis value of the axis type specified by the axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param axisType Axis type. The values are defined in {@link InputEvent_AxisType}.
+ * @param axisValue Axis value.
+ * @return OH_Input_SetAxisEventAxisValue function result code.
+ *         {@link INPUT_SUCCESS} Sets the axis value of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventAxisValue(Input_AxisEvent* axisEvent,
+                                            InputEvent_AxisType axisType, double axisValue);
+
+/**
+ * @brief Obtains the axis value for the specified axis type of the axis event.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param axisType Axis type. The values are defined in {@link InputEvent_AxisType}.
+ * @param axisValue Axis value.
+ * @return OH_Input_GetAxisEventAxisValue function result code.
+ *         {@link INPUT_SUCCESS} Obtains the axis value of the axis event success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the axisValue is NULL,
+ *         or the axisType not found in the axisEvent.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventAxisValue(const Input_AxisEvent* axisEvent,
+                                            InputEvent_AxisType axisType, double* axisValue);
+
+/**
+ * @brief Sets the time when an axis event occurs.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param actionTime Time when an axis event occurs.
+ * @return OH_Input_SetAxisEventActionTime function result code.
+ *         {@link INPUT_SUCCESS} Sets the time when an axis event occurs success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventActionTime(Input_AxisEvent* axisEvent, int64_t actionTime);
+
+/**
+ * @brief Obtains the time when an axis event occurs.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param actionTime Time when an axis event occurs.
+ * @return OH_Input_GetAxisEventActionTime function result code.
+ *         {@link INPUT_SUCCESS} Obtains the time when an axis event occurs success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the actionTime is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventActionTime(const Input_AxisEvent* axisEvent, int64_t* actionTime);
+
+/**
+ * @brief Sets the axis event type.
+ *
+ * @param axisEvent Axis event object. For details, see {@Link Input_AxisEvent}.
+ * @param axisEventType Axis event type. The values are defined in {@link InputEvent_AxisEventType}.
+ * @return OH_Input_SetAxisEventType function result code.
+ *         {@link INPUT_SUCCESS} Sets the axis event type success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventType(Input_AxisEvent* axisEvent, InputEvent_AxisEventType axisEventType);
+
+/**
+ * @brief Obtains the axis event type.
+ *
+ * @param axisEvent Axis event object.
+ * @param axisEventType Axis event type. The values are defined in {@link InputEvent_AxisEventType}.
+ * @return OH_Input_GetAxisEventType function result code.
+ *         {@link INPUT_SUCCESS} Obtains the axis event type success.\n
+ *         {@Link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the axisEventType is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventType(const Input_AxisEvent* axisEvent, InputEvent_AxisEventType* axisEventType);
+
+/**
+ * @brief Sets the axis event source type.
+ *
+ * @param axisEvent Axis event object.
+ * @param sourceType Axis event source type. The values are defined in {@link InputEvent_SourceType}.
+ * @return OH_Input_SetAxisEventSourceType function result code.
+ *         {@link INPUT_SUCCESS} Sets the axis event source type success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventSourceType(Input_AxisEvent* axisEvent, InputEvent_SourceType sourceType);
+
+/**
+ * @brief Obtains the axis event source type.
+ *
+ * @param axisEvent Axis event object.
+ * @param axisEventType Axis event source type. The values are defined in {@link InputEvent_SourceType}.
+ * @return OH_Input_GetAxisEventSourceType function result code.
+ *         {@link INPUT_SUCCESS} Obtains the axis event source type success.\n
+ *         {@link INPUT_PARAMETER_ERROR} The axisEvent is NULL or the sourceType is NULL.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, InputEvent_SourceType* sourceType);
+
+/**
+ * @brief Adds a listener of key events.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback used to receive key events.
+ * @return OH_Input_AddKeyEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Adds a listener of key events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback);
+
+/**
+ * @brief Adds a listener for mouse events, including mouse click and movement events,
+ * but not scroll wheel events. Scroll wheel events are axis events.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback used to receive mouse events.
+ * @return OH_Input_AddMouseEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Adds a listener of mouse events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback);
+
+/**
+ * @brief Add a listener for touch events.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback used to receive touch events.
+ * @return OH_Input_AddTouchEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Adds a listener of touch events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback);
+
+/**
+ * @brief Adds a listener for all types of axis events.
+ * The axis event types are defined in {@Link InputEvent_AxisEventType}.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback used to receive axis events.
+ * @return OH_Input_AddAxisEventMonitorForAll function result code.
+ *         {@link INPUT_SUCCESS} Adds a listener for all types of axis events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddAxisEventMonitorForAll(Input_AxisEventCallback callback);
+
+/**
+ * @brief Adds a listener for the specified type of axis events.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param axisEventType - Axis event type. The values are defined in {@Link InputEvent_AxisEventType}.
+ * @param callback - Callback used to receive the specified type of axis events.
+ * @return OH_Input_AddAxisEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Adds a listener for the specified types of axis events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback);
+
+/**
+ * @brief Removes a key event listener.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback for the key event listener.
+ * @return OH_Input_RemoveKeyEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Removes a key event listener success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL or has not been added.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Fail to remove the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback);
+
+/**
+ * @brief Removes a mouse event listener.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback for the mouse event listener.
+ * @return OH_Input_RemoveMouseEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Removes a mouse event listener success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL or has not been added.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Fail to remove the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback);
+
+/**
+ * @brief Removes a touch event listener.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback for the touch event listener.
+ * @return OH_Input_RemoveTouchEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Removes a touch event listener success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL or has not been added.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Fail to remove the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback);
+
+/**
+ * @brief Removes the listener for all types of axis events.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - Callback for the listener used to listen for all types of axis events.
+ * @return OH_Input_RemoveAllAxisEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Removes the listener for all types of axis events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL or has not been added.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Fail to remove the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveAllAxisEventMonitor(Input_AxisEventCallback callback);
+
+/**
+ * @brief Removes the listener for the specified type of axis events.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param axisEventType - Axis event type. The axis event type is defined in {@Link InputEvent_AxisEventType}.
+ * @param callback - Callback for the listener used to listen for the specified type of axis events.
+ * @return OH_Input_RemoveAxisEventMonitor function result code.
+ *         {@link INPUT_SUCCESS} Removes the listener for the specified type of axis events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL or has not been added.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Fail to remove the monitor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback);
+
+/**
+ * @brief Adds a key event interceptor. If multiple interceptors are added, only the first one takes effect.
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @param callback - Callback used to receive key events.
+ * @param option - Options for event interception. If **null** is passed, the default value is used.
+ * @return OH_Input_AddKeyEventInterceptor function result code.
+ *         {@link INPUT_SUCCESS} Adds a key event interceptor success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_REPEAT_INTERCEPTOR} Interceptor repeatedly created for an application.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the interceptor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback, Input_InterceptorOptions *option);
+
+/**
+ * @brief Adds an interceptor for input events, including mouse, touch, and axis events.
+ * If multiple interceptors are added, only the first one takes effect.
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @param callback - Pointer to the structure of the callback for the input event interceptor.
+ * For details, see {@Link Input_InterceptorEventCallback}.
+ * @param option - Options for event interception. If **null** is passed, the default value is used.
+ * @return OH_Input_AddInputEventInterceptor function result code.
+ *         {@link INPUT_SUCCESS} Adds an interceptor for input events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_PARAMETER_ERROR} The callback is NULL.\n
+ *         {@link INPUT_REPEAT_INTERCEPTOR} Interceptor repeatedly created for an application.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to add the interceptor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *callback,
+                                               Input_InterceptorOptions *option);
+
+/**
+ * @brief Removes a key event interceptor.
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @return OH_Input_RemoveKeyEventInterceptor function result code.
+ *         {@link INPUT_SUCCESS}Removes a key event interceptor success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to remove the interceptor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveKeyEventInterceptor();
+
+/**
+ * @brief Removes an interceptor for input events, including mouse, touch, and axis events.
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @return OH_Input_RemoveInputEventInterceptor function result code.
+ *         {@link INPUT_SUCCESS} Removes an interceptor for input events success.\n
+ *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
+ *         {@link INPUT_SERVICE_EXCEPTION} Failed to remove the interceptor because the service is exception.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveInputEventInterceptor();
 #ifdef __cplusplus
 }
 #endif

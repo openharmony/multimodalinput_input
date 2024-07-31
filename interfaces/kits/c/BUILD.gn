@@ -18,6 +18,7 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 ohos_ndk_headers("ohinput_header") {
   dest_dir = "$ndk_headers_out_dir/multimodalinput"
   sources = [
+    "./input/oh_axis_type.h",
     "./input/oh_input_manager.h",
     "./input/oh_key_code.h",
   ]
@@ -29,6 +30,7 @@ ohos_ndk_library("libohinput_ndk") {
   ndk_description_file = "./ohinput.ndk.json"
   system_capability = "SystemCapability.MultimodalInput.Input.Core"
   system_capability_headers = [
+    "multimodalinput/oh_axis_type.h",
     "multimodalinput/oh_input_manager.h",
     "multimodalinput/oh_key_code.h",
   ]

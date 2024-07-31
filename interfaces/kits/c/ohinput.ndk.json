@@ -194,5 +194,125 @@
     {
         "first_introduced": "12",
         "name": "OH_Input_CancelInjection"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CreateAxisEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_DestroyAxisEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventAction"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventDisplayX"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventDisplayX"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventDisplayY"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventDisplayY"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventAxisValue"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventAxisValue"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventActionTime"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventType"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventType"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetAxisEventSourceType"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetAxisEventSourceType"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddKeyEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddMouseEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddTouchEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddAxisEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddAxisEventMonitorForAll"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveKeyEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveMouseEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveTouchEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveAxisEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveAllAxisEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddKeyEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddInputEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveKeyEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveInputEventInterceptor"
     }
 ]
