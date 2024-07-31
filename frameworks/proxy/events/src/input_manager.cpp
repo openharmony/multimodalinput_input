@@ -612,5 +612,10 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
 {
     return InputMgrImpl.AncoRemoveChannel(consumer);
 }
+
+int32_t InputManager::SkipPointerLayer(bool isSkip)
+{
+    return InputMgrImpl.SkipPointerLayer(isSkip);
+}
 } // namespace MMI
 } // namespace OHOS
