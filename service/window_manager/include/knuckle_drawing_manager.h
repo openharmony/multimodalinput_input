@@ -78,7 +78,7 @@ private:
     int64_t firstDownTime_ { 0 };
     bool hasScreenReadObserver_ { false };
     ScreenReadState screenReadState_ { };
-    int32_t pointerNum { 0 };
+    int32_t pointerNum_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
