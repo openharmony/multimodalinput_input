@@ -1233,6 +1233,29 @@ ohos_unittest("KeyEventNormalizeTest") {
   ]
 }
 
+ohos_unittest("KeyEventValueTransformationTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "event_handler/test/key_event_value_transformation_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [ "hilog:libhilog" ]
+}
+
 ohos_unittest("KeyCommandTest") {
   module_out_path = module_output_path
 
