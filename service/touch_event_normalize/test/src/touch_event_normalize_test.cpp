@@ -40,6 +40,7 @@ private:
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
     bool preRotateSwitch_ { true };
+    int32_t preScrollRows_ { 3 };
 };
 
 class JoystickTransformProcessorTest : public testing::Test {
@@ -59,6 +60,7 @@ void TouchEventNormalizeTest::SetUp()
     TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(prePinchSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(preRotateSwitch_);
+    TOUCH_EVENT_HDR->GetTouchpadScrollRows();
 }
 
 void TouchEventNormalizeTest::TearDown()
@@ -66,6 +68,7 @@ void TouchEventNormalizeTest::TearDown()
     TOUCH_EVENT_HDR->SetTouchpadPinchSwitch(prePinchSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadSwipeSwitch(preSwipeSwitch_);
     TOUCH_EVENT_HDR->SetTouchpadRotateSwitch(preRotateSwitch_);
+    TOUCH_EVENT_HDR->SetTouchpadScrollRows(preScrollRows_);
 }
 
 /**
@@ -210,6 +213,34 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitc
     bool newRotateSwitch = true;
     TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_SetTouchpadScrollRows_07
+ * @tc.desc: Test SetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadScrollRows_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 50;
+    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadScrollRows(rows) == RET_OK);
+}
+
+/**
+ * @tc.name: TouchEventNormalizeTest_GetTouchpadScrollRows_08
+ * @tc.desc: Test GetTouchpadScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadScrollRows_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 50;
+    TOUCH_EVENT_HDR->SetTouchpadScrollRows(rows);
+    int32_t newRows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    ASSERT_TRUE(rows == newRows);
 }
 } // namespace MMI
 } // namespace OHOS
