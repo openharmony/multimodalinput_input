@@ -2600,6 +2600,49 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
     return RET_OK;
 }
 
+int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [rows] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(rows);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the number of touchpad scrolling rows failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
+{
+    rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &rows] {
+            return this->ReadTouchpadScrollRows(rows);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the number of touchpad scrolling rows failed, return %{public}d, pid:%{public}d", ret,
+            GetCallingPid());
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
 {
