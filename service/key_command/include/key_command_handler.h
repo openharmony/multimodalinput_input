@@ -151,6 +151,7 @@ struct RepeatKey {
     std::string statusConfig;
     bool statusConfigValue { true };
     Ability ability;
+    int32_t countDown;
 };
 
 struct KnuckleSwitch {
@@ -210,6 +211,7 @@ private:
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
+    void LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched, const std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool IsRepeatKeyEvent(const SequenceKey &sequenceKey);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
@@ -221,6 +223,8 @@ private:
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+        const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
@@ -316,6 +320,8 @@ private:
     bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
+    std::map<int32_t, int32_t> repeatKeyMaxTimes_;
+    std::map<int32_t, int32_t> repeatKeyTimerIds_;
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
@@ -337,9 +343,11 @@ private:
     int32_t repeatTimerId_ { -1 };
     int32_t knuckleCount_ { 0 };
     int64_t downActionTime_ { 0 };
+    int64_t lastDownActionTime_ { 0 };
+    int64_t lastVolumeDownActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
-    int64_t intervalTime_ { 120000 };
+    int64_t intervalTime_ { 500000 };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool sequenceOccurred_ { false };
