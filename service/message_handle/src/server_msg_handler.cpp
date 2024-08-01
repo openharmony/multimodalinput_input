@@ -227,7 +227,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-            TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+                TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+            }
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
