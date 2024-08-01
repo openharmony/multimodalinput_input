@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,7 +104,7 @@ private:
     void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,
-        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool isRepeat, bool &handled);
     void NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &keyEvent,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent> &keyEvent,

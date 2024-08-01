@@ -306,7 +306,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNo
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     std::list<std::shared_ptr<OHOS::MMI::KeySubscriberHandler::Subscriber>> subscribers;
     bool handled = false;
-    handler.NotifyKeyDownRightNow(keyEvent, subscribers, handled);
+    handler.NotifyKeyDownRightNow(keyEvent, subscribers, true, handled);
     ASSERT_FALSE(handled);
 }
 
@@ -1338,12 +1338,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownRightNo
     std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
     subscriberList.push_back(subscriber);
     handler.isForegroundExits_ = true;
-    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownRightNow(keyEvent, subscriberList, handled));
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownRightNow(keyEvent, subscriberList, true, handled));
 
     handler.isForegroundExits_ = false;
     handler.foregroundPids_.insert(UDS_PID);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
-    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownRightNow(keyEvent, subscriberList, handled));
+    ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyDownRightNow(keyEvent, subscriberList, true, handled));
 }
 
 /**
