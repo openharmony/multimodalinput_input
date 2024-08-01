@@ -174,7 +174,6 @@ group("mmi_tests") {
     "service:TwoFingerLongTouchTest",
     "service:event_resample_test",
     "service:mmi-service-tests",
-    "service:rust_mmi_test",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
     "service/fingerprint_event_processor/test:FingerprintEventProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
@@ -183,12 +182,18 @@ group("mmi_tests") {
     "test/fuzztest:test",
     "test/unittest/interfaces:InputNativeTest",
     "tools/inject_event:InjectEventTest",
-    "util:rust_mmi_key_config_test",
-    "util:ut-mmi-util-out",
   ]
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
+  }
+
+  if (!use_clang_coverage) {
+    deps += [
+      "service:rust_mmi_test",
+      "util:rust_mmi_key_config_test",
+      "util:ut-mmi-util-out",
+    ]
   }
 
   if (input_ext_feature_anco) {
