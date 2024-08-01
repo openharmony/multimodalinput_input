@@ -162,6 +162,7 @@ group("mmi_tests") {
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
+    "service:PointerDrawingManagerExTest",
     "service:PointerDrawingManagerTest",
     "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",
