@@ -670,7 +670,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateMouse (
     unsafe {
         dx = (*offset).dx;
         dy = (*offset).dy;
-        vin = (fmax(fabs(dx), fabs(dy)) + fmin(fabs(dx), fabs(dy))) / 2.0;
+        vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
         debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
