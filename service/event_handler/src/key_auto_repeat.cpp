@@ -117,7 +117,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
     if (JudgeKeyEvent(keyEvent_) && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        if (!JudgeLimitPrint(keyEvent)) {
+        if (!JudgeLimitPrint(keyEvent_)) {
             MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d, keyAction: %{public}d",
                 keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         } else {
@@ -140,7 +140,7 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime();
             AddHandleTimer(delayTime);
-            if (!JudgeLimitPrint(keyEvent)) {
+            if (!JudgeLimitPrint(keyEvent_)) {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
             } else {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%d", keyEvent_->GetKeyCode());
