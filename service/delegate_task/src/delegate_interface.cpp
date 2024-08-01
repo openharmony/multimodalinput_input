@@ -45,9 +45,12 @@ int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
 void DelegateInterface::OnInputEvent(
     InputHandlerType type, std::shared_ptr<PointerEvent> event) const
 {
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     OnInputEventHandler(type, event);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 }
 
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 void DelegateInterface::OnInputEventHandler(
     InputHandlerType type, std::shared_ptr<PointerEvent> event) const
 {
@@ -61,12 +64,14 @@ void DelegateInterface::OnInputEventHandler(
             (summary.eventType & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
         }
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
         uint32_t deviceTags = 0;
         if (type == InputHandlerType::INTERCEPTOR &&
             ((deviceTags & summary.deviceTags) == summary.deviceTags) &&
             !EventInterceptorHandler::CheckInputDeviceSource(event, summary.deviceTags)) {
             continue;
         }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
         CHKPV(summary.cb);
         if (summary.mode == HandlerMode::SYNC) {
             summary.cb(event);
@@ -95,15 +100,19 @@ int32_t DelegateInterface::AddHandler(InputHandlerType type, HandlerSummary summ
     if (currentType != newType || ((currentTags & summary.deviceTags) != summary.deviceTags)) {
         uint32_t allDeviceTags = GetDeviceTags(type);
         if (type == InputHandlerType::INTERCEPTOR) {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             auto interceptorHandler = InputHandler->GetInterceptorHandler();
             CHKPR(interceptorHandler, ERROR_NULL_POINTER);
             ret = interceptorHandler->AddInputHandler(type,
                 newType, summary.priority, allDeviceTags, nullptr);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
         } else if (type == InputHandlerType::MONITOR) {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPR(monitorHandler, ERROR_NULL_POINTER);
             ret = monitorHandler->AddInputHandler(type,
                 newType, shared_from_this());
+#endif // OHOS_BUILD_ENABLE_MONITOR
         }
     }
     if (ret != RET_OK) {
@@ -185,20 +194,25 @@ void DelegateInterface::RemoveHandler(InputHandlerType type, std::string name)
     const uint64_t newTags = GetDeviceTags(type);
     if (currentType != newType || ((currentTags & deviceTags) != 0)) {
         if (type == InputHandlerType::INTERCEPTOR) {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             auto interceptorHandler = InputHandler->GetInterceptorHandler();
             CHKPV(interceptorHandler);
             interceptorHandler->RemoveInputHandler(type,
                 newType, newLevel, newTags, nullptr);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
         }
         if (type == InputHandlerType::MONITOR) {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             auto monitorHandler = InputHandler->GetMonitorHandler();
             CHKPV(monitorHandler);
             monitorHandler->RemoveInputHandler(type,
                 newType, shared_from_this());
+#endif // OHOS_BUILD_ENABLE_MONITOR
         }
     }
     MMI_HILOGI("Remove Handler:%{public}d:%{public}s-%{public}d:%{public}d, size:%{public}zu", type,
                name.c_str(), currentType, currentTags, handlers.size());
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI
 } // namespace OHOS
