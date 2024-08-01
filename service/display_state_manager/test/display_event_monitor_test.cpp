@@ -50,20 +50,71 @@ void DisplayEventMonitorTest::TearDownTestCase()
 }
 
 /**
- * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber
- * @tc.desc: Test InitCommonEventSubscriber
+ * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn_001
+ * @tc.desc: Test the funcation UpdateShieldStatusOnScreenOn
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber, TestSize.Level1)
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.shieldModeBeforeSreenOff_ = 0;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
+    displayEventMonitor.shieldModeBeforeSreenOff_ = 1;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
+    displayEventMonitor.shieldModeBeforeSreenOff_ = -1;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001
+ * @tc.desc: Test the funcation UpdateShieldStatusOnScreenOff
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.shieldModeBeforeSreenOff_ = 10;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
+    displayEventMonitor.shieldModeBeforeSreenOff_ = 5;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
+    displayEventMonitor.shieldModeBeforeSreenOff_ = -1;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_InitCommonEventSubscriber_001
+ * @tc.desc: Test the funcation InitCommonEventSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscriber_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayEventMonitor displayEventMonitor;
+    displayEventMonitor.hasInit_ = false;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    displayEventMonitor.hasInit_ = true;
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+}
+
+/**
+ * @tc.name: DisplayEventMonitorTest_IsCommonEventSubscriberInit_001
+ * @tc.desc: Test the funcation IsCommonEventSubscriberInit
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_IsCommonEventSubscriberInit_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     DisplayEventMonitor displayEventMonitor;
     displayEventMonitor.hasInit_ = true;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
-
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.IsCommonEventSubscriberInit());
     displayEventMonitor.hasInit_ = false;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
+    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.IsCommonEventSubscriberInit());
 }
 } // namespace MMI
 } // namespace OHOS
