@@ -1002,6 +1002,21 @@ public:
         void SetPressure(double pressure);
 
         /**
+         * @brief Obtains the moveflag in this event.
+         * @return Returns the moveflag.
+         * @since 12
+         */
+        int32_t GetMoveFlag() const;
+
+        /**
+         * @brief Sets the moveflag for this event.
+         * @param moveflag Indicates the moveflag to set.
+         * @return void
+         * @since 12
+         */
+        void SetMoveFlag(int32_t moveflag);
+
+        /**
          * @brief Obtains the long axis of the touch point area.
          * @return Returns the long axis of the touch point area.
          * @since 9
@@ -1143,6 +1158,7 @@ public:
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double pressure_ {};
+        int32_t moveFlag_ { -1 };
         int32_t longAxis_ {};
         int32_t shortAxis_ {};
         int32_t deviceId_ {};
