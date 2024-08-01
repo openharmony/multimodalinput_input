@@ -432,24 +432,22 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     NotifyDevCallback(deviceId, info);
     if (!hasPointer && info.isPointerDevice) {
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         NotifyPointerDevice(true, true, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
         MMI_HILOGI("Set para input.pointer.device true");
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
         WIN_MGR->UpdatePointerChangeAreas();
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
@@ -487,14 +485,12 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             deviceId, sysUid.c_str());
     }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (enable) {
         for (const auto& item : devListeners_) {
             CHKPV(item);
