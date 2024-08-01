@@ -195,7 +195,7 @@ group("mmi_tests") {
       "util:ut-mmi-util-out",
     ]
   }
-  
+
   if (input_ext_feature_anco) {
     deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
   }
