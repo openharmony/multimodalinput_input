@@ -67,6 +67,7 @@ constexpr int32_t SUBSCRIPT_TWO { 2 };
 constexpr int32_t SUBSCRIPT_ZERO { 0 };
 constexpr std::string_view SCREEN_READING { "accessibility_screenreader_enabled" };
 constexpr std::string_view SCREEN_READ_ENABLE { "1" };
+constexpr int32_t POINTER_NUMBER_TO_DRAW { 10 };
 } // namespace
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -136,6 +137,7 @@ bool KnuckleDrawingManager::IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEv
     CHKPF(touchEvent);
     int32_t touchAction = touchEvent->GetPointerAction();
     if (touchAction == PointerEvent::POINTER_ACTION_DOWN) {
+        pointerNum_ = 0;
         firstDownTime_ = touchEvent->GetActionTime();
         int64_t intervalTime = touchEvent->GetActionTime() - lastUpTime_;
         bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
@@ -318,6 +320,7 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
     pointerInfo.x = pointerItem.GetDisplayX();
     pointerInfo.y = pointerItem.GetDisplayY();
     pointerInfos_.push_back(pointerInfo);
+    pointerNum_++;
 
     if (pointerInfos_.size() == MAX_POINTER_NUM) {
         pointerInfos_[POINT_INDEX3].x = (pointerInfos_[POINT_INDEX2].x + pointerInfos_[POINT_INDEX4].x) / MID_POINT;
@@ -343,6 +346,10 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
         path_.CubicTo(pointerInfos_[POINT_INDEX1].x, pointerInfos_[POINT_INDEX1].y,
             pointerInfos_[POINT_INDEX2].x, pointerInfos_[POINT_INDEX2].y,
             pointerInfos_[POINT_INDEX3].x, pointerInfos_[POINT_INDEX3].y);
+        pointerInfos_.erase(pointerInfos_.begin(), pointerInfos_.begin() + POINT_INDEX3);
+        if (pointerNum_ < POINTER_NUMBER_TO_DRAW) {
+            return RET_ERR;
+        }
 #ifndef USE_ROSEN_DRAWING
         auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
             BeginRecording(scaleW_, scaleH_));
@@ -352,12 +359,8 @@ int32_t KnuckleDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> touchEv
 #endif // USE_ROSEN_DRAWING
         CHKPR(canvas, RET_ERR);
         canvas->AttachPaint(paint_);
-        bool startDraw = (touchEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
-        if (startDraw) {
-            canvas->DrawPath(path_);
-        }
+        canvas->DrawPath(path_);
         canvas->DetachPaint();
-        pointerInfos_.erase(pointerInfos_.begin(), pointerInfos_.begin() + POINT_INDEX3);
     } else {
         MMI_HILOGD("isActionUp_ is true");
         isActionUp_ = false;
@@ -372,6 +375,7 @@ int32_t KnuckleDrawingManager::DestoryWindow()
 {
     CALL_DEBUG_ENTER;
     pointerInfos_.clear();
+    path_.Reset();
     CHKPR(canvasNode_, RET_ERR);
 #ifndef USE_ROSEN_DRAWING
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
