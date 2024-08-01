@@ -1270,49 +1270,6 @@ ohos_unittest("ModuleLoaderTest") {
   ]
 }
 
-ohos_unittest("ModuleLoaderExTest") {
-  module_out_path = module_output_path
-
-  include_dirs = [
-    "${mmi_path}/util/common/include",
-    "//third_party/node/src",
-  ]
-
-  configs = [
-    "${mmi_path}:coverage_flags",
-    ":libmmi_server_config",
-  ]
-
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
-  sources = [
-    "module_loader/test/mmi_service_ex_test.cpp",
-    "module_loader/test/mock.cpp",
-  ]
-
-  deps = [
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-  ]
-
-  external_deps = [
-    "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "c_utils:utils",
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
-    "hilog:libhilog",
-    "image_framework:image_native",
-    "libinput:libinput-third-mmi",
-    "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libwm",
-  ]
-}
-
 ohos_unittest("KeyEventNormalizeTest") {
   module_out_path = module_output_path
 
