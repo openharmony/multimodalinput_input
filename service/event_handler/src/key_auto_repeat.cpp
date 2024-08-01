@@ -72,6 +72,17 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     return RET_OK;
 }
 
+bool KeyAutoRepeat::JudgeKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    return (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) || (keyEvent->GetKeyAction() ==
+            KeyEvent::KEY_ACTION_CANCEL);
+}
+
+bool KeyAutoRepeat::JudgeLimitPrint(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    return !EventLogHelper::IsBetaVersion() || keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+}
+
 void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -103,29 +114,33 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
         AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
     }
-    if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
+    if (JudgeKeyEvent(keyEvent_) && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d",
-                keyEvent_->GetKeyCode(), repeatKeyCode_);
+        if (!JudgeLimitPrint(keyEvent_)) {
+            MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d, keyAction: %{public}d",
+                keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         } else {
-            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d",
-                keyEvent_->GetKeyCode(), repeatKeyCode_);
+            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d",
+                keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         }
-        if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
+        if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && repeatKeyCode_ != keyEvent_->GetKeyCode()) {
             std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
             if (pressedKeyItem) {
                 keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
             } else {
                 MMI_HILOGW("The pressedKeyItem is nullopt");
             }
+            pressedKeyItem = keyEvent_->GetKeyItem(repeatKeyCode_);
+            if (!pressedKeyItem) {
+                return;
+            }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime();
             AddHandleTimer(delayTime);
-            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            if (!JudgeLimitPrint(keyEvent_)) {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
             } else {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%d", keyEvent_->GetKeyCode());
