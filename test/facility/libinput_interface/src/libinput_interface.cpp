@@ -161,6 +161,11 @@ double libinput_event_touch_get_pressure(struct libinput_event_touch* event)
     return g_instance->TouchEventGetPressure(event);
 }
 
+int32_t libinput_event_touch_get_move_flag(struct libinput_event_touch* event)
+{
+    return g_instance->TouchEventGetMoveFlag(event);
+}
+
 int32_t libinput_event_get_touch_contact_long_axis(struct libinput_event_touch *event)
 {
     return g_instance->TouchEventGetContactLongAxis(event);
