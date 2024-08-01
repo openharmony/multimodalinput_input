@@ -67,6 +67,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "setting_datashare.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -1466,6 +1467,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
+        DISPLAY_MONITOR->InitCommonEventSubscriber();
         MMI_HILOGD("Common event service started");
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -1476,6 +1478,11 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
+    }
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            IPointerDrawingManager::GetInstance()->InitPointerObserver();
+        }
     }
 }
 

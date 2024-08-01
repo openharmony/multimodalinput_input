@@ -415,7 +415,9 @@ void KnuckleDynamicDrawingManager::DestoryWindow()
     CALL_DEBUG_ENTER;
     traceControlPoints_.clear();
     pointerPath_.Reset();
-    glowTraceSystem_->Clear();
+    if (glowTraceSystem_ != nullptr) {
+        glowTraceSystem_->Clear();
+    }
     CHKPV(canvasNode_);
 #ifndef USE_ROSEN_DRAWING
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->

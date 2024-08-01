@@ -2182,8 +2182,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    const std::vector<WindowInfo>& windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
-    UpdateTransformDisplayXY(pointerEvent, windowsInfo, *physicalDisplayInfo);
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
@@ -2837,7 +2835,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
+        }
+        if (lastTouchEventOnBackGesture_ != nullptr &&
             lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
             lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
         }

@@ -47,9 +47,12 @@ int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
 void DelegateInterface::OnInputEvent(
     InputHandlerType type, std::shared_ptr<PointerEvent> event) const
 {
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     OnInputEventHandler(type, event);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 }
 
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 void DelegateInterface::OnInputEventHandler(
     InputHandlerType type, std::shared_ptr<PointerEvent> event) const
 {
@@ -214,5 +217,6 @@ void DelegateInterface::RemoveHandler(InputHandlerType type, std::string name)
     MMI_HILOGI("Remove Handler:%{public}d:%{public}s-%{public}d:%{public}d, size:%{public}zu", type,
                name.c_str(), currentType, currentTags, handlers.size());
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI
 } // namespace OHOS

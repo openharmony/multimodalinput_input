@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "input_device_manager.h"
+#include "bytrace_adapter.h"
 
 namespace OHOS {
 namespace MMI {
