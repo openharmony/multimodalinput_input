@@ -515,4 +515,9 @@ int32_t InputWindowsManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> c
 void InputWindowsManager::CleanShellWindowIds()
 {}
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return false;
+}
 } // namespace OHOS

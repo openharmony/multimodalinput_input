@@ -43,5 +43,11 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId
 {
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
+
+void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType)
+{}
+
+void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn)
+{}
 } // namespace MMI
 } // namespace OHOS
