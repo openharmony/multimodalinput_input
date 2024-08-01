@@ -2789,7 +2789,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
+        }
+        if (lastTouchEventOnBackGesture_ != nullptr &&
             lastTouchEventOnBackGesture_->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
             lastTouchEventOnBackGesture_ = std::make_shared<PointerEvent>(*pointerEvent);
         }
