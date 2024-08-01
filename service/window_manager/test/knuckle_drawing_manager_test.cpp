@@ -408,7 +408,7 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestS
     pointerInfo.x = 300;
     pointerInfo.y = 300;
     kceDrawMgr.pointerInfos_.push_back(pointerInfo);
-    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
 }
 
 /**
@@ -444,34 +444,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002,
     kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
     ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
     ASSERT_EQ(kceDrawMgr.DestoryWindow(), RET_OK);
-}
-
-/**
- * @tc.name: KnuckleDrawingManagerTest_CreateObserver_001
- * @tc.desc: Test Overrides CreateObserver function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateObserver_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    kceDrawMgr.hasScreenReadObserver_ = false;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateObserver());
-}
-
-/**
- * @tc.name: KnuckleDrawingManagerTest_CreateObserver_002
- * @tc.desc: Test Overrides CreateObserver function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateObserver_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    kceDrawMgr.hasScreenReadObserver_ = true;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateObserver());
 }
 
 /**

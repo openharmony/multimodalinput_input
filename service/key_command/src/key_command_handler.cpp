@@ -637,7 +637,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEve
     float eventY = item.GetDisplayY();
     float dx = std::abs(eventX - gestureLastX_);
     float dy = std::abs(eventY - gestureLastY_);
-    if (dx > MOVE_TOLERANCE || dy > MOVE_TOLERANCE) {
+    if (dx >= MOVE_TOLERANCE || dy >= MOVE_TOLERANCE) {
         gestureLastX_ = eventX;
         gestureLastY_ = eventY;
         gesturePoints_.emplace_back(gestureLastX_);
@@ -689,6 +689,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
             break;
         }
     }
+    ResetKnuckleGesture();
 }
 
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
