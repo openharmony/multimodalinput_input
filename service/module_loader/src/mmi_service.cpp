@@ -365,7 +365,9 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
@@ -1466,10 +1468,12 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         DEVICE_MONITOR->InitCommonEventSubscriber();
         MMI_HILOGD("Common event service started");
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
         MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
     }
@@ -2542,6 +2546,7 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
 int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
@@ -2550,13 +2555,16 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
@@ -2565,8 +2573,10 @@ int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)

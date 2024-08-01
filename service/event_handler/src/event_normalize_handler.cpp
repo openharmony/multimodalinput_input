@@ -23,7 +23,9 @@
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"
+#endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -40,7 +42,9 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
+#ifdef OHOS_BUILD_ENABLE_POINTER
 #include "touchpad_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -105,6 +109,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
         return;
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
         (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
@@ -116,6 +121,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
         }
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
@@ -193,6 +199,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 
 bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
 {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
     if ((event == nullptr) && (pointerEvent != nullptr) && MMISceneBoardJudgement::IsSceneBoardEnabled()
         && MMISceneBoardJudgement::IsResampleEnabled()) {
@@ -202,6 +209,7 @@ bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t fram
         }
         return true;
     }
+#endif // OHOS_BUILD_ENABLE_TOUCH
     return false;
 }
 
@@ -376,11 +384,11 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-#ifdef OHOS_BUILD_ENABLE_CROWN
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_CROWN)
     if (CROWN_EVENT_HDR->IsCrownEvent(event)) {
         return CROWN_EVENT_HDR->NormalizeRotateEvent(event);
     }
-#endif // OHOS_BUILD_ENABLE_CROWN
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     BytraceAdapter::StartPackageEvent("package mouseEvent");
@@ -482,6 +490,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
@@ -509,7 +518,6 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     }
     auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
-#ifdef OHOS_BUILD_ENABLE_POINTER
     if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
         return RET_ERR;
@@ -795,9 +803,11 @@ int32_t EventNormalizeHandler::SetOriginPointerId(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_SWITCH
 void EventNormalizeHandler::RestoreTouchPadStatus()
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     auto ids = INPUT_DEV_MGR->GetTouchPadIds();
     for (auto id : ids) {
         MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
@@ -810,12 +820,15 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
             mouseEvent->Reset();
         }
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     buttonIds_.clear();
 }
+#endif // OHOS_BUILD_ENABLE_SWITCH
 
 void EventNormalizeHandler::TerminateRotate(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (!GESTURE_HANDLER->GetRotateStatus()) {
         return;
     }
@@ -835,11 +848,15 @@ void EventNormalizeHandler::TerminateRotate(libinput_event* event)
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         GESTURE_HANDLER->InitRotateGesture();
     }
+#else
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         bool result = MouseEventHdr->CheckAndPackageAxisEvent(event);
@@ -852,6 +869,9 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
         LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
+#else
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 } // namespace MMI
 } // namespace OHOS

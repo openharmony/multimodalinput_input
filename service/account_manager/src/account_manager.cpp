@@ -23,7 +23,9 @@
 #endif // SCREENLOCK_MANAGER_ENABLED
 #include <system_ability_definition.h>
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "setting_datashare.h"
 #include "timer_manager.h"
 
@@ -273,22 +275,30 @@ AccountManager::AccountManager()
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON,
             [this](const EventFwk::CommonEventData &data) {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF,
             [this](const EventFwk::CommonEventData &data) {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenStatus(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED,
             [this](const EventFwk::CommonEventData &data) {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenLocked(true);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }, {
             EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED,
             [this](const EventFwk::CommonEventData &data) {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 DISPLAY_MONITOR->SetScreenLocked(false);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
             },
         }
     };
@@ -329,8 +339,10 @@ AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
 void AccountManager::InitializeScreenLockStatus()
 {
     MMI_HILOGI("Initialize screen lock status");
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     DISPLAY_MONITOR->SetScreenLocked(
         ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked());
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 #endif // SCREENLOCK_MANAGER_ENABLED
 
