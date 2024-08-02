@@ -188,7 +188,6 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 
 void InputWindowsManager::CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent)
 {
-
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
         return;
     }
@@ -3190,7 +3189,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY) && defined(OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER)
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_COMBINATION_KEY) && \
+    defined(OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER)
     std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
     auto knuckleSwitch = InputHandler->GetKeyCommandHandler()->GetKnuckleSwitchValue();
     if (!knuckleSwitch) {

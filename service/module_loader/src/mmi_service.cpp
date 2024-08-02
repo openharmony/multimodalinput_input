@@ -1434,25 +1434,32 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
+#ifdef OHOS_RSS_CLIENT
+void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    int sleepSeconds = 1;
+    sleep(sleepSeconds);
+    uint64_t tid = tid_.load();
+    int32_t userInteraction = 2;
+    std::unordered_map<std::string, std::string> payload;
+    payload["uid"] = std::to_string(getuid());
+    payload["pid"] = std::to_string(getpid());
+    payload["extType"] = "10002";
+    payload["tid"] = std::to_string(tid);
+    payload["isSa"] = "1";
+    payload["cgroupPrio"] = "1";
+    payload["threadName"] = "mmi_service";
+    ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+}
+#endif // OHOS_RSS_CLIENT
+
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
-        int sleepSeconds = 1;
-        sleep(sleepSeconds);
-        uint64_t tid = tid_.load();
-        int32_t userInteraction = 2;
-        std::unordered_map<std::string, std::string> payload;
-        payload["uid"] = std::to_string(getuid());
-        payload["pid"] = std::to_string(getpid());
-        payload["extType"] = "10002";
-        payload["tid"] = std::to_string(tid);
-        payload["isSa"] = "1";
-        payload["cgroupPrio"] = "1";
-        payload["threadName"] = "mmi_service";
-        ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-            ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+        OnAddResSchedSystemAbility(systemAbilityId, deviceId);
     }
 #endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
