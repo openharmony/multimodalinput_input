@@ -1096,7 +1096,7 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
     }
-    if (key->GetKeyCode() == keyEvent::KEYCODE_VOLUME_DOWN || key->GetKeyCode() == keyEvent::KEYCODE_VOLUME_UP) {
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP) {
         lastVolumeDownActionTime_ = key->GetActionTime();
     }
     return true;
