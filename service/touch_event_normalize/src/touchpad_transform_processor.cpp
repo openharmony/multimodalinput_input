@@ -475,6 +475,7 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
     if (fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
         pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+        pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_PINCH);
     } else {
         pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);

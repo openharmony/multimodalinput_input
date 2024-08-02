@@ -99,7 +99,7 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
 
-    void RemoveMonitor(int32_t monitorId);
+    int32_t RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
@@ -109,7 +109,7 @@ public:
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
         int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
-    void RemoveInterceptor(int32_t interceptorId);
+    int32_t RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);

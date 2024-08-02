@@ -32,9 +32,9 @@ int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> mon
     return AddHandler(InputHandlerType::MONITOR, monitor, eventType);
 }
 
-void InputMonitorManager::RemoveMonitor(int32_t monitorId)
+int32_t InputMonitorManager::RemoveMonitor(int32_t monitorId)
 {
-    RemoveHandler(monitorId, InputHandlerType::MONITOR);
+    return RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
 
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)

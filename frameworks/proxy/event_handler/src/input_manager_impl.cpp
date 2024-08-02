@@ -794,18 +794,19 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
-void InputManagerImpl::RemoveMonitor(int32_t monitorId)
+int32_t InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return;
+        return RET_ERR;
     }
-    IMonitorMgr->RemoveMonitor(monitorId);
+    return IMonitorMgr->RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
@@ -874,18 +875,19 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
-void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
+int32_t InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return;
+        return RET_ERR;
     }
-    InputInterMgr->RemoveInterceptor(interceptorId);
+    return InputInterMgr->RemoveInterceptor(interceptorId);
 #else
     MMI_HILOGW("Interceptor function does not support");
+    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
