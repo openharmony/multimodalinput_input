@@ -69,7 +69,7 @@ constexpr int32_t BOTTOM_RIGHT_AREA { 4 };
 constexpr int32_t BOTTOM_AREA { 5 };
 constexpr int32_t BOTTOM_LEFT_AREA { 6 };
 constexpr int32_t LEFT_AREA { 7 };
-constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
+[[ maybe_unused ]] constexpr int32_t WAIT_TIME_FOR_REGISTER { 2000 };
 constexpr int32_t RS_PROCESS_TIMEOUT { 500 * 1000 };
 constexpr int32_t HICAR_MIN_DISPLAY_ID { 1000 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -83,7 +83,7 @@ const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/Default.svg" };
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-constexpr int32_t WINDOW_ROTATE { 0 };
+[[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 } // namespace
@@ -3594,8 +3594,8 @@ bool InputWindowsManager::HandleWindowInputType(const WindowInfo &window, std::s
         MMI_HILOG_WINDOWE("Invalid pointer:%{public}d", pointerId);
         return false;
     }
-    int32_t toolType = item.GetToolType();
-    int32_t sourceType = pointerEvent->GetSourceType();
+    [[ maybe_unused ]] int32_t toolType = item.GetToolType();
+    [[ maybe_unused ]] int32_t sourceType = pointerEvent->GetSourceType();
     switch (window.windowInputType)
     {
         case WindowInputType::NORMAL:

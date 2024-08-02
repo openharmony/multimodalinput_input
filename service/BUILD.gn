@@ -88,7 +88,10 @@ config("libmmi_server_config") {
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
+    "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
+    "${graphics_path}/2d_graphics/include",
+    "${mmi_path}/util/napi/include",
   ]
 
   if (input_feature_fingerprint) {
@@ -241,6 +244,7 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
   ]
 
   if (input_ext_feature_anco) {
