@@ -1961,7 +1961,6 @@ bool InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, 
     CALL_DEBUG_ENTER;
     int32_t windowId = windowInfo.id;
     bool findFlag = false;
-    UpdatePointerChangeAreas(GetDisplayGroupInfo());
     if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
         std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
         MMI_HILOG_CURSORD("windowHotAreas size:%{public}zu, windowId:%{public}d",
