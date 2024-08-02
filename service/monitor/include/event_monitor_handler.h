@@ -28,6 +28,9 @@
 #include "input_handler_type.h"
 #include "uds_session.h"
 #include "nap_process.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "input_screen_capture_monitor_listener.h"
+#endif
 
 namespace OHOS {
 namespace MMI {
@@ -59,6 +62,9 @@ public:
     bool OnHandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    void RegisterScreenCaptureListener();
+#endif
 
 private:
     void InitSessionLostCallback();
@@ -119,6 +125,9 @@ private:
 private:
     bool sessionLostCallbackInitialized_ { false };
     MonitorCollection monitors_;
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    sptr<InputScreenCaptureMonitorListener> screenCaptureMonitorListener_ { nullptr };
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

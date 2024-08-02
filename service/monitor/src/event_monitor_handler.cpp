@@ -26,6 +26,9 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "screen_capture_monitor.h"
+#endif
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -519,5 +522,14 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
                 item.eventType_, session->GetProgramName().c_str());
     }
 }
+
+#ifdef PLAYER_FRAMEWORK_EXISTS
+void EventMonitorHandler::RegisterScreenCaptureListener()
+{
+    screenCaptureMonitorListener_ = new (std::nothrow) InputScreenCaptureMonitorListener();
+    CHKPV(screenCaptureMonitorListener_);
+    Media::ScreenCaptureMonitor::GetInstance()->RegisterScreenCaptureMonitorListener(screenCaptureMonitorListener_);
+}
+#endif
 } // namespace MMI
 } // namespace OHOS
