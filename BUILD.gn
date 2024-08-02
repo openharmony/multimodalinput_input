@@ -61,6 +61,8 @@ ohos_executable("uinput_inject") {
 
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
+  cflags = [ "-fstack-protector-strong" ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
