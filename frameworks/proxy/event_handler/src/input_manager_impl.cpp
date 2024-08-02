@@ -984,8 +984,12 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER)
-    if (MMIEventHdl.InjectPointerEvent(pointerEvent, false) != RET_OK) {
-        MMI_HILOGE("Failed to inject pointer event to touchPad");
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (MMIEventHdl.InjectPointerEvent(pointerEvent, false) != RET_OK) {
+            MMI_HILOGE("Failed to inject pointer event to touchPad");
+        }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
