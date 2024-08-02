@@ -1413,7 +1413,7 @@ void KeyCommandHandler::SendKeyEvent()
     if (!isHandleSequence_) {
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
-            if (count_ == repeatKeyMaxTimes_.[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
+            if (count_ == repeatKeyMaxTimes_[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
                 break;
             }
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
