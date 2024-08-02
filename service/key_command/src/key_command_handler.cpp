@@ -1469,6 +1469,7 @@ bool KeyCommandHandler::IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyE
 {
     return (sequenceOccurred_ && !keys_.empty() &&
             (keys_.back().keyCode == keyEvent->GetKeyCode()) &&
+            (keys_.back().keyAction == KeyEvent::KEY_ACTION_DOWN) &&
             (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN));
 }
 
