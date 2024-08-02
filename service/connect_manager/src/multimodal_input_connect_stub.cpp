@@ -29,6 +29,9 @@
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "screen_capture_monitor.h"
+#endif
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -1128,17 +1131,30 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        if (handlerType == InputHandlerType::MONITOR) {
+#ifdef PLAYER_FRAMEWORK_EXISTS
+            int pid = GetCallingPid();
+            int capturePid = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+            if (capturePid != pid) {
+                MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+                return ERROR_NO_PERMISSION;
+            }
+#else
+            return ERROR_NOT_SYSAPI;
+#endif
+        } else if (handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
     }
 
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType = 0;
-    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;
@@ -1165,17 +1181,19 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        if (handlerType != InputHandlerType::MONITOR && handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
     }
 
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType = 0;
-    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;

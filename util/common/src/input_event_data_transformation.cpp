@@ -206,15 +206,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         return RET_ERR;
     }
     SerializeFingerprint(event, pkt);
-    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
-        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
-        << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
-    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
-        if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
-            pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
-        }
-    }
-    pkt << event->GetVelocity();
+    SerializePointerEvent(event, pkt);
     std::set<int32_t> pressedBtns { event->GetPressedButtons() };
     pkt << pressedBtns.size();
     for (int32_t btnId : pressedBtns) {
@@ -252,6 +244,20 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         return RET_ERR;
     }
     return RET_OK;
+}
+
+void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
+        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
+        << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
+            pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
+        }
+    }
+    pkt << event->GetVelocity();
+    pkt << event->GetAxisEventType();
 }
 
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
@@ -378,6 +384,9 @@ void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<P
     double velocity;
     pkt >> velocity;
     event->SetVelocity(velocity);
+    int32_t axisEventType;
+    pkt >> axisEventType;
+    event->SetAxisEventType(axisEventType);
 }
 
 int32_t InputEventDataTransformation::SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)

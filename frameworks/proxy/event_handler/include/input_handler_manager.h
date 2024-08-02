@@ -56,7 +56,7 @@ protected:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
-    void RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
+    int32_t RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
 private:
     struct Handler {
@@ -75,7 +75,7 @@ private:
     int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType, uint32_t &deviceTags);
-    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+    int32_t RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);

@@ -191,4 +191,8 @@ ohos_unittest("MouseTransformProcessorMockTest") {
       "graphic_2d_ext:libsdf",
     ]
   }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
