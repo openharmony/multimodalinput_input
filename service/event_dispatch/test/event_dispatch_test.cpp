@@ -1938,10 +1938,10 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_008,
     point->pointerId_ = 3;
     std::shared_ptr<WindowInfo> windowInfo = std::make_shared<WindowInfo>();
     windowInfo->id = 3;
-    eventdispatchhandler.cancelEventList_[1].push_back(windowInfo);
+    eventdispatchhandler.cancelEventList_[1].insert(windowInfo);
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
     windowInfo->id = 1;
-    eventdispatchhandler.cancelEventList_[2].push_back(windowInfo);
+    eventdispatchhandler.cancelEventList_[2].insert(windowInfo);
     point->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
     ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
     point->pointerAction_ = PointerEvent::POINTER_ACTION_CANCEL;
