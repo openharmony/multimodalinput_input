@@ -151,7 +151,6 @@ struct RepeatKey {
     std::string statusConfig;
     bool statusConfigValue { true };
     Ability ability;
-    int32_t countDown;
 };
 
 struct KnuckleSwitch {
