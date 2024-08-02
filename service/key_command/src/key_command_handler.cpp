@@ -1263,7 +1263,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
-    if (keyEvent->GetAction() != KeyEvent::KEY_ACTION_DOWN) {
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
         return true;
     }
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
@@ -1310,14 +1310,10 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
     const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes)
 {
     if (!isMaxTimes) {
-        int64_t delaytime = intervalTime_ - (upActionTime_ - downActionTime_);
+        int64_t delaytime = intervalTime_ - (downActionTime_ - upActionTime_);
         int32_t timerId = TimerMgr->AddTimer(
             delaytime / SECONDS_SYSTEM, 1, [this, item, &isLaunched, keyEvent] () {
             LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
-            if (repeatTimerId_ >= 0) {
-                TimerMgr->RemoveTimer(repeatTimerId_);
-                repeatTimerId_ = -1;
-            }
             auto it = repeatKeyTimerIds_.find(item.ability.bundleName);
             if (it != repeatKeyTimerIds_.end()) {
                 repeatKeyTimerIds_.erase(it);
