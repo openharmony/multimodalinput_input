@@ -82,7 +82,10 @@
         "bounds_checking_function",
         "call_manager",
         "libinput",
-        "screenlock_mgr"
+        "screenlock_mgr",
+        "FreeBSD",
+        "googletest",
+        "skia"
       ],
       "third_party": [
         "cJSON",
