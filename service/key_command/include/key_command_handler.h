@@ -221,6 +221,7 @@ private:
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeyOwnCount(const RepeatKey &item);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
@@ -321,7 +322,8 @@ private:
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
     std::map<int32_t, int32_t> repeatKeyMaxTimes_;
-    std::map<int32_t, int32_t> repeatKeyTimerIds_;
+    std::map<std::string, int32_t> repeatKeyTimerIds_;
+    std::map<std::string, int32_t> repeatKeyCountMap_;
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
