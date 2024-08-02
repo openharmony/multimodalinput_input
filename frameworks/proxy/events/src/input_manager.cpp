@@ -191,6 +191,14 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
+void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    InputMgrImpl.SimulateTouchPadEvent(pointerEvent);
+}
+
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
     return InputMgrImpl.RegisterDevListener(type, listener);
