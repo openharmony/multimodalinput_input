@@ -1376,7 +1376,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         upActionTime_ = keyEvent->GetActionTime();
-        repeatTimerId_ = TimerMgr->AddTimer(item.delay / SECONDS_SYSTEM, 1, [this] () {
+        repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
         });
         if (repeatTimerId_ < 0) {
