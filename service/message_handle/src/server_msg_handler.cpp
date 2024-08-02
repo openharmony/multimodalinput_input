@@ -55,9 +55,9 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
-constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+[[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-constexpr int32_t WINDOW_ROTATE { 0 };
+[[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
