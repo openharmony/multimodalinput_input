@@ -62,13 +62,14 @@ constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY { 1000 };
 constexpr int64_t TAP_DOWN_INTERVAL_MILLIS { 550000 };
+constexpr int64_t SOS_INTERVAL_TIMES { 300000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
-constexpr int32_t REPEAT_COUNT = 1;
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -829,12 +830,17 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
         maxCount_ = 0;
     }
     int32_t tempCount = 0;
+    int32_t tempDelay = 0;
     for (RepeatKey& item : repeatKeys_) {
         if (item.times > tempCount) {
             tempCount = item.times;
         }
+        if (item.delay > tempDelay) {
+            tempDelay = item.delay;
+        }
     }
     maxCount_ = tempCount;
+    intervalTime_ = tempDelay;
 }
 
 bool KeyCommandHandler::ParseJson(const std::string &configFile)
@@ -1090,6 +1096,9 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
     }
+    if (key->GetKeyCode() == keyEvent::KEYCODE_VOLUME_DOWN || key->GetKeyCode() == keyEvent::KEYCODE_VOLUME_UP) {
+        lastVolumeDownActionTime_ = key->GetActionTime();
+    }
     return true;
 }
 
@@ -1215,7 +1224,12 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
         if (HandleKeyUpCancel(item, keyEvent)) {
             return false;
         }
-        HandleRepeatKeyCount(item, keyEvent);
+        if (HandleRepeatKeyCount(item, keyEvent)) {
+            break;
+        }
+    }
+
+    for (RepeatKey& item : repeatKeys_) {
         bool isRepeatKey = HandleRepeatKey(item, isLaunched, keyEvent);
         if (isRepeatKey) {
             waitRepeatKey = true;
@@ -1223,6 +1237,21 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     }
 
     return isLaunched || waitRepeatKey;
+}
+
+void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
+{
+    if (item.ability.bundleName == SOS_BUNDLE_NAME) {
+        if (repeatKeyCountMap_[item.ability.bundleName] == 1) {
+            if (downActionTime_ - lastVolumeDownActionTime_ > SOS_INTERVAL_TIMES) {
+                repeatKeyCountMap_[item.ability.bundleName]++;
+            }
+        } else if (downActionTime_ - lastDownActionTime_ < item.delay) {
+            repeatKeyCountMap_[item.ability.bundleName]++;
+        }
+    } else if (downActionTime_ - upActionTime_ < item.delay) {
+        repeatKeyCountMap_[item.ability.bundleName]++;
+    }
 }
 
 bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
@@ -1234,18 +1263,18 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
-    if (count_ == item.times || (repeatKey_.countDown == item.times && item.keyCode == KeyEvent::KEYCODE_POWER)) {
-        if (repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end() &&
-            repeatKeyTimerIds_.find(item.keyCode) != repeatKeyTimerIds_.end()) {
-            int32_t timerId = repeatKeyTimerIds_[item.keyCode];
-            if (item.times < repeatKeyMaxTimes_[item.keyCode] && timerId != 0) {
-                launchAbilityCount_ = item.times;
-                TimerMgr->RemoveTimer(timerId);
-                repeatKeyTimerIds_[item.keyCode] = 0;
-                return true;
-            }
-        }
-
+    if (keyEvent->GetAction() != keyEvent::KEY_ACTION_DOWN) {
+        return true;
+    }
+    auto it = repeatKeyCountMap_.find(item.ability.bundleName);
+    if (it == repeatKeyCountMap_.end()) {
+        repeatKeyCountMap_.emplace(item.ability.bundleName, 1);
+        lastDownActionTime_ = downActionTime_;
+        return true;
+    }
+    HandleRepeatKeyOwnCount(item);
+    lastDownActionTime_ = downActionTime_;
+    if (repeatKeyCountMap_[item.ability.bundleName] == item.times) {
         if (!item.statusConfig.empty()) {
             bool statusValue = true;
             auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -1266,6 +1295,14 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
             return HandleRepeatKeyAbility(item, isLaunched, keyEvent, true);
         }
     }
+    if (count_ > item.times && repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end() &&
+        repeatKeyTimerIds_.find(item.ability.bundleName) != repeatKeyTimerIds_.end()) {
+        if (count_ < repeatKeyMaxTimes_[item.keyCode] && repeatKeyTimerIds_[item.ability.bundleName] >= 0) {
+            TimerMgr->RemoveTimer(repeatKeyTimerIds_[item.ability.bundleName]);
+            repeatKeyTimerIds_.erase(item.ability.bundleName);
+            return true;
+        }
+    }
     return true;
 }
 
@@ -1273,17 +1310,17 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
     const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes)
 {
     if (!isMaxTimes) {
-        int64_t delaytime = { 0 };
-        if (item.time == 2 && item.keyCode == KeyEvent::KEYCODE_POWER) {
-            delaytime = intervalTime_ - (upActionTime_ - downActionTime_);
-        } else {
-            delaytime = item.delay;
-        }
+        int64_t delaytime = intervalTime_ - (upActionTime_ - downActionTime_);
         int32_t timerId = TimerMgr->AddTimer(
-            delaytime / SECONDS_SYSTEM, REPEAT_COUNT, [this, item, &isLaunched, keyEvent] () {
+            delaytime / SECONDS_SYSTEM, 1, [this, item, &isLaunched, keyEvent] () {
             LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
-            if (repeatKeyTimerIds_.find(item.keyCode) != repeatKeyTimerIds_.end()) {
-                repeatKeyTimerIds_[item.keyCode] = 0;
+            if (repeatTimerId_ >= 0) {
+                TimerMgr->RemoveTimer(repeatTimerId_);
+                repeatTimerId_ = -1;
+            }
+            auto it = repeatKeyTimerIds_.find(item.ability.bundleName);
+            if (it != repeatKeyTimerIds_.end()) {
+                repeatKeyTimerIds_.erase(it);
             }
         });
         if (timerId < 0) {
@@ -1291,25 +1328,16 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
         }
         if (repeatTimerId_ >= 0) {
             TimerMgr->RemoveTimer(repeatTimerId_);
-            repeatTimerId_ = TimerMgr->AddTimer(delaytime / SECONDS_SYSTEM, REPEAT_COUNT, [this] () {
-                SendKeyEvent();
-            });
-            if (repeatTimerId_ < 0) {
-                return false;
-            }
+            repeatTimerId_ = -1;
         }
-        if (repeatKeyTimerIds_.find(item.keyCode) == repeatKeyTimerIds_.end()) {
-            repeatKeyTimerIds_.insert(std::make_pair(item.keyCode, timerId));
+        if (repeatKeyTimerIds_.find(item.ability.bundleName) == repeatKeyTimerIds_.end()) {
+            repeatKeyTimerIds_.emplace(item.ability.bundleName, timerId);
             return true;
         }
-        repeatKeyTimerIds_[item.keyCode] = timerId;
-        return true;
-    }
-    if (launchAbilityCount_ == count_) {
+        repeatKeyTimerIds_[item.ability.bundleName] = timerId;
         return true;
     }
     LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
-
     return true;
 }
 
@@ -1319,7 +1347,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
     LaunchAbility(item.ability);
     BytraceAdapter::StopLaunchAbility();
-    launchAbilityCount_ = item.times;
+    launchAbilityCount_ = count_;
     isLaunched = true;
     isDownStart_ = false;
     if (InputHandler->GetSubscriberHandler() != nullptr) {
@@ -1347,19 +1375,6 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     CHKPF(keyEvent);
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        if (repeatKey_.keyCode != item.keyCode) {
-            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-
-            if (pressedKeys.size() == 0) {
-                count_ = 1;
-            } else {
-                count_ = 0;
-            }
-            repeatKey_.keyCode = item.keyCode;
-        } else {
-            count_++;
-        }
-
         upActionTime_ = keyEvent->GetActionTime();
         repeatTimerId_ = TimerMgr->AddTimer(item.delay / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
@@ -1367,31 +1382,26 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         if (repeatTimerId_ < 0) {
             return false;
         }
-        repeatKey_.keyCode = item.keyCode;
         return true;
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-        repeatKey_.keyCode = item.keyCode;
+        if (repeatKey_.keyCode != item.keyCode) {
+            count_ = 1;
+            repeatKeyCountMap_.clear();
+            repeatKey_.keyCode = item.keyCode;
+        } else {
+            count_++;
+        }
         isDownStart_ = true;
 
         downActionTime_ = keyEvent->GetActionTime();
-        if (item.keyCode == KeyEvent::KEYCODE_VOLUME_UP || item.keyCode == KeyEvent::KEYCODE_VOLUME_DOWN) {
-            lastVolumeDownActionTime_ = downActionTime_;
-        }
-
-        if ((downActionTime_ - upActionTime_) < item.delay ) {
+        if ((downActionTime_ - upActionTime_) < intervalTime_) {
             if (repeatTimerId_ >= 0) {
                 TimerMgr->RemoveTimer(repeatTimerId_);
+                repeatTimerId_ = -1;
             }
-            if (item.keyCode == KeyEvent::KEYCODE_POWER && ((downActionTime_ - lastDownActionTime_) > item.delay ||
-                downActionTime_ - lastVolumeDownActionTime_ < 300000)) {
-                lastDownActionTime_ = downActionTime_;
-                return false;
-            }
-            repeatKey_.countDown++;
         }
-        lastDownActionTime_ = downActionTime_;
         return true;
     }
     return false;
@@ -1403,7 +1413,7 @@ void KeyCommandHandler::SendKeyEvent()
     if (!isHandleSequence_) {
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
-            if (count_ == repeatKeyMaxTimes_.[item.keyCode] - REPEAT_COUNT && keycode == KeyEvent::KEYCODE_POWER) {
+            if (count_ == repeatKeyMaxTimes_.[keyCode] - REPEAT_COUNT && keycode == KeyEvent::KEYCODE_POWER) {
                 break;
             }
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
@@ -1427,11 +1437,10 @@ void KeyCommandHandler::SendKeyEvent()
         }
     }
     count_ = 0;
+    repeatKeyCountMap_.clear();
     isDownStart_ = false;
     isHandleSequence_ = false;
     launchAbilityCount_ = 0;
-    repeatKey_.countDown = 0;
-    lastVolumeDownActionTime_ = 0;
 }
 
 bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
