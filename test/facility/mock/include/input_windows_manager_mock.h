@@ -89,6 +89,8 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void UpdatePointerChangeAreas() override {}
+    void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo) override {}
+    MOCK_METHOD(const DisplayGroupInfo&, GetDisplayGroupInfo, ());
 #endif // OHOS_BUILD_ENABLE_POINTER
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
