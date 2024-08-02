@@ -981,7 +981,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER)
     CHKPV(pointerEvent);
