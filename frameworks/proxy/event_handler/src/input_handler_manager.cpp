@@ -93,7 +93,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     return handlerId;
 }
 
-void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
@@ -101,16 +101,21 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
     const HandleEventType currentType = GetEventType();
     uint32_t currentTags = GetDeviceTags();
     uint32_t deviceTags = 0;
-    if (RET_OK == RemoveLocal(handlerId, handlerType, deviceTags)) {
+    int32_t ret = RemoveLocal(handlerId, handlerType, deviceTags);
+    if (ret == RET_OK) {
         const HandleEventType newType = GetEventType();
         const int32_t newLevel = GetPriority();
         const uint64_t newTags = GetDeviceTags();
         if (currentType != newType || ((currentTags & deviceTags) != 0)) {
-            RemoveFromServer(handlerType, newType, newLevel, newTags);
+            ret = RemoveFromServer(handlerType, newType, newLevel, newTags);
+            if (ret != RET_OK) {
+                return ret;
+            }
         }
+        MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ",
+                   handlerType, handlerId, currentType, currentTags);
     }
-    MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ", handlerType,
-               handlerId, currentType, currentTags);
+    return ret;
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
@@ -185,13 +190,14 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     return RET_OK;
 }
 
-void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+int32_t InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+    return ret;
 }
 
 int32_t InputHandlerManager::GetNextId()

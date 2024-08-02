@@ -44,6 +44,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 private:
     static void SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt);
+    static void SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
