@@ -125,8 +125,6 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     virtual void UpdatePointerChangeAreas() = 0;
-    virtual void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo) = 0;
-    virtual const DisplayGroupInfo& GetDisplayGroupInfo() = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
     virtual std::optional<WindowInfo> GetWindowAndDisplayInfo(int32_t windowId, int32_t displayId) = 0;
     virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds) = 0;
