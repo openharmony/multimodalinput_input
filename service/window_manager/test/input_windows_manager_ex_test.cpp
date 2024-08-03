@@ -2416,12 +2416,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_004
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_006
  * @tc.desc: Test the function IsNeedRefreshLayer
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_004, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
@@ -2453,7 +2453,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_004
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplayXY_003, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplayXY_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
