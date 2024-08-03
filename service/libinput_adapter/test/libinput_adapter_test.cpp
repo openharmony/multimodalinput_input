@@ -130,7 +130,7 @@ HWTEST_F(LibinputAdapterTest, LibinputAdapterTest_Stop, TestSize.Level1)
     CALL_TEST_DEBUG;
     LibinputAdapter libinputAdapter;
     libinputAdapter.fd_ = 0;
-    libinputAdapter.input_ =  nullptr;
+    libinputAdapter.input_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(libinputAdapter.Stop());
 }
 
