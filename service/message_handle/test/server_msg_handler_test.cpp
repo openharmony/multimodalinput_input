@@ -1872,7 +1872,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler_001, TestSize.L
 {
     CALL_TEST_DEBUG;
     ServerMsgHandler msgHandler;
-    MsgHandler<int,int> handler;
+    MsgHandler<int, int> handler;
     handler.callbacks_[0] = 1;
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     MmiMessageId idMsg = MmiMessageId::INVALID;
