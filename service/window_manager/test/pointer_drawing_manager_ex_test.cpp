@@ -1034,5 +1034,76 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerSize_03,
     EXPECT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
     EXPECT_EQ(pointerDrawingManager.SetPointerSize(size), RET_OK);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerDevice_01
+ * @tc.desc: Test UpdatePointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdatePointerDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    bool hasPointerDevice = true;
+    bool isPointerVisible = true;
+    bool isHotPlug = false;
+    ASSERT_NO_FATAL_FAILURE(manager.UpdatePointerDevice(hasPointerDevice, isPointerVisible, isHotPlug));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerDevice_02
+ * @tc.desc: Test UpdatePointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdatePointerDevice_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    bool hasPointerDevice = true;
+    bool isPointerVisible = true;
+    bool isHotPlug = true;
+    ASSERT_NO_FATAL_FAILURE(manager.UpdatePointerDevice(hasPointerDevice, isPointerVisible, isHotPlug));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerDevice_03
+ * @tc.desc: Test UpdatePointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdatePointerDevice_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    bool hasPointerDevice = false;
+    bool isPointerVisible = false;
+    bool isHotPlug = true;
+
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    EXPECT_TRUE(manager.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(manager.UpdatePointerDevice(hasPointerDevice, isPointerVisible, isHotPlug));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdatePointerDevice_04
+ * @tc.desc: Test UpdatePointerDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdatePointerDevice_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    bool hasPointerDevice = false;
+    bool isPointerVisible = false;
+    bool isHotPlug = true;
+    manager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.UpdatePointerDevice(hasPointerDevice, isPointerVisible, isHotPlug));
+}
 } // namespace MMI
 } // namespace OHOS
