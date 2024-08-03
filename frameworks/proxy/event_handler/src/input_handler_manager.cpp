@@ -318,7 +318,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         return;
     }
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
-    if (tokenType != TokenType::TOKEN_HAP) {
+    if (tokenType != TokenType::TOKEN_HAP && tokenType != TokenType::TOKEN_SYSTEM_HAP) {
         return;
     }
     AddMouseEventId(pointerEvent);
