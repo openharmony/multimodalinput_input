@@ -260,6 +260,7 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto sess = udsServer->GetSession(fd);
     CHKPV(sess);
     auto currentTime = GetSysClockTime();
+    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
         MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
             "action:%{public}s)", point->GetDeviceId(), point->DumpPointerAction());
@@ -274,7 +275,6 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     int32_t pointerAc = pointerEvent->GetPointerAction();
     if (pointerAc == PointerEvent::POINTER_ACTION_PULL_DOWN || pointerAc == PointerEvent::POINTER_ACTION_UP ||
         pointerAc == PointerEvent::POINTER_ACTION_DOWN || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP) {
