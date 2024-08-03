@@ -122,7 +122,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
     int32_t ret = RET_ERR;
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
-            ret =  StubHandleAllocSocketFd(data, reply);
+            ret = StubHandleAllocSocketFd(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_EVENT_FILTER):
             ret = StubAddInputEventFilter(data, reply);

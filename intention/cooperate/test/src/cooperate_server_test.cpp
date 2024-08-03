@@ -214,7 +214,7 @@ HWTEST_F(CooperateServerTest, EnableTest2, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    DefaultParam  param { 1 };
+    DefaultParam param { 1 };
     ASSERT_TRUE(param.Marshalling(data));
     auto ret = cooperateServer_->Enable(context, data, reply);
     EXPECT_EQ(ret, RET_OK);
@@ -238,7 +238,7 @@ HWTEST_F(CooperateServerTest, AddWatchTest1, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    DefaultParam  param { 1 };
+    DefaultParam param { 1 };
     ASSERT_TRUE(param.Marshalling(data));
     auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_LISTENER, data, reply);
     EXPECT_EQ(ret, RET_OK);
@@ -260,7 +260,7 @@ HWTEST_F(CooperateServerTest, DisableTest2, TestSize.Level0)
         .uid = IPCSkeleton::GetCallingUid(),
         .pid = IPCSkeleton::GetCallingPid(),
     };
-    DefaultParam  param { 1 };
+    DefaultParam param { 1 };
     MessageParcel datas;
     MessageParcel reply;
     param.Marshalling(datas);
@@ -331,7 +331,7 @@ HWTEST_F(CooperateServerTest, AddWatchTest4, TestSize.Level0)
     };
     MessageParcel data;
     MessageParcel reply;
-    RegisterEventListenerParam  param { "networkId" };
+    RegisterEventListenerParam param { "networkId" };
     param.Marshalling(data);
     ASSERT_TRUE(param.Marshalling(data));
     auto ret = cooperateServer_->AddWatch(context, CooperateRequestID::REGISTER_EVENT_LISTENER, data, reply);
