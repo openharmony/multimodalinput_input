@@ -25,12 +25,26 @@ namespace MMI {
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
 void InputScreenCaptureMonitorListener::OnScreenCaptureStarted(int32_t pid)
 {
-    MMI_HILOGD("The process starts to record the screen, pid: %{public}d", pid);
+    MMI_HILOGI("The process starts to record the screen, pid: %{public}d", pid);
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPV(monitorHandler);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
+    auto sess = udsServer->GetSessionByPid(pid);
+    CHKPV(sess);
+    monitorHandler->OnScreenCaptureStarted(sess);
 }
 
 void InputScreenCaptureMonitorListener::OnScreenCaptureFinished(int32_t pid)
 {
-    MMI_HILOGD("The process screen recording finishs, pid: %{public}d", pid);
+    MMI_HILOGI("The process screen recording finishs, pid: %{public}d", pid);
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPV(monitorHandler);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
+    auto sess = udsServer->GetSessionByPid(pid);
+    CHKPV(sess);
+    monitorHandler->OnScreenCaptureFinished(sess);
 }
 #endif
 }

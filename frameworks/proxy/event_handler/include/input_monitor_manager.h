@@ -38,8 +38,6 @@ public:
 
 public:
     static bool IsValidMonitorId(int32_t monitorId);
-private:
-    std::function<void()> removeMonitorCallback_ { nullptr };
 };
 
 inline InputHandlerType InputMonitorManager::GetHandlerType() const

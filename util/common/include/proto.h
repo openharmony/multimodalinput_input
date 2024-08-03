@@ -43,6 +43,7 @@ enum TokenType : int32_t {
     TOKEN_HAP = 0,
     TOKEN_NATIVE,
     TOKEN_SHELL,
+    TOKEN_SYSTEM_HAP,
 };
 
 enum ANTTimeOutTime : int64_t {
