@@ -459,6 +459,7 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
+__attribute__((no_sanitize("cfi")))
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_DEBUG_ENTER;
