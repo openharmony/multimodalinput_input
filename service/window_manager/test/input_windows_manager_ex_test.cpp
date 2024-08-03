@@ -2348,5 +2348,32 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     pointer->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointer));
 }
+
+
+
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent
+ * @tc.desc: Cover if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsMgr =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsMgr, nullptr);
+    std::shared_ptr<PointerEvent> pointer = PointerEvent::Create();
+    ASSERT_NE(pointer, nullptr);
+    int32_t logicalX = 500;
+    int32_t logicalY = 500;
+    WindowInfo windowInfo;
+    pointer->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    pointer->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointer));
+}
 } // namespace MMI
 } // namespace OHOS
