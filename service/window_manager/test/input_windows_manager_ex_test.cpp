@@ -2389,25 +2389,30 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     EventTouch touchInfo;
     int32_t physicalDisplayId;
     inputWindowsManager->bindInfo_.AddDisplay(2, "abcde");
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
     deviceId = 2;
     DisplayInfo displayInfo;
     displayInfo.width = -1;
     displayInfo.height = 3;
     inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
     displayInfo.width = 3;
     displayInfo.height = -1;
     inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
     displayInfo.width = -5;
     displayInfo.height = -6;
     inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
     displayInfo.width = 3;
     displayInfo.height = 2;
     inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint(deviceId, &touch, touchInfo, physicalDisplayId));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
 }
 
 /**
@@ -2503,14 +2508,17 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     PointerEvent::PointerItem item;
     item.pointerId_ = -1;
     pointerEvent->pointers_.push_back(item);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
     item.pointerId_ = 1;
     pointerEvent->pointers_.push_back(item);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
     windowInfo.id = 1;
     windowInfo.pid = 11;
     windowInfo.transform.push_back(1.1);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
 }
 
 /**
