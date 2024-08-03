@@ -70,6 +70,7 @@ const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+constexpr int32_t DEFAULT_VALUE { -1 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1324,7 +1325,7 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
         }
         if (repeatTimerId_ >= 0) {
             TimerMgr->RemoveTimer(repeatTimerId_);
-            repeatTimerId_ = -1;
+            repeatTimerId_ = DEFAULT_VALUE;
         }
         if (repeatKeyTimerIds_.find(item.ability.bundleName) == repeatKeyTimerIds_.end()) {
             repeatKeyTimerIds_.emplace(item.ability.bundleName, timerId);
