@@ -1442,7 +1442,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
     }
 
-    for (const auto &pointerEvent_item : pointerQueue_) {
+    for (const auto &pointerEventItem : pointerQueue_) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
@@ -1451,84 +1451,84 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                                 napi_create_object(jsEnv_, &napiPointer),
                                 CREATE_OBJECT,
                                 scope,
-                                pointerEvent_item);
+                                pointerEventItem);
         auto ret = RET_ERR;
         switch (TO_GESTURE_TYPE[typeName.c_str()]) {
             case TypeName::TOUCH: {
-                ret = TransformPointerEvent(pointerEvent_item, napiPointer);
+                ret = TransformPointerEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::MOUSE: {
-                ret = TransformMousePointerEvent(pointerEvent_item, napiPointer);
+                ret = TransformMousePointerEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::ROTATE: {
-                if (!IsRotate(pointerEvent_item)) {
+                if (!IsRotate(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformRotateEvent(pointerEvent_item, napiPointer);
+                ret = TransformRotateEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::PINCH: {
-                if (!IsPinch(pointerEvent_item, fingers)) {
+                if (!IsPinch(pointerEventItem, fingers)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformPinchEvent(pointerEvent_item, napiPointer);
+                ret = TransformPinchEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::THREE_FINGERS_SWIPE: {
                 bool canUse = false;
-                if (IsThreeFingersSwipe(pointerEvent_item)) {
+                if (IsThreeFingersSwipe(pointerEventItem)) {
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                 }
                 if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformSwipeEvent(pointerEvent_item, napiPointer);
+                ret = TransformSwipeEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::FOUR_FINGERS_SWIPE: {
-                if (!IsFourFingersSwipe(pointerEvent_item)) {
+                if (!IsFourFingersSwipe(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformSwipeEvent(pointerEvent_item, napiPointer);
+                ret = TransformSwipeEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
                 bool canUse = false;
                 InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                 if (canUse) {
-                    ret = TransformMultiTapEvent(pointerEvent_item, napiPointer);
+                    ret = TransformMultiTapEvent(pointerEventItem, napiPointer);
                 }
                 break;
             }
             case TypeName::JOYSTICK:{
-                if (!IsJoystick(pointerEvent_item)) {
+                if (!IsJoystick(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformJoystickPointerEvent(pointerEvent_item, napiPointer);
+                ret = TransformJoystickPointerEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::SWIPE_INWARD: {
-                if (!IsSwipeInward(pointerEvent_item)) {
+                if (!IsSwipeInward(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformSwipeInwardEvent(pointerEvent_item, napiPointer);
+                ret = TransformSwipeInwardEvent(pointerEventItem, napiPointer);
                 break;
             }
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
             case TypeName::FINGERPRINT: {
-                if (!IsFingerprint(pointerEvent_item)) {
+                if (!IsFingerprint(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformFingerprintEvent(pointerEvent_item, napiPointer);
+                ret = TransformFingerprintEvent(pointerEventItem, napiPointer);
                 break;
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -1544,25 +1544,25 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
         napi_value callback = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
-            GET_REFERENCE_VALUE, scope, pointerEvent_item);
+            GET_REFERENCE_VALUE, scope, pointerEventItem);
         napi_value result = nullptr;
         if (monitor_->GetRectTotal() == 0
             || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectArea())) {
             CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
-                CALL_FUNCTION, scope, pointerEvent_item);
+                CALL_FUNCTION, scope, pointerEventItem);
         }
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward";
         if (typeNameFlag) {
-            if (pointerEvent_item->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
-                MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent_item->GetPointerId(),
-                    pointerEvent_item->DumpPointerAction());
+            if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+                MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEventItem->GetPointerId(),
+                    pointerEventItem->DumpPointerAction());
             }
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
-            CheckConsumed(retValue, pointerEvent_item);
+            CheckConsumed(retValue, pointerEventItem);
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
