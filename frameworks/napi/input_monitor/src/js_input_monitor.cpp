@@ -1447,11 +1447,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
         napi_value napiPointer = nullptr;
-        CHECK_SCOPE_BEFORE_BREAK(jsEnv_,
-                                napi_create_object(jsEnv_, &napiPointer),
-                                CREATE_OBJECT,
-                                scope,
-                                pointerEventItem);
+        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer),
+                                CREATE_OBJECT, scope, pointerEventItem);
         auto ret = RET_ERR;
         switch (TO_GESTURE_TYPE[typeName.c_str()]) {
             case TypeName::TOUCH: {
