@@ -1442,12 +1442,16 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
     }
 
-    for(const auto &pointerEvent_item : pointerQueue_) {
+    for (const auto &pointerEvent_item : pointerQueue_) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
         napi_value napiPointer = nullptr;
-        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer), CREATE_OBJECT, scope, pointerEvent_item);
+        CHECK_SCOPE_BEFORE_BREAK(jsEnv_,
+                                napi_create_object(jsEnv_, &napiPointer),
+                                CREATE_OBJECT,
+                                scope,
+                                pointerEvent_item);
         auto ret = RET_ERR;
         switch (TO_GESTURE_TYPE[typeName.c_str()]) {
             case TypeName::TOUCH: {
@@ -1562,7 +1566,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
-     pointerQueue_.clear();
+    pointerQueue_.clear();
 }
 
 bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
