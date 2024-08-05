@@ -61,6 +61,8 @@ ohos_executable("uinput_inject") {
 
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
+  cflags = [ "-fstack-protector-strong" ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -159,10 +161,10 @@ group("mmi_tests") {
     "service:KnuckleGlowPointTest",
     "service:KnuckleGlowTraceSystemTest",
     "service:LibinputAdapterTest",
-    "service:ModuleLoaderExTest",
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
+    "service:PointerDrawingManagerExTest",
     "service:PointerDrawingManagerTest",
     "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",

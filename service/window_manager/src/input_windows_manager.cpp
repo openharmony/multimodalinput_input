@@ -2270,8 +2270,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (!dragFlag_) {
         isDragBorder_ = SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
         dragPointerStyle_ = pointerStyle;
-        MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{public}d,"
-            "logicalY is :%{public}d", pointerStyle.id, window.id, logicalX, logicalY);
+        MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{private}d,"
+            "logicalY is :%{private}d", pointerStyle.id, window.id, logicalX, logicalY);
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         SetMouseFlag(true);
@@ -2789,8 +2789,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (it == touchItemDownInfos_.end() ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-                MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{public}f,"
-                    "logicalY:%{public}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
+                MMI_HILOG_DISPATCHE("The touchWindow is nullptr, logicalX:%{private}f,"
+                    "logicalY:%{private}f, pointerId:%{public}d", logicalX, logicalY, pointerId);
                 return RET_ERR;
             }
         }
@@ -2852,7 +2852,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     SetPrivacyModeFlag(touchWindow->privacyMode, pointerEvent);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    DispatchUIExtentionPointerEvent(logicalX, logicalX, pointerEvent);
+    DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
     pointerItem.SetDisplayX(static_cast<int32_t>(physicalX));
     pointerItem.SetDisplayY(static_cast<int32_t>(physicalY));
     pointerItem.SetWindowX(static_cast<int32_t>(windowX));

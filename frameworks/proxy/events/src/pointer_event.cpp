@@ -451,7 +451,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
       buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), zOrder_(other.zOrder_),
       axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
-      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
+      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_), axisEventType_(other.axisEventType_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -483,6 +483,7 @@ void PointerEvent::Reset()
     axes_ = 0U;
     axisValues_.fill(0.0);
     velocity_ = 0.0;
+    axisEventType_ = AXIS_EVENT_TYPE_UNKNOWN;
     pressedKeys_.clear();
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     fingerprintDistanceX_ = 0.0;
@@ -791,6 +792,16 @@ std::vector<int32_t> PointerEvent::GetPressedKeys() const
     return pressedKeys_;
 }
 
+int32_t PointerEvent::GetAxisEventType() const
+{
+    return axisEventType_;
+}
+
+void PointerEvent::SetAxisEventType(int32_t axisEventType)
+{
+    axisEventType_ = axisEventType;
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void PointerEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
 {
@@ -853,6 +864,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
     WRITEDOUBLE(out, velocity_);
+
+    WRITEINT32(out, axisEventType_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -918,6 +931,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READDOUBLE(in, velocity_);
 
+    READINT32(in, axisEventType_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
         return false;

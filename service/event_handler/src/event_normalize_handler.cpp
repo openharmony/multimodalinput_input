@@ -55,6 +55,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t FINGER_NUM { 2 };
+constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
+constexpr int32_t SWIPE_INWARD_MAX_X_THRE { 110 };
+constexpr int32_t SWIPE_INWARD_MIN_X_THRE { 10 };
+bool g_isSwipeInward = false;
 constexpr int32_t MT_TOOL_PALM { 2 };
 constexpr double TOUCH_SLOP { 1.0 };
 constexpr int32_t SQUARE { 2 };
@@ -469,6 +473,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         MMI_HILOGD("Handle mouse axis event");
         HandleMouseEvent(event);
     }
+    if (buttonIds_.size() == SWIPE_INWARD_FINGER_ONE && JudgeIfSwipeInward(pointerEvent)) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+    }
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This event is up remove this finger");
@@ -477,6 +484,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
             pointerEvent->Reset();
         }
         buttonIds_.erase(seatSlot);
+        g_isSwipeInward = false;
     }
     if (buttonIds_.empty()) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
@@ -872,6 +880,18 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    if (g_isSwipeInward == false &&
+        pointerEvent->GetAllPointerItems().size() == SWIPE_INWARD_FINGER_ONE &&
+        (pointerEvent->GetAllPointerItems().begin()->GetDisplayX() >= SWIPE_INWARD_MAX_X_THRE ||
+        pointerEvent->GetAllPointerItems().begin()->GetDisplayX() <= SWIPE_INWARD_MIN_X_THRE)) {
+        g_isSwipeInward = true;
+    }
+    return g_isSwipeInward;
 }
 } // namespace MMI
 } // namespace OHOS

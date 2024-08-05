@@ -1910,13 +1910,50 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey, TestSize.
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
     repeatKey.times = 2;
-    repeatKey.statusConfig = true;
-    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyAbility_001
+ * @tc.desc: HandleRepeatKeyAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.ability.bundleName = "bundleName";
+    ASSERT_TRUE(handler.HandleRepeatKeyAbility(repeatKey, isLaunched, keyEvent, false));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyAbility_002
+ * @tc.desc: HandleRepeatKeyAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.ability.bundleName = "bundleName";
+    handler.repeatKeyTimerIds_.emplace(repeatKey.ability.bundleName, 1);
+    ASSERT_TRUE(handler.HandleRepeatKeyAbility(repeatKey, isLaunched, keyEvent, false));
 }
 
 /**
@@ -3559,6 +3596,56 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestS
     item.times = 6;
     handler.count_ = 5;
     ASSERT_TRUE(handler.HandleRepeatKey(item, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_003
+ * @tc.desc: HandleRepeatKey_003
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    repeatKey.times = 2;
+    repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
+    repeatKey.ability.bundleName = "bundleName";
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.repeatKeyCountMap_.emplace(repeatKey.ability.bundleName, 2);
+    handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 2);
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_004
+ * @tc.desc: HandleRepeatKey_004
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 3;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "statusConfig";
+    repeatKey.keyCode = KeyEvent::KEYCODE_POWER;
+    repeatKey.ability.bundleName = "bundleName";
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.repeatKeyCountMap_.emplace(repeatKey.ability.bundleName, 2);
+    handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 5);
+    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**

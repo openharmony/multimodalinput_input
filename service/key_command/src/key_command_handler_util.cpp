@@ -635,7 +635,8 @@ bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& exclude
     return true;
 }
 
-bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec)
+bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec,
+    std::map<int32_t, int32_t>& repeatKeyMaxTimes)
 {
     cJSON* repeatKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "RepeatKeys");
     if (!cJSON_IsArray(repeatKeys)) {
@@ -653,6 +654,12 @@ bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKey
             continue;
         }
         repeatKeyVec.push_back(rep);
+        if (repeatKeyMaxTimes.find(rep.keyCode) == repeatKeyMaxTimes.end()) {
+            repeatKeyMaxTimes.insert(std::make_pair(rep.keyCode, rep.times));
+        }
+        if (repeatKeyMaxTimes[rep.keyCode] < rep.times) {
+            repeatKeyMaxTimes[rep.keyCode] = rep.times;
+        }
     }
 
     return true;

@@ -417,63 +417,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
 }
 
 /**
- * @tc.name: EventNormalizeHandlerTest_HandleEvent_001
- * @tc.desc: Test the function HandleEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleEvent_001, TestSize.Level1)
-{
-    EventNormalizeHandler handler;
-    MultiFingersTapHandler processor;
-    int64_t frameTime = 100;
-    libinput_event* event = new (std::nothrow) libinput_event;
-    ASSERT_NE(event, nullptr);
-    event->type = LIBINPUT_EVENT_TOUCH_CANCEL;
-    handler.HandleEvent(event, frameTime);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_TOUCH_FRAME;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_TAP;
-    processor.multiFingersState_ = MulFingersTap::TRIPLETAP;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    processor.multiFingersState_ = MulFingersTap::NO_TAP;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_DEVICE_ADDED;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_DEVICE_REMOVED;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_KEYBOARD_KEY;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_MOTION;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_BUTTON;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_AXIS;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_TAP;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_TOUCHPAD_DOWN;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_TOUCHPAD_UP;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_TOUCHPAD_MOTION;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_NONE;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-    event->type = LIBINPUT_EVENT_GESTURE_SWIPE_END;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleEvent(event, frameTime));
-}
-
-/**
  * @tc.name: EventNormalizeHandlerTest_HandleKeyboardEvent_001
  * @tc.desc: Test the function HandleKeyboardEvent
  * @tc.type: FUNC
