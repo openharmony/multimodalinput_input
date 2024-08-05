@@ -48,6 +48,12 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
     napi_value napiValue = {};
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, object, name.c_str(), &exist);
+    if (status != napi_ok || !exist) {
+        MMI_HILOGD("Can not find %{public}s property", name.c_str());
+        return false;
+    }
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
 
@@ -60,28 +66,6 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return true;
-}
-
-std::optional<bool> GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
-{
-    napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
-    napi_valuetype tmpType = napi_undefined;
-    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof failed");
-        return std::nullopt;
-    }
-    if (tmpType != napi_boolean) {
-        MMI_HILOGE("The value is not bool");
-        return std::nullopt;
-    }
-    bool ret = true;
-    if (napi_get_value_bool(env, napiValue, &ret) != napi_ok) {
-        MMI_HILOGE("Call napi_get_value_bool failed");
-        return std::nullopt;
-    }
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
-    return std::make_optional(ret);
 }
 
 std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
