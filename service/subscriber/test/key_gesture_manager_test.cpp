@@ -49,19 +49,23 @@ public:
     MyKeyGesture() = default;
     ~MyKeyGesture() override = default;
 
-    bool IsWorking() override {
+    bool IsWorking() override
+    {
         return true;
     }
 
-    bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const override {
+    bool ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const override
+    {
         return true;
     }
 
-    bool Intercept(std::shared_ptr<KeyEvent> keyEvent) override {
+    bool Intercept(std::shared_ptr<KeyEvent> keyEvent) override
+    {
         return true;
     }
 
-    void Dump(std::ostringstream &output) const override {
+    void Dump(std::ostringstream &output) const override
+    {
         output << "MyKeyGesture";
     }
 };
