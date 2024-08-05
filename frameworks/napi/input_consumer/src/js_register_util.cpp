@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,6 +60,28 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return true;
+}
+
+std::optional<bool> GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
+{
+    napi_value napiValue = {};
+    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    napi_valuetype tmpType = napi_undefined;
+    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
+        MMI_HILOGE("Call napi_typeof failed");
+        return std::nullopt;
+    }
+    if (tmpType != napi_boolean) {
+        MMI_HILOGE("The value is not bool");
+        return std::nullopt;
+    }
+    bool ret = true;
+    if (napi_get_value_bool(env, napiValue, &ret) != napi_ok) {
+        MMI_HILOGE("Call napi_get_value_bool failed");
+        return std::nullopt;
+    }
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return std::make_optional(ret);
 }
 
 std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)

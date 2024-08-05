@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ namespace MMI {
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value);
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, std::string value);
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret);
+std::optional<bool> GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name);
 std::string GetNamedPropertyString(const napi_env &env, const napi_value &object, const std::string &name);
 std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name);
 napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params);
