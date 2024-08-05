@@ -81,77 +81,7 @@ typedef enum {
      *
      * @since 12
      */
-    AXIS_TYPE_ROTATE,
-
-    /**
-     * Indicates the x axis. The status of the x axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_X,
-
-    /**
-     * Indicates the y axis. The status of the y axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_Y,
-
-    /**
-     * Indicates the z axis. The status of the z axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_Z,
-
-    /**
-     * Indicates the rz axis. The status of the rz axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_RZ,
-
-    /**
-     * Indicates the gas axis. The status of the gas axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_GAS,
-
-    /**
-     * Indicates the brake axis. The status of the brake axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_BRAKE,
-
-    /**
-     * Indicates the hat0x axis. The status of the hat0x axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_HAT0X,
-
-    /**
-     * Indicates the hat0y axis. The status of the hat0y axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_HAT0Y,
-
-    /**
-     * Indicates the throttle axis. The status of the throttle axis changes when you operate the joystick.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_ABS_THROTTLE,
-
-    /**
-     * Indicates the maximum number of defined axis types.
-     *
-     * @since 12
-     */
-    AXIS_TYPE_MAX
+    AXIS_TYPE_ROTATE
 } InputEvent_AxisType;
 
 /**

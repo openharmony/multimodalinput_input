@@ -144,7 +144,7 @@ DisplayInfo InputManagerUpdateDisplayInfoTest::CreateDisplayInfo(int32_t id) con
 
 /**
  * @tc.name: InputManagerTest_UpdateDisplayInfoShaped_001
- * @tc.desc: Update shaped window information for  1 display and 1 window
+ * @tc.desc: Update shaped window information for 1 display and 1 window
  * @tc.type: FUNC
  * @tc.require:
  */

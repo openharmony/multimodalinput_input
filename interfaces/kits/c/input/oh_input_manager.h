@@ -1078,7 +1078,7 @@ Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback)
  *
  * @permission ohos.permission.INPUT_MONITORING
  * @param callback - Callback for the listener used to listen for all types of axis events.
- * @return OH_Input_RemoveAllAxisEventMonitor function result code.
+ * @return OH_Input_RemoveAxisEventMonitorForAll function result code.
  *         {@link INPUT_SUCCESS} Removes the listener for all types of axis events success.\n
  *         {@link INPUT_PERMISSION_DENIED} Permission verification failed.\n
  *         {@link INPUT_PARAMETER_ERROR} The callback is NULL or has not been added.\n
@@ -1086,7 +1086,7 @@ Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback)
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-Input_Result OH_Input_RemoveAllAxisEventMonitor(Input_AxisEventCallback callback);
+Input_Result OH_Input_RemoveAxisEventMonitorForAll(Input_AxisEventCallback callback);
 
 /**
  * @brief Removes the listener for the specified type of axis events.
