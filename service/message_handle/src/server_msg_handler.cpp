@@ -865,7 +865,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("SendNotice submit  begin");
+    MMI_HILOGD("SendNotice submit begin");
     ffrt::submit([this, noticeInfo] {
         MMI_HILOGD("SendNotice submit enter");
         CHKPV(injectNotice_);

@@ -205,6 +205,10 @@ ohos_unittest("GestureTransformTest") {
       "graphic_2d_ext:libsdf",
     ]
   }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
 
 ohos_unittest("TabletToolTranformTest") {
@@ -359,6 +363,10 @@ ohos_unittest("TabletToolTranformTest") {
       "eventhandler:libeventhandler",
       "graphic_2d_ext:libsdf",
     ]
+  }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
   }
 }
 
@@ -528,6 +536,10 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
       "graphic_2d_ext:libsdf",
     ]
   }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
 
 ohos_unittest("TouchpadGestureTest") {
@@ -667,6 +679,10 @@ ohos_unittest("TouchpadGestureTest") {
       "graphic_2d_ext:libsdf",
     ]
   }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
 
 ohos_unittest("TouchPadTransformProcessorMockTest") {
@@ -805,6 +821,10 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
       "eventhandler:libeventhandler",
       "graphic_2d_ext:libsdf",
     ]
+  }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
   }
 }
 

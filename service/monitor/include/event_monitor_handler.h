@@ -28,6 +28,9 @@
 #include "input_handler_type.h"
 #include "uds_session.h"
 #include "nap_process.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "input_screen_capture_monitor_listener.h"
+#endif
 
 namespace OHOS {
 namespace MMI {
@@ -59,6 +62,11 @@ public:
     bool OnHandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    void RegisterScreenCaptureListener();
+    void OnScreenCaptureStarted(SessionPtr session);
+    void OnScreenCaptureFinished(SessionPtr session);
+#endif
 
 private:
     void InitSessionLostCallback();
@@ -71,6 +79,13 @@ private:
             SessionPtr session, std::shared_ptr<IInputEventConsumer> cb = nullptr)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
               session_(session), callback(cb) {}
+        SessionHandler(const SessionHandler& other)
+        {
+            handlerType_ = other.handlerType_;
+            eventType_ = other.eventType_;
+            session_ = other.session_;
+            callback = other.callback;
+        }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
         bool operator<(const SessionHandler& other) const
@@ -96,6 +111,9 @@ private:
         void MarkConsumed(int32_t eventId, SessionPtr session);
 
         bool HasMonitor(SessionPtr session);
+        bool HasScreenCaptureMonitor(SessionPtr session);
+        void RemoveScreenCaptureMonitor(SessionPtr session);
+        void RecoveryScreenCaptureMonitor(SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -113,12 +131,16 @@ private:
 
     private:
         std::set<SessionHandler> monitors_;
+        std::map<int32_t, std::set<SessionHandler>> endScreenCaptureMonitors_;
         std::unordered_map<int32_t, ConsumptionState> states_;
     };
 
 private:
     bool sessionLostCallbackInitialized_ { false };
     MonitorCollection monitors_;
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    sptr<InputScreenCaptureMonitorListener> screenCaptureMonitorListener_ { nullptr };
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

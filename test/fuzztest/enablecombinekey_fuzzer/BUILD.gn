@@ -71,6 +71,10 @@ ohos_fuzztest("EnableCombineKeyFuzzTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
 
 ###############################################################################
