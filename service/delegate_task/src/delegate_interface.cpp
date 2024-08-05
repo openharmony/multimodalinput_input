@@ -29,7 +29,9 @@ namespace MMI {
 void DelegateInterface::Init()
 {
     TOUCH_DRAWING_MGR->SetDelegateProxy(shared_from_this());
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     DISPLAY_MONITOR->SetDelegateProxy(shared_from_this());
+#endif // #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
@@ -60,10 +62,12 @@ void DelegateInterface::OnInputEventHandler(
         if (handler.first != type) {
             continue;
         }
+#ifdef OHOS_BUILD_ENABLE_MONITOR
         if (type == InputHandlerType::MONITOR &&
             (summary.eventType & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
         }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
         uint32_t deviceTags = 0;
         if (type == InputHandlerType::INTERCEPTOR &&
