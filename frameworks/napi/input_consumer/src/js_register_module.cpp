@@ -157,14 +157,13 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
     bool isRepeat = true;
-    std::optional<bool> tempIsRepeat = GetNamedPropertyBool(env, argv[1], "isRepeat");
-    if (tempIsRepeat) {
-        isRepeat = tempIsRepeat.value();
+    if (!GetNamedPropertyBool(env, argv[1], "isRepeat", isRepeat)) {
+        MMI_HILOGD("IsRepeat field is default");
     }
     subKeyNames += std::to_string(isRepeat);
     subKeyNames += ",";
     keyOption->SetRepeat(isRepeat);
-    MMI_HILOGD("IsRepeat:%{public}d", (isRepeat ? 1 : 0));
+    MMI_HILOGD("IsRepeat:%{public}s", (isRepeat ? "true" : "false"));
     if (argc == INPUT_PARAMETER_MAX) {
         CHKRP(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
         if (valueType != napi_function) {
