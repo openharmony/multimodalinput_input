@@ -534,6 +534,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    PointerEventSetPressedKeys(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
     if (actionType == PointerEvent::POINTER_ACTION_ROTATE_END) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -552,6 +553,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    PointerEventSetPressedKeys(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
@@ -597,7 +599,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
-    TouchEventSetPressedKeys(pointerEvent);
+    PointerEventSetPressedKeys(pointerEvent);
 
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     if (SetOriginPointerId(pointerEvent) != RET_OK) {
@@ -614,7 +616,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     return RET_OK;
 }
 
-void EventNormalizeHandler::TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent)
+void EventNormalizeHandler::PointerEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent)
 {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (KeyEventHdr != nullptr) {

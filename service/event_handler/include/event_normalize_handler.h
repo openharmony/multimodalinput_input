@@ -65,7 +65,7 @@ private:
     double CalcTouchOffset(const std::shared_ptr<PointerEvent> touchMoveEvent);
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
-    void TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
+    void PointerEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     int32_t timerId_ { -1 };
