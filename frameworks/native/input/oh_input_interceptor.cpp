@@ -35,7 +35,7 @@ int32_t OHInputInterceptor::Start(OHInterceptorType type)
     std::lock_guard<std::mutex> guard(mutex_);
     if (type == INTERCEPTOR_TYPE_KEY) {
         if (keyInterceptorId_ < 0) {
-            keyInterceptorId_ =  InputMgrImpl.AddInterceptor(shared_from_this(), DEFUALT_INTERCEPTOR_PRIORITY,
+            keyInterceptorId_ = InputMgrImpl.AddInterceptor(shared_from_this(), DEFUALT_INTERCEPTOR_PRIORITY,
                 CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD));
         }
         return keyInterceptorId_;
@@ -43,7 +43,7 @@ int32_t OHInputInterceptor::Start(OHInterceptorType type)
         if (pointerInterceptorId_ < 0) {
             uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) -
                 CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
-            pointerInterceptorId_ =  InputMgrImpl.AddInterceptor(shared_from_this(),
+            pointerInterceptorId_ = InputMgrImpl.AddInterceptor(shared_from_this(),
                 DEFUALT_INTERCEPTOR_PRIORITY, deviceTags);
         }
         return pointerInterceptorId_;
