@@ -1441,7 +1441,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             pointerQueue_.push_back(pointerEvent);
         }
     }
-
+    std::lock_guard<std::mutex> guard(resourcemutex_);
     for (const auto &pointerEventItem : pointerQueue_) {
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
