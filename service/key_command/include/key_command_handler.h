@@ -210,6 +210,7 @@ private:
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
+    void LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched, const std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool IsRepeatKeyEvent(const SequenceKey &sequenceKey);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
@@ -219,8 +220,11 @@ private:
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    void HandleRepeatKeyOwnCount(const RepeatKey &item);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+        const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
@@ -316,6 +320,9 @@ private:
     bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
+    std::map<int32_t, int32_t> repeatKeyMaxTimes_;
+    std::map<std::string, int32_t> repeatKeyTimerIds_;
+    std::map<std::string, int32_t> repeatKeyCountMap_;
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
@@ -337,6 +344,8 @@ private:
     int32_t repeatTimerId_ { -1 };
     int32_t knuckleCount_ { 0 };
     int64_t downActionTime_ { 0 };
+    int64_t lastDownActionTime_ { 0 };
+    int64_t lastVolumeDownActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };

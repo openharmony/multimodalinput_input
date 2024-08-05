@@ -686,6 +686,27 @@ public:
      */
     static constexpr int32_t JOYSTICK_BUTTON_MODE = 28;
 
+    enum AxisEventType {
+        /**
+         * Indicates an unknown axis events.
+         *
+         * @since 12
+         */
+        AXIS_EVENT_TYPE_UNKNOWN = -1,
+        /**
+         * Indicates two-finger pinch events. The axis value can be AXIS_TYPE_PINCH or AXIS_TYPE_ROTATE.
+         *
+         * @since 12
+         */
+        AXIS_EVENT_TYPE_PINCH = 1,
+        /**
+         * Indicates scroll axis events. The axis value can be AXIS_TYPE_SCROLL_VERTICAL or AXIS_TYPE_SCROLL_HORIZONTAL.
+         * Wherein, the value of AXIS_TYPE_SCROLL_HORIZONTAL is 0 for a mouse wheel event.
+         *
+         * @since 12
+         */
+        AXIS_EVENT_TYPE_SCROLL = 2,
+    };
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
@@ -1604,6 +1625,21 @@ public:
      */
     void SetOriginPointerAction(int32_t pointerAction);
 
+    /**
+     * @brief Obtains the axis event type.
+     * @return Returns the axis event type.
+     * @since 12
+     */
+    int32_t GetAxisEventType() const;
+
+    /**
+     * @brief Sets axis event type.
+     * @param axisEventType Indicates the axis event type to set.
+     * @return void
+     * @since 12
+     */
+    void SetAxisEventType(int32_t axisEventType);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1670,6 +1706,7 @@ private:
     double velocity_ { 0.0 };
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+    int32_t axisEventType_ { AXIS_EVENT_TYPE_UNKNOWN };
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     double fingerprintDistanceX_ { 0.0 };
     double fingerprintDistanceY_ { 0.0 };

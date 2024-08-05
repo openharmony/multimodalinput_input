@@ -48,6 +48,18 @@ constexpr int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
+
+class RemoteObjectTest : public IRemoteObject {
+public:
+    explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
+    ~RemoteObjectTest() {}
+
+    int32_t GetObjectRefCount() { return 0; }
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { return 0; }
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    int Dump(int fd, const std::vector<std::u16string> &args) { return 0; }
+};
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
@@ -1574,6 +1586,52 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo, TestSize.Leve
         << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_WRITE;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnTransferBinderClientSrv_001
+ * @tc.desc: Test OnTransferBinderClientSrv
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    sptr<RemoteObjectTest> binderClientObject = new RemoteObjectTest(u"test");
+    int32_t pid = 12345;
+    EXPECT_EQ(RET_OK, handler.OnTransferBinderClientSrv(binderClientObject, pid));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnTransferBinderClientSrv_002
+ * @tc.desc: Test OnTransferBinderClientSrv
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    sptr<IRemoteObject> binderClientObject = nullptr;
+    int32_t pid = 12345;
+    EXPECT_EQ(RET_ERR, handler.OnTransferBinderClientSrv(binderClientObject, pid));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_001
+ * @tc.desc: Test CloseInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.InitInjectNoticeSource();
+    int32_t pid = 12345;
+    bool result = handler.CloseInjectNotice(pid);
+    ASSERT_FALSE(result);
 }
 } // namespace MMI
 } // namespace OHOS

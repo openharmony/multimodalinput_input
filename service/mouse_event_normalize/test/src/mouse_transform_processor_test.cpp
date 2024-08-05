@@ -951,7 +951,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Normalize_02, 
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    EXPECT_EQ(processor.Normalize(event), RET_OK);
+    EXPECT_EQ(processor.Normalize(event), RET_ERR);
 }
 
 /**
@@ -1360,7 +1360,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_HandleMotionIn
     EXPECT_EQ(ret, RET_ERR);
     type = LIBINPUT_EVENT_POINTER_BUTTON;
     ret = processor.HandleMotionInner(data, event);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**

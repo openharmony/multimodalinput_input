@@ -200,7 +200,7 @@ std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
         ++canDelEventCount;
     }
     if (canDelEventCount == 0) {
-        MMI_HILOGW("Can not find event:%{public}d pid:%{public}d type:%{public}d", id, pid_, type);
+        MMI_HILOGD("Can not find event:%{public}d pid:%{public}d type:%{public}d", id, pid_, type);
         return timerIds;
     }
     events.erase(events.begin(), events.begin() + canDelEventCount);
