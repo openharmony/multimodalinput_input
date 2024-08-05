@@ -459,7 +459,7 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
-bool MultimodalInputConnectManager::ConnectMultimodalInputService()
+bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);

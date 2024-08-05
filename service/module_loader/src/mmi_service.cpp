@@ -363,6 +363,11 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    MMI_HILOGI("Add system ability listener start");
+    AddSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
+    MMI_HILOGI("Add system ability listener end");
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -401,6 +406,9 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    RemoveSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1480,6 +1488,14 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
             IPointerDrawingManager::GetInstance()->InitPointerObserver();
         }
     }
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
+        MMI_HILOGI("Init screen capture monitor listener start");
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPV(monitorHandler);
+        monitorHandler->RegisterScreenCaptureListener();
+    }
+#endif
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)

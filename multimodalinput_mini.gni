@@ -396,3 +396,15 @@ if (input_ext_feature_magiccursor) {
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
 }
+
+if (defined(global_parts_info.multimedia_player_framework)) {
+  enable_player_framework = true
+  input_default_defines += [ "PLAYER_FRAMEWORK_EXISTS" ]
+} else {
+  enable_player_framework = false
+}
+
+if (enable_player_framework) {
+  libmmi_service_sources +=
+      [ "module_loader/src/input_screen_capture_monitor_listener.cpp" ]
+}

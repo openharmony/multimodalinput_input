@@ -62,7 +62,7 @@ const std::string FOLDABLE = system::GetParameter("const.window.foldabledevice.r
 constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t SCREEN_ROTATE { 1 };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
-constexpr char FOLDABLE_ROTATE  { '0' };
+constexpr char FOLDABLE_ROTATE { '0' };
 constexpr int32_t SUBSCRIPT_TWO { 2 };
 constexpr int32_t SUBSCRIPT_ZERO { 0 };
 constexpr std::string_view SCREEN_READING { "accessibility_screenreader_enabled" };

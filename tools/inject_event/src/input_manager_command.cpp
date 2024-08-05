@@ -83,6 +83,11 @@ constexpr int32_t MOVE_POS_TWO = 2;
 constexpr int32_t MOVE_POS_THREE = 3;
 constexpr int32_t MAX_KEEP_TIME = 60000;
 constexpr int32_t NUM_KEEP_ARGC = 2;
+constexpr int32_t MAX_ARGC = 18;
+constexpr int32_t ONE_ARGC = 1;
+constexpr int32_t TWO_ARGC = 2;
+constexpr int32_t THREE_ARGC = 3;
+constexpr int32_t FOUR_ARGC = 4;
 
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
@@ -969,9 +974,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:k", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            std::cout << "number of parameters:" << argc << std::endl;
-                            if (argc < moveArgcSeven) {
-                                std::cout << "wrong number of parameters" << std::endl;
+                            if (argc < moveArgcSeven || argc > MAX_ARGC) {
+                                std::cout << "wrong number of parameters:" << argc << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             struct FingerInfo {
@@ -990,20 +994,19 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::vector<FingerInfo> fingerList;
                             int32_t startPos = optind - MOVE_POS_ONE;
                             while (true) {
-                                if (argv[startPos] == nullptr) {
+                                int32_t residueArgc = argc - startPos;
+                                if (residueArgc == 0) {
                                     totalTimeMs = TOTAL_TIME_MS;
                                     optind = startPos;
                                     break;
-                                }
-                                if (argv[startPos + MOVE_POS_ONE] == nullptr) {
+                                } else if (residueArgc == ONE_ARGC) {
                                     if (!StrToInt(argv[startPos], totalTimeMs)) {
                                         std::cout << "invalid total times" << std::endl;
                                         return EVENT_REG_FAIL;
                                     }
                                     optind = startPos + MOVE_POS_ONE;
                                     break;
-                                }
-                                if (argv[startPos + MOVE_POS_TWO] == nullptr) {
+                                } else if (residueArgc == TWO_ARGC) {
                                     totalTimeMs = TOTAL_TIME_MS;
                                     if ((strlen(argv[startPos]) != NUM_KEEP_ARGC) ||
                                         (argv[startPos][0] != '-') ||
@@ -1014,8 +1017,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     }
                                     optind = startPos + MOVE_POS_TWO;
                                     break;
-                                }
-                                if (argv[startPos + MOVE_POS_THREE] == nullptr) {
+                                } else if (residueArgc == THREE_ARGC) {
                                     if (strlen(argv[startPos]) == NUM_KEEP_ARGC) {
                                         if ((argv[startPos][0] != '-') ||
                                             (argv[startPos][1] != 'k') ||
@@ -1041,8 +1043,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     }
                                     optind = startPos + MOVE_POS_THREE;
                                     break;
-                                }
-                                if (argv[startPos + MOVE_POS_THREE] != nullptr) {
+                                } else if (residueArgc >= FOUR_ARGC) {
                                     if ((!StrToInt(argv[startPos], startX)) ||
                                         (!StrToInt(argv[startPos + MOVE_POS_ONE], startY)) ||
                                         (!StrToInt(argv[startPos + MOVE_POS_TWO], endX)) ||
@@ -1064,6 +1065,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     fingerCount += 1;
                                     startPos += FINGER_LOCATION_NUMS;
                                     optind += THREE_MORE_COMMAND;
+                                } else {
+                                    std::cout << "invalid total times" << std::endl;
+                                    return EVENT_REG_FAIL;
                                 }
                             }
 

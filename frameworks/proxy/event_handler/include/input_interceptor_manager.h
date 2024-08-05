@@ -32,7 +32,7 @@ public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
-    void RemoveInterceptor(int32_t interceptorId);
+    int32_t RemoveInterceptor(int32_t interceptorId);
     InputHandlerType GetHandlerType() const override;
 };
 
