@@ -68,7 +68,7 @@ class DisplayEventMonitor final {
         void SendCancelEventWhenLock();
     private:
         int32_t shieldModeBeforeSreenOff_ { -1 };
-        bool hasInit_ { false };
+        std::atomic<bool> hasInit_ { false };
         std::string screenStatus_;
         bool isScreenLocked_ { true };
         std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };

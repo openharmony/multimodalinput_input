@@ -415,12 +415,12 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
@@ -470,12 +470,12 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
