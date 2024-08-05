@@ -52,9 +52,9 @@ namespace MMI {
 namespace {
 constexpr int32_t FINGER_NUM { 2 };
 constexpr int32_t SWIPE_INWARD_FINGER_ONE { 1 };
-constexpr int32_t SWIPE_INWARD_MAX_X_THRE { 110 };
-constexpr int32_t SWIPE_INWARD_MIN_X_THRE { 10 };
-bool g_isSwipeInward = false;
+[[ maybe_unused ]] constexpr int32_t SWIPE_INWARD_MAX_X_THRE { 110 };
+[[ maybe_unused ]] constexpr int32_t SWIPE_INWARD_MIN_X_THRE { 10 };
+[[ maybe_unused ]] bool g_isSwipeInward = false;
 constexpr int32_t MT_TOOL_PALM { 2 };
 constexpr double TOUCH_SLOP { 1.0 };
 constexpr int32_t SQUARE { 2 };
