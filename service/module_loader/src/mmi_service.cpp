@@ -1465,6 +1465,7 @@ void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
+    MMI_HILOGI("systemAbilityId is %{public}d", systemAbilityId);
 #ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         OnAddResSchedSystemAbility(systemAbilityId, deviceId);
@@ -1473,11 +1474,9 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         isCesStart_ = true;
-        MMI_HILOGD("Common event service started");
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
-        MMI_HILOGI("Init app state observer start");
         APP_OBSERVER_MGR->InitAppStateObserver();
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
@@ -1485,16 +1484,13 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-        MMI_HILOGD("Common event service started");
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
-        MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
-        MMI_HILOGI("Init render service state observer start");
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
@@ -1505,7 +1501,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
-        MMI_HILOGI("Init screen capture monitor listener start");
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPV(monitorHandler);
         monitorHandler->RegisterScreenCaptureListener();
