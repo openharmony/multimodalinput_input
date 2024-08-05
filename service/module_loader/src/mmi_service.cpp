@@ -1134,7 +1134,7 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
     CALL_DEBUG_ENTER;
     int32_t ret = INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
-        MMI_HILOGE("GetKeyboardType call failed");
+        MMI_HILOGD("GetKeyboardType call failed");
         return ret;
     }
     return RET_OK;
@@ -1149,7 +1149,7 @@ int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
         }
         );
     if (ret != RET_OK) {
-        MMI_HILOGE("Get keyboard type failed, ret:%{public}d", ret);
+        MMI_HILOGD("Get keyboard type failed, ret:%{public}d", ret);
         return ret;
     }
     return ret;
