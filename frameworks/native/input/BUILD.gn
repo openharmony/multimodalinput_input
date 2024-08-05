@@ -27,17 +27,22 @@ ohos_shared_library("oh_input_manager") {
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/frameworks/native/input/",
+    "${mmi_path}/frameworks/native/input/include",
     "${mmi_path}/interfaces/kits/c/input/",
     "${mmi_path}/interfaces/native/innerkits/",
     "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
   ]
 
-  sources = [ "./oh_input_manager.cpp" ]
+  sources = [
+    "./oh_input_interceptor.cpp",
+    "./oh_input_manager.cpp",
+  ]
 
   cflags = [ "-Werror" ]
 

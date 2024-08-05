@@ -26,6 +26,9 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "screen_capture_monitor.h"
+#endif
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -269,6 +272,18 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
     }
 
     monitors_.erase(iter);
+    CHKPV(iter->session_);
+    int32_t pid = iter->session_->GetPid();
+    auto it = endScreenCaptureMonitors_.find(pid);
+    if (it != endScreenCaptureMonitors_.end()) {
+        auto setIter = endScreenCaptureMonitors_[pid].find(monitor);
+        if (setIter != endScreenCaptureMonitors_[pid].end()) {
+            endScreenCaptureMonitors_[pid].erase(setIter);
+        }
+        if (endScreenCaptureMonitors_[pid].empty()) {
+            endScreenCaptureMonitors_.erase(it);
+        }
+    }
     if (monitor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGD("Unregister monitor successfully");
         return;
@@ -382,6 +397,50 @@ bool EventMonitorHandler::MonitorCollection::HasMonitor(SessionPtr session)
     return (monitors_.find(monitor) != monitors_.end());
 }
 
+bool EventMonitorHandler::MonitorCollection::HasScreenCaptureMonitor(SessionPtr session)
+{
+    int32_t pid = session->GetPid();
+    return (endScreenCaptureMonitors_.find(pid) != endScreenCaptureMonitors_.end());
+}
+
+void EventMonitorHandler::MonitorCollection::RemoveScreenCaptureMonitor(SessionPtr session)
+{
+    if (session->GetTokenType() != TokenType::TOKEN_HAP) {
+        return;
+    }
+    int32_t pid = session->GetPid();
+    std::set<SessionHandler> monitorSet;
+    for (const auto &monitor : monitors_) {
+        if (monitor.session_ == session) {
+            SessionHandler screenCaptureMointor(monitor);
+            monitorSet.insert(screenCaptureMointor);
+        }
+    }
+    for (const auto &monitor : monitorSet) {
+        auto it = monitors_.find(monitor);
+        if (it != monitors_.end()) {
+            monitors_.erase(it);
+        }
+    }
+    endScreenCaptureMonitors_.emplace(pid, monitorSet);
+}
+
+void EventMonitorHandler::MonitorCollection::RecoveryScreenCaptureMonitor(SessionPtr session)
+{
+    if (session->GetTokenType() != TokenType::TOKEN_HAP) {
+        return;
+    }
+    int32_t pid = session->GetPid();
+    auto it = endScreenCaptureMonitors_.find(pid);
+    if (it != endScreenCaptureMonitors_.end()) {
+        for (auto &monitor : endScreenCaptureMonitors_[pid]) {
+            SessionHandler screenCaptureMointor(monitor);
+            monitors_.insert(screenCaptureMointor);
+        }
+        endScreenCaptureMonitors_.erase(it);
+    }
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -492,6 +551,12 @@ void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
             cItr = monitors_.erase(cItr);
         }
     }
+    CHKPV(session);
+    int32_t pid = session->GetPid();
+    auto it = endScreenCaptureMonitors_.find(pid);
+    if (it != endScreenCaptureMonitors_.end()) {
+        endScreenCaptureMonitors_.erase(it);
+    }
 }
 
 void EventMonitorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -519,5 +584,32 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
                 item.eventType_, session->GetProgramName().c_str());
     }
 }
+
+#ifdef PLAYER_FRAMEWORK_EXISTS
+void EventMonitorHandler::RegisterScreenCaptureListener()
+{
+    screenCaptureMonitorListener_ = new (std::nothrow) InputScreenCaptureMonitorListener();
+    CHKPV(screenCaptureMonitorListener_);
+    Media::ScreenCaptureMonitor::GetInstance()->RegisterScreenCaptureMonitorListener(screenCaptureMonitorListener_);
+}
+
+void EventMonitorHandler::OnScreenCaptureStarted(SessionPtr session)
+{
+    if (!monitors_.HasMonitor(session) && !monitors_.HasScreenCaptureMonitor(session)) {
+        MMI_HILOGI("This process has no screen capture monitor");
+        return;
+    }
+    monitors_.RecoveryScreenCaptureMonitor(session);
+}
+
+void EventMonitorHandler::OnScreenCaptureFinished(SessionPtr session)
+{
+    if (!monitors_.HasMonitor(session)) {
+        MMI_HILOGI("This process has no screen capture monitor");
+        return;
+    }
+    monitors_.RemoveScreenCaptureMonitor(session);
+}
+#endif
 } // namespace MMI
 } // namespace OHOS

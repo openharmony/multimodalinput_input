@@ -1885,5 +1885,91 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_02, TestS
     EXPECT_FALSE(itemPid != InputHandler->udsServer_->GetClientPid(fd));
     ASSERT_NO_FATAL_FAILURE(dispatch.FilterInvalidPointerItem(pointerEvent, fd));
 }
+
+/**
+ * @tc.name: EventDispatchTest_FilterInvalidPointerItem_008
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_008, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t fd = 10;
+    PointerEvent::PointerItem item1;
+    item1.pointerId_ = 1;
+    item1.pressed_ = true;
+    item1.displayX_ = 10;
+    item1.displayY_ = 20;
+    pointerEvent->pointers_.push_back(item1);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+    PointerEvent::PointerItem item2;
+    item2.pointerId_ = 2;
+    item2.pressed_ = false;
+    item2.displayX_ = 20;
+    item2.displayY_ = 30;
+    item2.targetWindowId_ = 1;
+    pointerEvent->pointers_.push_back(item2);
+    UDSServer udsServer;
+    udsServer.pid_ = 1;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+    udsServer.pid_ = -1;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.FilterInvalidPointerItem(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_008
+ * @tc.desc: Test the function HandleMultiWindowPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_008, TestSize.Level1)
+{
+    EventDispatchHandler eventdispatchhandler;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    ASSERT_NE(point, nullptr);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(1);
+    pointerItem.SetWindowY(2);
+    pointerItem.SetTargetWindowId(3);
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    point->pointerId_ = 3;
+    std::shared_ptr<WindowInfo> windowInfo = std::make_shared<WindowInfo>();
+    windowInfo->id = 3;
+    eventdispatchhandler.cancelEventList_[1].insert(windowInfo);
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    windowInfo->id = 1;
+    eventdispatchhandler.cancelEventList_[2].insert(windowInfo);
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_CANCEL;
+    ASSERT_NO_FATAL_FAILURE(eventdispatchhandler.HandleMultiWindowPointerEvent(point, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchKeyEvent_002
+ * @tc.desc: Test the funcation DispatchKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEvent_002, TestSize.Level1)
+{
+    EventDispatchHandler handler;
+    int32_t fd = 1;
+    UDSServer udsServer;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, 1, 1, 100, 100);
+    session->tokenType_ = 0;
+    session->isAnrProcess_.insert(std::make_pair(1, true));
+    int32_t ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+    fd = 2;
+    session->isAnrProcess_.insert(std::make_pair(2, false));
+    ret = handler.DispatchKeyEvent(fd, udsServer, key);
+    EXPECT_EQ(ret, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
