@@ -209,7 +209,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             return;
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (typeName  != "touch") {
+            if (typeName != "touch") {
                 return;
             }
             SetConsumeState(pointerEvent);

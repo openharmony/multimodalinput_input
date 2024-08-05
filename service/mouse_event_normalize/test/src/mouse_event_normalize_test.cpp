@@ -188,7 +188,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
     struct InputDeviceManager::InputDeviceInfo info = iter->second;
     INPUT_DEV_MGR->inputDevice_.erase(iter);
 
-    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     double angle = 0.5;
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
     INPUT_DEV_MGR->inputDevice_[deviceId] = info;
@@ -219,7 +219,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
         MouseEventHdr->processors_.erase(iter);
     }
 
-    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     double angle = 0.5;
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));

@@ -729,7 +729,7 @@ float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent>
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(id, item);
     return static_cast<float>(sqrt(pow(knuckleGesture.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
-        pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE)));
+        pow(knuckleGesture.lastDownPointer.y - item.GetDisplayY(), POW_SQUARE)));
 }
 
 bool IsEqual(float f1, float f2)
