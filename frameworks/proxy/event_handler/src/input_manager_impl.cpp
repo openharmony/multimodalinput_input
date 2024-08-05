@@ -1314,13 +1314,12 @@ void InputManagerImpl::OnConnected()
         MMI_HILOGD("displayGroupInfo_: windowsInfo size: %{public}zu, displaysInfo size: %{public}zu",
             displayGroupInfo_.windowsInfo.size(), displayGroupInfo_.displaysInfo.size());
         SendDisplayInfo();
+        PrintDisplayInfo();
     }
     if (!windowGroupInfo_.windowsInfo.empty()) {
         MMI_HILOGD("windowGroupInfo_: windowsInfo size: %{public}zu", windowGroupInfo_.windowsInfo.size());
         SendWindowInfo();
     }
-
-    PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     SendEnhanceConfig();
     PrintEnhanceConfig();
