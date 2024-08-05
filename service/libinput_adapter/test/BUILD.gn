@@ -33,8 +33,6 @@ ohos_unittest("mmi-libadapter-hotplug-test") {
     "hotplug_detector_test.cpp",
   ]
 
-  deps = []
-
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
   external_deps = [

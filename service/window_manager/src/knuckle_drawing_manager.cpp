@@ -48,7 +48,7 @@ constexpr int32_t POINT_INDEX4 { 4 };
 constexpr int32_t PAINT_STROKE_WIDTH { 10 };
 constexpr int32_t PAINT_PATH_RADIUS { 10 };
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW { 450000 };
-constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
+[[ maybe_unused ]] constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
 [[ maybe_unused ]] constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };

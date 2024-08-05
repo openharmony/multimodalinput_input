@@ -73,14 +73,11 @@ ohos_unittest("libudev-test") {
     "libevdev:libevdev",
   ]
 
-  deps = []
-
   defines += [ "MMI_DISABLE_LOG_TRACE" ]
 }
 
 ohos_unittest("e2e-libudev-test") {
   module_out_path = output_path
-  include_dirs = []
 
   sources = [ "test/e2e_udev_test.cpp" ]
 
