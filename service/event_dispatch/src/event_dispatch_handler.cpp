@@ -123,7 +123,9 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
             windowInfo = std::make_optional(*curInfo);
             MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
         } else {
-            MMI_HILOGE("Window:%{public}d is nullptr", windowId);
+            if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+                MMI_HILOGE("Window:%{public}d is nullptr", windowId);
+            }
             return false;
         }
     }
@@ -250,7 +252,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
         eventTime_ = currentTime_;
         if (point->GetPointerCount() < THREE_FINGERS &&
             point->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-            point->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
             MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
         }
         return;
@@ -284,7 +287,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount());
     }
     if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
+        pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
         MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d, action:%{public}d",
             sess->GetProgramName().c_str(), sess->GetPid(), pointerEvent->GetPointerAction());
     }

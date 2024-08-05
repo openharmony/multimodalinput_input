@@ -288,7 +288,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        MMI_HILOGE("Failed to search for the deviceID");
+        MMI_HILOGD("Failed to search for the deviceID");
         return COMMON_PARAMETER_ERROR;
     }
     if (!iter->second.enable) {
