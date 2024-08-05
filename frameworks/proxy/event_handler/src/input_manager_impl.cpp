@@ -485,7 +485,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
         MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
@@ -1470,7 +1471,7 @@ int32_t InputManagerImpl::UnregisterDevListener(std::string type,
 
 int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
