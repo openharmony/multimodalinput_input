@@ -86,7 +86,8 @@
         "FreeBSD",
         "googletest",
         "skia",
-        "player_framework"
+        "player_framework",
+        "cJSON"
       ],
       "third_party": [
         "cJSON",
