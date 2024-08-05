@@ -1431,7 +1431,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             napi_open_handle_scope(jsEnv_, &scope);
             CHKPV(scope);
             auto pointerEvent = evQueue_.front();
-            LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
             if (pointerEvent == nullptr) {
                 MMI_HILOGE("scope is nullptr");
                 napi_close_handle_scope(jsEnv_, scope);
@@ -1446,6 +1445,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
+        LogTracer lt(pointerEventItem->GetId(), pointerEventItem->GetEventType(), pointerEventItem->GetPointerAction());
         napi_value napiPointer = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer),
                                 CREATE_OBJECT, scope, pointerEventItem);
