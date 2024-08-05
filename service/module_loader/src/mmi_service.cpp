@@ -2763,7 +2763,8 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
 {
     static int32_t BLOCK_TIME = 10;
     std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_LOG);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
