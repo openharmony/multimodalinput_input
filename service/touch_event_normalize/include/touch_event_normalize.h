@@ -51,17 +51,21 @@ public:
 public:
     DISALLOW_COPY_AND_MOVE(TouchEventNormalize);
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, DeviceType deviceType);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t SetTouchpadPinchSwitch(bool switchFlag) const;
     void GetTouchpadPinchSwitch(bool &switchFlag) const;
     int32_t SetTouchpadSwipeSwitch(bool switchFlag) const;
     void GetTouchpadSwipeSwitch(bool &switchFlag) const;
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch) const;
     void GetTouchpadRotateSwitch(bool &rotateSwitch) const;
+#endif // OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> GetPointerEvent(int32_t deviceId);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) const;
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) const;
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows() const;
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(

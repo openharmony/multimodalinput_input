@@ -400,7 +400,9 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
             item.SetPressed(false);
             lastPointerEvent_->UpdatePointerItem(pointerId, item);
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
             OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
             return true;
         }
     }
