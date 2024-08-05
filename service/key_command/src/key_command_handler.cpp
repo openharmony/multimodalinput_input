@@ -119,12 +119,14 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
 {
     return knuckleSwitch_.statusConfigValue;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -187,6 +189,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     singleKnuckleGesture_.state = false;
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureDownEvent(touchEvent);
             break;
@@ -196,6 +199,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             HandleKnuckleGestureDownEvent(touchEvent);
             break;
         }
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         default: {
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
@@ -227,7 +231,9 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     auto dy = std::abs(pos->y - item.GetDisplayY());
     auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
     if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         StopTwoFingerGesture();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     }
 }
 
@@ -240,6 +246,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     switch (toolType) {
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
             break;
@@ -248,6 +255,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             HandleKnuckleGestureUpEvent(touchEvent);
             break;
         }
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         default: {
             MMI_HILOGW("Current touch event tool type:%{public}d", toolType);
             break;
@@ -255,7 +263,9 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     }
     previousUpTime_ = touchEvent->GetActionTime();
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -519,6 +529,7 @@ bool KeyCommandHandler::CheckTwoFingerGestureAction() const
         return false;
     }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     auto devX = firstFinger.x - secondFinger.x;
     auto devY = firstFinger.y - secondFinger.y;
     auto distance = sqrt(pow(devX, 2) + pow(devY, 2));
@@ -540,10 +551,13 @@ bool KeyCommandHandler::CheckTwoFingerGestureAction() const
         MMI_HILOGI("any finger out of region");
         return false;
     }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 {
     if (vp <= 0) {
@@ -2020,7 +2034,9 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     CHKPV(keyEvent);
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
         MMI_HILOGI("force make pointer visible");
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
     lastKeyEventCode_ = keyEvent->GetKeyCode();
 }

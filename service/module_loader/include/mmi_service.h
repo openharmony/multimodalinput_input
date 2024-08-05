@@ -133,6 +133,9 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     int32_t SetMoveEventFilters(bool flag) override;
+#ifdef OHOS_RSS_CLIENT
+    void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
+#endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
