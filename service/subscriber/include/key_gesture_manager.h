@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 
 class KeyGestureManager final {
+private:
     class Handler final {
     public:
         Handler(int32_t id, int32_t pid, int32_t longPressTime,
