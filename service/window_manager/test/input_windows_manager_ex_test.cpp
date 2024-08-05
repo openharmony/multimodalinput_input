@@ -2348,5 +2348,208 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointer
     pointer->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr->SendUIExtentionPointerEvent(logicalX, logicalY, windowInfo, pointer));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPhysicalDisplayCoord_001
+ * @tc.desc: Test the funcation GetPhysicalDisplayCoord
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoord_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    libinput_event_touch touch {};
+    DisplayInfo info;
+    EventTouch touchInfo;
+    info.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    info.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+    info.direction = DIRECTION180;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->GetPhysicalDisplayCoord(&touch, info, touchInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_001
+ * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t deviceId = 10;
+    libinput_event_touch touch {};
+    EventTouch touchInfo;
+    int32_t physicalDisplayId;
+    inputWindowsManager->bindInfo_.AddDisplay(2, "abcde");
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    deviceId = 2;
+    DisplayInfo displayInfo;
+    displayInfo.width = -1;
+    displayInfo.height = 3;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    displayInfo.width = 3;
+    displayInfo.height = -1;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    displayInfo.width = -5;
+    displayInfo.height = -6;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    displayInfo.width = 3;
+    displayInfo.height = 2;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_006
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = -1;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = -1;
+    bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+    inputEvent->targetDisplayId_ = 2;
+    DisplayInfo displayInfo;
+    displayInfo.id = 2;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+    windowId = 5;
+    ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+@tc.name: InputWindowsManagerTest_UpdateTransformDisplayXY_001
+ * @tc.desc: Test the funcation UpdateTransformDisplayXY
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTransformDisplayXY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    std::vector<WindowInfo> windowsInfo;
+    DisplayInfo displayInfo;
+    pointerEvent->pointerId_ = 1;
+    PointerEvent::PointerItem item;
+    item.pointerId_ = 1;
+    pointerEvent->pointers_.push_back(item);
+    WindowInfo windowInfo;
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    item.displayX_ = 10;
+    item.displayY_ = 20;
+    Rect rect = {0, 0, 30, 40};
+    windowInfo.defaultHotAreas.push_back(rect);
+    windowsInfo.push_back(windowInfo);
+    pointerEvent->bitwise_ = 1;
+    pointerEvent->zOrder_ = -1.0f;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateTransformDisplayXY(pointerEvent, windowsInfo, displayInfo));
+    pointerEvent->bitwise_ = 0;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateTransformDisplayXY(pointerEvent, windowsInfo, displayInfo));
+    pointerEvent->bitwise_ = 0x00000200;
+    pointerEvent->zOrder_ = 1.0f;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateTransformDisplayXY(pointerEvent, windowsInfo, displayInfo));
+    pointerEvent->bitwise_ = 0x00000100;
+    pointerEvent->zOrder_ = 1.0f;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->UpdateTransformDisplayXY(pointerEvent, windowsInfo, displayInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendUIExtentionPointerEvent_001
+ * @tc.desc: Test the funcation SendUIExtentionPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendUIExtentionPointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 100;
+    int32_t logicalY = 200;
+    WindowInfo windowInfo;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerId_ = 1;
+    PointerEvent::PointerItem item;
+    item.pointerId_ = -1;
+    pointerEvent->pointers_.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
+    item.pointerId_ = 1;
+    pointerEvent->pointers_.push_back(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
+    windowInfo.id = 1;
+    windowInfo.pid = 11;
+    windowInfo.transform.push_back(1.1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SendUIExtentionPointerEvent
+        (logicalX, logicalY, windowInfo, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchUIExtentionPointerEvent_001
+ * @tc.desc: Test the funcation DispatchUIExtentionPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchUIExtentionPointerEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 400;
+    int32_t logicalY = 600;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 2;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.targetWindowId_ = 2;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent));
+    pointerItem.targetWindowId_ = 3;
+    WindowInfo windowInfo;
+    windowInfo.id = 3;
+    windowInfo.uiExtentionWindowInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent));
+    pointerItem.targetWindowId_ = 6;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
