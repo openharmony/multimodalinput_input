@@ -308,6 +308,7 @@ private:
     void ReportRegionGesture();
     void ReportLetterGesture();
     void ReportGestureInfo();
+    bool IsMatchedAbility(std::vector<float> gesturePoints_, float gestureLastX, float gestureLastY);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent);
 
@@ -363,6 +364,8 @@ private:
     bool isParseStatusConfig_ { false };
     bool isDoubleClick_ { false };
     int32_t lastKeyEventCode_ { -1 };
+    std::string sessionKey_ { };
+    bool isStartBase_ { false };
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool isGesturing_ { false };
     bool isLetterGesturing_ { false };

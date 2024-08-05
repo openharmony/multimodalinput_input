@@ -58,6 +58,8 @@ namespace {
 constexpr float MOVE_TOLERANCE { 3.0f };
 constexpr float MIN_GESTURE_STROKE_LENGTH { 200.0f };
 constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
+constexpr float MIN_START_GESTURE { 60.0f };
+constexpr int32_t POINTER_NUMBER { 2 };
 constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY { 1000 };
@@ -632,10 +634,11 @@ void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEve
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     ResetKnuckleGesture();
+    isStartBase_ = false;
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
-
+    sessionKey_ = "Base" + std::to_string(item.GetDownTime());
     gestureLastX_ = item.GetDisplayX();
     gestureLastY_ = item.GetDisplayY();
 
@@ -660,6 +663,11 @@ void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEve
         gesturePoints_.emplace_back(gestureLastX_);
         gesturePoints_.emplace_back(gestureLastY_);
         gestureTimeStamps_.emplace_back(touchEvent->GetActionTime());
+        if (!isStartBase_ && IsMatchedAbility(gesturePoints_, gestureLastX_, gestureLastY_)) {
+            MMI_HILOGI("First time start aility, size:%{public}zu", gesturePoints_.size());
+            ProcessKnuckleGestureTouchUp(NotifyType::REGIONGESTURE);
+            isStartBase_ = true;
+        }
         if (!isGesturing_) {
             gestureTrackLength_ += sqrt(dx * dx + dy * dy);
             if (gestureTrackLength_ > MIN_GESTURE_STROKE_LENGTH) {
@@ -717,8 +725,15 @@ void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
         ability.abilityName = WAKEUP_ABILITY_NAME;
         ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
-        ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
-        ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
+        MMI_HILOGI("isStartBase_:%{public}d, sessionKey_:%{public}s", isStartBase_, sessionKey_.c_str());
+        if (!isStartBase_) {
+            ability.params.emplace(std::make_pair("fingerPath", ""));
+            ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture_pre"));
+        } else {
+            ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
+            ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
+        }
+        ability.params.emplace(std::make_pair("session_id", sessionKey_));
     } else if (type == NotifyType::LETTERGESTURE) {
         ability.abilityName = SCREENSHOT_ABILITY_NAME;
         ability.bundleName = SCREENSHOT_BUNDLE_NAME;
@@ -791,6 +806,19 @@ void KeyCommandHandler::ReportGestureInfo()
         DfxHisysevent::ReportKnuckleGestureFromFailToSuccessTime(drawOSuccTimestamp_ - drawOFailTimestamp_);
     }
     isLastGestureSucceed_ = true;
+}
+
+bool KeyCommandHandler::IsMatchedAbility(std::vector<float> gesturePoints,
+    float gestureLastX, float gestureLastY)
+{
+    if (gesturePoints.size() < POINTER_NUMBER) {
+        MMI_HILOGI("gesturePoints_ is empty");
+        return false;
+    }
+    float gestureFirstX = gesturePoints[0];
+    float gestureFirstY = gesturePoints[1];
+    float distance = std::min(std::abs(gestureLastX - gestureFirstX), std::abs(gestureLastY - gestureFirstY));
+    return distance >= MIN_START_GESTURE;
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
