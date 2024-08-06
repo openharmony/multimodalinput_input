@@ -2373,49 +2373,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPhysicalDisplayCoor
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint_001
- * @tc.desc: Test the funcation TouchPointToDisplayPoint
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    int32_t deviceId = 10;
-    libinput_event_touch touch {};
-    EventTouch touchInfo;
-    int32_t physicalDisplayId;
-    inputWindowsManager->bindInfo_.AddDisplay(2, "abcde");
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
-        (deviceId, &touch, touchInfo, physicalDisplayId));
-    deviceId = 2;
-    DisplayInfo displayInfo;
-    displayInfo.width = -1;
-    displayInfo.height = 3;
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
-        (deviceId, &touch, touchInfo, physicalDisplayId));
-    displayInfo.width = 3;
-    displayInfo.height = -1;
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
-        (deviceId, &touch, touchInfo, physicalDisplayId));
-    displayInfo.width = -5;
-    displayInfo.height = -6;
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
-        (deviceId, &touch, touchInfo, physicalDisplayId));
-    displayInfo.width = 3;
-    displayInfo.height = 2;
-    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
-        (deviceId, &touch, touchInfo, physicalDisplayId));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_006
  * @tc.desc: Test the function IsNeedRefreshLayer
  * @tc.type: FUNC
@@ -2550,6 +2507,143 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchUIExtentionPoi
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent));
     pointerItem.targetWindowId_ = 6;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_001
+ * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 10;
+    int32_t logicalY = 20;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    inputWindowsManager->firstBtnDownWindowId_ = -1;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.targetWindowId_ = 2;
+    inputWindowsManager->extraData_.appended = true;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    WindowInfo windowInfo;
+    windowInfo.pointerHotAreas.push_back({ 0, 0, 30, 40 });
+    windowInfo.windowInputType = WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_IN_WINDOW);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->pressedButtons_.insert(1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_BUTTOM;
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    inputWindowsManager->extraData_.appended = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SelectWindowInfo_002
+ * @tc.desc: Test the funcation SelectWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t logicalX = 10;
+    int32_t logicalY = 20;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    inputWindowsManager->firstBtnDownWindowId_ = -1;
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.targetWindowId_ = 2;
+    inputWindowsManager->extraData_.appended = false;
+    inputWindowsManager->extraData_.sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    WindowInfo windowInfo;
+    windowInfo.pointerHotAreas.push_back({ 0, 0, 30, 40 });
+    windowInfo.windowInputType = WindowInputType::TRANSMIT_BUTTOM;
+    pointerEvent->pressedButtons_.insert(1);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+    inputWindowsManager->firstBtnDownWindowId_ = 1;
+    pointerEvent->pressedButtons_.insert(2);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsManager->extraData_.appended = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_TouchPointToDisplayPoint
+ * @tc.desc: Test the funcation TouchPointToDisplayPoint
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoint, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t deviceId = 10;
+    libinput_event_touch touch {};
+    EventTouch touchInfo;
+    int32_t physicalDisplayId;
+    inputWindowsManager->bindInfo_.AddDisplay(2, "abcdefg");
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    deviceId = 2;
+    DisplayInfo displayInfo;
+    displayInfo.width = -1;
+    displayInfo.height = 3;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    displayInfo.width = 3;
+    displayInfo.height = -1;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    displayInfo.width = -5;
+    displayInfo.height = -6;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
+    displayInfo.width = 3;
+    displayInfo.height = 2;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
+        (deviceId, &touch, touchInfo, physicalDisplayId));
 }
 } // namespace MMI
 } // namespace OHOS
