@@ -1497,12 +1497,10 @@ void PointerDrawingManager::DrawManager()
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
-            WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
         DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
-        WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
     }
