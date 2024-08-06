@@ -1374,7 +1374,7 @@ Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *c
     return retCode;
 }
 
-Input_Result OH_Input_RemoveKeyEventInterceptor()
+Input_Result OH_Input_RemoveKeyEventInterceptor(void)
 {
     CALL_DEBUG_ENTER;
     Input_Result retCode = INPUT_SUCCESS;
@@ -1390,7 +1390,7 @@ Input_Result OH_Input_RemoveKeyEventInterceptor()
     return retCode;
 }
 
-Input_Result OH_Input_RemoveInputEventInterceptor()
+Input_Result OH_Input_RemoveInputEventInterceptor(void)
 {
     CALL_DEBUG_ENTER;
     Input_Result retCode = INPUT_SUCCESS;
