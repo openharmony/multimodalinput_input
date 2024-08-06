@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,12 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
     napi_value napiValue = {};
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, object, name.c_str(), &exist);
+    if (status != napi_ok || !exist) {
+        MMI_HILOGD("Can not find %{public}s property", name.c_str());
+        return false;
+    }
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
 
