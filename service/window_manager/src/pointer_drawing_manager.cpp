@@ -1463,7 +1463,6 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
-        WIN_MGR->UpdatePointerChangeAreas();
         bool pointerVisible = isPointerVisible;
         if (!isHotPlug) {
             pointerVisible = (pointerVisible && IsPointerVisible());
