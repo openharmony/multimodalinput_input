@@ -1553,7 +1553,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward";
         if (typeNameFlag) {
-            if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+                pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
                 MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEventItem->GetPointerId(),
                     pointerEventItem->DumpPointerAction());
             }

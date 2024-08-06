@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,6 +75,16 @@ void KeyOption::SetFinalKeyUpDelay(int32_t delay)
     finalKeyUpDelay_ = delay;
 }
 
+bool KeyOption::IsRepeat() const
+{
+    return isRepeat_;
+}
+
+void KeyOption::SetRepeat(bool repeat)
+{
+    isRepeat_ = repeat;
+}
+
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
     int32_t preKeysSize = 0;
@@ -96,7 +106,8 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         in.ReadInt32(finalKey_) &&
         in.ReadBool(isFinalKeyDown_) &&
         in.ReadInt32(finalKeyDownDuration_) &&
-        in.ReadInt32(finalKeyUpDelay_)
+        in.ReadInt32(finalKeyUpDelay_) &&
+        in.ReadBool(isRepeat_)
     );
 }
 
@@ -116,7 +127,8 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         out.WriteInt32(finalKey_) &&
         out.WriteBool(isFinalKeyDown_) &&
         out.WriteInt32(finalKeyDownDuration_) &&
-        out.WriteInt32(finalKeyUpDelay_)
+        out.WriteInt32(finalKeyUpDelay_) &&
+        out.WriteBool(isRepeat_)
     );
 }
 } // namespace MMI

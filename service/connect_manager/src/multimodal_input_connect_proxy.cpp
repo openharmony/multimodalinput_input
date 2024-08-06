@@ -858,7 +858,7 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(std::vector<int32_t> &ids)
         MMI_HILOGE("Read vector failed");
         return RET_ERR;
     }
-    MMI_HILOGE("ids size:%{public}zu", ids.size());
+    MMI_HILOGD("ids size:%{public}zu", ids.size());
     return RET_OK;
 }
 
@@ -905,7 +905,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t deviceId, int32_t &
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE),
         data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        MMI_HILOGD("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     READINT32(reply, keyboardType, IPC_PROXY_DEAD_OBJECT_ERR);

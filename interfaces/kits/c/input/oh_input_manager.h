@@ -1152,7 +1152,7 @@ Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *c
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-Input_Result OH_Input_RemoveKeyEventInterceptor();
+Input_Result OH_Input_RemoveKeyEventInterceptor(void);
 
 /**
  * @brief Removes an interceptor for input events, including mouse, touch, and axis events.
@@ -1165,7 +1165,7 @@ Input_Result OH_Input_RemoveKeyEventInterceptor();
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 12
  */
-Input_Result OH_Input_RemoveInputEventInterceptor();
+Input_Result OH_Input_RemoveInputEventInterceptor(void);
 #ifdef __cplusplus
 }
 #endif

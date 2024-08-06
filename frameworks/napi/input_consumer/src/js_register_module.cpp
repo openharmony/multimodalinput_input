@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -156,6 +156,14 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
+    bool isRepeat = true;
+    if (!GetNamedPropertyBool(env, argv[1], "isRepeat", isRepeat)) {
+        MMI_HILOGD("IsRepeat field is default");
+    }
+    subKeyNames += std::to_string(isRepeat);
+    subKeyNames += ",";
+    keyOption->SetRepeat(isRepeat);
+    MMI_HILOGD("IsRepeat:%{public}s", (isRepeat ? "true" : "false"));
     if (argc == INPUT_PARAMETER_MAX) {
         CHKRP(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
         if (valueType != napi_function) {
