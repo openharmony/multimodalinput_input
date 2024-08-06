@@ -79,6 +79,9 @@ struct ShortcutKey {
     int32_t keyDownDuration { 0 };
     int32_t triggerType { KeyEvent::KEY_ACTION_DOWN };
     int32_t timerId { -1 };
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    int32_t shortcutId { -1 };
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
     Ability ability;
     void Print() const;
 };
@@ -233,6 +236,9 @@ private:
     void MarkActiveSequence(bool active);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool MatchShortcutKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool MatchShortcutKey(std::shared_ptr<KeyEvent> keyEvent,
+        ShortcutKey &shortcutKey, std::vector<ShortcutKey> &upAbilities);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
