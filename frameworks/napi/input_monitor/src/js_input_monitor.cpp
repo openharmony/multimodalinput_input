@@ -1431,21 +1431,23 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             napi_open_handle_scope(jsEnv_, &scope);
             CHKPV(scope);
             auto pointerEvent = evQueue_.front();
-            LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
             if (pointerEvent == nullptr) {
                 MMI_HILOGE("scope is nullptr");
                 napi_close_handle_scope(jsEnv_, scope);
                 continue;
             }
             evQueue_.pop();
-            pointerQueue_.push_back(pointerEvent);
+            pointerQueue_.push(pointerEvent);
         }
     }
     std::lock_guard<std::mutex> guard(resourcemutex_);
-    for (const auto &pointerEventItem : pointerQueue_) {
+    while (!pointerQueue_.empty()) {
+        auto pointerEventItem = pointerQueue_.front();
+        pointerQueue_.pop();
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
+        LogTracer lt(pointerEventItem->GetId(), pointerEventItem->GetEventType(), pointerEventItem->GetPointerAction());
         napi_value napiPointer = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer),
                                 CREATE_OBJECT, scope, pointerEventItem);
@@ -1564,7 +1566,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
-    pointerQueue_.clear();
 }
 
 bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
