@@ -49,6 +49,8 @@ declare_args() {
   input_feature_fingerprint = false
   input_feature_crown = true
   input_feature_move_event_filters = false
+  shortcut_key_manager_enabled = true
+  shortcut_key_rules_enabled = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_call_manager)) {
@@ -407,4 +409,8 @@ if (defined(global_parts_info.multimedia_player_framework)) {
 if (enable_player_framework) {
   libmmi_service_sources +=
       [ "module_loader/src/input_screen_capture_monitor_listener.cpp" ]
+}
+
+if (shortcut_key_rules_enabled) {
+  shortcut_key_manager_enabled = true
 }

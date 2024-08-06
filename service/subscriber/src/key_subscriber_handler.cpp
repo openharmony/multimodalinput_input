@@ -30,6 +30,9 @@
 #include "key_auto_repeat.h"
 #include "net_packet.h"
 #include "proto.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "timer_manager.h"
 #include "util_ex.h"
 
@@ -63,6 +66,9 @@ void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEve
     }
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
+    KEY_SHORTCUT_MGR->UpdateShortcutConsumed(keyEvent);
+#endif // SHORTCUT_KEY_RULES_ENABLED
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -109,9 +115,17 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     if (keyGestureMgr_.ShouldIntercept(keyOption)) {
-        AddKeyGestureSubscriber(subscriber, keyOption);
+        auto ret = AddKeyGestureSubscriber(subscriber, keyOption);
+        if (ret != RET_OK) {
+            MMI_HILOGE("AddKeyGestureSubscriber fail, error:%{public}d", ret);
+            return ret;
+        }
     } else {
-        AddSubscriber(subscriber, keyOption);
+        auto ret = AddSubscriber(subscriber, keyOption);
+        if (ret != RET_OK) {
+            MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
+            return ret;
+        }
     }
     InitSessionDeleteCallback();
     return RET_OK;
@@ -138,6 +152,9 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 ClearTimer(*it);
                 auto option = (*it)->keyOption_;
                 CHKPR(option, ERROR_NULL_POINTER);
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+                KEY_SHORTCUT_MGR->UnregisterSystemKey((*it)->shortcutId_);
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
                 MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
@@ -149,25 +166,30 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
     return RET_ERR;
 }
 
-void KeySubscriberHandler::AddKeyGestureSubscriber(
+int32_t KeySubscriberHandler::AddKeyGestureSubscriber(
     std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_INFO_TRACE;
-    CHKPV(subscriber);
-    CHKPV(subscriber->sess_);
+    CHKPR(subscriber, RET_ERR);
+    CHKPR(subscriber->sess_, RET_ERR);
     subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(subscriber->sess_->GetPid(), keyOption,
         [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
             NotifySubscriber(keyEvent, subscriber);
         });
+    if (subscriber->timerId_ < 0) {
+        MMI_HILOGE("AddKeyGesture fail, error:%{public}d", subscriber->timerId_);
+        return RET_ERR;
+    }
     MMI_HILOGI("Handler(%{public}d) of key gesture was added", subscriber->timerId_);
     PrintKeyOption(keyOption);
     for (auto &iter : keyGestures_) {
         if (IsEqualKeyOption(keyOption, iter.first)) {
             iter.second.push_back(subscriber);
-            return;
+            return RET_OK;
         }
     }
     keyGestures_[keyOption] = { subscriber };
+    return RET_OK;
 }
 
 int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId)
@@ -195,23 +217,52 @@ int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_
     return RET_ERR;
 }
 
-void KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> option,
+    int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    KeyShortcutManager::SystemShortcutKey sysKey {
+        .modifiers = option->GetPreKeys(),
+        .finalKey = option->GetFinalKey(),
+        .longPressTime = option->GetFinalKeyDownDuration(),
+        .triggerType = (option->IsFinalKeyDown() ? KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN :
+                                                   KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP),
+        .session = session,
+        .callback = callback,
+    };
+    return KEY_SHORTCUT_MGR->RegisterSystemKey(sysKey);
+}
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
+
+int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
     std::shared_ptr<KeyOption> option)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(subscriber);
-    CHKPV(option);
+    CHKPR(subscriber, RET_ERR);
+    CHKPR(option, RET_ERR);
     PrintKeyOption(option);
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    CHKPR(subscriber->sess_, RET_ERR);
+    subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
+        [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
+            NotifySubscriber(keyEvent, subscriber);
+        });
+    if (subscriber->shortcutId_ < 0) {
+        MMI_HILOGE("RegisterSystemKey fail, error:%{public}d", subscriber->shortcutId_);
+        return RET_ERR;
+    }
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
     for (auto &iter : subscriberMap_) {
         if (IsEqualKeyOption(option, iter.first)) {
             MMI_HILOGI("Add subscriber Id:%{public}d", subscriber->id_);
             iter.second.push_back(std::move(subscriber));
             MMI_HILOGI("Subscriber size:%{public}zu", iter.second.size());
-            return;
+            return RET_OK;
         }
     }
     MMI_HILOGI("Add subscriber Id:%{public}d", subscriber->id_);
     subscriberMap_[option] = {subscriber};
+    return RET_OK;
 }
 
 bool KeySubscriberHandler::IsEqualKeyOption(std::shared_ptr<KeyOption> newOption,
@@ -610,6 +661,12 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(subscriber);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
+    if (keyEvent->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        CHKPV(subscriber->keyOption_);
+        KEY_SHORTCUT_MGR->MarkShortcutConsumed(*subscriber->keyOption_);
+    }
+#endif // SHORTCUT_KEY_RULES_ENABLED
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
@@ -808,8 +865,11 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
 
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
-    CALL_DEBUG_ENTER;
-    CHKPF(keyEvent);
+#ifdef SHORTCUT_KEY_RULES_ENABLED
+    if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent)) {
+        return false;
+    }
+#endif // SHORTCUT_KEY_RULES_ENABLED
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -845,9 +905,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
         CHK_KEY_ITEM(keyItem);
-        auto upTime = keyEvent->GetActionTime();
-        auto downTime = keyItem->GetDownTime();
-        if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
+        if (keyEvent->GetActionTime() - keyItem->GetDownTime() >= MS2US(duration)) {
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
