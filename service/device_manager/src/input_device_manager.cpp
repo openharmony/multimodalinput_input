@@ -442,6 +442,9 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         MMI_HILOGI("Set para input.pointer.device true");
     }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (IsPointerDevice(inputDevice)) {
+        WIN_MGR->UpdatePointerChangeAreas();
+    }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         WIN_MGR->UpdatePointerChangeAreas();
