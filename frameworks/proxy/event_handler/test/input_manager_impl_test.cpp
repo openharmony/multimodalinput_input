@@ -238,10 +238,27 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_01, TestSize
 
     int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
     EXPECT_TRUE(winPid != -1);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetMouseHotSpot(winPid, windowId, hotSpotX, hotSpotY);
+    int32_t ret = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
-    int32_t ret2 = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
-    EXPECT_EQ(ret2, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetMouseHotSpot_02
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseHotSpot_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = -5;
+    int32_t hotSpotX = 2;
+    int32_t hotSpotY = 3;
+
+    int32_t winPid = InputMgrImpl.GetWindowPid(windowId);
+    EXPECT_FALSE(winPid != -1);
+    int32_t ret = InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -267,10 +284,22 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSiz
 {
     CALL_TEST_DEBUG;
     bool visible = true;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->IsPointerVisible(visible);
-    EXPECT_EQ(ret, 0);
-    bool ret2 = InputMgrImpl.IsPointerVisible();
-    EXPECT_TRUE(ret2);
+    bool ret = InputMgrImpl.IsPointerVisible();
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_IsPointerVisible_02
+ * @tc.desc: Test IsPointerVisible
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool visible = false;
+    bool ret = InputMgrImpl.IsPointerVisible();
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -283,10 +312,22 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_01, TestSize
 {
     CALL_TEST_DEBUG;
     int32_t color = 6;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerColor(color);
+    int32_t ret = InputMgrImpl.SetPointerColor(color);
     EXPECT_EQ(ret, RET_ERR);
-    int32_t ret2 = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret2, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetPointerColor_02
+ * @tc.desc: Test SetPointerColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t color = -10;
+    int32_t ret = InputMgrImpl.SetPointerColor(color);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
@@ -299,8 +340,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerSpeed_01, TestSize
 {
     CALL_TEST_DEBUG;
     int32_t speed = 10;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerSpeed(speed);
-    EXPECT_EQ(ret, RET_OK);
     int32_t ret2 = InputMgrImpl.SetPointerSpeed(speed);
     EXPECT_EQ(ret2, RET_OK);
 }
@@ -315,8 +354,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_01, TestSiz
 {
     CALL_TEST_DEBUG;
     bool enable = true;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->EnableCombineKey(enable);
-    EXPECT_EQ(ret, RET_OK);
     int32_t ret2 = InputMgrImpl.EnableCombineKey(enable);
     EXPECT_EQ(ret2, RET_OK);
 }
@@ -331,8 +368,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableCombineKey_02, TestSiz
 {
     CALL_TEST_DEBUG;
     bool enable = false;
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->EnableCombineKey(enable);
-    EXPECT_EQ(ret, RET_OK);
     int32_t ret2 = InputMgrImpl.EnableCombineKey(enable);
     EXPECT_EQ(ret2, RET_OK);
 }
@@ -431,6 +466,122 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPixelMapData_01, TestSize
     infoId = 2;
     int32_t ret2 = InputMgrImpl.SetPixelMapData(infoId, pixelMap);
     EXPECT_EQ(ret2, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendEnhanceConfig_01
+ * @tc.desc: Test SendEnhanceConfig
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendEnhanceConfig_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MmiMessageId idMsg = MmiMessageId::SCINFO_CONFIG;
+    NetPacket pkt(idMsg);
+    EXPECT_EQ(InputMgrImpl.PackEnhanceConfig(pkt), RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.SendEnhanceConfig());
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SendEnhanceConfig_02
+ * @tc.desc: Test SendEnhanceConfig
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SendEnhanceConfig_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    EXPECT_EQ(InputMgrImpl.PackEnhanceConfig(pkt), RET_ERR);
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.SendEnhanceConfig());
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetPointerColor_01
+ * @tc.desc: Test GetPointerColor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetPointerColor_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t color = 5;
+    int32_t ret = InputMgrImpl.GetPointerColor(color);
+    EXPECT_EQ(ret, RET_OK);
+
+    color = -1;
+    int32_t ret2 = InputMgrImpl.GetPointerColor(color);
+    EXPECT_EQ(ret2, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetMouseScrollRows_01
+ * @tc.desc: Test GetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetMouseScrollRows_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 8;
+    int32_t ret = InputMgrImpl.GetMouseScrollRows(rows);
+    EXPECT_EQ(ret, RET_OK);
+
+    rows = -5;
+    int32_t ret2 = InputMgrImpl.GetMouseScrollRows(rows);
+    EXPECT_EQ(ret2, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetMouseScrollRows_01
+ * @tc.desc: Test SetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetMouseScrollRows_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 3;
+    int32_t ret = InputMgrImpl.SetMouseScrollRows(rows);
+    EXPECT_EQ(ret, RET_OK);
+
+    rows = -2;
+    int32_t ret2 = InputMgrImpl.SetMouseScrollRows(rows);
+    EXPECT_EQ(ret2, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_LeaveCaptureMode_01
+ * @tc.desc: Test LeaveCaptureMode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_LeaveCaptureMode_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t windowId = 3;
+    int32_t ret = InputMgrImpl.LeaveCaptureMode(windowId);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_EnableInputDevice_01
+ * @tc.desc: Test EnableInputDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableInputDevice_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool enable = false;
+    int32_t ret = InputMgrImpl.EnableInputDevice(enable);
+    EXPECT_EQ(ret, RET_OK);
+
+    enable = true;
+    int32_t ret2 = InputMgrImpl.EnableInputDevice(enable);
+    EXPECT_EQ(ret2, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
