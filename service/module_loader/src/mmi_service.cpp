@@ -93,6 +93,15 @@ constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
 constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
+const std::set<int32_t> g_keyCodeValueSet = {
+    KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::KEYCODE_DPAD_RIGHT,
+    KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT,
+    KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT,
+    KeyEvent::KEYCODE_CAPS_LOCK, KeyEvent::KEYCODE_SCROLL_LOCK, KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_F2,
+    KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
+    KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
+    KeyEvent::KEYCODE_NUM_LOCK
+};
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -1396,6 +1405,13 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     pressedKeys = keyEvent->GetPressedKeys();
+    for (auto iter = pressedKeys.begin(); iter != pressedKeys.end();) {
+        if (g_keyCodeValueSet.find(*iter) == g_keyCodeValueSet.end()) {
+            iter = pressedKeys.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
     specialKeysState[KeyEvent::KEYCODE_CAPS_LOCK] =
         static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
     specialKeysState[KeyEvent::KEYCODE_SCROLL_LOCK] =
