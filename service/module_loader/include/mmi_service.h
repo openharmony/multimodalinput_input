@@ -240,6 +240,7 @@ private:
     bool isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+    std::thread eventMonitorThread_;
     sptr<Rosen::Display> displays_[2] = { nullptr, nullptr };
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
