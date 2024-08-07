@@ -16,25 +16,20 @@
 #ifndef EVENT_NORMALIZE_HANDLER_H
 #define EVENT_NORMALIZE_HANDLER_H
 
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <ctime>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <queue>
-#include <set>
 #include <sstream>
 #include <stdio.h>
 #include <string>
 #include <sys/stat.h>
 #include <thread>
-#include <unistd.h>
-#include <vector>
 
 #include "i_input_event_handler.h"
 #include "key_event_normalize.h"
