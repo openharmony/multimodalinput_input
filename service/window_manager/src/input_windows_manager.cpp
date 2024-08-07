@@ -2516,8 +2516,6 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
     }
     double physicalX = pointerItem.GetDisplayX();
     double physicalY = pointerItem.GetDisplayY();
-    pointerItem.SetRawDisplayX(static_cast<int32_t>(physicalX));
-    pointerItem.SetRawDisplayY(static_cast<int32_t>(physicalY));
     for (auto &item : windowsInfo) {
         if (IsValidNavigationWindow(item, physicalX, physicalY) &&
             !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE_NAVIGATION) && pointerEvent->GetZOrder() <= 0) {
