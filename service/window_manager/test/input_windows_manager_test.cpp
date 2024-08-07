@@ -5813,5 +5813,110 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
     inputWindowsMgr.windowsPerDisplay_.insert(std::make_pair(100, winGroupInfo));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTouchScreenTarget(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SendCancelEventWhenLock_001
+ * @tc.desc: Test the funcation SendCancelEventWhenLock
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLock_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    inputWindowsMgr.lastTouchEventOnBackGesture_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsMgr.lastTouchEventOnBackGesture_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfoEX windowInfoEX;
+    windowInfoEX.flag = true;
+    pointerEvent->SetPointerId(1);
+    inputWindowsMgr.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(2);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+    inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerId(1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_001
+ * @tc.desc: Test the funcation DrawTouchGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    inputWindowsMgr.knuckleDrawMgr_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
+    inputWindowsMgr.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(inputWindowsMgr.knuckleDrawMgr_, nullptr);
+    inputWindowsMgr.knuckleDynamicDrawingManager_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
+    inputWindowsMgr.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+    ASSERT_NE(inputWindowsMgr.knuckleDynamicDrawingManager_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DrawTouchGraphic(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsMouseDrawing_001
+ * @tc.desc: Test the funcation IsMouseDrawing
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseDrawing_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t currentAction = 10;
+    bool ret = inputWindowsMgr.IsMouseDrawing(currentAction);
+    ASSERT_FALSE(ret);
+    currentAction = 11;
+    ret = inputWindowsMgr.IsMouseDrawing(currentAction);
+    ASSERT_FALSE(ret);
+    currentAction = 15;
+    ret = inputWindowsMgr.IsMouseDrawing(currentAction);
+    ASSERT_FALSE(ret);
+    currentAction = 16;
+    ret = inputWindowsMgr.IsMouseDrawing(currentAction);
+    ASSERT_FALSE(ret);
+    currentAction = 1;
+    ret = inputWindowsMgr.IsMouseDrawing(currentAction);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetTargetWindowIds_002
+ * @tc.desc: Test the funcation GetTargetWindowIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetTargetWindowIds_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t pointerItemId = 1;
+    int32_t sourceType = 1;
+    std::vector<int32_t> windowIds { 1, 2, 3 };
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
+    inputWindowsMgr.targetMouseWinIds_.insert(std::make_pair(1, windowIds));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
+    sourceType = 2;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
+    pointerItemId = 5;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
+    inputWindowsMgr.targetMouseWinIds_.insert(std::make_pair(5, windowIds));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
+}
 } // namespace MMI
 } // namespace OHOS
