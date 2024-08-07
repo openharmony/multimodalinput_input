@@ -2447,7 +2447,6 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
         MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success enable:%{public}d, pid:%{public}d", enable, GetCallingPid());
     return RET_OK;
 }
 
@@ -2461,8 +2460,6 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
