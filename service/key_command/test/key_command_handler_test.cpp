@@ -3843,5 +3843,64 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCount
     ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(touchEvent));
     ASSERT_EQ(handler.tappingCount_, 3);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_005
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->targetDisplayId_ = 1;
+    WindowGroupInfo windowGroupInfo;
+    inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(1, windowGroupInfo));
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleSequences_001
+ * @tc.desc: HandleSequences
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.matchedSequence_.timerId = 10;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+    handler.matchedSequence_.timerId = -1;
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+    keyEvent->SetKeyCode(2017);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetActionTime(10000);
+    SequenceKey sequenceKey;
+    Sequence sequence;
+    sequence.statusConfigValue = false;
+    sequence.timerId = 1;
+    handler.filterSequences_.push_back(sequence);
+    sequenceKey.actionTime = 15000;
+    handler.keys_.push_back(sequenceKey);
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+    handler.keys_.clear();
+    keyEvent->SetActionTime(1500000);
+    sequenceKey.actionTime = 200000;
+    sequence.statusConfigValue = false;
+    sequence.timerId = 1;
+    handler.filterSequences_.push_back(sequence);
+    ASSERT_FALSE(handler.HandleSequences(keyEvent));
+}
 } // namespace MMI
 } // namespace OHOS
