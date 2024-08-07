@@ -2,39 +2,11 @@
     "SystemKeys": [
         {
             "preKeys": [ 2076 ],
-            "finalKey": 2020
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2030
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2019
-        },
-        {
-            "preKeys": [ 2076 ],
             "finalKey": 2017
         },
         {
             "preKeys": [ 2076 ],
             "finalKey": -1
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2049
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2012
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2012
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2055
         },
         {
             "preKeys": [ 2076 ],
@@ -51,10 +23,6 @@
         {
             "preKeys": [ 2076 ],
             "finalKey": 2035
-        },
-        {
-            "preKeys": [ 2076 ],
-            "finalKey": 2050
         },
         {
             "preKeys": [ 2076 ],

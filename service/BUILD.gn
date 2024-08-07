@@ -180,6 +180,14 @@ ohos_shared_library("libmmi-server") {
         "key_command/src/stylus_key_handler.cpp",
       ]
     }
+    if (shortcut_key_manager_enabled) {
+      sources += [ "subscriber/src/key_shortcut_manager.cpp" ]
+      defines += [ "SHORTCUT_KEY_MANAGER_ENABLED" ]
+
+      if (shortcut_key_rules_enabled) {
+        defines += [ "SHORTCUT_KEY_RULES_ENABLED" ]
+      }
+    }
   }
 
   if (input_feature_switch) {
