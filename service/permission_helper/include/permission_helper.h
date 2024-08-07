@@ -29,7 +29,8 @@ public:
     static const uint32_t APL_SYSTEM_BASIC_CORE = APL_SYSTEM_BASIC + APL_SYSTEM_CORE;
 
 public:
-    static PermissionHelper* GetInstance() {
+    static PermissionHelper* GetInstance()
+    {
         static PermissionHelper instance;
         return &instance;
     }
