@@ -64,6 +64,9 @@ constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
 constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
+constexpr int32_t WEBER_DEVICE_WIDTH { 2880 };
+constexpr int32_t WEBER_DEVICE_HEIGHT { 1920 };
+const std::string DEVICE_TYPE_WEEBER { "WEB"};
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
@@ -710,6 +713,11 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
         MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
+    }
+    if (PRODUCT_TYPE == DEVICE_TYPE_WEEBER) {
+        if (width == WEBER_DEVICE_WIDTH && height == WEBER_DEVICE_HEIGHT) {
+            ret = DeviceType::DEVICE_WEBER;
+        }
     }
     return ret;
 }
