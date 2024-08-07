@@ -42,6 +42,7 @@
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
 #include "touchpad_transform_processor.h"
+#include "util_ex.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -83,7 +84,20 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
+const std::string EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
+const std::string EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
+const int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
+const int32_t EVENT_OUT_SIZE = 30;
+const int32_t FUNC_EXE_OK = 0;
+const int32_t STRING_WIDTH = 3;
 }
+
+std::queue<std::string> EventNormalizeHandler::eventQueue_;
+std::list<std::string> EventNormalizeHandler::dumperEventList_;
+std::mutex EventNormalizeHandler::queueMutex_;
+std::condition_variable EventNormalizeHandler::queueCondition_;
+bool EventNormalizeHandler::runningSignal_ = false;
+std::string EventNormalizeHandler::eventString_ = "";
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
 {
@@ -115,6 +129,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
     }
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
+    std::string::size_type eventStrLen = InitEventString(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -184,6 +199,10 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             MMI_HILOGD("This device does not support :%d", type);
             break;
         }
+    }
+    if (eventString_.length() > eventStrLen) {
+        eventString_ += "}";
+        PushEventStr();
     }
     BytraceAdapter::StopHandleInput();
     DfxHisysevent::ReportDispTimes();
@@ -310,6 +329,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
+    eventString_ += ConvertKeyEventToStr(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -396,6 +416,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
+    eventString_ += ConvertPointerEventToStr(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
@@ -430,6 +451,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    eventString_ += ConvertPointerEventToStr(pointerEvent);
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -520,6 +542,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    eventString_ += ConvertPointerEventToStr(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
@@ -559,6 +582,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
+    eventString_ += ConvertPointerEventToStr(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     if (KeyEventHdr != nullptr) {
         const auto &keyEvent = KeyEventHdr->GetKeyEvent();
@@ -610,6 +634,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    eventString_ += ConvertPointerEventToStr(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
@@ -630,6 +655,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    eventString_ += ConvertPointerEventToStr(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Joystick device does not support");
@@ -658,6 +684,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
         RestoreTouchPadStatus();
     }
     swEvent->SetSwitchType(switchStatus);
+    eventString_ += ConvertSwitchEventToStr(std::move(swEvent));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("Switch device does not support");
@@ -753,6 +780,171 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
         CHKPV(pointerEvent);
         LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
         nextHandler_->HandlePointerEvent(pointerEvent);
+    }
+}
+
+std::string::size_type EventNormalizeHandler::InitEventString(int32_t eventType)
+{
+    auto nowTime = std::chrono::system_clock::now();
+    std::time_t timeT = std::chrono::system_clock::to_time_t(nowTime);
+    auto milsecsCount = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime.time_since_epoch()).count();
+    std::string handleTime = ConvertTimeToStr(static_cast<int64_t>(timeT));
+    int32_t milsec = milsecsCount % 1000;
+    std::stringstream strStream;
+    strStream << std::left << std::setw(STRING_WIDTH) << milsec;
+    std::string milsecStr(strStream.str());
+    handleTime += "." + milsecStr;
+    eventString_ = "{" + handleTime + ",eventType:" + std::to_string(eventType);
+    return eventString_.length();
+}
+
+std::string EventNormalizeHandler::ConvertKeyEventToStr(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    std::string eventStr = ",actionTime:" + std::to_string(keyEvent->GetActionTime());
+    eventStr += ",deviceId:" + std::to_string(keyEvent->GetDeviceId());
+    eventStr += ",keyCode:" + std::to_string(keyEvent->GetKeyCode());
+    eventStr += ",keyAction:" + std::to_string(keyEvent->GetKeyAction());
+    eventStr += ",keyItems:[";
+    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
+    for (size_t i = 0; i < keyItems.size(); i++) {
+        int32_t pressed = keyItems[i].IsPressed() ? 1 : 0;
+        eventStr += "{pressed:" + std::to_string(pressed);
+        eventStr += ",deviceId:" + std::to_string(keyItems[i].GetDeviceId());
+        eventStr += ",keyCode:" + std::to_string(keyItems[i].GetKeyCode());
+        eventStr += ",downTime:" + std::to_string(keyItems[i].GetDownTime());
+        eventStr += ",unicode:" + std::to_string(keyItems[i].GetUnicode()) + "}";
+        if (i != keyItems.size() - 1) {
+            eventStr += ",";
+        }
+    }
+    eventStr += "]";
+    return eventStr;
+}
+
+std::string EventNormalizeHandler::ConvertPointerEventToStr(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("PointEvent is filtered");
+        return "";
+    }
+    std::string eventStr = ",actionTime:" + std::to_string(pointerEvent->GetActionTime());
+    eventStr += ",deviceId:" + std::to_string(pointerEvent->GetDeviceId());
+    eventStr += ",pointerId:" + std::to_string(pointerEvent->GetPointerId());
+    eventStr += ",sourceType:" + std::to_string(pointerEvent->GetSourceType());
+    eventStr += ",pointerAction:" + std::to_string(pointerAction);
+    eventStr += ",buttonId:" + std::to_string(pointerEvent->GetButtonId());
+    eventStr += ",pointers:[";
+    std::list<PointerEvent::PointerItem> pointers = pointerEvent->GetAllPointerItems();
+    size_t pointerSize = 0;
+    for (auto it = pointers.begin(); it != pointers.end(); it++) {
+        pointerSize++;
+        eventStr += "{displayX:" + std::to_string((*it).GetDisplayX());
+        eventStr += ",displayY:" + std::to_string((*it).GetDisplayY());
+        eventStr += ",windowX:" + std::to_string((*it).GetWindowX());
+        eventStr += ",windowY:" + std::to_string((*it).GetWindowY());
+        eventStr += ",targetWindowId:" + std::to_string((*it).GetTargetWindowId());
+        eventStr += ",longAxis:" + std::to_string((*it).GetLongAxis());
+        eventStr += ",shortAxis:" + std::to_string((*it).GetShortAxis()) + "}";
+        if (pointerSize != pointers.size()) {
+            eventStr += ",";
+        }
+    }
+    eventStr += "],pressedButtons:[";
+    std::set<int32_t> pressedButtons = pointerEvent->GetPressedButtons();
+    size_t buttonsSize = 0;
+    for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
+        buttonsSize++;
+        eventStr += std::to_string(*it);
+        if (buttonsSize != pressedButtons.size()) {
+            eventStr += ",";
+        }
+    }
+    eventStr += "]";
+    return eventStr;
+}
+
+std::string EventNormalizeHandler::ConvertSwitchEventToStr(const std::shared_ptr<SwitchEvent> switchEvent)
+{
+    std::string eventStr = ",actionTime:" + std::to_string(switchEvent->GetActionTime());
+    eventStr += ",deviceId:" + std::to_string(switchEvent->GetDeviceId());
+    eventStr += ",switchValue:" + std::to_string(switchEvent->GetSwitchValue());
+    eventStr += ",updateSwitchMask:" + std::to_string(switchEvent->GetSwitchMask());
+    eventStr += ",switchType:" + std::to_string(switchEvent->GetSwitchType());
+    return eventStr;
+}
+
+std::string EventNormalizeHandler::ConvertTimeToStr(int64_t timestamp)
+{
+    std::string timeStr = std::to_string(timestamp);
+    std::time_t timeT = timestamp;
+    std::tm tmInfo;
+    localtime_r(&timeT, &tmInfo);
+    char buffer[32] = {0};
+    if (std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tmInfo) > 0) {
+        timeStr = buffer;
+    }
+    return timeStr;
+}
+
+void EventNormalizeHandler::PushEventStr()
+{
+    std::lock_guard<std::mutex> lock(queueMutex_);
+    dumperEventList_.push_back(eventString_);
+    if (dumperEventList_.size() > EVENT_OUT_SIZE) {
+        dumperEventList_.pop_front();
+    }
+    if (runningSignal_) {
+        eventQueue_.push(eventString_);
+        queueCondition_.notify_all();
+    }
+}
+
+std::string EventNormalizeHandler::PopEventStr()
+{
+    std::unique_lock<std::mutex> lock(queueMutex_);
+    if (eventQueue_.empty()) {
+        queueCondition_.wait(lock, []() { return !eventQueue_.empty(); });
+    }
+    std::string eventStr = eventQueue_.front();
+    eventQueue_.pop();
+    return eventStr;
+}
+
+void EventNormalizeHandler::WriteEventFile()
+{
+    while (runningSignal_) {
+        std::string eventStr = PopEventStr();
+        struct stat statbuf;
+        int fileSize = 0;
+        if (stat(EVENT_FILE_NAME.c_str(), &statbuf) == FUNC_EXE_OK) {
+            fileSize = statbuf.st_size;
+        }
+        if (fileSize >= FILE_MAX_SIZE) {
+            if (access(EVENT_FILE_NAME_HISTORY.c_str(), F_OK) == FUNC_EXE_OK &&
+                remove(EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
+                MMI_HILOGE("remove %{public}s failed", EVENT_FILE_NAME_HISTORY.c_str());
+            }
+            if (rename(EVENT_FILE_NAME.c_str(), EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
+                MMI_HILOGE("rename %{public}s failed", EVENT_FILE_NAME.c_str());
+            }
+        }
+        std::ofstream file(EVENT_FILE_NAME, std::ios::app);
+        if (file.is_open()) {
+            file << eventStr << std::endl;
+            file.close();
+        } else {
+            MMI_HILOGE("open %{public}s failed", EVENT_FILE_NAME.c_str());
+        }
+    }
+}
+
+void EventNormalizeHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    std::lock_guard<std::mutex> lock(queueMutex_);
+    for (auto it = dumperEventList_.begin(); it != dumperEventList_.end(); it++) {
+        mprintf(fd, (*it).c_str());
     }
 }
 } // namespace MMI

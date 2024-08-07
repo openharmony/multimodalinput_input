@@ -16,7 +16,20 @@
 #ifndef EVENT_NORMALIZE_HANDLER_H
 #define EVENT_NORMALIZE_HANDLER_H
 
+#include <chrono>
+#include <condition_variable>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <list>
 #include <memory>
+#include <mutex>
+#include <queue>
+#include <sstream>
+#include <stdio.h>
+#include <string>
+#include <sys/stat.h>
+#include <thread>
 
 #include "i_input_event_handler.h"
 #include "key_event_normalize.h"
@@ -38,6 +51,15 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddHandleTimer(int32_t timeout = 300);
+    static void PushEventStr();
+    static std::string PopEventStr();
+    static void WriteEventFile();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    std::string::size_type InitEventString(int32_t eventType);
+    std::string ConvertKeyEventToStr(const std::shared_ptr<KeyEvent> keyEvent);
+    std::string ConvertPointerEventToStr(const std::shared_ptr<PointerEvent> pointerEvent);
+    std::string ConvertSwitchEventToStr(const std::shared_ptr<SwitchEvent> switchEvent);
+    std::string ConvertTimeToStr(int64_t timestamp);
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -58,6 +80,12 @@ private:
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
+    static std::queue<std::string> eventQueue_;
+    static std::list<std::string> dumperEventList_;
+    static std::mutex queueMutex_;
+    static std::condition_variable queueCondition_;
+    static bool runningSignal_;
+    static std::string eventString_;
     int32_t timerId_ { -1 };
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
