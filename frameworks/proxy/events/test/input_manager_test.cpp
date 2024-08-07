@@ -1655,7 +1655,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
 {
-    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), INVAID_VALUE);
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), -2);
 }
 
 /**
@@ -1671,7 +1671,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.L
             event->GetSwitchType(), event->GetSwitchValue());
     };
     ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
-        fun, SwitchEvent::SwitchType(INVAID_VALUE)), INVAID_VALUE);
+        fun, SwitchEvent::SwitchType(INVAID_VALUE)), -2);
 }
 
 /**
