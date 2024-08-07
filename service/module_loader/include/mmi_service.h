@@ -243,7 +243,7 @@ private:
     void PrintLog(const std::string &flag, int32_t duration);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
-    bool isCesStart_ { false };
+    std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT
