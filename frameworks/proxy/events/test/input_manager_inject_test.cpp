@@ -1975,7 +1975,7 @@ HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_004, TestSize.Level1)
     int64_t actionTimeBase = GetSysClockTime();
     pointerEvent->SetActionTime(actionTimeBase);
     pointerEvent->SetActionStartTime(actionTimeBase);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, 0.87);
     PointerEvent::PointerItem itemFirst;
     itemFirst.SetDownTime(actionTimeBase);
     itemFirst.SetDisplayX(135);
@@ -2009,7 +2009,7 @@ HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_005, TestSize.Level1)
     int64_t actionTimeBase = GetSysClockTime();
     pointerEvent->SetActionTime(actionTimeBase);
     pointerEvent->SetActionStartTime(actionTimeBase);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, 0.87);
     PointerEvent::PointerItem itemFirst;
     itemFirst.SetDownTime(actionTimeBase);
     itemFirst.SetDisplayX(125);
