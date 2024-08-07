@@ -818,7 +818,7 @@ void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
     info.pixelMap = transparentWins_[infoId].get();
 }
 
-int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
+int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     if (infoId < 0 || pixelMap == nullptr) {
