@@ -223,7 +223,7 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
 
 bool TouchDrawingManager::IsWindowRotation()
 {
-    return false;
+    return DfsMessageParcel::messageParcel->IsWindowRotation();
 }
 
 PointerDrawingManager::PointerDrawingManager() {}
