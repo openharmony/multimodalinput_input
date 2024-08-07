@@ -3805,6 +3805,7 @@ void InputWindowsManager::SendCancelEventWhenLock()
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
+    __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     if (pixelMap == nullptr) {

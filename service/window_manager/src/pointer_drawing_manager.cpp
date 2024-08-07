@@ -1173,6 +1173,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
 }
 
 int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+    __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     if (pid == -1) {
