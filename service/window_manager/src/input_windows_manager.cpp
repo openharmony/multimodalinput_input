@@ -328,6 +328,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (mouseDownInfo_.pid != -1) {
             pid = GetWindowPid(mouseDownInfo_.agentWindowId);
+            if (pid < 0) {
+                pid = mouseDownInfo_.pid;
+            }
             MMI_HILOGD("mouseevent occurs, update the pid:%{public}d", pid);
             InitMouseDownInfo();
         }
@@ -889,6 +892,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         displayId = displayId < 0 ? displayGroupInfo_.displaysInfo[0].id : displayId;
         auto displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
+        DispatchPointerCancel(displayId);
         int32_t logicX = mouseLocation.physicalX + displayInfo->x;
         int32_t logicY = mouseLocation.physicalY + displayInfo->y;
         std::optional<WindowInfo> windowInfo;
@@ -923,6 +927,72 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         }
         IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_, simulate);
     }
+}
+
+void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
+{
+    if (mouseDownInfo_.id < 0 || (extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE))) {
+        return;
+    }
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOGD("lastPointerEvent is null");
+        return;
+    }
+    std::optional<WindowInfo> windowInfo;
+    std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(displayId);
+    for (const auto &item : windowInfos) {
+        if (item.id == mouseDownInfo_.id) {
+            windowInfo = std::make_optional(item);
+            break;
+        }
+    }
+    if (windowInfo != std::nullopt) {
+        return;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    pointerEvent->UpdateId();
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), PointerEvent::POINTER_ACTION_CANCEL);
+    SetPointerEvent(PointerEvent::POINTER_ACTION_CANCEL, pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_FREEZE);
+    auto filter = InputHandler->GetFilterHandler();
+    CHKPV(filter);
+    filter->HandlePointerEvent(pointerEvent);
+}
+
+void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem lastPointerItem;
+    int32_t lastPointerId = lastPointerEvent_->GetPointerId();
+    if (!lastPointerEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
+        return;
+    }
+    bool checkFlag = lastPointerItem.IsPressed() && lastWindowInfo_.id != mouseDownInfo_.id;
+    int32_t id = lastWindowInfo_.id;
+    if (checkFlag) {
+        id = mouseDownInfo_.id;
+    }
+    PointerEvent::PointerItem currentPointerItem;
+    currentPointerItem.SetWindowX(lastLogicX_-lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowY(lastLogicY_-lastWindowInfo_.area.y);
+    currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
+    currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+    currentPointerItem.SetPointerId(0);
+    pointerEvent->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
+    SetPrivacyModeFlag(lastWindowInfo_.privacyMode, pointerEvent);
+    pointerEvent->SetTargetWindowId(id);
+    pointerEvent->SetAgentWindowId(id);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(currentPointerItem);
+    pointerEvent->SetPointerAction(pointerAction);
+    pointerEvent->SetOriginPointerAction(lastPointerEvent_->GetPointerAction());
+    pointerEvent->SetSourceType(lastPointerEvent_->GetSourceType());
+    int64_t time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetActionStartTime(time);
+    pointerEvent->SetDeviceId(lastPointerEvent_->GetDeviceId());
 }
 
 bool InputWindowsManager::NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows)
@@ -2203,6 +2273,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (!touchWindow) {
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
             MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+            if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+                IsMouseDrawing(pointerEvent->GetPointerAction())) {
+                    MMI_HILOGD("Turn the mouseDisplay from false to true");
+                    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+            }
             int64_t beginTime = GetSysClockTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
             IPointerDrawingManager::GetInstance()->DrawMovePointer(displayId, physicalX, physicalY);

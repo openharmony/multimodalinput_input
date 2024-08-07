@@ -246,6 +246,8 @@ private:
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void AdjustDisplayRotation();
+    void SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent);
+    void DispatchPointerCancel(int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
