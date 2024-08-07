@@ -2749,7 +2749,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetKeyboardType_002, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -2766,7 +2766,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -2897,7 +2897,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_007, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -2914,7 +2914,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Le
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -3784,7 +3784,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_003, TestSize.Le
         .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true)).WillOnce(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        .WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
 #else
         .WillOnce(Return(true));
@@ -3839,7 +3839,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_004, TestSize.Le
         .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true)).WillOnce(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        .WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
 #else
         .WillOnce(Return(true));
@@ -3894,7 +3894,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_005, TestSize.Le
         .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(Return(true)).WillOnce(Return(true))
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-        .WillOnce(Return(true))
+        .WillOnce(Return(true)).WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
 #else
         .WillOnce(Return(true));
