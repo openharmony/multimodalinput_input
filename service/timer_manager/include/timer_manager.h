@@ -61,6 +61,7 @@ private:
 
 private:
     std::list<std::unique_ptr<TimerItem>> timers_;
+    std::recursive_mutex timerMutex_;
 };
 
 #define TimerMgr ::OHOS::DelayedSingleton<TimerManager>::GetInstance()
