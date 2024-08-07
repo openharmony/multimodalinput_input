@@ -2645,5 +2645,288 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TouchPointToDisplayPoi
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->TouchPointToDisplayPoint
         (deviceId, &touch, touchInfo, physicalDisplayId));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfoEX winInfoEx;
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(2, winInfoEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_001
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(true));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfoEX winInfoEx;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(1, winInfoEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_002
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfoEX winInfoEx;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager->touchItemDownInfos_.insert(std::make_pair(1, winInfoEx));
+    inputWindowsManager->lastDirection_ = static_cast<Direction>(-1);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_003
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(2);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    inputWindowsManager.lastDirection_ = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_004
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(1);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    inputWindowsManager.lastDirection_ = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_005
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    inputWindowsManager.lastDirection_ = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_006
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    WindowInfoEX winInfoEx;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsManager.lastDirection_ = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, winInfoEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_007
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    WindowInfoEX winInfoEx;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->bitwise_ = 0x00000080;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsManager.lastDirection_ = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, winInfoEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_008
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    WindowInfoEX winInfoEx;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(1);
+    item.SetPressed(true);
+    pointerEvent->bitwise_ = 0x00000000;
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    inputWindowsManager.lastDirection_ = DIRECTION0;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, winInfoEx));
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_FoldScreenRotation_009
+ * @tc.desc: Test the function FoldScreenRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    DisplayInfo displayInfo;
+    displayInfo.id = 10;
+    displayInfo.direction = DIRECTION90;
+    item.SetPointerId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetTargetDisplayId(10);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    inputWindowsManager.lastDirection_ = DIRECTION90;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS
