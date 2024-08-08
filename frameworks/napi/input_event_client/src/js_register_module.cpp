@@ -102,7 +102,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
         MMI_HILOGE("Get keyCode failed");
     }
     if (keyCode < 0) {
-        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
+        MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyCode);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
     }
     keyEvent->SetKeyCode(keyCode);
