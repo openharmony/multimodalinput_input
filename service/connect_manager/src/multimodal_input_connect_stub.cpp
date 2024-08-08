@@ -964,6 +964,10 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     READINT32(data, pointerStyle.id, RET_ERR);
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
+    if (windowId == -1 && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("can not set global winid, because this is not sys app");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = SetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
