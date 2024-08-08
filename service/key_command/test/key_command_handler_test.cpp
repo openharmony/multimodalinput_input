@@ -342,6 +342,109 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupFourFingerTapEvent()
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_OnHandleEvent_002
+ * @tc.desc: Test the funcation OnHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    key->SetKeyCode(18);
+    handler.specialKeys_.insert(std::make_pair(18, 18));
+    bool ret = handler.OnHandleEvent(key);
+    EXPECT_FALSE(ret);
+    key->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    handler.specialTimers_.insert(std::make_pair(KeyEvent::KEYCODE_POWER, 10));
+    ret = handler.OnHandleEvent(key);
+    EXPECT_TRUE(ret);
+    key->SetKeyCode(5);
+    ret = handler.OnHandleEvent(key);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SendKeyEvent_004
+ * @tc.desc: Test the funcation SendKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isHandleSequence_ = false;
+    handler.launchAbilityCount_ = 5;
+    handler.count_ = 7;
+    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_POWER;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+    handler.repeatKey_.keyCode = 60;
+    handler.launchAbilityCount_ = 0;
+    handler.count_ = 1;
+    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_006
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_006, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey key;
+    key.preKeys = {2, 3, 4};
+    key.businessId = "business";
+    key.statusConfig = "config";
+    key.statusConfigValue = true;
+    key.finalKey = 6;
+    key.keyDownDuration = 7;
+    key.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    key.timerId = 10;
+    handler.shortcutKeys_.insert(std::make_pair("key1", key));
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.currentLaunchAbilityKey_.businessId = "business1";
+    handler.currentLaunchAbilityKey_.statusConfig = "config1";
+    handler.currentLaunchAbilityKey_.timerId = 6;
+    handler.currentLaunchAbilityKey_.statusConfigValue = true;
+    handler.currentLaunchAbilityKey_.finalKey = 4;
+    handler.currentLaunchAbilityKey_.keyDownDuration = 5;
+    handler.currentLaunchAbilityKey_.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::INTENTION_RIGHT);
+    keyEvent->SetKeyAction(KeyEvent::INTENTION_UP);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 2017;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    handler.keys_.push_back(sequenceKey);
+    sequenceKey.keyCode = 2022;
+    sequenceKey.keyAction = KeyEvent::INTENTION_UP;
+    handler.keys_.push_back(sequenceKey);
+    EventLogHelper eventLogHelper;
+    eventLogHelper.userType_ = "beta";
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->bitwise_ = 0x00000040;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    eventLogHelper.userType_ = "abcde";
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    inputEvent->bitwise_ = 0x00000000;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+    handler.lastMatchedKey_.timerId = -5;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_HandlePointerEvent_002
  * @tc.desc: Test the funcation HandlePointerEvent
  * @tc.type: FUNC
