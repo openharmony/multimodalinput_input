@@ -4111,5 +4111,66 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_001, TestS
     handler.filterSequences_.push_back(sequence);
     ASSERT_FALSE(handler.HandleSequences(keyEvent));
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleConsumedKeyEvent_001
+ * @tc.desc: Test the funcation HandleConsumedKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleConsumedKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey testKey;
+    testKey.finalKey = -1;
+    handler.currentLaunchAbilityKey_ = testKey;
+    int32_t keyCode = -1;
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    bool ret = handler.HandleConsumedKeyEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleSequences_003
+ * @tc.desc: HandleSequences
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.sequenceOccurred_ = false;
+    handler.matchedSequence_.timerId = 1;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    bool ret = handler.HandleSequences(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleScreenLocked_001
+ * @tc.desc: HandleScreenLocked
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleScreenLocked_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    Sequence sequence;
+    sequence.timerId = -1;
+    bool isLaunchAbility = true;
+    bool ret = handler.HandleScreenLocked(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+    sequence.timerId = 2;
+    ret = handler.HandleScreenLocked(sequence, isLaunchAbility);
+    ASSERT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
