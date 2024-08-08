@@ -898,7 +898,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
                             } else {
-                                MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
                                     ",KeyAction:%{public}s, IsRepeat:%{public}s",
                                     keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
                                     KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
@@ -917,7 +917,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
                             } else {
-                                MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
                                     ",KeyAction:%{public}s, IsRepeat:%{public}s",
                                     keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                                     KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
