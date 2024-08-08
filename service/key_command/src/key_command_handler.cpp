@@ -1018,7 +1018,8 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 
     if (IsExcludeKey(key)) {
         if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("ExcludekeyCode:%{private}d,ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+            MMI_HILOGD("ExcludekeyCode:%{private}d,ExcludekeyAction:%{public}d",
+                key->GetKeyCode(), key->GetKeyAction());
         } else {
             MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
         }
