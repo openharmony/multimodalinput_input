@@ -1020,6 +1020,48 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_04, TestSize.L
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_05
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_TRUE(keyEvent != nullptr);
+    KeyCommandHandler keyCommandHandler;
+    EXPECT_TRUE(keyCommandHandler.PreHandleEvent(keyEvent));
+    EXPECT_FALSE(STYLUS_HANDLER->HandleStylusKey(keyEvent));
+    EXPECT_FALSE(keyCommandHandler.HandleShortKeys(keyEvent));
+
+    bool ret = keyCommandHandler.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleEvent_06
+ * @tc.desc: Test HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleEvent_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_TRUE(keyEvent != nullptr);
+    KeyCommandHandler keyCommandHandler;
+    EXPECT_TRUE(keyCommandHandler.PreHandleEvent(keyEvent));
+    EXPECT_FALSE(STYLUS_HANDLER->HandleStylusKey(keyEvent));
+    EXPECT_FALSE(keyCommandHandler.HandleShortKeys(keyEvent));
+    EXPECT_FALSE(keyCommandHandler.HandleSequences(keyEvent));
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
+
+    bool ret = keyCommandHandler.HandleEvent(keyEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_ParseJson_01
  * @tc.desc: Test ParseJson
  * @tc.type: FUNC
@@ -3529,6 +3571,60 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchU
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
     handler.isLetterGesturing_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_01
+ * @tc.desc: Test HandleKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    NotifyType notifyType;
+    notifyType = NotifyType::REGIONGESTURE;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_02
+ * @tc.desc: Test HandleKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    NotifyType notifyType;
+    notifyType = NotifyType::LETTERGESTURE;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(pointerEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_03
+ * @tc.desc: Test HandleKnuckleGestureTouchUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchUp_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    NotifyType notifyType;
+    notifyType = NotifyType::OTHER;
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureTouchUp(pointerEvent));
 }
 
 /**
