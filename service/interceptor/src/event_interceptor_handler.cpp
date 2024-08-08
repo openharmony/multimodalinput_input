@@ -41,7 +41,7 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
 {
     CHKPV(keyEvent);
     if (OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{private}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
