@@ -83,7 +83,7 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
     }
@@ -1018,7 +1018,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 
     if (IsExcludeKey(key)) {
         if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-            MMI_HILOGD("ExcludekeyCode:%{public}d,ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+            MMI_HILOGD("ExcludekeyCode:%{private}d,ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
         } else {
             MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
         }
@@ -1119,7 +1119,7 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
     if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
+        MMI_HILOGD("KeyEvent occured. keyCode:%{private}d, keyAction:%{public}d",
             key->GetKeyCode(), key->GetKeyAction());
     } else {
         MMI_HILOGD("KeyEvent occured. keyCode:%d, keyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
