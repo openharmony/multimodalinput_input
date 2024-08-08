@@ -85,6 +85,8 @@ public:
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
+    virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
+        double logicX, double logicY) const = 0;
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
