@@ -354,7 +354,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
         MMI_HILOGD("keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
