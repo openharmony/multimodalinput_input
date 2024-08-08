@@ -2928,5 +2928,61 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_009
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen
+ * @tc.desc: Test the function RotateScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo info;
+    PhysicalCoordinate coord;
+    info.height = 500;
+    coord.x = 200;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION90;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_001
+ * @tc.desc: Test the function RotateScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo info;
+    PhysicalCoordinate coord;
+    info.width = 500;
+    coord.y = 200;
+    info.direction = DIRECTION0;
+    inputWindowsManager.cursorPos_.direction = DIRECTION270;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_RotateScreen_002
+ * @tc.desc: Test the function RotateScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo info;
+    PhysicalCoordinate coord;
+    info.direction = static_cast<Direction>(10);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
+}
 } // namespace MMI
 } // namespace OHOS
