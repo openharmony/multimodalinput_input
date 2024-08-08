@@ -2661,6 +2661,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isHotArea = false;
     bool isFirstSpecialWindow = false;
     static std::unordered_map<int32_t, WindowInfo> winMap;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+        ClearTargetWindowId(pointerId);
+    }
     for (auto &item : windowsInfo) {
         bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
             !IsValidZorderWindow(item, pointerEvent);
