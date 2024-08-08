@@ -407,7 +407,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     BytraceAdapter::StartConsumer(keyEvent);
     consumer->OnInputEvent(keyEvent);
     BytraceAdapter::StopConsumer();
-    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOGD("Key event callback keyCode:%{private}d", keyEvent->GetKeyCode());
 }
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -443,9 +443,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
         BytraceAdapter::StopConsumer();
-        MMI_HILOG_DISPATCHD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOG_DISPATCHD("Key event report keyCode:%{private}d", keyEvent->GetKeyCode());
     }
-    MMI_HILOG_DISPATCHD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOG_DISPATCHD("Key event keyCode:%{private}d", keyEvent->GetKeyCode());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -900,7 +900,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
     } else {
-        MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGI("KeyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
