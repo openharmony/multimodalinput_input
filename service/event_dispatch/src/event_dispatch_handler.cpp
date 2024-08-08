@@ -335,7 +335,7 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{public}d, Action:%{public}d, EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{private}d, Action:%{public}d, EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
@@ -347,7 +347,7 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
                 key->GetDeviceId(), key->GetKeyAction());
         } else {
             MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+                "KeyEvent(deviceid:%{public}d, keycode:%{private}d, key action:%{public}d)",
                 key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
         }
         return RET_OK;
