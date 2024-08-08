@@ -1905,7 +1905,7 @@ int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enabl
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    MMI_HILOGI("EnableHardwareCursorStats, enable:%{public}d", enable);
+    MMI_HILOGI("EnableHardwareCursorStats, enable:%{private}d", enable);
     return RET_OK;
 }
 
@@ -1919,7 +1919,7 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    MMI_HILOGI("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    MMI_HILOGI("GetHardwareCursorStats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
     return RET_OK;
 }
 
