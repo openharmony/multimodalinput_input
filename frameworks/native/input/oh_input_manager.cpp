@@ -769,7 +769,9 @@ static bool SetAxisValueByAxisEventType(std::shared_ptr<OHOS::MMI::PointerEvent>
 
 static bool IsAxisEvent(int32_t action)
 {
-    if (action != AXIS_ACTION_BEGIN && action != AXIS_ACTION_UPDATE && action != AXIS_ACTION_END) {
+    if (action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END) {
         return false;
     }
     return true;
@@ -917,12 +919,31 @@ static Input_Result NormalizeResult(int32_t result)
     return INPUT_SUCCESS;
 }
 
+static bool SetKeyEventAction(Input_KeyEvent* keyEvent, int32_t action)
+{
+    CHKPF(keyEvent);
+    if (action == OHOS::MMI::KeyEvent::KEY_ACTION_CANCEL) {
+        keyEvent->action = KEY_ACTION_CANCEL;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        keyEvent->action = KEY_ACTION_DOWN;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        keyEvent->action = KEY_ACTION_UP;
+    } else {
+        MMI_HILOGE("Invalid key event action");
+        return false;
+    }
+    return true;
+}
+
 static void KeyEventMonitorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
 {
     CHKPV(event);
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
     CHKPV(keyEvent);
-    keyEvent->action = event->GetKeyAction();
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
     keyEvent->keyCode = event->GetKeyCode();
     keyEvent->actionTime = event->GetActionTime();
     std::lock_guard guard(g_mutex);
@@ -950,19 +971,45 @@ Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
     return retCode;
 }
 
+static bool SetTouchEventAction(Input_TouchEvent* touchEvent, int32_t action)
+{
+    CHKPF(touchEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL:
+            touchEvent->action = TOUCH_ACTION_CANCEL;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN:
+            touchEvent->action = TOUCH_ACTION_DOWN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE:
+            touchEvent->action = TOUCH_ACTION_MOVE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_UP:
+            touchEvent->action = TOUCH_ACTION_UP;
+            break;
+        default:
+            MMI_HILOGE("Invalid touch event action");
+            return false;
+    }
+    return true;
+}
+
 static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
 {
     CHKPV(event);
     Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
     CHKPV(touchEvent);
-    touchEvent->action = event->GetPointerAction();
-    touchEvent->id = event->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem item;
     if (!(event->GetPointerItem(event->GetPointerId(), item))) {
         MMI_HILOGE("Can not get pointerItem for the pointer event");
         OH_Input_DestroyTouchEvent(&touchEvent);
         return;
     }
+    if (!SetTouchEventAction(touchEvent, event->GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    touchEvent->id = event->GetPointerId();
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
     touchEvent->actionTime = event->GetActionTime();
@@ -971,6 +1018,58 @@ static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
         callback(touchEvent);
     }
     OH_Input_DestroyTouchEvent(&touchEvent);
+}
+
+static bool SetMouseEventAction(Input_MouseEvent* mouseEvent, int32_t action)
+{
+    CHKPF(mouseEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL:
+            mouseEvent->action = MOUSE_ACTION_CANCEL;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE:
+            mouseEvent->action = MOUSE_ACTION_MOVE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+            mouseEvent->action = MOUSE_ACTION_BUTTON_DOWN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_UP:
+            mouseEvent->action = MOUSE_ACTION_BUTTON_UP;
+            break;
+        default:
+            MMI_HILOGE("Invalid mouse event action");
+            return false;
+    }
+    return true;
+}
+
+static bool SetMouseEventButton(Input_MouseEvent* mouseEvent, int32_t button)
+{
+    CHKPF(mouseEvent);
+    switch (button) {
+        case OHOS::MMI::PointerEvent::BUTTON_NONE:
+            mouseEvent->button = MOUSE_BUTTON_NONE;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_LEFT:
+            mouseEvent->button = MOUSE_BUTTON_LEFT;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_MIDDLE:
+            mouseEvent->button = MOUSE_BUTTON_MIDDLE;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_RIGHT:
+            mouseEvent->button = MOUSE_BUTTON_RIGHT;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_FORWARD:
+            mouseEvent->button = MOUSE_BUTTON_FORWARD;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_BACK:
+            mouseEvent->button = MOUSE_BUTTON_BACK;
+            break;
+        default:
+            MMI_HILOGE("Invalid mouse event button");
+            return false;
+    }
+    return true;
 }
 
 static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
@@ -984,16 +1083,40 @@ static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
         OH_Input_DestroyMouseEvent(&mouseEvent);
         return;
     }
+    if (!SetMouseEventAction(mouseEvent, event->GetPointerAction())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventButton(mouseEvent, event->GetButtonId())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
-    mouseEvent->action = event->GetPointerAction();
-    mouseEvent->button = event->GetButtonId();
     mouseEvent->actionTime = event->GetActionTime();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_mouseMonitorCallbacks) {
         callback(mouseEvent);
     }
     OH_Input_DestroyMouseEvent(&mouseEvent);
+}
+
+static void SetAxisEventAction(Input_AxisEvent* axisEvent, int32_t action)
+{
+    CHKPV(axisEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+            axisEvent->axisAction = AXIS_ACTION_BEGIN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+            axisEvent->axisAction = AXIS_ACTION_UPDATE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END:
+            axisEvent->axisAction = AXIS_ACTION_END;
+            break;
+        default:
+            break;
+    }
 }
 
 static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
@@ -1011,7 +1134,7 @@ static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> ev
         OH_Input_DestroyAxisEvent(&axisEvent);
         return;
     }
-    axisEvent->axisAction = event->GetPointerAction();
+    SetAxisEventAction(axisEvent, event->GetPointerAction());
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
@@ -1232,7 +1355,10 @@ static void KeyEventInterceptorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> eve
     CHKPV(event);
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
     CHKPV(keyEvent);
-    keyEvent->action = event->GetKeyAction();
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
     keyEvent->keyCode = event->GetKeyCode();
     keyEvent->actionTime = event->GetActionTime();
     std::lock_guard guard(g_mutex);
@@ -1275,14 +1401,17 @@ static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     }
     Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
     CHKPV(touchEvent);
-    touchEvent->action = event->GetPointerAction();
-    touchEvent->id = event->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem item;
     if (!(event->GetPointerItem(event->GetPointerId(), item))) {
         MMI_HILOGE("Can not get pointerItem for the pointer event");
         OH_Input_DestroyTouchEvent(&touchEvent);
         return;
     }
+    if (!SetTouchEventAction(touchEvent, event->GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    touchEvent->id = event->GetPointerId();
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
     touchEvent->actionTime = event->GetActionTime();
@@ -1307,10 +1436,16 @@ static void MouseEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
         OH_Input_DestroyMouseEvent(&mouseEvent);
         return;
     }
+    if (!SetMouseEventAction(mouseEvent, event->GetPointerAction())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventButton(mouseEvent, event->GetButtonId())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
-    mouseEvent->action = event->GetPointerAction();
-    mouseEvent->button = event->GetButtonId();
     mouseEvent->actionTime = event->GetActionTime();
     g_pointerInterceptorCallback->mouseCallback(mouseEvent);
     OH_Input_DestroyMouseEvent(&mouseEvent);
@@ -1338,7 +1473,7 @@ static void AxisEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent
         OH_Input_DestroyAxisEvent(&axisEvent);
         return;
     }
-    axisEvent->axisAction = event->GetPointerAction();
+    SetAxisEventAction(axisEvent, event->GetPointerAction());
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
