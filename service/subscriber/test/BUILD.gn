@@ -1,0 +1,126 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../multimodalinput_mini.gni")
+
+module_output_path = "multimodalinput/mmi_unit_out"
+
+ohos_unittest("key_shortcut_manager_test") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  include_dirs = [
+    "include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/service/app_state_manager/include",
+    "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/device_config/include",
+    "${mmi_path}/service/device_manager/include",
+    "${mmi_path}/service/display_state_manager/include",
+    "${mmi_path}/service/dfx/include",
+    "${mmi_path}/service/event_dispatch/include",
+    "${mmi_path}/service/event_handler/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/fingersense_wrapper/include",
+    "${mmi_path}/service/hardware_cursor_pointer_manager/include",
+    "${mmi_path}/service/interceptor/include",
+    "${mmi_path}/service/key_command/include",
+    "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
+    "${mmi_path}/service/mouse_event_normalize/include",
+    "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/subscriber/include",
+    "${mmi_path}/service/window_manager/include",
+  ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
+  }
+
+  sources = [
+    "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
+    "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
+    "${mmi_path}/service/dfx/src/dfx_hisysevent.cpp",
+    "${mmi_path}/service/display_state_manager/src/display_event_monitor.cpp",
+    "${mmi_path}/service/subscriber/src/key_shortcut_manager.cpp",
+    "src/key_shortcut_manager_test.cpp",
+    "src/timer_manager.cpp",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/cJSON:cjson",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
+    "c_utils:utils",
+    "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
+    "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "window_manager:libwm_lite",
+  ]
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
+}
+
+ohos_unittest("key_shortcut_rules_test") {
+  module_out_path = module_output_path
+  defines = input_default_defines
+
+  sources = [ "src/key_shortcut_rules_test.cpp" ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [ "hilog:libhilog" ]
+}
+
+group("mmi_subscriber_tests") {
+  testonly = true
+  deps = [ ":key_shortcut_manager_test" ]
+
+  if (shortcut_key_rules_enabled) {
+    deps += [ ":key_shortcut_rules_test" ]
+  }
+}
