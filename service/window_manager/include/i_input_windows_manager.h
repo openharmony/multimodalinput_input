@@ -112,6 +112,7 @@ public:
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
+    virtual bool IsMouseSimulate() const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING

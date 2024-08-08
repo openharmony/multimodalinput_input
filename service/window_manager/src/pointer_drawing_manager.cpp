@@ -1807,7 +1807,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
-    if (!INPUT_DEV_MGR->HasPointerDevice()) {
+    if (!INPUT_DEV_MGR->HasPointerDevice() && !WIN_MGR->IsMouseSimulate()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
     }
@@ -1860,9 +1860,10 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
     return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate)
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    bool simulate = WIN_MGR->IsMouseSimulate();
     if (hasDisplay_ && (hasPointerDevice_ || simulate)) {
         if (surfaceNode_ != nullptr) {
             AttachToDisplay();
