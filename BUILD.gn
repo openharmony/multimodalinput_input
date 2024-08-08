@@ -180,6 +180,7 @@ group("mmi_tests") {
     "service/fingerprint_event_processor/test:FingerprintEventProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
     "service/mouse_event_normalize/test:MouseTransformProcessorMockTest",
+    "service/subscriber/test:mmi_subscriber_tests",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
     "test/fuzztest:test",
     "test/unittest/interfaces:InputNativeTest",
