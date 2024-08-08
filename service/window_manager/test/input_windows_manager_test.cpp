@@ -5880,5 +5880,139 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetTargetWindowIds_002
     inputWindowsMgr.targetMouseWinIds_.insert(std::make_pair(5, windowIds));
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetTargetWindowIds(pointerItemId, sourceType, windowIds));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTarget
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTarget, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    inputWindowsMgr.isParseConfig_ = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateTarget(keyEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_HandleKeyEventWindowId
+ * @tc.desc: Test HandleKeyEventWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_HandleKeyEventWindowId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    WindowInfo winInfo;
+    keyEvent->SetTargetDisplayId(-1);
+    inputWindowsMgr.displayGroupInfo_.focusWindowId = 50;
+    winInfo.id = 50;
+    winInfo.agentWindowId = 100;
+    winInfo.privacyMode = SecureFlag::PRIVACY_MODE;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
+
+    inputWindowsMgr.displayGroupInfo_.windowsInfo[0].privacyMode = SecureFlag::DEFAULT_MODE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
+
+    inputWindowsMgr.displayGroupInfo_.focusWindowId = 80;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.HandleKeyEventWindowId(keyEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetDisplayId
+ * @tc.desc: Test GetDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetDisplayId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    inputEvent->SetTargetDisplayId(-1);
+    inputWindowsMgr.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetDisplayId(inputEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetClientFd_004
+ * @tc.desc: Test GetClientFd
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t windowId = 10;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    WindowInfo winInfo;
+    UDSServer udsServer;
+    inputWindowsMgr.udsServer_ = &udsServer;
+    pointerEvent->SetTargetDisplayId(-1);
+    winInfo.id = 20;
+    winInfo.uiExtentionWindowInfo.push_back(winInfo);
+    winInfo.id = 10;
+    winInfo.uiExtentionWindowInfo.push_back(winInfo);
+    winInfo.pid = 50;
+    winInfo.flags = 15;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetClientFd(pointerEvent, windowId));
+    windowId = 100;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetClientFd(pointerEvent, windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPidAndUpdateTarget
+ * @tc.desc: Test GetPidAndUpdateTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetPidAndUpdateTarget(keyEvent));
+
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    WindowInfo winInfo;
+    winInfo.id = 10;
+    winInfo.privacyUIFlag = true;
+    winInfo.uiExtentionWindowInfo.push_back(winInfo);
+    keyEvent->SetTargetDisplayId(-1);
+    inputWindowsMgr.displayGroupInfo_.focusWindowId = 10;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetPidAndUpdateTarget(keyEvent));
+
+    inputWindowsMgr.displayGroupInfo_.windowsInfo[0].uiExtentionWindowInfo[0].privacyUIFlag = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.GetPidAndUpdateTarget(keyEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfoExtIfNeed
+ * @tc.desc: Test UpdateDisplayInfoExtIfNeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfoExtIfNeed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    DisplayGroupInfo displayGroupInfo;
+    bool needUpdateDisplayExt = true;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.UpdateDisplayInfoExtIfNeed(displayGroupInfo, needUpdateDisplayExt));
+}
 } // namespace MMI
 } // namespace OHOS
