@@ -70,6 +70,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
+    MOCK_METHOD(bool, IsMouseSimulate, (), (const));
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
