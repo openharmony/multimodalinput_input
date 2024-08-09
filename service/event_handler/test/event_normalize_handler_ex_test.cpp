@@ -21,7 +21,6 @@
 #include "event_normalize_handler.h"
 #include "event_resample.h"
 #include "general_touchpad.h"
-#include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "libinput_mock.h"
 #include "libinput_wrapper.h"
@@ -61,28 +60,6 @@ void EventNormalizeHandlerEXTest::SetUp()
 
 void EventNormalizeHandlerEXTest::TearDown()
 {
-}
-
-/**
- * @tc.name: EventNormalizeHandlerEXTest_GestureIdentify_001
- * @tc.desc: Test the function GestureIdentify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerEXTest, EventNormalizeHandlerEXTest_GestureIdentify_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventNormalizeHandler handler;
-    libinput_event event {};
-    libinput_event_touch touchevent {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetTouchpadEvent).WillRepeatedly(Return(&touchevent));
-    libinput_device device {};
-    EXPECT_CALL(libinputMock, GetDevice).WillRepeatedly(Return(&device));
-    ASSERT_NO_FATAL_FAILURE(handler.GestureIdentify(&event));
-    MouseEventNormalize mouseEventNormalize;
-    mouseEventNormalize.processors_.insert(std::make_pair(1, nullptr));
-    ASSERT_NO_FATAL_FAILURE(handler.GestureIdentify(&event));
 }
 
 /**

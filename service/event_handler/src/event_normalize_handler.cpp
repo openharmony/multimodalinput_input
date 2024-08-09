@@ -29,7 +29,6 @@
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-#include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_scene_board_judgement.h"
@@ -400,7 +399,6 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    TerminateRotate(event);
     TerminateAxis(event);
     if (MouseEventHdr->OnEvent(event) == RET_ERR) {
         MMI_HILOGE("OnEvent is failed");
@@ -453,7 +451,6 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
-    GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -490,55 +487,6 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
     }
     return RET_OK;
-#else
-    MMI_HILOGW("Pointer device does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER
-    return RET_OK;
-}
-
-int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
-{
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    CHKPR(event, ERROR_NULL_POINTER);
-    auto touchpad = libinput_event_get_touchpad_event(event);
-    CHKPR(touchpad, ERROR_NULL_POINTER);
-    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
-    double logicalX = libinput_event_touchpad_get_x(touchpad);
-    double logicalY = libinput_event_touchpad_get_y(touchpad);
-    auto originType = libinput_event_get_type(event);
-    auto device = libinput_event_get_device(event);
-    CHKPR(device, RET_ERR);
-    int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
-    auto mouseEvent = MouseEventHdr->GetPointerEvent(deviceId);
-    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
-    if (mouseEvent == nullptr || mouseEvent->GetPressedButtons().empty()) {
-        actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
-    }
-    if (actionType == PointerEvent::POINTER_ACTION_UNKNOWN) {
-        MMI_HILOGD("Gesture identify failed");
-        return RET_ERR;
-    }
-    bool tpRotateSwitch = true;
-    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(tpRotateSwitch);
-    if (!tpRotateSwitch) {
-        MMI_HILOGD("touchpad rotate switch is false");
-        return RET_ERR;
-    }
-    auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
-    CHKPR(nextHandler_, ERROR_UNSUPPORT);
-    if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
-        MMI_HILOGE("OnEvent is failed");
-        return RET_ERR;
-    }
-    auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    PointerEventSetPressedKeys(pointerEvent);
-    nextHandler_->HandlePointerEvent(pointerEvent);
-    if (actionType == PointerEvent::POINTER_ACTION_ROTATE_END) {
-        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-    }
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -834,34 +782,6 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
     buttonIds_.clear();
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
-
-void EventNormalizeHandler::TerminateRotate(libinput_event* event)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    if (!GESTURE_HANDLER->GetRotateStatus()) {
-        return;
-    }
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
-        MMI_HILOGI("Terminate rotate event");
-        auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
-        int32_t actionType = PointerEvent::POINTER_ACTION_ROTATE_END;
-        if (MouseEventHdr->NormalizeRotateEvent(event, actionType, rotateAngle) == RET_ERR) {
-            MMI_HILOGE("OnEvent is failed");
-            return;
-        }
-        auto pointerEvent = MouseEventHdr->GetPointerEvent();
-        CHKPV(pointerEvent);
-        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-        nextHandler_->HandlePointerEvent(pointerEvent);
-        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        GESTURE_HANDLER->InitRotateGesture();
-    }
-#else
-    MMI_HILOGW("Pointer device does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER
-}
 
 void EventNormalizeHandler::TerminateAxis(libinput_event* event)
 {
