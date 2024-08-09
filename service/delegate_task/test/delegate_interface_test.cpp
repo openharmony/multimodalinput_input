@@ -1,0 +1,186 @@
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <gtest/gtest.h>
+
+#include "delegate_interface.h"
+#include "error_multimodal.h"
+
+#include "mmi_log.h"
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "DelegateInterfaceTest"
+namespace OHOS {
+namespace MMI {
+namespace {
+using namespace testing::ext;
+} // namespace
+
+class DelegateInterfaceTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+};
+
+/**
+ * @tc.name: DelegateInterfaceTest_GetDeviceTags_01
+ * @tc.desc: Test the function GetDeviceTags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetDeviceTags_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    InputHandlerType type = InputHandlerType::MONITOR;
+    uint32_t ret = delegateInterface.GetDeviceTags(type);
+    EXPECT_EQ(ret, 0);
+
+    type = InputHandlerType::NONE;
+    EXPECT_TRUE(delegateInterface.handlers.empty());
+    uint32_t ret2 = delegateInterface.GetDeviceTags(type);
+    EXPECT_EQ(ret2, 0);
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_GetDeviceTags_02
+ * @tc.desc: Test the function GetDeviceTags
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetDeviceTags_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    InputHandlerType type = InputHandlerType::INTERCEPTOR;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+    EXPECT_FALSE(delegateInterface.handlers.empty());
+    uint32_t ret1 = delegateInterface.GetDeviceTags(type);
+    EXPECT_EQ(ret1, 2);
+
+    type = InputHandlerType::NONE;
+    uint32_t ret2 = delegateInterface.GetDeviceTags(type);
+    EXPECT_EQ(ret2, 0);
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_RemoveLocal_01
+ * @tc.desc: Test the function RemoveLocal
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_RemoveLocal_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    InputHandlerType type = InputHandlerType::NONE;
+    std::string name = "handler";
+    uint32_t deviceTags = 1;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.RemoveLocal(type, name, deviceTags));
+
+    type = InputHandlerType::INTERCEPTOR;
+    name = "handler3";
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.RemoveLocal(type, name, deviceTags));
+
+    type = InputHandlerType::INTERCEPTOR;
+    name = "handler1";
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.RemoveLocal(type, name, deviceTags));
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_GetPriority_01
+ * @tc.desc: Test the function GetPriority
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetPriority_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    InputHandlerType type = InputHandlerType::INTERCEPTOR;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+
+    int32_t ret = delegateInterface.GetPriority(type);
+    EXPECT_EQ(ret, 1);
+
+    type = InputHandlerType::NONE;
+    int32_t ret2 = delegateInterface.GetPriority(type);
+    EXPECT_EQ(ret2, 500);
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_GetEventType_01
+ * @tc.desc: Test the function GetEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    InputHandlerType type = InputHandlerType::MONITOR;
+    EXPECT_TRUE(delegateInterface.handlers.empty());
+    uint32_t ret = delegateInterface.GetEventType(type);
+    EXPECT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_GetEventType_02
+ * @tc.desc: Test the function GetEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    InputHandlerType type = InputHandlerType::MONITOR;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+    uint32_t ret = delegateInterface.GetEventType(type);
+    EXPECT_EQ(ret, 2);
+}
+} // namespace MMI
+} // namespace OHOS
