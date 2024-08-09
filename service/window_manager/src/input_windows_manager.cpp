@@ -3906,6 +3906,25 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
     return true;
 }
 
+void InputWindowsManager::SetWindowStateNotifyPid(int32_t pid)
+{
+    windowStateNotifyPid_ = pid;
+}
+
+int32_t InputWindowsManager::GetWindowStateNotifyPid()
+{
+    return windowStateNotifyPid_;
+}
+
+int32_t InputWindowsManager::WindowIdGetPid(int32_t id)
+{
+    for (auto item : displayGroupInfo_.windowsInfo) {
+        if (item.id== id) {
+            return item.pid;
+        }
+    }
+    return RET_ERR;
+}
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InputWindowsManager::IsKeyPressed(int32_t pressedKey, std::vector<KeyEvent::KeyItem> &keyItems)
 {

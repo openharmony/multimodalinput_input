@@ -215,7 +215,8 @@ public:
     int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t SkipPointerLayer(bool isSkip);
-
+    int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
+    void OnWindowStateError(int32_t pid, int32_t windowId);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
@@ -265,6 +266,7 @@ private:
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::function<void(int32_t, int32_t)> windowStatecallback_;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

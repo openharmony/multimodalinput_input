@@ -617,5 +617,10 @@ int32_t InputManager::SkipPointerLayer(bool isSkip)
 {
     return InputMgrImpl.SkipPointerLayer(isSkip);
 }
+
+int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
+{
+    return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
+}
 } // namespace MMI
 } // namespace OHOS

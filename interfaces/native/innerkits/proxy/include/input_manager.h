@@ -934,6 +934,7 @@ public:
 
     int32_t SkipPointerLayer(bool isSkip);
 
+    int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
