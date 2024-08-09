@@ -182,5 +182,58 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_GetEventType_02, TestSize.
     uint32_t ret = delegateInterface.GetEventType(type);
     EXPECT_EQ(ret, 2);
 }
+
+/**
+ * @tc.name: DelegateInterfaceTest_OnPostSyncTask_01
+ * @tc.desc: Test the function OnPostSyncTask
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnPostSyncTask_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    DTaskCallback myCallback = []() -> int32_t {
+        return RET_OK; 
+    };
+    uint32_t ret = delegateInterface.OnPostSyncTask(myCallback);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_OnInputEventHandler_01
+ * @tc.desc: Test the function OnInputEventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnInputEventHandler_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    InputHandlerType type = InputHandlerType::NONE;
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    type = InputHandlerType::MONITOR;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+#endif // OHOS_BUILD_ENABLE_MONITOR
+
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    type = InputHandlerType::INTERCEPTOR;
+    ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+}
 } // namespace MMI
 } // namespace OHOS
