@@ -197,7 +197,7 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnPostSyncTask_01, TestSiz
     };
     DelegateInterface delegateInterface(delegate);
     DTaskCallback myCallback = []() -> int32_t {
-        return RET_OK; 
+        return RET_OK;
     };
     uint32_t ret = delegateInterface.OnPostSyncTask(myCallback);
     EXPECT_EQ(ret, RET_OK);
