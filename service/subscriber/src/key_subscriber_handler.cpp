@@ -656,7 +656,7 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
 }
 
 void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-    const std::shared_ptr<Subscriber> &subscriber)
+    const std::shared_ptr<Subscriber> &subscriber) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
