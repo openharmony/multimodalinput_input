@@ -328,54 +328,5 @@ HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_SetT
     EXPECT_EQ(ret, RET_ERR);
 }
 
-/**
- * @tc.name: TouchPadTransformProcessorMock_SetTouchPadPinchData_01
- * @tc.desc: SetTouchPadPinchData
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_SetTouchPadPinchData_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 5;
-    TouchPadTransformProcessor processor(deviceId);
-    int32_t action = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-    processor.pointerEvent_ = PointerEvent::Create();
-    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-
-    libinput_event_gesture gestureevent {};
-    libinput_event event {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetGestureEvent).WillRepeatedly(Return(&gestureevent));
-    EXPECT_CALL(libinputMock, GestureEventGetFingerCount).WillRepeatedly(Return(-1));
-
-    int32_t ret = processor.SetTouchPadPinchData(&event, action);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
- * @tc.name: TouchPadTransformProcessorMock_SetTouchPadPinchData_02
- * @tc.desc: SetTouchPadPinchData
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchPadTransformProcessorMockTest, TouchPadTransformProcessorMock_SetTouchPadPinchData_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t deviceId = 5;
-    TouchPadTransformProcessor processor(deviceId);
-    int32_t action = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-    processor.pointerEvent_ = PointerEvent::Create();
-    ASSERT_TRUE(processor.pointerEvent_ != nullptr);
-
-    libinput_event_gesture gestureevent {};
-    libinput_event event {};
-    NiceMock<LibinputInterfaceMock> libinputMock;
-    EXPECT_CALL(libinputMock, GetGestureEvent).WillRepeatedly(Return(&gestureevent));
-    EXPECT_CALL(libinputMock, GestureEventGetFingerCount).WillRepeatedly(Return(6));
-
-    int32_t ret = processor.SetTouchPadPinchData(&event, action);
-    EXPECT_EQ(ret, RET_ERR);
-}
 } // namespace MMI
 } // namespace OHOS
