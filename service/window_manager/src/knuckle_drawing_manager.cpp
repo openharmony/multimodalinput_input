@@ -389,9 +389,11 @@ int32_t KnuckleDrawingManager::DestoryWindow()
     CHKPR(canvas, RET_ERR);
     canvas->Clear();
     canvasNode_->FinishRecording();
+    CHKPR(surfaceNode_, RET_ERR);
+    surfaceNode_->DetachToDisplay(screenId_);
+    surfaceNode_->RemoveChild(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
-    CHKPR(surfaceNode_, RET_ERR);
     surfaceNode_.reset();
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
