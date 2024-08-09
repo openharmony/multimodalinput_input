@@ -778,11 +778,6 @@ double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent
     }
     PointerEvent::PointerItem itemMove = moveItems.front();
     PointerEvent::PointerItem itemDown = lastTouchDownItems_.front();
-    MMI_HILOGD("Move item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
-        itemMove.GetPointerId(), itemMove.GetDisplayX(), itemMove.GetDisplayY());
-    MMI_HILOGD("Down item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
-        itemDown.GetPointerId(), itemDown.GetDisplayX(), itemDown.GetDisplayY());
-
     double offset = sqrt(pow(itemMove.GetDisplayX() - itemDown.GetDisplayX(), SQUARE) +
         pow(itemMove.GetDisplayY() - itemDown.GetDisplayY(), SQUARE));
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());

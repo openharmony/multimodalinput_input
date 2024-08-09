@@ -30,6 +30,7 @@
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
+#include "window_info.h"
 
 #include "i_input_event_handler.h"
 #include "key_event.h"
@@ -383,6 +384,7 @@ private:
     std::vector<int64_t> gestureTimeStamps_;
     int64_t drawOFailTimestamp_ { 0 };
     int64_t drawOSuccTimestamp_ { 0 };
+    Direction lastDirection_ { DIRECTION0 };
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     int64_t lastDownTime_ { 0 };
     int64_t previousUpTime_ { 0 };
