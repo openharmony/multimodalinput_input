@@ -82,7 +82,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
