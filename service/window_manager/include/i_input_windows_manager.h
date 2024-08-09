@@ -140,7 +140,9 @@ public:
     virtual void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds) = 0;
     virtual int32_t SetCurrentUser(int32_t userId) = 0;
     virtual DisplayMode GetDisplayMode() const = 0;
-
+    virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
+    virtual int32_t GetWindowStateNotifyPid() = 0;
+    virtual int32_t WindowIdGetPid(int32_t pid) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;

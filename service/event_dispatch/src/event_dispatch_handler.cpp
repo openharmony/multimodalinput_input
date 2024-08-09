@@ -234,14 +234,25 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-
     std::vector<int32_t> windowIds;
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
+    auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
+    if (udsServer->GetSession(fd) == nullptr) {
+        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId &&
+            GetSysClockTime() - windowStateErrorInfo_.startTime > INTERVAL_TIME){
+            auto sess = udsServer->GetSession(WIN_MGR->GetWindowStateNotifyPid());
+            if (sess != nullptr) {
+                auto pid = WIN_MGR->WindowIdGetPid(point->GetTargetWindowId());
+                NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
+                pkt << pid << point->GetTargetWindowId();
+            }
+        }
+    }
     DispatchPointerEventInner(point, fd);
 }
 
