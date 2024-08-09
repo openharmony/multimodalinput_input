@@ -44,7 +44,7 @@ extern "C" {
  *
  * @since 12
  */
-typedef enum {
+typedef enum InputEvent_AxisType {
     /**
      * Indicates an unknown axis type. It is generally used as the initial value.
      *
@@ -89,7 +89,7 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+typedef enum InputEvent_AxisEventType {
     /**
      * @brief Enumerates two-finger pinch events. The axis value can be AXIS_TYPE_PINCH or AXIS_TYPE_ROTATE.
      *
@@ -107,56 +107,35 @@ typedef enum {
 } InputEvent_AxisEventType;
 
 /**
- * @brief Enumerates axis event source types.
- *
- * @since 12
- */
-typedef enum {
-    /**
-     * Indicates that the input source generates events similar to mouse cursor movement,
-     * button press and release, and wheel scrolling.
-     *
-     * @since 12
-     */
-    SOURCE_TYPE_MOUSE = 1,
-    /**
-     * Indicates that the input source generates a touchscreen multi-touch event.
-     *
-     * @since 12
-     */
-    SOURCE_TYPE_TOUCHSCREEN = 2,
-    /**
-     * Indicates that the input source generates a touchpad multi-touch event.
-     *
-     * @since 12
-     */
-    SOURCE_TYPE_TOUCHPAD = 3
-} InputEvent_SourceType;
-
-/**
  * @brief Enumerates axis event actions.
  *
  * @since 12
  */
-typedef enum {
+typedef enum InputEvent_AxisAction {
+    /**
+     * Cancel action for the axis input event.
+     *
+     * @since 12
+     */
+    AXIS_ACTION_CANCEL = 0,
     /**
      * Start action for the axis input event.
      *
      * @since 12
      */
-    AXIS_ACTION_BEGIN = 5,
+    AXIS_ACTION_BEGIN,
     /**
      * Update action for the axis input event.
      *
      * @since 12
      */
-    AXIS_ACTION_UPDATE = 6,
+    AXIS_ACTION_UPDATE,
     /**
      * End action for the axis input event.
      *
      * @since 12
      */
-    AXIS_ACTION_END = 7,
+    AXIS_ACTION_END,
 } InputEvent_AxisAction;
 #ifdef __cplusplus
 }
