@@ -604,7 +604,6 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
     if (!HandlePostInner(data, pointerItem)) {
-        CHKPL(pointerEvent_);
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
         return ERROR_NULL_POINTER;
     }
