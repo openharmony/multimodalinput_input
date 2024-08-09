@@ -2604,8 +2604,6 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
         MMI_HILOGE("Get hardware cursor stats failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("GetHardwareCursorStats frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }

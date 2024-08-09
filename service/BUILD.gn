@@ -265,6 +265,13 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "resource_schedule_service:ressched_client" ]
   }
 
+  if (input_feature_product == "pc") {
+    external_deps += [
+      "eventhandler:libeventhandler",
+      "graphic_2d:librender_service_base",
+    ]
+  }
+
   external_deps += [
     "ability_base:want",
     "ability_base:zuri",
