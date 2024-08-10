@@ -119,11 +119,17 @@ void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callba
 
 SessionPtr UDSServer::GetSession(int32_t fd) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetSession(fd);
 }
 
 int32_t UDSServer::GetClientFd(int32_t pid) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetClientFd(pid);
 }
 
@@ -178,12 +184,18 @@ void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callba
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->HasPointerDevice();
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
 
@@ -223,6 +235,9 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
 
 bool TouchDrawingManager::IsWindowRotation()
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->IsWindowRotation();
 }
 
@@ -288,6 +303,9 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetMouseDisplayState();
 }
 int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId,
@@ -378,6 +396,9 @@ int32_t MultiModalInputPreferencesManager::GetIntValue(const std::string &key, i
 
 bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, bool defaultValue)
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetBoolValue(key, defaultValue);
 }
 
@@ -493,11 +514,17 @@ FingersenseWrapper::~FingersenseWrapper() {}
 
 bool UDSSession::SendMsg(NetPacket &pkt) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->SendMsg(pkt);
 }
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->IsSceneBoardEnabled();
 }
 
