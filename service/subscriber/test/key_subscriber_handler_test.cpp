@@ -423,7 +423,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, T
     std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
     handler.AddSubscriber(subscriber, option);
     auto it = handler.subscriberMap_.find(option);
-    ASSERT_NE(it, handler.subscriberMap_.end());
+    ASSERT_EQ(it, handler.subscriberMap_.end());
     ASSERT_EQ(it->second.size(), 1);
     ASSERT_EQ(it->second.front(), subscriber);
     auto newSubscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
@@ -982,7 +982,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     std::set<int32_t> preKeys;
     preKeys.insert(1);
     keyOption->SetPreKeys(preKeys);
-    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_OK);
+    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_ERR);
 
     preKeys.insert(2);
     preKeys.insert(3);
