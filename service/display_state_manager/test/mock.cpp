@@ -21,7 +21,7 @@ using namespace OHOS::MMI;
 int32_t KeyEventNormalize::GetCurrentShieldMode()
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
-        return false;
+        return 0;
     }
     return DfsMessageParcel::messageParcel->GetCurrentShieldMode();
 }
