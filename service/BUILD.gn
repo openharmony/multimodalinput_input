@@ -1939,7 +1939,10 @@ ohos_unittest("DelegateTaskTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
+  sources = [
+    "delegate_task/test/delegate_interface_test.cpp",
+    "delegate_task/test/delegate_tasks_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",
