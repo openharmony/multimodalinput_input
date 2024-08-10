@@ -298,6 +298,8 @@ ohos_shared_library("libmmi-server") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
+    "faultloggerd:libjson_stack_formatter",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",

@@ -31,7 +31,11 @@
 #include "app_debug_listener.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
+#include "dfx_define.h"
+#include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
+#include "dfx_json_formatter.h"
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -60,8 +64,11 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
+#include "watchdog_task.h"
+#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
+
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -93,6 +100,8 @@ constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
 constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
+constexpr size_t MAX_FRAME_NUMS { 100 };
+constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::KEYCODE_DPAD_RIGHT,
     KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT,
@@ -1777,7 +1786,8 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             epoll_event event = ev[i];
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
-                libinputAdapter_.EventDispatch(mmiEd->fd);
+                CalculateFuntionRunningTime([this, &mmiEd] () { libinputAdapter_.EventDispatch(mmiEd->fd); },
+                    "EPOLL_EVENT_INPUT");
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "MMI:EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
@@ -2791,17 +2801,27 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    static int32_t BLOCK_TIME = 10;
-    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr,
-        HiviewDFX::XCOLLIE_FLAG_LOG);
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, THREAD_BLOCK_TIMER_SPAN_S,
+        getpid(), gettid());
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, THREAD_BLOCK_TIMER_SPAN_S, printLog, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
-void MMIService::PrintLog(const std::string &flag, int32_t duration)
+void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid)
 {
-    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
+    std::string dfxThreadBlockMsg { "MMIBlockTask name:" };
+    dfxThreadBlockMsg += flag;
+    dfxThreadBlockMsg += ", duration time:";
+    dfxThreadBlockMsg += std::to_string(duration);
+    dfxThreadBlockMsg += ", pid:";
+    dfxThreadBlockMsg += std::to_string(pid);
+    dfxThreadBlockMsg += ", tid:";
+    dfxThreadBlockMsg += std::to_string(tid);
+    MMI_HILOGW("DfxThreadBlockMsg:%{public}s", dfxThreadBlockMsg.c_str());
+    OHOS::HiviewDFX::DfxDumpCatcher dumpCatcher;
+    dumpCatcher.DumpCatch(pid, tid, dfxThreadBlockMsg, MAX_FRAME_NUMS, false);
 }
 
 int32_t MMIService::SkipPointerLayer(bool isSkip)
