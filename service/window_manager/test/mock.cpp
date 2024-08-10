@@ -120,7 +120,7 @@ void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callba
 SessionPtr UDSServer::GetSession(int32_t fd) const
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
-        return false;
+        return nullptr;
     }
     return DfsMessageParcel::messageParcel->GetSession(fd);
 }
@@ -128,7 +128,7 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
 int32_t UDSServer::GetClientFd(int32_t pid) const
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
-        return false;
+        return 0;
     }
     return DfsMessageParcel::messageParcel->GetClientFd(pid);
 }
@@ -194,7 +194,7 @@ bool InputDeviceManager::HasPointerDevice()
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
     if (DfsMessageParcel::messageParcel == nullptr) {
-        return false;
+        return nullptr;
     }
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
