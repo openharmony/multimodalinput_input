@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -116,6 +116,10 @@ public:
      */
     void SetFinalKeyUpDelay(int32_t delay);
 
+    bool IsRepeat() const;
+
+    void SetRepeat(bool repeat);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -139,6 +143,7 @@ private:
     bool isFinalKeyDown_ { false };
     int32_t finalKeyDownDuration_ { 0 };
     int32_t finalKeyUpDelay_ { 0 };
+    bool isRepeat_ { true };
 };
 } // namespace MMI
 } // namespace OHOS
