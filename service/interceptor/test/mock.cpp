@@ -41,6 +41,9 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisib
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
 
