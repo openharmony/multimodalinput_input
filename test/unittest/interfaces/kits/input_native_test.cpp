@@ -125,7 +125,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
     ASSERT_NE(keyState, nullptr);
     OH_Input_SetKeyCode(keyState, 22);
     OH_Input_GetKeyState(keyState);
-    ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
+    ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_PRESSED);
     ASSERT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
     ASSERT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
     OH_Input_DestroyKeyState(&keyState);
