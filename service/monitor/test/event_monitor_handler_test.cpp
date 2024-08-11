@@ -43,6 +43,53 @@ public:
     static void TearDownTestCase(void) {}
 };
 
+class MyInputEventConsumer : public IInputEventHandler::IInputEventConsumer {
+public:
+    void OnInputEvent(InputHandlerType type, std::shared_ptr<KeyEvent> event) const override {}
+    void OnInputEvent(InputHandlerType type, std::shared_ptr<PointerEvent> event) const override {}
+    void OnInputEvent(InputHandlerType type, std::shared_ptr<AxisEvent> event) const override {}
+};
+
+/**
+ * @tc.name: EventMonitorHandlerTest_AddInputHandler_002
+ * @tc.desc: Verify the invalid and valid event type of AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    std::shared_ptr<IInputEventHandler::IInputEventConsumer> callback = std::make_shared<MyInputEventConsumer>();
+    int32_t ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, callback);
+    EXPECT_EQ(ret, RET_OK);
+    eventType = HANDLE_EVENT_TYPE_FINGERPRINT;
+    ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, callback);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_AddInputHandler_003
+ * @tc.desc: Verify the invalid and valid event type of AddInputHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_AddInputHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    InputHandlerType handlerType = InputHandlerType::NONE;
+    HandleEventType eventType = HANDLE_EVENT_TYPE_KEY;
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    int32_t ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
+    EXPECT_EQ(ret, RET_OK);
+    eventType = HANDLE_EVENT_TYPE_FINGERPRINT;
+    ret = eventMonitorHandler.AddInputHandler(handlerType, eventType, session);
+    EXPECT_EQ(ret, RET_OK);
+}
+
 /**
  * @tc.name: EventMonitorHandlerTest_HandlePointerEvent
  * @tc.desc: Test Overrides the if (OnHandleEvent(pointerEvent)) branch of the HandlePointerEvent function
