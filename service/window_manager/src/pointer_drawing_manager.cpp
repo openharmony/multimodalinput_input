@@ -197,20 +197,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-        if (HasMagicCursor()) {
-            if (currentMouseStyle_.id == DEVELOPER_DEFINED_ICON) {
-                surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-                    canvasWidth_, canvasHeight_);
-            } else {
-                surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-                    imageWidth_, imageHeight_);
-            }
-        }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+        UpdateSurfaceNodeBounds(physicalX, physicalY);  
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle, id:%{public}d, size:%{public}d",
             pointerStyle.id, pointerStyle.size);
@@ -228,6 +215,18 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
+    UpdateSurfaceNodeBounds(physicalX, physicalY);
+    surfaceNode_->SetVisible(true);
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    UpdatePointerVisible();
+    mouseIconUpdate_ = false;
+    MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
+        displayId, physicalX, physicalY);
+    return RET_OK;
+}
+
+void PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY)
+{
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         if (currentMouseStyle_.id == DEVELOPER_DEFINED_ICON) {
@@ -237,19 +236,16 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
             surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
                 imageWidth_, imageHeight_);
         }
+    } else {
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
     }
 #else
     surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
         surfaceNode_->GetStagingProperties().GetBounds().w_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    surfaceNode_->SetVisible(true);
-    Rosen::RSTransaction::FlushImplicitTransaction();
-    UpdatePointerVisible();
-    mouseIconUpdate_ = false;
-    MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
-        displayId, physicalX, physicalY);
-    return RET_OK;
 }
 
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)

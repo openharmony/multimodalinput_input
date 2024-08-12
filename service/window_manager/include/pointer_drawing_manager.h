@@ -152,6 +152,7 @@ private:
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
+    void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
 
 private:
     struct PidInfo {
