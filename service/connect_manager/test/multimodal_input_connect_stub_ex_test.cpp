@@ -2321,7 +2321,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_001, TestS
 HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventObserver_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -2343,7 +2343,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerStyle_001, TestSize.Level
         .WillOnce(Return(true))
         .WillOnce(Return(true))
         .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
@@ -3657,7 +3657,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_003, TestSize.Level1
         .WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(0));
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -3707,7 +3707,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectKeyEvent_004, TestSize.Level1
         .WillOnce(Return(true))
         .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadInt32()).WillOnce(Return(0));
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -3839,14 +3839,11 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_003, TestSize.Le
         .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillOnce(Return(true));
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillRepeatedly(Return(true));
 #else
     EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillOnce(Return(true));
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(false));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(false));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -3894,14 +3891,11 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_004, TestSize.Le
         .WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillOnce(Return(true));
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillRepeatedly(Return(true));
 #else
     EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillOnce(Return(true));
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -3949,10 +3943,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubInjectPointerEvent_005, TestSize.Le
         .WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
     EXPECT_CALL(*messageParcelMock_, ReadFloat(_)).WillOnce(Return(true));
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    EXPECT_CALL(*messageParcelMock_, ReadDouble(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillRepeatedly(Return(true));
 #else
     EXPECT_CALL(*messageParcelMock_, ReadDouble(_)).WillOnce(Return(true));
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -4833,7 +4824,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubEnableInputDevice_001, TestSize.Lev
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableInputDevice_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(true), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -4852,7 +4843,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubEnableInputDevice_002, TestSize.Lev
 HWTEST_F(MultimodalInputConnectStubTest, StubEnableInputDevice_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(DoAll(SetArgReferee<0>(false), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -5593,7 +5584,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_003, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7661,7 +7652,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAnco
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoAddChannel_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
     EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
@@ -7722,7 +7713,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAnco
 HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubAncoRemoveChannel_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
     EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
     sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
     EXPECT_CALL(*messageParcelMock_, ReadRemoteObject()).WillOnce(Return(remote));
