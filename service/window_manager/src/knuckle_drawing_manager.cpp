@@ -30,6 +30,7 @@
 #include "mmi_log.h"
 #include "parameters.h"
 #include "setting_datashare.h"
+#include "touch_drawing_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDrawingManager"
@@ -144,16 +145,15 @@ bool KnuckleDrawingManager::IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEv
         int32_t id = touchEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         touchEvent->GetPointerItem(id, pointerItem);
-        int32_t physicalX = pointerItem.GetDisplayX();
-        int32_t physicalY = pointerItem.GetDisplayY();
-        float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownPointer_.x - physicalX, POW_SQUARE) +
-            pow(lastDownPointer_.y - physicalY, POW_SQUARE)));
+        auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+        float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownPointer_.x - displayXY.first, POW_SQUARE) +
+            pow(lastDownPointer_.y - displayXY.second, POW_SQUARE)));
         bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
         if (isTimeIntervalReady && isDistanceReady) {
             return false;
         }
-        lastDownPointer_.x = physicalX;
-        lastDownPointer_.y = physicalY;
+        lastDownPointer_.x = displayXY.first;
+        lastDownPointer_.y = displayXY.second;
     } else if (touchAction == PointerEvent::POINTER_ACTION_UP) {
         lastUpTime_ = touchEvent->GetActionTime();
     }
@@ -259,6 +259,7 @@ void KnuckleDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
 
     CHKPV(surfaceNode_);
+    surfaceNode_->SetSkipLayer(true);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);
@@ -317,8 +318,9 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    pointerInfo.x = pointerItem.GetDisplayX();
-    pointerInfo.y = pointerItem.GetDisplayY();
+    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    pointerInfo.x = displayXY.first;
+    pointerInfo.y = displayXY.second;
     pointerInfos_.push_back(pointerInfo);
     pointerNum_++;
 

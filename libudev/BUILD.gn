@@ -55,7 +55,10 @@ group("test") {
 
 ohos_unittest("libudev-test") {
   module_out_path = output_path
-  include_dirs = [ "${mmi_path}/util/common/include" ]
+  include_dirs = [
+    "${mmi_path}/util/common/include",
+    "//third_party/libevdev",
+  ]
 
   configs = [
     ":mmi_libudev_config",
@@ -67,10 +70,11 @@ ohos_unittest("libudev-test") {
     "test/custom_udev_test.cpp",
   ]
 
-  external_deps = [
-    "googletest:gmock_main",
-    "hilog:libhilog",
-    "libevdev:libevdev",
+  external_deps = [ "hilog:libhilog" ]
+
+  deps = [
+    "//third_party/googletest:gmock_main",
+    "//third_party/libevdev",
   ]
 
   defines += [ "MMI_DISABLE_LOG_TRACE" ]
@@ -78,13 +82,13 @@ ohos_unittest("libudev-test") {
 
 ohos_unittest("e2e-libudev-test") {
   module_out_path = output_path
+  include_dirs = [ "//third_party/libevdev" ]
 
   sources = [ "test/e2e_udev_test.cpp" ]
 
-  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
-
-  external_deps = [
-    "googletest:gmock_main",
-    "libevdev:libevdev",
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "//third_party/googletest:gmock_main",
+    "//third_party/libevdev",
   ]
 }

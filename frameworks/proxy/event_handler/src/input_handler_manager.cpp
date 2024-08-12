@@ -243,7 +243,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
         }
     }
@@ -256,7 +256,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
             break;
         }
@@ -400,7 +400,9 @@ bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerAc
             item.SetPressed(false);
             lastPointerEvent_->UpdatePointerItem(pointerId, item);
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
             OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
             return true;
         }
     }

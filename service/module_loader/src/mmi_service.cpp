@@ -31,7 +31,11 @@
 #include "app_debug_listener.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
+#include "dfx_define.h"
+#include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
+#include "dfx_json_formatter.h"
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -60,8 +64,11 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
+#include "watchdog_task.h"
+#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
+
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -93,6 +100,17 @@ constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
 [[ maybe_unused ]] constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
+constexpr size_t MAX_FRAME_NUMS { 100 };
+constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
+const std::set<int32_t> g_keyCodeValueSet = {
+    KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::KEYCODE_DPAD_RIGHT,
+    KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT,
+    KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT,
+    KeyEvent::KEYCODE_CAPS_LOCK, KeyEvent::KEYCODE_SCROLL_LOCK, KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_F2,
+    KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
+    KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
+    KeyEvent::KEYCODE_NUM_LOCK
+};
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -371,7 +389,9 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
@@ -1132,7 +1152,7 @@ int32_t MMIService::OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType)
     CALL_DEBUG_ENTER;
     int32_t ret = INPUT_DEV_MGR->GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
-        MMI_HILOGE("GetKeyboardType call failed");
+        MMI_HILOGD("GetKeyboardType call failed");
         return ret;
     }
     return RET_OK;
@@ -1147,7 +1167,7 @@ int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
         }
         );
     if (ret != RET_OK) {
-        MMI_HILOGE("Get keyboard type failed, ret:%{public}d", ret);
+        MMI_HILOGD("Get keyboard type failed, ret:%{public}d", ret);
         return ret;
     }
     return ret;
@@ -1394,6 +1414,13 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     pressedKeys = keyEvent->GetPressedKeys();
+    for (auto iter = pressedKeys.begin(); iter != pressedKeys.end();) {
+        if (g_keyCodeValueSet.find(*iter) == g_keyCodeValueSet.end()) {
+            iter = pressedKeys.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
     specialKeysState[KeyEvent::KEYCODE_CAPS_LOCK] =
         static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
     specialKeysState[KeyEvent::KEYCODE_SCROLL_LOCK] =
@@ -1440,57 +1467,65 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
+#ifdef OHOS_RSS_CLIENT
+void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    int sleepSeconds = 1;
+    sleep(sleepSeconds);
+    uint64_t tid = tid_.load();
+    int32_t userInteraction = 2;
+    std::unordered_map<std::string, std::string> payload;
+    payload["uid"] = std::to_string(getuid());
+    payload["pid"] = std::to_string(getpid());
+    payload["extType"] = "10002";
+    payload["tid"] = std::to_string(tid);
+    payload["isSa"] = "1";
+    payload["cgroupPrio"] = "1";
+    payload["threadName"] = "mmi_service";
+    ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+}
+#endif // OHOS_RSS_CLIENT
+
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
+    MMI_HILOGI("systemAbilityId is %{public}d", systemAbilityId);
 #ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
-        int sleepSeconds = 1;
-        sleep(sleepSeconds);
-        uint64_t tid = tid_.load();
-        int32_t userInteraction = 2;
-        std::unordered_map<std::string, std::string> payload;
-        payload["uid"] = std::to_string(getuid());
-        payload["pid"] = std::to_string(getpid());
-        payload["extType"] = "10002";
-        payload["tid"] = std::to_string(tid);
-        payload["isSa"] = "1";
-        payload["cgroupPrio"] = "1";
-        payload["threadName"] = "mmi_service";
-        ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-            ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+        OnAddResSchedSystemAbility(systemAbilityId, deviceId);
     }
 #endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         isCesStart_ = true;
-        MMI_HILOGD("Common event service started");
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (systemAbilityId == APP_MGR_SERVICE_ID) {
-        MMI_HILOGI("Init app state observer start");
         APP_OBSERVER_MGR->InitAppStateObserver();
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
         DISPLAY_MONITOR->InitCommonEventSubscriber();
-        MMI_HILOGD("Common event service started");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
-        MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
-        MMI_HILOGI("Init render service state observer start");
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
             IPointerDrawingManager::GetInstance()->InitPointerObserver();
         }
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
-        MMI_HILOGI("Init screen capture monitor listener start");
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPV(monitorHandler);
         monitorHandler->RegisterScreenCaptureListener();
@@ -1751,7 +1786,8 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             epoll_event event = ev[i];
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
-                libinputAdapter_.EventDispatch(mmiEd->fd);
+                CalculateFuntionRunningTime([this, &mmiEd] () { libinputAdapter_.EventDispatch(mmiEd->fd); },
+                    "EPOLL_EVENT_INPUT");
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "MMI:EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
@@ -2565,6 +2601,7 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
 int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
@@ -2573,13 +2610,16 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
@@ -2588,8 +2628,10 @@ int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
@@ -2653,8 +2695,6 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
         MMI_HILOGE("Get hardware cursor stats failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("GetHardwareCursorStats frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
@@ -2761,16 +2801,27 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    static int32_t BLOCK_TIME = 1;
-    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, THREAD_BLOCK_TIMER_SPAN_S,
+        getpid(), gettid());
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, THREAD_BLOCK_TIMER_SPAN_S, printLog, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
-void MMIService::PrintLog(const std::string &flag, int32_t duration)
+void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid)
 {
-    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
+    std::string dfxThreadBlockMsg { "MMIBlockTask name:" };
+    dfxThreadBlockMsg += flag;
+    dfxThreadBlockMsg += ", duration time:";
+    dfxThreadBlockMsg += std::to_string(duration);
+    dfxThreadBlockMsg += ", pid:";
+    dfxThreadBlockMsg += std::to_string(pid);
+    dfxThreadBlockMsg += ", tid:";
+    dfxThreadBlockMsg += std::to_string(tid);
+    MMI_HILOGW("DfxThreadBlockMsg:%{public}s", dfxThreadBlockMsg.c_str());
+    OHOS::HiviewDFX::DfxDumpCatcher dumpCatcher;
+    dumpCatcher.DumpCatch(pid, tid, dfxThreadBlockMsg, MAX_FRAME_NUMS, false);
 }
 
 int32_t MMIService::SkipPointerLayer(bool isSkip)

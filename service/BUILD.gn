@@ -180,6 +180,14 @@ ohos_shared_library("libmmi-server") {
         "key_command/src/stylus_key_handler.cpp",
       ]
     }
+    if (shortcut_key_manager_enabled) {
+      sources += [ "subscriber/src/key_shortcut_manager.cpp" ]
+      defines += [ "SHORTCUT_KEY_MANAGER_ENABLED" ]
+
+      if (shortcut_key_rules_enabled) {
+        defines += [ "SHORTCUT_KEY_RULES_ENABLED" ]
+      }
+    }
   }
 
   if (input_feature_switch) {
@@ -296,6 +304,8 @@ ohos_shared_library("libmmi-server") {
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
     "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
+    "faultloggerd:libjson_stack_formatter",
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
@@ -1095,7 +1105,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
   ]
 
   sources = [
-    "key_command/src/key_command_handler.cpp",
     "window_manager/src/input_windows_manager.cpp",
     "window_manager/test/input_windows_manager_ex_test.cpp",
     "window_manager/test/mock.cpp",
@@ -1915,7 +1924,7 @@ ohos_unittest("DisplayStateManagerTest") {
   external_deps = [
     "ability_base:want",
     "cJSON:cjson",
-    "googletest:gtest_main",
+    "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1998,7 +2007,10 @@ ohos_unittest("DelegateTaskTest") {
     "-Dprotected=public",
   ]
 
-  sources = [ "delegate_task/test/delegate_tasks_test.cpp" ]
+  sources = [
+    "delegate_task/test/delegate_interface_test.cpp",
+    "delegate_task/test/delegate_tasks_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/service:libmmi-server",

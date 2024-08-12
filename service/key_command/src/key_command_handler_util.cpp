@@ -14,6 +14,9 @@
  */
 
 #include "key_command_handler_util.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 
 namespace OHOS {
 namespace MMI {
@@ -563,6 +566,22 @@ std::string GenerateKey(const ShortcutKey& key)
     return std::string(ss.str());
 }
 
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+static int32_t RegisterSystemKey(const ShortcutKey &shortcutKey,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    KeyShortcutManager::SystemShortcutKey sysKey {
+        .modifiers = shortcutKey.preKeys,
+        .finalKey = shortcutKey.finalKey,
+        .longPressTime = shortcutKey.keyDownDuration,
+        .triggerType = (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN ?
+            KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN : KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP),
+        .callback = callback,
+    };
+    return KEY_SHORTCUT_MGR->RegisterSystemKey(sysKey);
+}
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
+
 bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap,
     std::vector<std::string>& businessIds)
 {
@@ -581,6 +600,14 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
         if (!ConvertToShortcutKey(shortkey, shortcutKey, businessIds)) {
             continue;
         }
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+        shortcutKey.shortcutId = RegisterSystemKey(shortcutKey,
+            [shortcutKey](std::shared_ptr<KeyEvent> keyEvent) {});
+        if (shortcutKey.shortcutId < 0) {
+            MMI_HILOGE("RegisterSystemKey fail, error:%{public}d", shortcutKey.shortcutId);
+            return RET_ERR;
+        }
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::string key = GenerateKey(shortcutKey);
         if (shortcutKeyMap.find(key) == shortcutKeyMap.end()) {
             if (!shortcutKeyMap.emplace(key, shortcutKey).second) {

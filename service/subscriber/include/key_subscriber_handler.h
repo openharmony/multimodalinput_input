@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,6 +63,9 @@ private:
         SessionPtr sess_ { nullptr };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
         int32_t timerId_ { -1 };
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+        int32_t shortcutId_ { -1 };
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     };
     using SubscriberCollection = std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>>;
@@ -96,15 +99,19 @@ private:
     void SubscriberNotifyNap(const std::shared_ptr<Subscriber> subscriber);
     bool IsEqualKeyOption(std::shared_ptr<KeyOption> newOption, std::shared_ptr<KeyOption> oldOption);
     bool IsEqualPreKeys(const std::set<int32_t> &preKeys, const std::set<int32_t> &pressedKeys);
-    void AddKeyGestureSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
+    int32_t AddKeyGestureSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
     int32_t RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId);
-    void AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    int32_t RegisterSystemKey(std::shared_ptr<KeyOption> option, int32_t session,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
+    int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
     bool IsMatchForegroundPid(std::list<std::shared_ptr<Subscriber>> subs, std::set<int32_t> foregroundPids);
     void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,
-        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool isRepeat, bool &handled);
     void NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &keyEvent,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent> &keyEvent,
