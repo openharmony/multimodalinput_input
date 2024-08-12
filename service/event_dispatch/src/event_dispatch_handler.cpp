@@ -243,14 +243,18 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
     if (udsServer->GetSession(fd) == nullptr) {
+        auto pid = WIN_MGR->WindowIdGetPid(point->GetTargetWindowId());
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId &&
             GetSysClockTime() - windowStateErrorInfo_.startTime > INTERVAL_TIME){
             auto sess = udsServer->GetSession(WIN_MGR->GetWindowStateNotifyPid());
             if (sess != nullptr) {
-                auto pid = WIN_MGR->WindowIdGetPid(point->GetTargetWindowId());
                 NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
                 pkt << pid << point->GetTargetWindowId();
             }
+        } else {
+            windowStateErrorInfo_.windowId = windowId;
+            windowStateErrorInfo_.startTime = GetSysClockTime();
+            windowStateErrorInfo_.pid = pid
         }
     }
     DispatchPointerEventInner(point, fd);
