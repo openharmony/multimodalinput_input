@@ -429,9 +429,11 @@ void KnuckleDynamicDrawingManager::DestoryWindow()
     CHKPV(canvas);
     canvas->Clear();
     canvasNode_->FinishRecording();
+    CHKPV(surfaceNode_);
+    surfaceNode_->DetachToDisplay(screenId_);
+    surfaceNode_->RemoveChild(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
-    CHKPV(surfaceNode_);
     surfaceNode_.reset();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
