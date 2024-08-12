@@ -2632,7 +2632,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GesturePointsToStr_003, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_001
- * @tc.desc: Test HandleKnuckleGestureEvent_001
+ * @tc.desc: Test HandleKnuckleGestureEvent function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2662,7 +2662,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_002
- * @tc.desc: Test HandleKnuckleGestureEvent_002
+ * @tc.desc: Test HandleKnuckleGestureEvent function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2686,7 +2686,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_003
- * @tc.desc: Test HandleKnuckleGestureEvent_003
+ * @tc.desc: Test HandleKnuckleGestureEvent function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -3241,6 +3241,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportIfNeed_001, TestSize
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
+    ASSERT_NO_FATAL_FAILURE(handler.ReportIfNeed());
+    handler.isGesturing_ = true;
     handler.isLastGestureSucceed_ = true;
     ASSERT_NO_FATAL_FAILURE(handler.ReportIfNeed());
     handler.isLastGestureSucceed_ = false;

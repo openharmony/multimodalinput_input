@@ -594,6 +594,15 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
         ResetKnuckleGesture();
         return;
     }
+    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
+    if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_) {
+        lastDirection_ = physicDisplayInfo->direction;
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE && !gesturePoints_.empty()) {
+            MMI_HILOGW("The screen has been rotated while knuckle is moving");
+            ResetKnuckleGesture();
+            return;
+        }
+    }
     if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
         return;
@@ -707,6 +716,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
         }
         case NotifyType::LETTERGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
+            drawOFailTimestamp_ = touchEvent->GetActionTime();
             ReportLetterGesture();
             break;
         }
@@ -780,6 +790,9 @@ std::string KeyCommandHandler::GesturePointsToStr() const
 
 void KeyCommandHandler::ReportIfNeed()
 {
+    if (!isGesturing_) {
+        return;
+    }
     DfxHisysevent::ReportKnuckleGestureFaildTimes();
     DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
     DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
