@@ -165,6 +165,7 @@ private:
     int32_t lastPhysicalY_ { -1 };
     PointerStyle lastMouseStyle_ {};
     PointerStyle currentMouseStyle_ {};
+    PointerStyle lastDrawPointerStyle_ {};
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
