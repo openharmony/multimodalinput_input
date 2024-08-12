@@ -108,8 +108,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
         return;
     }
-    if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         auto iter = std::find(ALL_EVENT_TYPES.begin(), ALL_EVENT_TYPES.end(), static_cast<int32_t>(type));
+    if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         if (iter != ALL_EVENT_TYPES.end()) {
             MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
         }
