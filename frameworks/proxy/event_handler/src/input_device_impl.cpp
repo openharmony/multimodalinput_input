@@ -111,7 +111,7 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
         return;
     }
     for (const auto &item : iter->second) {
-        MMI_HILOGI("Report device change task, event type:%{public}s", type.c_str());
+        MMI_HILOGD("Report device change task, event type:%{public}s", type.c_str());
         if (type == "add") {
             item->OnDeviceAdded(deviceId, type);
             continue;
