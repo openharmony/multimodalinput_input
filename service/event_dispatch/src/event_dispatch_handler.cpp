@@ -258,7 +258,9 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
     auto sess = udsServer->GetSession(fd);
-    CHKPV(sess);
+    if (sess == nullptr) {
+        return;
+    }
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
         MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
