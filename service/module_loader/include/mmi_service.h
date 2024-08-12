@@ -157,6 +157,7 @@ public:
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();

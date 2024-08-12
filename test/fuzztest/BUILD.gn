@@ -31,6 +31,7 @@ group("test") {
     "getdeviceids_fuzzer:fuzztest",
     "getdisplaybindinfo_fuzzer:fuzztest",
     "gethardwarecursorstats_fuzzer:fuzztest",
+    "getintervalsincelastinput_fuzzer:fuzztest",
     "getkeyboardrepeatdelay_fuzzer:fuzztest",
     "getkeyboardrepeatrate_fuzzer:fuzztest",
     "getkeyboardtype_fuzzer:fuzztest",

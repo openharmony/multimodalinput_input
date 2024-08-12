@@ -40,6 +40,7 @@ public:
     using FunInputDevIds = std::function<void(std::vector<int32_t>&)>;
     using FunInputDevKeys = std::function<void(std::vector<bool>&)>;
     using FunKeyboardTypes = std::function<void(int32_t)>;
+    using FunIntervalSinceLastInput = std::function<void(int64_t)>;
     using InputDevListenerPtr = std::shared_ptr<IInputDeviceListener>;
 
     int32_t RegisterDevListener(const std::string &type, InputDevListenerPtr listener);
@@ -52,6 +53,7 @@ public:
     int32_t SetKeyboardRepeatRate(int32_t rate);
     int32_t GetKeyboardRepeatDelay(std::function<void(int32_t)> callback);
     int32_t GetKeyboardRepeatRate(std::function<void(int32_t)> callback);
+    int32_t GetIntervalSinceLastInput(FunIntervalSinceLastInput callback);
     void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);
