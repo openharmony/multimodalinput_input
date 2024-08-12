@@ -272,6 +272,7 @@ public:
         rows = parameterRows_;
         return touchpadScrollRows_;
     }
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override { return timeInterval; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -7741,6 +7742,39 @@ HWTEST_F(MultimodalInputConnectStubTest,
     MessageParcel data;
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubTransferBinderClientService(data, reply));
+}
+
+/**
+ * @tc.name: StubGetIntervalSinceLastInput_001
+ * @tc.desc: Test the function StubGetIntervalSinceLastInput
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetIntervalSinceLastInput_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetIntervalSinceLastInput(data, reply));
+}
+
+/**
+ * @tc.name: StubGetIntervalSinceLastInput_002
+ * @tc.desc: Test the function StubGetIntervalSinceLastInput
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubGetIntervalSinceLastInput_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetIntervalSinceLastInput(data, reply));
 }
 } // namespace MMI
 } // namespace OHOS
