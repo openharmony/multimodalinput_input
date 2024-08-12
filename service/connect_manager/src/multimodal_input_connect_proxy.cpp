@@ -858,7 +858,7 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(std::vector<int32_t> &ids)
         MMI_HILOGE("Read vector failed");
         return RET_ERR;
     }
-    MMI_HILOGE("ids size:%{public}zu", ids.size());
+    MMI_HILOGD("ids size:%{public}zu", ids.size());
     return RET_OK;
 }
 
@@ -878,7 +878,7 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t deviceId, std::shared_ptr
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE),
         data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        MMI_HILOGD("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     ret = ParseInputDevice(reply, inputDevice);

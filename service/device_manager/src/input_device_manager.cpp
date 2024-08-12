@@ -208,7 +208,7 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
 {
     CALL_DEBUG_ENTER;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
-        MMI_HILOGE("Failed to search for the deviceID");
+        MMI_HILOGD("Failed to search for the deviceID");
         return false;
     }
     auto deviceConfig = KeyRepeat->GetDeviceConfig();
