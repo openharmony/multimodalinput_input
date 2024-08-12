@@ -917,5 +917,131 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ResetAllTriggering_01, T
     std::this_thread::sleep_for(std::chrono::milliseconds(TWICE_LONG_PRESS_TIME));
     EXPECT_EQ(keyCode, KeyEvent::KEYCODE_UNKNOWN);
 }
+
+/**
+ * @tc.name: KeyShortcutManagerTest_GetInstance_01
+ * @tc.desc: Test the funcation GetInstance
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GetInstance_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    shortcutMgr.instance_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.GetInstance());
+    shortcutMgr.instance_ = std::make_shared<KeyShortcutManager>();
+    ASSERT_TRUE(shortcutMgr.instance_ != nullptr);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.GetInstance());
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_UnregisterHotKey_01
+ * @tc.desc: Test the funcation UnregisterHotKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UnregisterHotKey_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool triggered = false;
+    KeyShortcutManager::KeyShortcut keyShortcut {
+        .modifiers = KeyEvent::KEYCODE_META_LEFT,
+        .finalKey = KeyEvent::KEYCODE_T,
+        .longPressTime = DEFAULT_LONG_PRESS_TIME,
+        .triggerType = KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN,
+        .callback = [&triggered](std::shared_ptr<KeyEvent> keyEvent) {
+            triggered = true;
+        },
+    };
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 100;
+    shortcutMgr.shortcuts_[100] = keyShortcut;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UnregisterHotKey(shortcutId));
+    shortcutId = 66;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UnregisterHotKey(shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_UpdateShortcutConsumed_01
+ * @tc.desc: Test the funcation UpdateShortcutConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_UpdateShortcutConsumed_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UpdateShortcutConsumed(keyEvent));
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UpdateShortcutConsumed(keyEvent));
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.UpdateShortcutConsumed(keyEvent));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_MarkShortcutConsumed_01
+ * @tc.desc: Test the funcation MarkShortcutConsumed(ShortcutKey)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_MarkShortcutConsumed_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    ShortcutKey shortcut;
+    shortcut.preKeys = {1, 2, 3};
+    shortcut.businessId = "businessId";
+    shortcut.statusConfig = "statusConfig";
+    shortcut.statusConfigValue = true;
+    shortcut.finalKey = 1;
+    shortcut.keyDownDuration = 2;
+    shortcut.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    shortcut.timerId = 1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.MarkShortcutConsumed(shortcut));
+    shortcut.triggerType = KeyEvent::KEY_ACTION_CANCEL;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.MarkShortcutConsumed(shortcut));
+    shortcut.triggerType = KeyEvent::KEY_ACTION_UP;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.MarkShortcutConsumed(shortcut));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_MarkShortcutConsumed_001
+ * @tc.desc: Test the funcation MarkShortcutConsumed(KeyOption)
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_MarkShortcutConsumed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    KeyOption shortcut;
+    std::set<int32_t> preKeys = {1, 2, 3, 4, 5};
+    shortcut.SetPreKeys(preKeys);
+    shortcut.SetFinalKeyDown(true);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.MarkShortcutConsumed(shortcut));
+    shortcut.SetFinalKeyDown(false);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.MarkShortcutConsumed(shortcut));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_ResetTriggering_01
+ * @tc.desc: Test the funcation ResetTriggering
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ResetTriggering_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    shortcutMgr.triggering_[1] = 1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.ResetTriggering(shortcutId));
+    shortcutId = 10;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.ResetTriggering(shortcutId));
+}
 } // namespace MMI
 } // namespace OHOS
