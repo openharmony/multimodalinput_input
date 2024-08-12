@@ -1930,6 +1930,10 @@ ohos_unittest("DeviceConfigTest") {
 
 ohos_unittest("DelegateTaskTest") {
   module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/util/napi",
+    "${mmi_path}/util/napi/include",
+  ]
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -1942,7 +1946,8 @@ ohos_unittest("DelegateTaskTest") {
   ]
 
   sources = [
-    "delegate_task/test/delegate_interface_test.cpp",
+    "${mmi_path}/util/napi/src/key_event_napi.cpp",
+    "${mmi_path}/util/napi/src/util_napi_value.cpp",
     "delegate_task/test/delegate_tasks_test.cpp",
   ]
 
@@ -1954,6 +1959,7 @@ ohos_unittest("DelegateTaskTest") {
   external_deps = [
     "hilog:libhilog",
     "init:libbegetutil",
+    "napi:ace_napi",
   ]
 }
 
