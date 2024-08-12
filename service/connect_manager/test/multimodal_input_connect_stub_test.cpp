@@ -1414,7 +1414,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    int32_t returnCode = 65142800;
+    int32_t returnCode = 201;
     int32_t ret = stub->StubAddInputHandler(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
@@ -1430,7 +1430,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Le
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    int32_t returnCode = 65142800;
+    int32_t returnCode = 201;
     int32_t ret = stub->StubRemoveInputHandler(data, reply);
     EXPECT_EQ(ret, returnCode);
 }

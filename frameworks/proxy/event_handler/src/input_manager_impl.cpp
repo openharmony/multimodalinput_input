@@ -407,7 +407,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     BytraceAdapter::StartConsumer(keyEvent);
     consumer->OnInputEvent(keyEvent);
     BytraceAdapter::StopConsumer();
-    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOGD("Key event callback keyCode:%{private}d", keyEvent->GetKeyCode());
 }
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -415,12 +415,12 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
     }
@@ -443,9 +443,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         BytraceAdapter::StartConsumer(keyEvent);
         inputConsumer->OnInputEvent(keyEvent);
         BytraceAdapter::StopConsumer();
-        MMI_HILOG_DISPATCHD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
+        MMI_HILOG_DISPATCHD("Key event report keyCode:%{private}d", keyEvent->GetKeyCode());
     }
-    MMI_HILOG_DISPATCHD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOG_DISPATCHD("Key event keyCode:%{private}d", keyEvent->GetKeyCode());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -470,12 +470,12 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    CHKPV(eventHandler_);
-    CHKPV(consumer_);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
     std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
     {
         std::lock_guard<std::mutex> guard(resourceMtx_);
+        CHKPV(eventHandler_);
+        CHKPV(consumer_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
         lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
@@ -485,7 +485,8 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CHKPV(client);
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
         MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
@@ -590,7 +591,7 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
     return RET_OK;
 }
 
-int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
+int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
@@ -899,7 +900,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
     } else {
-        MMI_HILOGI("KeyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGI("KeyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
@@ -983,6 +984,19 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #else
     MMI_HILOGW("Pointer and touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+}
+
+void InputManagerImpl::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    CHKPV(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (MMIEventHdl.InjectPointerEvent(pointerEvent, false) != RET_OK) {
+            MMI_HILOGE("Failed to inject pointer event to touchPad");
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t InputManagerImpl::SetMouseScrollRows(int32_t rows)
@@ -1310,13 +1324,16 @@ void InputManagerImpl::OnConnected()
 {
     CALL_INFO_TRACE;
     ReAddInputEventFilter();
-    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGD("The windows info or display info is empty");
-        return;
+    if (!displayGroupInfo_.windowsInfo.empty() && !displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGD("displayGroupInfo_: windowsInfo size: %{public}zu, displaysInfo size: %{public}zu",
+            displayGroupInfo_.windowsInfo.size(), displayGroupInfo_.displaysInfo.size());
+        SendDisplayInfo();
+        PrintDisplayInfo();
     }
-    SendDisplayInfo();
-    SendWindowInfo();
-    PrintDisplayInfo();
+    if (!windowGroupInfo_.windowsInfo.empty()) {
+        MMI_HILOGD("windowGroupInfo_: windowsInfo size: %{public}zu", windowGroupInfo_.windowsInfo.size());
+        SendWindowInfo();
+    }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     SendEnhanceConfig();
     PrintEnhanceConfig();
@@ -1470,7 +1487,7 @@ int32_t InputManagerImpl::UnregisterDevListener(std::string type,
 
 int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");

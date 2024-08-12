@@ -28,9 +28,6 @@
 
 namespace OHOS {
 namespace MMI {
-PermissionHelper::PermissionHelper() {}
-PermissionHelper::~PermissionHelper() {}
-
 bool PermissionHelper::VerifySystemApp()
 {
     MMI_HILOGD("Verify system App");

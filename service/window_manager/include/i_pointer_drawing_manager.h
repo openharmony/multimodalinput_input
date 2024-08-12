@@ -73,7 +73,7 @@ public:
     {
         return 0;
     }
-    virtual void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) {}
+    virtual void DrawPointerStyle(const PointerStyle& pointerStyle) {}
     virtual bool IsPointerVisible()
     {
         return false;
@@ -135,7 +135,7 @@ public:
     {
         return 0;
     }
-    virtual void ForceClearPointerVisiableStatus();
+    virtual void ForceClearPointerVisiableStatus() {}
     virtual void InitPointerObserver() {}
     virtual void OnSessionLost(int32_t pid) {}
     virtual int32_t SkipPointerLayer(bool isSkip)

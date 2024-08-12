@@ -64,6 +64,9 @@ constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
 constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
+constexpr int32_t WEBER_DEVICE_WIDTH { 2880 };
+constexpr int32_t WEBER_DEVICE_HEIGHT { 1920 };
+const std::string DEVICE_TYPE_WEBER { "WEB"};
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
@@ -604,7 +607,6 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
     if (!HandlePostInner(data, pointerItem)) {
-        CHKPL(pointerEvent_);
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
         return ERROR_NULL_POINTER;
     }
@@ -711,6 +713,11 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
         MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
+    }
+    if (PRODUCT_TYPE == DEVICE_TYPE_WEBER) {
+        if (width == WEBER_DEVICE_WIDTH && height == WEBER_DEVICE_HEIGHT) {
+            ret = DeviceType::DEVICE_WEBER;
+        }
     }
     return ret;
 }
