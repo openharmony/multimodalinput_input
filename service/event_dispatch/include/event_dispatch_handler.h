@@ -80,7 +80,7 @@ private:
     struct {
         int32_t pid { -1 };
         int32_t windowId { -1 };
-        int32_t startTime { -1 };
+        int64_t startTime { -1 };
     } windowStateErrorInfo_;
     std::map<int32_t, std::set<std::shared_ptr<WindowInfo>, CancelCmp>> cancelEventList_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
