@@ -123,7 +123,7 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
 {
     struct Input_KeyState* keyState = OH_Input_CreateKeyState();
     ASSERT_NE(keyState, nullptr);
-    OH_Input_SetKeyCode(keyState, 22);
+    OH_Input_SetKeyCode(keyState, KEYCODE_FN);
     OH_Input_GetKeyState(keyState);
     ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_PRESSED);
     ASSERT_EQ(OH_Input_GetKeySwitch(keyState), KEY_PRESSED);
