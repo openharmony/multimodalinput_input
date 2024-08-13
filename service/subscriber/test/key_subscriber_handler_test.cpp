@@ -32,6 +32,7 @@
 #include "switch_subscriber_handler.h"
 #include "uds_server.h"
 #include "want.h"
+#include "event_log_helper.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -55,6 +56,65 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
 };
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyEvent_001
+ * @tc.desc: Test HandleKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    KeySubscriberHandler handler;
+    KeyEvent::KeyItem item;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.enableCombineKey_ = false;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    keyEvent->AddKeyItem(item);
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    keyEvent->AddKeyItem(item);
+    EXPECT_FALSE(handler.OnSubscribeKeyEvent(keyEvent));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+
+    handler.enableCombineKey_ = true;
+    handler.hasEventExecuting_ = true;
+    handler.keyEvent_ = KeyEvent::Create();
+    ASSERT_NE(handler.keyEvent_, nullptr);
+    handler.keyEvent_->SetKeyCode(KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+    handler.keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.SetKeyCode(KeyEvent::KEYCODE_A);
+    handler.keyEvent_->AddKeyItem(item);
+    item.SetKeyCode(KeyEvent::KEYCODE_B);
+    handler.keyEvent_->AddKeyItem(item);
+    EXPECT_TRUE(handler.OnSubscribeKeyEvent(keyEvent));
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
+    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyEvent(keyEvent));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_DumpSubscriber_001
+ * @tc.desc: Test DumpSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_DumpSubscriber_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t fd = 1;
+    SessionPtr sess;
+    auto keyOption = std::make_shared<KeyOption>();
+    keyOption->preKeys_.insert(10);
+    keyOption->preKeys_.insert(20);
+    keyOption->preKeys_.insert(30);
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    ASSERT_NO_FATAL_FAILURE(handler.DumpSubscriber(fd, subscriber));
+}
 
 /**
  * @tc.name: InputWindowsManagerTest_UnsubscribeKeyEvent_001
@@ -2246,6 +2306,32 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_004
     ASSERT_NE(subscriber, nullptr);
 
     keyEvent->keyCode_ = KeyEvent::KEYCODE_POWER;
+    ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_NotifySubscriber_005
+ * @tc.desc: Test NotifySubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    SessionPtr sess;
+    std::shared_ptr<KeyOption> keyOption;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
+    ASSERT_NE(subscriber, nullptr);
+    keyEvent->keyCode_ = KeyEvent::KEYCODE_CAMERA;
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
+
+    NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
+    EXPECT_FALSE(pkt.ChkRWError());
     ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
 }
 
