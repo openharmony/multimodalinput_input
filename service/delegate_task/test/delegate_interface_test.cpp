@@ -235,5 +235,75 @@ HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_OnInputEventHandler_01, Te
     ASSERT_NO_FATAL_FAILURE(delegateInterface.OnInputEventHandler(type, pointerEvent));
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
+
+/**
+ * @tc.name: DelegateInterfaceTest_AddHandler_01
+ * @tc.desc: Test the function AddHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    DelegateInterface::HandlerSummary summary;
+    summary.handlerName = "handler1";
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+
+    InputHandlerType type = InputHandlerType::MONITOR;
+    int32_t ret = delegateInterface.AddHandler(type, summary);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    summary.handlerName = "handler";
+    int32_t ret2 = delegateInterface.AddHandler(type, summary);
+    EXPECT_EQ(ret2, ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: DelegateInterfaceTest_AddHandler_02
+ * @tc.desc: Test the function AddHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DelegateInterfaceTest, DelegateInterfaceTest_AddHandler_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<int32_t(DTaskCallback)> delegate = [](DTaskCallback cb) -> int32_t {
+        return 0;
+    };
+    DelegateInterface delegateInterface(delegate);
+    DelegateInterface::HandlerSummary summary;
+    summary.handlerName = "handler";
+    DelegateInterface::HandlerSummary handler1 = {"handler1", 0x1, HandlerMode::SYNC, 1, 2};
+    DelegateInterface::HandlerSummary handler2 = {"handler2", 0x2, HandlerMode::ASYNC, 2, 3};
+    delegateInterface.handlers.insert({INTERCEPTOR, handler1});
+    delegateInterface.handlers.insert({MONITOR, handler2});
+
+    InputHandlerType type = InputHandlerType::MONITOR;
+    HandleEventType currentType = delegateInterface.GetEventType(type);
+    type = InputHandlerType::INTERCEPTOR;
+    HandleEventType newType = delegateInterface.GetEventType(type);
+    EXPECT_TRUE(currentType != newType);
+
+    uint32_t currentTags = delegateInterface.GetDeviceTags(type);
+    summary.deviceTags = 1;
+    EXPECT_TRUE((currentTags & summary.deviceTags) != summary.deviceTags);
+
+    int32_t ret = delegateInterface.AddHandler(type, summary);
+    EXPECT_EQ(ret, ERROR_NULL_POINTER);
+
+    type = InputHandlerType::MONITOR;
+    currentType = delegateInterface.GetEventType(type);
+    newType = delegateInterface.GetEventType(type);
+    EXPECT_FALSE(currentType != newType);
+    int32_t ret2 = delegateInterface.AddHandler(type, summary);
+    EXPECT_EQ(ret2, ERROR_NULL_POINTER);
+}
 } // namespace MMI
 } // namespace OHOS
