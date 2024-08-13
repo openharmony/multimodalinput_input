@@ -92,7 +92,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
-
+    void SetWindowStateNotifyPid(int32_t pid) override {}
+    int32_t GetWindowStateNotifyPid() override { return 0; }
+    int32_t WindowIdGetPid(int32_t pid) override { return 0; }
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
     MOCK_METHOD(DisplayMode, GetDisplayMode, (), (const));
