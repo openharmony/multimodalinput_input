@@ -262,6 +262,9 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
                         MMI_HILOGE("SendMsg failed");
                         return;
                     }
+                    windowStateErrorInfo_.windowId = -1;
+                    windowStateErrorInfo_.startTime = -1;
+                    windowStateErrorInfo_.pid = -1;
                 }
             }
         } else {
