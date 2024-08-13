@@ -565,8 +565,10 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 
 int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
 {
-    int32_t pid = IPCSkeleton::GetCallingPid();
+    CALL_DEBUG_ENTER;
+    int32_t pid = sess->GetPid();
     WIN_MGR->SetWindowStateNotifyPid(pid);
+    MMI_HILOGI("pid:%{public}d", pid);
     return RET_OK;
 }
 
