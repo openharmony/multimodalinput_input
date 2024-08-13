@@ -2453,5 +2453,239 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscriberNotifyNap_
     EXPECT_FALSE(napProcess.IsNeedNotify(napData));
     ASSERT_NO_FATAL_FAILURE(handler.SubscriberNotifyNap(subscriber));
 }
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_003
+ * @tc.desc: Test subscribe keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::set<int32_t> preKeys = { 2017, 2018, 2019, 2072, 2046 };
+    keyOption->SetPreKeys(preKeys);
+    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_SubscribeKeyEvent_004
+ * @tc.desc: Test subscribe keyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKey(2072);
+    keyOption->SetFinalKeyDown(true);
+    keyOption->SetFinalKeyDownDuration(100);
+    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_AddKeyGestureSubscriber_003
+ * @tc.desc: Test AddKeyGestureSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddKeyGestureSubscriber_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    subscriber->timerId_ = -1;
+    EXPECT_EQ(handler.AddKeyGestureSubscriber(subscriber, keyOption), RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveKeyGestureSubscriber
+ * @tc.desc: Test RemoveKeyGestureSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyGestureSubscriber, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> listSub;
+    listSub.push_back(subscriber);
+    subscribeId = 2;
+    handler.keyGestures_.insert(std::make_pair(keyOption, listSub));
+    EXPECT_EQ(handler.RemoveKeyGestureSubscriber(sess, subscribeId), RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveKeyGestureSubscriber_001
+ * @tc.desc: Test RemoveKeyGestureSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyGestureSubscriber_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> listSub;
+    listSub.push_back(subscriber);
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    handler.keyGestures_.insert(std::make_pair(keyOption, listSub));
+    EXPECT_EQ(handler.RemoveKeyGestureSubscriber(session, subscribeId), RET_ERR);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_RemoveKeyGestureSubscriber_002
+ * @tc.desc: Test RemoveKeyGestureSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveKeyGestureSubscriber_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> listSub;
+    listSub.push_back(subscriber);
+    handler.keyGestures_.insert(std::make_pair(keyOption, listSub));
+    EXPECT_EQ(handler.RemoveKeyGestureSubscriber(sess, subscribeId), RET_OK);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnSessionDelete_002
+ * @tc.desc: Test OnSessionDelete
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> listSub;
+    listSub.push_back(subscriber);
+
+    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> keySubscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, session, keyOption);
+    listSub.push_back(keySubscriber);
+    handler.keyGestures_.insert(std::make_pair(keyOption, listSub));
+    EXPECT_NO_FATAL_FAILURE(handler.OnSessionDelete(session));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_OnSessionDelete_003
+ * @tc.desc: Test OnSessionDelete
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnSessionDelete_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> listSub;
+    handler.keyGestures_.insert(std::make_pair(keyOption, listSub));
+    EXPECT_NO_FATAL_FAILURE(handler.OnSessionDelete(sess));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_002
+ * @tc.desc: Test HandleKeyUpWithDelay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyUpDelay(-1);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    EXPECT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_003
+ * @tc.desc: Test HandleKeyUpWithDelay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyUpDelay(100);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    EXPECT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_DumpSubscriber
+ * @tc.desc: Test DumpSubscriber
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_DumpSubscriber, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeySubscriberHandler handler;
+    int32_t subscribeId = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetFinalKeyUpDelay(100);
+    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
+        std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, keyOption);
+    int32_t fd = 100;
+    EXPECT_NO_FATAL_FAILURE(handler.DumpSubscriber(fd, subscriber));
+
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+    std::set<int32_t> preKeys = { 2020, 2021 };
+    option->SetPreKeys(preKeys);
+    subscriber = std::make_shared<KeySubscriberHandler::Subscriber>(subscribeId, sess, option);
+    EXPECT_NO_FATAL_FAILURE(handler.DumpSubscriber(fd, subscriber));
+}
 } // namespace MMI
 } // namespace OHOS
