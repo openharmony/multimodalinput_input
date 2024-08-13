@@ -38,6 +38,8 @@ namespace {
 using namespace testing::ext;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
+constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
@@ -1328,6 +1330,58 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
         pointerDrawMgr.pidInfos_.push_back(pidInfo);
     }
     ASSERT_EQ(pointerDrawMgr.SetPointerVisible(pid, visible, priority, isHap), RET_OK);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SetCustomCursor
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetCustomCursor, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
+    PointerDrawingManager pointerDrawMgr;
+    std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    int32_t pid = 50;
+    int32_t windowId = 100;
+    int32_t focusX = 300;
+    int32_t focusY = 300;
+    EXPECT_EQ(pointerDrawMgr.SetCustomCursor((void *)pixelMapPtr.get(), pid, windowId, focusX, focusY), RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SetMouseIcon
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseIcon, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    int32_t pid = 50;
+    int32_t windowId = -1;
+    EXPECT_EQ(pointerDrawMgr.SetMouseIcon(pid, windowId, (void *)pixelMapPtr.get()), RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SetMouseHotSpot
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawMgr;
+    int32_t pid = 10;
+    int32_t windowId = 100;
+    int32_t hotSpotX = -1;
+    int32_t hotSpotY = 100;
+    EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
 }
 } // namespace MMI
 } // namespace OHOS
