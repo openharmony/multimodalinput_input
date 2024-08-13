@@ -66,7 +66,7 @@ private:
         int32_t id_ { -1 };
         int32_t pid_ { -1 };
         int32_t longPressTime_ { -1 };
-        int32_t timerId_ {};
+        int32_t timerId_ { -1 };
         std::shared_ptr<KeyEvent> keyEvent_;
         std::function<void(std::shared_ptr<KeyEvent>)> callback_;
     };
