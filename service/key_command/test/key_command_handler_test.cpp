@@ -4373,5 +4373,82 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleScreenLocked_001, Te
     ret = handler.HandleScreenLocked(sequence, isLaunchAbility);
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_001
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    std::vector<ShortcutKey> upAbilities;
+    shortcutKey.statusConfigValue = false;
+    bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    ASSERT_FALSE(ret);
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 1;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    shortcutKey.preKeys.insert(2024);
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(KeyEvent::KEYCODE_R);
+    item1.SetPressed(true);
+    item1.SetDownTime(500);
+    keyEvent->keys_.push_back(item1);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(KeyEvent::KEYCODE_R);
+    item2.SetPressed(false);
+    item2.SetDownTime(200);
+    keyEvent->keys_.push_back(item2);
+    ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_PreHandleEvent_001
+ * @tc.desc: Test the funcation PreHandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_001, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    EventLogHelper eventLogHelper;
+    eventLogHelper.userType_ = "beta";
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->bitwise_ = 0x00000000;
+    bool ret = handler.PreHandleEvent(key);
+    ASSERT_TRUE(ret);
+    inputEvent->bitwise_ = InputEvent::EVENT_FLAG_PRIVACY_MODE;
+    ret = handler.PreHandleEvent(key);
+    ASSERT_TRUE(ret);
+    handler.enableCombineKey_ = false;
+    ret = handler.PreHandleEvent(key);
+    ASSERT_FALSE(ret);
+    handler.enableCombineKey_ = true;
+    handler.isParseConfig_ = false;
+    ret = handler.PreHandleEvent(key);
+    ASSERT_TRUE(ret);
+    handler.isParseConfig_ = true;
+    handler.isParseMaxCount_ = false;
+    ret = handler.PreHandleEvent(key);
+    ASSERT_TRUE(ret);
+    handler.isParseMaxCount_ = true;
+    handler.isParseStatusConfig_ = false;
+    ret = handler.PreHandleEvent(key);
+    ASSERT_TRUE(ret);
+    handler.isParseStatusConfig_ = false;
+    ret = handler.PreHandleEvent(key);
+    ASSERT_TRUE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
