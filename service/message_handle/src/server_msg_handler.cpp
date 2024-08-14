@@ -482,10 +482,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
 
-        if (byteCount != 0) {
-            MMI_HILOGD("byteCount:%{public}d", byteCount);
-            SetWindowInfo(info.id, info);
-        }
         OnUiExtentionWindowInfo(pkt, info);
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
@@ -826,10 +822,7 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap) __attr
         return ERR_INVALID_VALUE;
     }
 
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
-        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-    transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
+    WIN_MGR->SetPixelMapData(infoId, pixelMap);
     return RET_OK;
 }
 
