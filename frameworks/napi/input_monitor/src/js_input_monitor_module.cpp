@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <string>
+#include <unordered_set>
 #include <uv.h>
 
 #include "define_multimodal.h"
