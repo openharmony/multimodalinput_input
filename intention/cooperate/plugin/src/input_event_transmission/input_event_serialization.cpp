@@ -36,6 +36,7 @@ constexpr int32_t MAX_KEY_SIZE { 395 };
 int32_t InputEventSerialization::KeyEventToNetPacket(
     const std::shared_ptr<MMI::KeyEvent> key, NetPacket &pkt)
 {
+    CHKPR(key, RET_ERR);
     if (SerializeInputEvent(key, pkt) != RET_OK) {
         FI_HILOGE("Serialize input event failed");
         return RET_ERR;
@@ -64,6 +65,7 @@ int32_t InputEventSerialization::KeyEventToNetPacket(
 
 int32_t InputEventSerialization::NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<MMI::KeyEvent> key)
 {
+    CHKPR(key, RET_ERR);
     if (DeserializeInputEvent(pkt, key) != RET_OK) {
         FI_HILOGE("Deserialize input event failed");
         return RET_ERR;
