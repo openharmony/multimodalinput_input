@@ -113,6 +113,7 @@ public:
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(void, CleanShellWindowIds, ());
+    MOCK_METHOD(bool, IsKnuckleOnAncoWindow, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();
