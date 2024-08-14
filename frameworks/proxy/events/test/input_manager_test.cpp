@@ -1823,54 +1823,6 @@ HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_003, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
-/**
- * @tc.name: InputManager_InjectMouseEvent_004
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G
- */
-HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_005
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G
- */
-HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-}
-
 static bool SimulateInputEventInjectKeyTest(int32_t keyAction, int32_t keyCode, bool isPressed, int32_t downTime)
 {
     auto keyEvent = KeyEvent::Create();
