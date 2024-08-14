@@ -27,14 +27,14 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
-std::set<int32_t> InputEventInterceptor::filterKeys_ {
+std::unordered_set<int32_t> InputEventInterceptor::filterKeys_ {
     MMI::KeyEvent::KEYCODE_BACK,
     MMI::KeyEvent::KEYCODE_VOLUME_UP,
     MMI::KeyEvent::KEYCODE_VOLUME_DOWN,
     MMI::KeyEvent::KEYCODE_POWER,
 };
 
-std::set<int32_t> InputEventInterceptor::filterPointers_ {
+std::unordered_set<int32_t> InputEventInterceptor::filterPointers_ {
     MMI::PointerEvent::POINTER_ACTION_ENTER_WINDOW,
     MMI::PointerEvent::POINTER_ACTION_LEAVE_WINDOW,
     MMI::PointerEvent::POINTER_ACTION_PULL_IN_WINDOW,
