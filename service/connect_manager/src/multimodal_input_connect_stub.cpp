@@ -420,6 +420,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CLIENT_INFO):
+            ret = StubSetClientInfo(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2636,6 +2639,20 @@ int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, Me
     }
     MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t pid = 0;
+    uint64_t newThreadId = 0;
+    READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT64(data, newThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
+    SetClientInfo(pid, newThreadId);
 }
 } // namespace MMI
 } // namespace OHOS
