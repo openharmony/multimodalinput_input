@@ -1748,7 +1748,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubEnableInputDevice(data, reply);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
