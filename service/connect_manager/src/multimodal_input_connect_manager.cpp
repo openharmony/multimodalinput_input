@@ -862,5 +862,11 @@ int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SkipPointerLayer(isSkip);
 }
+
+int32_t MultimodalInputConnectManager::SetClientInfo(int32_t pid, uint64_t newThreadId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetClientInfo(pid, newThreadId);
+}
 } // namespace MMI
 } // namespace OHOS
