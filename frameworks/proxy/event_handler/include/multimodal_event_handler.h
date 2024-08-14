@@ -56,6 +56,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t Authorize(bool isAuthorize);
     int32_t CancelInjection();
+    int32_t SetClientInfo(int32_t pid, uint64_t newThreadId);
 
 private:
     MMIClientPtr client_ { nullptr };

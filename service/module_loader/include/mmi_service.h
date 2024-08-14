@@ -157,6 +157,7 @@ public:
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
+    int32_t SetClientInfo(int32_t pid, uint64_t newThreadId) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
@@ -235,12 +236,14 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
+    void InitPrintClientInfo();
 private:
     MMIService();
     ~MMIService();
 private:
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
+    void OnSessionDelete(SessionPtr session);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     std::atomic<bool> isCesStart_ { false };
@@ -255,6 +258,11 @@ private:
     std::shared_ptr<DelegateInterface> delegateInterface_ {nullptr};
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };
+    struct ClientInfo {
+        int32_t pid { -1 };
+        uint64_t newThreadId { -1 };
+    };
+    std::map<std::string, ClientInfo> clientsInfo_;
 };
 } // namespace MMI
 } // namespace OHOS
