@@ -136,6 +136,13 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
         MMI_HILOGE("The client fails to start");
         return false;
     }
+    if (!client_->GetEventHandler()->PostTask([this] {
+            auto runner = this->client_->GetEventHandler()->GetEventRunner();
+            CHKPF(runner);
+            return SetClientInfo(GetPid(), GetThisThreadId()) ? true : false; })) {
+        MMI_HILOGE("Failed to set client info");
+        return false;
+    }
     return true;
 }
 
@@ -194,6 +201,13 @@ int32_t MultimodalEventHandler::CancelInjection()
         return RET_ERR;
     }
     return RET_OK;
+}
+
+int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t newThreadId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, newThreadId);
 }
 } // namespace MMI
 } // namespace OHOS
