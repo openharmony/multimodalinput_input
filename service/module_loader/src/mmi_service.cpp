@@ -102,6 +102,7 @@ constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
+constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
@@ -410,6 +411,7 @@ void MMIService::OnStart()
         }
     };
     MMI_HILOGI("Run periodical task success");
+    InitPrintClientInfo();
 }
 
 void MMIService::OnStop()
@@ -2843,6 +2845,72 @@ int32_t MMIService::SkipPointerLayer(bool isSkip)
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
+}
+
+void MMIService::OnSessionDelete(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(session);
+    std::string programName = session->GetProgranName();
+    auto it = clientsInfo_.find(programName);
+    if (it != clientsInfo_.end()) {
+        clientsInfo_.erase(it);
+        MMI_HILOGD("Clear the client info, programName:%{public}s", programName.c_str());
+    }
+}
+
+int32_t MMIService::SetClientInfo(int32_t pid, uint64_t newThreadId)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    std::string programName = sess->GetProgranName();
+    if (clientsInfo_.end() != clientsInfo_.find(programName)) {
+        clientsInfo_[programName].pid = pid;
+        clientsInfo_[programName].newThreadId = newThreadId;
+        return RET_OK;
+    }
+    ClientInfo clientInfo {
+        .pid = pid,
+        .newThreadId = newThreadId
+    };
+    clientsInfo_[programName] = clientInfo;
+    return RET_OK;
+}
+
+void MMIService::InitPrintClientInfo()
+{
+    CALL_DEBUG_ENTER;
+    std::pair<std::string, ClientInfo> mainThreadClient;
+    std::pair<std::string, ClientInfo> childThreadClient;
+    bool hasMainThreadClient = false;
+    bool hasChildThreadClient = false;
+    TimerMgr->AddTimer(PRINT_INTERVAL_TIME, -1, [this]() {
+        for (auto it = clientsInfo_.begin(); it != clientsInfo_.end(); it++) {
+            if (hasMainThreadClient && hasChildThreadClient) {
+                break;
+            }
+            if (!hasMainThreadClient && it->second.pid == it->second.newThreadId) {
+                mainThreadClient = std::make_pair(it->first, it->second);
+                hasMainThreadClient = true;
+                continue;
+            }
+            if (!hasChildThreadClient) {
+                childThreadClient = std::make_pair(it->first, it->second);
+                hasChildThreadClient = true;
+            }
+        }
+        if (!mainThreadClient.first.empty()) {
+            MMI_HILOGW("The application main thread and event receiving thread are combined, programName:%{public}s, "
+                "pid:%{public}d, mainThreadId:%{public}d", mainThreadClient.first.c_str(),
+                mainThreadClient.second.pid, mainThreadClient.second.pid);
+        }
+        if (!childThreadClient.first.empty()) {
+            MMI_HILOGI("The application main thread and event receiving thread are separated, programName:%{public}s, "
+                "pid:%{public}d, newThreadId:%{public}" PRIu64, childThreadClient.first.c_str(),
+                childThreadClient.second.pid, childThreadClient.second.newThreadId);
+        }
+    })
 }
 } // namespace MMI
 } // namespace OHOS
