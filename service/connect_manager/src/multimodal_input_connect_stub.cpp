@@ -958,6 +958,12 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (windowId < 0) {
+            MMI_HILOGE("windowId is negative number and not system hap, set pointerStyle failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
     PointerStyle pointerStyle;
     READINT32(data, pointerStyle.size, RET_ERR);
     READINT32(data, pointerStyle.color, RET_ERR);
@@ -1002,6 +1008,12 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (windowId < 0) {
+            MMI_HILOGE("windowId is negative number and not system hap, get pointerStyle failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
     PointerStyle pointerStyle;
