@@ -4023,5 +4023,39 @@ bool InputWindowsManager::IsOnTheWhitelist(std::shared_ptr<KeyEvent> keyEvent)
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, false);
+    PointerEvent::PointerItem pointerItem {};
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Get pointer item failed, pointer:%{public}d", pointerId);
+        return false;
+    }
+
+    if (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
+        return false;
+    }
+
+    const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
+    WindowInfo *windowInfo = nullptr;
+    std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    auto iter = find_if(windowInfos.begin(), windowInfos.end(),
+        [&](const auto &item) { return item.id == focusWindowId; });
+    if (iter != windowInfos.end()) {
+        windowInfo = &(*iter);
+    }
+
+    if (windowInfo == nullptr) {
+        MMI_HILOGE("windowInfo is nullptr");
+        return false;
+    }
+
+    return IsAncoWindowFocus(*windowInfo);
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace MMI
 } // namespace OHOS

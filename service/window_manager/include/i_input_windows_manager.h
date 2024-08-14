@@ -148,6 +148,7 @@ public:
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
     virtual void CleanShellWindowIds() = 0;
+    virtual bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
