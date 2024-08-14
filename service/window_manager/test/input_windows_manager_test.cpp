@@ -1213,7 +1213,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayCoordinat
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    void* pixelMap = nullptr;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     bool result = WIN_MGR->IsTransparentWin(pixelMap, logicalX, logicalY);
@@ -2559,7 +2559,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckWindowIdPermissio
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    void* pixelMap = nullptr;
+    std::unique_ptr<Media::PixelMap> pixelMap = nullptr;
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     auto result = WIN_MGR->IsTransparentWin(pixelMap, logicalX, logicalY);
@@ -4351,11 +4351,13 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin_002, 
 {
     CALL_TEST_DEBUG;
     InputWindowsManager inputWindowsMgr;
-    std::shared_ptr<Media::PixelMap> pixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
-    ASSERT_NE(pixelMap, nullptr);
+    std::shared_ptr<Media::PixelMap> sharedPixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    ASSERT_NE(sharedPixelMap, nullptr);
+    std::unique_ptr<Media::PixelMap> pixelMap = std::unique_ptr<Media::PixelMap>(sharedPixelMap.get());
+    sharedPixelMap.reset();
     int32_t logicalX = 100;
     int32_t logicalY = 100;
-    EXPECT_FALSE(inputWindowsMgr.IsTransparentWin((void *)pixelMap.get(), logicalX, logicalY));
+    EXPECT_FALSE(inputWindowsMgr.IsTransparentWin(pixelMap, logicalX, logicalY));
 }
 
 /**

@@ -163,7 +163,7 @@ public:
     void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId);
     void ClearTargetWindowId(int32_t pointerId);
-    bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
+    bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
 
@@ -171,6 +171,8 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+    int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
 
 private:
     void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
@@ -363,6 +365,7 @@ private:
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
+    std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 };
 } // namespace MMI
 } // namespace OHOS
