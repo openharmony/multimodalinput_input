@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::set<std::string> ACTION_TYPE = {
+const std::unordered_set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
     "fingerprint", "swipeInward"
 };
