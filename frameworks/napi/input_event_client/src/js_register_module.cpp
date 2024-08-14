@@ -79,6 +79,7 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
 {
+    CHKPV(keyEvent);
     keyEvent->SetRepeat(true);
     bool isPressed = false;
     if (GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed) != RET_OK) {
