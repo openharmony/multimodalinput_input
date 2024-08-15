@@ -257,6 +257,7 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
 void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
     pointCounter_++;
     if (pointCounter_ >= POINT_TOTAL_SIZE) {
         MMI_HILOGE("traceControlPoints_ index out of size");
