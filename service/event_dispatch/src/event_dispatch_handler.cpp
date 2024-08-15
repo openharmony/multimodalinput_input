@@ -262,7 +262,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     auto fd = WIN_MGR->GetClientFd(point);
     auto pid = WIN_MGR->WindowIdGetPid(point->GetTargetWindowId());
     if (udsServer->GetSession(fd) == nullptr && pid != -1 && point->GetTargetWindowId() != -1) {
-        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid){
+        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
                 SendWindowStateError(pid, point->GetTargetWindowId());
             }

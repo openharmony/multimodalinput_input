@@ -80,7 +80,7 @@ void ClientMsgHandler::Init()
         { MmiMessageId::NOTIFY_BUNDLE_NAME, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->NotifyBundleName(client, pkt); }},
         { MmiMessageId::WINDOW_STATE_ERROR_NOTIFY, [this] (const UDSClient& client, NetPacket& pkt) {
-            return this->NotifyWindowStateError(client, pkt); }},   
+            return this->NotifyWindowStateError(client, pkt); }},
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
