@@ -114,11 +114,12 @@ static bool IsSingleDisplayFoldDevice()
 
 void RsRemoteDiedCallback()
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     g_isRsRemoteDied = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    IPointerDrawingManager::GetInstance()->DestroyPointerWindow();
 }
 
 void PointerDrawingManager::InitPointerCallback()
@@ -133,6 +134,23 @@ void PointerDrawingManager::InitPointerCallback()
         MAGIC_CURSOR->RsRemoteInitCallbackForMagicCursor();
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+void PointerDrawingManager::DestroyPointerWindow()
+{
+    CALL_INFO_TRACE;
+    CHKPV(delegateProxy_);
+    delegateProxy_->OnPostSyncTask([this] {
+        if (surfaceNode_ != nullptr) {
+            MMI_HILOGI("Pointer window destroy start");
+            g_isRsRemoteDied = false;
+            surfaceNode_->DetachToDisplay(screenId_);
+            surfaceNode_ = nullptr;
+            Rosen::RSTransaction::FlushImplicitTransaction();
+            MMI_HILOGI("Pointer window destroy success");
+        }
+        return RET_OK;
+    });
 }
 
 PointerDrawingManager::PointerDrawingManager()

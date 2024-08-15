@@ -18,6 +18,7 @@
 #include "display_event_monitor.h"
 #include "error_multimodal.h"
 #include "input_event_handler.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "touch_drawing_manager.h"
 
@@ -32,6 +33,9 @@ void DelegateInterface::Init()
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     DISPLAY_MONITOR->SetDelegateProxy(shared_from_this());
 #endif // #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    IPointerDrawingManager::GetInstance()->SetDelegateProxy(shared_from_this());
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t DelegateInterface::OnPostSyncTask(DTaskCallback cb) const
