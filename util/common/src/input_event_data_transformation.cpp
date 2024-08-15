@@ -29,6 +29,7 @@ namespace MMI {
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
+    CHKPR(key, RET_ERR);
     if (SerializeInputEvent(key, pkt) != RET_OK) {
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
