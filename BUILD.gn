@@ -120,6 +120,7 @@ group("mmi_tests") {
   testonly = true
   deps = [
     "common/anco/comm:AncoChannelStubTest",
+    "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerImplTest",

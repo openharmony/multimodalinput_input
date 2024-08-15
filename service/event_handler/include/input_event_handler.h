@@ -48,6 +48,7 @@ public:
     void OnEvent(void *event, int64_t frameTime);
     UDSServer *GetUDSServer() const;
     int32_t SetMoveEventFilters(bool flag);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
@@ -77,6 +78,7 @@ private:
     bool isTyping_ { false };
     int32_t timerId_ { -1 };
     bool isTapMistouch_ { false };
+    int64_t lastEventBeginTime_ { 0 };
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI

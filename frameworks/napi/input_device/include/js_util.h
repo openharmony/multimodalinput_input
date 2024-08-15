@@ -42,6 +42,7 @@ public:
         int32_t keyboardType { 0 };
         int32_t keyboardRepeatDelay { 0 };
         int32_t keyboardRepeatRate { 0 };
+        int64_t IntervalSinceLastInput { 0 };
     };
     struct ReportData : RefBase {
         napi_ref ref { nullptr };

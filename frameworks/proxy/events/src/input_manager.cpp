@@ -625,5 +625,10 @@ int32_t InputManager::SkipPointerLayer(bool isSkip)
 {
     return InputMgrImpl.SkipPointerLayer(isSkip);
 }
+
+int32_t InputManager::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+{
+    return InputMgrImpl.GetIntervalSinceLastInput(callback);
+}
 } // namespace MMI
 } // namespace OHOS

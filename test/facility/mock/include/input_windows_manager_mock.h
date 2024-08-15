@@ -105,6 +105,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
@@ -113,6 +114,7 @@ public:
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(void, CleanShellWindowIds, ());
+    MOCK_METHOD(bool, IsKnuckleOnAncoWindow, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();

@@ -2912,5 +2912,17 @@ void MMIService::InitPrintClientInfo()
         }
     });
 }
+
+int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
+                                                        InputHandler, std::ref(timeInterval)));
+    MMI_HILOGD("timeInterval:%{public}" PRId64, timeInterval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
