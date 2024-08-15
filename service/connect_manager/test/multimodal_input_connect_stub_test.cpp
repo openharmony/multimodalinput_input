@@ -2569,7 +2569,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_002, TestSize
     ret = stub->StubGetTouchpadScrollRows(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @tc.name: StubAddInputEventFilter_111
  * @tc.desc: Test the function StubAddInputEventFilter
