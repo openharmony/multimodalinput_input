@@ -15,6 +15,8 @@
 
 #include "js_util.h"
 
+#include <unordered_map>
+
 #include <linux/input.h>
 
 #include "mmi_log.h"
