@@ -2361,8 +2361,7 @@ int32_t MultimodalInputConnectProxy::SetClientInfo(int32_t pid, uint64_t newThre
     MessageParcel data;
     if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVA
-        LID_VALUE;
+        return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, pid, ERR_INVALID_VALUE);
     WRITEUINT64(data, newThreadId, ERR_INVALID_VALUE);

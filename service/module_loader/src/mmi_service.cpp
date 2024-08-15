@@ -2851,7 +2851,7 @@ void MMIService::OnSessionDelete(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
-    std::string programName = session->GetProgranName();
+    std::string programName = session->GetProgramName();
     auto it = clientsInfo_.find(programName);
     if (it != clientsInfo_.end()) {
         clientsInfo_.erase(it);
@@ -2864,7 +2864,7 @@ int32_t MMIService::SetClientInfo(int32_t pid, uint64_t newThreadId)
     CALL_DEBUG_ENTER;
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    std::string programName = sess->GetProgranName();
+    std::string programName = sess->GetProgramName();
     if (clientsInfo_.end() != clientsInfo_.find(programName)) {
         clientsInfo_[programName].pid = pid;
         clientsInfo_[programName].newThreadId = newThreadId;
@@ -2881,11 +2881,11 @@ int32_t MMIService::SetClientInfo(int32_t pid, uint64_t newThreadId)
 void MMIService::InitPrintClientInfo()
 {
     CALL_DEBUG_ENTER;
-    std::pair<std::string, ClientInfo> mainThreadClient;
-    std::pair<std::string, ClientInfo> childThreadClient;
-    bool hasMainThreadClient = false;
-    bool hasChildThreadClient = false;
     TimerMgr->AddTimer(PRINT_INTERVAL_TIME, -1, [this]() {
+        std::pair<std::string, ClientInfo> mainThreadClient;
+        std::pair<std::string, ClientInfo> childThreadClient;
+        bool hasMainThreadClient = false;
+        bool hasChildThreadClient = false;
         for (auto it = clientsInfo_.begin(); it != clientsInfo_.end(); it++) {
             if (hasMainThreadClient && hasChildThreadClient) {
                 break;
@@ -2910,7 +2910,7 @@ void MMIService::InitPrintClientInfo()
                 "pid:%{public}d, newThreadId:%{public}" PRIu64, childThreadClient.first.c_str(),
                 childThreadClient.second.pid, childThreadClient.second.newThreadId);
         }
-    })
+    });
 }
 } // namespace MMI
 } // namespace OHOS
