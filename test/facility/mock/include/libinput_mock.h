@@ -46,6 +46,7 @@ public:
     MOCK_METHOD(uint64_t, TouchEventGetTime, (struct libinput_event_touch *));
     MOCK_METHOD(int32_t, TouchEventGetSeatSlot, (struct libinput_event_touch *));
     MOCK_METHOD(double, TouchEventGetPressure, (struct libinput_event_touch *));
+    MOCK_METHOD(int32_t, TouchEventGetMoveFlag, (struct libinput_event_touch *));
     MOCK_METHOD(int32_t, TouchEventGetContactLongAxis, (struct libinput_event_touch *));
     MOCK_METHOD(int32_t, TouchEventGetContactShortAxis, (struct libinput_event_touch *));
     MOCK_METHOD(int32_t, TouchEventGetToolType, (struct libinput_event_touch *));
