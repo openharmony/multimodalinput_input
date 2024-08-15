@@ -2388,12 +2388,10 @@ int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInte
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
                                       MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL),
                                       data, reply, option);
