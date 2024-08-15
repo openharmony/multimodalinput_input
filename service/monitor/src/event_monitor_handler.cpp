@@ -272,16 +272,17 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
     }
 
     monitors_.erase(iter);
-    CHKPV(iter->session_);
-    int32_t pid = iter->session_->GetPid();
-    auto it = endScreenCaptureMonitors_.find(pid);
-    if (it != endScreenCaptureMonitors_.end()) {
-        auto setIter = endScreenCaptureMonitors_[pid].find(monitor);
-        if (setIter != endScreenCaptureMonitors_[pid].end()) {
-            endScreenCaptureMonitors_[pid].erase(setIter);
-        }
-        if (endScreenCaptureMonitors_[pid].empty()) {
-            endScreenCaptureMonitors_.erase(it);
+    if (monitor.session_) {
+        int32_t pid = monitor.session_->GetPid();
+        auto it = endScreenCaptureMonitors_.find(pid);
+        if (it != endScreenCaptureMonitors_.end()) {
+            auto setIter = endScreenCaptureMonitors_[pid].find(monitor);
+            if (setIter != endScreenCaptureMonitors_[pid].end()) {
+                endScreenCaptureMonitors_[pid].erase(setIter);
+            }
+            if (endScreenCaptureMonitors_[pid].empty()) {
+                endScreenCaptureMonitors_.erase(it);
+            }
         }
     }
     if (monitor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
