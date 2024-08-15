@@ -2652,7 +2652,9 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     uint64_t newThreadId = 0;
     READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
     READUINT64(data, newThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
+
     SetClientInfo(pid, newThreadId);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
