@@ -225,6 +225,24 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
     return true;
 }
 
+void EventDispatchHandler::SendWindowStateError(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    auto udsServer = InputHandler->GetUDSServer();
+    auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
+    if (sess != nullptr) {
+        NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
+        pkt << pid << windowId;
+        if (!sess->SendMsg(pkt)) {
+            MMI_HILOGE("SendMsg failed");
+            return;
+        }
+        windowStateErrorInfo_.windowId = -1;
+        windowStateErrorInfo_.startTime = -1;
+        windowStateErrorInfo_.pid = -1;
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -241,34 +259,14 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
-    auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
     auto pid = WIN_MGR->WindowIdGetPid(point->GetTargetWindowId());
-    MMI_HILOGI("111windowId:%{public}d,pid:%{public}d,currentTime:%{public}" PRIu64, point->GetTargetWindowId(), pid, GetSysClockTime());
-    MMI_HILOGI("222windowStateErrorInfo:windowId:%{public}d,pid:%{public}d,startTime:%{public}" PRIu64,
-        windowStateErrorInfo_.windowId, windowStateErrorInfo_.pid, windowStateErrorInfo_.startTime);
     if (udsServer->GetSession(fd) == nullptr && pid != -1 && point->GetTargetWindowId() != -1) {
-        MMI_HILOGI("3333enter");
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid){
-            MMI_HILOGI("4444enter");
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
-                MMI_HILOGI("5555enter,pid:%{public}d", WIN_MGR->GetWindowStateNotifyPid());
-                auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
-                if (sess != nullptr) {
-                    MMI_HILOGI("666enter");
-                    NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
-                    pkt << pid << point->GetTargetWindowId();
-                    if (!sess->SendMsg(pkt)) {
-                        MMI_HILOGE("SendMsg failed");
-                        return;
-                    }
-                    windowStateErrorInfo_.windowId = -1;
-                    windowStateErrorInfo_.startTime = -1;
-                    windowStateErrorInfo_.pid = -1;
-                }
+                SendWindowStateError(pid, point->GetTargetWindowId());
             }
         } else {
-            MMI_HILOGI("777enter");
             windowStateErrorInfo_.windowId = point->GetTargetWindowId();
             windowStateErrorInfo_.startTime = GetSysClockTime();
             windowStateErrorInfo_.pid = pid;
