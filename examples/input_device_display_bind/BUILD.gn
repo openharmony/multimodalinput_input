@@ -28,6 +28,12 @@ ohos_executable("input_device_display_bind") {
     "${mmi_path}/util:libmmi-util",
   ]
 
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
+  ]
+
   subsystem_name = "multimodalinput"
   part_name = "input"
 }

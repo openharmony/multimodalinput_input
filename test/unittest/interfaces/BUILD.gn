@@ -38,8 +38,6 @@ ohos_unittest("InputNativeTest") {
     "${mmi_path}/frameworks/native/input:oh_input_manager",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   if (input_ext_feature_anco && input_feature_product != "pc") {
@@ -50,6 +48,8 @@ ohos_unittest("InputNativeTest") {
   }
   external_deps = [
     "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
   ]

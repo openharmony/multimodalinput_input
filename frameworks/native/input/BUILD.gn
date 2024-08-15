@@ -40,6 +40,9 @@ ohos_shared_library("oh_input_manager") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/frameworks/proxy/events/include",
   ]
 
   sources = [
@@ -56,7 +59,9 @@ ohos_shared_library("oh_input_manager") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 

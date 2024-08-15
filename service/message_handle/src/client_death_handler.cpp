@@ -42,7 +42,7 @@ bool ClientDeathHandler::AddClientDeathCallback(CallBackType type, ClientDeathCa
     CALL_DEBUG_ENTER;
     CHKPF(callback);
     std::lock_guard<std::mutex> callBackLock(mutexCallbacks_);
-    bool bFind = false;
+    [[ maybe_unused ]] bool bFind = false;
     auto it = deathCallbacks_.find(type);
     if (it != deathCallbacks_.end()) {
         MMI_HILOGE("Death callBack has existed type:%{public}d", type);

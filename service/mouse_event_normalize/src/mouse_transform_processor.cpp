@@ -58,7 +58,7 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
 constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
 constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
-constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
+[[ maybe_unused ]] constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
 constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };

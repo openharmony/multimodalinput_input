@@ -45,6 +45,7 @@ ohos_shared_library("libmmi-napi") {
   deps = [ "${mmi_path}/util:libmmi-util" ]
 
   external_deps = [
+    "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
   ]
