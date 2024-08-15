@@ -259,6 +259,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
+    auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
     auto pid = WIN_MGR->WindowIdGetPid(point->GetTargetWindowId());
     if (udsServer->GetSession(fd) == nullptr && pid != -1 && point->GetTargetWindowId() != -1) {
