@@ -1325,6 +1325,18 @@ void InputManagerImpl::OnConnected()
     SendEnhanceConfig();
     PrintEnhanceConfig();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+    if (windowStatecallback_ != nullptr) {
+        MMIClientPtr client = MMIEventHdl.GetMMIClient();
+        if (client != nullptr) {
+            NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
+            if (!client->SendMessage(pkt)) {
+                MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+            }
+        } else {
+            MMI_HILOGE("Get client failed");
+        }
+    }
     if (anrObservers_.empty()) {
         return;
     }
