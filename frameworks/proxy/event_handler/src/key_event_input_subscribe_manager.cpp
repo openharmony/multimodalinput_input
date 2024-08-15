@@ -41,7 +41,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
     : keyOption_(keyOption), callback_(callback)
 {
-    if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
+    if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT32_MAX) {
         subscribeId_ = -1;
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
         return;
