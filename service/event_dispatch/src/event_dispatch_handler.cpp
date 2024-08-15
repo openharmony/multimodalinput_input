@@ -247,13 +247,13 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     MMI_HILOGI("111windowId:%{public}d,pid:%{public}d,currentTime:%{public}" PRIu64, point->GetTargetWindowId(), pid, GetSysClockTime());
     MMI_HILOGI("222windowStateErrorInfo:windowId:%{public}d,pid:%{public}d,startTime:%{public}" PRIu64,
         windowStateErrorInfo_.windowId, windowStateErrorInfo_.pid, windowStateErrorInfo_.startTime);
-    if (udsServer->GetSession(fd) == nullptr) {
+    if (udsServer->GetSession(fd) == nullptr && pid != -1 && point->GetTargetWindowId() != -1) {
         MMI_HILOGI("3333enter");
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid){
             MMI_HILOGI("4444enter");
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
                 MMI_HILOGI("5555enter,pid:%{public}d", WIN_MGR->GetWindowStateNotifyPid());
-                auto sess = udsServer->GetSession(WIN_MGR->GetWindowStateNotifyPid());
+                auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
                 if (sess != nullptr) {
                     MMI_HILOGI("666enter");
                     NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
