@@ -15,6 +15,8 @@
 
 #include "input_event_transmission/input_event_interceptor.h"
 
+#include <unordered_set>
+
 #include "cooperate_context.h"
 #include "devicestatus_define.h"
 #include "input_event_transmission/input_event_serialization.h"
