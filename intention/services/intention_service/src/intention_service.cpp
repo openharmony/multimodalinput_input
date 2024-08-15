@@ -41,7 +41,7 @@ int32_t IntentionService::Enable(Intention intention, MessageParcel &data, Messa
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->Enable(context, data, reply);
@@ -62,7 +62,7 @@ int32_t IntentionService::Disable(Intention intention, MessageParcel &data, Mess
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->Disable(context, data, reply);
@@ -83,7 +83,7 @@ int32_t IntentionService::Start(Intention intention, MessageParcel &data, Messag
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->Start(context, data, reply);
@@ -104,7 +104,7 @@ int32_t IntentionService::Stop(Intention intention, MessageParcel &data, Message
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->Stop(context, data, reply);
@@ -125,7 +125,7 @@ int32_t IntentionService::AddWatch(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->AddWatch(context, id, data, reply);
@@ -146,7 +146,7 @@ int32_t IntentionService::RemoveWatch(Intention intention, uint32_t id, MessageP
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->RemoveWatch(context, id, data, reply);
@@ -167,7 +167,7 @@ int32_t IntentionService::SetParam(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->SetParam(context, id, data, reply);
@@ -188,7 +188,7 @@ int32_t IntentionService::GetParam(Intention intention, uint32_t id, MessageParc
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->GetParam(context, id, data, reply);
@@ -209,7 +209,7 @@ int32_t IntentionService::Control(Intention intention, uint32_t id, MessageParce
         .pid = IPCSkeleton::GetCallingPid(),
     };
     CHKPR(context_, RET_ERR);
-    int32_t ret = context_->GetDelegateTasks().PostSyncTask([&] {
+    int32_t ret = context_->GetDelegateTasks().PostSyncTask([=] {
         IPlugin *plugin = LoadPlugin(context.intention);
         CHKPR(plugin, RET_ERR);
         return plugin->Control(context, id, data, reply);

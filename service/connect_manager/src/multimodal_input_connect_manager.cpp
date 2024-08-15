@@ -868,5 +868,12 @@ int32_t MultimodalInputConnectManager::SetClientInfo(int32_t pid, uint64_t newTh
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetClientInfo(pid, newThreadId);
 }
+
+int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetIntervalSinceLastInput(timeInterval);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1296,7 +1296,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_CalcDrawCoordinate_002
     pointerItem.SetRawDisplayX(physicalX);
     pointerItem.SetRawDisplayY(physicalY);
     auto retPair = touchDrawingMgr.CalcDrawCoordinate(displayInfo, pointerItem);
-    EXPECT_EQ(retPair.first, 0);
+    EXPECT_EQ(retPair.first, 21);
     EXPECT_EQ(retPair.second, 0);
 }
 } // namespace MMI

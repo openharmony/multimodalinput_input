@@ -643,6 +643,26 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatRate(napi_env env, napi_callba
     return jsInputDeviceMgr->GetKeyboardRepeatRate(env, argv[0]);
 }
 
+napi_value JsInputDeviceContext::GetIntervalSinceLastInput(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    if (argc < 1) {
+        return jsInputDeviceMgr->GetIntervalSinceLastInput(env);
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->GetIntervalSinceLastInput(env, argv[0]);
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;

@@ -141,6 +141,7 @@ public:
     int32_t GetTouchpadScrollRows(int32_t &rows);
     int32_t SkipPointerLayer(bool isSkip);
     int32_t SetClientInfo(int32_t pid, uint64_t newThreadId);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);

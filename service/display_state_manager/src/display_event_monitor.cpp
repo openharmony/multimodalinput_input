@@ -60,6 +60,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
             STYLUS_HANDLER->IsLaunchAbility();
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
+            CHKPV(FINGERSENSE_WRAPPER);
             if (FINGERSENSE_WRAPPER->enableFingersense_ != nullptr) {
                 MMI_HILOGI("Start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
@@ -68,6 +69,7 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
+            CHKPV(FINGERSENSE_WRAPPER);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
