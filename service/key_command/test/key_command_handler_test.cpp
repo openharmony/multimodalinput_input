@@ -47,6 +47,11 @@ constexpr int32_t INTERVAL_TIME_OUT = 500000;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
+constexpr int32_t TWO_FINGERS_DISTANCE_LIMIT = 16;
+constexpr int32_t TOUCH_LIFT_LIMIT = 24;
+constexpr int32_t TOUCH_RIGHT_LIMIT = 24;
+constexpr int32_t TOUCH_TOP_LIMIT = 80;
+constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
@@ -588,6 +593,109 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     handler.twoFingerGesture_.touches[1].y = 170;
     ret = handler.CheckTwoFingerGestureAction();
     EXPECT_FALSE(ret);
+    ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_008
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    auto firstFinger = handler.twoFingerGesture_.touches[0];
+    auto secondFinger = handler.twoFingerGesture_.touches[1];
+
+    int64_t firstTime = firstFinger.downTime;
+    firstTime = 150000;
+    int64_t secondTime = secondFinger.downTime;
+    secondTime = 200000;
+    auto pressTimeInterval = fabs(firstTime - secondTime);
+    EXPECT_FALSE(pressTimeInterval > TWO_FINGERS_TIME_LIMIT);
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+
+    int32_t firstFingerX = firstFinger.x;
+    firstFingerX = 90;
+    int32_t firstFingerY = firstFinger.y;
+    firstFingerY = 200;
+    int32_t secondFingerX = secondFinger.x;
+    secondFingerX = 30;
+    int32_t secondFingerY = secondFinger.y;
+    secondFingerY = 170;
+    int32_t devX = firstFingerX - secondFingerX;
+    int32_t devY = firstFingerY - secondFingerY;
+    auto distance = sqrt(pow(devX, 2) + pow(devY, 2));
+    EXPECT_FALSE(distance < handler.ConvertVPToPX(TWO_FINGERS_DISTANCE_LIMIT));
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+
+    auto leftLimit = handler.ConvertVPToPX(TOUCH_LIFT_LIMIT);
+    firstFingerX = -10;
+    EXPECT_TRUE(firstFingerX <= leftLimit);
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.dpi = 320;
+    displayInfo.width = 10;
+    displayInfo.height = 30;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    auto rightLimit = displayInfo.width - handler.ConvertVPToPX(TOUCH_RIGHT_LIMIT);
+    firstFingerX = 50;
+    EXPECT_TRUE(firstFingerX >= rightLimit);
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+
+    auto topLimit = handler.ConvertVPToPX(TOUCH_TOP_LIMIT);
+    firstFingerY = -20;
+    EXPECT_TRUE(firstFingerY <= topLimit);
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+
+    auto bottomLimit = displayInfo.height - handler.ConvertVPToPX(TOUCH_BOTTOM_LIMIT);
+    firstFingerY = 60;
+    EXPECT_TRUE(firstFingerY >= bottomLimit);
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+
+    secondFingerX = -5;
+    EXPECT_TRUE(secondFingerX <= leftLimit);
+    secondFingerX = 30;
+    EXPECT_TRUE(secondFingerX >= rightLimit);
+    secondFingerY = -1;
+    EXPECT_TRUE(secondFingerY <= topLimit);
+    secondFingerY = 50;
+    EXPECT_TRUE(secondFingerY >= bottomLimit);
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_01
+ * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = false;
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
+    ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_02
+ * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    EXPECT_FALSE(handler.CheckTwoFingerGestureAction());
     ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
 }
 
@@ -1212,9 +1320,13 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ProcessKnuckleGestureTouch
 {
     CALL_TEST_DEBUG;
     NotifyType type;
-    KeyCommandHandler eventKeyCommandHandler;
+    KeyCommandHandler handler;
     type = NotifyType::REGIONGESTURE;
-    ASSERT_NO_FATAL_FAILURE(eventKeyCommandHandler.ProcessKnuckleGestureTouchUp(type));
+    handler.isStartBase_ = false;
+    ASSERT_NO_FATAL_FAILURE(handler.ProcessKnuckleGestureTouchUp(type));
+
+    handler.isStartBase_ = true;
+    ASSERT_NO_FATAL_FAILURE(handler.ProcessKnuckleGestureTouchUp(type));
 }
 
 /**
