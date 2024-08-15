@@ -798,6 +798,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         action == WINDOW_UPDATE_ACTION::ADD_END) {
         if ((currentUserId_ < 0) || (currentUserId_ == displayGroupInfoTmp_.currentUserId)) {
             PrintChangedWindowBySync(displayGroupInfoTmp_);
+            CleanInvalidPiexMap();
             displayGroupInfo_ = displayGroupInfoTmp_;
             UpdateWindowsInfoPerDisplay(displayGroupInfo);
         }
@@ -4042,6 +4043,22 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
     return RET_OK;
+}
+
+void InputWindowsManager::CleanInvalidPiexMap()
+{
+    for(auto it = transparentWins_.begin(); it != transparentWins_.end();) {
+        int32_t windowId = it->first;
+        auto iter = std::find_if(displayGroupInfo_.windowsInfo.begin(), displayGroupInfo_.windowsInfo.end(),
+            [windowId](const auto &window) {
+                return window.id == windowId;
+            });
+            if (iter == displayGroupInfo_.windowsInfo.end()) {
+                it = transparentWins_.erase(it);
+            } else {
+                ++it;
+            }
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
