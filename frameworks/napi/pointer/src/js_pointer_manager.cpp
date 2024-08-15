@@ -566,6 +566,12 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
     PointerStyle style;
     style.id = pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("windowId is negative number and no system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
+            "windowId is negative number and no system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
@@ -582,9 +588,17 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
 napi_value JsPointerManager::SetPointerStyleSync(napi_env env, int32_t windowid, int32_t pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
     PointerStyle style;
     style.id = pointerStyle;
-    InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("WindowId is negative number and no system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
+            "WindowId is negative number and no system applications use system API");
+        return nullptr;
+    }
     napi_value result = nullptr;
     if (napi_get_undefined(env, &result) != napi_ok) {
         MMI_HILOGE("Get undefined result is failed");
@@ -600,6 +614,12 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
     CHKPP(asyncContext);
     PointerStyle pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("WindowId is negative number and no system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
+            "WindowId is negative number and no system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::NUMBER << pointerStyle.id;
     napi_value promise = nullptr;
     if (handle != nullptr) {
@@ -615,8 +635,16 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
 napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid)
 {
     CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
     PointerStyle pointerStyle;
-    InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("WindowId is negative number and no system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR,
+            "WindowId is negative number and no system applications use system API");
+        return nullptr;
+    }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_int32(env, pointerStyle.id, &result));
     return result;

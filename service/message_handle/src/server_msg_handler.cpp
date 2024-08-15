@@ -56,9 +56,9 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
-constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+[[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-constexpr int32_t WINDOW_ROTATE { 0 };
+[[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
@@ -146,7 +146,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGD("Inject keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
         MMI_HILOGD("Inject keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
@@ -485,10 +485,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
 
-        if (byteCount != 0) {
-            MMI_HILOGD("byteCount:%{public}d", byteCount);
-            SetWindowInfo(info.id, info);
-        }
         OnUiExtentionWindowInfo(pkt, info);
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
@@ -830,7 +826,7 @@ void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
     info.pixelMap = transparentWins_[infoId].get();
 }
 
-int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
+int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     if (infoId < 0 || pixelMap == nullptr) {
@@ -838,10 +834,7 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
         return ERR_INVALID_VALUE;
     }
 
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
-        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-    transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
+    WIN_MGR->SetPixelMapData(infoId, pixelMap);
     return RET_OK;
 }
 

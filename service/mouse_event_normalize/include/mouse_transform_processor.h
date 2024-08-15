@@ -40,6 +40,7 @@ extern "C" {
         DEVICE_KLV = 1,
         DEVICE_SOFT_HARDEN = 2,
         DEVICE_HARD_HARDEN = 3,
+        DEVICE_WEBER = 4,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);

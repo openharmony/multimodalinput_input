@@ -85,7 +85,9 @@ public:
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
-
+    virtual std::pair<double, double> TransformDisplayXY(const DisplayInfo &info,
+        double logicX, double logicY) const = 0;
+    virtual int32_t SetPixelMapData(int32_t infoId, void *pixelMap) = 0;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual void HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent) = 0;
@@ -110,6 +112,7 @@ public:
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;
     virtual void SendPointerEvent(int32_t pointerAction) = 0;
+    virtual bool IsMouseSimulate() const = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -147,6 +150,7 @@ public:
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
     virtual void CleanShellWindowIds() = 0;
+    virtual bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();

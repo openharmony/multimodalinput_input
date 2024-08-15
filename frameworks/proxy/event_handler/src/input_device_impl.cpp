@@ -217,6 +217,19 @@ int32_t InputDeviceImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> call
     return RET_OK;
 }
 
+int32_t InputDeviceImpl::GetIntervalSinceLastInput(FunIntervalSinceLastInput callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
+    int64_t timeInterval = 0;
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetIntervalSinceLastInput(timeInterval) != RET_OK) {
+        MMI_HILOGE("GetIntervalSinceLastInput failed");
+        return RET_ERR;
+    }
+    callback(timeInterval);
+    return RET_OK;
+}
+
 int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;

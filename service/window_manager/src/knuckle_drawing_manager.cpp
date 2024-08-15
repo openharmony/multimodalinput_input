@@ -30,6 +30,7 @@
 #include "mmi_log.h"
 #include "parameters.h"
 #include "setting_datashare.h"
+#include "touch_drawing_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDrawingManager"
@@ -48,9 +49,9 @@ constexpr int32_t POINT_INDEX4 { 4 };
 constexpr int32_t PAINT_STROKE_WIDTH { 10 };
 constexpr int32_t PAINT_PATH_RADIUS { 10 };
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW { 450000 };
-constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
+[[ maybe_unused ]] constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
-constexpr float VPR_CONFIG { 3.25f };
+[[ maybe_unused ]] constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t ROTATION_ANGLE_0 { 0 };
 constexpr int32_t ROTATION_ANGLE_90 { 90 };
@@ -144,16 +145,15 @@ bool KnuckleDrawingManager::IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEv
         int32_t id = touchEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         touchEvent->GetPointerItem(id, pointerItem);
-        int32_t physicalX = pointerItem.GetDisplayX();
-        int32_t physicalY = pointerItem.GetDisplayY();
-        float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownPointer_.x - physicalX, POW_SQUARE) +
-            pow(lastDownPointer_.y - physicalY, POW_SQUARE)));
+        auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+        float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownPointer_.x - displayXY.first, POW_SQUARE) +
+            pow(lastDownPointer_.y - displayXY.second, POW_SQUARE)));
         bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
         if (isTimeIntervalReady && isDistanceReady) {
             return false;
         }
-        lastDownPointer_.x = physicalX;
-        lastDownPointer_.y = physicalY;
+        lastDownPointer_.x = displayXY.first;
+        lastDownPointer_.y = displayXY.second;
     } else if (touchAction == PointerEvent::POINTER_ACTION_UP) {
         lastUpTime_ = touchEvent->GetActionTime();
     }
@@ -318,8 +318,9 @@ int32_t KnuckleDrawingManager::GetPointerPos(std::shared_ptr<PointerEvent> touch
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return RET_ERR;
     }
-    pointerInfo.x = pointerItem.GetDisplayX();
-    pointerInfo.y = pointerItem.GetDisplayY();
+    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    pointerInfo.x = displayXY.first;
+    pointerInfo.y = displayXY.second;
     pointerInfos_.push_back(pointerInfo);
     pointerNum_++;
 
@@ -388,9 +389,11 @@ int32_t KnuckleDrawingManager::DestoryWindow()
     CHKPR(canvas, RET_ERR);
     canvas->Clear();
     canvasNode_->FinishRecording();
+    CHKPR(surfaceNode_, RET_ERR);
+    surfaceNode_->DetachToDisplay(screenId_);
+    surfaceNode_->RemoveChild(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
-    CHKPR(surfaceNode_, RET_ERR);
     surfaceNode_.reset();
     Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;

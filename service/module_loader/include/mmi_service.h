@@ -157,6 +157,7 @@ public:
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
@@ -240,10 +241,10 @@ private:
     ~MMIService();
 private:
     int32_t CheckPidPermission(int32_t pid);
-    void PrintLog(const std::string &flag, int32_t duration);
+    void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
-    bool isCesStart_ { false };
+    std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT

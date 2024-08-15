@@ -18,6 +18,7 @@
 #include <fstream>
 #include <regex>
 
+#include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_device.h"
 #include "libinput.h"

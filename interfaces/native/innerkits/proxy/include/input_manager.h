@@ -283,6 +283,16 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder);
 
     /**
+     * @brief Simulates a touchpad input event.
+     * because some event for touchpad is very different from other input,
+     *  especially pointer.id must be same as actual data 0, 1, 2.
+     * @param pointerEvent Indicates the touchpad input event.
+     * @return void
+     * @since 12
+     */
+    void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
+    /**
      * @brief Starts listening for an input device event.
      * @param type Indicates the type of the input device event, which is <b>change</b>.
      * @param listener Indicates the listener for the input device event.
@@ -935,6 +945,14 @@ public:
     int32_t SkipPointerLayer(bool isSkip);
 
     int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
+    /**
+     * @brief Get Interval Since Last Input.
+     * @param callback Callback used to return the time interval.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

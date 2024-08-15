@@ -898,7 +898,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
                             } else {
-                                MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
                                     ",KeyAction:%{public}s, IsRepeat:%{public}s",
                                     keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
                                     KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
@@ -917,7 +917,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
                             } else {
-                                MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                MMI_HILOGI("KeyCode:%{private}d, ActionTime:%{public}" PRId64
                                     ",KeyAction:%{public}s, IsRepeat:%{public}s",
                                     keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
                                     KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
@@ -1640,15 +1640,15 @@ const std::map<char, SpecialChar> CHAR_TO_KEYCODE = {
     { ' ',  { KeyEvent::KEYCODE_SPACE, false} },
     { '!',  { KeyEvent::KEYCODE_1, true} },
     { '\"', { KeyEvent::KEYCODE_APOSTROPHE, true} },
-    { '#',  { KeyEvent::KEYCODE_POUND, false} },
+    { '#',  { KeyEvent::KEYCODE_3, true} },
     { '$',  { KeyEvent::KEYCODE_4, true} },
     { '%',  { KeyEvent::KEYCODE_5, true} },
     { '&',  { KeyEvent::KEYCODE_7, true} },
     { '\'', { KeyEvent::KEYCODE_APOSTROPHE, false} },
-    { '(',  { KeyEvent::KEYCODE_NUMPAD_LEFT_PAREN, false} },
-    { ')',  { KeyEvent::KEYCODE_NUMPAD_RIGHT_PAREN, false} },
-    { '*',  { KeyEvent::KEYCODE_STAR, false} },
-    { '+',  { KeyEvent::KEYCODE_PLUS, false} },
+    { '(',  { KeyEvent::KEYCODE_9, true} },
+    { ')',  { KeyEvent::KEYCODE_0, true} },
+    { '*',  { KeyEvent::KEYCODE_8, true} },
+    { '+',  { KeyEvent::KEYCODE_EQUALS, true} },
     { ',',  { KeyEvent::KEYCODE_COMMA, false} },
     { '-',  { KeyEvent::KEYCODE_MINUS, false} },
     { '.',  { KeyEvent::KEYCODE_PERIOD, false} },
@@ -1659,7 +1659,7 @@ const std::map<char, SpecialChar> CHAR_TO_KEYCODE = {
     { '=',  { KeyEvent::KEYCODE_EQUALS, false} },
     { '>',  { KeyEvent::KEYCODE_PERIOD, true} },
     { '?',  { KeyEvent::KEYCODE_SLASH, true} },
-    { '@',  { KeyEvent::KEYCODE_AT, false} },
+    { '@',  { KeyEvent::KEYCODE_2, true} },
     { '[',  { KeyEvent::KEYCODE_LEFT_BRACKET, false} },
     { '\\', { KeyEvent::KEYCODE_BACKSLASH, false} },
     { ']',  { KeyEvent::KEYCODE_RIGHT_BRACKET, false} },

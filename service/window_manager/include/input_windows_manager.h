@@ -109,6 +109,7 @@ public:
     void SetUiExtensionInfo(bool isUiExtension, int32_t uiExtensionPid, int32_t uiExtensionWindoId);
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1);
     void SendPointerEvent(int32_t pointerAction);
+    bool IsMouseSimulate() const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     PointerStyle GetLastPointerStyle() const;
@@ -145,6 +146,7 @@ public:
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
     void CleanShellWindowIds();
+    bool IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -161,7 +163,7 @@ public:
     void GetTargetWindowIds(int32_t pointerItemId, int32_t sourceType, std::vector<int32_t> &windowIds);
     void AddTargetWindowIds(int32_t pointerItemId, int32_t sourceType, int32_t windowId);
     void ClearTargetWindowId(int32_t pointerId);
-    bool IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY);
+    bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
     void SetWindowStateNotifyPid(int32_t pid);
@@ -171,6 +173,8 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+    int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
 
 private:
     void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
@@ -248,6 +252,8 @@ private:
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void AdjustDisplayRotation();
+    void SetPointerEvent(int32_t pointerAction, std::shared_ptr<PointerEvent> pointerEvent);
+    void DispatchPointerCancel(int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -362,6 +368,7 @@ private:
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
     int32_t windowStateNotifyPid_ { -1 };
+    std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 };
 } // namespace MMI
 } // namespace OHOS

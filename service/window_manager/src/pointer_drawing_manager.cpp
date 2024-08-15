@@ -67,7 +67,7 @@ constexpr char ROTATE_WINDOW_ROTATE { '0' };
 constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
-constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
+[[ maybe_unused ]] constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS { 40 };
 constexpr int32_t POINTER_WINDOW_INIT_SIZE { 64 };
 constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
@@ -79,7 +79,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
-constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
+[[ maybe_unused ]] constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
 constexpr float ROTATION_ANGLE { 360.f };
 constexpr float LOADING_CENTER_RATIO { 0.5f };
 constexpr float RUNNING_X_RATIO { 0.3f };
@@ -1173,6 +1173,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
 }
 
 int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+    __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     if (pid == -1) {
@@ -1463,7 +1464,6 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
-        WIN_MGR->UpdatePointerChangeAreas();
         bool pointerVisible = isPointerVisible;
         if (!isHotPlug) {
             pointerVisible = (pointerVisible && IsPointerVisible());
@@ -1497,12 +1497,10 @@ void PointerDrawingManager::DrawManager()
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
-            WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
         DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
-        WIN_MGR->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
     }
@@ -1809,7 +1807,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
-    if (!INPUT_DEV_MGR->HasPointerDevice()) {
+    if (!INPUT_DEV_MGR->HasPointerDevice() && !WIN_MGR->IsMouseSimulate()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
     }
@@ -1862,9 +1860,10 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
     return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate)
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    bool simulate = WIN_MGR->IsMouseSimulate();
     if (hasDisplay_ && (hasPointerDevice_ || simulate)) {
         if (surfaceNode_ != nullptr) {
             AttachToDisplay();
@@ -1907,7 +1906,7 @@ int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enabl
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    MMI_HILOGI("EnableHardwareCursorStats, enable:%{public}d", enable);
+    MMI_HILOGI("EnableHardwareCursorStats, enable:%{private}d", enable);
     return RET_OK;
 }
 
@@ -1921,7 +1920,7 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    MMI_HILOGI("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    MMI_HILOGI("GetHardwareCursorStats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
     return RET_OK;
 }
 

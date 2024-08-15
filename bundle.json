@@ -41,7 +41,8 @@
       "input_ext_feature_gesturesense",
       "input_ext_feature_magiccursor",
       "input_feature_infrared_emitter",
-      "input_feature_joystick"
+      "input_feature_joystick",
+      "input_feature_coverage"
     ],
     "adapted_system_type": [
       "standard"
@@ -89,7 +90,11 @@
         "call_manager",
         "libinput",
         "screenlock_mgr",
-	"player_framework"
+        "FreeBSD",
+        "googletest",
+        "skia",
+        "player_framework",
+        "cJSON"
       ],
       "third_party": [
         "cJSON",
@@ -97,7 +102,8 @@
         "libuv",
         "libevdev",
         "mtdev",
-        "libinput"
+        "libinput",
+        "rust"
       ]
     },
     "build": {

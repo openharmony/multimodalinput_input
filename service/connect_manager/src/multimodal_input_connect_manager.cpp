@@ -862,5 +862,12 @@ int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SkipPointerLayer(isSkip);
 }
+
+int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetIntervalSinceLastInput(timeInterval);
+}
 } // namespace MMI
 } // namespace OHOS

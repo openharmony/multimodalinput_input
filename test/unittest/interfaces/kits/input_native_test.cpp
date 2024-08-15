@@ -123,11 +123,11 @@ HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
 {
     struct Input_KeyState* keyState = OH_Input_CreateKeyState();
     ASSERT_NE(keyState, nullptr);
-    OH_Input_SetKeyCode(keyState, 22);
+    OH_Input_SetKeyCode(keyState, KEYCODE_DPAD_UP);
     OH_Input_GetKeyState(keyState);
-    ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
-    ASSERT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
-    ASSERT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
+    EXPECT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
+    EXPECT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
     OH_Input_DestroyKeyState(&keyState);
 }
 
@@ -1714,6 +1714,19 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
     EXPECT_EQ(retResult, INPUT_SUCCESS);
     retResult = OH_Input_RemoveInputEventInterceptor();
     EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_GetIntervalSinceLastInput_001
+ * @tc.desc: Verify the Get Interval Since Last Input
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
+{
+    int64_t *intervalSinceLastInput = nullptr;
+    int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
 }
 } // namespace MMI
 } // namespace OHOS

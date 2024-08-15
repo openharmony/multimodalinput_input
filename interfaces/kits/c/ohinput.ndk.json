@@ -314,5 +314,9 @@
     {
         "first_introduced": "12",
         "name": "OH_Input_RemoveInputEventInterceptor"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetIntervalSinceLastInput"
     }
 ]

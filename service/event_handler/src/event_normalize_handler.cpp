@@ -60,9 +60,9 @@ constexpr int32_t SWIPE_INWARD_MAX_X_THRE { 110 };
 constexpr int32_t SWIPE_INWARD_MIN_X_THRE { 10 };
 bool g_isSwipeInward = false;
 constexpr int32_t MT_TOOL_PALM { 2 };
-constexpr double TOUCH_SLOP { 1.0 };
-constexpr int32_t SQUARE { 2 };
-constexpr double DENSITY_BASELINE { 160.0 };
+[[ maybe_unused ]] constexpr double TOUCH_SLOP { 1.0 };
+[[ maybe_unused ]] constexpr int32_t SQUARE { 2 };
+[[ maybe_unused ]] constexpr double DENSITY_BASELINE { 160.0 };
 const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_DEVICE_ADDED),
     static_cast<int32_t>(LIBINPUT_EVENT_DEVICE_REMOVED),
@@ -354,7 +354,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGD("keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
         MMI_HILOGD("keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
@@ -778,11 +778,6 @@ double EventNormalizeHandler::CalcTouchOffset(const std::shared_ptr<PointerEvent
     }
     PointerEvent::PointerItem itemMove = moveItems.front();
     PointerEvent::PointerItem itemDown = lastTouchDownItems_.front();
-    MMI_HILOGD("Move item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
-        itemMove.GetPointerId(), itemMove.GetDisplayX(), itemMove.GetDisplayY());
-    MMI_HILOGD("Down item, pointerId:%{public}d, location:(%{public}d, %{public}d)",
-        itemDown.GetPointerId(), itemDown.GetDisplayX(), itemDown.GetDisplayY());
-
     double offset = sqrt(pow(itemMove.GetDisplayX() - itemDown.GetDisplayX(), SQUARE) +
         pow(itemMove.GetDisplayY() - itemDown.GetDisplayY(), SQUARE));
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(touchMoveEvent->GetTargetDisplayId());

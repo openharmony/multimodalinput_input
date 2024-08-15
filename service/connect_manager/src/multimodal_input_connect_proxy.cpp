@@ -217,7 +217,7 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
 }
 
 int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
-    void* pixelMap)
+    void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, ERR_INVALID_VALUE);
@@ -249,7 +249,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, ERR_INVALID_VALUE);
@@ -1948,6 +1948,7 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
 }
 
 int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
+    __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, RET_ERR);
@@ -2066,7 +2067,6 @@ int32_t MultimodalInputConnectProxy::GetHardwareCursorStats(uint32_t &frameCount
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
     READUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     READUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
@@ -2352,6 +2352,29 @@ int32_t MultimodalInputConnectProxy::SkipPointerLayer(bool isSkip)
         return ret;
     }
     READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(
+                                      MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL),
+                                      data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
+    } else {
+        READINT64(reply, timeInterval);
+    }
     return ret;
 }
 } // namespace MMI
