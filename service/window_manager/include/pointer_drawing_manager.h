@@ -152,6 +152,7 @@ private:
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
+    void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
 
 private:
     struct PidInfo {
@@ -165,6 +166,7 @@ private:
     int32_t lastPhysicalY_ { -1 };
     PointerStyle lastMouseStyle_ {};
     PointerStyle currentMouseStyle_ {};
+    PointerStyle lastDrawPointerStyle_ {};
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
