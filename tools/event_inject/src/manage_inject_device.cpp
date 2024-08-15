@@ -89,7 +89,7 @@ int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray &inputEv
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {
-        if(write(fd, &item.event, sizeof(item.event)) < 0) {
+        if (write(fd, &item.event, sizeof(item.event)) < 0) {
             MMI_HILOGE("Write event failed");
             close(fd);
             fd = -1;
