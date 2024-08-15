@@ -197,9 +197,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        UpdateSurfaceNodeBounds(physicalX, physicalY);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle, id:%{public}d, size:%{public}d",
             pointerStyle.id, pointerStyle.size);
@@ -217,9 +215,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
-    surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-        surfaceNode_->GetStagingProperties().GetBounds().z_,
-        surfaceNode_->GetStagingProperties().GetBounds().w_);
+    UpdateSurfaceNodeBounds(physicalX, physicalY);
     surfaceNode_->SetVisible(true);
     Rosen::RSTransaction::FlushImplicitTransaction();
     UpdatePointerVisible();
@@ -227,6 +223,29 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     MMI_HILOGD("Leave, display:%{public}d, physicalX:%{public}d, physicalY:%{public}d",
         displayId, physicalX, physicalY);
     return RET_OK;
+}
+
+void PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY)
+{
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor()) {
+        if (currentMouseStyle_.id == DEVELOPER_DEFINED_ICON) {
+            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+                canvasWidth_, canvasHeight_);
+        } else {
+            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+                imageWidth_, imageHeight_);
+        }
+    } else {
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+    }
+#else
+    surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+        surfaceNode_->GetStagingProperties().GetBounds().z_,
+        surfaceNode_->GetStagingProperties().GetBounds().w_);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
@@ -269,7 +288,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor()) {
+    if (HasMagicCursor() && currentMouseStyle_.id != DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("magicCursor DrawPointer enter CreatePointerWindow");
         MAGIC_CURSOR->CreatePointerWindow(displayId, physicalX, physicalY, direction, surfaceNode_);
     } else {
@@ -1485,6 +1504,15 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 void PointerDrawingManager::DrawManager()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor() && lastDrawPointerStyle_.id != currentMouseStyle_.id) {
+        if (surfaceNode_ != nullptr) {
+            surfaceNode_->DetachToDisplay(screenId_);
+            surfaceNode_ = nullptr;
+            Rosen::RSTransaction::FlushImplicitTransaction();
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasDisplay_ && hasPointerDevice_ && surfaceNode_ == nullptr) {
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
@@ -1494,6 +1522,7 @@ void PointerDrawingManager::DrawManager()
         if (IsWindowRotation()) {
             direction = displayInfo_.direction;
         }
+        lastDrawPointerStyle_ = pointerStyle;
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
