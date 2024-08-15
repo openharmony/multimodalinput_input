@@ -123,6 +123,7 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_POINTER_SNAPSHOT = 99,
     SET_MOVE_EVENT_FILTERS = 100,
     SKIP_POINTER_LAYER = 101,
+    GET_SYSTEM_EVENT_TIME_INTERVAL = 102,
 };
 
 enum class MultimodalinputEventObserverCode {

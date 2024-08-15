@@ -2347,5 +2347,16 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
 }
+
+int32_t InputManagerImpl::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return INPUT_DEVICE_IMPL.GetIntervalSinceLastInput(callback);
+}
 } // namespace MMI
 } // namespace OHOS

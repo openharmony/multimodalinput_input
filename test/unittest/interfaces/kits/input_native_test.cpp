@@ -1715,5 +1715,18 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
     retResult = OH_Input_RemoveInputEventInterceptor();
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
+
+/**
+ * @tc.name: InputNativeTest_GetIntervalSinceLastInput_001
+ * @tc.desc: Verify the Get Interval Since Last Input
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
+{
+    int64_t *intervalSinceLastInput = nullptr;
+    int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
 } // namespace MMI
 } // namespace OHOS

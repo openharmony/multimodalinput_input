@@ -944,6 +944,14 @@ public:
 
     int32_t SkipPointerLayer(bool isSkip);
 
+    /**
+     * @brief Get Interval Since Last Input.
+     * @param callback Callback used to return the time interval.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

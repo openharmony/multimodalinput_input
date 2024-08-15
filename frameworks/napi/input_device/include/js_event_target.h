@@ -41,6 +41,7 @@ public:
     static void EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
     static void EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
     static void EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
+    static void EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);
@@ -65,6 +66,8 @@ private:
     static void CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t status);
     static void CallKeyboardRepeatRateAsync(uv_work_t *work, int32_t status);
     static void CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t status);
+    static void CallIntervalSinceLastInputAsync(uv_work_t *work, int32_t status);
+    static void CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t status);
     static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
     static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
