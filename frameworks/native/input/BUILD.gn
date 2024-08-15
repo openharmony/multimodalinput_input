@@ -102,6 +102,7 @@ ohos_unittest("OHInputManagerTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
 }
