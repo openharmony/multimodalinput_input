@@ -31,7 +31,7 @@ enum Option {
     HELP = 'h'
 };
 
-void PrintHelp(const std::string &title = {})
+void PrintHelp(const std::string &title = "")
 {
     std::cout << title << std::endl;
     printf("Usage\n"
