@@ -1449,6 +1449,22 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetPressure_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: PointerEventTest_SetMoveFlag_001
+ * @tc.desc: Test the funcation SetMoveFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetMoveFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t moveFlag = -1;
+    PointerEvent::PointerItem item;
+    ASSERT_NO_FATAL_FAILURE(item.SetMoveFlag(moveFlag));
+    moveFlag = 0;
+    ASSERT_NO_FATAL_FAILURE(item.SetMoveFlag(moveFlag));
+}
+
+/**
  * @tc.name: PointerEventTest_ActionToShortStr_003
  * @tc.desc: Test the funcation ActionToShortStr
  * @tc.type: FUNC

@@ -185,6 +185,8 @@ int32_t libinput_event_touch_get_seat_slot(struct libinput_event_touch *event);
 
 double libinput_event_touch_get_pressure(struct libinput_event_touch* event);
 
+int32_t libinput_event_touch_get_move_flag(struct libinput_event_touch* event);
+
 int32_t libinput_event_get_touch_contact_long_axis(struct libinput_event_touch *event);
 
 int32_t libinput_event_get_touch_contact_short_axis(struct libinput_event_touch *event);

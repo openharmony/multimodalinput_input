@@ -122,8 +122,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
         return;
     }
-    if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         auto iter = std::find(ALL_EVENT_TYPES.begin(), ALL_EVENT_TYPES.end(), static_cast<int32_t>(type));
+    if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         if (iter != ALL_EVENT_TYPES.end()) {
             MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
         }
@@ -284,10 +284,10 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
         }
         MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
             "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
-            "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
+            "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, MoveFlag:%{public}d, Device:%{public}d",
             item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
             item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-            item.GetDeviceId());
+            item.GetMoveFlag(), item.GetDeviceId());
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
