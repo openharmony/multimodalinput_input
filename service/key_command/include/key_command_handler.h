@@ -30,6 +30,7 @@
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
+#include "window_info.h"
 
 #include "i_input_event_handler.h"
 #include "key_event.h"
@@ -79,6 +80,9 @@ struct ShortcutKey {
     int32_t keyDownDuration { 0 };
     int32_t triggerType { KeyEvent::KEY_ACTION_DOWN };
     int32_t timerId { -1 };
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    int32_t shortcutId { -1 };
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
     Ability ability;
     void Print() const;
 };
@@ -233,6 +237,9 @@ private:
     void MarkActiveSequence(bool active);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool MatchShortcutKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool MatchShortcutKey(std::shared_ptr<KeyEvent> keyEvent,
+        ShortcutKey &shortcutKey, std::vector<ShortcutKey> &upAbilities);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
@@ -377,6 +384,7 @@ private:
     std::vector<int64_t> gestureTimeStamps_;
     int64_t drawOFailTimestamp_ { 0 };
     int64_t drawOSuccTimestamp_ { 0 };
+    Direction lastDirection_ { DIRECTION0 };
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     int64_t lastDownTime_ { 0 };
     int64_t previousUpTime_ { 0 };

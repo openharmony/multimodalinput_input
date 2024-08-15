@@ -54,6 +54,9 @@ struct SoftHardenTouchpadAccelerateCurves {
 struct HardHardenTouchpadAccelerateCurves {
     data: Vec<CurveItem>,
 }
+struct WeberTouchpadAccelerateCurves {
+    data: Vec<CurveItem>,
+}
 struct AxisAccelerateCurvesTouchpad {
     data: Vec<CurveItem>,
 }
@@ -84,6 +87,11 @@ impl SoftHardenTouchpadAccelerateCurves {
 }
 impl HardHardenTouchpadAccelerateCurves {
     fn hard_harden_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
+        &self.data[speed - 1]
+    }
+}
+impl WeberTouchpadAccelerateCurves {
+    fn weber_touchpad_get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
@@ -538,6 +546,76 @@ impl AxisAccelerateCurvesTouchpad {
     }
 }
 
+impl WeberTouchpadAccelerateCurves {
+    fn get_instance() -> &'static WeberTouchpadAccelerateCurves {
+        static mut GLOBAL_CURVES: Option<WeberTouchpadAccelerateCurves> = None;
+        static ONCE: Once = Once::new();
+
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(WeberTouchpadAccelerateCurves {
+                data: vec![
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.12, 0.21, 0.45, 0.87],
+                        diff_nums: vec![0.0, -0.18, -4.98, -17.58]
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.16, 0.28, 0.60, 1.16],
+                        diff_nums: vec![0.0, -0.24, -6.64, -23.44],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.20, 0.35, 0.75, 1.45],
+                        diff_nums: vec![0.0, -0.30, -8.30, -29.30],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.24, 0.42, 0.90, 1.74],
+                        diff_nums: vec![0.0, -0.36, -9.96, -35.16],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.32, 0.56, 1.20, 2.32],
+                        diff_nums: vec![0.0, -0.48, -13.28, -46.88],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.40, 0.70, 1.50, 2.90],
+                        diff_nums: vec![0.0, -0.60, -16.60, -58.60],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.48, 0.84, 1.80, 3.48],
+                        diff_nums: vec![0.0, -0.72, -19.92, -70.32],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.60, 1.05, 2.25, 4.35],
+                        diff_nums: vec![0.0, -0.90, -24.90, -87.90],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.76, 1.33, 2.85, 5.51],
+                        diff_nums: vec![0.0, -1.14, -31.54, -111.34],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![0.92, 1.61, 3.45, 6.67],
+                        diff_nums: vec![0.0, -1.38, -38.18, -134.78],
+                    },
+                    CurveItem {
+                        speeds: vec![2.0, 20.0, 30.0, 128.0],
+                        slopes: vec![1.08, 1.89, 4.05, 7.83],
+                        diff_nums: vec![0.0, -1.62, -44.82, -158.22],
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
 // 这个 extern 代码块链接到 libm 库
 #[link(name = "m")]
 extern {
@@ -599,6 +677,7 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i3
         1 => KLVTouchpadAccelerateCurves::get_instance().klv_touchpad_get_curve_by_speed(speed as usize),  
         2 => SoftHardenTouchpadAccelerateCurves::get_instance().soft_harden_touchpad_get_curve_by_speed(speed as usize),  
         3 => HardHardenTouchpadAccelerateCurves::get_instance().hard_harden_touchpad_get_curve_by_speed(speed as usize),  
+        4 => WeberTouchpadAccelerateCurves::get_instance().weber_touchpad_get_curve_by_speed(speed as usize),
         _ => KLVTouchpadAccelerateCurves::get_instance().klv_touchpad_get_curve_by_speed(speed as usize),
     };
     unsafe {

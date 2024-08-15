@@ -191,6 +191,14 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
+void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    InputMgrImpl.SimulateTouchPadEvent(pointerEvent);
+}
+
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
     return InputMgrImpl.RegisterDevListener(type, listener);
@@ -621,6 +629,11 @@ int32_t InputManager::SkipPointerLayer(bool isSkip)
 int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
 {
     return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
+}
+
+int32_t InputManager::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+{
+    return InputMgrImpl.GetIntervalSinceLastInput(callback);
 }
 } // namespace MMI
 } // namespace OHOS

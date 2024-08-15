@@ -420,6 +420,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL):
+            ret = StubGetIntervalSinceLastInput(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -958,12 +961,22 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (windowId < 0) {
+            MMI_HILOGE("windowId is negative number and not system hap, set pointerStyle failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
     PointerStyle pointerStyle;
     READINT32(data, pointerStyle.size, RET_ERR);
     READINT32(data, pointerStyle.color, RET_ERR);
     READINT32(data, pointerStyle.id, RET_ERR);
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
+    if (windowId == -1 && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("can not set global winid, because this is not sys app");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = SetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
@@ -998,6 +1011,12 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (windowId < 0) {
+            MMI_HILOGE("windowId is negative number and not system hap, get pointerStyle failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
     PointerStyle pointerStyle;
@@ -1693,17 +1712,8 @@ int32_t MultimodalInputConnectStub::StubEnableCombineKey(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    bool enable;
-    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = EnableInputDevice(enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call EnableInputDevice failed, ret:%{public}d", ret);
-    }
-    return ret;
+    MMI_HILOGW("EnableInputDevice is not supported yet");
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
@@ -2447,7 +2457,6 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
         MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success enable:%{public}d, pid:%{public}d", enable, GetCallingPid());
     return RET_OK;
 }
 
@@ -2461,8 +2470,6 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
@@ -2644,6 +2651,19 @@ int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, Me
     }
     MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int64_t timeInterval = 0;
+    int32_t ret = GetIntervalSinceLastInput(timeInterval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubGetIntervalSinceLastInput ret:%{public}d", ret);
+    } else {
+        WRITEINT64(reply, timeInterval);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

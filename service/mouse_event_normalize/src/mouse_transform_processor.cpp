@@ -58,12 +58,15 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
 constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
 constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
-constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
+[[ maybe_unused ]] constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
 constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
 constexpr int32_t SOFT_HARDEN_DEVICE_WIDTH { 3120 };
 constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
+constexpr int32_t WEBER_DEVICE_WIDTH { 2880 };
+constexpr int32_t WEBER_DEVICE_HEIGHT { 1920 };
+const std::string DEVICE_TYPE_WEBER { "WEB"};
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
@@ -710,6 +713,11 @@ DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t heigh
             MMI_HILOGE("Undefined width:%{public}d, height:%{public}d", width, height);
         }
         MMI_HILOGD("Device width:%{public}d, height:%{public}d", width, height);
+    }
+    if (PRODUCT_TYPE == DEVICE_TYPE_WEBER) {
+        if (width == WEBER_DEVICE_WIDTH && height == WEBER_DEVICE_HEIGHT) {
+            ret = DeviceType::DEVICE_WEBER;
+        }
     }
     return ret;
 }

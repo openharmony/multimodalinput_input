@@ -29,6 +29,7 @@
 #endif // USE_ROSEN_DRAWING
 #include "parameters.h"
 #include "render/rs_pixel_map_util.h"
+#include "touch_drawing_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDynamicDrawingManager"
@@ -38,11 +39,11 @@ namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
-constexpr int32_t DENSITY_BASELINE { 160 };
-constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
-constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
-constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
-constexpr int32_t CALCULATE_MIDDLE { 2 };
+[[ maybe_unused ]] constexpr int32_t DENSITY_BASELINE { 160 };
+[[ maybe_unused ]] constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
+[[ maybe_unused ]] constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
+[[ maybe_unused ]] constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
+[[ maybe_unused ]] constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t MAX_POINTER_COLOR { 0x00ffff };
 constexpr int32_t TIME_DIMENSION { 1000 };
@@ -53,12 +54,12 @@ constexpr float DOUBLE { 2.0f };
 constexpr int32_t POINT_TOTAL_SIZE { 5 };
 constexpr int32_t POINT_SYSTEM_SIZE { 200 };
 constexpr int32_t MAX_DIVERGENCE_NUM { 10 };
-constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+[[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
 constexpr int32_t DESIRED_SIZE { 80 };
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW { 450000 };
 constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
-constexpr float VPR_CONFIG { 3.25f };
+[[ maybe_unused ]] constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t IN_DRAWING_TIME { 23000 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
@@ -210,9 +211,8 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
         auto id = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(id, pointerItem);
-        int32_t physicalX = pointerItem.GetDisplayX();
-        int32_t physicalY = pointerItem.GetDisplayY();
-        glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
+        auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+        glowTraceSystem_->ResetDivergentPoints(displayXY.first, displayXY.second);
     }
     isDrawing_ = true;
     DestoryWindow();
@@ -238,10 +238,9 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    int32_t physicalX = pointerItem.GetDisplayX();
-    int32_t physicalY = pointerItem.GetDisplayY();
-    float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - physicalX, POW_SQUARE) +
-        pow(lastDownY_ - physicalY, POW_SQUARE)));
+    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - displayXY.first, POW_SQUARE) +
+        pow(lastDownY_ - displayXY.second, POW_SQUARE)));
     bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
     if (isTimeIntervalReady && isDistanceReady) {
         MMI_HILOGE("Take a screenshot");
@@ -249,15 +248,16 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
         isStop_ = true;
         return;
     }
-    lastDownX_ = physicalX;
-    lastDownY_ = physicalY;
-    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
+    lastDownX_ = displayXY.first;
+    lastDownY_ = displayXY.second;
+    traceControlPoints_[pointCounter_].Set(displayXY.first, displayXY.second);
     isStop_ = false;
 }
 
 void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent);
     pointCounter_++;
     if (pointCounter_ >= POINT_TOTAL_SIZE) {
         MMI_HILOGE("traceControlPoints_ index out of size");
@@ -266,9 +266,8 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    int32_t physicalX = pointerItem.GetDisplayX();
-    int32_t physicalY = pointerItem.GetDisplayY();
-    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
+    auto displayXY = TOUCH_DRAWING_MGR->CalcDrawCoordinate(displayInfo_, pointerItem);
+    traceControlPoints_[pointCounter_].Set(displayXY.first, displayXY.second);
     int pointIndex4 = 4;
     bool draw = (pointerEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
     if (pointCounter_ == pointIndex4) {
@@ -299,7 +298,7 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         lastUpdateTimeMillis_ = now;
     }
     if (draw) {
-        glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
+        glowTraceSystem_->ResetDivergentPoints(displayXY.first, displayXY.second);
         isDrawing_ = false;
     }
 }
@@ -431,9 +430,11 @@ void KnuckleDynamicDrawingManager::DestoryWindow()
     CHKPV(canvas);
     canvas->Clear();
     canvasNode_->FinishRecording();
+    CHKPV(surfaceNode_);
+    surfaceNode_->DetachToDisplay(screenId_);
+    surfaceNode_->RemoveChild(canvasNode_);
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     canvasNode_.reset();
-    CHKPV(surfaceNode_);
     surfaceNode_.reset();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }

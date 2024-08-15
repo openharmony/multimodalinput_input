@@ -49,7 +49,7 @@ extern "C" {
  *
  * @since 12
  */
-typedef enum {
+typedef enum Input_KeyStateAction {
     /** Default */
     KEY_DEFAULT = -1,
     /** Pressing of a key */
@@ -67,7 +67,7 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+typedef enum Input_KeyEventAction {
     /** Cancellation of a key action. */
     KEY_ACTION_CANCEL = 0,
     /** Pressing of a key. */
@@ -81,7 +81,7 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+typedef enum Input_MouseEventAction {
     /** Cancel. */
     MOUSE_ACTION_CANCEL = 0,
     /** Moving of the mouse pointer. */
@@ -103,7 +103,7 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+typedef enum InputEvent_MouseAxis {
     /** Vertical scroll axis */
     MOUSE_AXIS_SCROLL_VERTICAL = 0,
     /** Horizontal scroll axis */
@@ -115,7 +115,7 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+typedef enum Input_MouseEventButton {
     /** Invalid button */
     MOUSE_BUTTON_NONE = -1,
     /** Left button on the mouse. */
@@ -135,7 +135,7 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+typedef enum Input_TouchEventAction {
     /** Touch cancelled. */
     TOUCH_ACTION_CANCEL = 0,
     /** Touch pressed. */
@@ -145,6 +145,33 @@ typedef enum {
     /** Touch lifted. */
     TOUCH_ACTION_UP = 3,
 } Input_TouchEventAction;
+
+/**
+ * @brief Enumerates event source types.
+ *
+ * @since 12
+ */
+typedef enum InputEvent_SourceType {
+    /**
+     * Indicates that the input source generates events similar to mouse cursor movement,
+     * button press and release, and wheel scrolling.
+     *
+     * @since 12
+     */
+    SOURCE_TYPE_MOUSE = 1,
+    /**
+     * Indicates that the input source generates a touchscreen multi-touch event.
+     *
+     * @since 12
+     */
+    SOURCE_TYPE_TOUCHSCREEN = 2,
+    /**
+     * Indicates that the input source generates a touchpad multi-touch event.
+     *
+     * @since 12
+     */
+    SOURCE_TYPE_TOUCHPAD = 3
+} InputEvent_SourceType;
 
 /**
  * @brief Defines key information, which identifies a key pressing behavior.
@@ -187,7 +214,7 @@ typedef struct Input_AxisEvent Input_AxisEvent;
  *
  * @since 12
  */
-typedef enum {
+typedef enum Input_Result {
     /** Success */
     INPUT_SUCCESS = 0,
     /** Permission verification failed */
@@ -1166,6 +1193,18 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void);
  * @since 12
  */
 Input_Result OH_Input_RemoveInputEventInterceptor(void);
+
+/**
+ * @brief Obtains the interval since the last system input event.
+ *
+ * @param timeInterval Interval, in nanoseconds.
+ * @return OH_Input_GetIntervalSinceLastInput status code, specifically,
+ *         {@Link INPUT_SUCCESS} if the Operation is successful;
+ *         {@Link INPUT_SERVICE_EXCEPTION} otherwise.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *timeInterval);
 #ifdef __cplusplus
 }
 #endif

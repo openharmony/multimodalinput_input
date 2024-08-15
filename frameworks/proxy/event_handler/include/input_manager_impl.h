@@ -114,6 +114,7 @@ public:
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
@@ -217,6 +218,8 @@ public:
     int32_t SkipPointerLayer(bool isSkip);
     int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
     void OnWindowStateError(int32_t pid, int32_t windowId);
+    int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
+
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);

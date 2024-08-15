@@ -1775,25 +1775,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_002, TestS
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnAuthorize_001
- * @tc.desc: Test the function OnAuthorize
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    handler.CurrentPID_ = 12345;
-    handler.InjectionType_ = InjectionType::KEYEVENT;
-    handler.keyEvent_ = KeyEvent::Create();
-    handler.authorizationCollection_.clear();
-    int32_t result = handler.OnAuthorize(true);
-    EXPECT_EQ(result, ERR_OK);
-    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::AUTHORIZED);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_OnAuthorize_002
  * @tc.desc: Test the function OnAuthorize
  * @tc.type: FUNC

@@ -98,6 +98,8 @@ void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerI
     item.SetDisplayY(touchInfo.point.y);
     item.SetDisplayXPos(touchInfo.point.x);
     item.SetDisplayYPos(touchInfo.point.y);
+    item.SetRawDisplayX(touchInfo.point.x);
+    item.SetRawDisplayY(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
     item.SetToolDisplayY(touchInfo.toolRect.point.y);
     item.SetToolWidth(touchInfo.toolRect.width);
@@ -113,8 +115,8 @@ void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem
     if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
         MMI_HILOGD("Fingersense start classify touch down event");
         TouchType rawTouchTmp = rawTouch_;
-        int32_t displayX = pointerItem.GetDisplayX();
-        int32_t displayY = pointerItem.GetDisplayY();
+        int32_t displayX = pointerItem.GetRawDisplayX();
+        int32_t displayY = pointerItem.GetRawDisplayY();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         WIN_MGR->ReverseXY(displayX, displayY);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -128,8 +130,8 @@ void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, Poin
     CALL_DEBUG_ENTER;
     rawTouch.id = pointerItem.GetPointerId();
     rawTouch.pressure = pointerItem.GetPressure();
-    rawTouch.x = pointerItem.GetDisplayX();
-    rawTouch.y = pointerItem.GetDisplayY();
+    rawTouch.x = pointerItem.GetRawDisplayX();
+    rawTouch.y = pointerItem.GetRawDisplayY();
 }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
@@ -164,6 +166,8 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetDisplayY(touchInfo.point.y);
     item.SetDisplayXPos(touchInfo.point.x);
     item.SetDisplayYPos(touchInfo.point.y);
+    item.SetRawDisplayX(touchInfo.point.x);
+    item.SetRawDisplayY(touchInfo.point.y);
     item.SetToolDisplayX(touchInfo.toolRect.point.x);
     item.SetToolDisplayY(touchInfo.toolRect.point.y);
     item.SetToolWidth(touchInfo.toolRect.width);
@@ -195,8 +199,8 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
         MMI_HILOGD("Notify fingersense touch up event");
         TouchType rawTouchTmp = rawTouch_;
-        int32_t displayX = item.GetDisplayX();
-        int32_t displayY = item.GetDisplayY();
+        int32_t displayX = item.GetRawDisplayX();
+        int32_t displayY = item.GetRawDisplayY();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         WIN_MGR->ReverseXY(displayX, displayY);
 #endif // OHOS_BUILD_ENABLE_TOUCH

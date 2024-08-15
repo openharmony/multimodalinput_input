@@ -31,7 +31,11 @@
 #include "app_debug_listener.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
+#include "dfx_define.h"
+#include "dfx_dump_catcher.h"
 #include "dfx_hisysevent.h"
+#include "dfx_json_formatter.h"
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -60,8 +64,11 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
+#include "watchdog_task.h"
+#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
+
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -82,17 +89,32 @@ MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
-constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
-constexpr int32_t WATCHDOG_WARNTIME { 6000 };
-constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_WARNTIME { 6000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
-constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
+[[ maybe_unused ]] constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
+constexpr size_t MAX_FRAME_NUMS { 100 };
+constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
+const std::set<int32_t> g_keyCodeValueSet = {
+    KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
+    KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_TAB, KeyEvent::KEYCODE_ENTER,
+    KeyEvent::KEYCODE_DEL, KeyEvent::KEYCODE_MENU, KeyEvent::KEYCODE_PAGE_UP, KeyEvent::KEYCODE_PAGE_DOWN,
+    KeyEvent::KEYCODE_ESCAPE, KeyEvent::KEYCODE_FORWARD_DEL, KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT,
+    KeyEvent::KEYCODE_CAPS_LOCK, KeyEvent::KEYCODE_SCROLL_LOCK, KeyEvent::KEYCODE_META_LEFT,
+    KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SYSRQ, KeyEvent::KEYCODE_BREAK, KeyEvent::KEYCODE_MOVE_HOME,
+    KeyEvent::KEYCODE_MOVE_END, KeyEvent::KEYCODE_INSERT, KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_F2,
+    KeyEvent::KEYCODE_F3, KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_F7,
+    KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
+    KeyEvent::KEYCODE_NUM_LOCK
+};
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -379,7 +401,7 @@ void MMIService::OnStart()
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     });
-    auto taskFunc = [this]() {
+    [[ maybe_unused ]] auto taskFunc = [this]() {
         if (threadStatusFlag_) {
             MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;
@@ -1396,6 +1418,13 @@ int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<in
     auto keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     pressedKeys = keyEvent->GetPressedKeys();
+    for (auto iter = pressedKeys.begin(); iter != pressedKeys.end();) {
+        if (g_keyCodeValueSet.find(*iter) == g_keyCodeValueSet.end()) {
+            iter = pressedKeys.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
     specialKeysState[KeyEvent::KEYCODE_CAPS_LOCK] =
         static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
     specialKeysState[KeyEvent::KEYCODE_SCROLL_LOCK] =
@@ -1761,7 +1790,8 @@ void MMIService::OnThread()
             CHKPC(mmiEd);
             epoll_event event = ev[i];
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
-                libinputAdapter_.EventDispatch(mmiEd->fd);
+                CalculateFuntionRunningTime([this, &mmiEd] () { libinputAdapter_.EventDispatch(mmiEd->fd); },
+                    "EPOLL_EVENT_INPUT");
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "MMI:EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
@@ -2669,8 +2699,6 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
         MMI_HILOGE("Get hardware cursor stats failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("GetHardwareCursorStats frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
@@ -2777,17 +2805,27 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    static int32_t BLOCK_TIME = 10;
-    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr,
-        HiviewDFX::XCOLLIE_FLAG_LOG);
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, THREAD_BLOCK_TIMER_SPAN_S,
+        getpid(), gettid());
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, THREAD_BLOCK_TIMER_SPAN_S, printLog, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
-void MMIService::PrintLog(const std::string &flag, int32_t duration)
+void MMIService::PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid)
 {
-    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
+    std::string dfxThreadBlockMsg { "MMIBlockTask name:" };
+    dfxThreadBlockMsg += flag;
+    dfxThreadBlockMsg += ", duration time:";
+    dfxThreadBlockMsg += std::to_string(duration);
+    dfxThreadBlockMsg += ", pid:";
+    dfxThreadBlockMsg += std::to_string(pid);
+    dfxThreadBlockMsg += ", tid:";
+    dfxThreadBlockMsg += std::to_string(tid);
+    MMI_HILOGW("DfxThreadBlockMsg:%{public}s", dfxThreadBlockMsg.c_str());
+    OHOS::HiviewDFX::DfxDumpCatcher dumpCatcher;
+    dumpCatcher.DumpCatch(pid, tid, dfxThreadBlockMsg, MAX_FRAME_NUMS, false);
 }
 
 int32_t MMIService::SkipPointerLayer(bool isSkip)
@@ -2805,6 +2843,18 @@ int32_t MMIService::SkipPointerLayer(bool isSkip)
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
+}
+
+int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
+                                                        InputHandler, std::ref(timeInterval)));
+    MMI_HILOGD("timeInterval:%{public}" PRId64, timeInterval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

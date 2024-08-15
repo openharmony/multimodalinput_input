@@ -238,7 +238,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
                 keyEvent->GetEventType(), keyEvent->GetFlag());
         } else {
             MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-                "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+                "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
                 "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
             subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
             keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
@@ -246,7 +246,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         }
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-            "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+            "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
             "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
