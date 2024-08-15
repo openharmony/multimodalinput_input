@@ -252,6 +252,20 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatRate(napi_env env, napi_value 
     return ret;
 }
 
+napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    auto callback = [cb] (int64_t timeInterval) { return EmitJsGetIntervalSinceLastInput(cb, timeInterval); };
+    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+    }
+    return ret;
+}
+
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_DEBUG_ENTER;

@@ -1552,3 +1552,18 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     g_pointerInterceptorCallback = nullptr;
     return retCode;
 }
+
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
+    std::promise<int64_t> prom;
+    auto fut = prom.get_future();
+    auto callback = [&prom](int64_t interval) {
+        MMI_HILOGD("GetIntervalSinceLastInputCallback interval:%{public}" PRId64, interval);
+        prom.set_value(interval);
+    };
+    OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(callback);
+    *intervalSinceLastInput = fut.get();
+    return INPUT_SUCCESS;
+}
