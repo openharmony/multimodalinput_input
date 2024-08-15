@@ -89,16 +89,16 @@ MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
-constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
-constexpr int32_t WATCHDOG_WARNTIME { 6000 };
-constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_WARNTIME { 6000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
-constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
+[[ maybe_unused ]] constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
@@ -401,7 +401,7 @@ void MMIService::OnStart()
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     });
-    auto taskFunc = [this]() {
+    [[ maybe_unused ]] auto taskFunc = [this]() {
         if (threadStatusFlag_) {
             MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;

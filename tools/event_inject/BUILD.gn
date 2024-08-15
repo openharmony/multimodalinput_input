@@ -31,8 +31,6 @@ config("event_injection_public_config") {
     "include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
-    "//third_party/cJSON",
-    "//third_party/FreeBSD/sys/dev/evdev",
   ]
 }
 
@@ -53,10 +51,11 @@ ohos_source_set("event-injection") {
     "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
     "${mmi_path}/service/filter:mmi_event_filter_service",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
+    "FreeBSD:ld128_static",
+    "cJSON:cjson",
     "c_utils:utils",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
@@ -106,8 +105,6 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
-    "//third_party/cJSON",
-    "//third_party/googletest/googletest/include",
   ]
 
   sources = [
@@ -130,13 +127,13 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
@@ -159,6 +156,8 @@ ohos_executable("mmi-event-injection") {
     "${mmi_path}/util:libmmi-util",
   ]
   external_deps = [
+    "FreeBSD:ld128_static",
+    "cJSON:cjson",
     "c_utils:utils",
     "libinput:libinput-third-mmi",
   ]
