@@ -1178,7 +1178,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     bool isHandled = HandleShortKeys(key);
-    if (isFreezePowerKey_ && key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && isFreezePowerKey_) {
         MMI_HILOGI("Freeze power key");
         return true;
     }
@@ -2060,6 +2060,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
             isFreezePowerKey_ = true;
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
+                MMI_HILOGW("Timeout, restore the power button");
             });
             if (sosDelayTimerId_ < 0) {
                 MMI_HILOGE("Add timer failed");
