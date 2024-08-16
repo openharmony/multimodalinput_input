@@ -2377,8 +2377,10 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 
 void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
 {
-    if (windowStatecallback_ == nullptr) {
+    if (windowStatecallback_ != nullptr) {
         windowStatecallback_(pid, windowId);
+    } else {
+        MMI_HILOGE("Window state callback is null");
     }
 }
 
