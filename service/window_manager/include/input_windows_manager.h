@@ -175,6 +175,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
+    void CleanInvalidPiexMap();
 
 private:
     void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
