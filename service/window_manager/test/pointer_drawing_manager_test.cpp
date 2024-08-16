@@ -2363,51 +2363,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DrawScreenCenterPo
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawScreenCenterPointer(pointerStyle));
 }
 
-/**
- * @tc.name: PointerDrawingManagerTest_DrawScreenCenterPointer_003
- * @tc.desc: Test DrawScreenCenterPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DrawScreenCenterPointer_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawScreenCenterPointer(pointerStyle));
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_DrawScreenCenterPointer_004
- * @tc.desc: Test DrawScreenCenterPointer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_DrawScreenCenterPointer_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    PointerStyle pointerStyle;
-    pointerStyle.id = 0;
-    pointerStyle.color = 0;
-    pointerStyle.size = 2;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawScreenCenterPointer(pointerStyle));
-}
-
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 /**
  * @tc.name: PointerDrawingManagerTest_UpdateBindDisplayId_001

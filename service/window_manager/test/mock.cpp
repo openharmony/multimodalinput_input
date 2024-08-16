@@ -371,6 +371,9 @@ int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
 {
     return 0;
 }
+void PointerDrawingManager::DestroyPointerWindow()
+{
+}
 void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle &pointerStyle)
 {}
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;

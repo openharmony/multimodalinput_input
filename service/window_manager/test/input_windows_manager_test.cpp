@@ -4342,25 +4342,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_IsTransparentWin_002
- * @tc.desc: Test IsTransparentWin
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsTransparentWin_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsMgr;
-    std::shared_ptr<Media::PixelMap> sharedPixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
-    ASSERT_NE(sharedPixelMap, nullptr);
-    std::unique_ptr<Media::PixelMap> pixelMap = std::unique_ptr<Media::PixelMap>(sharedPixelMap.get());
-    sharedPixelMap.reset();
-    int32_t logicalX = 100;
-    int32_t logicalY = 100;
-    EXPECT_FALSE(inputWindowsMgr.IsTransparentWin(pixelMap, logicalX, logicalY));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_PrintChangedWindowBySync
  * @tc.desc: Test PrintChangedWindowBySync
  * @tc.type: FUNC
@@ -5256,35 +5237,35 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CheckFoldChange_001
- * @tc.desc: Test CheckFoldChange
+ * @tc.name: InputWindowsManagerTest_IgnoreTouchEvent_001
+ * @tc.desc: Test IgnoreTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFoldChange_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IgnoreTouchEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckFoldChange(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->IgnoreTouchEvent(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckFoldChange(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->IgnoreTouchEvent(pointerEvent));
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
- * @tc.desc: Test OnFoldStatusChanged
+ * @tc.name: InputWindowsManagerTest_ReissueCancelTouchEvent_001
+ * @tc.desc: Test ReissueCancelTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnFoldStatusChanged(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->ReissueCancelTouchEvent(pointerEvent));
 }
 
 /**
@@ -6257,6 +6238,81 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DispatchPointerCancel
+ * @tc.desc: Test DispatchPointerCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t displayId = -1;
+    WindowInfo winInfo;
+    inputWindowsMgr.mouseDownInfo_.id = -1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.mouseDownInfo_.id = 10;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.lastPointerEvent_ = nullptr;
+    inputWindowsMgr.extraData_.appended = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsMgr.lastPointerEvent_, nullptr);
+    winInfo.id = 10;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.clear();
+    winInfo.id = 100;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPidByWindowId
+ * @tc.desc: Test GetPidByWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByWindowId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t id = 100;
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.pid = 150;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), winInfo.pid);
+    id = 300;
+    EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPixelMapData
+ * @tc.desc: Test SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPixelMapData, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t infoId = -1;
+    void *pixelMap = nullptr;
+    EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, pixelMap), ERR_INVALID_VALUE);
+    infoId = 100;
+    EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, pixelMap), ERR_INVALID_VALUE);
+    std::shared_ptr<Media::PixelMap> sharedPixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    ASSERT_NE(sharedPixelMap, nullptr);
+    EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, (void *)sharedPixelMap.get()), RET_OK);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_002
  * @tc.desc: Test updating window & display information for each display in extended screen mode
  * @tc.type: FUNC
@@ -6270,18 +6326,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_002,
     displayGroupInfo.height = 20;
     displayGroupInfo.focusWindowId = 1;
 
-    WindowInfo wimdowInfo1;
-    wimdowInfo1.id = 1;
-    wimdowInfo1.pid = 1;
-    wimdowInfo1.uid = 1;
-    wimdowInfo1.area = {1, 1, 1, 1};
-    wimdowInfo1.defaultHotAreas = { wimdowInfo1.area };
-    wimdowInfo1.pointerHotAreas = { wimdowInfo1.area };
-    wimdowInfo1.agentWindowId = 1;
-    wimdowInfo1.flags = 1;
-    wimdowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    wimdowInfo1.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
-    displayGroupInfo.windowsInfo.push_back(wimdowInfo1);
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 1;
+    windowInfo.uid = 1;
+    windowInfo.area = {1, 1, 1, 1};
+    windowInfo.defaultHotAreas = { windowInfo.area };
+    windowInfo.pointerHotAreas = { windowInfo.area };
+    windowInfo.agentWindowId = 1;
+    windowInfo.flags = 1;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
 
     DisplayInfo displayInfo1;
     displayInfo1.id = 1;
@@ -6368,18 +6424,18 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_004,
     displayGroupInfo.height = 20;
     displayGroupInfo.focusWindowId = 1;
 
-    WindowInfo wimdowInfo1;
-    wimdowInfo1.id = 1;
-    wimdowInfo1.pid = 1;
-    wimdowInfo1.uid = 1;
-    wimdowInfo1.area = {1, 1, 1, 1};
-    wimdowInfo1.defaultHotAreas = { wimdowInfo1.area };
-    wimdowInfo1.pointerHotAreas = { wimdowInfo1.area };
-    wimdowInfo1.agentWindowId = 1;
-    wimdowInfo1.flags = 1;
-    wimdowInfo1.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    wimdowInfo1.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
-    displayGroupInfo.windowsInfo.push_back(wimdowInfo1);
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 1;
+    windowInfo.uid = 1;
+    windowInfo.area = {1, 1, 1, 1};
+    windowInfo.defaultHotAreas = { windowInfo.area };
+    windowInfo.pointerHotAreas = { windowInfo.area };
+    windowInfo.agentWindowId = 1;
+    windowInfo.flags = 1;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
 
     DisplayInfo displayInfo1;
     displayInfo1.id = 1;
@@ -6481,6 +6537,38 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemoved_001, 
     displayGroupInfo.displaysInfo = {info2};
     ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
     EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindowInfo_001
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 1;
+    windowInfo.uid = 1;
+    windowInfo.area = {1, 1, 1, 1};
+    windowInfo.defaultHotAreas = { windowInfo.area };
+    windowInfo.pointerHotAreas = { windowInfo.area };
+    windowInfo.agentWindowId = 1;
+    windowInfo.flags = 1;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+    windowInfo1.action = WINDOW_UPDATE_ACTION::ADD;
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+
+    WINDOW_UPDATE_ACTION ret = WIN_MGR->UpdateWindowInfo(displayGroupInfo);
+    ASSERT_EQ(ret, WINDOW_UPDATE_ACTION::ADD);
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI

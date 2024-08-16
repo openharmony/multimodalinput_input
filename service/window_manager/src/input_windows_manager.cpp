@@ -779,8 +779,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
     windowsPerDisplay_ = windowsPerDisplay;
 }
 
-
-void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
+WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo)
 {
     auto action = WINDOW_UPDATE_ACTION::ADD_END;
     if (!displayGroupInfo.windowsInfo.empty()) {
@@ -794,11 +793,33 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
     });
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    for (auto &windowInfo : displayGroupInfo.windowsInfo) {
+        auto displayInfo = GetPhysicalDisplay(windowInfo.displayId);
+        CHKPR(displayInfo, action);
+        windowInfo.area.x += displayInfo->x;
+        windowInfo.area.y += displayInfo->y;
+        for (auto &area : windowInfo.defaultHotAreas) {
+            area.x += displayInfo->x;
+            area.y += displayInfo->y;
+        }
+        for (auto &area : windowInfo.pointerHotAreas) {
+            area.x += displayInfo->x;
+            area.y += displayInfo->y;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    return action;
+}
+
+void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
+{
+    auto action = UpdateWindowInfo(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     bool isDisplayRemoved = OnDisplayRemoved(displayGroupInfo);
-#endif // #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
@@ -2412,11 +2433,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     DispatchUIExtentionPointerEvent(logicalX, logicalY, pointerEvent);
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
+#ifndef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (!(touchWindow->transform.empty())) {
         auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     windowX = static_cast<int32_t>(windowX);
     windowY = static_cast<int32_t>(windowY);
     pointerItem.SetWindowX(windowX);
