@@ -256,7 +256,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo, bool isDisplayRemoved = false);
 bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -304,6 +304,10 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     void UpdateDisplayMode();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
+    bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     UDSServer* udsServer_ { nullptr };

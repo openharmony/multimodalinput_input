@@ -107,6 +107,7 @@ public:
     void InitPointerObserver() override;
     void OnSessionLost(int32_t pid) override;
     int32_t SkipPointerLayer(bool isSkip) override;
+    void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -153,6 +154,9 @@ private:
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
     void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    void UpdateBindDisplayId(int32_t displayId);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     struct PidInfo {
@@ -194,6 +198,7 @@ private:
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+    int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
 };
 } // namespace MMI
 } // namespace OHOS

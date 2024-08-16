@@ -142,6 +142,7 @@ public:
     {
         return 0;
     }
+    virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
