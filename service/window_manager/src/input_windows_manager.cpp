@@ -509,6 +509,9 @@ std::vector<std::pair<int32_t, TargetInfo>> InputWindowsManager::GetPidAndUpdate
         return secSubWindows;
     }
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    UpdateKeyEventDisplayId(keyEvent, focusWindowId);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     bool isUIExtention = false;
@@ -793,6 +796,9 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     });
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool isDisplayRemoved = OnDisplayRemoved(displayGroupInfo);
+#endif // #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
@@ -812,12 +818,15 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         UpdatePointerChangeAreas(displayGroupInfo);
     }
-
     InitPointerStyle();
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (!displayGroupInfo.displaysInfo.empty() && pointerDrawFlag_) {
         AdjustDisplayRotation();
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, isDisplayRemoved);
+#else
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     }
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     UpdateDisplayMode();
@@ -880,7 +889,8 @@ void InputWindowsManager::UpdateDisplayMode()
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo,
+    bool isDisplayRemoved)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
     CHKPV(lastPointerEvent_);
@@ -923,7 +933,11 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
-        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+        if (!isDisplayRemoved) {
+            IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+        } else {
+            IPointerDrawingManager::GetInstance()->DrawScreenCenterPointer(dragPointerStyle_);
+        }
     }
 }
 
@@ -4077,5 +4091,29 @@ bool InputWindowsManager::IsKnuckleOnAncoWindow(std::shared_ptr<PointerEvent> po
     return IsAncoWindowFocus(*windowInfo);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void InputWindowsManager::UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId)
+{
+    CHKPV(keyEvent);
+    for (const auto &item : windowsPerDisplay_) {
+        if (item.second.focusWindowId == focusWindowId) {
+            keyEvent->SetTargetDisplayId(item.second.displayId);
+        }
+    }
+    if (!displayGroupInfo_.displaysInfo.empty()) {
+        keyEvent->SetTargetDisplayId(displayGroupInfo_.displaysInfo[0].id);
+    }
+}
+
+bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo)
+{
+    if (displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
+        ResetCursorPos();
+        return true;
+    }
+    return false;
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
