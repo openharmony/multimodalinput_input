@@ -2582,7 +2582,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputEventFilter_111, TestSize.L
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubAddInputEventFilter(data, reply);
     int32_t returnCode = -201;
     EXPECT_EQ(ret, returnCode);
@@ -2600,7 +2599,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventFilter_111, TestSiz
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubRemoveInputEventFilter(data, reply);
     int32_t returnCode = -201;
     EXPECT_EQ(ret, returnCode);
@@ -2618,7 +2616,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_111, TestSize.Le
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubSetPointerLocation(data, reply);
     int32_t returnCode = -201;
     EXPECT_EQ(ret, returnCode);
@@ -2636,7 +2633,6 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAuthorize_111, TestSize.Level1)
     std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubAuthorize(data, reply);
     int32_t returnCode = -201;
     EXPECT_EQ(ret, returnCode);
