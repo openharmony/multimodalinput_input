@@ -1306,6 +1306,8 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:FR:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK:
             return "P:FC:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL:
+            return "P:FCA:";
         case PointerEvent::POINTER_ACTION_UNKNOWN:
             return "P:UK:";
         default:

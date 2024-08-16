@@ -59,6 +59,7 @@ constexpr int32_t FINGERPRINT_UP { 1 };
 constexpr int32_t FINGERPRINT_SLIDE { 2 };
 constexpr int32_t FINGERPRINT_RETOUCH { 3 };
 constexpr int32_t FINGERPRINT_CLICK { 4 };
+constexpr int32_t FINGERPRINT_CANCEL { 5 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -760,6 +761,9 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         }
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK: {
             return FINGERPRINT_CLICK;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL: {
+            return FINGERPRINT_CANCEL;
         }
         default: {
             MMI_HILOGE("wrong action is %{public}d", action);
@@ -1708,9 +1712,10 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
-        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
-        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
-            return true;
+        ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
+        return true;
     }
     MMI_HILOGD("not fingerprint event");
     return false;
