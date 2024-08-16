@@ -586,12 +586,10 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
+    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE ||
-        singleKnuckleGesture_.state) {
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         ResetKnuckleGesture();
         return;
@@ -607,6 +605,10 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
     }
     if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
+    if (CheckInputMethodArea(touchEvent)) {
+        MMI_HILOGI("In input method area, skip");
         return;
     }
     int32_t touchAction = touchEvent->GetPointerAction();
