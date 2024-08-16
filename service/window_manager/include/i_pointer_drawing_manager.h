@@ -24,6 +24,7 @@
 #include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"
+#include "delegate_interface.h"
 
 namespace OHOS {
 namespace MMI {
@@ -142,6 +143,8 @@ public:
     {
         return 0;
     }
+    virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
+    virtual void DestroyPointerWindow() {}
     virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
