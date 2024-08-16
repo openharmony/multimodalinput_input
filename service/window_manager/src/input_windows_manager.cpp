@@ -4047,7 +4047,7 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
 
 void InputWindowsManager::CleanInvalidPiexMap()
 {
-    for(auto it = transparentWins_.begin(); it != transparentWins_.end();) {
+    for (auto it = transparentWins_.begin(); it != transparentWins_.end();) {
         int32_t windowId = it->first;
         auto iter = std::find_if(displayGroupInfo_.windowsInfo.begin(), displayGroupInfo_.windowsInfo.end(),
             [windowId](const auto &window) {
