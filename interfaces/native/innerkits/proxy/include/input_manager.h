@@ -944,6 +944,7 @@ public:
 
     int32_t SkipPointerLayer(bool isSkip);
 
+    int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
     /**
      * @brief Get Interval Since Last Input.
      * @param callback Callback used to return the time interval.
