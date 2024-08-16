@@ -41,10 +41,8 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
 
 void GetIntervalSinceLastInputFuzzTest(const uint8_t* data, size_t size)
 {
-    auto fun = [](int64_t timeInterval) {
-        MMI_HILOGD("Get Interval Since Last Input success,timeInterval:%{public}" PRId64, timeInterval);
-    };
-    InputManager::GetInstance()->GetIntervalSinceLastInput(fun);
+    int64_t timeInterval = 0;
+    InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
 }
 } // namespace MMI
 } // namespace OHOS

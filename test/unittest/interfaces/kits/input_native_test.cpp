@@ -1724,9 +1724,10 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
  */
 HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
 {
-    int64_t *intervalSinceLastInput = nullptr;
+    int64_t *intervalSinceLastInput = static_cast<int64_t *>(malloc(sizeof(int64_t)));
     int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    free(intervalSinceLastInput);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
 } // namespace MMI
 } // namespace OHOS
