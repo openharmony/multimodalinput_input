@@ -343,6 +343,22 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     // 1.Determine whether the key event is a focus type event or an operation type event,
     // 2.Determine whether the current focus window has a safety sub window.
     auto secSubWindowTargets = WIN_MGR->UpdateTarget(key);
+    if (!secSubWindowTargets.empty()) {
+        auto focusWindowInfo = secSubWindowTargets.front();
+        auto udsServer = InputHandler->GetUDSServer();
+        auto pid = WIN_MGR->GetPidByWindowId(focusWindowInfo.second.id);
+        if (udsServer->GetSession(focusWindowInfo.first) == nullptr && pid != -1 && focusWindowInfo.second.id != -1) {
+            if (focusWindowInfo.second.id == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
+                if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
+                    SendWindowStateError(pid, focusWindowInfo.second.id);
+                }
+            } else {
+                windowStateErrorInfo_.windowId = focusWindowInfo.second.id;
+                windowStateErrorInfo_.startTime = GetSysClockTime();
+                windowStateErrorInfo_.pid = pid;
+            }
+        }
+    }
     for (const auto &item : secSubWindowTargets) {
         key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
         if (item.second.privacyMode == SecureFlag::PRIVACY_MODE) {
