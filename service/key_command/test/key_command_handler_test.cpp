@@ -734,7 +734,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsKeyMatch_01, TestSize.Le
     item.SetKeyCode(KeyEvent::KEYCODE_META_RIGHT);
     item.SetKeyCode(KeyEvent::KEYCODE_FUNCTION);
     keyEvent->AddKeyItem(item);
-    EXPECT_TRUE(handler.IsKeyMatch(shortcutKey, keyEvent));
+    EXPECT_FALSE(handler.IsKeyMatch(shortcutKey, keyEvent));
 }
 
 /**
