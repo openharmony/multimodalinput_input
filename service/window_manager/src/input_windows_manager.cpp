@@ -4004,7 +4004,7 @@ int32_t InputWindowsManager::GetWindowStateNotifyPid()
     return windowStateNotifyPid_;
 }
 
-int32_t InputWindowsManager::WindowIdGetPid(int32_t id)
+int32_t InputWindowsManager::GetPidByWindowId(int32_t id)
 {
     for (auto item : displayGroupInfo_.windowsInfo) {
         if (item.id== id) {
