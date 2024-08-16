@@ -670,6 +670,72 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_002
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    std::vector<ShortcutKey> upAbilities;
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = -1;
+    shortcutKey.keyDownDuration = 0;
+    EXPECT_FALSE(handler.IsKeyMatch(shortcutKey, keyEvent));
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+
+    shortcutKey.businessId = "V1";
+    int32_t delay = handler.GetKeyDownDurationFromXml(shortcutKey.businessId);
+    delay = 100;
+    EXPECT_TRUE(delay >= MIN_SHORT_KEY_DOWN_DURATION);
+    EXPECT_TRUE(delay <= MAX_SHORT_KEY_DOWN_DURATION);
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+
+    delay = 5000;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+    EXPECT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
+    shortcutKey.keyDownDuration = 100;
+    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_003
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_003, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    std::vector<ShortcutKey> upAbilities;
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 2076;
+    shortcutKey.keyDownDuration = 0;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN; 
+    keyEvent->keyCode_ = 2076;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    shortcutKey.preKeys = {2076, 2077}; 
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    item.SetKeyCode(KeyEvent::KEYCODE_META_RIGHT);
+    item.SetKeyCode(KeyEvent::KEYCODE_FUNCTION);
+    keyEvent->AddKeyItem(item);
+    EXPECT_TRUE(handler.IsKeyMatch(shortcutKey, keyEvent));
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_01
  * @tc.desc: Test the funcation StartTwoFingerGesture
  * @tc.type: FUNC
