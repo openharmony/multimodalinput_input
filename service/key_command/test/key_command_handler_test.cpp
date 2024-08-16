@@ -48,7 +48,7 @@ constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int32_t TWO_FINGERS_DISTANCE_LIMIT = 16;
-constexpr int32_t TOUCH_LIFT_LIMIT = 24
+constexpr int32_t TOUCH_LIFT_LIMIT = 24;
 constexpr int32_t TOUCH_RIGHT_LIMIT = 24;
 constexpr int32_t TOUCH_TOP_LIMIT = 80;
 constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
@@ -707,78 +707,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_002, Test
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_003
- * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.name: KeyCommandHandlerTest_IsKeyMatch_01
+ * @tc.desc: Test the funcation IsKeyMatch
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_003, TestSize.Level1)
-{
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    ShortcutKey shortcutKey;
-    std::vector<ShortcutKey> upAbilities;
-    shortcutKey.statusConfigValue = true;
-    shortcutKey.finalKey = 2076;
-    shortcutKey.keyDownDuration = 0;
-    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN; 
-    keyEvent->keyCode_ = 2076;
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-
-    shortcutKey.preKeys = {2076, 2077}; 
-    KeyEvent::KeyItem item;
-    item.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
-    item.SetKeyCode(KeyEvent::KEYCODE_META_RIGHT);
-    item.SetKeyCode(KeyEvent::KEYCODE_FUNCTION);
-    keyEvent->AddKeyItem(item);
-    EXPECT_TRUE(handler.IsKeyMatch(shortcutKey, keyEvent));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_002
- * @tc.desc: Test the funcation MatchShortcutKey
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_002, TestSize.Level1)
-{
-    KeyCommandHandler handler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    ShortcutKey shortcutKey;
-    std::vector<ShortcutKey> upAbilities;
-    shortcutKey.statusConfigValue = true;
-    shortcutKey.finalKey = -1;
-    shortcutKey.keyDownDuration = 0;
-    EXPECT_FALSE(handler.IsKeyMatch(shortcutKey, keyEvent));
-    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
-
-    shortcutKey.businessId = "V1";
-    int32_t delay = handler.GetKeyDownDurationFromXml(shortcutKey.businessId);
-    delay = 100;
-    EXPECT_TRUE(delay >= MIN_SHORT_KEY_DOWN_DURATION);
-    EXPECT_TRUE(delay <= MAX_SHORT_KEY_DOWN_DURATION);
-    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
-
-    delay = 5000;
-    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
-    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
-
-    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
-    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
-    EXPECT_TRUE(handler.HandleKeyUp(keyEvent, shortcutKey));
-    shortcutKey.keyDownDuration = 100;
-    EXPECT_FALSE(handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities));
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_003
- * @tc.desc: Test the funcation MatchShortcutKey
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_003, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsKeyMatch_01, TestSize.Level1)
 {
     KeyCommandHandler handler;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
