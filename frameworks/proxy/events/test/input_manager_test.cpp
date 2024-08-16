@@ -3235,7 +3235,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int64_t timeInterval = 0;
+    int64_t timeInterval = -1;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval));
 }
 
