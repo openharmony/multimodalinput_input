@@ -4052,7 +4052,7 @@ void InputWindowsManager::CleanInvalidPiexMap()
         auto iter = std::find_if(displayGroupInfo_.windowsInfo.begin(), displayGroupInfo_.windowsInfo.end(),
             [windowId](const auto &window) {
                 return window.id == windowId;
-            });
+        });
         if (iter == displayGroupInfo_.windowsInfo.end()) {
             it = transparentWins_.erase(it);
         } else {
