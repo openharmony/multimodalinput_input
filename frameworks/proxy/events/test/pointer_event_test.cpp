@@ -1754,7 +1754,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_MarkProcessed_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
-
     auto callback = [](int a, int b) {};
     inputEvent->processedCallback_ = callback;
     inputEvent->processedCallback_(10, 20);
