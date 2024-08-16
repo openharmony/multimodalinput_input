@@ -258,7 +258,7 @@ napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env)
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, nullptr, cb);
-    int64_t timeInterval = 0;
+    int64_t timeInterval = -1;
     InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
     EmitJsGetIntervalSinceLastInput(cb, timeInterval);
     return ret;
