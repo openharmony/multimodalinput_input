@@ -1338,6 +1338,18 @@ void InputManagerImpl::OnConnected()
     SendEnhanceConfig();
     PrintEnhanceConfig();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+    if (windowStatecallback_ != nullptr) {
+        MMIClientPtr client = MMIEventHdl.GetMMIClient();
+        if (client != nullptr) {
+            NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
+            if (!client->SendMessage(pkt)) {
+                MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+            }
+        } else {
+            MMI_HILOGE("Get client failed");
+        }
+    }
     if (anrObservers_.empty()) {
         return;
     }
@@ -1423,6 +1435,21 @@ int32_t InputManagerImpl::SendWindowInfo()
         MMI_HILOGE("Pack window group info failed");
         return ret;
     }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
+    windowStatecallback_ = callback;
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPR(client, RET_ERR);
+    NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
@@ -2346,6 +2373,13 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
 int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
+}
+
+void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
+{
+    if (windowStatecallback_ == nullptr) {
+        windowStatecallback_(pid, windowId);
+    }
 }
 
 int32_t InputManagerImpl::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
