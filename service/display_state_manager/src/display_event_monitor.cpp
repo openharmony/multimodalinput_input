@@ -71,6 +71,7 @@ public:
             DISPLAY_MONITOR->SetScreenStatus(action);
             CHKPV(FINGERSENSE_WRAPPER);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
+                MMI_HILOGI("Disable fingersense")
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
