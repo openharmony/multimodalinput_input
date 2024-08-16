@@ -4053,11 +4053,11 @@ void InputWindowsManager::CleanInvalidPiexMap()
             [windowId](const auto &window) {
                 return window.id == windowId;
             });
-            if (iter == displayGroupInfo_.windowsInfo.end()) {
-                it = transparentWins_.erase(it);
-            } else {
-                ++it;
-            }
+        if (iter == displayGroupInfo_.windowsInfo.end()) {
+            it = transparentWins_.erase(it);
+        } else {
+            ++it;
+        }
     }
 }
 
