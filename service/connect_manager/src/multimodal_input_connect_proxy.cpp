@@ -217,7 +217,7 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
 }
 
 int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
-    void* pixelMap)
+    void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, ERR_INVALID_VALUE);
@@ -249,7 +249,7 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, ERR_INVALID_VALUE);
@@ -1948,6 +1948,7 @@ int32_t MultimodalInputConnectProxy::TransmitInfrared(int64_t number, std::vecto
 }
 
 int32_t MultimodalInputConnectProxy::SetPixelMapData(int32_t infoId, void* pixelMap)
+    __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     CHKPR(pixelMap, RET_ERR);
