@@ -48,7 +48,7 @@ public:
     napi_value SetKeyboardRepeatRate(napi_env env, int32_t rate, napi_value handle = nullptr);
     napi_value GetKeyboardRepeatDelay(napi_env env, napi_value handle = nullptr);
     napi_value GetKeyboardRepeatRate(napi_env env, napi_value handle = nullptr);
-    napi_value GetIntervalSinceLastInput(napi_env env, napi_value handle = nullptr);
+    napi_value GetIntervalSinceLastInput(napi_env env);
 };
 } // namespace MMI
 } // namespace OHOS
