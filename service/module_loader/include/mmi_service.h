@@ -168,6 +168,9 @@ public:
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+    int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
+
 protected:
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;

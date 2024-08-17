@@ -287,6 +287,10 @@ public:
         return skipMouseLayer_;
     }
 
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override
+    {
+        return getAllSystemHotkeys_;
+    }
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
     int32_t size_ = 0;
@@ -327,6 +331,7 @@ public:
     int32_t skipMouseLayer_ = 0;
     int32_t retSetPointerStyle_ = 0;
     int32_t retSetCurrentUser_ = 0;
+    int32_t getAllSystemHotkeys_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
