@@ -3287,5 +3287,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     ASSERT_EQ(result, RET_OK);
     EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
 }
+
+/**
+ * @tc.name: InputManagerTest_GetAllSystemHotkey
+ * @tc.desc: Obtains all hot keys supported by the system.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetAllSystemHotkey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
