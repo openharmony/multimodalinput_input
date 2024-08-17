@@ -631,9 +631,9 @@ int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_
     return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
 }
 
-int32_t InputManager::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
-    return InputMgrImpl.GetIntervalSinceLastInput(callback);
+    return InputMgrImpl.GetIntervalSinceLastInput(timeInterval);
 }
 } // namespace MMI
 } // namespace OHOS
