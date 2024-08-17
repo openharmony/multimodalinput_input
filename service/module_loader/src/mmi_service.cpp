@@ -2907,8 +2907,9 @@ void MMIService::InitPrintClientInfo()
         }
         if (!childThreadClient.first.empty()) {
             MMI_HILOGI("The application main thread and event reading thread are separated, programName:%{public}s, "
-                "pid:%{public}d, readThreadId:%{public}" PRIu64, childThreadClient.first.c_str(),
-                childThreadClient.second.pid, childThreadClient.second.readThreadId);
+                "pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                childThreadClient.first.c_str(), childThreadClient.second.pid, childThreadClient.second.pid,
+                childThreadClient.second.readThreadId);
         }
     });
     std::function<void(SessionPtr)> callback = [this](SessionPtr sess) {
