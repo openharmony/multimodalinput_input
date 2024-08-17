@@ -129,10 +129,10 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_01, TestS
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    uint32_t tokenId = 5;
-    std::string permissionCode = "access denied";
+    uint32_t tokenId = 2;
+    std::string permissionCode = "access";
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
     bool result = PER_HELPER->CheckHapPermission(tokenId, permissionCode);
     ASSERT_FALSE(result);
 }
@@ -146,6 +146,40 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_02, TestS
 HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_03, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    uint32_t tokenId = 6;
+    std::string permissionCode = "access";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result = PER_HELPER->CheckHapPermission(tokenId, permissionCode);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_04
+ * @tc.desc: Test CheckHapPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 5;
+    std::string permissionCode = "access denied";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_INVALID;
+    bool result = PER_HELPER->CheckHapPermission(tokenId, permissionCode);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_05
+ * @tc.desc: Test CheckHapPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
     uint32_t tokenId = 1;
     uint32_t required = 1;
     OHOS::Security::AccessToken::HapTokenInfo findInfo;
@@ -153,6 +187,60 @@ HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_03, TestS
     EXPECT_NE(ret, 0);
     bool result = PER_HELPER->CheckHapPermission(tokenId, required);
     ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_06
+ * @tc.desc: Test CheckHapPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    std::string permissionCode = "access";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_HAP;
+    bool result = PER_HELPER->CheckHapPermission(permissionCode);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_07
+ * @tc.desc: Test CheckHapPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_07, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 2;
+    std::string permissionCode = "access";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_NATIVE;
+
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, permissionCode);
+    ret = OHOS::Security::AccessToken::PERMISSION_GRANTED;
+    bool result = PER_HELPER->CheckHapPermission(permissionCode);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: PermissionHelperTest_CheckHapPermission_08
+ * @tc.desc: Test CheckHapPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PermissionHelperTest, PermissionHelperTest_CheckHapPermission_08, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t tokenId = 3;
+    std::string permissionCode = "access";
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    tokenType = OHOS::Security::AccessToken::TOKEN_SHELL;
+    bool result = PER_HELPER->CheckHapPermission(permissionCode);
+    ASSERT_TRUE(result);
 }
 
 /**
