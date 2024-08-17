@@ -3256,7 +3256,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSi
     int64_t timeInterval = 0;
     int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
     ASSERT_EQ(result, RET_OK);
-    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * NANOSECOND_TO_MILLISECOND));
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
 }
 
 /**
@@ -3285,7 +3285,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     int64_t timeInterval = 0;
     int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
     ASSERT_EQ(result, RET_OK);
-    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * NANOSECOND_TO_MILLISECOND));
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
 }
 } // namespace MMI
 } // namespace OHOS
