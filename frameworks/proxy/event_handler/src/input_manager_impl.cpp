@@ -591,7 +591,7 @@ int32_t InputManagerImpl::PackUiExtentionWindowInfo(const std::vector<WindowInfo
     return RET_OK;
 }
 
-int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
+int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
