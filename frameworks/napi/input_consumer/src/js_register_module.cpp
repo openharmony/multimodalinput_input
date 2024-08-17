@@ -434,6 +434,12 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value GetAllSystemHotkeys(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    return GetSystemHotkey(env);
+}
+
 static napi_value EnumConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -485,7 +491,8 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
         DECLARE_NAPI_FUNCTION("setShieldStatus", SetShieldStatus),
-        DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus)
+        DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus),
+        DECLARE_NAPI_FUNCTION("getAllSystemHotkeys", GetAllSystemHotkeys)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     if (CreateShieldMode(env, exports) == nullptr) {

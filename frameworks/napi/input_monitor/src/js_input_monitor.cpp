@@ -17,14 +17,16 @@
 
 #include <cinttypes>
 
+#include "securec.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
-#include "util_napi_value.h"
+#include "js_gesture_event.h"
 #include "napi_constants.h"
-#include "securec.h"
 #include "util_napi_error.h"
+#include "util_napi_value.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsInputMonitor"
@@ -59,6 +61,7 @@ constexpr int32_t FINGERPRINT_UP { 1 };
 constexpr int32_t FINGERPRINT_SLIDE { 2 };
 constexpr int32_t FINGERPRINT_RETOUCH { 3 };
 constexpr int32_t FINGERPRINT_CLICK { 4 };
+constexpr int32_t FINGERPRINT_CANCEL { 5 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -72,6 +75,7 @@ enum TypeName : int32_t {
     JOYSTICK = 7,
     FINGERPRINT = 8,
     SWIPE_INWARD = 9,
+    TOUCH_GESTURE = 10
 };
 
 std::map<std::string, int32_t> TO_GESTURE_TYPE = {
@@ -85,6 +89,7 @@ std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "joystick", JOYSTICK},
     { "fingerprint", FINGERPRINT},
     { "swipeInward", SWIPE_INWARD},
+    { "touchGesture", TOUCH_GESTURE},
 };
 
 struct MonitorInfo {
@@ -136,6 +141,10 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
 };
 
+std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
+    {"touchGesture", HANDLE_EVENT_TYPE_TOUCH_GESTURE},
+};
+
 void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
 {
     if (*monitorInfo != nullptr) {
@@ -149,12 +158,17 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
 }
 } // namespace
 
-int32_t InputMonitor::Start()
+int32_t InputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
+        auto it = TO_HANDLE_EVENT_TYPE.find(typeName.c_str());
+        if (it != TO_HANDLE_EVENT_TYPE.end()) {
+            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this(), it->second);
+        } else {
+            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
+        }
     }
     return monitorId_;
 }
@@ -209,7 +223,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             return;
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (typeName != "touch") {
+            if (typeName != "touch" && typeName != "touchGesture") {
                 return;
             }
             SetConsumeState(pointerEvent);
@@ -453,6 +467,34 @@ int32_t JsInputMonitor::GetAction(int32_t action) const
             return static_cast<int32_t>(JsTouchEvent::Action::PULL_UP);
         }
         default: {
+            return RET_ERR;
+        }
+    }
+}
+
+int32_t JsInputMonitor::GetGestureAction(int32_t action) const
+{
+    switch (action) {
+        case PointerEvent::TOUCH_ACTION_SWIPE_DOWN: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_DOWN);
+        }
+        case PointerEvent::TOUCH_ACTION_SWIPE_UP: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_UP);
+        }
+        case PointerEvent::TOUCH_ACTION_SWIPE_RIGHT: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_RIGHT);
+        }
+        case PointerEvent::TOUCH_ACTION_SWIPE_LEFT: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_LEFT);
+        }
+        case PointerEvent::TOUCH_ACTION_PINCH_OPENED: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::PINCH_OPENED);
+        }
+        case PointerEvent::TOUCH_ACTION_PINCH_CLOSEED: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::PINCH_CLOSED);
+        }
+        default: {
+            MMI_HILOGW("unknow action, action:%{public}d", action);
             return RET_ERR;
         }
     }
@@ -760,6 +802,9 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         }
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK: {
             return FINGERPRINT_CLICK;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL: {
+            return FINGERPRINT_CANCEL;
         }
         default: {
             MMI_HILOGE("wrong action is %{public}d", action);
@@ -1277,7 +1322,40 @@ int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerE
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
-int32_t JsInputMonitor::Start()
+int32_t JsInputMonitor::TransformGestureEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (SetNameProperty(jsEnv_, result, "action", GetGestureAction(pointerEvent->GetPointerAction())) != napi_ok) {
+        MMI_HILOGE("Set action property failed");
+        return RET_ERR;
+    }
+    napi_value pointers = nullptr;
+    CHKRR(napi_create_array(jsEnv_, &pointers), "napi_create_array is", RET_ERR);
+    std::vector<PointerEvent::PointerItem> pointerItems;
+    for (const auto &item : pointerEvent->GetPointerIds()) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(item, pointerItem)) {
+            MMI_HILOGE("Get pointer item failed");
+            return RET_ERR;
+        }
+        pointerItems.push_back(pointerItem);
+    }
+    uint32_t index = 0;
+    for (const auto &it : pointerItems) {
+        napi_value element = nullptr;
+        CHKRR(napi_create_object(jsEnv_, &element), "napi_create_object is", RET_ERR);
+        if (GetJsPointerItem(it, element) != RET_OK) {
+            MMI_HILOGE("Transform pointerItem failed");
+            return RET_ERR;
+        }
+        CHKRR(napi_set_element(jsEnv_, pointers, index, element), "napi_set_element is", RET_ERR);
+        ++index;
+    }
+    CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
+    return RET_OK;
+}
+
+int32_t JsInputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
@@ -1285,7 +1363,7 @@ int32_t JsInputMonitor::Start()
         MMI_HILOGW("Js is monitoring");
         return RET_OK;
     }
-    int32_t ret = monitor_->Start();
+    int32_t ret = monitor_->Start(typeName);
     if (ret >= 0) {
         isMonitoring_ = true;
     }
@@ -1533,6 +1611,9 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 break;
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+            case TypeName::TOUCH_GESTURE:
+                ret = TransformGestureEvent(pointerEventItem, napiPointer);
+                break;
             default: {
                 MMI_HILOGE("This event is invalid");
                 break;
@@ -1555,7 +1636,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
-            typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward";
+            typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward" ||
+            typeName == "touchGesture";
         if (typeNameFlag) {
             if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
                 pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
@@ -1708,9 +1790,10 @@ bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
-        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
-        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
-            return true;
+        ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
+        return true;
     }
     MMI_HILOGD("not fingerprint event");
     return false;

@@ -55,7 +55,7 @@ struct PixelMapReleaseContext {
 private:
     std::shared_ptr<Media::PixelMap> pixelMap_ { nullptr };
 };
-
+class DelegateInterface;
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
@@ -107,6 +107,11 @@ public:
     void InitPointerObserver() override;
     void OnSessionLost(int32_t pid) override;
     int32_t SkipPointerLayer(bool isSkip) override;
+    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) override
+    {
+        delegateProxy_ = proxy;
+    }
+    void DestroyPointerWindow() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -152,6 +157,7 @@ private:
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
+    void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
 
 private:
     struct PidInfo {
@@ -165,6 +171,7 @@ private:
     int32_t lastPhysicalY_ { -1 };
     PointerStyle lastMouseStyle_ {};
     PointerStyle currentMouseStyle_ {};
+    PointerStyle lastDrawPointerStyle_ {};
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
@@ -192,6 +199,7 @@ private:
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+    std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

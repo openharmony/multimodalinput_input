@@ -191,6 +191,7 @@ public:
     bool GetKnuckleSwitchValue();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t SetIsFreezePowerKey(const std::string pageName);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
@@ -357,12 +358,14 @@ private:
     int32_t count_ { 0 };
     int32_t repeatTimerId_ { -1 };
     int32_t knuckleCount_ { 0 };
+    int32_t sosDelayTimerId_ { -1 };
     int64_t downActionTime_ { 0 };
     int64_t lastDownActionTime_ { 0 };
     int64_t lastVolumeDownActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };
+    bool isFreezePowerKey_ { false };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool sequenceOccurred_ { false };
@@ -389,6 +392,7 @@ private:
     int64_t lastDownTime_ { 0 };
     int64_t previousUpTime_ { 0 };
     int32_t tappingCount_ { 0 };
+    std::mutex mutex_;
 };
 } // namespace MMI
 } // namespace OHOS

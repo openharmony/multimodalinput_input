@@ -34,11 +34,15 @@ enum InputHandlerType : int32_t {
 };
 
 using HandleEventType = uint32_t;
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_NONE { 0x0 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_KEY { 0x1 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_POINTER { 0x2 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_FINGERPRINT { 0x3 };
-inline constexpr HandleEventType HANDLE_EVENT_TYPE_ALL { HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER };
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_NONE {0x0};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_KEY {1u};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_POINTER {1u << 1};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_TOUCH_GESTURE {1u << 2};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_ALL {
+    HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER | HANDLE_EVENT_TYPE_TOUCH_GESTURE
+};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_KP {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
+inline constexpr HandleEventType HANDLE_EVENT_TYPE_FINGERPRINT {HANDLE_EVENT_TYPE_KEY | HANDLE_EVENT_TYPE_POINTER};
 
 inline bool IsValidHandlerType(InputHandlerType handlerType)
 {
