@@ -2859,7 +2859,7 @@ void MMIService::OnSessionDelete(SessionPtr session)
     }
 }
 
-int32_t MMIService::SetClientInfo(int32_t pid, uint64_t newThreadId)
+int32_t MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
 {
     CALL_DEBUG_ENTER;
     auto sess = GetSessionByPid(pid);
@@ -2867,12 +2867,12 @@ int32_t MMIService::SetClientInfo(int32_t pid, uint64_t newThreadId)
     std::string programName = sess->GetProgramName();
     if (clientsInfo_.end() != clientsInfo_.find(programName)) {
         clientsInfo_[programName].pid = pid;
-        clientsInfo_[programName].newThreadId = newThreadId;
+        clientsInfo_[programName].readThreadId = readThreadId;
         return RET_OK;
     }
     ClientInfo clientInfo {
         .pid = pid,
-        .newThreadId = newThreadId
+        .readThreadId = readThreadId
     };
     clientsInfo_[programName] = clientInfo;
     return RET_OK;
@@ -2890,7 +2890,7 @@ void MMIService::InitPrintClientInfo()
             if (hasMainThreadClient && hasChildThreadClient) {
                 break;
             }
-            if (!hasMainThreadClient && it->second.pid == it->second.newThreadId) {
+            if (!hasMainThreadClient && it->second.pid == it->second.readThreadId) {
                 mainThreadClient = std::make_pair(it->first, it->second);
                 hasMainThreadClient = true;
                 continue;
@@ -2901,19 +2901,19 @@ void MMIService::InitPrintClientInfo()
             }
         }
         if (!mainThreadClient.first.empty()) {
-            MMI_HILOGW("The application main thread and event receiving thread are combined, programName:%{public}s, "
+            MMI_HILOGW("The application main thread and event reading thread are combined, programName:%{public}s, "
                 "pid:%{public}d, mainThreadId:%{public}d", mainThreadClient.first.c_str(),
                 mainThreadClient.second.pid, mainThreadClient.second.pid);
         }
         if (!childThreadClient.first.empty()) {
-            MMI_HILOGI("The application main thread and event receiving thread are separated, programName:%{public}s, "
-                "pid:%{public}d, newThreadId:%{public}" PRIu64, childThreadClient.first.c_str(),
-                childThreadClient.second.pid, childThreadClient.second.newThreadId);
+            MMI_HILOGI("The application main thread and event reading thread are separated, programName:%{public}s, "
+                "pid:%{public}d, readThreadId:%{public}" PRIu64, childThreadClient.first.c_str(),
+                childThreadClient.second.pid, childThreadClient.second.readThreadId);
         }
     });
     std::function<void(SessionPtr)> callback = [this](SessionPtr sess) {
         return this->OnSessionDelete(sess);
-    }
+    };
     AddSessionDeletedCallback(callback);
 }
 

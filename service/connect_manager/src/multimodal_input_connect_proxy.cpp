@@ -2355,7 +2355,7 @@ int32_t MultimodalInputConnectProxy::SkipPointerLayer(bool isSkip)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::SetClientInfo(int32_t pid, uint64_t newThreadId)
+int32_t MultimodalInputConnectProxy::SetClientInfo(int32_t pid, uint64_t readThreadId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -2364,7 +2364,7 @@ int32_t MultimodalInputConnectProxy::SetClientInfo(int32_t pid, uint64_t newThre
         return ERR_INVALID_VALUE;
     }
     WRITEINT32(data, pid, ERR_INVALID_VALUE);
-    WRITEUINT64(data, newThreadId, ERR_INVALID_VALUE);
+    WRITEUINT64(data, readThreadId, ERR_INVALID_VALUE);
     
     MessageParcel reply;
     MessageOption option;
