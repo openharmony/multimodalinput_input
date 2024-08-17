@@ -97,7 +97,7 @@ public:
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+        HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
 
     int32_t RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
@@ -218,8 +218,8 @@ public:
     int32_t SkipPointerLayer(bool isSkip);
     int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
     void OnWindowStateError(int32_t pid, int32_t windowId);
-    int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

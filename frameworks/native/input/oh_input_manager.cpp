@@ -1564,14 +1564,15 @@ int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
 {
     CALL_DEBUG_ENTER;
     CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
-    std::promise<int64_t> prom;
-    auto fut = prom.get_future();
-    auto callback = [&prom](int64_t interval) {
-        MMI_HILOGD("GetIntervalSinceLastInputCallback interval:%{public}" PRId64, interval);
-        prom.set_value(interval);
-    };
-    OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(callback);
-    *intervalSinceLastInput = fut.get();
+    int64_t interval = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(interval);
+    *intervalSinceLastInput = interval;
+    Input_Result retCode = INPUT_SUCCESS;
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Get Interval Since Last Input failed");
+        return retCode;
+    }
     return INPUT_SUCCESS;
 }
 

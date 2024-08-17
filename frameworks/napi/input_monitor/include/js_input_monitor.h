@@ -42,7 +42,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputMonitor);
     ~InputMonitor() override = default;
 
-    int32_t Start();
+    int32_t Start(const std::string &typeName);
     void Stop();
     void MarkConsumed(int32_t eventId);
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
@@ -82,7 +82,7 @@ public:
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id, int32_t fingers);
     ~JsInputMonitor();
 
-    int32_t Start();
+    int32_t Start(const std::string &typeName);
     void Stop();
     void MarkConsumed(const int32_t eventId);
     int32_t IsMatch(const napi_env jsEnv, napi_value callback);
@@ -105,6 +105,7 @@ private:
     int32_t GetSwipeAction(int32_t action) const;
     int32_t GetRotateAction(int32_t action) const;
     int32_t GetMultiTapAction(int32_t action) const;
+    int32_t GetGestureAction(int32_t action) const;
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t GetFingerprintAction(int32_t action) const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -117,6 +118,7 @@ private:
     int32_t TransformMultiTapEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformJoystickPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformGestureEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT

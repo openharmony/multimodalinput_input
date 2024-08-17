@@ -201,7 +201,7 @@ public:
      * the monitor fails to be added.
      * @since 9
      */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
 
     /**
      * @brief Removes a monitor.
@@ -947,11 +947,11 @@ public:
     int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
     /**
      * @brief Get Interval Since Last Input.
-     * @param callback Callback used to return the time interval.
+     * @param timeInterval the value which Indicates the time interval since last input.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 13
      */
-    int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
 

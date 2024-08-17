@@ -2377,12 +2377,14 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 
 void InputManagerImpl::OnWindowStateError(int32_t pid, int32_t windowId)
 {
-    if (windowStatecallback_ == nullptr) {
+    if (windowStatecallback_ != nullptr) {
         windowStatecallback_(pid, windowId);
+    } else {
+        MMI_HILOGE("Window state callback is null");
     }
 }
 
-int32_t InputManagerImpl::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -2390,7 +2392,11 @@ int32_t InputManagerImpl::GetIntervalSinceLastInput(std::function<void(int64_t)>
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return INPUT_DEVICE_IMPL.GetIntervalSinceLastInput(callback);
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetIntervalSinceLastInput(timeInterval) != RET_OK) {
+        MMI_HILOGE("GetIntervalSinceLastInput failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t InputManagerImpl::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)

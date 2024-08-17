@@ -2368,8 +2368,7 @@ int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInte
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(
-                                      MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL),
-                                      data, reply, option);
+        MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
     } else {
