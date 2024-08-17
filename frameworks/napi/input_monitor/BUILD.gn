@@ -18,10 +18,11 @@ config("inputmonitor_config") {
 
   include_dirs = [
     "${mmi_path}/frameworks/napi/input_monitor/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/frameworks/napi/gesture_event/include",
     "${mmi_path}/frameworks/napi/touch_event/include",
     "${mmi_path}/frameworks/napi/joystick_event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/common/include",
     "${mmi_path}/util/napi/include",
   ]
 

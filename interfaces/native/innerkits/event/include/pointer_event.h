@@ -184,6 +184,23 @@ public:
 
     static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
 
+    /**
+     * 表示触屏手势动作
+     *
+     * @since 12
+     */
+    static constexpr int32_t TOUCH_ACTION_SWIPE_DOWN = 100;
+
+    static constexpr int32_t TOUCH_ACTION_SWIPE_UP = 101;
+
+    static constexpr int32_t TOUCH_ACTION_SWIPE_RIGHT = 102;
+
+    static constexpr int32_t TOUCH_ACTION_SWIPE_LEFT = 103;
+
+    static constexpr int32_t TOUCH_ACTION_PINCH_OPENED = 104;
+
+    static constexpr int32_t TOUCH_ACTION_PINCH_CLOSEED = 105;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.

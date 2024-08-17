@@ -34,7 +34,7 @@ namespace MMI {
 namespace {
 const std::unordered_set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
-    "fingerprint", "swipeInward"
+    "fingerprint", "swipeInward", "touchGesture"
 };
 constexpr int32_t TWO_PARAMETERS { 2 };
 constexpr int32_t THREE_PARAMETERS { 3 };
