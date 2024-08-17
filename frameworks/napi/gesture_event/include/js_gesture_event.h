@@ -24,6 +24,14 @@ namespace OHOS {
 namespace MMI {
 class JsGestureEvent final {
 public:
+    enum class TouchGesturAction : int32_t {
+        SWIPE_DOWN = 0,
+        SWIPE_UP,
+        SWIPE_LEFT,
+        SWIPE_RIGHT,
+        PINCH_CLOSED,
+        PINCH_OPENED
+    };
     JsGestureEvent() = default;
     ~JsGestureEvent() = default;
     DISALLOW_COPY_AND_MOVE(JsGestureEvent);

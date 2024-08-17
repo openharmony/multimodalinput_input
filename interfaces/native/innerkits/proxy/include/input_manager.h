@@ -201,7 +201,7 @@ public:
      * the monitor fails to be added.
      * @since 9
      */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
 
     /**
      * @brief Removes a monitor.
