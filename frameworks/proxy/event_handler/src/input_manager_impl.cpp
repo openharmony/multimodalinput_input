@@ -2398,5 +2398,16 @@ int32_t InputManagerImpl::GetIntervalSinceLastInput(int64_t &timeInterval)
     }
     return RET_OK;
 }
+
+int32_t InputManagerImpl::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
+{
+    CALL_INFO_TRACE;
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetAllSystemHotkeys(keyOptions) != RET_OK) {
+        MMI_HILOGE("GetAllSystemHotkeys failed");
+        return RET_ERR;
+    }
+    count = static_cast<int32_t>(keyOptions.size());
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

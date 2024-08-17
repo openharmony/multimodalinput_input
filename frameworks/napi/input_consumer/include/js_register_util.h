@@ -17,12 +17,32 @@
 #define JS_REGISTER_UTIL_H
 
 #include <array>
+#include <uv.h>
+
+#include "refbase.h"
 
 #include "js_register_module.h"
 #include "key_event.h"
 
 namespace OHOS {
 namespace MMI {
+struct CallbackInfo : RefBase {
+    napi_env env { nullptr };
+    napi_ref ref { nullptr };
+    napi_deferred deferred { nullptr };
+    int32_t errCode { -1 };
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+};
+
+template <typename T>
+static void DeletePtr(T &ptr)
+{
+    if (ptr != nullptr) {
+        delete ptr;
+        ptr = nullptr;
+    }
+}
+
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value);
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, std::string value);
 bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret);
@@ -33,6 +53,13 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event);
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event);
 int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event, int32_t &subscribeId);
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *event);
+
+napi_value ConvertHotkeyToNapiValue(napi_env env, const KeyOption &keyOption);
+napi_value ConvertHotkeysToNapiArray(sptr<CallbackInfo> cb);
+napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
+void CallHotkeyPromiseWork(uv_work_t *work, int32_t status);
+void EmitSystemHotkey(sptr<CallbackInfo> cb);
+napi_value GetSystemHotkey(napi_env env, napi_value handle = nullptr);
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_REGISTER_UTIL_H
