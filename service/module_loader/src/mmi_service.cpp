@@ -56,6 +56,9 @@
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
 #include "key_map_manager.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
@@ -2855,6 +2858,31 @@ int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
         MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MMIService::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &keyOptions] {
+            return this->OnGetAllSystemHotkey(keyOptions);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGD("Get all system hot key, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    #ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    return KEY_SHORTCUT_MGR->GetAllSystemHotkeys(keyOptions);
+    #endif // SHORTCUT_KEY_MANAGER_ENABLED
+    MMI_HILOGI("OnGetAllSystemHotkey function does not support");
+    return ERROR_UNSUPPORT;
 }
 } // namespace MMI
 } // namespace OHOS

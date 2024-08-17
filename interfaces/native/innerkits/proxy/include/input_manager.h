@@ -953,6 +953,8 @@ public:
      */
     int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
 
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

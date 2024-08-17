@@ -635,5 +635,10 @@ int32_t InputManager::GetIntervalSinceLastInput(std::function<void(int64_t)> cal
 {
     return InputMgrImpl.GetIntervalSinceLastInput(callback);
 }
+
+int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
+{
+    return InputMgrImpl.GetAllSystemHotkeys(keyOptions, count);
+}
 } // namespace MMI
 } // namespace OHOS

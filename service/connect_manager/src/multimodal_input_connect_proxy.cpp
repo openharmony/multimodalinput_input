@@ -2377,5 +2377,40 @@ int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInte
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_SYSTEM_HOT_KEY),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGD("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    int32_t  keyOptionsCount = -1;
+    if (!reply.ReadInt32(keyOptionsCount)) {
+        MMI_HILOGE("Read keyOptionsCount failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    for (int32_t i = 0; i < keyOptionsCount; ++i) {
+        std::unique_ptr<KeyOption> keyOption = std::make_unique<KeyOption>();
+        if (!keyOption->ReadFromParcel(reply)) {
+            MMI_HILOGE("Read keyOption failed");
+            return IPC_PROXY_DEAD_OBJECT_ERR;
+        }
+        keyOptions.push_back(std::move(keyOption));
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

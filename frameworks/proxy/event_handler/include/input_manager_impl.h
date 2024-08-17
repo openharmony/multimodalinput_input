@@ -219,6 +219,7 @@ public:
     int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
     void OnWindowStateError(int32_t pid, int32_t windowId);
     int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
