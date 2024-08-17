@@ -157,7 +157,7 @@ public:
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
-    int32_t SetClientInfo(int32_t pid, uint64_t newThreadId) override;
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override;
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
@@ -261,7 +261,7 @@ private:
     std::atomic_bool threadStatusFlag_ { false };
     struct ClientInfo {
         int32_t pid { -1 };
-        uint64_t newThreadId { -1 };
+        uint64_t readThreadId { -1 };
     };
     std::map<std::string, ClientInfo> clientsInfo_;
 };

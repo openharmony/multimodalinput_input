@@ -2663,11 +2663,11 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t pid = 0;
-    uint64_t newThreadId = 0;
+    uint64_t readThreadId = 0;
     READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
-    READUINT64(data, newThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
 
-    SetClientInfo(pid, newThreadId);
+    SetClientInfo(pid, readThreadId);
     return RET_OK;
 }
 

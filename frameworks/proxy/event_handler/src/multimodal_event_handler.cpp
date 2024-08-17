@@ -203,11 +203,11 @@ int32_t MultimodalEventHandler::CancelInjection()
     return RET_OK;
 }
 
-int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t newThreadId)
+int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t readThreadId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
-    return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, newThreadId);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, readThreadId);
 }
 } // namespace MMI
 } // namespace OHOS
