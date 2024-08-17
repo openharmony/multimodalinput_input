@@ -724,11 +724,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsKeyMatch_01, TestSize.Le
     shortcutKey.statusConfigValue = true;
     shortcutKey.finalKey = 2076;
     shortcutKey.keyDownDuration = 0;
-    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN; 
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
     keyEvent->keyCode_ = 2076;
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
-    shortcutKey.preKeys = {2076, 2077}; 
+    shortcutKey.preKeys = {2076, 2077};
     KeyEvent::KeyItem item;
     item.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
     item.SetKeyCode(KeyEvent::KEYCODE_META_RIGHT);
