@@ -15,6 +15,8 @@
 
 #include "delegate_interface.h"
 
+#include <algorithm>
+
 #include "display_event_monitor.h"
 #include "error_multimodal.h"
 #include "input_event_handler.h"
@@ -91,15 +93,13 @@ void DelegateInterface::OnInputEventHandler(
     }
 }
 
-int32_t DelegateInterface::AddHandler(InputHandlerType type, HandlerSummary summary)
+int32_t DelegateInterface::AddHandler(InputHandlerType type, const HandlerSummary &summary)
 {
     CHKPR(summary.cb, ERROR_NULL_POINTER);
     int32_t ret = RET_OK;
-    for (const auto &handler : handlers) {
-        if (handler.second.handlerName == summary.handlerName) {
-            MMI_HILOGW("The current handler(%{public}s) already exists", summary.handlerName.c_str());
-            return ret;
-        }
+    if (HasHandler(summary.handlerName)) {
+        MMI_HILOGW("The current handler(%{public}s) already exists", summary.handlerName.c_str());
+        return ret;
     }
     const HandleEventType currentType = GetEventType(type);
     uint32_t currentTags = GetDeviceTags(type);
@@ -164,7 +164,7 @@ uint32_t DelegateInterface::GetDeviceTags(InputHandlerType type) const
     return deviceTags;
 }
 
-void DelegateInterface::RemoveLocal(InputHandlerType type, std::string name, uint32_t &deviceTags)
+void DelegateInterface::RemoveLocal(InputHandlerType type, const std::string &name, uint32_t &deviceTags)
 {
     for (auto it = handlers.cbegin(); it != handlers.cend(); ++it) {
         if (type != it->first) {
@@ -191,7 +191,7 @@ int32_t DelegateInterface::GetPriority(InputHandlerType type) const
     return DEFUALT_INTERCEPTOR_PRIORITY;
 }
 
-void DelegateInterface::RemoveHandler(InputHandlerType type, std::string name)
+void DelegateInterface::RemoveHandler(InputHandlerType type, const std::string &name)
 {
     const HandleEventType currentType = GetEventType(type);
     uint32_t currentTags = GetDeviceTags(type);
@@ -220,6 +220,14 @@ void DelegateInterface::RemoveHandler(InputHandlerType type, std::string name)
     }
     MMI_HILOGI("Remove Handler:%{public}d:%{public}s-%{public}d:%{public}d, size:%{public}zu", type,
                name.c_str(), currentType, currentTags, handlers.size());
+}
+
+bool DelegateInterface::HasHandler(const std::string &name) const
+{
+    return std::find_if(handlers.cbegin(), handlers.cend(),
+        [name](const auto &item) {
+            return item.second.handlerName == name;
+        }) != handlers.cend();
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI

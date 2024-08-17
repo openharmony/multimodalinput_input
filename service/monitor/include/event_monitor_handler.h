@@ -48,6 +48,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    bool CheckHasInputHandler(HandleEventType eventType);
     int32_t AddInputHandler(InputHandlerType handlerType,
         HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
     void RemoveInputHandler(InputHandlerType handlerType,
@@ -106,6 +107,7 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        bool CheckHasInputHandler(HandleEventType eventType);
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t eventId, SessionPtr session);

@@ -54,7 +54,7 @@ public:
 
 protected:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_KP, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     int32_t RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
@@ -62,7 +62,7 @@ private:
     struct Handler {
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
-        HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
+        HandleEventType eventType_ { HANDLE_EVENT_TYPE_KP };
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
