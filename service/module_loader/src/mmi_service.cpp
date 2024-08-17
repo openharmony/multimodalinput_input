@@ -2911,6 +2911,10 @@ void MMIService::InitPrintClientInfo()
                 childThreadClient.second.pid, childThreadClient.second.newThreadId);
         }
     });
+    std::function<void(SessionPtr)> callback = [this](SessionPtr sess) {
+        return this->OnSessionDelete(sess);
+    }
+    AddSessionDeletedCallback(callback);
 }
 
 int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
