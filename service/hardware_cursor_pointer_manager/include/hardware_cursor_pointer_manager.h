@@ -34,7 +34,7 @@ public:
     int32_t GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 private:
     bool isEnableState_ { false };
-    bool isEnable_ { false };
+    [[ maybe_unused ]] bool isEnable_ { false };
     uint32_t devId_ { 0 };
     sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
 };

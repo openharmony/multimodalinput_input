@@ -68,6 +68,8 @@ constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY { 1000 };
 constexpr int64_t TAP_DOWN_INTERVAL_MILLIS { 550000 };
 constexpr int64_t SOS_INTERVAL_TIMES { 300000 };
+constexpr int64_t SOS_DELAY_TIMES { 1000000 };
+constexpr int64_t SOS_COUNT_DOWN_TIMES { 4000000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
@@ -584,12 +586,10 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(id, item);
+    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE ||
-        singleKnuckleGesture_.state) {
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         ResetKnuckleGesture();
         return;
@@ -605,6 +605,10 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
     }
     if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
+    if (CheckInputMethodArea(touchEvent)) {
+        MMI_HILOGI("In input method area, skip");
         return;
     }
     int32_t touchAction = touchEvent->GetPointerAction();
@@ -1176,6 +1180,10 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     bool isHandled = HandleShortKeys(key);
+    if (isFreezePowerKey_ && key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+        MMI_HILOGI("Freeze power key");
+        return true;
+    }
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
         if (isKeyCancel_) {
@@ -1198,6 +1206,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         }
     }
     count_ = 0;
+    repeatKeyCountMap_.clear();
     isDownStart_ = false;
     return false;
 }
@@ -1324,7 +1333,8 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
-    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
+        (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
         return true;
     }
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
@@ -1350,6 +1360,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
             }
         }
         if (repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end()) {
+            launchAbilityCount_ = count_;
             if (item.times < repeatKeyMaxTimes_[item.keyCode]) {
                 return HandleRepeatKeyAbility(item, isLaunched, keyEvent, false);
             }
@@ -1404,14 +1415,37 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
     LaunchAbility(item.ability);
     BytraceAdapter::StopLaunchAbility();
-    launchAbilityCount_ = count_;
+    repeatKeyCountMap_.clear();
     isLaunched = true;
-    isDownStart_ = false;
     if (InputHandler->GetSubscriberHandler() != nullptr) {
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
     }
+}
+
+int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pageName != "SosCountdown") {
+        isFreezePowerKey_ = false;
+        return RET_OK;
+    }
+    isFreezePowerKey_ = true;
+    if (sosDelayTimerId_ >= 0) {
+        TimerMgr->RemoveTimer(sosDelayTimerId_);
+        sosDelayTimerId_ = DEFAULT_VALUE;
+    }
+    int32_t timerId = TimerMgr->AddTimer(
+        SOS_COUNT_DOWN_TIMES / SECONDS_SYSTEM, 1, [this] () {
+        MMI_HILOGW("Timeout, restore the power button");
+        isFreezePowerKey_ = false;
+    });
+    if (timerId < 0) {
+        MMI_HILOGE("Add timer failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
@@ -1445,7 +1479,6 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (repeatKey_.keyCode != item.keyCode) {
             count_ = 1;
-            repeatKeyCountMap_.clear();
             repeatKey_.keyCode = item.keyCode;
         } else {
             count_++;
@@ -1470,13 +1503,10 @@ void KeyCommandHandler::SendKeyEvent()
     if (!isHandleSequence_) {
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
-            if (count_ == repeatKeyMaxTimes_[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
-                break;
-            }
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_UP);
             }
-            if (count_ > repeatKeyMaxTimes_[keycode]) {
+            if (count_ == repeatKeyMaxTimes_[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
                 auto keyEventCancel = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_CANCEL, false);
                 CHKPV(keyEventCancel);
                 InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
@@ -2027,6 +2057,15 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
+        }
+        if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
+            isFreezePowerKey_ = true;
+            sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
+                isFreezePowerKey_ = false;
+            });
+            if (sosDelayTimerId_ < 0) {
+                MMI_HILOGE("Add timer failed");
+            }
         }
     }
 

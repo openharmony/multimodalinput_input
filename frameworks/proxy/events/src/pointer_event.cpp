@@ -545,6 +545,12 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH, "fingerprint-retouch" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK, "fingerprint-click" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_DOWN, "touch-swipe-down" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_UP, "touch-swipe-up" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_LEFT, "touch-swipe-left" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_RIGHT, "touch-swipe-right" },
+    { PointerEvent::TOUCH_ACTION_PINCH_OPENED, "touch-pinch-open" },
+    { PointerEvent::TOUCH_ACTION_PINCH_CLOSEED, "touch-pinch-close" },
 };
 
 const char* PointerEvent::DumpPointerAction() const
@@ -1306,6 +1312,8 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:FR:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK:
             return "P:FC:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL:
+            return "P:FCA:";
         case PointerEvent::POINTER_ACTION_UNKNOWN:
             return "P:UK:";
         default:

@@ -32,6 +32,7 @@ enum class FingerprintAction : int32_t {
     SLIDE = 2,
     RETOUCH = 3,
     CLICK = 4,
+    CANCEL = 5,
 };
 } // namespace
 
@@ -217,6 +218,7 @@ napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("SLIDE", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::SLIDE))),
         DECLARE_NAPI_STATIC_PROPERTY("RETOUCH", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::RETOUCH))),
         DECLARE_NAPI_STATIC_PROPERTY("CLICK", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CLICK))),
+        DECLARE_NAPI_STATIC_PROPERTY("CANCEL", GetNapiInt32(env, static_cast<int32_t>(FingerprintAction::CANCEL))),
     };
     napi_value fingerprintAction = nullptr;
     CHKRP(napi_define_class(env, "FingerprintAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
