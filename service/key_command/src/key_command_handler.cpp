@@ -614,7 +614,7 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
 
 bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent)
 {
-    CHKPV(touchEvent);
+    CHKPF(touchEvent);
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
