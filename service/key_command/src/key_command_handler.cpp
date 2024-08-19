@@ -585,33 +585,7 @@ int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(touchEvent);
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
-    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
-        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
-        ResetKnuckleGesture();
-        return;
-    }
-    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
-    if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_) {
-        lastDirection_ = physicDisplayInfo->direction;
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE && !gesturePoints_.empty()) {
-            MMI_HILOGW("The screen has been rotated while knuckle is moving");
-            ResetKnuckleGesture();
-            return;
-        }
-    }
-    if (knuckleSwitch_.statusConfigValue) {
-        MMI_HILOGI("Knuckle switch closed");
-        return;
-    }
-    if (CheckInputMethodArea(touchEvent)) {
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
-            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-            MMI_HILOGI("In input method area, skip");
-        }
+    if (!CheckKnuckleCondition(touchEvent)) {
         return;
     }
     int32_t touchAction = touchEvent->GetPointerAction();
@@ -635,6 +609,40 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
                 break;
         }
     }
+}
+
+bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CHKPV(touchEvent);
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
+    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
+        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
+        ResetKnuckleGesture();
+        return false;
+    }
+    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
+    if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_) {
+        lastDirection_ = physicDisplayInfo->direction;
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE && !gesturePoints_.empty()) {
+            MMI_HILOGW("The screen has been rotated while knuckle is moving");
+            ResetKnuckleGesture();
+            return false;
+        }
+    }
+    if (knuckleSwitch_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return false;
+    }
+    if (CheckInputMethodArea(touchEvent)) {
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            MMI_HILOGI("In input method area, skip");
+        }
+        return false;
+    }
+    return true;
 }
 
 bool KeyCommandHandler::IsValidAction(int32_t action)

@@ -299,6 +299,7 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    bool CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t ConvertVPToPX(int32_t vp) const;
