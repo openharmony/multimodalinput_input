@@ -60,11 +60,16 @@ ohos_source_set("mmi_connect_manager_service") {
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "bounds_checking_function:libsec_shared",
+    "c_utils:utilsbase",
+    "eventhandler:libeventhandler",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "skia:skia_canvaskit",
   ]
 
   if (enable_player_framework) {
@@ -117,10 +122,15 @@ ohos_source_set("mmi_connect_manager_proxy") {
   configs = [ ":mmi_connect_manager_config" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "c_utils:utilsbase",
+    "eventhandler:libeventhandler",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "skia:skia_canvaskit",
   ]
 }

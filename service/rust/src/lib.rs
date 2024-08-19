@@ -180,59 +180,59 @@ impl SoftHardenMouseAccelerateCurves {
             GLOBAL_CURVES = Some(SoftHardenMouseAccelerateCurves {
                 data: vec![
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![0.22, 0.41, 0.77],
-                        diff_nums: vec![0.0, -1.54, -12.99],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.09, 0.14, 0.24, 0.55],
+                        diff_nums: vec![0.00, -0.14, -0.96, -9.17],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![0.44, 0.83, 1.54],
-                        diff_nums: vec![0.0, -3.08, -25.97],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.17, 0.28, 0.48, 1.10],
+                        diff_nums: vec![0.00, -0.28, -1.92, -18.35],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![0.88, 1.65, 3.08],
-                        diff_nums: vec![0.0, -6.16, -51.94],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.26, 0.42, 0.72, 1.65],
+                        diff_nums: vec![0.00, -0.41, -2.87, -27.52],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.10, 2.06, 3.85],
-                        diff_nums: vec![0.0, -7.70, -64.93],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.34, 0.56, 0.96, 2.20],
+                        diff_nums: vec![0.00, -0.55, -3.83, -36.69],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.27, 3.30, 6.16],
-                        diff_nums: vec![0.0, -16.29, -107.85],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.51, 0.84, 1.44, 3.30],
+                        diff_nums: vec![0.00, -0.83, -5.75, -55.04],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.43, 4.54, 8.47],
-                        diff_nums: vec![0.0, -24.87, -150.77],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.68, 1.12, 1.92, 4.40],
+                        diff_nums: vec![0.00, -1.10, -7.66, -73.38],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.51, 5.16, 9.63],
-                        diff_nums: vec![0.0, -29.16, -172.23],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![0.85, 1.40, 2.40, 5.50],
+                        diff_nums: vec![0.00, -1.38, -9.58, -91.73],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.60, 5.78, 10.79],
-                        diff_nums: vec![0.0, -33.46, -193.69],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![1.02, 1.50, 3.00, 7.15],
+                        diff_nums: vec![0.00, -1.20, -13.50, -123.48],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.68, 6.40, 11.94],
-                        diff_nums: vec![0.0, -37.75, -215.15],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![1.19, 1.96, 3.36, 7.70],
+                        diff_nums: vec![0.00, -1.93, -13.41, -128.42],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.76, 7.02, 13.10],
-                        diff_nums: vec![0.0, -42.04, -236.61],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![1.45, 2.38, 4.08, 9.35],
+                        diff_nums: vec![0.00, -2.34, -16.28, -155.93],
                     },
                     CurveItem {
-                        speeds: vec![8.0, 32.0, 128.0],
-                        slopes: vec![1.84, 7.63, 14.25],
-                        diff_nums: vec![0.0, -46.33, -258.07],
+                        speeds: vec![2.5, 8.2, 26.5, 128.0],
+                        slopes: vec![1.70, 2.80, 4.80, 11.00],
+                        diff_nums: vec![0.00, -2.75, -19.15, -183.45],
                     },
                 ],
             });
@@ -645,15 +645,16 @@ fn get_speed_gain_mouse(vin: f64, gain: *mut f64, speed: i32, device_type: i32) 
     };
     unsafe {
         let num: f64 = fabs(vin);
-        for i in 0..3 {
+        let len = item.speeds.len();
+        for i in 0..len {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
+                debug!(LOG_LABEL, "slope is set to {}, gain is {}", @public(item.slopes[i]), @public(*gain));
                 return true;
             }
         }
-        *gain = (item.slopes[2] * vin + item.diff_nums[2]) / vin;
-        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[2])/ vin));
+        *gain = (item.slopes[len - 1] * vin + item.diff_nums[len - 1]) / vin;
+        debug!(LOG_LABEL, "slope is set to {}, gain is {}", @public(item.slopes[len - 1]), @public(*gain));
     }
     debug!(LOG_LABEL, "get_speed_gain_mouse leave");
     true

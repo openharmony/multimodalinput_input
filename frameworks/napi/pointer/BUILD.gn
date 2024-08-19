@@ -54,9 +54,11 @@ ohos_shared_library("pointer") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "image_framework:image",
     "image_framework:image_native",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 

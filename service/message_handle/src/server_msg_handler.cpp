@@ -16,6 +16,7 @@
 #include "server_msg_handler.h"
 
 #include <cinttypes>
+#include "ipc_skeleton.h"
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
@@ -55,9 +56,9 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
-constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+[[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-constexpr int32_t WINDOW_ROTATE { 0 };
+[[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
@@ -73,6 +74,8 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::WINDOW_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnWindowGroupInfo(sess, pkt); }},
+        {MmiMessageId::WINDOW_STATE_ERROR_CALLBACK, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->RegisterWindowStateErrorCallback(sess, pkt); }},
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         {MmiMessageId::SCINFO_CONFIG, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnEnhanceConfig(sess, pkt); }},
@@ -553,6 +556,15 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         }
     }
     WIN_MGR->UpdateWindowInfo(windowGroupInfo);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = sess->GetPid();
+    WIN_MGR->SetWindowStateNotifyPid(pid);
+    MMI_HILOGI("pid:%{public}d", pid);
     return RET_OK;
 }
 

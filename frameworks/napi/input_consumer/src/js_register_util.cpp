@@ -19,6 +19,7 @@
 #include <uv.h>
 
 #include "error_multimodal.h"
+#include "input_manager.h"
 #include "napi_constants.h"
 #include "util_napi.h"
 #include "util_napi_error.h"
@@ -28,6 +29,16 @@
 
 namespace OHOS {
 namespace MMI {
+
+bool TypeOf(napi_env env, napi_value value, napi_valuetype type)
+{
+    napi_valuetype valueType = napi_undefined;
+    CHKRF(napi_typeof(env, value, &valueType), TYPEOF);
+    if (valueType != type) {
+        return false;
+    }
+    return true;
+}
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
@@ -362,6 +373,124 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         delete dataWorker;
         delete work;
     }
+}
+
+napi_value ConvertHotkeyToNapiValue(napi_env env, std::unique_ptr<KeyOption> &keyOption)
+{
+    napi_value obj = nullptr;
+    CHKRP(napi_create_object(env, &obj), CREATE_OBJECT);
+    napi_value preKeysArray = nullptr;
+    CHKRP(napi_create_array(env, &preKeysArray), CREATE_ARRAY);
+    int32_t index = 0;
+    std::set<int32_t> preKeys = keyOption->GetPreKeys();
+    for (auto key : preKeys) {
+        napi_value keyVal = nullptr;
+        CHKRP(napi_create_int32(env, key, &keyVal), CREATE_INT32);
+        CHKRP(napi_set_element(env, preKeysArray, index++, keyVal), SET_ELEMENT);
+    }
+    CHKRP(napi_set_named_property(env, obj, "preKeys", preKeysArray), SET_NAMED_PROPERTY);
+    napi_value finalKeyVal = nullptr;
+    CHKRP(napi_create_int32(env, keyOption->GetFinalKey(), &finalKeyVal), CREATE_INT32);
+    CHKRP(napi_set_named_property(env, obj, "finalKey", finalKeyVal), SET_NAMED_PROPERTY);
+    return obj;
+}
+
+napi_value ConvertHotkeysToNapiArray(sptr<CallbackInfo> cb)
+{
+    napi_value keyOptionArray = nullptr;
+    CHKRP(napi_create_array(cb->env, &keyOptionArray), CREATE_ARRAY);
+    if (cb->errCode != RET_OK) {
+        MMI_HILOGE("Get Hotkeys failed, errCode:%{public}d", cb->errCode);
+        return keyOptionArray;
+    }
+    for (size_t i = 0; i < cb->keyOptions.size(); ++i) {
+        napi_value obj = ConvertHotkeyToNapiValue(cb->env, cb->keyOptions[i]);
+        if (obj == nullptr) {
+            MMI_HILOGE("ConvertHotkeyToNapiValue fail");
+            return keyOptionArray;
+        }
+        CHKRP(napi_set_element(cb->env, keyOptionArray, i, obj), SET_ELEMENT);
+    }
+    return keyOptionArray;
+}
+
+napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    napi_value resultCode = nullptr;
+    napi_value resultMessage = nullptr;
+    CHKRP(napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+    CHKRP(napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_STRING_UTF8);
+    CHKRP(napi_create_error(env, nullptr, resultMessage, &result), CREATE_ERROR);
+    CHKRP(napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
+    return result;
+}
+
+void CallHotkeyPromiseWork(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<CallbackInfo> cb(static_cast<CallbackInfo *>(work->data));
+    DeletePtr<uv_work_t *>(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult = ConvertHotkeysToNapiArray(cb);
+    if (callResult == nullptr) {
+        MMI_HILOGE("Check callResult is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env, scope);
+}
+
+void EmitSystemHotkey(sptr<CallbackInfo> cb)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = 0;
+    ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work CallHotkeyPromiseWork callback function is called");
+        }, CallHotkeyPromiseWork, uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
+        DeletePtr<uv_work_t *>(work);
+    }
+}
+
+napi_value GetSystemHotkey(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<CallbackInfo> cb = new (std::nothrow) CallbackInfo();
+    CHKPP(cb);
+    cb->env = env;
+    napi_value promise = nullptr;
+    CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t count = 0;
+    cb->errCode = InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
+    cb->keyOptions = std::move(keyOptions);
+    EmitSystemHotkey(cb);
+    return promise;
 }
 } // namespace MMI
 } // namespace OHOS
