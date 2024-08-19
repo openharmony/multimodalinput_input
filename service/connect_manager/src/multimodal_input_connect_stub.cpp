@@ -1263,11 +1263,6 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
