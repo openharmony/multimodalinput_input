@@ -15,6 +15,7 @@
 
 #include "device_event_monitor.h"
 
+#include "input_event_handler.h"
 #include "mmi_log.h"
 #include "want.h"
 
@@ -23,6 +24,7 @@
 
 namespace OHOS {
 namespace MMI {
+const std::string SOS_PAGE_CHANGE_EVENTS = "emergencycommunication.event.SOS_EMERGENCY_CALL_ABILITY_PAGE_CHANGE";
 DeviceEventMonitor::DeviceEventMonitor() {}
 DeviceEventMonitor::~DeviceEventMonitor() {}
 
@@ -48,6 +50,19 @@ public:
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED) {
             int32_t callState = 0;
             DEVICE_MONITOR->SetCallState(eventData, callState);
+        } else if (action == SOS_PAGE_CHANGE_EVENTS) {
+            MMI_HILOGD("Display emergency call page change");
+            std::string pageName = eventData.GetWant().GetStringParam("pageName");
+            if (pageName.empty()) {
+                MMI_HILOGE("StringParam is empty");
+                return;
+            }
+            auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+            int32_t ret = eventKeyCommandHandler->SetIsFreezePowerKey(pageName);
+            if (ret != RET_OK) {
+                MMI_HILOGE("SetIsFreezePowerKey is failed in key command:%{public}d", ret);
+                return;
+            }
         } else {
             MMI_HILOGW("Device changed receiver event: unknown");
             return;
@@ -64,6 +79,7 @@ void DeviceEventMonitor::InitCommonEventSubscriber()
     }
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
+    matchingSkills.AddEvent(SOS_PAGE_CHANGE_EVENTS);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DeviceChangedReceiver>(commonEventSubscribeInfo));

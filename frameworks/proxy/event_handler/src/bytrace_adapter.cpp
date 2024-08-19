@@ -111,7 +111,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType)
 {
     CHKPV(key);
-    int32_t keyCode = key->GetKeyCode();
+    [[ maybe_unused ]] int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     switch (handlerType) {
         case KEY_INTERCEPT_EVENT: {
@@ -144,7 +144,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
 {
     CHKPV(keyEvent);
     int32_t keyId = keyEvent->GetId();
-    int32_t keyCode = keyEvent->GetKeyCode();
+    [[ maybe_unused ]] int32_t keyCode = keyEvent->GetKeyCode();
     if (traceBtn == TRACE_START) {
         switch (handlerType) {
             case KEY_INTERCEPT_EVENT: {

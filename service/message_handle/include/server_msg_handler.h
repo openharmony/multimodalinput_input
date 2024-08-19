@@ -104,6 +104,7 @@ public:
     bool InitInjectNoticeSource();
     bool AddInjectNotice(const InjectNoticeInfo& noticeInfo);
     int32_t OnTransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject, int32_t pid);
+    int32_t RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);

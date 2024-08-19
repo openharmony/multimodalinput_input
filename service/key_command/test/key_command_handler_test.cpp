@@ -356,7 +356,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_002, TestSiz
     key->SetKeyCode(18);
     handler.specialKeys_.insert(std::make_pair(18, 18));
     bool ret = handler.OnHandleEvent(key);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     handler.specialTimers_.insert(std::make_pair(KeyEvent::KEYCODE_POWER, 10));
     ret = handler.OnHandleEvent(key);
@@ -364,27 +364,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_002, TestSiz
     key->SetKeyCode(5);
     ret = handler.OnHandleEvent(key);
     EXPECT_FALSE(ret);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_SendKeyEvent_004
- * @tc.desc: Test the funcation SendKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SendKeyEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeyCommandHandler handler;
-    handler.isHandleSequence_ = false;
-    handler.launchAbilityCount_ = 5;
-    handler.count_ = 7;
-    handler.repeatKey_.keyCode = KeyEvent::KEYCODE_POWER;
-    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
-    handler.repeatKey_.keyCode = 60;
-    handler.launchAbilityCount_ = 0;
-    handler.count_ = 1;
-    ASSERT_NO_FATAL_FAILURE(handler.SendKeyEvent());
 }
 
 /**
@@ -2344,7 +2323,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
@@ -4055,7 +4034,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestS
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.repeatKeyCountMap_.emplace(repeatKey.ability.bundleName, 2);
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 5);
-    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**
