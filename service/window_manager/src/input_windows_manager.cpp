@@ -2899,7 +2899,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
                 pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT ||
-                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_CANCEL ||) {
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
             } else {
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
