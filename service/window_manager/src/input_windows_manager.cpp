@@ -2308,7 +2308,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
             pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_CANCEL ||) {
+            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
         } else {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
