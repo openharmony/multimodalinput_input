@@ -41,6 +41,9 @@ ohos_shared_library("oh_input_manager") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/frameworks/proxy/events/include",
   ]
 
   sources = [
@@ -60,8 +63,10 @@ ohos_shared_library("oh_input_manager") {
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
@@ -118,6 +123,7 @@ ohos_unittest("OHInputManagerTest") {
     "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
 

@@ -146,8 +146,9 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             } else {
                 MMI_HILOGD("The end keyboard autorepeat, keyCode:%d", keyEvent_->GetKeyCode());
             }
+        } else {
+            repeatKeyCode_ = -1;
         }
-        repeatKeyCode_ = -1;
     }
 }
 

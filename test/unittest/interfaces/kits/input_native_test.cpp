@@ -1724,9 +1724,54 @@ HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_RemoveInputEventInterceptor_0
  */
 HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
 {
-    int64_t *intervalSinceLastInput = nullptr;
+    int64_t *intervalSinceLastInput = static_cast<int64_t *>(malloc(sizeof(int64_t)));
     int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
-    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    free(intervalSinceLastInput);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_OH_Input_GetAllSystemHotkeys_001
+ * @tc.desc: Verify the InputNativeTest_OH_Input_GetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_001, TestSize.Level1)
+{
+    int32_t count = 1;
+    Input_Result ret = OH_Input_GetAllSystemHotkeys(nullptr, &count);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    Input_Hotkey **hotkey = OH_Input_CreateAllSystemHotkeys(count);
+    ASSERT_NE(hotkey, nullptr);
+    ret = OH_Input_GetAllSystemHotkeys(hotkey, &count);
+    EXPECT_EQ(ret, INPUT_SUCCESS);
+    OH_Input_DestroyAllSystemHotkeys(hotkey, count);
+}
+
+/**
+ * @tc.name: InputNativeTest_OH_Input_GetAllSystemHotkeys_002
+ * @tc.desc: Verify the InputNativeTest_OH_Input_GetAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_GetAllSystemHotkey_002, TestSize.Level1)
+{
+    Input_Hotkey *hotkey { nullptr };
+    Input_Result ret = OH_Input_GetAllSystemHotkeys(&hotkey, nullptr);
+    ASSERT_NE(ret, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_OH_Input_CreateAllSystemHotkeys_001
+ * @tc.desc: Verify the InputNativeTest_OH_Input_CreateAllSystemHotkeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_OH_Input_CreateAllSystemHotkeys_001, TestSize.Level1)
+{
+    int32_t count = 100;
+    Input_Hotkey **hotkey = OH_Input_CreateAllSystemHotkeys(count);
+    EXPECT_EQ(hotkey, nullptr);
 }
 } // namespace MMI
 } // namespace OHOS

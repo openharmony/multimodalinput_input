@@ -166,13 +166,16 @@ public:
     bool IsTransparentWin(std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY);
     int32_t SetCurrentUser(int32_t userId);
     DisplayMode GetDisplayMode() const;
-
+    void SetWindowStateNotifyPid(int32_t pid);
+    int32_t GetWindowStateNotifyPid();
+    int32_t GetPidByWindowId(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
+    void CleanInvalidPiexMap();
 
 private:
     void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
@@ -365,6 +368,7 @@ private:
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
     bool isParseConfig_ { false };
+    int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
 };
 } // namespace MMI

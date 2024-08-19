@@ -141,6 +141,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SkipPointerLayer(bool isSkip) override;
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

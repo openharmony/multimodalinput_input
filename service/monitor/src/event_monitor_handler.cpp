@@ -92,6 +92,11 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+bool EventMonitorHandler::CheckHasInputHandler(HandleEventType eventType)
+{
+    return monitors_.CheckHasInputHandler(eventType);
+}
+
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
 {
@@ -558,6 +563,16 @@ void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
     if (it != endScreenCaptureMonitors_.end()) {
         endScreenCaptureMonitors_.erase(it);
     }
+}
+
+bool EventMonitorHandler::MonitorCollection::CheckHasInputHandler(HandleEventType eventType)
+{
+    for (const auto &item : monitors_) {
+        if ((item.eventType_ & eventType) == eventType) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void EventMonitorHandler::Dump(int32_t fd, const std::vector<std::string> &args)

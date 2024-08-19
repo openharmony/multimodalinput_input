@@ -43,6 +43,7 @@ public:
 private:
     int32_t AnalyseKeyEvent(struct libinput_event* event);
     int32_t AnalysePointEvent(struct libinput_event *event);
+    int32_t SendFingerprintCancelEvent();
 
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
     const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
