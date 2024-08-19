@@ -1016,7 +1016,7 @@ public:
          * @return void
          * @since 12
          */
-        void SetMoveFlag(int32_t moveflag);
+        void SetMoveFlag(int32_t moveFlag);
 
         /**
          * @brief Obtains the long axis of the touch point area.
