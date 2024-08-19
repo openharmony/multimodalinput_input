@@ -49,6 +49,8 @@ public:
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
 private:
+    bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
+private:
     std::mutex lockFilter_;
     struct FilterInfo {
         const sptr<IEventFilter> filter;
