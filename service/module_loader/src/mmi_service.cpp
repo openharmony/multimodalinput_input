@@ -56,6 +56,9 @@
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
 #include "key_map_manager.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
@@ -89,16 +92,16 @@ MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
-constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
-constexpr int32_t WATCHDOG_WARNTIME { 6000 };
-constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_WARNTIME { 6000 };
+[[ maybe_unused ]] constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
-constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
+[[ maybe_unused ]] constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
@@ -401,7 +404,7 @@ void MMIService::OnStart()
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     });
-    auto taskFunc = [this]() {
+    [[ maybe_unused ]] auto taskFunc = [this]() {
         if (threadStatusFlag_) {
             MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;
@@ -2849,12 +2852,37 @@ int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
-                                                        InputHandler, std::ref(timeInterval)));
+        InputHandler, std::ref(timeInterval)));
     MMI_HILOGD("timeInterval:%{public}" PRId64, timeInterval);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MMIService::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &keyOptions] {
+            return this->OnGetAllSystemHotkey(keyOptions);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGD("Get all system hot key, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    #ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    return KEY_SHORTCUT_MGR->GetAllSystemHotkeys(keyOptions);
+    #endif // SHORTCUT_KEY_MANAGER_ENABLED
+    MMI_HILOGI("OnGetAllSystemHotkey function does not support");
+    return ERROR_UNSUPPORT;
 }
 } // namespace MMI
 } // namespace OHOS

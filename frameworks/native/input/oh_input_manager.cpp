@@ -72,6 +72,13 @@ struct Input_AxisEvent {
     int32_t axisEventType { -1 };
 };
 
+struct Input_Hotkey {
+    std::set<int32_t> preKeys {};
+    int32_t finalKey { -1 };
+};
+
+std::mutex g_hotkeyCountsMutex;
+static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
 static constexpr int32_t INVALID_MONITOR_ID = -1;
 static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
@@ -1608,13 +1615,169 @@ int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
 {
     CALL_DEBUG_ENTER;
     CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
-    std::promise<int64_t> prom;
-    auto fut = prom.get_future();
-    auto callback = [&prom](int64_t interval) {
-        MMI_HILOGD("GetIntervalSinceLastInputCallback interval:%{public}" PRId64, interval);
-        prom.set_value(interval);
-    };
-    OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(callback);
-    *intervalSinceLastInput = fut.get();
+    int64_t interval = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(interval);
+    *intervalSinceLastInput = interval;
+    Input_Result retCode = INPUT_SUCCESS;
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Get Interval Since Last Input failed");
+        return retCode;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
+{
+    if (count <= 0) {
+        MMI_HILOGE("Invalid count:%{public}d", count);
+        return nullptr;
+    }
+    std::vector<std::unique_ptr<OHOS::MMI::KeyOption>> keyOptions;
+    int32_t hotkeyCount = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, hotkeyCount);
+    if (ret != RET_OK || hotkeyCount < 0) {
+        MMI_HILOGE("GetAllSystemHotkeys fail");
+        return nullptr;
+    }
+    if (count != hotkeyCount) {
+        MMI_HILOGE("Parameter error");
+        return nullptr;
+    }
+    auto hotkeys = new (std::nothrow)Input_Hotkey *[count];
+    for (int32_t i = 0; i < count; ++i) {
+        hotkeys[i] = new (std::nothrow)Input_Hotkey();
+    }
+    std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
+    g_hotkeyCounts.insert(std::make_pair(hotkeys, count));
+    return hotkeys;
+}
+
+void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
+{
+    std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
+    if (g_hotkeyCounts.find(hotkeys) != g_hotkeyCounts.end()) {
+        if (count != g_hotkeyCounts[hotkeys]) {
+                MMI_HILOGW("Parameter inconsistency");
+            }
+        for (int32_t i = 0; i < g_hotkeyCounts[hotkeys]; ++i) {
+            if (hotkeys[i] != nullptr) {
+                delete hotkeys[i];
+                hotkeys[i] = nullptr;
+            }
+        }
+        if (hotkeys != nullptr) {
+            delete[] hotkeys;
+            hotkeys = nullptr;
+        }
+        g_hotkeyCounts.erase(hotkeys);
+    }
+}
+
+Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
+{
+    CALL_DEBUG_ENTER;
+    if (count == nullptr) {
+        MMI_HILOGE("Parameter error");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::vector<std::unique_ptr<OHOS::MMI::KeyOption>> keyOptions;
+    int32_t hotkeyCount = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, hotkeyCount);
+    if (ret != RET_OK || hotkeyCount < 0) {
+        MMI_HILOGE("GetAllSystemHotkeys fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    if (hotkey == nullptr) {
+        *count = static_cast<int32_t>(hotkeyCount);
+        MMI_HILOGD("Hot key count:%{public}d", *count);
+        return INPUT_SUCCESS;
+    }
+    if ((static_cast<int32_t>(hotkeyCount) != *count) && (*count <= 0)) {
+        MMI_HILOGE("Count:%{public}d is invalid, should be:%{public}d", *count, hotkeyCount);
+        return INPUT_PARAMETER_ERROR;
+    }
+    for (int32_t i = 0; i < hotkeyCount; ++i) {
+        if (hotkey[i] == nullptr) {
+            MMI_HILOGE("hotkey is null, i:%{public}d", i);
+            return INPUT_PARAMETER_ERROR;
+        }
+        hotkey[i]->preKeys = keyOptions[i]->GetPreKeys();
+        hotkey[i]->finalKey = keyOptions[i]->GetFinalKey();
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Hotkey* OH_Input_CreateHotkey(void)
+{
+    CALL_DEBUG_ENTER;
+    Input_Hotkey* hotkey = new (std::nothrow) Input_Hotkey();
+    if (hotkey == nullptr) {
+        MMI_HILOGE("hotkey is null");
+        return nullptr;
+    }
+    return hotkey;
+}
+
+void OH_Input_DestroyHotkey(Input_Hotkey **hotkey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    CHKPV(*hotkey);
+    delete *hotkey;
+    *hotkey = nullptr;
+}
+
+void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    CHKPV(preKeys);
+    if (size <= 0) {
+        MMI_HILOGE("PreKeys does not exist");
+        return;
+    }
+
+    for (int32_t i = 0; i < size; ++i) {
+        hotkey->preKeys.insert(preKeys[i]);
+    }
+    return;
+}
+
+Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, int32_t *preKeyCount)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(preKeys, INPUT_PARAMETER_ERROR);
+    CHKPR(*preKeys, INPUT_PARAMETER_ERROR);
+    CHKPR(preKeyCount, INPUT_PARAMETER_ERROR);
+    std::set<int32_t> preKey = hotkey->preKeys;
+    int32_t size = preKey.size();
+    if (size <= 0) {
+        MMI_HILOGE("The pressKeys not exit");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    int32_t index = 0;
+    for (auto it = preKey.begin(); it != preKey.end(); ++it) {
+        *preKeys[index++] = *it;
+    }
+    *preKeyCount = size;
+    return INPUT_SUCCESS;
+}
+
+void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    hotkey->finalKey = finalKey;
+    return;
+}
+
+Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(finalKeyCode, INPUT_PARAMETER_ERROR);
+    *finalKeyCode = hotkey->finalKey;
     return INPUT_SUCCESS;
 }

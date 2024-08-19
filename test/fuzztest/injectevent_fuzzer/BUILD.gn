@@ -61,9 +61,6 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
-    "//third_party/cJSON",
-    "${preferences_path}/frameworks/native/include",
-    "${graphics_path}/2d_graphics/include",
   ]
   cflags = [
     "-g",
@@ -87,6 +84,7 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "cJSON:cjson",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",

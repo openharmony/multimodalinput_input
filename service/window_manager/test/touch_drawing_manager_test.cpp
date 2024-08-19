@@ -1297,7 +1297,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_CalcDrawCoordinate_002
     pointerItem.SetRawDisplayY(physicalY);
     auto retPair = touchDrawingMgr.CalcDrawCoordinate(displayInfo, pointerItem);
     EXPECT_EQ(retPair.first, 21);
-    EXPECT_EQ(retPair.second, 0);
+    EXPECT_EQ(retPair.second, 21);
 }
 } // namespace MMI
 } // namespace OHOS

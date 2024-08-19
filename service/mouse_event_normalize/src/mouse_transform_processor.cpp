@@ -58,7 +58,7 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t BTN_RIGHT_MENUE_CODE { 0x118 };
 constexpr int32_t RIGHT_CLICK_TYPE_MIN { 1 };
 constexpr int32_t RIGHT_CLICK_TYPE_MAX { 3 };
-constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
+[[ maybe_unused ]] constexpr int32_t TP_CLICK_FINGER_ONE { 1 };
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT { 2 };
 constexpr int32_t HARD_HARDEN_DEVICE_WIDTH { 2880 };
 constexpr int32_t HARD_HARDEN_DEVICE_HEIGHT { 1920 };
@@ -512,7 +512,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
 
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
-    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetActionStartTime(time);
@@ -522,6 +521,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
     if (data == nullptr) {
+        pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
         return false;
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
@@ -530,6 +530,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     } else {
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     }
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     return true;
 }
 
@@ -606,6 +607,7 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->ClearAxisValue();
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     if (!HandlePostInner(data, pointerItem)) {
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
         return ERROR_NULL_POINTER;

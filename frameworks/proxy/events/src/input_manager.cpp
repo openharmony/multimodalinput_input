@@ -626,9 +626,19 @@ int32_t InputManager::SkipPointerLayer(bool isSkip)
     return InputMgrImpl.SkipPointerLayer(isSkip);
 }
 
-int32_t InputManager::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
 {
-    return InputMgrImpl.GetIntervalSinceLastInput(callback);
+    return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
+}
+
+int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    return InputMgrImpl.GetIntervalSinceLastInput(timeInterval);
+}
+
+int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
+{
+    return InputMgrImpl.GetAllSystemHotkeys(keyOptions, count);
 }
 } // namespace MMI
 } // namespace OHOS

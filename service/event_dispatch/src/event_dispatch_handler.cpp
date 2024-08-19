@@ -44,6 +44,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
 constexpr int32_t THREE_FINGERS { 3 };
@@ -224,6 +225,24 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
     return true;
 }
 
+void EventDispatchHandler::SendWindowStateError(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    auto udsServer = InputHandler->GetUDSServer();
+    auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
+    if (sess != nullptr) {
+        NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
+        pkt << pid << windowId;
+        if (!sess->SendMsg(pkt)) {
+            MMI_HILOGE("SendMsg failed");
+            return;
+        }
+        windowStateErrorInfo_.windowId = -1;
+        windowStateErrorInfo_.startTime = -1;
+        windowStateErrorInfo_.pid = -1;
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -234,14 +253,26 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-
     std::vector<int32_t> windowIds;
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
+    auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
+    auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
+    if (udsServer->GetSession(fd) == nullptr && pid != -1 && point->GetTargetWindowId() != -1) {
+        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
+            if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
+                SendWindowStateError(pid, point->GetTargetWindowId());
+            }
+        } else {
+            windowStateErrorInfo_.windowId = point->GetTargetWindowId();
+            windowStateErrorInfo_.startTime = GetSysClockTime();
+            windowStateErrorInfo_.pid = pid;
+        }
+    }
     DispatchPointerEventInner(point, fd);
 }
 

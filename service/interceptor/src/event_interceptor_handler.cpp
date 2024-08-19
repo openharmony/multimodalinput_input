@@ -40,6 +40,9 @@ constexpr int32_t ACCESSIBILITY_UID { 1103 };
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
+        return;
+    }
     if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{private}d",
             keyEvent->GetKeyCode());
@@ -391,6 +394,19 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
                 session->GetEarliestEventTime(), session->GetDescript().c_str(),
                 session->GetProgramName().c_str());
     }
+}
+
+bool EventInterceptorHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
+{
+    CHKPF(event);
+    CHKPF(nextHandler_);
+    if (event->GetKeyAction() != KNUCKLE_1F_DOUBLE_CLICK &&
+        event->GetKeyAction() != KNUCKLE_2F_DOUBLE_CLICK) {
+        return false;
+    }
+    MMI_HILOGI("Current is touchPad knuckle double click action");
+    nextHandler_->HandleKeyEvent(event);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

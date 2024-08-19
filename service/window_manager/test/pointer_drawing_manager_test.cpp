@@ -542,9 +542,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_003,
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
     int32_t pid = 1;
     int32_t windowId = -2;
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
     int32_t hotSpotX = -1;
     int32_t hotSpotY = 2;
     pointerDrawingManager.userIcon_ = nullptr;
@@ -578,8 +579,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_003,
     ASSERT_NE(pointerDrawingManager.userIcon_, nullptr);
     ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
     ASSERT_EQ(ret, RET_ERR);
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillRepeatedly(testing::Return(RET_OK));
-    ASSERT_EQ(ret, RET_ERR);
+    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**
@@ -637,12 +637,13 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_005, Tes
 {
     CALL_TEST_DEBUG;
     PointerDrawingManager pointerDrawingManager;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
     pointerDrawingManager.hasDisplay_ = true;
     pointerDrawingManager.hasPointerDevice_ = true;
     pointerDrawingManager.surfaceNode_ = nullptr;
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
     pointerDrawingManager.lastPhysicalX_ = -1;
     pointerDrawingManager.lastPhysicalY_ = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
@@ -652,10 +653,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_005, Tes
     pointerDrawingManager.lastPhysicalX_ = -1;
     pointerDrawingManager.lastPhysicalY_ = -1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
     pointerDrawingManager.lastPhysicalX_ = 1;
     pointerDrawingManager.lastPhysicalY_ = 1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawManager());
+    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**
@@ -667,9 +669,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawManager_005, Tes
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    EXPECT_CALL(*WIN_MGR_MOCK, GetExtraData).WillRepeatedly(testing::Return(ExtraData{true}));
+    EXPECT_CALL(*winmgrmock, GetExtraData).WillRepeatedly(testing::Return(ExtraData{true}));
     int32_t pid = 1;
     bool visible = true;
     int32_t priority = 0;
@@ -687,7 +690,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     priority = 1;
     ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
-    EXPECT_CALL(*WIN_MGR_MOCK, GetExtraData).WillRepeatedly(testing::Return(ExtraData{false}));
+    EXPECT_CALL(*winmgrmock, GetExtraData).WillRepeatedly(testing::Return(ExtraData{false}));
     visible = false;
     priority = 0;
     ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
@@ -700,6 +703,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     priority = 1;
     ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
+    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**
@@ -731,6 +735,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerLocation_0
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateDefaultPointerStyle_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
     PointerDrawingManager pointerDrawingManager;
     int32_t pid = 1;
     int32_t windowId = -1;
@@ -738,9 +743,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateDefaultPointer
     pointerStyle.id = 0;
     pointerStyle.color = 0;
     pointerStyle.size = 2;
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
+    EXPECT_CALL(*winmgrmock, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_OK);
+    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**
@@ -752,15 +758,17 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateDefaultPointer
 HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_GetPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     int32_t pid = 1;
     int32_t windowId = 2;
     bool isUiExtension = true;
     PointerStyle pointerStyle;
-    EXPECT_CALL(*WIN_MGR_MOCK, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
+    EXPECT_CALL(*winmgrmock, GetPointerStyle).WillRepeatedly(testing::Return(RET_ERR));
     int32_t ret = pointerDrawingManager->GetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
     EXPECT_EQ(ret, RET_OK);
+    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**

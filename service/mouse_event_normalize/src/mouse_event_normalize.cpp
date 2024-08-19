@@ -105,7 +105,7 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         processor = it->second;
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
-        auto [tIter, isOk] = processors_.emplace(deviceId, processor);
+        [[ maybe_unused ]] auto [tIter, isOk] = processors_.emplace(deviceId, processor);
     }
     CHKPR(processor, RET_ERR);
     return processor->Normalize(event);
@@ -154,7 +154,7 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
         processor = it->second;
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
-        auto [tIter, isOk] = processors_.emplace(deviceId, processor);
+        [[ maybe_unused ]] auto [tIter, isOk] = processors_.emplace(deviceId, processor);
     }
     CHKPR(processor, RET_ERR);
     return processor->NormalizeRotateEvent(event, type, angle);
