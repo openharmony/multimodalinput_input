@@ -276,9 +276,9 @@ int32_t PointerEvent::PointerItem::GetMoveFlag() const
     return moveFlag_;
 }
 
-void PointerEvent::PointerItem::SetMoveFlag(int32_t moveflag)
+void PointerEvent::PointerItem::SetMoveFlag(int32_t moveFlag)
 {
-    moveFlag_ = moveflag;
+    moveFlag_ = moveFlag;
 }
 
 int32_t PointerEvent::PointerItem::GetLongAxis() const
