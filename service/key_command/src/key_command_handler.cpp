@@ -588,6 +588,7 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
     if (!CheckKnuckleCondition(touchEvent)) {
         return;
     }
+    CHKPV(touchEvent);
     int32_t touchAction = touchEvent->GetPointerAction();
     if (IsValidAction(touchAction)) {
         switch (touchAction) {
