@@ -29,6 +29,7 @@
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
 #include "net_packet.h"
+#include "permission_helper.h"
 #include "proto.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
@@ -232,6 +233,19 @@ int32_t KeySubscriberHandler::RegisterSystemKey(std::shared_ptr<KeyOption> optio
     };
     return KEY_SHORTCUT_MGR->RegisterSystemKey(sysKey);
 }
+
+int32_t KeySubscriberHandler::RegisterHotKey(std::shared_ptr<KeyOption> option,
+    int32_t session, std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    KeyShortcutManager::HotKey hotKey {
+        .modifiers = option->GetPreKeys(),
+        .finalKey = option->GetFinalKey(),
+        .longPressTime = option->GetFinalKeyDownDuration(),
+        .session = session,
+        .callback = callback,
+    };
+    return KEY_SHORTCUT_MGR->RegisterHotKey(hotKey);
+}
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 
 int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
@@ -243,12 +257,19 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
     PrintKeyOption(option);
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CHKPR(subscriber->sess_, RET_ERR);
-    subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
-        [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
-            NotifySubscriber(keyEvent, subscriber);
-        });
+    if (PER_HELPER->VerifySystemApp()) {
+        subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
+            [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
+                NotifySubscriber(keyEvent, subscriber);
+            });
+    } else {
+        subscriber->shortcutId_ = RegisterHotKey(option, subscriber->sess_->GetPid(),
+            [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
+                NotifySubscriber(keyEvent, subscriber);
+            });
+    }
     if (subscriber->shortcutId_ < 0) {
-        MMI_HILOGE("RegisterSystemKey fail, error:%{public}d", subscriber->shortcutId_);
+        MMI_HILOGE("Register shortcut fail, error:%{public}d", subscriber->shortcutId_);
         return RET_ERR;
     }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
