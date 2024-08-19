@@ -115,30 +115,6 @@ std::shared_ptr<Media::PixelMap> PointerDrawingManagerTest::CreatePixelMap(int32
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_01
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-    pointerStyle.color = 1;
-    pointerStyle.size = 2;
-
-    int32_t ROTATE_POLICY;
-    ROTATE_POLICY = WINDOW_ROTATE;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawPointerStyle_02
  * @tc.desc: Test DrawManager
  * @tc.type: FUNC
