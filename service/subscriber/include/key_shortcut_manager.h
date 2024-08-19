@@ -66,6 +66,7 @@ public:
     struct HotKey {
         std::set<int32_t> modifiers;
         int32_t finalKey;
+        int32_t longPressTime; // ms
         int32_t session;
         std::function<void(std::shared_ptr<KeyEvent>)> callback;
     };

@@ -104,6 +104,8 @@ private:
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
     int32_t RegisterSystemKey(std::shared_ptr<KeyOption> option, int32_t session,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    int32_t RegisterHotKey(std::shared_ptr<KeyOption> option, int32_t session,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback);
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
     int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
