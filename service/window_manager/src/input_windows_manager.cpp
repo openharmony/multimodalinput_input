@@ -2304,7 +2304,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
         touchWindow = std::make_optional(mouseDownInfo_);
         int32_t pointerAction = pointerEvent->GetPointerAction();
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        }
         pointerEvent->SetOriginPointerAction(pointerAction);
         MMI_HILOGI("mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
     }
@@ -2888,7 +2890,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
         touchWindow = &it->second.window;
         if (it->second.flag) {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            }
             MMI_HILOG_DISPATCHI("Not found event down target window, maybe this window was untouchable,"
                 "need send cancel event, windowId:%{public}d pointerId:%{public}d", touchWindow->id, pointerId);
         }
