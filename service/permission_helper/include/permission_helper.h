@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace MMI {
 class PermissionHelper final {
-    DECLARE_DELAYED_SINGLETON(PermissionHelper);
 public:
     static const uint32_t APL_NORMAL = 1 << OHOS::Security::AccessToken::APL_NORMAL;
     static const uint32_t APL_SYSTEM_BASIC = 1 << OHOS::Security::AccessToken::APL_SYSTEM_BASIC;
@@ -30,7 +29,14 @@ public:
     static const uint32_t APL_SYSTEM_BASIC_CORE = APL_SYSTEM_BASIC + APL_SYSTEM_CORE;
 
 public:
-    DISALLOW_COPY_AND_MOVE(PermissionHelper);
+    static PermissionHelper* GetInstance()
+    {
+        static PermissionHelper instance;
+        return &instance;
+    }
+    PermissionHelper(const PermissionHelper&) = delete;
+    PermissionHelper& operator=(const PermissionHelper&) = delete;
+
     bool CheckPermission(uint32_t required);
     bool CheckMonitor();
     bool CheckInterceptor();
@@ -44,12 +50,13 @@ public:
     bool CheckAuthorize();
 
 private:
+    PermissionHelper() {}
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
     bool CheckHapPermission(uint32_t tokenId, std::string permissionCode);
     bool CheckHapPermission(std::string permissionCode);
 };
 
-#define PER_HELPER ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()
+#define PER_HELPER PermissionHelper::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // PERMISSION_HELPER_H

@@ -23,6 +23,11 @@
 #include "oh_axis_type.h"
 #include "oh_input_interceptor.h"
 #include "oh_key_code.h"
+#include "permission_helper.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "screen_capture_monitor.h"
+#include "ipc_skeleton.h"
+#endif // PLAYER_FRAMEWORK_EXISTS
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManager"
@@ -94,7 +99,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{public}d", keyState->keyCode);
+        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -139,7 +144,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{public}d", keyCode);
+        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyCode);
         return;
     }
     keyState->keyCode = keyCode;
@@ -185,7 +190,7 @@ static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::Ke
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_HILOGW("Find pressed key failed, keyCode:%{public}d", keyEvent->keyCode);
+            MMI_HILOGW("Find pressed key failed, keyCode:%{private}d", keyEvent->keyCode);
         }
         g_keyEvent->RemoveReleasedKeyItems(item);
         g_keyEvent->AddPressedKeyItems(item);
@@ -197,7 +202,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     MMI_HILOGI("Input_KeyEvent injectEvent");
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
-        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyEvent->keyCode);
+        MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyEvent->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(g_keyEvent, INPUT_PARAMETER_ERROR);
@@ -759,7 +764,9 @@ static bool SetAxisValueByAxisEventType(std::shared_ptr<OHOS::MMI::PointerEvent>
 
 static bool IsAxisEvent(int32_t action)
 {
-    if (action != AXIS_ACTION_BEGIN && action != AXIS_ACTION_UPDATE && action != AXIS_ACTION_END) {
+    if (action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END) {
         return false;
     }
     return true;
@@ -907,12 +914,31 @@ static Input_Result NormalizeResult(int32_t result)
     return INPUT_SUCCESS;
 }
 
+static bool SetKeyEventAction(Input_KeyEvent* keyEvent, int32_t action)
+{
+    CHKPF(keyEvent);
+    if (action == OHOS::MMI::KeyEvent::KEY_ACTION_CANCEL) {
+        keyEvent->action = KEY_ACTION_CANCEL;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        keyEvent->action = KEY_ACTION_DOWN;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        keyEvent->action = KEY_ACTION_UP;
+    } else {
+        MMI_HILOGE("Invalid key event action");
+        return false;
+    }
+    return true;
+}
+
 static void KeyEventMonitorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
 {
     CHKPV(event);
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
     CHKPV(keyEvent);
-    keyEvent->action = event->GetKeyAction();
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
     keyEvent->keyCode = event->GetKeyCode();
     keyEvent->actionTime = event->GetActionTime();
     std::lock_guard guard(g_mutex);
@@ -922,10 +948,32 @@ static void KeyEventMonitorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
     OH_Input_DestroyKeyEvent(&keyEvent);
 }
 
+static bool IsScreenCaptureWorking()
+{
+    CALL_DEBUG_ENTER;
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    int32_t pid = OHOS::IPCSkeleton::GetCallingPid();
+    int32_t capturePid = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+    if (capturePid != pid) {
+        MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+        return false;
+    }
+    return true;
+#else
+    return false;
+#endif // PLAYER_FRAMEWORK_EXISTS
+}
+
 Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
     Input_Result retCode = INPUT_SUCCESS;
     std::lock_guard guard(g_mutex);
     if (g_keyMonitorId == INVALID_MONITOR_ID) {
@@ -940,19 +988,45 @@ Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
     return retCode;
 }
 
+static bool SetTouchEventAction(Input_TouchEvent* touchEvent, int32_t action)
+{
+    CHKPF(touchEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL:
+            touchEvent->action = TOUCH_ACTION_CANCEL;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN:
+            touchEvent->action = TOUCH_ACTION_DOWN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE:
+            touchEvent->action = TOUCH_ACTION_MOVE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_UP:
+            touchEvent->action = TOUCH_ACTION_UP;
+            break;
+        default:
+            MMI_HILOGE("Invalid touch event action");
+            return false;
+    }
+    return true;
+}
+
 static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
 {
     CHKPV(event);
     Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
     CHKPV(touchEvent);
-    touchEvent->action = event->GetPointerAction();
-    touchEvent->id = event->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem item;
     if (!(event->GetPointerItem(event->GetPointerId(), item))) {
         MMI_HILOGE("Can not get pointerItem for the pointer event");
         OH_Input_DestroyTouchEvent(&touchEvent);
         return;
     }
+    if (!SetTouchEventAction(touchEvent, event->GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    touchEvent->id = event->GetPointerId();
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
     touchEvent->actionTime = event->GetActionTime();
@@ -961,6 +1035,58 @@ static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
         callback(touchEvent);
     }
     OH_Input_DestroyTouchEvent(&touchEvent);
+}
+
+static bool SetMouseEventAction(Input_MouseEvent* mouseEvent, int32_t action)
+{
+    CHKPF(mouseEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL:
+            mouseEvent->action = MOUSE_ACTION_CANCEL;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE:
+            mouseEvent->action = MOUSE_ACTION_MOVE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+            mouseEvent->action = MOUSE_ACTION_BUTTON_DOWN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_UP:
+            mouseEvent->action = MOUSE_ACTION_BUTTON_UP;
+            break;
+        default:
+            MMI_HILOGE("Invalid mouse event action");
+            return false;
+    }
+    return true;
+}
+
+static bool SetMouseEventButton(Input_MouseEvent* mouseEvent, int32_t button)
+{
+    CHKPF(mouseEvent);
+    switch (button) {
+        case OHOS::MMI::PointerEvent::BUTTON_NONE:
+            mouseEvent->button = MOUSE_BUTTON_NONE;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_LEFT:
+            mouseEvent->button = MOUSE_BUTTON_LEFT;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_MIDDLE:
+            mouseEvent->button = MOUSE_BUTTON_MIDDLE;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_RIGHT:
+            mouseEvent->button = MOUSE_BUTTON_RIGHT;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_FORWARD:
+            mouseEvent->button = MOUSE_BUTTON_FORWARD;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_BACK:
+            mouseEvent->button = MOUSE_BUTTON_BACK;
+            break;
+        default:
+            MMI_HILOGE("Invalid mouse event button");
+            return false;
+    }
+    return true;
 }
 
 static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
@@ -974,16 +1100,40 @@ static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> e
         OH_Input_DestroyMouseEvent(&mouseEvent);
         return;
     }
+    if (!SetMouseEventAction(mouseEvent, event->GetPointerAction())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventButton(mouseEvent, event->GetButtonId())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
-    mouseEvent->action = event->GetPointerAction();
-    mouseEvent->button = event->GetButtonId();
     mouseEvent->actionTime = event->GetActionTime();
     std::lock_guard guard(g_mutex);
     for (auto &callback : g_mouseMonitorCallbacks) {
         callback(mouseEvent);
     }
     OH_Input_DestroyMouseEvent(&mouseEvent);
+}
+
+static void SetAxisEventAction(Input_AxisEvent* axisEvent, int32_t action)
+{
+    CHKPV(axisEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+            axisEvent->axisAction = AXIS_ACTION_BEGIN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+            axisEvent->axisAction = AXIS_ACTION_UPDATE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END:
+            axisEvent->axisAction = AXIS_ACTION_END;
+            break;
+        default:
+            break;
+    }
 }
 
 static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
@@ -1001,7 +1151,7 @@ static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> ev
         OH_Input_DestroyAxisEvent(&axisEvent);
         return;
     }
-    axisEvent->axisAction = event->GetPointerAction();
+    SetAxisEventAction(axisEvent, event->GetPointerAction());
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
@@ -1054,6 +1204,12 @@ Input_Result OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         return ret;
@@ -1067,6 +1223,12 @@ Input_Result OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback)
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         return ret;
@@ -1080,6 +1242,12 @@ Input_Result OH_Input_AddAxisEventMonitorForAll(Input_AxisEventCallback callback
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         return ret;
@@ -1093,6 +1261,12 @@ Input_Result OH_Input_AddAxisEventMonitor(InputEvent_AxisEventType axisEventType
 {
     CALL_DEBUG_ENTER;
     CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
     Input_Result ret = AddPointerEventMonitor();
     if (ret != INPUT_SUCCESS) {
         return ret;
@@ -1222,7 +1396,10 @@ static void KeyEventInterceptorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> eve
     CHKPV(event);
     Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
     CHKPV(keyEvent);
-    keyEvent->action = event->GetKeyAction();
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
     keyEvent->keyCode = event->GetKeyCode();
     keyEvent->actionTime = event->GetActionTime();
     std::lock_guard guard(g_mutex);
@@ -1265,14 +1442,17 @@ static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
     }
     Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
     CHKPV(touchEvent);
-    touchEvent->action = event->GetPointerAction();
-    touchEvent->id = event->GetPointerId();
     OHOS::MMI::PointerEvent::PointerItem item;
     if (!(event->GetPointerItem(event->GetPointerId(), item))) {
         MMI_HILOGE("Can not get pointerItem for the pointer event");
         OH_Input_DestroyTouchEvent(&touchEvent);
         return;
     }
+    if (!SetTouchEventAction(touchEvent, event->GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    touchEvent->id = event->GetPointerId();
     touchEvent->displayX = item.GetDisplayX();
     touchEvent->displayY = item.GetDisplayY();
     touchEvent->actionTime = event->GetActionTime();
@@ -1297,10 +1477,16 @@ static void MouseEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEven
         OH_Input_DestroyMouseEvent(&mouseEvent);
         return;
     }
+    if (!SetMouseEventAction(mouseEvent, event->GetPointerAction())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventButton(mouseEvent, event->GetButtonId())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
     mouseEvent->displayX = item.GetDisplayX();
     mouseEvent->displayY = item.GetDisplayY();
-    mouseEvent->action = event->GetPointerAction();
-    mouseEvent->button = event->GetButtonId();
     mouseEvent->actionTime = event->GetActionTime();
     g_pointerInterceptorCallback->mouseCallback(mouseEvent);
     OH_Input_DestroyMouseEvent(&mouseEvent);
@@ -1328,7 +1514,7 @@ static void AxisEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent
         OH_Input_DestroyAxisEvent(&axisEvent);
         return;
     }
-    axisEvent->axisAction = event->GetPointerAction();
+    SetAxisEventAction(axisEvent, event->GetPointerAction());
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
@@ -1374,7 +1560,7 @@ Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *c
     return retCode;
 }
 
-Input_Result OH_Input_RemoveKeyEventInterceptor()
+Input_Result OH_Input_RemoveKeyEventInterceptor(void)
 {
     CALL_DEBUG_ENTER;
     Input_Result retCode = INPUT_SUCCESS;
@@ -1390,7 +1576,7 @@ Input_Result OH_Input_RemoveKeyEventInterceptor()
     return retCode;
 }
 
-Input_Result OH_Input_RemoveInputEventInterceptor()
+Input_Result OH_Input_RemoveInputEventInterceptor(void)
 {
     CALL_DEBUG_ENTER;
     Input_Result retCode = INPUT_SUCCESS;
