@@ -84,6 +84,9 @@ constexpr int32_t DEFAULT_VALUE { -1 };
 void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
+        return;
+    }
     if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{private}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
@@ -2360,6 +2363,85 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
             DfxHisysevent::ReportFailIfKnockTooFast();
         }
     }
+}
+
+bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
+{
+    CHKPF(event);
+    std::string shotBundleName;
+    std::string shotAbilityName;
+    std::string recorderBundleName;
+    std::string recorderAbilityName;
+    if (!GetTouchPadKnuckleAbilityInfo(shotBundleName, shotAbilityName, recorderBundleName, recorderAbilityName)) {
+        return false;
+    }
+    auto actionType = event->GetKeyAction();
+    if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
+        TouchPadKnuckleDoubleClickProcess(shotBundleName, shotAbilityName, "single_knuckle");
+        return true;
+    }
+    if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
+        TouchPadKnuckleDoubleClickProcess(recorderBundleName, recorderAbilityName, "double_knuckle");
+        return true;
+    }
+    return false;
+}
+
+void KeyCommandHandler::TouchPadKnuckleDoubleClickProcess(const std::string bundleName,
+    const std::string abilityName, const std::string action)
+{
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
+        MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
+        return;
+    }
+    Ability ability;
+    ability.bundleName = bundleName;
+    ability.abilityName = abilityName;
+    ability.params.emplace(std::make_pair("trigger_type", action));
+    LaunchAbility(ability, NO_DELAY);
+}
+
+bool KeyCommandHandler::GetTouchPadKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
+    std::string &recorderBundleName, std::string &recorderAbilityName)
+{
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        isParseConfig_ = true;
+    }
+    if (sequences_.empty()) {
+        MMI_HILOGI("No sequences configuration data");
+        return false;
+    }
+    std::string bundleName;
+    std::string shotMatchName = ".screenshot";
+    std::string recorderMatchName = ".screenrecorder";
+    for (auto iter = sequences_.begin(); iter != sequences_.end(); ++iter) {
+        bundleName = iter->ability.bundleName;
+        if (bundleName.find(shotMatchName) != std::string::npos) {
+            shotBundleName = iter->ability.bundleName;
+            shotAbilityName = iter->ability.abilityName;
+            break;
+        }
+    }
+    for (auto iter = sequences_.begin(); iter != sequences_.end(); ++iter) {
+        bundleName = iter->ability.bundleName;
+        if (bundleName.find(recorderMatchName) != std::string::npos) {
+            recorderBundleName = iter->ability.bundleName;
+            recorderAbilityName = iter->ability.abilityName;
+            break;
+        }
+    }
+    if (shotBundleName.empty() || shotAbilityName.empty() || recorderBundleName.empty() ||
+        recorderAbilityName.empty()) {
+        MMI_HILOGI("Get touchPad knuckle ability information failed");
+        return false;
+    }
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
