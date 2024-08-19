@@ -193,7 +193,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
             std::to_string(pointerEvent->GetId()));
     }
     EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
-    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
+    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction() ||
+        PointerEvent::POINTER_ACTION_HOVER_CANCEL == pointerEvent->GetPointerAction() ||
+        PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
