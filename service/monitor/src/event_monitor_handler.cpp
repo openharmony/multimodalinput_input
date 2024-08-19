@@ -277,8 +277,8 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
     }
 
     monitors_.erase(iter);
-    if (iter->session_) {
-        int32_t pid = iter->session_->GetPid();
+    if (monitor.session_) {
+        int32_t pid = monitor.session_->GetPid();
         auto it = endScreenCaptureMonitors_.find(pid);
         if (it != endScreenCaptureMonitors_.end()) {
             auto setIter = endScreenCaptureMonitors_[pid].find(monitor);
