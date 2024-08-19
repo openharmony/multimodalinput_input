@@ -189,6 +189,7 @@ public:
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
+    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t SetIsFreezePowerKey(const std::string pageName);
@@ -285,7 +286,6 @@ private:
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);

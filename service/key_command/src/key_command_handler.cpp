@@ -608,7 +608,10 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
         return;
     }
     if (CheckInputMethodArea(touchEvent)) {
-        MMI_HILOGI("In input method area, skip");
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            MMI_HILOGI("In input method area, skip");
+        }
         return;
     }
     int32_t touchAction = touchEvent->GetPointerAction();
@@ -2233,9 +2236,12 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
         }
         if (displayX >= window.area.x && displayX <= rightDownX &&
             displayY >= window.area.y && displayY <= rightDownY) {
+            if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+                touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
                 MMI_HILOGI("In input method area, windowId:%{public}d, windowType:%{public}d",
                     window.id, window.windowType);
                 return true;
+            }
         }
     }
     return false;
