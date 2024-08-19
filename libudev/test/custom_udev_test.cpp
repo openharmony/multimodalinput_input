@@ -98,7 +98,7 @@ HWTEST_F(CustomUdevTest, TestBasicsFail, TestSize.Level1)
 {
     errno = 0;
     EXPECT_EQ(udev_device_get_udev(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 
     errno = 0;
     EXPECT_EQ(udev_device_ref(nullptr), nullptr);

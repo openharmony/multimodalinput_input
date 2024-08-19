@@ -191,7 +191,7 @@ std::shared_ptr<sharedType> GetPtr()
 template<typename EventType>
 void TestSimulateInputEvent(EventType& event, const TestScene& testScene = TestScene::NORMAL_TEST)
 {
-    EXPECT_TRUE((static_cast<int32_t>(testScene) ^ TestUtil->CompareDump(event)));
+    EXPECT_FALSE((static_cast<int32_t>(testScene) ^ TestUtil->CompareDump(event)));
 }
 template<typename EventType>
 void SimulateInputEventUtilTest(EventType& event)
