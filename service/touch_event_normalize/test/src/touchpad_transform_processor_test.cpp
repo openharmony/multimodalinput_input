@@ -1197,5 +1197,72 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     int32_t newRows = processor.GetTouchpadScrollRows();
     ASSERT_TRUE(rows == newRows);
 }
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001
+ * @tc.desc: test OnEventTouchPadPinchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
+        if (iter->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
+    int32_t deviceId = iter->first;
+    TouchPadTransformProcessor processor(deviceId);
+    ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchGesture(event));
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_GetPinchGestureType_001
+ * @tc.desc: test GetPinchGestureType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetPinchGestureType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 1;
+    TouchPadTransformProcessor processor(deviceId);
+    int32_t type = LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
+    double angle = 5.0;
+    int32_t action = processor.GetPinchGestureType(type, angle);
+    ASSERT_EQ(action, PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
+
+    type = LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
+    action = processor.GetPinchGestureType(type, angle);
+    ASSERT_EQ(action, PointerEvent::POINTER_ACTION_ROTATE_UPDATE);
+
+    type = LIBINPUT_EVENT_GESTURE_PINCH_END;
+    action = processor.GetPinchGestureType(type, angle);
+    ASSERT_EQ(action, PointerEvent::POINTER_ACTION_ROTATE_END);
+
+    type = LIBINPUT_EVENT_GESTURE_PINCH_BEGIN;
+    angle = 0.0;
+    action = processor.GetPinchGestureType(type, angle);
+    ASSERT_EQ(action, PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+
+    type = LIBINPUT_EVENT_GESTURE_PINCH_UPDATE;
+    action = processor.GetPinchGestureType(type, angle);
+    ASSERT_EQ(action, PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+
+    type = LIBINPUT_EVENT_GESTURE_PINCH_END;
+    action = processor.GetPinchGestureType(type, angle);
+    ASSERT_EQ(action, PointerEvent::POINTER_ACTION_AXIS_END);
+}
+
 } // namespace MMI
 } // namespace OHOS
