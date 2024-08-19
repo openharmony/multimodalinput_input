@@ -546,7 +546,11 @@ void InputWindowsManager::CleanShellWindowIds()
 {}
 #endif // OHOS_BUILD_ENABLE_ANCO
 
-bool KeyCommandHandler::GetKnuckleSwitchValue()
+bool KeyCommandHandler::GetKnuckleSwitchValue(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    return false;
+}
+bool KeyCommandHandler::CheckInputMethodArea()
 {
     return false;
 }
