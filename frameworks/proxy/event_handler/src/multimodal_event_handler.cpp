@@ -136,10 +136,12 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
         MMI_HILOGE("The client fails to start");
         return false;
     }
-    if (!client_->GetEventHandler()->PostTask([this] {
+    int32_t ret = client_->GetEventHandler()->PostTask([this] {
             auto runner = this->client_->GetEventHandler()->GetEventRunner();
             CHKPF(runner);
-            return SetClientInfo(GetPid(), GetThisThreadId()) ? true : false; })) {
+            return SetClientInfo(GetPid(), GetThisThreadId());
+        });
+    if (ret != RET_OK) {
         MMI_HILOGE("Failed to set client info");
         return false;
     }
