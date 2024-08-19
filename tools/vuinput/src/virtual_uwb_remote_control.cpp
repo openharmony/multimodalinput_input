@@ -21,7 +21,7 @@ namespace {
 constexpr int32_t ABS_MAX_X = 719;
 constexpr int32_t ABS_MAX_Y = 1279;
 constexpr int32_t ABS_PRESSURE_MAX = 3000;
-constexpr int32_t ABS_MT_MOVEFLAG_MAX = 10;
+constexpr int32_t ABS_MT_MOVEFLAG_MAX = 100;
 constexpr int32_t ABS_MT_SLOT_MAX = 10;
 constexpr int32_t ABS_MT_TOUCH_MAJOR_MAX = 1;
 constexpr int32_t ABS_MT_TOUCH_MINOR_MAX = 1;
