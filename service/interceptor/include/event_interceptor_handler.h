@@ -59,7 +59,7 @@ public:
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
-
+    bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
 private:
     class SessionHandler {
     public:

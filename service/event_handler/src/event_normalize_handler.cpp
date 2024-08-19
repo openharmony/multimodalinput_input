@@ -444,6 +444,20 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     }
 }
 
+bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+        bool threeFingerSwitch = false;
+        TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
+        if (!threeFingerSwitch) {
+            return true;
+        }
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
+    }
+    return false;
+}
+
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
@@ -452,20 +466,17 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION && TouchPadKnuckleDoubleClickHandle(event)) {
+        return RET_OK;
+    }
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
     GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
-        bool threeFingerSwitch = false;
-        TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
-        if (!threeFingerSwitch) {
-            return RET_OK;
-        }
-        nextHandler_->HandlePointerEvent(pointerEvent);
-        MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
+    if (HandleTouchPadTripleTapEvent(pointerEvent)) {
+        return RET_OK;
     }
     buttonIds_.insert(seatSlot);
     if (buttonIds_.size() == FINGER_NUM &&
@@ -889,6 +900,32 @@ bool EventNormalizeHandler::JudgeIfSwipeInward(std::shared_ptr<PointerEvent> poi
         g_isSwipeInward = true;
     }
     return g_isSwipeInward;
+}
+
+bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* event)
+{
+    CHKPF(event);
+    CHKPF(nextHandler_);
+    auto touchpadEvent = libinput_event_get_touchpad_event(event);
+    CHKPF(touchpadEvent);
+    double value = libinput_event_touchpad_get_pressure(touchpadEvent);
+    if (std::fabs(SINGLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon()) {
+        std::shared_ptr<MMI::KeyEvent> keyEvent = KeyEvent::Create();
+        CHKPF(keyEvent);
+        keyEvent->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
+        MMI_HILOGI("Current is touchPad single knuckle double click action");
+        nextHandler_->HandleKeyEvent(keyEvent);
+        return true;
+    }
+    if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+        std::shared_ptr<MMI::KeyEvent> keyEvent = KeyEvent::Create();
+        CHKPF(keyEvent);
+        keyEvent->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
+        MMI_HILOGI("Current is touchPad double knuckle double click action");
+        nextHandler_->HandleKeyEvent(keyEvent);
+        return true;
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS

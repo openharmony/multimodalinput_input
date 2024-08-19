@@ -48,6 +48,7 @@ private:
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleTouchPadEvent(libinput_event* event);
+    bool HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
@@ -66,6 +67,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
     void PointerEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
+    bool TouchPadKnuckleDoubleClickHandle(libinput_event* event);
 
 private:
     int32_t timerId_ { -1 };
