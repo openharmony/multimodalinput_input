@@ -26,17 +26,17 @@
 #include "app_debug_listener.h"
 #include "delegate_interface.h"
 #include "delegate_tasks.h"
+#include "infrared_frequency_info.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
+#include "nap_process.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-#include "nap_process.h"
-#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
-
+class TouchGestureAdapter;
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_SYSTEM_ABILITY(MMIService);
@@ -256,7 +256,10 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
-    std::shared_ptr<DelegateInterface> delegateInterface_ {nullptr};
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    std::shared_ptr<TouchGestureAdapter> touchGestureAdapter_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };
 };
