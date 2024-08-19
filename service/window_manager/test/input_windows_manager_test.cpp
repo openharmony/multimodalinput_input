@@ -40,8 +40,6 @@ using namespace testing::ext;
 namespace {
 InputWindowsManager *g_instance;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
-constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
-constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
