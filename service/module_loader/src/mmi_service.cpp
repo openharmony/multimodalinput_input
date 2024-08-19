@@ -2881,7 +2881,7 @@ int32_t MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
 void MMIService::InitPrintClientInfo()
 {
     CALL_DEBUG_ENTER;
-    TimerMgr->AddTimer(PRINT_INTERVAL_TIME, -1, [this]() {
+    TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
         std::pair<std::string, ClientInfo> mainThreadClient;
         std::pair<std::string, ClientInfo> childThreadClient;
         bool hasMainThreadClient = false;
