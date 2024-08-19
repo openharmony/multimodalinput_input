@@ -311,7 +311,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL ||
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
         MMI_HILOG_DISPATCHD("window info is null, so pointerEvent is dropped! return -1");
         return udsServer_->GetClientFd(-1);
