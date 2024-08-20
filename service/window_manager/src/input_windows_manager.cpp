@@ -4001,7 +4001,9 @@ bool InputWindowsManager::ParseJson(const std::string &configFile)
 
 void InputWindowsManager::SetWindowStateNotifyPid(int32_t pid)
 {
-    windowStateNotifyPid_ = pid;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        windowStateNotifyPid_ = pid;
+    }
 }
 
 int32_t InputWindowsManager::GetWindowStateNotifyPid()
