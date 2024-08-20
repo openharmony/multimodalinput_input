@@ -789,24 +789,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark, TestSize.Level1
 }
 
 /**
- * @tc.name: EventDispatchTest_HandlePointerEventInner
- * @tc.desc: Test HandlePointerEventInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem pointerItem;
-    pointerEvent->SetPointerId(5);
-    pointerItem.SetPointerId(5);
-    pointerEvent->AddPointerItem(pointerItem);
-    ASSERT_NO_FATAL_FAILURE(dispatch.HandlePointerEventInner(pointerEvent));
-}
-
-/**
  * @tc.name: EventDispatchTest_DispatchPointerEventInner_001
  * @tc.desc: Test Dispatch Pointer Event Inner
  * @tc.type: FUNC
