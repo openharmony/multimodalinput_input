@@ -365,11 +365,11 @@
     },
     {
         "first_introduced": "13",
-        "name": "OH_Input_SetIsRepeat"
+        "name": "OH_Input_SetRepeat"
     },
     {
         "first_introduced": "13",
-        "name": "OH_Input_GetIsRepeat"
+        "name": "OH_Input_IsRepeat"
     },
     {
         "first_introduced": "13",
