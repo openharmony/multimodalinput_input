@@ -31,6 +31,7 @@ KnuckleGlowTraceSystem::KnuckleGlowTraceSystem(int32_t pointSize, std::shared_pt
     int32_t maxDivergenceNum) : maxDivergenceNum_(maxDivergenceNum)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(pixelMap);
     for (int32_t i = 0; i < pointSize; ++i) {
         divergentPoints_.emplace_back(std::make_shared<KnuckleDivergentPoint>(pixelMap));
         glowPoints_.emplace_back(std::make_shared<KnuckleGlowPoint>(pixelMap));
