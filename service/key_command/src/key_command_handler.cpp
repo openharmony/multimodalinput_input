@@ -1183,7 +1183,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     bool isHandled = HandleShortKeys(key);
-    if (isFreezePowerKey_ && key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && isFreezePowerKey_) {
         MMI_HILOGI("Freeze power key");
         return true;
     }
@@ -1435,6 +1435,8 @@ int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
         return RET_OK;
     }
     isFreezePowerKey_ = true;
+    count_ = 0;
+    repeatKeyCountMap_.clear();
     if (sosDelayTimerId_ >= 0) {
         TimerMgr->RemoveTimer(sosDelayTimerId_);
         sosDelayTimerId_ = DEFAULT_VALUE;
@@ -2063,8 +2065,11 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         }
         if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
             isFreezePowerKey_ = true;
+            count_ = 0;
+            repeatKeyCountMap_.clear();
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
+                MMI_HILOGW("Timeout, restore the power button");
             });
             if (sosDelayTimerId_ < 0) {
                 MMI_HILOGE("Add timer failed");

@@ -370,7 +370,7 @@ private:
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };
-    bool isFreezePowerKey_ { false };
+    std::atomic<bool> isFreezePowerKey_ { false };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool sequenceOccurred_ { false };
