@@ -154,7 +154,11 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 auto option = (*it)->keyOption_;
                 CHKPR(option, ERROR_NULL_POINTER);
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
-                KEY_SHORTCUT_MGR->UnregisterSystemKey((*it)->shortcutId_);
+                if (PER_HELPER->VerifySystemApp()) {
+                    KEY_SHORTCUT_MGR->UnregisterSystemKey((*it)->shortcutId_);
+                } else {
+                    KEY_SHORTCUT_MGR->UnregisterHotKey((*it)->shortcutId_);
+                }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
                 MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
                     "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
@@ -1153,10 +1157,10 @@ void KeySubscriberHandler::DumpSubscriber(int32_t fd, std::shared_ptr<Subscriber
     }
     mprintf(fd,
             "Subscriber ID:%d | Pid:%d | Uid:%d | Fd:%d | Prekeys:[%s] | FinalKey:%d | "
-            "FinalKeyDownDuration:%d | IsFinalKeyDown:%s | ProgramName:%s",
+            "FinalKeyDownDuration:%d | IsFinalKeyDown:%s | IsRepeat:%s | ProgramName:%s",
             subscriber->id_, session->GetPid(), session->GetUid(), session->GetFd(),
             sPrekeys.str().c_str(), keyOption->GetFinalKey(), keyOption->GetFinalKeyDownDuration(),
-            keyOption->IsFinalKeyDown() ? "true" : "false",
+            keyOption->IsFinalKeyDown() ? "true" : "false", keyOption->IsRepeat() ? "true" : "false",
             session->GetProgramName().c_str());
 }
 } // namespace MMI
