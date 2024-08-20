@@ -1447,6 +1447,11 @@ int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(in
     CALL_DEBUG_ENTER;
     CHKPR(callback, RET_ERR);
     windowStatecallback_ = callback;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
