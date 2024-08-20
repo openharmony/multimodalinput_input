@@ -33,6 +33,7 @@ AncoChannelProxy::AncoChannelProxy(const sptr<IRemoteObject> &remoteObj)
 int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_INFO_TRACE;
+    CHKPR(pointerEvent, RET_ERR);
     MessageParcel data;
     if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
@@ -59,6 +60,7 @@ int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<PointerEvent> pointerEv
 int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_INFO_TRACE;
+    CHKPR(keyEvent, RET_ERR);
     MessageParcel data;
     if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
