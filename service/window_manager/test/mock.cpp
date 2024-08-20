@@ -550,4 +550,9 @@ bool KeyCommandHandler::GetKnuckleSwitchValue()
 {
     return false;
 }
+
+bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    return false;
+}
 } // namespace OHOS
