@@ -48,8 +48,11 @@ std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libin
             break;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY: {
-            MMI_HILOGE("Proximity event");
-            return nullptr;
+            if (!OnTipProximity(event)) {
+                MMI_HILOGE("OnTipProximity failed");
+                return nullptr;
+            }
+            break;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_TIP: {
             if (!OnTip(event)) {
@@ -243,6 +246,60 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
         return false;
     }
     item.SetPressed(false);
+    pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
+    return true;
+}
+
+bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
+    auto tabletEvent = libinput_event_get_tablet_tool_event(event);
+    CHKPF(tabletEvent);
+    uint64_t time = libinput_event_tablet_tool_get_time_usec(tabletEvent);
+    pointerEvent_->SetActionTime(time);
+
+    bool tabletProximityState = libinput_event_tablet_tool_get_proximity_state(tabletEvent);
+    if (tabletProximityState) {
+        MMI_HILOGI("The pen is getting close and report proximity in event");
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_IN);
+    } else {
+        MMI_HILOGI("The pen is getting away and report proximity out event");
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_PROXIMITY_OUT);
+    }
+
+    int32_t targetDisplayId = pointerEvent_->GetTargetDisplayId();
+    PhysicalCoordinate tCoord;
+    if (!WIN_MGR->CalculateTipPoint(tabletEvent, targetDisplayId, tCoord)) {
+        MMI_HILOGE("CalculateTipPoint failed");
+        return false;
+    }
+    double tiltX = libinput_event_tablet_tool_get_tilt_x(tabletEvent);
+    double tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
+    double pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
+    int32_t toolType = GetToolType(tabletEvent);
+
+    PointerEvent::PointerItem item;
+    if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
+        MMI_HILOGW("The pointer is expected, but not found");
+        pointerEvent_->SetActionStartTime(time);
+        pointerEvent_->SetTargetDisplayId(targetDisplayId);
+        pointerEvent_->SetDeviceId(deviceId_);
+        pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
+
+        item.SetPointerId(DEFAULT_POINTER_ID);
+        item.SetDeviceId(deviceId_);
+        item.SetDownTime(time);
+        item.SetPressed(false);
+        item.SetToolType(toolType);
+    }
+    item.SetDisplayX(static_cast<int32_t>(tCoord.x));
+    item.SetDisplayY(static_cast<int32_t>(tCoord.y));
+    item.SetDisplayXPos(tCoord.x);
+    item.SetDisplayYPos(tCoord.y);
+    item.SetTiltX(tiltX);
+    item.SetTiltY(tiltY);
+    item.SetPressure(pressure);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, item);
     return true;
 }
