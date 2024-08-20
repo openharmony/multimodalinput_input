@@ -186,26 +186,40 @@ void InputWindowsManager::Init(UDSServer& udsServer)
         );
 }
 
-void InputWindowsManager::CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent)
+bool InputWindowsManager::IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
-        return;
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        return false;
     }
     PointerEvent::PointerItem pointer {};
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer)) {
         MMI_HILOGE("Corrupted pointer event");
-        return;
+        return false;
     }
     /* Fold status is indicated by 27th bit of long axis of touch. */
     uint32_t longAxis = pointer.GetLongAxis();
-    if ((longAxis ^ lastFoldStatus_) & FOLD_STATUS_MASK) {
-        lastFoldStatus_ = (longAxis & FOLD_STATUS_MASK);
-        MMI_HILOGI("Fold status (0x%{public}x) change", lastFoldStatus_);
-        OnFoldStatusChanged(pointerEvent);
+    if (cancelTouchStatus_) {
+        if (longAxis & FOLD_STATUS_MASK) {
+            // Screen in the process of folding, ignore this event
+            return true;
+        } else {
+            // Screen folding is complete
+            cancelTouchStatus_ = false;
+            return false;
+        }
+    } else if (longAxis & FOLD_STATUS_MASK) {
+        // The screen begins to collapse, reissues the cancel event, and ignores this event
+        MMI_HILOGI("Screen begins to collapse, reissue cancel event");
+        cancelTouchStatus_ = true;
+        ReissueCancelTouchEvent(pointerEvent);
+        return true;
     }
+    return false;
 }
 
-void InputWindowsManager::OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent)
+void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -3342,7 +3356,10 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
-    CheckFoldChange(pointerEvent);
+    if (IgnoreTouchEvent(pointerEvent)) {
+        MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
+        return RET_OK;
+    };
     switch (source) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
