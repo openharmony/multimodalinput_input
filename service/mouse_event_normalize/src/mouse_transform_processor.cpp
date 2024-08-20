@@ -610,6 +610,7 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     if (!HandlePostInner(data, pointerItem)) {
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
+        DumpInner();
         return ERROR_NULL_POINTER;
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
