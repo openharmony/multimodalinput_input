@@ -446,6 +446,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
 
 bool EventNormalizeHandler::HandleTouchPadTripleTapEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPF(nextHandler_);
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
@@ -909,17 +910,15 @@ bool EventNormalizeHandler::TouchPadKnuckleDoubleClickHandle(libinput_event* eve
     auto touchpadEvent = libinput_event_get_touchpad_event(event);
     CHKPF(touchpadEvent);
     double value = libinput_event_touchpad_get_pressure(touchpadEvent);
+    std::shared_ptr<MMI::KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPF(keyEvent);
     if (std::fabs(SINGLE_KNUCKLE_ABS_PRESSURE_VALUE - value) <= std::numeric_limits<double>::epsilon()) {
-        std::shared_ptr<MMI::KeyEvent> keyEvent = KeyEvent::Create();
-        CHKPF(keyEvent);
         keyEvent->SetKeyAction(KNUCKLE_1F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad single knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
         return true;
     }
     if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
-        std::shared_ptr<MMI::KeyEvent> keyEvent = KeyEvent::Create();
-        CHKPF(keyEvent);
         keyEvent->SetKeyAction(KNUCKLE_2F_DOUBLE_CLICK);
         MMI_HILOGI("Current is touchPad double knuckle double click action");
         nextHandler_->HandleKeyEvent(keyEvent);
