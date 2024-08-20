@@ -35,6 +35,10 @@ KeyMapManager::~KeyMapManager() {}
 void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
+    if (fileName.empty()) {
+        MMI_HILOGE("fileName is empty");
+        return;
+    }
     std::string filePath = GetProFilePath(fileName);
     ReadProFile(filePath, deviceId, configKeyValue_);
     MMI_HILOGD("Number of loaded config files:%{public}zu", configKeyValue_.size());
