@@ -36,9 +36,9 @@ const std::string KEY_EVENT_SUBSCRIBE { "KeyEventSubscribe" };
 const std::string POINTER_EVENT_INTERCEPT { "PointerEventIntercept" };
 const std::string TOUCH_EVENT_INTERCEPT { "TouchEventIntercept" };
 const std::string KEY_EVENT_INTERCEPT { "KeyEventIntercept" };
-const std::string START_EVENT { "StartEvent" };
-const std::string LAUNCH_EVENT { "LaunchEvent" };
-const std::string STOP_EVENT { "StopEvent" };
+const std::string ON_START_EVENT { "StartEvent" };
+const std::string ON_LAUNCH_EVENT { "LaunchEvent" };
+const std::string ON_STOP_EVENT { "StopEvent" };
 constexpr int32_t START_ID { 1 };
 constexpr int32_t LAUNCH_ID { 2 };
 constexpr int32_t STOP_ID { 3 };
@@ -237,19 +237,19 @@ void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
     if (traceBtn == TRACE_START) {
         switch (eventType) {
             case START_EVENT: {
-                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, START_EVENT, START_ID);
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, ON_START_EVENT, START_ID);
                 checkKeyCode = "crossing startId:" + std::to_string(START_ID);
                 HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
                 break;
             }
             case LAUNCH_EVENT: {
-                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, LAUNCH_EVENT, LAUNCH_ID);
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, ON_LAUNCH_EVENT, LAUNCH_ID);
                 checkKeyCode = "crossing launchId:" + std::to_string(LAUNCH_ID);
                 HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
                 break;
             }
             case STOP_EVENT: {
-                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, STOP_EVENT, STOP_ID);
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, ON_STOP_EVENT, STOP_ID);
                 checkKeyCode = "crossing stopId:" + std::to_string(STOP_ID);
                 HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
                 break;
