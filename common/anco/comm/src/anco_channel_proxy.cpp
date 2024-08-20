@@ -85,6 +85,7 @@ int32_t AncoChannelProxy::SyncInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 int32_t AncoChannelProxy::UpdateWindowInfo(std::shared_ptr<AncoWindows> windows)
 {
     CALL_INFO_TRACE;
+    CHKPR(windows, RET_ERR);
     MessageParcel data;
     if (!data.WriteInterfaceToken(IAncoChannel::GetDescriptor())) {
         MMI_HILOGE("Failed to write descriptor");
