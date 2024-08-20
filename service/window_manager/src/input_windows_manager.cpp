@@ -33,7 +33,6 @@
 #include "key_command_handler_util.h"
 #include "mmi_matrix3.h"
 #include "util_ex.h"
-#include "input_device_manager.h"
 #include "scene_board_judgement.h"
 #include "i_preference_manager.h"
 #include "parameters.h"
