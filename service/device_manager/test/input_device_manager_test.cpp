@@ -141,7 +141,7 @@ HWTEST_F(InputDeviceManagerTest, InputDeviceManagerTest_NotifyDevRemoveCallback_
     int32_t deviceId = 1;
     InputDeviceManager::InputDeviceInfo deviceInfo;
     deviceInfo.sysUid = "";
-    deviceManager.NotifyDevRemoveCallback(deviceId, deviceInfo);
+    ASSERT_NO_FATAL_FAILURE(deviceManager.NotifyDevRemoveCallback(deviceId, deviceInfo));
 }
 
 /**
