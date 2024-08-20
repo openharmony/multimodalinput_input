@@ -81,7 +81,7 @@ HWTEST_F(SceneBoardJudgementTest, SceneBoardJudgementTest_SafeGetLine_001, TestS
     std::string line;
     configFile >> std::ws;
     judgement.SafeGetLine(configFile, line);
-    assert(line == "Hello");
+    ASSERT_EQ(line, "Hello");
     configFile >> std::ws;
     judgement.SafeGetLine(configFile, line);
     assert(line == "");
