@@ -476,7 +476,9 @@ ohos_unittest("EventFilterHandlerTest") {
 
   sources = [
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
+    "${mmi_path}/service/filter/test/event_filter_handler_ex_test.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_test.cpp",
+    "${mmi_path}/service/filter/test/mock.cpp",
   ]
 
   deps = [
