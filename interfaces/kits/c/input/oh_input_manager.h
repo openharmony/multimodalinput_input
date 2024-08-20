@@ -265,6 +265,12 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
 /**
+ * @brief 回调函数，用于回调快捷键事件。
+ * @since 13
+ */
+typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
+
+/**
  * @brief Defines the structure for the interceptor of event callbacks,
  * including mouseCallback, touchCallback, and axisCallback.
  * @since 12
@@ -1319,6 +1325,79 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
  * @since 13
  */
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
+
+/**
+ * @brief 设置Key事件是否重复。
+ *
+ * @param hotkey 快捷键对象的实例。
+ * @param isRepeat Key事件是否重复。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
+
+/**
+ * @brief 获取Key事件是否重复。
+ *
+ * @param hotkey 快捷键对象的实例。
+ * @param isRepeat 返回Key事件是否重复。
+ * @return OH_Input_GetIsRepeat 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
+
+/**
+ * @brief 设置被修饰键保持按下持续时间。
+ *
+ * @param hotkey 快捷键对象的实例。
+ * @param duration 被修饰键按下持续时间，单位为微秒（μs）。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetFinalKeyDownDuration(Input_Hotkey* hotkey, int32_t duration);
+
+/**
+ * @brief 获取被修饰键保持按下持续时间。
+ *
+ * @param hotkey 快捷键对象的实例。
+ * @param duration 返回被修饰键保持按下持续时间，单位为微秒（μs）。
+ * @return OH_Input_GetFinalKeyDownDuration 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetFinalKeyDownDuration(const Input_Hotkey* hotkey, int32_t *duration);
+
+/**
+ * @brief 订阅快捷键事件。
+ *
+ * @param hotkey 指定要订阅的快捷键对象。
+ * @param callback 回调函数，用于回调快捷键事件。
+ * @return OH_Input_AddHotkeyMonitor 函数错误码。
+ *         {@Link INPUT_SUCCESS} 订阅组合按键成功。\n
+ *         {@link INPUT_PARAMETER_ERROR} 参数检查失败。\n
+ *         {@Link INPUT_SERVICE_EXCEPTION} 服务异常，订阅组合按键失败。可能的原因是已经被系统订阅。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
+
+/**
+ * @brief 取消订阅快捷键。
+ *
+ * @param hotkey 指定要取消订阅的快捷键对象。
+ * @param callback 回调函数，用于回调快捷键事件。
+ * @return OH_Input_RemoveHotkeyMonitor 函数错误码。
+ *         {@Link INPUT_SUCCESS} 取消订阅组合按键成功。\n
+ *         {@link INPUT_PARAMETER_ERROR} 参数检查失败。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 #ifdef __cplusplus
 }
 #endif
