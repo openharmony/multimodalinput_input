@@ -354,5 +354,29 @@
     {
         "first_introduced": "13",
         "name": "OH_Input_GetFinalKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_AddHotkeyMonitor"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_RemoveHotkeyMonitor"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetIsRepeat"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetIsRepeat"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetFinalKeyDownDuration"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetFinalKeyDownDuration"
     }
 ]
