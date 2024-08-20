@@ -3302,5 +3302,21 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetAllSystemHotkey_001, TestSize.Lev
     int32_t ret = InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
     ASSERT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_SkipPointerLayer_001
+ * @tc.desc: Test SkipPointerLayer
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isSkip = true;
+    int32_t ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
+    isSkip = false;
+    ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
+}
 } // namespace MMI
 } // namespace OHOS
