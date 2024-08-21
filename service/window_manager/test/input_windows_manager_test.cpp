@@ -5235,35 +5235,35 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarge
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CheckFoldChange_001
- * @tc.desc: Test CheckFoldChange
+ * @tc.name: InputWindowsManagerTest_IgnoreTouchEvent_001
+ * @tc.desc: Test IgnoreTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckFoldChange_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IgnoreTouchEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckFoldChange(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->IgnoreTouchEvent(pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckFoldChange(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->IgnoreTouchEvent(pointerEvent));
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
- * @tc.desc: Test OnFoldStatusChanged
+ * @tc.name: InputWindowsManagerTest_ReissueCancelTouchEvent_001
+ * @tc.desc: Test ReissueCancelTouchEvent
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-    EXPECT_NO_FATAL_FAILURE(WIN_MGR->OnFoldStatusChanged(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->ReissueCancelTouchEvent(pointerEvent));
 }
 
 /**
