@@ -147,6 +147,7 @@ public:
     virtual void SetWindowStateNotifyPid(int32_t pid) = 0;
     virtual int32_t GetWindowStateNotifyPid() = 0;
     virtual int32_t GetPidByWindowId(int32_t pid) = 0;
+    virtual int32_t GetFoucusWindowId() = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;

@@ -170,6 +170,7 @@ public:
     void SetWindowStateNotifyPid(int32_t pid);
     int32_t GetWindowStateNotifyPid();
     int32_t GetPidByWindowId(int32_t pid);
+    int32_t GetFoucusWindowId();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);

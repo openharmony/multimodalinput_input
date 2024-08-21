@@ -335,6 +335,25 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
+void EventDispatchHandler::checkFocusWindowState()
+{
+    auto windowID = WIN_MGR->GetFoucusWindowId();
+    auto udsServer = InputHandler->GetUDSServer();
+    auto fd = udsServer->GetClientFd(windowID);
+    auto pid = WIN_MGR->GetPidByWindowId(windowID);
+    if (udsServer->GetSession(fd) == nullptr && pid != -1 && windowID != -1) {
+        if (windowID == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
+            if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
+                SendWindowStateError(pid, windowID);
+            }
+        } else {
+            windowStateErrorInfo_.windowId = windowID;
+            windowStateErrorInfo_.startTime = GetSysClockTime();
+            windowStateErrorInfo_.pid = pid;
+        }
+    }
+}
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
@@ -343,23 +362,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     int32_t ret = RET_OK;
     // 1.Determine whether the key event is a focus type event or an operation type event,
     // 2.Determine whether the current focus window has a safety sub window.
+    checkFocusWindowState();
     auto secSubWindowTargets = WIN_MGR->UpdateTarget(key);
-    if (!secSubWindowTargets.empty()) {
-        auto focusWindowInfo = secSubWindowTargets.front();
-        auto udsServer = InputHandler->GetUDSServer();
-        auto pid = WIN_MGR->GetPidByWindowId(focusWindowInfo.second.id);
-        if (udsServer->GetSession(focusWindowInfo.first) == nullptr && pid != -1 && focusWindowInfo.second.id != -1) {
-            if (focusWindowInfo.second.id == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
-                if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
-                    SendWindowStateError(pid, focusWindowInfo.second.id);
-                }
-            } else {
-                windowStateErrorInfo_.windowId = focusWindowInfo.second.id;
-                windowStateErrorInfo_.startTime = GetSysClockTime();
-                windowStateErrorInfo_.pid = pid;
-            }
-        }
-    }
     for (const auto &item : secSubWindowTargets) {
         key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
         if (item.second.privacyMode == SecureFlag::PRIVACY_MODE) {
