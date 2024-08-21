@@ -1207,7 +1207,9 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
 HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 299);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 260);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
     libinput_event *event = libinput_.Dispatch();
     ASSERT_TRUE(event != nullptr);
     
