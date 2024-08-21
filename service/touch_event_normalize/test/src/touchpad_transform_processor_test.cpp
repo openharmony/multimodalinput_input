@@ -1167,6 +1167,37 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
 }
 
 /**
+ * @tc.name: TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001
+ * @tc.desc: test OnEventTouchPadPinchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, 
+    TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 299);
+    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 260);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
+    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
+    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
+        if (iter->second.inputDeviceOrigin == dev) {
+            break;
+        }
+    }
+    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
+    int32_t deviceId = iter->first;
+    TouchPadTransformProcessor processor(deviceId);
+    ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchGesture(event));
+}
+
+/**
  * @tc.name: TouchPadTransformProcessorTest_SetTouchpadScrollRows_001
  * @tc.desc: Test SetTouchpadScrollRows
  * @tc.type: FUNC
@@ -1196,37 +1227,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     processor.SetTouchpadScrollRows(rows);
     int32_t newRows = processor.GetTouchpadScrollRows();
     ASSERT_TRUE(rows == newRows);
-}
-
-/**
- * @tc.name: TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001
- * @tc.desc: test OnEventTouchPadPinchGesture
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchPadTransformProcessorTest, 
-    TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 299);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 260);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    auto iter = INPUT_DEV_MGR->inputDevice_.begin();
-    for (; iter != INPUT_DEV_MGR->inputDevice_.end(); ++iter) {
-        if (iter->second.inputDeviceOrigin == dev) {
-            break;
-        }
-    }
-    ASSERT_TRUE(iter != INPUT_DEV_MGR->inputDevice_.end());
-    int32_t deviceId = iter->first;
-    TouchPadTransformProcessor processor(deviceId);
-    ASSERT_NO_FATAL_FAILURE(processor.OnEventTouchPadPinchGesture(event));
 }
 
 /**
