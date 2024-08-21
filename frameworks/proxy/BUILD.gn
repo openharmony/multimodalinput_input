@@ -360,8 +360,8 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   deps = [
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
