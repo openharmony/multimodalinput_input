@@ -765,24 +765,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyCancel_001,
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber_001
- * @tc.desc: Test IsNotifyPowerKeySubsciber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    std::vector<int32_t> keyCodes = {KeyEvent::KEYCODE_VOLUME_DOWN};
-    EXPECT_TRUE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_VOLUME_DOWN, keyCodes));
-    keyCodes = {KeyEvent::KEYCODE_POWER, KeyEvent::KEYCODE_VOLUME_DOWN};
-    EXPECT_FALSE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_POWER, keyCodes));
-    keyCodes = {KeyEvent::KEYCODE_POWER};
-    EXPECT_TRUE(handler.IsNotifyPowerKeySubsciber(KeyEvent::KEYCODE_POWER, keyCodes));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_PrintKeyOption_001
  * @tc.desc: Test PrintKeyOption
  * @tc.type: FUNC
@@ -1633,27 +1615,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberKeyU
     subscriberList.push_back(subscriber);
     handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
     ASSERT_NO_FATAL_FAILURE(handler.RemoveSubscriberKeyUpTimer(keyCode));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber
- * @tc.desc: Test IsNotifyPowerKeySubsciber
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsNotifyPowerKeySubsciber, TestSize.Level1)
-{
-    KeySubscriberHandler handler;
-    int32_t keyCode = KeyEvent::KEYCODE_A;
-    std::vector<int32_t> keyCodes;
-    ASSERT_TRUE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
-    keyCode = KeyEvent::KEYCODE_POWER;
-    keyCodes.push_back(KeyEvent::KEYCODE_A);
-    ASSERT_TRUE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
-    keyCodes.insert(keyCodes.begin(), KeyEvent::KEYCODE_VOLUME_DOWN);
-    ASSERT_FALSE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
-    keyCodes.insert(keyCodes.begin(), KeyEvent::KEYCODE_VOLUME_UP);
-    ASSERT_FALSE(handler.IsNotifyPowerKeySubsciber(keyCode, keyCodes));
 }
 
 /**
