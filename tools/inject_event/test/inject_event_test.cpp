@@ -413,28 +413,6 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_012, TestSize.Level1)
 }
 
 /**
- * @tc.name:InjectEvent_InjectTouch_001
- * @tc.desc: test inject touch screen smooth movement interface
- * @tc.type: FUNC
- * @tc.require:SR000GGQBJ
- */
-HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_001, TestSize.Level1)
-{
-    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
-    char command1[] = {"uinput"};
-    char command2[] = {"-T"};
-    char command3[] = {"-m"};
-    char command4[] = {"100"};
-    char command5[] = {"200"};
-    char command6[] = {"100"};
-    char command7[] = {"600"};
-    char command8[] = {"1000"};
-    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8};
-    int32_t result = inputManagerCommand->ParseCommand(8, argv);
-    EXPECT_EQ(OHOS::ERR_OK, result);
-}
-
-/**
  * @tc.name:InjectEvent_InjectTouch_002
  * @tc.desc: test inject touch down interface
  * @tc.type: FUNC

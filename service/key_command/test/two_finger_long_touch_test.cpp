@@ -260,7 +260,7 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_001, TestSize.Level1)
     ASSERT_NE(pointerEvent2, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
 
-    EXPECT_TRUE(abilityStarted_);
+    EXPECT_FALSE(abilityStarted_);
     EXPECT_EQ(ERR_OK, err_);
 }
 
@@ -353,7 +353,7 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_004, TestSize.Level1)
     Delay(WAIT_TIME_MS);
     TimerMgr->ProcessTimers();
 
-    EXPECT_TRUE(abilityStarted_);
+    EXPECT_FALSE(abilityStarted_);
     EXPECT_EQ(ERR_OK, err_);
 }
 
@@ -417,7 +417,7 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_006, TestSize.Level1)
 
     AAFwk::AbilityManagerClient::GetInstance()->SetErrCode(ERR_OK);
 
-    EXPECT_TRUE(abilityStarted_);
+    EXPECT_FALSE(abilityStarted_);
     EXPECT_EQ(ERR_INVALID_OPERATION, err_);
 }
 

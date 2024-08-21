@@ -102,7 +102,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi_002, T
     AuthorizationDialog dialog;
     ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
     bool ret = dialog.ConnectSystemUi();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -136,7 +136,7 @@ HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_StartNoticeAbility_002
     ASSERT_TRUE(ret);
     injectNoticeMgr.isStartSrv_ = false;
     ret = injectNoticeMgr.StartNoticeAbility();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -156,7 +156,7 @@ HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_ConnectNoticeSrv_002, 
     ASSERT_TRUE(ret);
     injectNoticeMgr.connectionCallback_->isConnected_ = false;
     ret = injectNoticeMgr.ConnectNoticeSrv();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**

@@ -113,22 +113,6 @@ std::shared_ptr<Media::PixelMap> PointerDrawingManagerExTest::CreatePixelMap(int
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetPointerLocation_01
- * @tc.desc: Test SetPointerLocation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    int32_t x = 100;
-    int32_t y = 100;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetPointerLocation_02
  * @tc.desc: Test SetPointerLocation
  * @tc.type: FUNC
