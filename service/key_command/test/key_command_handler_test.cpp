@@ -4609,5 +4609,96 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_PreHandleEvent_001, TestSi
     ret = handler.PreHandleEvent(key);
     ASSERT_TRUE(ret);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckInputMethodArea_006
+ * @tc.desc: Test the funcation CheckInputMethodArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckInputMethodArea_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->SetTargetDisplayId(-1);
+    inputEvent->SetTargetWindowId(5);
+    InputWindowsManager inputWindowsManager;
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.id = 5;
+    windowInfo.area.x = 10;
+    windowInfo.area.y = 20;
+    windowInfo.area.width = 100;
+    windowInfo.area.height = 200;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(5);
+    item.SetDisplayY(10);
+    touchEvent->AddPointerItem(item);
+    bool ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    item.SetDisplayX(20);
+    item.SetDisplayY(30);
+    touchEvent->AddPointerItem(item);
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    windowInfo.area.height = INT32_MAX;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    windowInfo.area.width = INT32_MAX;
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    inputEvent->SetTargetWindowId(10);
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+    windowInfo.windowType = 1000;
+    ret = handler.CheckInputMethodArea(touchEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleSequences_004
+ * @tc.desc: Test the funcation HandleSequences
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.sequenceOccurred_ = false;
+    handler.matchedSequence_.timerId = -10;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    Sequence sequence1;
+    sequence1.statusConfig = "statusConfig1";
+    sequence1.statusConfigValue = true;
+    sequence1.abilityStartDelay = 1;
+    sequence1.timerId = 5;
+    handler.sequences_.push_back(sequence1);
+    Sequence sequence2;
+    sequence2.statusConfig = "statusConfig2";
+    sequence2.statusConfigValue = false;
+    sequence2.abilityStartDelay = 2;
+    sequence2.timerId = 1;
+    handler.filterSequences_.push_back(sequence2);
+    bool ret = handler.HandleSequences(keyEvent);
+    ASSERT_FALSE(ret);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = 1;
+    sequenceKey.keyAction = KeyEvent::KEY_ACTION_DOWN;
+    sequenceKey.actionTime = 2;
+    sequenceKey.delay = 5;
+    handler.keys_.push_back(sequenceKey);
+    ret = handler.HandleSequences(keyEvent);
+    ASSERT_FALSE(ret);
+}
 } // namespace MMI
 } // namespace OHOS
