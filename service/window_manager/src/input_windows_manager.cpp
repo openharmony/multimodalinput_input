@@ -278,7 +278,6 @@ bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> point
     }
     return false;
 }
-}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
