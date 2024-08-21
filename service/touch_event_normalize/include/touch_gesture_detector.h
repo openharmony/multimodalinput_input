@@ -77,6 +77,14 @@ private:
     bool NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode);
     bool WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent> event);
 
+    Point CalcGravityCenter(std::map<int32_t, Point> &map);
+    double CalcTwoPointsDistance(const Point &p1, const Point &p2);
+    void CalcAndStoreDistance(std::map<int32_t, Point> &map);
+    int32_t CalcMultiFingerMovement(std::map<int32_t, Point> &map);
+    void HandlePinchMoveEvent(std::shared_ptr<PointerEvent> event);
+    GetureType JudgeOperationMode(std::map<int32_t, Point> &movePoint);
+    bool AntiJitter(std::shared_ptr<PointerEvent> event, GetureType mode);
+
     bool HandleFingerDown();
     int64_t GetMaxDownInterval();
     float GetMaxFingerSpacing();
@@ -92,8 +100,12 @@ private:
     bool isRecognized_ { false };
     bool gestureEnable_ { false };
     bool isFingerReady_ { false };
+    bool haveLastDistance_ { false };
     int32_t gestureDisplayId_ { INT32_MAX };
+    int32_t continuousCloseCount_ { 0 };
+    int32_t continuousOpenCount_ { 0 };
     std::map<int32_t, Point> downPoint_;
+    std::map<int32_t, double> lastDistance_;
     std::shared_ptr<GestureListener> listener_ { nullptr };
 };
 } // namespace MMI
