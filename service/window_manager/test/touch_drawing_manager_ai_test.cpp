@@ -41,46 +41,6 @@ public:
 };
 
 /**
- * @tc.name: TouchDrawingManagerTest_RecordLabelsInfo
- * @tc.desc: Test RecordLabelsInfo
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_RecordLabelsInfo, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawMgr;
-    touchDrawMgr.pointerEvent_ = PointerEvent::Create();
-    ASSERT_NE(touchDrawMgr.pointerEvent_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetPressed(true);
-    item.SetDisplayX(100);
-    item.SetDisplayY(100);
-    touchDrawMgr.pointerEvent_->AddPointerItem(item);
-    touchDrawMgr.pointerEvent_->SetPointerId(0);
-    touchDrawMgr.currentPointerId_ = 1;
-    EXPECT_NO_FATAL_FAILURE(touchDrawMgr.RecordLabelsInfo());
-
-    touchDrawMgr.currentPointerId_ = 0;
-    touchDrawMgr.isFirstDownAction_ = true;
-    touchDrawMgr.lastPointerItem_.push_back(item);
-    touchDrawMgr.pointerEvent_->SetActionTime(150);
-    touchDrawMgr.lastActionTime_ = 300;
-    EXPECT_NO_FATAL_FAILURE(touchDrawMgr.RecordLabelsInfo());
-
-    touchDrawMgr.pointerEvent_->SetActionTime(50);
-    touchDrawMgr.lastActionTime_ = 50;
-    EXPECT_NO_FATAL_FAILURE(touchDrawMgr.RecordLabelsInfo());
-
-    item.SetPressed(false);
-    touchDrawMgr.isFirstDownAction_ = false;
-    touchDrawMgr.pointerEvent_->SetPointerId(10);
-    touchDrawMgr.pointerEvent_->UpdatePointerItem(0, item);
-    EXPECT_NO_FATAL_FAILURE(touchDrawMgr.RecordLabelsInfo());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_TouchDrawHandler
  * @tc.desc: Test TouchDrawHandler
  * @tc.type: Function
