@@ -359,7 +359,10 @@ ohos_unittest("InputManagerImplTest") {
     "-Dprotected=public",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/util:libmmi-util",
+    "${mmi_path}/service:libmmi-server",
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
