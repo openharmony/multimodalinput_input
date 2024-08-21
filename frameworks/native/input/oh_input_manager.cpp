@@ -83,7 +83,7 @@ struct Input_Hotkey {
 typedef std::map<std::string, std::list<Input_KeyEventMonitorInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
-static constexpr size_t PRE_KEYS_SIZE { 4 };
+static constexpr size_t PRE_KEYS_SIZE { 2 };
 static int32_t MICROSECONDS = 1000;
 std::mutex g_hotkeyCountsMutex;
 static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
@@ -1778,8 +1778,32 @@ Input_Result OH_Input_GetFinalKeyDownDuration(const Input_Hotkey* hotkey, int32_
     return INPUT_SUCCESS;
 }
 
-static int32_t GetEventInfo(const Input_Hotkey* hotkey,
-    Input_KeyEventMonitorInfo* event, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+std::string GetSubKeyName(std::set<int32_t> preKeys, int32_t finalKey, int32_t finalKeyDownDuration,
+    bool isRepeat, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+{
+    bool isFinalKeyDown = true;
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(finalKey);
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
+    keyOption->SetRepeat(isRepeat);
+    std::string subKeyName = "";
+    for (const auto &item : preKeys) {
+        subKeyName += std::to_string(item);
+        subKeyName += ",";
+    }
+    subKeyName += std::to_string(finalKey);
+    subKeyName += ",";
+    subKeyName += std::to_string(isFinalKeyDown);
+    subKeyName += ",";
+    subKeyName += std::to_string(finalKeyDownDuration);
+    subKeyName += ",";
+    subKeyName += std::to_string(isRepeat);
+    return subKeyName;
+}
+
+static int32_t GetEventInfo(const Input_Hotkey* hotkey, Input_KeyEventMonitorInfo* event,
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
     CHKPR(hotkey, INPUT_PARAMETER_ERROR);
@@ -1789,41 +1813,37 @@ static int32_t GetEventInfo(const Input_Hotkey* hotkey,
         MMI_HILOGE("pressedKeys not found");
         return INPUT_PARAMETER_ERROR;
     }
-
-    std::set<int32_t> preKeys;
-    preKeys = hotkey->preKeys;
+    std::set<int32_t> preKeys = hotkey->preKeys;
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("preKeys size invalid");
         return INPUT_PARAMETER_ERROR;
     }
-    keyOption->SetPreKeys(preKeys);
-    std::string subKeyNames = "";
     for (const auto &item : preKeys) {
-        subKeyNames += std::to_string(item);
-        subKeyNames += ",";
+        if (item != KEYCODE_ALT_LEFT && item != KEYCODE_ALT_RIGHT && item != KEYCODE_SHIFT_LEFT &&
+            item != KEYCODE_SHIFT_RIGHT && item != KEYCODE_CTRL_LEFT  && item != KEYCODE_CTRL_RIGHT &&
+            item != KEYCODE_META_LEFT  && item != KEYCODE_META_RIGHT) {
+            MMI_HILOGE("preKeys:%{public}d, expect:{ctrl alt shift logo}", item);
+            return INPUT_PARAMETER_ERROR;
+        }
     }
-
     int32_t finalKey = hotkey->finalKey;
     if (finalKey < 0) {
         MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
         return INPUT_PARAMETER_ERROR;
     }
-    subKeyNames += std::to_string(finalKey);
-    subKeyNames += ",";
-    keyOption->SetFinalKey(finalKey);
-
+    if (finalKey == KEYCODE_ALT_LEFT || finalKey == KEYCODE_ALT_RIGHT || finalKey == KEYCODE_SHIFT_LEFT ||
+        finalKey == KEYCODE_SHIFT_RIGHT || finalKey == KEYCODE_CTRL_LEFT  || finalKey == KEYCODE_CTRL_RIGHT ||
+        finalKey == KEYCODE_META_LEFT  || finalKey == KEYCODE_META_RIGHT) {
+        MMI_HILOGE("finalKey:%{public}d cannot be {ctrl alt shift logo}", finalKey);
+        return INPUT_PARAMETER_ERROR;
+    }
     int32_t finalKeyDownDuration = hotkey->finalKeyDownDuration;
     if (finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
         return INPUT_PARAMETER_ERROR;
     }
-    subKeyNames += std::to_string(finalKeyDownDuration);
-    subKeyNames += ",";
-    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-
     bool isRepeat = hotkey->isRepeat;
-    subKeyNames += std::to_string(isRepeat);
-    keyOption->SetRepeat(isRepeat);
+    std::string subKeyNames = GetSubKeyName(preKeys, finalKey, finalKeyDownDuration, isRepeat, keyOption);
     event->eventType = subKeyNames;
     MMI_HILOGD("event->eventType:%{public}s", event->eventType.c_str());
     return INPUT_SUCCESS;
@@ -1863,6 +1883,20 @@ static int32_t AddEventCallback(Input_KeyEventMonitorInfo* event)
     return INPUT_SUCCESS;
 }
 
+static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("isFinalKeydown:%{public}d, keyAction:%{public}d", isFinalKeydown, keyAction);
+    if (isFinalKeydown && keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        return true;
+    }
+    if (!isFinalKeydown && keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        return true;
+    }
+    MMI_HILOGE("isFinalKeydown not matched with keyAction");
+    return false;
+}
+
 static bool MatchCombinationKeys(Input_KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1873,8 +1907,10 @@ static bool MatchCombinationKeys(Input_KeyEventMonitorInfo* monitorInfo, std::sh
     std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
+    bool isFinalKeydown = keyOption->IsFinalKeyDown();
     MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE) {
+    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
+        !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
         MMI_HILOGD("Param invalid");
         return false;
     }
