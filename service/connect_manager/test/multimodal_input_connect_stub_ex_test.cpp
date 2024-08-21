@@ -272,6 +272,7 @@ public:
         rows = parameterRows_;
         return touchpadScrollRows_;
     }
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override { return retSetClientInfo_; }
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override { return timeInterval; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -332,6 +333,7 @@ public:
     int32_t retSetPointerStyle_ = 0;
     int32_t retSetCurrentUser_ = 0;
     int32_t getAllSystemHotkeys_ = 0;
+    int32_t retSetClientInfo_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
