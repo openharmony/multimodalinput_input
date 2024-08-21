@@ -1253,7 +1253,7 @@ int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     if (((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
         if (!touchGestureAdapter_) {
             touchGestureAdapter_ = TouchGestureAdapter::GetGestureFactory();
@@ -1276,7 +1276,7 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
             return ret;
         }
     }
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
@@ -1321,7 +1321,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     auto monitorHandler = InputHandler->GetMonitorHandler();
     if (monitorHandler && monitorHandler->CheckHasInputHandler(HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
         if (delegateInterface_ && delegateInterface_->HasHandler("touchGesture")) {
@@ -1331,7 +1331,7 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, 
             }
         }
     }
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
