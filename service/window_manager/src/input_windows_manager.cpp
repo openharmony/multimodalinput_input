@@ -4079,6 +4079,7 @@ int32_t InputWindowsManager::SetPixelMapData(int32_t infoId, void *pixelMap)
     auto pixelMapSource = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     Media::InitializationOptions opts;
     auto pixelMapPtr = OHOS::Media::PixelMap::Create(*pixelMapSource, opts);
+    CHKPR(pixelMapPtr, RET_ERR);
     MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
         pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
     transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
