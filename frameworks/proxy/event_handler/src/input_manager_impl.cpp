@@ -1445,6 +1445,10 @@ int32_t InputManagerImpl::SendWindowInfo()
 int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
+    if (!MMISceneBoardJudgement::IsSceneBoardEnabled()) {
+        MMI_HILOGE("SceneBoard is not enabled");
+        return RET_ERR;
+    }
     CHKPR(callback, RET_ERR);
     windowStatecallback_ = callback;
     std::lock_guard<std::mutex> guard(mtx_);

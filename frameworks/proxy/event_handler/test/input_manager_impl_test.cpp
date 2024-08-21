@@ -15,9 +15,11 @@
 
 #include <gtest/gtest.h>
 
+#include "input_scene_board_judgement.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"
