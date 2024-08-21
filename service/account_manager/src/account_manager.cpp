@@ -340,8 +340,9 @@ void AccountManager::InitializeScreenLockStatus()
 {
     MMI_HILOGI("Initialize screen lock status");
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    DISPLAY_MONITOR->SetScreenLocked(
-        ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked());
+    auto screenLockPtr = ScreenLock::ScreenLockManager::GetInstance();
+    CHKPF(screenLockPtr);
+    DISPLAY_MONITOR->SetScreenLocked(screenLockPtr->IsScreenLocked());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 #endif // SCREENLOCK_MANAGER_ENABLED
