@@ -216,6 +216,8 @@ ohos_shared_library("libmmi-server") {
       sources += [
         "event_resample/src/event_resample.cpp",
         "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+        "touch_event_normalize/src/touch_gesture_adapter.cpp",
+        "touch_event_normalize/src/touch_gesture_detector.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
       ]
     }
