@@ -20,7 +20,6 @@
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 
-
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputManagerImplTest"
 
