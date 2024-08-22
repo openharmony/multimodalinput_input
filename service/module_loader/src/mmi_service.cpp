@@ -2904,13 +2904,14 @@ void MMIService::InitPrintClientInfo()
             }
         }
         if (!mainThreadClient.first.empty()) {
-            MMI_HILOGW("The application main thread and event reading thread are combined, programName:%{public}s, "
-                "pid:%{public}d, mainThreadId:%{public}d", mainThreadClient.first.c_str(),
-                mainThreadClient.second.pid, mainThreadClient.second.pid);
+            MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+                "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                mainThreadClient.first.c_str(), mainThreadClient.second.pid, mainThreadClient.second.pid,
+                mainThreadClient.second.readThreadId);
         }
         if (!childThreadClient.first.empty()) {
-            MMI_HILOGI("The application main thread and event reading thread are separated, programName:%{public}s, "
-                "pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+            MMI_HILOGI("The application main thread and event reading thread are separated, such as:"
+                "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
                 childThreadClient.first.c_str(), childThreadClient.second.pid, childThreadClient.second.pid,
                 childThreadClient.second.readThreadId);
         }
