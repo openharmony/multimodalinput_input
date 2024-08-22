@@ -241,6 +241,165 @@ HWTEST_F(UDSSessionTest, DelEvents, TestSize.Level1)
 }
 
 /**
+ * @tc.name: UDSSessionTest_DelEvents_01
+ * @tc.desc: Verify uds session function DelEvents
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_DelEvents_01, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    int32_t type = 3;
+    int32_t id = 2;
+    UDSSession::EventTime event;
+    event.id = 4;
+    event.eventTime = 1000;
+    event.timerId = 5;
+
+    int32_t key = 1;
+    sesObj.events_[key].push_back(event);
+    ASSERT_NO_FATAL_FAILURE(sesObj.DelEvents(type, id));
+}
+
+/**
+ * @tc.name: UDSSessionTest_DelEvents_02
+ * @tc.desc: Verify uds session function DelEvents
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_DelEvents_02, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    int32_t type = 1;
+    int32_t id = 2;
+    UDSSession::EventTime event;
+    event.id = 4;
+    event.eventTime = 1000;
+    event.timerId = 5;
+
+    int32_t key = 1;
+    sesObj.events_[key].push_back(event);
+    ASSERT_NO_FATAL_FAILURE(sesObj.DelEvents(type, id));
+
+    id = 5;
+    ASSERT_NO_FATAL_FAILURE(sesObj.DelEvents(type, id));
+}
+
+/**
+ * @tc.name: UDSSessionTest_GetEarliestEventTime_01
+ * @tc.desc: Verify uds session function DelEvents
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_GetEarliestEventTime_01, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    int32_t type = 1;
+    UDSSession::EventTime event;
+    event.id = 4;
+    event.eventTime = 1000;
+    event.timerId = 5;
+
+    int32_t key = 1;
+    sesObj.events_[key].push_back(event);
+    int64_t ret = sesObj.GetEarliestEventTime(type);
+    EXPECT_EQ(ret, 1000);
+
+    type = 2;
+    int64_t ret2 = sesObj.GetEarliestEventTime(type);
+    EXPECT_EQ(ret2, 0);
+}
+
+/**
+ * @tc.name: UDSSessionTest_SaveANREvent_01
+ * @tc.desc: Verify uds session function SaveANREvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_SaveANREvent_01, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    int32_t type = 1;
+    int32_t id = 2;
+    int64_t time = 5;
+    int32_t timerId = 6;
+    UDSSession::EventTime event;
+    event.id = 4;
+    event.eventTime = 1000;
+    event.timerId = 5;
+
+    int32_t key = 1;
+    sesObj.events_[key].push_back(event);
+    ASSERT_NO_FATAL_FAILURE(sesObj.SaveANREvent(type, id, time, timerId));
+
+    type = 3;
+    ASSERT_NO_FATAL_FAILURE(sesObj.SaveANREvent(type, id, time, timerId));
+}
+
+/**
+ * @tc.name: UDSSessionTest_GetTimerIds_01
+ * @tc.desc: Verify uds session function GetTimerIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_GetTimerIds_01, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    int32_t type = 1;
+    UDSSession::EventTime event;
+    event.id = 4;
+    event.eventTime = 1000;
+    event.timerId = 5;
+
+    int32_t key = 1;
+    sesObj.events_[key].push_back(event);
+    ASSERT_NO_FATAL_FAILURE(sesObj.GetTimerIds(type));
+
+    type = 2;
+    ASSERT_NO_FATAL_FAILURE(sesObj.GetTimerIds(type));
+}
+
+/**
+ * @tc.name: UDSSessionTest_sendMsg_01
+ * @tc.desc: Verify uds session function sendMsg
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_sendMsg_01, TestSize.Level1)
+{
+    const char *buf = "123";
+    size_t size = 0;
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    bool retResult = sesObj.SendMsg(buf, size);
+    EXPECT_FALSE(retResult);
+}
+
+/**
+ * @tc.name: UDSSessionTest_Close_01
+ * @tc.desc: Verify uds session function Close
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_Close_01, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    sesObj.fd_ = -1;
+    ASSERT_NO_FATAL_FAILURE(sesObj.Close());
+}
+
+/**
+ * @tc.name: UDSSessionTest_ReportSocketBufferFull_01
+ * @tc.desc: Verify uds session function ReportSocketBufferFull
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(UDSSessionTest, UDSSessionTest_ReportSocketBufferFull_01, TestSize.Level1)
+{
+    UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
+    ASSERT_NO_FATAL_FAILURE(sesObj.ReportSocketBufferFull());
+}
+
+/**
  * @tc.name: GetEarliestEventTime
  * @tc.desc: Verify uds session function GetEarliestEventTime
  * @tc.type: FUNC
