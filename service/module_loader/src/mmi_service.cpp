@@ -1580,7 +1580,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, pid, subscribeId] {
-            return sMsgHandler_.OnUnsubscribeKeyEvent(this, pid, subscribeId, );
+            return sMsgHandler_.OnUnsubscribeKeyEvent(this, pid, subscribeId, PER_HELPER->VerifySystemApp());
         }
         );
     if (ret != RET_OK) {
