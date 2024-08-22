@@ -261,6 +261,7 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
+    "src/virtual_uwb_remote_control.cpp",
   ]
 
   libmmi_util_sources = [

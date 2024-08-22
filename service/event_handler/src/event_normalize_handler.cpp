@@ -284,10 +284,10 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
         } else {
             MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
                 "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
-                "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
+                "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, MoveFlag:%{public}d, Device:%{public}d",
                 item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
                 item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-                item.GetDeviceId());
+                item.GetMoveFlag(), item.GetDeviceId());
         }
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent);
