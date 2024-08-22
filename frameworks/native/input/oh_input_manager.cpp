@@ -77,7 +77,6 @@ struct Input_KeyEventMonitorInfo {
 struct Input_Hotkey {
     std::set<int32_t> preKeys {};
     int32_t finalKey { -1 };
-    int32_t finalKeyDownDuration { 0 };
     bool isRepeat { true };
 };
 typedef std::map<std::string, std::list<Input_KeyEventMonitorInfo *>> Callbacks;
@@ -85,7 +84,7 @@ static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
 static constexpr size_t PRE_KEYS_SIZE { 2 };
 static int32_t MICROSECONDS = 1000;
-std::mutex g_hotkeyCountsMutex;
+static std::mutex g_hotkeyCountsMutex;
 static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
 static constexpr int32_t INVALID_MONITOR_ID = -1;
 static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
@@ -116,6 +115,8 @@ static const std::set<int32_t> g_keyCodeValueSet = {
     KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
     KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
 };
+static const std::vector<int32_t> g_pressKeyCodes = { 2045, 2046, 2047, 2048, 2072, 2073 };
+static const std::vector<int32_t> g_finalKeyCodes = { 2045, 2046, 2047, 2048, 2072, 2073, 2076, 2077};
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
@@ -1761,27 +1762,11 @@ Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat)
     return INPUT_SUCCESS;
 }
 
-void OH_Input_SetFinalKeyDownDuration(Input_Hotkey* hotkey, int32_t duration)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(hotkey);
-    hotkey->finalKeyDownDuration  = duration;
-    return;
-}
-
-Input_Result OH_Input_GetFinalKeyDownDuration(const Input_Hotkey* hotkey, int32_t *duration)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
-    CHKPR(duration, INPUT_PARAMETER_ERROR);
-    *duration = hotkey->finalKeyDownDuration;
-    return INPUT_SUCCESS;
-}
-
-std::string GetSubKeyName(std::set<int32_t> preKeys, int32_t finalKey, int32_t finalKeyDownDuration,
-    bool isRepeat, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+std::string GetSubKeyName(std::set<int32_t> preKeys, int32_t finalKey, bool isRepeat,
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
 {
     bool isFinalKeyDown = true;
+    int32_t finalKeyDownDuration = 0;
     keyOption->SetPreKeys(preKeys);
     keyOption->SetFinalKey(finalKey);
     keyOption->SetFinalKeyDown(isFinalKeyDown);
@@ -1809,6 +1794,7 @@ static int32_t GetEventInfo(const Input_Hotkey* hotkey, Input_KeyEventMonitorInf
     CHKPR(hotkey, INPUT_PARAMETER_ERROR);
     CHKPR(event, INPUT_PARAMETER_ERROR);
     CHKPR(keyOption, INPUT_PARAMETER_ERROR);
+
     if (hotkey->preKeys.empty()) {
         MMI_HILOGE("pressedKeys not found");
         return INPUT_PARAMETER_ERROR;
@@ -1819,31 +1805,26 @@ static int32_t GetEventInfo(const Input_Hotkey* hotkey, Input_KeyEventMonitorInf
         return INPUT_PARAMETER_ERROR;
     }
     for (const auto &item : preKeys) {
-        if (item != KEYCODE_ALT_LEFT && item != KEYCODE_ALT_RIGHT && item != KEYCODE_SHIFT_LEFT &&
-            item != KEYCODE_SHIFT_RIGHT && item != KEYCODE_CTRL_LEFT  && item != KEYCODE_CTRL_RIGHT &&
-            item != KEYCODE_META_LEFT  && item != KEYCODE_META_RIGHT) {
-            MMI_HILOGE("preKeys:%{public}d, expect:{ctrl alt shift logo}", item);
+        auto it = std::find(g_pressKeyCodes.begin(), g_pressKeyCodes.end(), item);
+        if (it == g_pressKeyCodes.end()) {
+            MMI_HILOGE("preKeys expect:{ctrl alt shift}");
             return INPUT_PARAMETER_ERROR;
         }
     }
+
     int32_t finalKey = hotkey->finalKey;
     if (finalKey < 0) {
         MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
         return INPUT_PARAMETER_ERROR;
     }
-    if (finalKey == KEYCODE_ALT_LEFT || finalKey == KEYCODE_ALT_RIGHT || finalKey == KEYCODE_SHIFT_LEFT ||
-        finalKey == KEYCODE_SHIFT_RIGHT || finalKey == KEYCODE_CTRL_LEFT  || finalKey == KEYCODE_CTRL_RIGHT ||
-        finalKey == KEYCODE_META_LEFT  || finalKey == KEYCODE_META_RIGHT) {
-        MMI_HILOGE("finalKey:%{public}d cannot be {ctrl alt shift logo}", finalKey);
+    auto it = std::find(g_finalKeyCodes.begin(), g_finalKeyCodes.end(), finalKey);
+    if (it != g_finalKeyCodes.end()) {
+        MMI_HILOGE("finalKey cannot be {ctrl alt shift logo}");
         return INPUT_PARAMETER_ERROR;
     }
-    int32_t finalKeyDownDuration = hotkey->finalKeyDownDuration;
-    if (finalKeyDownDuration < 0) {
-        MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
-        return INPUT_PARAMETER_ERROR;
-    }
+
     bool isRepeat = hotkey->isRepeat;
-    std::string subKeyNames = GetSubKeyName(preKeys, finalKey, finalKeyDownDuration, isRepeat, keyOption);
+    std::string subKeyNames = GetSubKeyName(preKeys, finalKey, isRepeat, keyOption);
     event->eventType = subKeyNames;
     MMI_HILOGD("event->eventType:%{public}s", event->eventType.c_str());
     return INPUT_SUCCESS;
@@ -1853,11 +1834,13 @@ static int32_t GetPreSubscribeId(Input_KeyEventMonitorInfo* event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, INPUT_PARAMETER_ERROR);
+
     auto it = g_callbacks.find(event->eventType);
     if (it == g_callbacks.end() || it->second.empty()) {
-        MMI_HILOGE("The callbacks is empty");
+        MMI_HILOGD("The callbacks is empty");
         return INPUT_PARAMETER_ERROR;
     }
+
     CHKPR(it->second.front(), INPUT_PARAMETER_ERROR);
     return it->second.front()->subscribeId;
 }
@@ -1975,7 +1958,6 @@ static void OnNotifyCallbackWorkResult(Input_KeyEventMonitorInfo* reportEvent)
     Input_Hotkey hotkey;
     hotkey.preKeys = info->keyOption->GetPreKeys();
     hotkey.finalKey = info->keyOption->GetFinalKey();
-    hotkey.finalKeyDownDuration = info->keyOption->GetFinalKeyDownDuration();
     hotkey.isRepeat = info->keyOption->IsRepeat();
     info->callback(&hotkey);
     delete info;
@@ -2111,7 +2093,7 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     if (DelEventCallback(event, subscribeId) != INPUT_SUCCESS) {
         delete event;
         MMI_HILOGE("DelEventCallback failed");
-        return INPUT_PARAMETER_ERROR;
+        return INPUT_SERVICE_EXCEPTION;
     }
     MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
     if (subscribeId >= 0) {
