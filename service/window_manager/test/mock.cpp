@@ -457,7 +457,7 @@ MouseEventNormalize::~MouseEventNormalize() {}
 
 int32_t MouseEventNormalize::GetDisplayId() const
 {
-    return 0;
+    return DfsMessageParcel::messageParcel->GetDisplayId();
 }
 
 KnuckleDrawingManager::KnuckleDrawingManager()

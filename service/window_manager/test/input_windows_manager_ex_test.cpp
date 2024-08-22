@@ -2984,5 +2984,124 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_RotateScreen_002, Test
     info.direction = static_cast<Direction>(10);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.RotateScreen(info, coord));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = -1;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetDisplayId()).WillRepeatedly(Return(displayId));
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 10;
+    DisplayInfo displayInfo;
+    WindowInfo winInfo;
+    displayInfo.id = 100;
+    displayInfo.x = 200;
+    displayInfo.y = 200;
+    winInfo.flags = 0;
+    winInfo.id = 10;
+    inputWindowsManager.mouseLocation_.displayId = 80;
+    inputWindowsManager.mouseLocation_.physicalX = 100;
+    inputWindowsManager.mouseLocation_.physicalY = 100;
+    winInfo.pointerHotAreas.push_back({ 100, 100, 1000, 1000 });
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_TRUE(inputWindowsManager.IsNeedRefreshLayer(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_007
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = -1;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetDisplayId()).WillRepeatedly(Return(displayId));
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = -1;
+    DisplayInfo displayInfo;
+    WindowInfo winInfo;
+    displayInfo.id = 100;
+    displayInfo.x = 200;
+    displayInfo.y = 200;
+    winInfo.flags = 0;
+    winInfo.id = 10;
+    inputWindowsManager.mouseLocation_.displayId = 80;
+    inputWindowsManager.mouseLocation_.physicalX = 100;
+    inputWindowsManager.mouseLocation_.physicalY = 100;
+    winInfo.pointerHotAreas.push_back({ 100, 100, 1000, 1000 });
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_TRUE(inputWindowsManager.IsNeedRefreshLayer(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_008
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = -1;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetDisplayId()).WillRepeatedly(Return(displayId));
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 50;
+    DisplayInfo displayInfo;
+    WindowInfo winInfo;
+    displayInfo.id = 100;
+    displayInfo.x = 200;
+    displayInfo.y = 200;
+    winInfo.flags = 0;
+    winInfo.id = 10;
+    inputWindowsManager.mouseLocation_.displayId = 80;
+    inputWindowsManager.mouseLocation_.physicalX = 100;
+    inputWindowsManager.mouseLocation_.physicalY = 100;
+    winInfo.pointerHotAreas.push_back({ 100, 100, 1000, 1000 });
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_FALSE(inputWindowsManager.IsNeedRefreshLayer(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_009
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_009, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = -1;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillRepeatedly(Return(false));
+    EXPECT_CALL(*messageParcelMock_, GetDisplayId()).WillRepeatedly(Return(displayId));
+    InputWindowsManager inputWindowsManager;
+    int32_t windowId = 50;
+    DisplayInfo displayInfo;
+    WindowInfo winInfo;
+    displayInfo.id = 100;
+    displayInfo.x = 200;
+    displayInfo.y = 200;
+    winInfo.flags = 0;
+    inputWindowsManager.mouseLocation_.displayId = 80;
+    inputWindowsManager.mouseLocation_.physicalX = 100;
+    inputWindowsManager.mouseLocation_.physicalY = 100;
+    winInfo.pointerHotAreas.push_back({ 100, 100, INT32_MAX, 1000 });
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_FALSE(inputWindowsManager.IsNeedRefreshLayer(windowId));
+}
 } // namespace MMI
 } // namespace OHOS
