@@ -955,6 +955,14 @@ public:
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
 
+    /**
+     * @brief Converted to a Capi-defined key action value.
+     * @param keyAction The key action value of the return value of inner api.
+     * @return Returns Capi-defined key action value if success; returns a negative number value otherwise.
+     * @since 13
+     */
+    int32_t ConvertToCapiKeyAction(int32_t keyAction);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

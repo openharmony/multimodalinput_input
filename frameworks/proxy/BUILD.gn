@@ -23,6 +23,7 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
