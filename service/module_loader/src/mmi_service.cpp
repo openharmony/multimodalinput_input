@@ -1490,7 +1490,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
-        MMI_HILOGI("Init screen capture monitor listener start");
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPV(monitorHandler);
         monitorHandler->RegisterScreenCaptureListener();

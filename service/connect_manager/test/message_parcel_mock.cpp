@@ -30,10 +30,6 @@ Parcelable::Parcelable(bool asRemote)
     behavior_ = 0;
 }
 
-PermissionHelper::PermissionHelper() {}
-
-PermissionHelper::~PermissionHelper() {}
-
 int32_t PermissionHelper::GetTokenType()
 {
     return 0;
