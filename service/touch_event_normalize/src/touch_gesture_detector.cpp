@@ -43,10 +43,10 @@ constexpr double ANGLE_LEFT_UP = 135.0;
 
 // gesture threshold values
 constexpr int32_t MAXIMUM_SAME_DIRECTION_OFFSET = 1;
-constexpr float MAXIMUM_POINTER_SPACING = 800;
+constexpr float MAXIMUM_POINTER_SPACING = 2000;
 constexpr int64_t MAXIMUM_POINTER_INTERVAL = 100000;
-constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 0.3;
-constexpr double MINIMUM_GRAVITY_OFFSET = 0.1;
+constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 1;
+constexpr double MINIMUM_GRAVITY_OFFSET = 0.5;
 constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 2;
 constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET = 1;
 } // namespace
@@ -160,7 +160,8 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
             MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
         }
     }
-    if (CalcMultiFingerMovement(movePoints) > downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET) {
+    if (CalcMultiFingerMovement(movePoints) >
+        static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
         GetureType type = JudgeOperationMode(movePoints);
         isRecognized_ = AntiJitter(event, type);
     }
@@ -349,8 +350,8 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
         int32_t y = item.GetDisplayY();
         double angle = GetAngle(point.x, point.y, x, y);
         bool isMove = IsFingerMove(point.x, point.y, x, y);
-        MMI_HILOGI("pointerId: %{public}d, point.x:%{private}.2f, point.y:%{private}.2f, x:%{private}d,"
-            "y:%{private}d, isMove:%{public}s", pointerId, point.x, point.y, x, y, isMove ? "true" : "false");
+        MMI_HILOGI("pointerId:%{public}d,dx:%{private}.2f,dy:%{private}.2f,x:%{private}d,"
+            "y:%{private}d,isMove:%{public}s", pointerId, point.x, point.y, x, y, isMove ? "true" : "false");
         if (fabs(angle) < FLT_EPSILON && !isMove) {
             continue;
         }
@@ -359,9 +360,9 @@ TouchGestureDetector::SlideState TouchGestureDetector::ClacFingerMoveDirection(s
             directions.insert(direction);
             ++recognizedCount;
         }
-        MMI_HILOGI("pointerId: %{public}d, angle: %{public}.2f, direction: %{public}d", pointerId, angle, direction);
+        MMI_HILOGI("pointerId:%{public}d,angle:%{public}.2f,direction:%{public}d", pointerId, angle, direction);
     }
-    if (recognizedCount < THREE_FINGER_COUNT || directions.size() > MAXIMUM_SAME_DIRECTION_OFFSET) {
+    if (recognizedCount < downPoint_.size() || directions.size() > MAXIMUM_SAME_DIRECTION_OFFSET) {
         return state;
     }
     return *(directions.begin());
@@ -443,7 +444,7 @@ int32_t TouchGestureDetector::CalcMultiFingerMovement(std::map<int32_t, Point> &
         if (movePoints == points.end()) {
             return 0;
         }
-        if (CalcTwoPointsDistance(point, movePoints->second) > MAXIMUM_SINGLE_SLIDE_DISTANCE) {
+        if (CalcTwoPointsDistance(point, movePoints->second) >= MAXIMUM_SINGLE_SLIDE_DISTANCE) {
             ++movementCount;
         }
     }
@@ -479,11 +480,18 @@ GetureType TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &mo
             ++openCount;
         }
         tempDistance.emplace(pointerId, currentDistance);
+        MMI_HILOGI("pointerId:%{public}d,lastDistance:%{public}.2f,"
+            "currentDistance:%{public}.2f,closeCount:%{public}d,openCount:%{public}d",
+            pointerId, lastDistance, currentDistance, closeCount, openCount);
     }
 
-    if (closeCount >= downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET) {
+    if (!lastDistance_.empty()) {
+        lastDistance_.clear();
+        lastDistance_ = tempDistance;
+    }
+    if (closeCount >= static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
         type = GetureType::ACTION_PINCH_CLOSED;
-    } else if (openCount >= downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET) {
+    } else if (openCount >= static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
         type = GetureType::ACTION_PINCH_OPENED;
     }
     return type;
@@ -526,6 +534,7 @@ bool TouchGestureDetector::NotifyGestureEvent(std::shared_ptr<PointerEvent> even
         MMI_HILOGE("Failed to notify the gesture(%{public}d) event", mode);
         return false;
     }
+    MMI_HILOGI("Gesture(%{public}d) identified successfully", mode);
     return true;
 }
 } // namespace MMI
