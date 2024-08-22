@@ -6234,5 +6234,80 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SendCancelEventWhenLoc
     inputWindowsMgr.lastTouchEventOnBackGesture_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.SendCancelEventWhenLock());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_DispatchPointerCancel
+ * @tc.desc: Test DispatchPointerCancel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointerCancel, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t displayId = -1;
+    WindowInfo winInfo;
+    inputWindowsMgr.mouseDownInfo_.id = -1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.mouseDownInfo_.id = 10;
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.lastPointerEvent_ = nullptr;
+    inputWindowsMgr.extraData_.appended = false;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.extraData_.appended = true;
+    inputWindowsMgr.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(inputWindowsMgr.lastPointerEvent_, nullptr);
+    winInfo.id = 10;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.clear();
+    winInfo.id = 100;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.DispatchPointerCancel(displayId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetPidByWindowId
+ * @tc.desc: Test GetPidByWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidByWindowId, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t id = 100;
+    WindowInfo winInfo;
+    winInfo.id = 100;
+    winInfo.pid = 150;
+    inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
+    EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), winInfo.pid);
+    id = 300;
+    EXPECT_EQ(inputWindowsMgr.GetPidByWindowId(id), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPixelMapData
+ * @tc.desc: Test SetPixelMapData
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPixelMapData, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsMgr;
+    int32_t infoId = -1;
+    void *pixelMap = nullptr;
+    EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, pixelMap), ERR_INVALID_VALUE);
+    infoId = 100;
+    EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, pixelMap), ERR_INVALID_VALUE);
+    std::shared_ptr<Media::PixelMap> sharedPixelMap = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
+    ASSERT_NE(sharedPixelMap, nullptr);
+    EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, (void *)sharedPixelMap.get()), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
