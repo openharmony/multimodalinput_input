@@ -2190,7 +2190,7 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, 
     int32_t bottomY = centerY + distance;
     int32_t stepY = distance / (fingerCount * times);
     int32_t actionType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-    double  scalePinch = static_cast<double>(1);
+    double  scalePinch = 1.0;
     scalePinch = (scalePinch - (static_cast<double> (scalePercentNumerator) / hundred)) / times;
     this->SendTouchDownForPinch(centerX, centerY, distance);
     for (int32_t index = 0; index < times; index++) {
