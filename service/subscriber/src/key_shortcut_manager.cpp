@@ -222,8 +222,7 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     if (!IsReservedSystemKey(shortcut)) {
-        MMI_HILOGE("Can not register reserved system key ([%{public}s],%{public}d)",
-            FormatModifiers(key.modifiers).c_str(), key.finalKey);
+        MMI_HILOGE("The system application can only subscribe to reserved shortcuts");
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), shortcut);
