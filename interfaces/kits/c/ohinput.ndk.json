@@ -370,13 +370,5 @@
     {
         "first_introduced": "13",
         "name": "OH_Input_IsRepeat"
-    },
-    {
-        "first_introduced": "13",
-        "name": "OH_Input_SetFinalKeyDownDuration"
-    },
-    {
-        "first_introduced": "13",
-        "name": "OH_Input_GetFinalKeyDownDuration"
     }
 ]
