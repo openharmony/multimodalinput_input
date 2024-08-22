@@ -1445,8 +1445,17 @@ int32_t InputManagerImpl::SendWindowInfo()
 int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
+    if (!MMISceneBoardJudgement::IsSceneBoardEnabled()) {
+        MMI_HILOGE("SceneBoard is not enabled");
+        return RET_ERR;
+    }
     CHKPR(callback, RET_ERR);
     windowStatecallback_ = callback;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_CALLBACK);
