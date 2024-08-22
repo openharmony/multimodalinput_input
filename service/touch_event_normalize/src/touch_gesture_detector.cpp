@@ -442,7 +442,7 @@ int32_t TouchGestureDetector::CalcMultiFingerMovement(std::map<int32_t, Point> &
     for (const auto &[id, point] : downPoint_) {
         auto movePoints = points.find(id);
         if (movePoints == points.end()) {
-            return movementCount;
+            return 0;
         }
         if (CalcTwoPointsDistance(point, movePoints->second) >= MAXIMUM_SINGLE_SLIDE_DISTANCE) {
             ++movementCount;
