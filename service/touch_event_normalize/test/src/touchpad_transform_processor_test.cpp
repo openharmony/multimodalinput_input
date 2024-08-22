@@ -1167,13 +1167,13 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
 }
 
 /**
- * @tc.name: TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001
+ * @tc.name: TouchPadTransformProcessorTest_OnEventPinchGesture_001
  * @tc.desc: test OnEventTouchPadPinchGesture
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(TouchPadTransformProcessorTest, 
-    TouchPadTransformProcessorTest_OnEventTouchPadPinchGesture_001, TestSize.Level1)
+    TouchPadTransformProcessorTest_OnEventPinchGesture_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 299);
