@@ -37,7 +37,6 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "pointer_event.h"
 #include "util.h"
 
 #undef MMI_LOG_TAG
@@ -73,10 +72,6 @@ constexpr int32_t BUTTON_PARAM_SIZE = 8;
 constexpr int32_t KEY_PARAM_SIZE = 5;
 constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
 constexpr int32_t INTERVAL_TIME_MS = 100;
-constexpr int32_t MIN_PINCH_FINGER = 2;
-constexpr int32_t MAX_PINCH_FINGER = 5;
-constexpr int32_t MIN_ACTION_FINGER = 2;
-constexpr int32_t MAX_ACTION_FINGER = 5;
 constexpr int32_t FINGER_LOCATION_NUMS = 4;
 constexpr int32_t MOVE_POS_ONE = 1;
 constexpr int32_t MOVE_POS_TWO = 2;
@@ -1974,7 +1969,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
 {
     struct option touchPadSensorOptions[] = {
         {"rotate", required_argument, nullptr, 'r'},
-        {"action", required_argument, nullptr, 's'},
+        {"swipe", required_argument, nullptr, 's'},
         {"pinch", required_argument, nullptr, 'p'},
         {nullptr, 0, nullptr, 0}
     };
@@ -1989,7 +1984,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
                 break;
             }
             case 's': {
-                int32_t ret = ProcessTouchPadFingerAction(argc, argv);
+                int32_t ret = ProcessTouchPadFingerSwipe(argc, argv);
                 if (ret != ERR_OK) {
                     return ret;
                 }
@@ -1997,8 +1992,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
             }
             case 'p': {
                 // uinput -P -p <finger count> <scale percent numerator> e.g. uinput -P -p 2 200
-                int32_t indexPercent = optind;
-                int32_t ret = ProcessPinchGesture(argc, argv, indexPercent);
+                int32_t ret = ProcessPinchGesture(argc, argv);
                 if (ret != ERR_OK) {
                     return ret;
                 }
@@ -2011,69 +2005,6 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
             }
         }
     }
-    return ERR_OK;
-}
-
-int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[], int32_t indexPercent)
-{
-    CHKPR(argv, ERROR_NULL_POINTER);
-    // e.g. uinput -P -p 2 200
-    constexpr int32_t maxArgcIndex = 4;
-    if (indexPercent != maxArgcIndex) {
-        std::cout << "wrong optind pointer index" << std::endl;
-        return EVENT_REG_FAIL;
-    }
-
-    char *fingerArg = argv[indexPercent - 1];
-    int32_t fingerCount = 0;
-    int32_t scalePercentNumerator = 0;
-    if (!StrToInt(fingerArg, fingerCount)) {
-        std::cout << "invalid finger count" << std::endl;
-        return EVENT_REG_FAIL;
-    }
-    if (!StrToInt(argv[indexPercent], scalePercentNumerator)) {
-        std::cout << "invalid scale percent numerator" << std::endl;
-        return EVENT_REG_FAIL;
-    }
-
-    if ((fingerCount < MIN_PINCH_FINGER) || (fingerCount > MAX_PINCH_FINGER)) {
-        std::cout << "invalid finger count:" << fingerCount << std::endl;
-        return EVENT_REG_FAIL;
-    }
-
-    constexpr int32_t minScaleNumerator = 0;
-    constexpr int32_t maxScaleNumerator = 500;
-    if ((scalePercentNumerator <= minScaleNumerator) || (scalePercentNumerator > maxScaleNumerator)) {
-        std::cout << "Invalid scale numberator:" << scalePercentNumerator << std::endl;
-        std::cout << std::endl;
-        return RET_ERR;
-    }
-    return InjectPinchEvent(fingerCount, scalePercentNumerator);
-}
-
-int32_t InputManagerCommand::InjectPinchEvent(int32_t fingerCount, int32_t scalePercentNumerator)
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (fingerCount == MIN_PINCH_FINGER) {
-        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    } else {
-        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    }
-
-    // Convert percentage to decimal
-    constexpr int32_t PERCENT_DENOMINATOR = 100;
-    double scalePinch = static_cast<double>(scalePercentNumerator) / PERCENT_DENOMINATOR;
-
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scalePinch);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-    pointerEvent->SetPointerId(0);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    MMI_HILOGD("Inject fingerCount:%{public}d,scalePinch:%{public}f,PointerId:%{public}d,", fingerCount, scalePinch,
-        pointerEvent->GetPointerId());
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     return ERR_OK;
 }
 
@@ -2109,59 +2040,209 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::ProcessTouchPadFingerAction(int32_t argc, char *argv[])
+int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
 {
-    constexpr int32_t actionUInputArgc = 4;
-    int32_t fingerCount = 0;
+    CHKPR(argv, ERROR_NULL_POINTER);
+    // e.g. uinput -P -p 500 500 d
+    constexpr int32_t actionInputArgc = 6;
+    int32_t centerX = 0;
+    int32_t centerY = 0;
+    int32_t scalePercentNumerator = 0;
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
         return EVENT_REG_FAIL;
     }
+    int32_t startPos = optind - MOVE_POS_ONE;
+    std::string tips = "uinput -P -p dx, dy, scalePercent; dx, dy, scalePercent are all number.0 < scalePercent < 500";
     // optarg is the first return argument in argv that call the function getopt_long with the current option
-    if (argc == actionUInputArgc) {
-        if (!StrToInt(optarg, fingerCount)) {
-            std::cout << "invalid swip data" << std::endl;
-            return EVENT_REG_FAIL;
+    if (argc == actionInputArgc) {
+        if ((!StrToInt(argv[startPos], centerX)) ||
+            (!StrToInt(argv[startPos + MOVE_POS_ONE], centerY)) ||
+            (!StrToInt(argv[startPos + MOVE_POS_TWO], scalePercentNumerator))) {
+            std::cout << tips << std::endl;
         }
     } else {
-        std::cout << "wrong number of parameters:" << argc << std::endl;
+        std::cout << tips << std::endl;
         return EVENT_REG_FAIL;
     }
-    if (fingerCount < MIN_ACTION_FINGER || fingerCount > MAX_ACTION_FINGER) {
-        std::cout << "invalid finger count:" << fingerCount << std::endl;
-        return EVENT_REG_FAIL;
+
+    constexpr int32_t minScaleNumerator = 0;
+    constexpr int32_t maxScaleNumerator = 500;
+    if ((scalePercentNumerator <= minScaleNumerator) || (scalePercentNumerator > maxScaleNumerator)) {
+        std::cout << "Invalid scale numberator:" << scalePercentNumerator << std::endl;
+        std::cout << std::endl;
+        return RET_ERR;
     }
-    ActionEvent(fingerCount);
-    return ERR_OK;
+    return ActionPinchEvent(centerX, centerY, scalePercentNumerator);
 }
 
-int32_t InputManagerCommand::ActionEvent(int32_t fingerCount)
+int32_t InputManagerCommand::SwipeActionEvent(int32_t startX, int32_t startY, int32_t endX, int32_t endY)
 {
-    MMI_HILOGI("InputManagerCommand::ActionEventInputManagerCommand::ActionEventInputManagerCommand::ActionEvent*****");
-    auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    // in order to simulate more actual, add some update update event, so adding some items to update ,
-    // the data of points are simulated average in axis
-    int32_t numberPoint = 10010;
-    int32_t widthOfFinger = 30;
-    int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
-
-    PointerEvent::PointerItem item;
-    item.SetDownTime(startTimeMs);
-    item.SetPointerId(numberPoint);
-    item.SetDisplayX(widthOfFinger);
-    item.SetDisplayY(widthOfFinger);
-    pointerEvent->SetPointerId(numberPoint);
-    pointerEvent->SetFingerCount(fingerCount);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetActionStartTime(startTimeMs);
-    pointerEvent->SetActionTime(startTimeMs);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    constexpr int32_t fingerCount = 3;
+    constexpr int32_t times = 10;
+    constexpr int32_t thousand = 1000;
+    int32_t disY =  static_cast<int32_t> (static_cast<double> (endY - startY) / times);
+    int32_t disX =  static_cast<int32_t> (static_cast<double> (endX - startX) / times);
+    int32_t actionType[10] = {PointerEvent::POINTER_ACTION_SWIPE_BEGIN};
+    int64_t actionTimeBase = GetSysClockTime() - times * thousand * thousand;
+    int64_t actionTimeStartTimeDis = fingerCount * thousand;
+    int64_t actionStartTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int64_t actionTime[10] =  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
+    actionTime[0] = actionTimeBase;
+    actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / thousand;
+    for (int32_t i = 1; i < times; i++) {
+        actionStartTime[i] = actionStartTime[i - 1] + times - fingerCount;
+        actionTime[i] = actionTime[i - 1] + times - fingerCount;
+        actionType[i] = PointerEvent::POINTER_ACTION_SWIPE_UPDATE;
+    }
+    actionType[times - 1] = PointerEvent::POINTER_ACTION_SWIPE_END;
+    for (int32_t i = 0; i < times; i++) {
+        auto pointerEvent = CreateEvent(0, actionType[i], fingerCount - 1, sourceType, fingerCount);
+        pointerEvent->SetActionTime(actionTime[i]);
+        pointerEvent->SetActionStartTime(actionStartTime[i]);
+        PointerEvent::PointerItem item;
+        item.SetDownTime(pointerEvent->GetActionStartTime());
+        item.SetDisplayX(startX + disX * i);
+        item.SetDisplayY(startY + disY * i);
+        item.SetPointerId(0);
+        pointerEvent->SetSourceType(sourceType);
+        pointerEvent->AddPointerItem(item);
+        pointerEvent->AddPointerItem(item);
+        std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
+        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    }
     return ERR_OK;
 }
- 
+
+int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv[])
+{
+    constexpr int32_t actionInputArgc = 7;
+    int32_t startX = 0;
+    int32_t startY = 0;
+    int32_t endX = 0;
+    int32_t endY = 0;
+    if (optind < 0 || optind > argc) {
+        std::cout << "wrong optind pointer index" << std::endl;
+        return EVENT_REG_FAIL;
+    }
+    int32_t startPos = optind - MOVE_POS_ONE;
+    std::string tip = "uinput -P -s startX, startY, endX, endY; startX startY ,endX, endY are all number";
+    if (argc == actionInputArgc) {
+        if ((!StrToInt(argv[startPos], startX)) ||
+            (!StrToInt(argv[startPos + MOVE_POS_ONE], startY)) ||
+            (!StrToInt(argv[startPos + MOVE_POS_TWO], endX)) ||
+            (!StrToInt(argv[startPos + MOVE_POS_THREE], endY))) {
+            std::cout << tip << argc << std::endl;
+        } else {
+            SwipeActionEvent(startX, startY, endX, endY);
+        }
+    } else {
+        std::cout << tip << argc << std::endl;
+        return EVENT_REG_FAIL;
+    }
+    return ERR_OK;
+}
+
+std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(
+    int32_t id,
+    int32_t type,
+    int32_t pointerId,
+    int32_t sourceType,
+    int32_t fingerCount)
+{
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(id);
+    pointerEvent->SetOriginPointerAction(type);
+    pointerEvent->SetPointerAction(type);
+    pointerEvent->SetPointerId(pointerId);
+    pointerEvent->SetSourceType(sourceType);
+    pointerEvent->SetFingerCount(fingerCount);
+    return pointerEvent;
+}
+
+void InputManagerCommand::FillPointerItem(
+    PointerEvent::PointerItem &item,
+    int32_t pointX,
+    int32_t pointY,
+    int32_t id,
+    bool press)
+{
+    item.SetDisplayX(pointX);
+    item.SetDisplayY(pointY);
+    item.SetWindowX(pointX);
+    item.SetWindowY(pointY);
+    item.SetPointerId(id);
+    item.SetPressed(press);
+}
+
+int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, int32_t scalePercentNumerator)
+{
+    CALL_DEBUG_ENTER;
+    constexpr int32_t hundred = 100;
+    constexpr int32_t fingerCount = 2;
+    int32_t timesForSleep = hundred * hundred;
+    int32_t distance = hundred * fingerCount;
+    int32_t times = hundred / (fingerCount * fingerCount);
+    int32_t topX = centerX;
+    int32_t bottomX = centerX;
+    int32_t topY = centerY - distance;
+    int32_t bottomY = centerY + distance;
+    int32_t stepY = distance / (fingerCount * times);
+    int32_t actionType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    double  scalePinch = static_cast<double>(1);
+    scalePinch = (scalePinch - (static_cast<double> (scalePercentNumerator) / hundred)) / times;
+    this->SendTouchDownForPinch(centerX, centerY, distance);
+    for (int32_t index = 0; index < times; index++) {
+        if (index != 0) {
+            actionType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+            scalePinch = scalePinch + scalePinch;
+        }
+        int32_t idForItem = 0;
+        auto pointerEvent = CreateEvent(0, actionType, 0, PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
+        pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scalePinch);
+        pointerEvent->SetTargetDisplayId(-1);
+        PointerEvent::PointerItem itemFirst;
+        topY = topY + stepY;
+        bottomY = bottomY - stepY;
+        FillPointerItem(itemFirst, topX, topY, idForItem, false);
+        itemFirst.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+        itemFirst.SetDownTime(pointerEvent->GetActionStartTime());
+        idForItem++;
+        pointerEvent->AddPointerItem(itemFirst);
+        PointerEvent::PointerItem itemSecond;
+        FillPointerItem(itemSecond, bottomX, bottomY, idForItem, true);
+        pointerEvent->SetPointerId(1);
+        pointerEvent->AddPointerItem(itemSecond);
+        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+        std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME * timesForSleep));
+    }
+    return RET_OK;
+}
+
+void InputManagerCommand::SendTouchDownForPinch(int32_t centerX, int32_t centerY, int32_t distance)
+{
+    constexpr int32_t fingerCount = 2;
+    int32_t itemId = 0;
+    auto pointerEvent = CreateEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0,
+        PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
+    pointerEvent->SetPointerId(itemId);
+    PointerEvent::PointerItem itemFirst;
+    FillPointerItem(itemFirst, centerX, centerY - distance, itemId, true);
+    itemFirst.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    pointerEvent->AddPointerItem(itemFirst);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
+    pointerEvent = CreateEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0,
+        PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
+    itemId = itemId + 1;
+    pointerEvent->SetPointerId(itemId);
+    PointerEvent::PointerItem itemSecond;
+    FillPointerItem(itemSecond, centerX, centerY + distance, itemId, true);
+    pointerEvent->AddPointerItem(itemFirst);
+    pointerEvent->AddPointerItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
 
 void InputManagerCommand::PrintMouseUsage()
 {
@@ -2259,16 +2340,13 @@ void InputManagerCommand::PrintKnuckleUsage()
 
 void InputManagerCommand::PrintTouchPadUsage()
 {
-    std::cout << "-p <finger count> <scale percent numerator>  --pinch <finger count> <scale percent numerator>";
+    std::cout << "-p  <scale percent numerator>  --pinch  <scale percent numerator>";
     std::cout << std::endl;
-    std::cout << "  <finger count> finger count range is [2, 5]"                                     << std::endl;
     std::cout << "  <scale percent numerator> numerator of percent scale, divided by 100 is scale, it is an integer,";
     std::cout << "  range is (0, 500]"                                                               << std::endl;
+    std::cout << "  while simulate this, make sure that a picture is on the top of the desktop."     << std::endl;
     std::cout << std::endl;
-    std::cout << "-s <fingerCount> <positionX1> <positionY1> <positionX2> <positionY2>  fc means"    << std::endl;
-    std::cout << "  finger count and its range is [2, 5], <positionX1> <positionY1> "                << std::endl;
-    std::cout << "  -press down a position  dx1 dy1  <positionX2> <positionY2> -press"               << std::endl;
-    std::cout << "  up a position  positionX2  positionY2"                                           << std::endl;
+    std::cout << "-s. While simulate this, make sure that your actual action is available"           << std::endl;
     std::cout << std::endl;
     std::cout << "-r <rotate value> rotate value must be within (-360,360)"                          << std::endl;
 }
