@@ -29,6 +29,7 @@
 #include "key_command_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_preferences_manager.h"
 #include "system_info.h"
 #include "stylus_key_handler.h"
 
@@ -4699,6 +4700,146 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleSequences_004, TestS
     handler.keys_.push_back(sequenceKey);
     ret = handler.HandleSequences(keyEvent);
     ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_003
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_003, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    std::vector<ShortcutKey> upAbilities;
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 5;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    shortcutKey.preKeys = {1};
+    shortcutKey.businessId = "Ctrl+O";
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    key->SetKeyCode(5);
+    key->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(1);
+    item1.SetDownTime(10);
+    item1.SetDeviceId(3);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(1);
+    item2.SetDownTime(20);
+    item2.SetDeviceId(4);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->AddKeyItem(item2);
+    MultiModalInputPreferencesManager multiModalInputPreferencesManager;
+    multiModalInputPreferencesManager.shortcutKeyMap_.insert(std::make_pair("Ctrl+O", 5000));
+    bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    EXPECT_FALSE(ret);
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
+    key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    EXPECT_FALSE(ret);
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UNKNOWN;
+    key->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_MatchShortcutKey_004
+ * @tc.desc: Test the funcation MatchShortcutKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_MatchShortcutKey_004, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    std::vector<ShortcutKey> upAbilities;
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 10;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_UP;
+    shortcutKey.preKeys = {5};
+    shortcutKey.businessId = "Ctrl+T";
+    std::shared_ptr<KeyEvent> key = KeyEvent::Create();
+    ASSERT_NE(key, nullptr);
+    key->SetKeyCode(10);
+    key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(5);
+    item1.SetDownTime(6);
+    item1.SetDeviceId(7);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(5);
+    item2.SetDownTime(2);
+    item2.SetDeviceId(1);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->AddKeyItem(item2);
+    MultiModalInputPreferencesManager multiModalInputPreferencesManager;
+    multiModalInputPreferencesManager.shortcutKeyMap_.insert(std::make_pair("Ctrl+R", 300));
+    bool ret = handler.MatchShortcutKey(keyEvent, shortcutKey, upAbilities);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleShortKeys_01
+ * @tc.desc: Test the funcation HandleShortKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_01, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ShortcutKey shortcutKey;
+    shortcutKey.preKeys = {2};
+    shortcutKey.statusConfigValue = true;
+    shortcutKey.finalKey = 6;
+    shortcutKey.keyDownDuration = 7;
+    shortcutKey.triggerType = KeyEvent::KEY_ACTION_DOWN;
+    shortcutKey.timerId = 10;
+    handler.shortcutKeys_.insert(std::make_pair("key", shortcutKey));
+    handler.lastMatchedKey_.finalKey = 1;
+    handler.lastMatchedKey_.triggerType = KeyEvent::KEY_ACTION_UP;
+    handler.lastMatchedKey_.preKeys = {3};
+    keyEvent->SetKeyCode(1);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(3);
+    item1.SetDownTime(5);
+    item1.SetDeviceId(8);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(3);
+    item2.SetDownTime(6);
+    item2.SetDeviceId(4);
+    keyEvent->AddKeyItem(item1);
+    keyEvent->AddKeyItem(item2);
+    bool ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_TRUE(ret);
+    handler.lastMatchedKey_.preKeys = {4, 5, 6};
+    handler.currentLaunchAbilityKey_.timerId = 5;
+    handler.currentLaunchAbilityKey_.finalKey = 1;
+    handler.currentLaunchAbilityKey_.triggerType = KeyEvent::KEY_ACTION_UP;
+    handler.currentLaunchAbilityKey_.preKeys = {3};
+    EventLogHelper eventLogHelper;
+    eventLogHelper.userType_ = "beta";
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    EXPECT_NE(inputEvent, nullptr);
+    inputEvent->bitwise_ = InputEvent::EVENT_FLAG_PRIVACY_MODE;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_TRUE(ret);
+    eventLogHelper.userType_ = "aaaaaaa";
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_TRUE(ret);
+    inputEvent->bitwise_ = 0;
+    ret = handler.HandleShortKeys(keyEvent);
+    ASSERT_TRUE(ret);
 }
 } // namespace MMI
 } // namespace OHOS
