@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace MMI {
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
+
 InputManager *InputManager::GetInstance()
 {
     return instance_;
@@ -639,6 +640,11 @@ int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
 {
     return InputMgrImpl.GetAllSystemHotkeys(keyOptions, count);
+}
+
+int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
 }
 } // namespace MMI
 } // namespace OHOS
