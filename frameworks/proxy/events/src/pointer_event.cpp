@@ -271,6 +271,16 @@ void PointerEvent::PointerItem::SetPressure(double pressure)
     }
 }
 
+int32_t PointerEvent::PointerItem::GetMoveFlag() const
+{
+    return moveFlag_;
+}
+
+void PointerEvent::PointerItem::SetMoveFlag(int32_t moveFlag)
+{
+    moveFlag_ = moveFlag;
+}
+
 int32_t PointerEvent::PointerItem::GetLongAxis() const
 {
     return longAxis_;
