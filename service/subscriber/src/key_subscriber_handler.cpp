@@ -29,7 +29,6 @@
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
 #include "net_packet.h"
-#include "permission_helper.h"
 #include "proto.h"
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
 #include "key_shortcut_manager.h"
@@ -91,8 +90,8 @@ void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> 
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t KeySubscriberHandler::SubscribeKeyEvent(
-    SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
+int32_t KeySubscriberHandler::SubscribeKeyEvent(SessionPtr sess,
+    int32_t subscribeId, std::shared_ptr<KeyOption> keyOption, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
@@ -122,7 +121,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
             return ret;
         }
     } else {
-        auto ret = AddSubscriber(subscriber, keyOption);
+        auto ret = AddSubscriber(subscriber, keyOption, isSystem);
         if (ret != RET_OK) {
             MMI_HILOGE("AddSubscriber fail, error:%{public}d", ret);
             return ret;
@@ -132,18 +131,18 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
+int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId, bool isSystem)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
-    int32_t ret = RemoveSubscriber(sess, subscribeId);
+    int32_t ret = RemoveSubscriber(sess, subscribeId, isSystem);
     if (ret != RET_OK) {
         ret = RemoveKeyGestureSubscriber(sess, subscribeId);
     }
     return ret;
 }
 
-int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
+int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
@@ -154,7 +153,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 auto option = (*it)->keyOption_;
                 CHKPR(option, ERROR_NULL_POINTER);
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
-                if (PER_HELPER->VerifySystemApp()) {
+                if (isSystem) {
                     KEY_SHORTCUT_MGR->UnregisterSystemKey((*it)->shortcutId_);
                 } else {
                     KEY_SHORTCUT_MGR->UnregisterHotKey((*it)->shortcutId_);
@@ -253,7 +252,7 @@ int32_t KeySubscriberHandler::RegisterHotKey(std::shared_ptr<KeyOption> option,
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 
 int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
-    std::shared_ptr<KeyOption> option)
+    std::shared_ptr<KeyOption> option, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     CHKPR(subscriber, RET_ERR);
@@ -261,7 +260,7 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
     PrintKeyOption(option);
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CHKPR(subscriber->sess_, RET_ERR);
-    if (PER_HELPER->VerifySystemApp()) {
+    if (isSystem) {
         subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
