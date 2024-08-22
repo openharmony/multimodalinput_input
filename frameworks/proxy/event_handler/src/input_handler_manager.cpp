@@ -243,7 +243,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
         }
     }
@@ -256,7 +256,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
             break;
         }
@@ -318,7 +318,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         return;
     }
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
-    if (tokenType != TokenType::TOKEN_HAP) {
+    if (tokenType != TokenType::TOKEN_HAP && tokenType != TokenType::TOKEN_SYSTEM_HAP) {
         return;
     }
     AddMouseEventId(pointerEvent);
