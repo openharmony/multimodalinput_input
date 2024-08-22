@@ -49,8 +49,8 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
-            const std::shared_ptr<KeyOption> keyOption);
-    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
+            const std::shared_ptr<KeyOption> keyOption, bool isSystem);
+    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId, bool isSystem);
     void RemoveSubscriberKeyUpTimer(int32_t keyCode);
     int32_t EnableCombineKey(bool enable);
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -107,8 +107,8 @@ private:
     int32_t RegisterHotKey(std::shared_ptr<KeyOption> option, int32_t session,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
-    int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
-    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
+    int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option, bool isSystem);
+    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId, bool isSystem);
     bool IsMatchForegroundPid(std::list<std::shared_ptr<Subscriber>> subs, std::set<int32_t> foregroundPids);
     void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
