@@ -243,6 +243,8 @@ int libinput_event_gesture_get_finger_count(struct libinput_event_gesture *event
 
 double libinput_event_gesture_get_scale(struct libinput_event_gesture *event);
 
+double libinput_event_gesture_get_angle_delta(struct libinput_event_gesture *event);
+
 int libinput_event_gesture_get_device_coords_x(struct libinput_event_gesture *event, uint32_t idx);
 
 int libinput_event_gesture_get_device_coords_y(struct libinput_event_gesture *event, uint32_t idx);
