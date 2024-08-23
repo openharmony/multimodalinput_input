@@ -2043,34 +2043,41 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
 int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[])
 {
     CHKPR(argv, ERROR_NULL_POINTER);
-    // e.g. uinput -P -p 500 500 d
     constexpr int32_t actionInputArgc = 6;
+    constexpr int32_t minScaleNumerator = 0;
+    constexpr int32_t maxScaleNumerator = 500;
+    constexpr int32_t hundred = 100;
+    constexpr int32_t fingerCount = 2;
     int32_t centerX = 0;
     int32_t centerY = 0;
     int32_t scalePercentNumerator = 0;
+    std::string tips = "uinput -P -p dx, dy, scalePercent; dx, dy, scalePercent are all number.";
+    std::string extralTips = " dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;";
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
-        return EVENT_REG_FAIL;
+        std::cout << tips << extralTips << std::endl;
+        return RET_ERR;
     }
     int32_t startPos = optind - MOVE_POS_ONE;
-    std::string tips = "uinput -P -p dx, dy, scalePercent; dx, dy, scalePercent are all number.0 < scalePercent < 500";
-    // optarg is the first return argument in argv that call the function getopt_long with the current option
     if (argc == actionInputArgc) {
         if ((!StrToInt(argv[startPos], centerX)) ||
             (!StrToInt(argv[startPos + MOVE_POS_ONE], centerY)) ||
             (!StrToInt(argv[startPos + MOVE_POS_TWO], scalePercentNumerator))) {
-            std::cout << tips << std::endl;
+            std::cout << tips << extralTips << std::endl;
+            return RET_ERR;
         }
     } else {
-        std::cout << tips << std::endl;
-        return EVENT_REG_FAIL;
+        std::cout << tips << extralTips << std::endl;
+        return RET_ERR;
     }
-
-    constexpr int32_t minScaleNumerator = 0;
-    constexpr int32_t maxScaleNumerator = 500;
     if ((scalePercentNumerator <= minScaleNumerator) || (scalePercentNumerator > maxScaleNumerator)) {
         std::cout << "Invalid scale numberator:" << scalePercentNumerator << std::endl;
-        std::cout << std::endl;
+        std::cout << tips << extralTips << std::endl;
+        return RET_ERR;
+    }
+    bool check = (centerX > 0) && (centerY >= hundred * fingerCount);
+    if (!check) {
+        std::cout << tips << extralTips << std::endl;
         return RET_ERR;
     }
     return ActionPinchEvent(centerX, centerY, scalePercentNumerator);
@@ -2081,13 +2088,13 @@ int32_t InputManagerCommand::SwipeActionEvent(int32_t startX, int32_t startY, in
     constexpr int32_t fingerCount = 3;
     constexpr int32_t times = 10;
     constexpr int32_t thousand = 1000;
-    int32_t disY =  static_cast<int32_t> (static_cast<double> (endY - startY) / times);
-    int32_t disX =  static_cast<int32_t> (static_cast<double> (endX - startX) / times);
+    int32_t disY = static_cast<int32_t>(static_cast<double>(endY - startY) / times);
+    int32_t disX = static_cast<int32_t>(static_cast<double>(endX - startX) / times);
     int32_t actionType[10] = {PointerEvent::POINTER_ACTION_SWIPE_BEGIN};
     int64_t actionTimeBase = GetSysClockTime() - times * thousand * thousand;
     int64_t actionTimeStartTimeDis = fingerCount * thousand;
     int64_t actionStartTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int64_t actionTime[10] =  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int64_t actionTime[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int32_t sourceType = PointerEvent::SOURCE_TYPE_TOUCHPAD;
     actionTime[0] = actionTimeBase;
     actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / thousand;
@@ -2124,24 +2131,29 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipe(int32_t argc, char *argv
     int32_t endY = 0;
     if (optind < 0 || optind > argc) {
         std::cout << "wrong optind pointer index" << std::endl;
-        return EVENT_REG_FAIL;
+        return RET_ERR;
     }
     int32_t startPos = optind - MOVE_POS_ONE;
-    std::string tip = "uinput -P -s startX, startY, endX, endY; startX startY ,endX, endY are all number";
+    std::string tip = "uinput -P -s startX, startY, endX, endY;";
+    std::string extralTip = "And startX, startY, endX, endY are all number which is bigger than 0;";
     if (argc == actionInputArgc) {
         if ((!StrToInt(argv[startPos], startX)) ||
             (!StrToInt(argv[startPos + MOVE_POS_ONE], startY)) ||
             (!StrToInt(argv[startPos + MOVE_POS_TWO], endX)) ||
             (!StrToInt(argv[startPos + MOVE_POS_THREE], endY))) {
-            std::cout << tip << argc << std::endl;
-        } else {
-            SwipeActionEvent(startX, startY, endX, endY);
+            std::cout << tip << extralTip << std::endl;
+            return RET_ERR;
         }
     } else {
-        std::cout << tip << argc << std::endl;
-        return EVENT_REG_FAIL;
+        std::cout << tip << extralTip << std::endl;
+        return RET_ERR;
     }
-    return ERR_OK;
+    bool check = (startX > 0) && (endX > 0) && (startY > 0) && (endY > 0);
+    if (!check) {
+        std::cout << tip << extralTip << std::endl;
+        return RET_ERR;
+    }
+    return SwipeActionEvent(startX, startY, endX, endY);
 }
 
 std::shared_ptr<PointerEvent> InputManagerCommand::CreateEvent(
@@ -2181,38 +2193,43 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, 
     CALL_DEBUG_ENTER;
     constexpr int32_t hundred = 100;
     constexpr int32_t fingerCount = 2;
+    constexpr int32_t idSecondItem = 1;
     int32_t timesForSleep = hundred * hundred;
-    int32_t distance = hundred * fingerCount;
-    int32_t times = hundred / (fingerCount * fingerCount);
+    int32_t distance = 0;
+    int32_t times = hundred / (fingerCount * fingerCount * fingerCount);
     int32_t topX = centerX;
     int32_t bottomX = centerX;
+    int32_t stepY = 0;
+    int32_t actionType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
+    double scalePinch = 1.0;
+    if (scalePercentNumerator > hundred) {
+        distance = hundred / fingerCount;
+        stepY = 0 - (distance / (fingerCount * times));
+    } else {
+        distance = hundred * fingerCount;
+        stepY = distance / (fingerCount * times);
+    }
     int32_t topY = centerY - distance;
     int32_t bottomY = centerY + distance;
-    int32_t stepY = distance / (fingerCount * times);
-    int32_t actionType = PointerEvent::POINTER_ACTION_AXIS_BEGIN;
-    double  scalePinch = 1.0;
-    scalePinch = (scalePinch - (static_cast<double> (scalePercentNumerator) / hundred)) / times;
-    this->SendTouchDownForPinch(centerX, centerY, distance);
+    double scalePinchChange = ((static_cast<double>(scalePercentNumerator) / hundred) - 1) / (times - 1);
+    SendTouchDownForPinch(topX, topY, bottomX, bottomY);
     for (int32_t index = 0; index < times; index++) {
         if (index != 0) {
             actionType = PointerEvent::POINTER_ACTION_AXIS_UPDATE;
-            scalePinch = scalePinch + scalePinch;
+            scalePinch = scalePinch + scalePinchChange;
         }
-        int32_t idForItem = 0;
         auto pointerEvent = CreateEvent(0, actionType, 0, PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
         pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scalePinch);
-        pointerEvent->SetTargetDisplayId(-1);
         PointerEvent::PointerItem itemFirst;
         topY = topY + stepY;
         bottomY = bottomY - stepY;
-        FillPointerItem(itemFirst, topX, topY, idForItem, false);
+        FillPointerItem(itemFirst, topX, topY, 0, false);
         itemFirst.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
         itemFirst.SetDownTime(pointerEvent->GetActionStartTime());
-        idForItem++;
         pointerEvent->AddPointerItem(itemFirst);
         PointerEvent::PointerItem itemSecond;
-        FillPointerItem(itemSecond, bottomX, bottomY, idForItem, true);
-        pointerEvent->SetPointerId(1);
+        FillPointerItem(itemSecond, bottomX, bottomY, idSecondItem, true);
+        pointerEvent->SetPointerId(idSecondItem);
         pointerEvent->AddPointerItem(itemSecond);
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME * timesForSleep));
@@ -2220,7 +2237,7 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t centerX, int32_t centerY, 
     return RET_OK;
 }
 
-void InputManagerCommand::SendTouchDownForPinch(int32_t centerX, int32_t centerY, int32_t distance)
+void InputManagerCommand::SendTouchDownForPinch(int32_t topX, int32_t topY, int32_t bottomX, int32_t bottomY)
 {
     constexpr int32_t fingerCount = 2;
     int32_t itemId = 0;
@@ -2228,7 +2245,7 @@ void InputManagerCommand::SendTouchDownForPinch(int32_t centerX, int32_t centerY
         PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
     pointerEvent->SetPointerId(itemId);
     PointerEvent::PointerItem itemFirst;
-    FillPointerItem(itemFirst, centerX, centerY - distance, itemId, true);
+    FillPointerItem(itemFirst, topX, topY, itemId, true);
     itemFirst.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     pointerEvent->AddPointerItem(itemFirst);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2238,7 +2255,7 @@ void InputManagerCommand::SendTouchDownForPinch(int32_t centerX, int32_t centerY
     itemId = itemId + 1;
     pointerEvent->SetPointerId(itemId);
     PointerEvent::PointerItem itemSecond;
-    FillPointerItem(itemSecond, centerX, centerY + distance, itemId, true);
+    FillPointerItem(itemSecond, bottomX, bottomY, itemId, true);
     pointerEvent->AddPointerItem(itemFirst);
     pointerEvent->AddPointerItem(itemSecond);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2340,15 +2357,13 @@ void InputManagerCommand::PrintKnuckleUsage()
 
 void InputManagerCommand::PrintTouchPadUsage()
 {
-    std::cout << "-p  <scale percent numerator>  --pinch  <scale percent numerator>";
-    std::cout << std::endl;
-    std::cout << "  <scale percent numerator> numerator of percent scale, divided by 100 is scale, it is an integer,";
-    std::cout << "  range is (0, 500]"                                                               << std::endl;
-    std::cout << "  while simulate this, make sure that a picture is on the top of the desktop."     << std::endl;
-    std::cout << std::endl;
-    std::cout << "-s. While simulate this, make sure that your actual action is available"           << std::endl;
-    std::cout << std::endl;
-    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                          << std::endl;
+    std::cout << "-p dx, dy, scalePercent; dx, dy, scalePercent are all number.";                   << std::endl;
+    std::cout << "dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;";          << std::endl;
+    std::cout << "While simulate this, make sure that a picture is on the top of the desktop."      << std::endl;
+    std::cout << "-s startX, startY, endX, endY;"                                                   << std::endl;
+    std::cout << "And startX, startY, endX, endY are all number which is bigger than 0;"            << std::endl;
+    std::cout << "While simulate this, make sure that your actual action is available"              << std::endl;
+    std::cout << "-r <rotate value> rotate value must be within (-360,360)"                         << std::endl;
 }
 
 void InputManagerCommand::ShowUsage()
