@@ -6311,5 +6311,265 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPixelMapData, TestS
     ASSERT_NE(sharedPixelMap, nullptr);
     EXPECT_EQ(inputWindowsMgr.SetPixelMapData(infoId, (void *)sharedPixelMap.get()), RET_OK);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_002
+ * @tc.desc: Test updating window & display information for each display in extended screen mode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 1;
+    windowInfo.uid = 1;
+    windowInfo.area = {1, 1, 1, 1};
+    windowInfo.defaultHotAreas = { windowInfo.area };
+    windowInfo.pointerHotAreas = { windowInfo.area };
+    windowInfo.agentWindowId = 1;
+    windowInfo.flags = 1;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+
+    DisplayInfo displayInfo1;
+    displayInfo1.id = 1;
+    displayInfo1.x =1;
+    displayInfo1.y = 1;
+    displayInfo1.width = 2;
+    displayInfo1.height = 2;
+    displayInfo1.dpi = 240;
+    displayInfo1.name = "pp";
+    displayInfo1.uniq = "pp";
+    displayInfo1.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo1);
+
+    DisplayInfo displayInfo2;
+    displayInfo2.id = 2;
+    displayInfo2.x =1;
+    displayInfo2.y = 1;
+    displayInfo2.width = 2;
+    displayInfo2.height = 2;
+    displayInfo2.dpi = 240;
+    displayInfo2.name = "pp";
+    displayInfo2.uniq = "pp";
+    displayInfo2.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo2);
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+
+    displayGroupInfo.displaysInfo.pop_back();
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_003
+ * @tc.desc: Test updating window & display information for each display in extended screen mode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    DisplayInfo displayInfo1;
+    displayInfo1.id = 1;
+    displayInfo1.x =1;
+    displayInfo1.y = 1;
+    displayInfo1.width = 2;
+    displayInfo1.height = 2;
+    displayInfo1.dpi = 240;
+    displayInfo1.name = "pp";
+    displayInfo1.uniq = "pp";
+    displayInfo1.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo1);
+
+    DisplayInfo displayInfo2;
+    displayInfo2.id = 2;
+    displayInfo2.x =1;
+    displayInfo2.y = 1;
+    displayInfo2.width = 2;
+    displayInfo2.height = 2;
+    displayInfo2.dpi = 240;
+    displayInfo2.name = "pp";
+    displayInfo2.uniq = "pp";
+    displayInfo2.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo2);
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_004
+ * @tc.desc: Test updating window & display information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 1;
+    windowInfo.uid = 1;
+    windowInfo.area = {1, 1, 1, 1};
+    windowInfo.defaultHotAreas = { windowInfo.area };
+    windowInfo.pointerHotAreas = { windowInfo.area };
+    windowInfo.agentWindowId = 1;
+    windowInfo.flags = 1;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+
+    DisplayInfo displayInfo1;
+    displayInfo1.id = 1;
+    displayInfo1.x =1;
+    displayInfo1.y = 1;
+    displayInfo1.width = 2;
+    displayInfo1.height = 2;
+    displayInfo1.dpi = 240;
+    displayInfo1.name = "pp";
+    displayInfo1.uniq = "pp";
+    displayInfo1.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo1);
+
+    DisplayInfo displayInfo2;
+    displayInfo2.id = 2;
+    displayInfo2.x =1;
+    displayInfo2.y = 1;
+    displayInfo2.width = 2;
+    displayInfo2.height = 2;
+    displayInfo2.dpi = 240;
+    displayInfo2.name = "pp";
+    displayInfo2.uniq = "pp";
+    displayInfo2.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo2);
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+
+    displayGroupInfo.displaysInfo.erase(displayGroupInfo.displaysInfo.begin());
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateDisplayInfo_005
+ * @tc.desc: Test updating window & display information for each display
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    ASSERT_NO_FATAL_FAILURE(WIN_MGR->UpdateDisplayInfo(displayGroupInfo));
+}
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateKeyEventDisplayId_001
+ * @tc.desc: Test the funcation UpdateKeyEventDisplayId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateKeyEventDisplayId_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<KeyEvent> keyEvent = nullptr;
+    int32_t focusWindowId = 1;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId));
+
+    WindowInfo windowInfo = {.displayId = 1};
+    WindowGroupInfo windowGroupInfo = {.focusWindowId = 1, .displayId = 1, .windowsInfo = {windowInfo}};
+    inputWindowsManager.windowsPerDisplay_.emplace(std::make_pair(1, windowGroupInfo));
+    keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
+
+    focusWindowId = 2;
+    inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 1);
+
+    DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
+    inputWindowsManager.displayGroupInfo_.displaysInfo.emplace_back(info1);
+    inputWindowsManager.UpdateKeyEventDisplayId(keyEvent, focusWindowId);
+    EXPECT_EQ(keyEvent->GetTargetDisplayId(), 0);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_OnDisplayRemoved_001
+ * @tc.desc: Test the funcation OnDisplayRemoved
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnDisplayRemoved_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    DisplayGroupInfo displayGroupInfo {};
+    bool ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
+    EXPECT_FALSE(ret);
+
+    DisplayInfo info1 = {.id = 0, .x = 0, .y = 0, .width = 100, .height = 200};
+    DisplayInfo info2 = {.id = 1, .x = 100, .y = 0, .width = 100, .height = 200};
+    inputWindowsManager.displayGroupInfo_.displaysInfo = {info1, info2};
+    displayGroupInfo.displaysInfo = {info2};
+    ret = inputWindowsManager.OnDisplayRemoved(displayGroupInfo);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindowInfo_001
+ * @tc.desc: Test the funcation UpdateWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.width = 20;
+    displayGroupInfo.height = 20;
+    displayGroupInfo.focusWindowId = 1;
+
+    WindowInfo windowInfo;
+    windowInfo.id = 1;
+    windowInfo.pid = 1;
+    windowInfo.uid = 1;
+    windowInfo.area = {1, 1, 1, 1};
+    windowInfo.defaultHotAreas = { windowInfo.area };
+    windowInfo.pointerHotAreas = { windowInfo.area };
+    windowInfo.agentWindowId = 1;
+    windowInfo.flags = 1;
+    windowInfo.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    windowInfo.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+    windowInfo1.action = WINDOW_UPDATE_ACTION::ADD;
+    displayGroupInfo.windowsInfo.push_back(windowInfo);
+
+    WINDOW_UPDATE_ACTION ret = WIN_MGR->UpdateWindowInfo(displayGroupInfo);
+    ASSERT_EQ(ret, WINDOW_UPDATE_ACTION::ADD);
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
