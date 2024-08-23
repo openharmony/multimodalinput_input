@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include "image_source.h"
+#include "input_device_manager.h"
 #include "input_windows_manager_mock.h"
 #include "i_preference_manager.h"
 #include "knuckle_drawing_manager.h"
@@ -116,6 +117,69 @@ std::shared_ptr<Media::PixelMap> PointerDrawingManagerExTest::CreatePixelMap(int
     }
     delete[] pixelColors;
     return pixelMap;
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DestroyPointerWindow_01
+ * @tc.desc: Test DestroyPointerWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DestroyPointerWindow_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindow());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DestroyPointerWindow_02
+ * @tc.desc: Test DestroyPointerWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DestroyPointerWindow_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DestroyPointerWindow());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
+ * @tc.desc: Test SetPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    bool isUiExtension = true;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 1;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    bool ret1 = pointerDrawingManager.CheckPointerStyleParam(windowId, pointerStyle);
+    EXPECT_TRUE(ret1);
+    int32_t ret2 = pointerDrawingManager.UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
+    EXPECT_EQ(ret2, RET_OK);
+    int32_t ret3 = WIN_MGR->SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(ret3, RET_OK);
+
+    EXPECT_FALSE(INPUT_DEV_MGR->HasPointerDevice());
+    EXPECT_FALSE(WIN_MGR->IsMouseSimulate());
+    EXPECT_FALSE(WIN_MGR->IsNeedRefreshLayer(windowId));
+    int32_t ret4 = pointerDrawingManager.SetPointerStyle(pid, windowId, pointerStyle, isUiExtension);
+    EXPECT_EQ(ret4, RET_OK);
 }
 
 /**
@@ -647,6 +711,51 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseHotSpot_04
     pointerDrawingManager.userIcon_ = nullptr;
     int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
     ASSERT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_05
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseHotSpot_05, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
+
+    int32_t hotSpotX = -3;
+    int32_t hotSpotY = -4;
+    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_06
+ * @tc.desc: Test SetMouseHotSpot
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetMouseHotSpot_06, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    int32_t pid = 1;
+    int32_t windowId = 2;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
+    int32_t hotSpotX = 3;
+    int32_t hotSpotY = 4;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 1;
+    pointerStyle.size = 2;
+    EXPECT_TRUE(pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
+    EXPECT_EQ(ret, RET_ERR);
 }
 
 /**
