@@ -1858,7 +1858,7 @@ static int32_t AddEventCallback(Input_KeyEventMonitorInfo* event)
         for (const auto &iter: it->second) {
             if (iter->callback == event->callback) {
                 MMI_HILOGI("Callback already exist");
-                return INPUT_SERVICE_EXCEPTION;
+                return INPUT_SUCCESS;
             }
         }
     }
@@ -2017,8 +2017,8 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     }
     if (AddEventCallback(event) != INPUT_SUCCESS) {
         delete event;
-        MMI_HILOGE("Callback already exist");
-        return INPUT_SERVICE_EXCEPTION;
+        MMI_HILOGE("AddEventCallback fail");
+        return INPUT_PARAMETER_ERROR;
     }
     return INPUT_SUCCESS;
 }
