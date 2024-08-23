@@ -1311,13 +1311,16 @@ void InputManagerImpl::OnConnected()
 {
     CALL_INFO_TRACE;
     ReAddInputEventFilter();
-    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGD("The windows info or display info is empty");
-        return;
+    if (!displayGroupInfo_.windowsInfo.empty() && !displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGD("displayGroupInfo_: windowsInfo size: %{public}zu, displaysInfo size: %{public}zu",
+            displayGroupInfo_.windowsInfo.size(), displayGroupInfo_.displaysInfo.size());
+        SendDisplayInfo();
+        PrintDisplayInfo();
     }
-    SendDisplayInfo();
-    SendWindowInfo();
-    PrintDisplayInfo();
+    if (!windowGroupInfo_.windowsInfo.empty()) {
+        MMI_HILOGD("windowGroupInfo_: windowsInfo size: %{public}zu", windowGroupInfo_.windowsInfo.size());
+        SendWindowInfo();
+    }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     SendEnhanceConfig();
     PrintEnhanceConfig();
