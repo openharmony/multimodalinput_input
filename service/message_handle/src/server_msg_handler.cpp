@@ -672,7 +672,7 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
-    int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+    int32_t subscribeId, const std::shared_ptr<KeyOption> option, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -680,10 +680,10 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
-    return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option);
+    return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option, isSystem);
 }
 
-int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -691,7 +691,7 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
-    return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
+    return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId, isSystem);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 

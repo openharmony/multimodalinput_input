@@ -221,9 +221,8 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         }
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
-    if (IsReservedSystemKey(shortcut)) {
-        MMI_HILOGE("Can not register reserved system key ([%{public}s],%{public}d)",
-            FormatModifiers(key.modifiers).c_str(), key.finalKey);
+    if (!IsReservedSystemKey(shortcut)) {
+        MMI_HILOGE("The system application can only subscribe to reserved shortcuts");
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), shortcut);
@@ -258,6 +257,11 @@ int32_t KeyShortcutManager::RegisterHotKey(const HotKey &key)
     if (HaveRegisteredGlobalKey(globalKey)) {
         MMI_HILOGE("Global key (0x%{public}x, %{public}d) has been taken", globalKey.modifiers, globalKey.finalKey);
         return KEY_SHORTCUT_ERROR_TAKEN;
+    }
+    if (IsReservedSystemKey(globalKey)) {
+        MMI_HILOGE("Can not register reserved system key ([%{public}s],%{public}d)",
+            FormatModifiers(key.modifiers).c_str(), key.finalKey);
+        return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     auto [iter, _] = shortcuts_.emplace(GenerateId(), globalKey);
     MMI_HILOGI("Register global key [No.%{public}d](0x%{public}x,%{public}d,SESSION:%{public}d)",

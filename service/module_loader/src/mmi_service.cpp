@@ -1581,9 +1581,10 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
+    bool isSystem = PER_HELPER->VerifySystemApp();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, subscribeId, option] {
-            return sMsgHandler_.OnSubscribeKeyEvent(this, pid, subscribeId, option);
+        [this, pid, subscribeId, option, isSystem] {
+            return sMsgHandler_.OnSubscribeKeyEvent(this, pid, subscribeId, option, isSystem);
         }
         );
     if (ret != RET_OK) {
@@ -1614,9 +1615,10 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
+    bool isSystem = PER_HELPER->VerifySystemApp();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [this, pid, subscribeId] {
-            return sMsgHandler_.OnUnsubscribeKeyEvent(this, pid, subscribeId);
+        [this, pid, subscribeId, isSystem] {
+            return sMsgHandler_.OnUnsubscribeKeyEvent(this, pid, subscribeId, isSystem);
         }
         );
     if (ret != RET_OK) {

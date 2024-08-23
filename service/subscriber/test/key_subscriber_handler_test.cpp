@@ -138,10 +138,10 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
     UDSServer udsServer;
     SessionPtr sess = udsServer.GetSessionByPid(1);
     std::shared_ptr<KeyOption> keyOption = nullptr;
-    ASSERT_EQ(keySubscriberHandler.SubscribeKeyEvent(sess, -1, keyOption), -1);
+    ASSERT_EQ(keySubscriberHandler.SubscribeKeyEvent(sess, -1, keyOption, true), -1);
     SessionPtr sessPtr = nullptr;
-    ASSERT_NE(keySubscriberHandler.UnsubscribeKeyEvent(sessPtr, -1), 0);
-    ASSERT_NE(keySubscriberHandler.UnsubscribeKeyEvent(sess, 1), 0);
+    ASSERT_NE(keySubscriberHandler.UnsubscribeKeyEvent(sessPtr, -1, true), 0);
+    ASSERT_NE(keySubscriberHandler.UnsubscribeKeyEvent(sess, 1, true), 0);
 }
 
 /**
@@ -213,11 +213,11 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     KeySubscriberHandler handler;
     SessionPtr sess;
     auto keyOption = std::make_shared<KeyOption>();
-    int32_t ret = handler.SubscribeKeyEvent(sess, -1, keyOption);
+    int32_t ret = handler.SubscribeKeyEvent(sess, -1, keyOption, true);
     ASSERT_EQ(ret, RET_ERR);
-    ret = handler.SubscribeKeyEvent(nullptr, 1, keyOption);
+    ret = handler.SubscribeKeyEvent(nullptr, 1, keyOption, true);
     ASSERT_NE(ret, RET_OK);
-    ret = handler.SubscribeKeyEvent(sess, 1, keyOption);
+    ret = handler.SubscribeKeyEvent(sess, 1, keyOption, true);
     ASSERT_NE(ret, RET_OK);
 }
 
@@ -232,9 +232,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriber_001
     CALL_DEBUG_ENTER;
     KeySubscriberHandler handler;
     SessionPtr sess;
-    int32_t ret = handler.RemoveSubscriber(sess, 1);
+    int32_t ret = handler.RemoveSubscriber(sess, 1, true);
     ASSERT_EQ(ret, RET_ERR);
-    ret = handler.RemoveSubscriber(nullptr, 1);
+    ret = handler.RemoveSubscriber(nullptr, 1, true);
     ASSERT_EQ(ret, RET_ERR);
 }
 
@@ -481,12 +481,12 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddSubscriber_001, T
     std::shared_ptr<KeyOption> keyOption;
     auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
     std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
-    handler.AddSubscriber(subscriber, option);
+    handler.AddSubscriber(subscriber, option, true);
     auto it = handler.subscriberMap_.find(option);
     ASSERT_EQ(it->second.size(), 1);
     ASSERT_EQ(it->second.front(), subscriber);
     auto newSubscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    handler.AddSubscriber(newSubscriber, option);
+    handler.AddSubscriber(newSubscriber, option, true);
     ASSERT_EQ(it->second.size(), 2);
     ASSERT_EQ(it->second.back(), newSubscriber);
 }
@@ -1064,7 +1064,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     std::set<int32_t> preKeys;
     preKeys.insert(1);
     keyOption->SetPreKeys(preKeys);
-    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_OK);
+    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_OK);
 
     preKeys.insert(2);
     preKeys.insert(3);
@@ -1072,7 +1072,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     preKeys.insert(5);
     preKeys.insert(6);
     keyOption->SetPreKeys(preKeys);
-    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_ERR);
+    ASSERT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_ERR);
 }
 
 /**
@@ -1227,9 +1227,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriber, Te
         std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
     subscriberList.push_back(subscriber);
     handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
-    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId), RET_ERR);
+    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId, true), RET_ERR);
     subscribeId = 1;
-    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId), RET_OK);
+    ASSERT_EQ(handler.RemoveSubscriber(session, subscribeId, true), RET_OK);
 }
 
 /**
@@ -2241,9 +2241,9 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
     SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
     EXPECT_NE(sess, nullptr);
     int32_t subscribeId = 2;
-    int32_t ret1 = keySubscriberHandler.RemoveSubscriber(sess, subscribeId);
+    int32_t ret1 = keySubscriberHandler.RemoveSubscriber(sess, subscribeId, true);
     EXPECT_EQ(ret1, RET_ERR);
-    int32_t ret2 = keySubscriberHandler.UnsubscribeKeyEvent(sess, subscribeId);
+    int32_t ret2 = keySubscriberHandler.UnsubscribeKeyEvent(sess, subscribeId, true);
     EXPECT_EQ(ret2, RET_ERR);
 }
 
@@ -2535,7 +2535,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     std::set<int32_t> preKeys = { 2017, 2018, 2019, 2072, 2046 };
     keyOption->SetPreKeys(preKeys);
-    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_ERR);
+    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_ERR);
 }
 
 /**
@@ -2554,7 +2554,7 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_SubscribeKeyEvent_00
     keyOption->SetFinalKey(2072);
     keyOption->SetFinalKeyDown(true);
     keyOption->SetFinalKeyDownDuration(100);
-    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption), RET_OK);
+    EXPECT_EQ(handler.SubscribeKeyEvent(sess, subscribeId, keyOption, true), RET_OK);
 }
 
 /**
