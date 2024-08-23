@@ -152,7 +152,7 @@ napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::
 bool GetNamePropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
 {
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    CHKRF(napi_get_named_property(env, object, name.c_str(), &napiValue), "napi_get_named_property");
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
@@ -172,7 +172,7 @@ std::string GetNamePropertyString(const napi_env &env, const napi_value &object,
 {
     std::string value = "";
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    CHKRR(napi_get_named_property(env, object, name.c_str(), &napiValue), "napi_get_named_property", value);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");

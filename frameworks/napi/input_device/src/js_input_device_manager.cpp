@@ -23,9 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-std::mutex mutex_;
-} // namespace
+
 void JsInputDeviceManager::RegisterDevListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_DEBUG_ENTER;

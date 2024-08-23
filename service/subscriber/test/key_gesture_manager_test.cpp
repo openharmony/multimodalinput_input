@@ -19,6 +19,7 @@
 
 #include "ability_manager_client.h"
 #include "display_event_monitor.h"
+#include "event_log_helper.h"
 #include "key_option.h"
 #include "key_gesture_manager.h"
 #include "key_event.h"
@@ -69,6 +70,109 @@ public:
         output << "MyKeyGesture";
     }
 };
+
+/**
+ * @tc.name: KeyGestureManagerTest_Intercept_002
+ * @tc.desc: Test the funcation Intercept
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_Intercept_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyGestureManager keyGestureManager;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto keyGesture1 = std::make_unique<MyKeyGesture>();
+    auto keyGesture2 = std::make_unique<MyKeyGesture>();
+    auto keyGesture3 = std::make_unique<MyKeyGesture>();
+    keyGestureManager.keyGestures_.push_back(std::move(keyGesture1));
+    keyGestureManager.keyGestures_.push_back(std::move(keyGesture2));
+    keyGestureManager.keyGestures_.push_back(std::move(keyGesture3));
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
+    EXPECT_TRUE(keyGestureManager.Intercept(keyEvent));
+}
+
+/**
+ * @tc.name: KeyGestureManagerTest_TriggerHandlers_01
+ * @tc.desc: Test the funcation TriggerHandlers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_TriggerHandlers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    KeyGestureManager::Handler handler1(1, 10, 500, myCallback);
+    KeyGestureManager::Handler handler2(2, 20, 1000, myCallback);
+    KeyGestureManager::Handler handler3(3, 30, 1500, myCallback);
+
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    myKeyGesture->handlers_.push_back(handler1);
+    myKeyGesture->handlers_.push_back(handler2);
+    myKeyGesture->handlers_.push_back(handler3);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+
+    std::set<int32_t> foregroundPids = myKeyGesture->GetForegroundPids();
+    bool haveForeground = myKeyGesture->HaveForegroundHandler(foregroundPids);
+    EXPECT_FALSE(haveForeground);
+    ASSERT_NO_FATAL_FAILURE(myKeyGesture->TriggerHandlers(keyEvent));
+}
+
+/**
+ * @tc.name: LongPressSingleKey_Dump_01
+ * @tc.desc: Test the funcation LongPressSingleKey_Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressSingleKey_Dump_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyCode = 1;
+    KeyGestureManager::LongPressSingleKey longPressSingleKey(keyCode);
+    std::ostringstream output;
+    longPressSingleKey.keyCode_ = 2;
+
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    KeyGestureManager::Handler handler1(1, 10, 500, myCallback);
+    KeyGestureManager::Handler handler2(2, 20, 1000, myCallback);
+    KeyGestureManager::Handler handler3(3, 30, 1500, myCallback);
+
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    myKeyGesture->handlers_.push_back(handler1);
+    myKeyGesture->handlers_.push_back(handler2);
+    myKeyGesture->handlers_.push_back(handler3);
+    ASSERT_NO_FATAL_FAILURE(longPressSingleKey.Dump(output));
+}
+
+/**
+ * @tc.name: LongPressCombinationKey_Dump_01
+ * @tc.desc: Test the funcation LongPressCombinationKey_Dump
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Dump_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::set<int32_t> keys = {1, 2, 3};
+    KeyGestureManager::LongPressCombinationKey longPressCombinationKey(keys);
+    std::ostringstream output;
+    longPressCombinationKey.keys_ = {3, 4, 5, 6};
+    ASSERT_NO_FATAL_FAILURE(longPressCombinationKey.Dump(output));
+
+    longPressCombinationKey.keys_ = {};
+    std::function<void(std::shared_ptr<KeyEvent>)> myCallback;
+    KeyGestureManager::Handler handler1(1, 10, 500, myCallback);
+    KeyGestureManager::Handler handler2(2, 20, 1000, myCallback);
+    KeyGestureManager::Handler handler3(3, 30, 1500, myCallback);
+    std::shared_ptr<MyKeyGesture> myKeyGesture = std::make_shared<MyKeyGesture>();
+    myKeyGesture->handlers_.push_back(handler1);
+    myKeyGesture->handlers_.push_back(handler2);
+    myKeyGesture->handlers_.push_back(handler3);
+    ASSERT_NO_FATAL_FAILURE(longPressCombinationKey.Dump(output));
+}
 
 /**
  * @tc.name: KeyGestureManagerTest_Intercept_01
@@ -517,6 +621,8 @@ HWTEST_F(KeyGestureManagerTest, LongPressCombinationKey_Intercept_01, TestSize.L
     longPressCombinationKey.keys_ = {2, 3, 4};
     keyEvent->keyAction_ = KeyEvent::KEY_ACTION_DOWN;
     myKeyGesture->active_ = true;
+    EXPECT_FALSE(EventLogHelper::IsBetaVersion());
+    EXPECT_FALSE(keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE));
     bool ret = longPressCombinationKey.Intercept(keyEvent);
     EXPECT_FALSE(ret);
     myKeyGesture->active_ = false;

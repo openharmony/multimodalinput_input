@@ -78,6 +78,10 @@ const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbili
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 constexpr int32_t DEFAULT_VALUE { -1 };
+const std::string HARDEN_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string HARDEN_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const std::string HARDEN_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string HARDEN_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -588,32 +592,10 @@ int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
+    if (!CheckKnuckleCondition(touchEvent)) {
+        return;
+    }
     CHKPV(touchEvent);
-    PointerEvent::PointerItem item;
-    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
-    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
-        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
-        ResetKnuckleGesture();
-        return;
-    }
-    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
-    if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_) {
-        lastDirection_ = physicDisplayInfo->direction;
-        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE && !gesturePoints_.empty()) {
-            MMI_HILOGW("The screen has been rotated while knuckle is moving");
-            ResetKnuckleGesture();
-            return;
-        }
-    }
-    if (knuckleSwitch_.statusConfigValue) {
-        MMI_HILOGI("Knuckle switch closed");
-        return;
-    }
-    if (CheckInputMethodArea(touchEvent)) {
-        MMI_HILOGI("In input method area, skip");
-        return;
-    }
     int32_t touchAction = touchEvent->GetPointerAction();
     if (IsValidAction(touchAction)) {
         switch (touchAction) {
@@ -635,6 +617,40 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
                 break;
         }
     }
+}
+
+bool KeyCommandHandler::CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CHKPF(touchEvent);
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(touchEvent->GetPointerId(), item);
+    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE || singleKnuckleGesture_.state) {
+        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
+        ResetKnuckleGesture();
+        return false;
+    }
+    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(touchEvent->GetTargetDisplayId());
+    if (physicDisplayInfo != nullptr && physicDisplayInfo->direction != lastDirection_) {
+        lastDirection_ = physicDisplayInfo->direction;
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE && !gesturePoints_.empty()) {
+            MMI_HILOGW("The screen has been rotated while knuckle is moving");
+            ResetKnuckleGesture();
+            return false;
+        }
+    }
+    if (knuckleSwitch_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return false;
+    }
+    if (CheckInputMethodArea(touchEvent)) {
+        if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            MMI_HILOGI("In input method area, skip");
+        }
+        return false;
+    }
+    return true;
 }
 
 bool KeyCommandHandler::IsValidAction(int32_t action)
@@ -1183,7 +1199,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     bool isHandled = HandleShortKeys(key);
-    if (isFreezePowerKey_ && key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && isFreezePowerKey_) {
         MMI_HILOGI("Freeze power key");
         return true;
     }
@@ -1435,6 +1451,8 @@ int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
         return RET_OK;
     }
     isFreezePowerKey_ = true;
+    count_ = 0;
+    repeatKeyCountMap_.clear();
     if (sosDelayTimerId_ >= 0) {
         TimerMgr->RemoveTimer(sosDelayTimerId_);
         sosDelayTimerId_ = DEFAULT_VALUE;
@@ -2063,8 +2081,11 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         }
         if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
             isFreezePowerKey_ = true;
+            count_ = 0;
+            repeatKeyCountMap_.clear();
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
+                MMI_HILOGW("Timeout, restore the power button");
             });
             if (sosDelayTimerId_ < 0) {
                 MMI_HILOGE("Add timer failed");
@@ -2236,9 +2257,12 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
         }
         if (displayX >= window.area.x && displayX <= rightDownX &&
             displayY >= window.area.y && displayY <= rightDownY) {
+            if (touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+                touchEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
                 MMI_HILOGI("In input method area, windowId:%{public}d, windowType:%{public}d",
                     window.id, window.windowType);
                 return true;
+            }
         }
     }
     return false;
@@ -2368,20 +2392,15 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
 bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
 {
     CHKPF(event);
-    std::string shotBundleName;
-    std::string shotAbilityName;
-    std::string recorderBundleName;
-    std::string recorderAbilityName;
-    if (!GetTouchPadKnuckleAbilityInfo(shotBundleName, shotAbilityName, recorderBundleName, recorderAbilityName)) {
-        return false;
-    }
     auto actionType = event->GetKeyAction();
     if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(shotBundleName, shotAbilityName, "single_knuckle");
+        TouchPadKnuckleDoubleClickProcess(HARDEN_SCREENSHOT_BUNDLE_NAME,
+            HARDEN_SCREENSHOT_ABILITY_NAME, "single_knuckle");
         return true;
     }
     if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(recorderBundleName, recorderAbilityName, "double_knuckle");
+        TouchPadKnuckleDoubleClickProcess(HARDEN_SCREENRECORDER_BUNDLE_NAME,
+            HARDEN_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
         return true;
     }
     return false;
@@ -2401,47 +2420,6 @@ void KeyCommandHandler::TouchPadKnuckleDoubleClickProcess(const std::string bund
     ability.abilityName = abilityName;
     ability.params.emplace(std::make_pair("trigger_type", action));
     LaunchAbility(ability, NO_DELAY);
-}
-
-bool KeyCommandHandler::GetTouchPadKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
-    std::string &recorderBundleName, std::string &recorderAbilityName)
-{
-    if (!isParseConfig_) {
-        if (!ParseConfig()) {
-            MMI_HILOGE("Parse configFile failed");
-            return false;
-        }
-        isParseConfig_ = true;
-    }
-    if (sequences_.empty()) {
-        MMI_HILOGI("No sequences configuration data");
-        return false;
-    }
-    std::string bundleName;
-    std::string shotMatchName = ".screenshot";
-    std::string recorderMatchName = ".screenrecorder";
-    for (auto iter = sequences_.begin(); iter != sequences_.end(); ++iter) {
-        bundleName = iter->ability.bundleName;
-        if (bundleName.find(shotMatchName) != std::string::npos) {
-            shotBundleName = iter->ability.bundleName;
-            shotAbilityName = iter->ability.abilityName;
-            break;
-        }
-    }
-    for (auto iter = sequences_.begin(); iter != sequences_.end(); ++iter) {
-        bundleName = iter->ability.bundleName;
-        if (bundleName.find(recorderMatchName) != std::string::npos) {
-            recorderBundleName = iter->ability.bundleName;
-            recorderAbilityName = iter->ability.abilityName;
-            break;
-        }
-    }
-    if (shotBundleName.empty() || shotAbilityName.empty() || recorderBundleName.empty() ||
-        recorderAbilityName.empty()) {
-        MMI_HILOGI("Get touchPad knuckle ability information failed");
-        return false;
-    }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS

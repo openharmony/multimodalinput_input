@@ -214,6 +214,9 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    UpdateBindDisplayId(displayId);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
         UpdateSurfaceNodeBounds(physicalX, physicalY);
         Rosen::RSTransaction::FlushImplicitTransaction();
@@ -248,19 +251,19 @@ void PointerDrawingManager::UpdateSurfaceNodeBounds(int32_t physicalX, int32_t p
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         if (currentMouseStyle_.id == DEVELOPER_DEFINED_ICON) {
-            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+            surfaceNode_->SetBounds(physicalX, physicalY,
                 canvasWidth_, canvasHeight_);
         } else {
-            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+            surfaceNode_->SetBounds(physicalX, physicalY,
                 imageWidth_, imageHeight_);
         }
     } else {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+        surfaceNode_->SetBounds(physicalX, physicalY,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
     }
 #else
-    surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+    surfaceNode_->SetBounds(physicalX, physicalY,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
         surfaceNode_->GetStagingProperties().GetBounds().w_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -270,7 +273,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+        surfaceNode_->SetBounds(physicalX, physicalY,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
@@ -434,7 +437,7 @@ void PointerDrawingManager::InitPointerObserver()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
- 
+
 int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
@@ -997,6 +1000,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
     AttachToDisplay();
+    lastDisplayId_ = displayId;
     RotateDegree(direction);
     lastDirection_ = direction;
 
@@ -1085,7 +1089,7 @@ void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> p
 {
     pixelMap_ = pixelMap;
 }
- 
+
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
@@ -1220,6 +1224,10 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     CHKPR(pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
@@ -2092,6 +2100,39 @@ void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &arg
 
     std::string dumpInfo = oss.str();
     dprintf(fd, dumpInfo.c_str());
+}
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
+{
+    if (lastDisplayId_ != displayId) {
+        MMI_HILOGI("Mouse traversal occurs, lastDisplayId_:%{public}d, displayId:%{public}d",
+            lastDisplayId_, displayId);
+        CHKPV(surfaceNode_);
+        surfaceNode_->DetachToDisplay(screenId_);
+        screenId_ = static_cast<uint64_t>(displayId);
+        MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
+        AttachToDisplay();
+        lastDisplayId_ = displayId;
+    }
+}
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
+void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle& pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (hasDisplay_ && hasPointerDevice_) {
+        if (surfaceNode_ != nullptr) {
+            AttachToDisplay();
+            Rosen::RSTransaction::FlushImplicitTransaction();
+        }
+        Direction direction = DIRECTION0;
+        if (displayInfo_.displayDirection == DIRECTION0) {
+            direction = displayInfo_.direction;
+        }
+        DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
+            pointerStyle, direction);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

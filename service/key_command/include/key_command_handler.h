@@ -189,6 +189,7 @@ public:
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
+    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t SetIsFreezePowerKey(const std::string pageName);
@@ -285,7 +286,6 @@ private:
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -299,6 +299,7 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+    bool CheckKnuckleCondition(std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t ConvertVPToPX(int32_t vp) const;
@@ -322,9 +323,6 @@ private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
     void TouchPadKnuckleDoubleClickProcess(const std::string bundleName, const std::string abilityName,
         const std::string action);
-    bool GetTouchPadKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
-        std::string &recorderBundleName, std::string &recorderAbilityName);
-
 private:
     Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
@@ -370,7 +368,7 @@ private:
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };
-    bool isFreezePowerKey_ { false };
+    std::atomic<bool> isFreezePowerKey_ { false };
     bool isDownStart_ { false };
     bool isKeyCancel_ { false };
     bool sequenceOccurred_ { false };

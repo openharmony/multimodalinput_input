@@ -178,8 +178,8 @@ public:
     void CleanInvalidPiexMap();
 
 private:
-    void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
-    void OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
@@ -259,7 +259,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo, bool isDisplayRemoved = false);
 bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -307,6 +307,11 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     void UpdateDisplayMode();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    void UpdateKeyEventDisplayId(std::shared_ptr<KeyEvent> keyEvent, int32_t focusWindowId);
+    bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -363,7 +368,7 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    uint32_t lastFoldStatus_ {};
+    bool cancelTouchStatus_ { false };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;
