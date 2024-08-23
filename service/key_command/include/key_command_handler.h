@@ -323,9 +323,6 @@ private:
     bool TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event);
     void TouchPadKnuckleDoubleClickProcess(const std::string bundleName, const std::string abilityName,
         const std::string action);
-    bool GetTouchPadKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
-        std::string &recorderBundleName, std::string &recorderAbilityName);
-
 private:
     Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;
