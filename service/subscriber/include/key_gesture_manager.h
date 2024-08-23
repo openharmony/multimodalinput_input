@@ -94,6 +94,7 @@ private:
         void TriggerHandlers(std::shared_ptr<KeyEvent> keyEvent);
         void RunHandler(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
         void NotifyHandlers(std::shared_ptr<KeyEvent> keyEvent);
+        void ShowHandlers(const std::string &prefix, const std::set<int32_t> &foregroundApps) const;
 
         bool active_ { false };
         std::set<int32_t> keys_;
