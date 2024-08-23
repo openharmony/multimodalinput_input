@@ -374,6 +374,8 @@ int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
 void PointerDrawingManager::DestroyPointerWindow()
 {
 }
+void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle &pointerStyle)
+{}
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
@@ -457,7 +459,7 @@ MouseEventNormalize::~MouseEventNormalize() {}
 
 int32_t MouseEventNormalize::GetDisplayId() const
 {
-    return 0;
+    return DfsMessageParcel::messageParcel->GetDisplayId();
 }
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -547,6 +549,11 @@ void InputWindowsManager::CleanShellWindowIds()
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return false;
+}
+
+bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
 {
     return false;
 }

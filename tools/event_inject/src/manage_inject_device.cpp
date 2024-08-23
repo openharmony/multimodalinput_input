@@ -89,7 +89,12 @@ int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray &inputEv
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {
-        write(fd, &item.event, sizeof(item.event));
+        if (write(fd, &item.event, sizeof(item.event)) < 0) {
+            MMI_HILOGE("Write event failed");
+            close(fd);
+            fd = -1;
+            return RET_ERR;
+        };
         int64_t blockTime = (item.blockTime == 0) ? INJECT_SLEEP_TIMES : item.blockTime;
         std::this_thread::sleep_for(std::chrono::milliseconds(blockTime));
     }

@@ -93,7 +93,6 @@ private:
     bool IsFunctionKey(const std::shared_ptr<KeyEvent> keyEvent);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
     bool IsEnableCombineKeySwipe(const std::shared_ptr<KeyEvent> key);
-    bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
     void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
     void SubscriberNotifyNap(const std::shared_ptr<Subscriber> subscriber);

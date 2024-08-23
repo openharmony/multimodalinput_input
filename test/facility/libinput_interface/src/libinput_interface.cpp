@@ -161,6 +161,11 @@ double libinput_event_touch_get_pressure(struct libinput_event_touch* event)
     return g_instance->TouchEventGetPressure(event);
 }
 
+int32_t libinput_event_touch_get_move_flag(struct libinput_event_touch* event)
+{
+    return g_instance->TouchEventGetMoveFlag(event);
+}
+
 int32_t libinput_event_get_touch_contact_long_axis(struct libinput_event_touch *event)
 {
     return g_instance->TouchEventGetContactLongAxis(event);
@@ -298,7 +303,12 @@ int libinput_event_gesture_get_finger_count(struct libinput_event_gesture *event
 
 double libinput_event_gesture_get_scale(struct libinput_event_gesture *event)
 {
-    return (event != nullptr ? static_cast<uint32_t>(event->scale) : 1.0);
+    return (event != nullptr ? static_cast<double>(event->scale) : 1.0);
+}
+
+double libinput_event_gesture_get_angle_delta(struct libinput_event_gesture *event)
+{
+    return (event != nullptr ? static_cast<double>(event->angle) : 0.0);
 }
 
 int libinput_event_gesture_get_device_coords_x(struct libinput_event_gesture *event, uint32_t idx)

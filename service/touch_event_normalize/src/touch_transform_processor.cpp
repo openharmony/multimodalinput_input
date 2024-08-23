@@ -75,8 +75,10 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     if (pointerItemCancelMarks_.find(seatSlot) != pointerItemCancelMarks_.end()) {
         pointerItemCancelMarks_.erase(seatSlot);
     }
+    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
+    item.SetMoveFlag(moveFlag);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -163,11 +165,13 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
         return false;
     }
     double pressure = libinput_event_touch_get_pressure(touch);
+    int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
     int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
     if (static_cast<uint32_t>(longAxis) & TOUCH_CANCEL_MASK) {
         pointerItemCancelMarks_.emplace(seatSlot, true);
     }
     int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
+    item.SetMoveFlag(moveFlag);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);

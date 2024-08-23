@@ -427,5 +427,56 @@ HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_HandleKeyEventFilter_004
     bool result = handler.HandleKeyEventFilter(event);
     ASSERT_FALSE(result);
 }
+
+/**
+ * @tc.name: EventFilterHandlerTest_RemoveInputEventFilter
+ * @tc.desc: Verify the RemoveInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_RemoveInputEventFilter, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFilterHandler filterHandler;
+    EventFilterHandler::FilterInfo filterInfo = { nullptr, nullptr, 300, 200, 0x1, 610 };
+    int32_t filterId = 300;
+    int32_t clientPid = 610;
+    filterHandler.filters_.emplace_front(filterInfo);
+    EXPECT_EQ(filterHandler.RemoveInputEventFilter(filterId, clientPid), RET_OK);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_RemoveInputEventFilter_002
+ * @tc.desc: Verify the RemoveInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_RemoveInputEventFilter_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFilterHandler filterHandler;
+    EventFilterHandler::FilterInfo filterInfo = { nullptr, nullptr, 500, 200, 0x1, 300 };
+    int32_t filterId = 300;
+    int32_t clientPid = 610;
+    filterHandler.filters_.emplace_front(filterInfo);
+    EXPECT_EQ(filterHandler.RemoveInputEventFilter(filterId, clientPid), RET_OK);
+}
+
+/**
+ * @tc.name: EventFilterHandlerTest_RemoveInputEventFilter_003
+ * @tc.desc: Verify the RemoveInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventFilterHandlerTest, EventFilterHandlerTest_RemoveInputEventFilter_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventFilterHandler filterHandler;
+    EventFilterHandler::FilterInfo filterInfo = { nullptr, nullptr, 500, 200, 0x1, 300 };
+    int32_t filterId = -1;
+    int32_t clientPid = 600;
+    filterHandler.filters_.emplace_front(filterInfo);
+    EXPECT_EQ(filterHandler.RemoveInputEventFilter(filterId, clientPid), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

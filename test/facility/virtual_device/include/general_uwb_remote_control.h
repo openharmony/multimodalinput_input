@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ROSEN_MMI_SCENE_SCENE_BOARD_JUDGEMENT_H
-#define OHOS_ROSEN_MMI_SCENE_SCENE_BOARD_JUDGEMENT_H
+#ifndef GENERAL_UWB_REMOTE_CONTROL_H
+#define GENERAL_UWB_REMOTE_CONTROL_H
 
-#include <fstream>
+#include "general_device.h"
+#include "virtual_uwb_remote_control.h"
+#include "v_input_device.h"
 
 namespace OHOS {
 namespace MMI {
-class MMISceneBoardJudgement final {
+class GeneralUwbRemoteControl final : public GeneralDevice {
 public:
-    static bool IsSceneBoardEnabled();
-    static bool IsResampleEnabled();
+    GeneralUwbRemoteControl() = default;
+    ~GeneralUwbRemoteControl() = default;
+    DISALLOW_COPY_AND_MOVE(GeneralUwbRemoteControl);
+
+    bool SetUp() override;
+    void Close() override;
+
 private:
-    // Dealing with Windows type end of line "\r\n".
-    static std::ifstream& SafeGetLine(std::ifstream& configFile, std::string& line);
-    static bool InitWithConfigFile(const char* filePath, bool& enabled);
+    VirtualUwbRemoteControl vUwbRemoteControl_;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // OHOS_ROSEN_MMI_SCENE_SCENE_BOARD_JUDGEMENT_H
+#endif // GENERAL_UWB_REMOTE_CONTROL_H
