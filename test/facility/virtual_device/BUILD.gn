@@ -36,6 +36,7 @@ ohos_source_set("virtual_device_sources") {
     "src/general_stylus.cpp",
     "src/general_touchpad.cpp",
     "src/general_touchscreen.cpp",
+    "src/general_uwb_remote_control.cpp",
     "src/v_input_device.cpp",
   ]
 

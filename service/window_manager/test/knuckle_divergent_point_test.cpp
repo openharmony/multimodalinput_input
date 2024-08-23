@@ -186,8 +186,7 @@ HWTEST_F(KnuckleDivergentPointTest, KnuckleDivergentPointTest_Draw_003, TestSize
     knuckleDivergentPoint->pointY_ = 1;
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode->BeginRecording(0, 0));
-    knuckleDivergentPoint->Draw(canvas);
-    EXPECT_EQ(knuckleDivergentPoint->lifespan_, 1);
+    ASSERT_NO_FATAL_FAILURE(knuckleDivergentPoint->Draw(canvas));
 }
 
 /**

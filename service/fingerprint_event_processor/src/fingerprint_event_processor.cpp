@@ -79,10 +79,32 @@ void FingerprintEventProcessor::SetPowerKeyState(struct libinput_event* event)
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         powerKeyState_ = POWER_KEY_DOWN;
+        SendFingerprintCancelEvent();
     } else {
         powerKeyState_ = POWER_KEY_UP;
         lastUpTime_ = std::chrono::steady_clock::now();
     }
+}
+
+int32_t FingerprintEventProcessor::SendFingerprintCancelEvent()
+{
+    CALL_DEBUG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL);
+    int64_t time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_FINGERPRINT);
+    pointerEvent->SetPointerId(0);
+    EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
+    MMI_HILOGI("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
+    if (eventMonitorHandler_ != nullptr) {
+        eventMonitorHandler_->OnHandleEvent(pointerEvent);
+    }
+#endif
+    return ERR_OK;
 }
 
 int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event* event)

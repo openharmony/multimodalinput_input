@@ -422,6 +422,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL):
             ret = StubGetIntervalSinceLastInput(data, reply);
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_SYSTEM_HOT_KEY):
+            ret = StubGetAllSystemHotkeys(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -2662,6 +2664,26 @@ int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel&
         MMI_HILOGE("Failed to call StubGetIntervalSinceLastInput ret:%{public}d", ret);
     } else {
         WRITEINT64(reply, timeInterval);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubGetAllSystemHotkeys(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = GetAllSystemHotkeys(keyOptions);
+    if (ret != RET_OK) {
+        MMI_HILOGD("Call GetAllSystemHotkeys failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, static_cast<int32_t>(keyOptions.size()), IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("keyOptionsCount size:%{public}d", static_cast<int32_t>(keyOptions.size()));
+    for (const auto &item : keyOptions) {
+        if (!item->WriteToParcel(reply)) {
+            MMI_HILOGE("Write keyOption failed");
+            return IPC_STUB_WRITE_PARCEL_ERR;
+        }
     }
     return ret;
 }

@@ -1341,7 +1341,8 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetPointerVisi
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetCustomCursor, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_ERR));
     PointerDrawingManager pointerDrawMgr;
     std::shared_ptr<Media::PixelMap> pixelMapPtr = CreatePixelMap(MIDDLE_PIXEL_MAP_WIDTH, MIDDLE_PIXEL_MAP_HEIGHT);
     int32_t pid = 50;
@@ -1349,6 +1350,7 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetCustomCurso
     int32_t focusX = 300;
     int32_t focusY = 300;
     EXPECT_EQ(pointerDrawMgr.SetCustomCursor((void *)pixelMapPtr.get(), pid, windowId, focusX, focusY), RET_ERR);
+    testing::Mock::AllowLeak(winmgrmock.get());
 }
 
 /**

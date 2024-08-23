@@ -437,7 +437,7 @@ void PointerDrawingManager::InitPointerObserver()
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
- 
+
 int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
@@ -1089,7 +1089,7 @@ void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> p
 {
     pixelMap_ = pixelMap;
 }
- 
+
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
@@ -1224,6 +1224,10 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     CHKPR(pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
+        MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);

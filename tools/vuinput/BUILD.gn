@@ -33,11 +33,15 @@ ohos_source_set("libmmi-virtual-device") {
   }
   configs = [ ":libmmi_virtual_device_config" ]
 
+  external_deps = [
+    "c_utils:utils",
+    "libinput:libinput-third-mmi",
+  ]
+
   public_configs = [ ":virtual_device_public_config" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
-  external_deps = [ "c_utils:utils" ]
 }
 
 ohos_executable("vuinput") {

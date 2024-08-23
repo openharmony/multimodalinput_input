@@ -37,6 +37,7 @@ ohos_shared_library("oh_input_manager") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/permission_helper/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
@@ -46,8 +47,9 @@ ohos_shared_library("oh_input_manager") {
   ]
 
   sources = [
-    "./oh_input_interceptor.cpp",
-    "./oh_input_manager.cpp",
+    "${mmi_path}/frameworks/native/input/oh_input_interceptor.cpp",
+    "${mmi_path}/frameworks/native/input/oh_input_manager.cpp",
+    "${mmi_path}/service/permission_helper/src/permission_helper.cpp",
   ]
 
   cflags = [ "-Werror" ]
@@ -58,12 +60,22 @@ ohos_shared_library("oh_input_manager") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "napi:ace_napi",
   ]
+
+  if (enable_player_framework) {
+    external_deps += [
+      "ipc:ipc_single",
+      "player_framework:media_client",
+    ]
+  }
 
   innerapi_tags = [ "ndk" ]
 
@@ -84,12 +96,14 @@ ohos_unittest("OHInputManagerTest") {
     "${mmi_path}/service/filter/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/service/permission_helper/include",
   ]
 
   sources = [
     "${mmi_path}/frameworks/native/input/oh_input_interceptor.cpp",
     "${mmi_path}/frameworks/native/input/oh_input_manager.cpp",
     "${mmi_path}/frameworks/native/input/test/oh_input_manager_test.cpp",
+    "${mmi_path}/service/permission_helper/src/permission_helper.cpp",
   ]
 
   configs = [
@@ -105,8 +119,15 @@ ohos_unittest("OHInputManagerTest") {
   ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }

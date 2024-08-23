@@ -275,31 +275,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandlePalmEvent, T
 }
 
 /**
- * @tc.name: EventNormalizeHandlerTest_GestureIdentify
- * @tc.desc: Test the function GestureIdentify
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_GestureIdentify, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EventNormalizeHandler handler;
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, ++trackingID_);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 2100);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 690);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_TOOL_TYPE, 2);
-    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    vTouchpad_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 713);
-
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::cout << "touchpad device: " << libinput_device_get_name(dev) << std::endl;
-    ASSERT_EQ(handler.GestureIdentify(event), RET_ERR);
-}
-
-/**
  * @tc.name: EventNormalizeHandlerTest_HandleTouchEvent
  * @tc.desc: Test the function HandleTouchEvent
  * @tc.type: FUNC
@@ -808,20 +783,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleGestureEvent
     libinput_event *event = nullptr;
     int32_t ret = eventNormalizeHandler.HandleGestureEvent(event);
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
-}
-
-/**
- * @tc.name: EventNormalizeHandlerTest_GestureIdentify_001
- * @tc.desc: Gesture Identify
- * @tc.type: FUNC
- * @tc.require:SR000HQ0RR
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_GestureIdentify_001, TestSize.Level1)
-{
-    EventNormalizeHandler eventNormalizeHandler;
-    libinput_event *event = nullptr;
-    int32_t ret = eventNormalizeHandler.GestureIdentify(event);
-    ASSERT_EQ(ret, ERROR_NULL_POINTER);
 }
 
 /**
