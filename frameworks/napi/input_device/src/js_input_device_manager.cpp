@@ -23,9 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-std::mutex mutex_;
-} // namespace
+
 void JsInputDeviceManager::RegisterDevListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -252,16 +250,17 @@ napi_value JsInputDeviceManager::GetKeyboardRepeatRate(napi_env env, napi_value 
     return ret;
 }
 
-napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env, napi_value handle)
+napi_value JsInputDeviceManager::GetIntervalSinceLastInput(napi_env env)
 {
     CALL_DEBUG_ENTER;
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
-    napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (int64_t timeInterval) { return EmitJsGetIntervalSinceLastInput(cb, timeInterval); };
-    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(callback);
-    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+    napi_value ret = CreateCallbackInfo(env, nullptr, cb);
+    int64_t timeInterval = -1;
+    int32_t napiCode = InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    EmitJsGetIntervalSinceLastInput(cb, timeInterval);
+    if (napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid get interval since last input");
     }
     return ret;
 }

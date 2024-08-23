@@ -216,6 +216,8 @@ ohos_shared_library("libmmi-server") {
       sources += [
         "event_resample/src/event_resample.cpp",
         "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+        "touch_event_normalize/src/touch_gesture_adapter.cpp",
+        "touch_event_normalize/src/touch_gesture_detector.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
       ]
     }
@@ -476,7 +478,9 @@ ohos_unittest("EventFilterHandlerTest") {
 
   sources = [
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
+    "${mmi_path}/service/filter/test/event_filter_handler_ex_test.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_test.cpp",
+    "${mmi_path}/service/filter/test/mock.cpp",
   ]
 
   deps = [
@@ -1415,6 +1419,29 @@ ohos_unittest("KeyEventNormalizeTest") {
   ]
 }
 
+ohos_unittest("KeyEventValueTransformationTest") {
+  module_out_path = module_output_path
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [ "event_handler/test/key_event_value_transformation_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  external_deps = [ "hilog:libhilog" ]
+}
+
 ohos_unittest("KeyCommandTest") {
   module_out_path = module_output_path
 
@@ -1642,7 +1669,6 @@ ohos_unittest("EventHandlerTest") {
   sources = [
     "event_handler/test/anr_manager_test.cpp",
     "event_handler/test/event_normalize_handler_test.cpp",
-    "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/input_event_handler_test.cpp",
     "event_handler/test/key_auto_repeat_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",

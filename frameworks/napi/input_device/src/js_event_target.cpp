@@ -1354,7 +1354,6 @@ void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> c
     CHKPV(cb);
     CHKPV(cb->env);
     cb->data.IntervalSinceLastInput = timeInterval;
-    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -1362,23 +1361,15 @@ void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> c
     cb->IncStrongRef(nullptr);
     work->data = cb.GetRefPtr();
     int32_t ret = 0;
-    if (cb->ref == nullptr) {
-        ret = uv_queue_work_with_qos(
-            loop, work,
-            [](uv_work_t *work) {
-                MMI_HILOGD("uv_queue_work callback function is called");
-            },
-            CallIntervalSinceLastInputPromise, uv_qos_user_initiated);
-    } else {
-        ret = uv_queue_work_with_qos(
-            loop, work,
-            [](uv_work_t *work) {
-                MMI_HILOGD("uv_queue_work callback function is called");
-            },
-            CallIntervalSinceLastInputAsync, uv_qos_user_initiated);
-    }
+    ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+        },
+        CallIntervalSinceLastInputPromise, uv_qos_user_initiated);
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -1401,81 +1392,9 @@ void JsEventTarget::CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t s
     napi_open_handle_scope(cb->env, &scope);
     CHKPV(scope);
     napi_value callResult;
-    if (cb->errCode != RET_OK) {
-        if (cb->errCode == RET_ERR) {
-            napi_close_handle_scope(cb->env, scope);
-            MMI_HILOGE("Other errors");
-            return;
-        }
-        NapiError codeMsg;
-        if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
-            napi_close_handle_scope(cb->env, scope);
-            MMI_HILOGE("Error code %{public}d not found", cb->errCode);
-            return;
-        }
-        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
-        if (callResult == nullptr) {
-            MMI_HILOGE("callResult is nullptr");
-            napi_close_handle_scope(cb->env, scope);
-            return;
-        }
-        CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
-    } else {
-        CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult),
-            CREATE_INT64, scope);
-        CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
-    }
-    napi_close_handle_scope(cb->env, scope);
-}
-
-void JsEventTarget::CallIntervalSinceLastInputAsync(uv_work_t *work, int32_t status)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(work);
-    if (work->data == nullptr) {
-        JsUtil::DeletePtr<uv_work_t *>(work);
-        MMI_HILOGE("Check data is nullptr");
-        return;
-    }
-    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
-    JsUtil::DeletePtr<uv_work_t *>(work);
-    cb->DecStrongRef(nullptr);
-    CHKPV(cb->env);
-
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(cb->env, &scope);
-    CHKPV(scope);
-
-    napi_value callResult[2] = { 0 };
-    if (cb->errCode != RET_OK) {
-        if (cb->errCode == RET_ERR) {
-            napi_close_handle_scope(cb->env, scope);
-            MMI_HILOGE("Other errors");
-            return;
-        }
-        NapiError codeMsg;
-        if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
-            napi_close_handle_scope(cb->env, scope);
-            MMI_HILOGE("Error code %{public}d not found", cb->errCode);
-            return;
-        }
-        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
-        if (callResult[0] == nullptr) {
-            MMI_HILOGE("callResult[0] is nullptr");
-            napi_close_handle_scope(cb->env, scope);
-            return;
-        }
-        CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
-    } else {
-        CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult[1]),
-            CREATE_INT64, scope);
-        CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[0]), GET_UNDEFINED, scope);
-    }
-    napi_value handler = nullptr;
-    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
-    napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, INPUT_PARAMETER_MIDDLE, callResult, &result),
-        CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult),
+        CREATE_INT64, scope);
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 

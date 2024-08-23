@@ -142,6 +142,7 @@ protected:
     int32_t StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply);
     int32_t StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetAllSystemHotkeys(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

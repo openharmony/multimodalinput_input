@@ -27,6 +27,7 @@ group("test") {
     "enableinputdevice_fuzzer:fuzztest",
     "functionkeystate_fuzzer:fuzztest",
     "getallnapstatusdata_fuzzer:fuzztest",
+    "getallsystemhotkeys_fuzzer:fuzztest",
     "getdevice_fuzzer:fuzztest",
     "getdeviceids_fuzzer:fuzztest",
     "getdisplaybindinfo_fuzzer:fuzztest",

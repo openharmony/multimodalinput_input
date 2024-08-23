@@ -459,7 +459,7 @@ MouseEventNormalize::~MouseEventNormalize() {}
 
 int32_t MouseEventNormalize::GetDisplayId() const
 {
-    return 0;
+    return DfsMessageParcel::messageParcel->GetDisplayId();
 }
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -549,6 +549,11 @@ void InputWindowsManager::CleanShellWindowIds()
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return false;
+}
+
+bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
 {
     return false;
 }

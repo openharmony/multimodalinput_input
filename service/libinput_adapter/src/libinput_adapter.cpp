@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 
 #include "define_multimodal.h"
 #include "i_input_windows_manager.h"
+#include "param_wrapper.h"
 #include "util.h"
 
 #undef MMI_LOG_DOMAIN
@@ -37,6 +38,9 @@ namespace MMI {
 namespace {
 constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 constexpr int32_t MAX_RETRY_COUNT { 5 };
+constexpr int32_t MIN_RIGHT_BTN_AREA_PERCENT { 0 };
+constexpr int32_t MAX_RIGHT_BTN_AREA_PERCENT { 100 };
+constexpr int32_t INVALID_RIGHT_BTN_AREA { -1 };
 
 void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
@@ -57,6 +61,30 @@ int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t
 {
     CHKPR(device, RET_ERR);
     return libinput_set_led_state(device, funcKey, enable);
+}
+
+void LibinputAdapter::InitRightButtonAreaConfig()
+{
+    CHKPV(input_);
+
+    int32_t height_percent = OHOS::system::GetIntParameter("const.multimodalinput.rightclick_y_percentage",
+                                                           INVALID_RIGHT_BTN_AREA);
+    if ((height_percent <= MIN_RIGHT_BTN_AREA_PERCENT) || (height_percent > MAX_RIGHT_BTN_AREA_PERCENT)) {
+        MMI_HILOGE("Right button area height percent param is invalid");
+        return;
+    }
+
+    int32_t width_percent = OHOS::system::GetIntParameter("const.multimodalinput.rightclick_x_percentage",
+                                                          INVALID_RIGHT_BTN_AREA);
+    if ((width_percent <= MIN_RIGHT_BTN_AREA_PERCENT) || (width_percent > MAX_RIGHT_BTN_AREA_PERCENT)) {
+        MMI_HILOGE("Right button area width percent param is invalid");
+        return;
+    }
+
+    auto status = libinput_config_rightbutton_area(input_, height_percent, width_percent);
+    if (status != LIBINPUT_CONFIG_STATUS_SUCCESS) {
+        MMI_HILOGE("Config the touchpad right button area failed");
+    }
 }
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
@@ -108,6 +136,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
         MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
+    InitRightButtonAreaConfig();
     return hotplugDetector_.Init([this](std::string path) { OnDeviceAdded(std::move(path)); },
         [this](std::string path) { OnDeviceRemoved(std::move(path)); });
 }

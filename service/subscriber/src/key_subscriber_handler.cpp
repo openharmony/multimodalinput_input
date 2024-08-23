@@ -894,10 +894,6 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             MMI_HILOGD("PreKeysMatch failed");
             continue;
         }
-        if (!IsNotifyPowerKeySubsciber(keyOption->GetFinalKey(), pressedKeys)) {
-            MMI_HILOGD("In special case, subscriber are not notified");
-            continue;
-        }
         auto duration = keyOption->GetFinalKeyDownDuration();
         if (duration <= 0) {
             NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
@@ -1022,20 +1018,6 @@ void KeySubscriberHandler::RemoveSubscriberKeyUpTimer(int32_t keyCode)
         }
     }
     keyGestureMgr_.ResetAll();
-}
-
-bool KeySubscriberHandler::IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes)
-{
-    if (keyCode != KeyEvent::KEYCODE_POWER) {
-        return true;
-    }
-
-    for (const auto& pressedKey: keyCodes) {
-        if (pressedKey == KeyEvent::KEYCODE_VOLUME_DOWN || pressedKey == KeyEvent::KEYCODE_VOLUME_UP) {
-            return false;
-        }
-    }
-    return true;
 }
 
 void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent,

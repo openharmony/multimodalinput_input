@@ -133,6 +133,11 @@ protected:
      * @since 9
      */
     explicit AxisEvent(int32_t eventType);
+
+private:
+    int32_t axisAction_ { 0 };
+    int32_t axisType_ { 0 };
+    int32_t axisValue_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

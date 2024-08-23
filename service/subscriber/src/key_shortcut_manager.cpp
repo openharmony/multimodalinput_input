@@ -49,6 +49,115 @@ const std::map<int32_t, uint32_t> KeyShortcutManager::modifiers_ {
     { KeyEvent::KEYCODE_META_RIGHT, SHORTCUT_MODIFIER_LOGO }
 };
 
+const std::list<std::pair<std::set<int32_t>, int32_t>> KeyShortcutManager::systemHotkeys_ {
+    /* 应用列表：logo up */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_UNKNOWN },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_UNKNOWN },
+    /* 显示/前往桌面：Logo + D */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_D },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_D },
+    /* 返回： Logo + Back 左箭头 */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DEL },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DEL },
+    /* 通知中心：Logo + N */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_N },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_N },
+    /* 控制中心：Logo + C */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_C },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_C },
+    /* 应用中心：Logo + A, 短按Logo */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_A },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_A },
+    /* 任务中心（多任务）：Logo + Tab，Logo + ↑ */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
+    /* 应用快捷切换：ALT + Tab, Shift + Alt + Tab（反向） */
+    { { KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_TAB },
+    { { KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_TAB },
+    /* 最小化窗口：Logo + M */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_M },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_M },
+    /* 关闭窗口：Alt + F4 */
+    { { KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_F4 },
+    { { KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_F4 },
+    /* 退出应用：Alt +Shift + F4 */
+    { { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_F4 },
+    { { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_F4 },
+    { { KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_F4 },
+    { { KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_F4 },
+    /* 切换全屏应用：Logo + ← or → */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_LEFT },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_LEFT },
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_RIGHT },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_RIGHT },
+    /* 任务中心：Logo + ↑ */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
+    /* 显示应用多实例：Logo + ↓ */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_DOWN },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_DOWN },
+    /* 焦点切换：Logo + . */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_PERIOD },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_PERIOD },
+    /* 应用切换窗口程序：Logo + Shift + ← or → */
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_LEFT },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_LEFT },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_LEFT },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_LEFT },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_RIGHT },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_RIGHT },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_RIGHT },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_RIGHT },
+    /* 应用全屏或者最小化：Logo + Shift + ↑ or ↓ */
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_DOWN },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_DOWN },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_DOWN },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_DOWN },
+    /* 锁定桌面：Logo + L */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_L },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_L },
+    /* 智慧搜索： Logo +S */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_S },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_S },
+    /* 打开文件管理器：Logo + F */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_F },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_F },
+    /* 截图：PrtSc, Logo + Shift + S */
+    { { KeyEvent::KEYCODE_SYSRQ}, KeyEvent::KEYCODE_UNKNOWN },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_S },
+    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_S },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_S },
+    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_S },
+    /* 切换输入发： Ctrl + Shift， Logo + Space */
+    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_UNKNOWN },
+    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_UNKNOWN },
+    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_UNKNOWN },
+    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_UNKNOWN },
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_SPACE },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_SPACE },
+    /* 切换中文/英文：Ctrl + Space */
+    { { KeyEvent::KEYCODE_CTRL_LEFT }, KeyEvent::KEYCODE_SPACE },
+    { { KeyEvent::KEYCODE_CTRL_RIGHT }, KeyEvent::KEYCODE_SPACE },
+    /* 打开任务管理器： Ctrl + Shift + Esc */
+    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_ESCAPE },
+    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_ESCAPE },
+    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_ESCAPE },
+    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_ESCAPE },
+    /* 快捷键提示：Logo + / */
+    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_SLASH },
+    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_SLASH }
+};
+
 bool KeyShortcutManager::SystemKey::operator<(const SystemKey &other) const
 {
     uint32_t modifier1 = (modifiers & SHORTCUT_MODIFIER_MASK);
@@ -737,6 +846,18 @@ void KeyShortcutManager::ResetAll()
         TimerMgr->RemoveTimer(item.second);
     }
     triggering_.clear();
+}
+
+int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &item : systemHotkeys_) {
+        std::unique_ptr<KeyOption> keyOptionPtr = std::make_unique<KeyOption>();
+        keyOptionPtr->SetPreKeys(item.first);
+        keyOptionPtr->SetFinalKey(item.second);
+        sysKeys.push_back(std::move(keyOptionPtr));
+    }
+    return RET_OK;
 }
 
 bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)

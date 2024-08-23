@@ -56,12 +56,16 @@
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
 #include "key_map_manager.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "timer_manager.h"
 #include "tokenid_kit.h"
 #include "touch_event_normalize.h"
+#include "touch_gesture_adapter.h"
 #include "util.h"
 #include "util_ex.h"
 #include "watchdog_task.h"
@@ -1249,6 +1253,30 @@ int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    if (((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
+        if (!touchGestureAdapter_) {
+            touchGestureAdapter_ = TouchGestureAdapter::GetGestureFactory();
+        }
+        if (touchGestureAdapter_) {
+            touchGestureAdapter_->SetGestureEnable(true);
+        }
+        int32_t ret = RET_OK;
+        if (delegateInterface_ && !delegateInterface_->HasHandler("touchGesture")) {
+            auto fun = [this](std::shared_ptr<PointerEvent> event) -> int32_t {
+                CHKPR(touchGestureAdapter_, ERROR_NULL_POINTER);
+                touchGestureAdapter_->process(event);
+            return RET_OK;
+        };
+        ret = delegateInterface_->AddHandler(InputHandlerType::MONITOR,
+            {"touchGesture", HANDLE_EVENT_TYPE_POINTER, HandlerMode::SYNC, 0, 0, fun});
+        }
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to add gesture recognizer");
+            return ret;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
@@ -1293,6 +1321,17 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    if (monitorHandler && monitorHandler->CheckHasInputHandler(HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
+        if (delegateInterface_ && delegateInterface_->HasHandler("touchGesture")) {
+            delegateInterface_->RemoveHandler(InputHandlerType::MONITOR, "touchGesture");
+            if (touchGestureAdapter_) {
+                touchGestureAdapter_->SetGestureEnable(false);
+            }
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
@@ -2849,12 +2888,37 @@ int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
-                                                        InputHandler, std::ref(timeInterval)));
+        InputHandler, std::ref(timeInterval)));
     MMI_HILOGD("timeInterval:%{public}" PRId64, timeInterval);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MMIService::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &keyOptions] {
+            return this->OnGetAllSystemHotkey(keyOptions);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGD("Get all system hot key, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    #ifdef SHORTCUT_KEY_MANAGER_ENABLED
+    return KEY_SHORTCUT_MGR->GetAllSystemHotkeys(keyOptions);
+    #endif // SHORTCUT_KEY_MANAGER_ENABLED
+    MMI_HILOGI("OnGetAllSystemHotkey function does not support");
+    return ERROR_UNSUPPORT;
 }
 } // namespace MMI
 } // namespace OHOS

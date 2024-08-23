@@ -3226,11 +3226,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
     EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
 
-static void GetIntervalSinceLastInputCallback(int64_t timeInterval)
-{
-    MMI_HILOGD("GetIntervalSinceLastInput:%{public}" PRId64, timeInterval);
-}
-
 /**
  * @tc.name: InputManagerTest_GetIntervalSinceLastInput001
  * @tc.desc: GetIntervalSinceLastInput interface detection
@@ -3240,8 +3235,8 @@ static void GetIntervalSinceLastInputCallback(int64_t timeInterval)
 HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(
-        GetIntervalSinceLastInputCallback));
+    int64_t timeInterval = -1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval));
 }
 
 /**
@@ -3258,8 +3253,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(
-        GetIntervalSinceLastInputCallback));
+    int64_t timeInterval = 0;
+    int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
 }
 
 /**
@@ -3285,8 +3282,41 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     keyEvent->AddKeyItem(itemSecond);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(
-        GetIntervalSinceLastInputCallback));
+    int64_t timeInterval = 0;
+    int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetAllSystemHotkey
+ * @tc.desc: Obtains all hot keys supported by the system.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetAllSystemHotkey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SkipPointerLayer_001
+ * @tc.desc: Test SkipPointerLayer
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isSkip = true;
+    int32_t ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
+    isSkip = false;
+    ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
 }
 } // namespace MMI
 } // namespace OHOS

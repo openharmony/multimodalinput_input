@@ -29,6 +29,7 @@ namespace MMI {
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
+    CHKPR(key, RET_ERR);
     if (SerializeInputEvent(key, pkt) != RET_OK) {
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
@@ -250,7 +251,8 @@ void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<P
 {
     pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
         << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
-        << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
+        << event->GetZOrder() << event->GetDispatchTimes() << event->GetHandlerEventType()
+        << event->GetAxes();
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
             pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
@@ -287,6 +289,9 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetZOrder(tField);
     pkt >> tField;
     event->SetDispatchTimes(tField);
+    uint32_t type = 0u;
+    pkt >> type;
+    event->SetHandlerEventType(type);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -363,6 +363,8 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
                 CHKPV(pointerEvent);
                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                 pointerEvent->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_SCROLL);
+                pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 0);
+                pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 0);
                 pointerEvent->UpdateId();
                 LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
                 auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
@@ -512,7 +514,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
 
     pointerEvent_->UpdateId();
     StartLogTraceId(pointerEvent_->GetId(), pointerEvent_->GetEventType(), pointerEvent_->GetPointerAction());
-    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetActionStartTime(time);
@@ -522,6 +523,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
     if (data == nullptr) {
+        pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
         return false;
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
@@ -530,6 +532,7 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     } else {
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
     }
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
     return true;
 }
 
@@ -606,8 +609,10 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->ClearAxisValue();
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
     if (!HandlePostInner(data, pointerItem)) {
         WIN_MGR->UpdateTargetPointer(pointerEvent_);
+        DumpInner();
         return ERROR_NULL_POINTER;
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
@@ -892,6 +897,7 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
         return;
     }
 
+    MMI_HILOGD("Transform right button event, evenType:%d, switchType:%d, button:%d", evenType, switchType, button);
     switch (switchType) {
         case RightClickType::TP_RIGHT_BUTTON:
             HandleTouchpadRightButton(data, evenType, button);
