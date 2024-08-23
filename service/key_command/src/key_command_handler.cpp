@@ -78,6 +78,10 @@ const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbili
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
 const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
 constexpr int32_t DEFAULT_VALUE { -1 };
+const std::string HARDEN_SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
+const std::string HARDEN_SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
+const std::string HARDEN_SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string HARDEN_SCREENRECORDER_ABILITY_NAME { "com.hmos.screenrecorder.ServiceExtAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2388,20 +2392,15 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
 bool KeyCommandHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
 {
     CHKPF(event);
-    std::string shotBundleName;
-    std::string shotAbilityName;
-    std::string recorderBundleName;
-    std::string recorderAbilityName;
-    if (!GetTouchPadKnuckleAbilityInfo(shotBundleName, shotAbilityName, recorderBundleName, recorderAbilityName)) {
-        return false;
-    }
     auto actionType = event->GetKeyAction();
     if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(shotBundleName, shotAbilityName, "single_knuckle");
+        TouchPadKnuckleDoubleClickProcess(HARDEN_SCREENSHOT_BUNDLE_NAME,
+            HARDEN_SCREENSHOT_ABILITY_NAME, "single_knuckle");
         return true;
     }
     if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
-        TouchPadKnuckleDoubleClickProcess(recorderBundleName, recorderAbilityName, "double_knuckle");
+        TouchPadKnuckleDoubleClickProcess(HARDEN_SCREENRECORDER_BUNDLE_NAME,
+            HARDEN_SCREENRECORDER_ABILITY_NAME, "double_knuckle");
         return true;
     }
     return false;
@@ -2421,47 +2420,6 @@ void KeyCommandHandler::TouchPadKnuckleDoubleClickProcess(const std::string bund
     ability.abilityName = abilityName;
     ability.params.emplace(std::make_pair("trigger_type", action));
     LaunchAbility(ability, NO_DELAY);
-}
-
-bool KeyCommandHandler::GetTouchPadKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
-    std::string &recorderBundleName, std::string &recorderAbilityName)
-{
-    if (!isParseConfig_) {
-        if (!ParseConfig()) {
-            MMI_HILOGE("Parse configFile failed");
-            return false;
-        }
-        isParseConfig_ = true;
-    }
-    if (sequences_.empty()) {
-        MMI_HILOGI("No sequences configuration data");
-        return false;
-    }
-    std::string bundleName;
-    std::string shotMatchName = ".screenshot";
-    std::string recorderMatchName = ".screenrecorder";
-    for (auto iter = sequences_.begin(); iter != sequences_.end(); ++iter) {
-        bundleName = iter->ability.bundleName;
-        if (bundleName.find(shotMatchName) != std::string::npos) {
-            shotBundleName = iter->ability.bundleName;
-            shotAbilityName = iter->ability.abilityName;
-            break;
-        }
-    }
-    for (auto iter = sequences_.begin(); iter != sequences_.end(); ++iter) {
-        bundleName = iter->ability.bundleName;
-        if (bundleName.find(recorderMatchName) != std::string::npos) {
-            recorderBundleName = iter->ability.bundleName;
-            recorderAbilityName = iter->ability.abilityName;
-            break;
-        }
-    }
-    if (shotBundleName.empty() || shotAbilityName.empty() || recorderBundleName.empty() ||
-        recorderAbilityName.empty()) {
-        MMI_HILOGI("Get touchPad knuckle ability information failed");
-        return false;
-    }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS
