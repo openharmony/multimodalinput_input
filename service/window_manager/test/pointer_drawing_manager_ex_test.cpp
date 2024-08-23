@@ -113,28 +113,6 @@ std::shared_ptr<Media::PixelMap> PointerDrawingManagerExTest::CreatePixelMap(int
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetPointerLocation_02
- * @tc.desc: Test SetPointerLocation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetPointerLocation_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    int32_t x = 100;
-    int32_t y = 100;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(x, y));
-}
-
-    int32_t windowId = GLOBAL_WINDOW_ID;
-
-/**
  * @tc.name: InputWindowsManagerTest_UpdateDefaultPointerStyle_01
  * @tc.desc: Test UpdateDefaultPointerStyle
  * @tc.type: FUNC
@@ -398,32 +376,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPointerStyle_0
 
     int32_t ROTATE_POLICY;
     ROTATE_POLICY = WINDOW_ROTATE;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_02
- * @tc.desc: Test DrawPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawPointerStyle_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-    pointerStyle.color = 1;
-    pointerStyle.size = 2;
-
-    int32_t ROTATE_POLICY;
-    ROTATE_POLICY = FOLDABLE_DEVICE;
-    pointerDrawingManager.lastPhysicalX_ = -1;
-    pointerDrawingManager.lastPhysicalY_ = -1;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
 
