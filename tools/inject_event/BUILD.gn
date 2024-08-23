@@ -51,7 +51,10 @@ ohos_source_set("input-manager") {
 ohos_executable("uinput") {
   sources = [ "src/main.cpp" ]
   configs = [ "${mmi_path}:coverage_flags" ]
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+  ]
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true

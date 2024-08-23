@@ -977,7 +977,15 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         return;
     }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
-    HandleSimulateInputEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        HandleSimulateInputEvent(pointerEvent);
+    } else {
+        int32_t pointerAction = pointerEvent->GetPointerAction();
+        if (pointerAction < PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
+            pointerAction > PointerEvent::POINTER_ACTION_SWIPE_END) {
+            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+        }
+    }
     if (MMIEventHdl.InjectPointerEvent(pointerEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
