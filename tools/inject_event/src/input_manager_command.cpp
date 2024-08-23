@@ -2357,8 +2357,8 @@ void InputManagerCommand::PrintKnuckleUsage()
 
 void InputManagerCommand::PrintTouchPadUsage()
 {
-    std::cout << "-p dx, dy, scalePercent; dx, dy, scalePercent are all number.";                   << std::endl;
-    std::cout << "dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;";          << std::endl;
+    std::cout << "-p dx, dy, scalePercent; dx, dy, scalePercent are all number."                    << std::endl;
+    std::cout << "dx is bigger than 0 and dy is bigger than 200. 0 < scalePercent < 500;"           << std::endl;
     std::cout << "While simulate this, make sure that a picture is on the top of the desktop."      << std::endl;
     std::cout << "-s startX, startY, endX, endY;"                                                   << std::endl;
     std::cout << "And startX, startY, endX, endY are all number which is bigger than 0;"            << std::endl;
