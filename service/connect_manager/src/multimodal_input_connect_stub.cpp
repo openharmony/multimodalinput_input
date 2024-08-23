@@ -2669,8 +2669,11 @@ int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, Messa
     READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
     READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
 
-    SetClientInfo(pid, readThreadId);
-    return RET_OK;
+    int32_t ret = SetClientInfo(pid, readThreadId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call SetClientInfo, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply)

@@ -41,6 +41,7 @@
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
 #include "event_log_helper.h"
+#include "ffrt.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #include "fingersense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -2855,9 +2856,10 @@ void MMIService::OnSessionDelete(SessionPtr session)
     CALL_DEBUG_ENTER;
     CHKPV(session);
     std::string programName = session->GetProgramName();
-    auto it = clientsInfo_.find(programName);
-    if (it != clientsInfo_.end()) {
-        clientsInfo_.erase(it);
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto it = clientInfos_.find(programName);
+    if (it != clientInfos_.end()) {
+        clientInfos_.erase(it);
         MMI_HILOGD("Clear the client info, programName:%{public}s", programName.c_str());
     }
 }
@@ -2868,16 +2870,17 @@ int32_t MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     std::string programName = sess->GetProgramName();
-    if (clientsInfo_.end() != clientsInfo_.find(programName)) {
-        clientsInfo_[programName].pid = pid;
-        clientsInfo_[programName].readThreadId = readThreadId;
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (clientInfos_.find(programName) != clientInfos_.end()) {
+        clientInfos_[programName].pid = pid;
+        clientInfos_[programName].readThreadId = readThreadId;
         return RET_OK;
     }
     ClientInfo clientInfo {
         .pid = pid,
         .readThreadId = readThreadId
     };
-    clientsInfo_[programName] = clientInfo;
+    clientInfos_[programName] = clientInfo;
     return RET_OK;
 }
 
@@ -2885,36 +2888,39 @@ void MMIService::InitPrintClientInfo()
 {
     CALL_DEBUG_ENTER;
     TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
-        std::pair<std::string, ClientInfo> mainThreadClient;
-        std::pair<std::string, ClientInfo> childThreadClient;
-        bool hasMainThreadClient = false;
-        bool hasChildThreadClient = false;
-        for (auto it = clientsInfo_.begin(); it != clientsInfo_.end(); it++) {
-            if (hasMainThreadClient && hasChildThreadClient) {
-                break;
+        ffrt::submit([this] {
+            std::pair<std::string, ClientInfo> mainThreadClient;
+            std::pair<std::string, ClientInfo> childThreadClient;
+            bool hasMainThreadClient = false;
+            bool hasChildThreadClient = false;
+            std::lock_guard<std::mutex> guard(mutex_);
+            for (auto it = clientInfos_.begin(); it != clientInfos_.end(); ++it) {
+                if (hasMainThreadClient && hasChildThreadClient) {
+                    break;
+                }
+                if (!hasMainThreadClient && it->second.pid == it->second.readThreadId) {
+                    mainThreadClient = std::make_pair(it->first, it->second);
+                    hasMainThreadClient = true;
+                    continue;
+                }
+                if (!hasChildThreadClient) {
+                    childThreadClient = std::make_pair(it->first, it->second);
+                    hasChildThreadClient = true;
+                }
             }
-            if (!hasMainThreadClient && it->second.pid == it->second.readThreadId) {
-                mainThreadClient = std::make_pair(it->first, it->second);
-                hasMainThreadClient = true;
-                continue;
+            if (!mainThreadClient.first.empty()) {
+                MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+                    "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                    mainThreadClient.first.c_str(), mainThreadClient.second.pid, mainThreadClient.second.pid,
+                    mainThreadClient.second.readThreadId);
             }
-            if (!hasChildThreadClient) {
-                childThreadClient = std::make_pair(it->first, it->second);
-                hasChildThreadClient = true;
+            if (!childThreadClient.first.empty()) {
+                MMI_HILOGI("The application main thread and event reading thread are separated, such as:"
+                    "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                    childThreadClient.first.c_str(), childThreadClient.second.pid, childThreadClient.second.pid,
+                    childThreadClient.second.readThreadId);
             }
-        }
-        if (!mainThreadClient.first.empty()) {
-            MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
-                "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
-                mainThreadClient.first.c_str(), mainThreadClient.second.pid, mainThreadClient.second.pid,
-                mainThreadClient.second.readThreadId);
-        }
-        if (!childThreadClient.first.empty()) {
-            MMI_HILOGI("The application main thread and event reading thread are separated, such as:"
-                "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
-                childThreadClient.first.c_str(), childThreadClient.second.pid, childThreadClient.second.pid,
-                childThreadClient.second.readThreadId);
-        }
+        });
     });
     std::function<void(SessionPtr)> callback = [this](SessionPtr sess) {
         return this->OnSessionDelete(sess);
