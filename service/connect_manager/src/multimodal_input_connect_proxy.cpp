@@ -2375,9 +2375,8 @@ int32_t MultimodalInputConnectProxy::SetClientInfo(int32_t pid, uint64_t readThr
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInterval)
