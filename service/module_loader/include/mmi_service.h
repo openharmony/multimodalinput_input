@@ -267,6 +267,7 @@ private:
         uint64_t readThreadId { -1 };
     };
     std::map<std::string, ClientInfo> clientsInfo_;
+    std::mutex mutex_;
 };
 } // namespace MMI
 } // namespace OHOS
