@@ -145,6 +145,7 @@ public:
     }
     virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
     virtual void DestroyPointerWindow() {}
+    virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
