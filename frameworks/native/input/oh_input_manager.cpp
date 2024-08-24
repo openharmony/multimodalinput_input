@@ -93,6 +93,14 @@ static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
 static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
 static int32_t g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
 static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
+static const std::set<int32_t> g_keyCodeValueSet = {
+    KEYCODE_FN, KEYCODE_DPAD_UP, KEYCODE_DPAD_DOWN, KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT, KEYCODE_ALT_LEFT,
+    KEYCODE_ALT_RIGHT, KEYCODE_SHIFT_LEFT, KEYCODE_SHIFT_RIGHT, KEYCODE_TAB, KEYCODE_ENTER, KEYCODE_DEL, KEYCODE_MENU,
+    KEYCODE_PAGE_UP, KEYCODE_PAGE_DOWN, KEYCODE_ESCAPE, KEYCODE_FORWARD_DEL, KEYCODE_CTRL_LEFT, KEYCODE_CTRL_RIGHT,
+    KEYCODE_CAPS_LOCK, KEYCODE_SCROLL_LOCK, KEYCODE_META_LEFT, KEYCODE_META_RIGHT, KEYCODE_SYSRQ, KEYCODE_BREAK,
+    KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
+    KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
+};
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
@@ -100,6 +108,10 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
         MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyState->keyCode);
+        return INPUT_PARAMETER_ERROR;
+    }
+    if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
+        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
