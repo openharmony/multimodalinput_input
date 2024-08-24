@@ -133,11 +133,10 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-                [&] (int32_t pid) {
-                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-                }
-                );
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
