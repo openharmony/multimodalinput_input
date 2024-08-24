@@ -24,6 +24,7 @@
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
 #include "client_death_handler.h"
+#include "display_event_monitor.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -116,6 +117,10 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -194,6 +199,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -205,6 +214,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             CurrentPID_ = pid;
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
+                [&] (int32_t pid) {
+                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+                }
+                );
             LaunchAbility();
             return COMMON_PERMISSION_CHECK_ERROR;
         }
