@@ -214,10 +214,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [&] (int32_t pid) {
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
                 MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-                }
-            );
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
