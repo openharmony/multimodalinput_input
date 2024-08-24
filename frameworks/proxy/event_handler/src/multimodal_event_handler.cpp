@@ -137,12 +137,8 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
         return false;
     }
     EventHandlerPtr eventHandlerPtr = client_->GetEventHandler();
-    CHKPB(eventHandlerPtr);
-    if (!eventHandlerPtr->PostTask([this] {
-            auto runner = this->client_->GetEventHandler()->GetEventRunner();
-            CHKPF(runner);
-            return SetClientInfo(GetPid(), GetThisThreadId());
-            })) {
+    CHKPF(eventHandlerPtr);
+    if (!eventHandlerPtr->PostTask([this] { SetClientInfo(GetPid(), GetThisThreadId()); })) {
         MMI_HILOGE("Send reconnect event failed");
         return false;
     }
