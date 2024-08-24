@@ -2889,9 +2889,33 @@ void MMIService::InitPrintClientInfo()
     CALL_DEBUG_ENTER;
     TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
         ffrt::submit([this] {
+<<<<<<< HEAD
             for (const auto &info : clientInfos_) {
                 if (static_cast<uint64_t>(info.second.pid) == info.second.readThreadId) {
                     MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+=======
+            std::pair<std::string, ClientInfo> mainThreadClient;
+            std::pair<std::string, ClientInfo> childThreadClient;
+            bool hasMainThreadClient = false;
+            bool hasChildThreadClient = false;
+            std::lock_guard<std::mutex> guard(mutex_);
+            for (auto it = clientInfos_.begin(); it != clientInfos_.end(); ++it) {
+                if (hasMainThreadClient && hasChildThreadClient) {
+                    break;
+                }
+                if (!hasMainThreadClient && it->second.pid == it->second.readThreadId) {
+                    mainThreadClient = std::make_pair(it->first, it->second);
+                    hasMainThreadClient = true;
+                    continue;
+                }
+                if (!hasChildThreadClient) {
+                    childThreadClient = std::make_pair(it->first, it->second);
+                    hasChildThreadClient = true;
+                }
+            }
+            if (!mainThreadClient.first.empty()) {
+                MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+>>>>>>> fc298097214eedb37701036390a13cc1d531c5fc
                     "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
                     info.first.c_str(), info.second.pid, info.second.pid, info.second.readThreadId);
                     return;
