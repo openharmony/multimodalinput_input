@@ -32,6 +32,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "oh_input_manager.h"
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
@@ -50,6 +51,12 @@ constexpr uint8_t LOOP_COND { 2 };
 constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
+constexpr int32_t INVALID_KEY_ACTION = -1;
+const std::map<int32_t, int32_t> g_keyActionMap = {
+    {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
+    {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
+    {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
+};
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -2425,6 +2432,16 @@ int32_t InputManagerImpl::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOpt
     }
     count = static_cast<int32_t>(keyOptions.size());
     return RET_OK;
+}
+
+int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    auto iter = g_keyActionMap.find(keyAction);
+    if (iter == g_keyActionMap.end()) {
+        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
+        return INVALID_KEY_ACTION;
+    }
+    return iter->second;
 }
 } // namespace MMI
 } // namespace OHOS
