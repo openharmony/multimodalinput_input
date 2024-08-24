@@ -41,6 +41,7 @@
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
 #include "event_log_helper.h"
+#include "ffrt.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #include "fingersense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -106,6 +107,7 @@ constexpr int32_t SUBSCRIBED { 1 };
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
+constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
 const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
@@ -414,6 +416,7 @@ void MMIService::OnStart()
         }
     };
     MMI_HILOGI("Run periodical task success");
+    InitPrintClientInfo();
 }
 
 void MMIService::OnStop()
@@ -2884,6 +2887,66 @@ int32_t MMIService::SkipPointerLayer(bool isSkip)
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
+}
+
+void MMIService::OnSessionDelete(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(session);
+    std::string programName = session->GetProgramName();
+    std::lock_guard<std::mutex> guard(mutex_);
+    auto it = clientInfos_.find(programName);
+    if (it != clientInfos_.end()) {
+        clientInfos_.erase(it);
+        MMI_HILOGD("Clear the client info, programName:%{public}s", programName.c_str());
+    }
+}
+
+int32_t MMIService::SetClientInfo(int32_t pid, uint64_t readThreadId)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    std::string programName = sess->GetProgramName();
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (clientInfos_.find(programName) != clientInfos_.end()) {
+        clientInfos_[programName].pid = pid;
+        clientInfos_[programName].readThreadId = readThreadId;
+        return RET_OK;
+    }
+    ClientInfo clientInfo {
+        .pid = pid,
+        .readThreadId = readThreadId
+    };
+    clientInfos_[programName] = clientInfo;
+    return RET_OK;
+}
+
+void MMIService::InitPrintClientInfo()
+{
+    CALL_DEBUG_ENTER;
+    TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
+        ffrt::submit([this] {
+            for (const auto &info : clientInfos_) {
+                if (static_cast<uint64_t>(info.second.pid) == info.second.readThreadId) {
+                    MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+                    "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                    info.first.c_str(), info.second.pid, info.second.pid, info.second.readThreadId);
+                    return;
+                }
+            }
+            if (!clientInfos_.empty()) {
+                auto it = clientInfos_.begin();
+                MMI_HILOGI("The application main thread and event reading thread are separated, such as:"
+                "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                it->first.c_str(), it->second.pid, it->second.pid, it->second.readThreadId);
+            }
+        });
+    });
+    std::function<void(SessionPtr)> callback = [this](SessionPtr sess) {
+        return this->OnSessionDelete(sess);
+    };
+    AddSessionDeletedCallback(callback);
 }
 
 int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)

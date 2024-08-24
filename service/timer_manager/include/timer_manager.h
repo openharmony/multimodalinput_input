@@ -34,6 +34,7 @@ class TimerManager final {
 public:
     DISALLOW_COPY_AND_MOVE(TimerManager);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
+    int32_t AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimer(int32_t timerId);
     int32_t ResetTimer(int32_t timerId);
     bool IsExist(int32_t timerId);

@@ -863,6 +863,12 @@ int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)
     return multimodalInputConnectService_->SkipPointerLayer(isSkip);
 }
 
+int32_t MultimodalInputConnectManager::SetClientInfo(int32_t pid, uint64_t readThreadId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetClientInfo(pid, readThreadId);
+}
+
 int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     std::lock_guard<std::mutex> guard(lock_);
