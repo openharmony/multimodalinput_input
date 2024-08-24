@@ -2610,8 +2610,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchD
     ASSERT_NE(touchEvent, nullptr);
 
     item.SetPointerId(1);
-    item.SetDisplayX(4);
-    item.SetDisplayY(4);
+    item.SetRawDisplayX(4);
+    item.SetRawDisplayY(4);
     touchEvent->SetPointerId(1);
     touchEvent->SetActionTime(1);
     touchEvent->AddPointerItem(item);
@@ -2639,8 +2639,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchM
 
     PointerEvent::PointerItem item1;
     item1.SetPointerId(2);
-    item1.SetDisplayX(24);
-    item1.SetDisplayY(24);
+    item1.SetRawDisplayX(24);
+    item1.SetRawDisplayY(24);
     touchEvent->AddPointerItem(item1);
     touchEvent->SetActionTime(6);
     touchEvent->SetPointerId(2);
@@ -4840,6 +4840,51 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleShortKeys_01, TestSi
     inputEvent->bitwise_ = 0;
     ret = handler.HandleShortKeys(keyEvent);
     ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CalcDrawCoordinate_001
+ * @tc.desc: Test CalcDrawCoordinate
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CalcDrawCoordinate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    DisplayInfo displayInfo;
+    PointerEvent::PointerItem pointerItem;
+    int32_t physicalX = 1;
+    int32_t physicalY = 1;
+    pointerItem.SetRawDisplayX(physicalX);
+    pointerItem.SetRawDisplayY(physicalY);
+    auto retPair = handler.CalcDrawCoordinate(displayInfo, pointerItem);
+    EXPECT_EQ(retPair.first, 1);
+    EXPECT_EQ(retPair.second, 1);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CalcDrawCoordinate_002
+ * @tc.desc: Test CalcDrawCoordinate
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CalcDrawCoordinate_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    DisplayInfo displayInfo = {
+        .id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .dpi = 240,
+        .transform = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}
+    };
+    PointerEvent::PointerItem pointerItem;
+    int32_t physicalX = 10;
+    int32_t physicalY = 10;
+    pointerItem.SetRawDisplayX(physicalX);
+    pointerItem.SetRawDisplayY(physicalY);
+    auto retPair = handler.CalcDrawCoordinate(displayInfo, pointerItem);
+    EXPECT_EQ(retPair.first, 21);
+    EXPECT_EQ(retPair.second, 21);
 }
 } // namespace MMI
 } // namespace OHOS
