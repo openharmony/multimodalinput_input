@@ -2355,6 +2355,30 @@ int32_t MultimodalInputConnectProxy::SkipPointerLayer(bool isSkip)
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::SetClientInfo(int32_t pid, uint64_t readThreadId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, pid, ERR_INVALID_VALUE);
+    WRITEUINT64(data, readThreadId, ERR_INVALID_VALUE);
+    
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CLIENT_INFO),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInterval)
 {
     CALL_DEBUG_ENTER;

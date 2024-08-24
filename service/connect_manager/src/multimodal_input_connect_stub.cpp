@@ -420,6 +420,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CLIENT_INFO):
+            ret = StubSetClientInfo(data, reply);
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL):
             ret = StubGetIntervalSinceLastInput(data, reply);
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_SYSTEM_HOT_KEY):
@@ -2643,6 +2645,25 @@ int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, Me
     }
     MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t pid = 0;
+    uint64_t readThreadId = 0;
+    READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetClientInfo(pid, readThreadId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call SetClientInfo, ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply)
