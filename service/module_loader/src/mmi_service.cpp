@@ -2889,36 +2889,19 @@ void MMIService::InitPrintClientInfo()
     CALL_DEBUG_ENTER;
     TimerMgr->AddLongTimer(PRINT_INTERVAL_TIME, -1, [this]() {
         ffrt::submit([this] {
-            std::pair<std::string, ClientInfo> mainThreadClient;
-            std::pair<std::string, ClientInfo> childThreadClient;
-            bool hasMainThreadClient = false;
-            bool hasChildThreadClient = false;
-            std::lock_guard<std::mutex> guard(mutex_);
-            for (auto it = clientInfos_.begin(); it != clientInfos_.end(); ++it) {
-                if (hasMainThreadClient && hasChildThreadClient) {
-                    break;
-                }
-                if (!hasMainThreadClient && it->second.pid == it->second.readThreadId) {
-                    mainThreadClient = std::make_pair(it->first, it->second);
-                    hasMainThreadClient = true;
-                    continue;
-                }
-                if (!hasChildThreadClient) {
-                    childThreadClient = std::make_pair(it->first, it->second);
-                    hasChildThreadClient = true;
-                }
-            }
-            if (!mainThreadClient.first.empty()) {
-                MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
+            for (const auto &info : clientInfos_) {
+                if (static_cast<uint64_t>(info.second.pid) == info.second.readThreadId) {
+                    MMI_HILOGW("The application main thread and event reading thread are combined, such as:"
                     "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
-                    mainThreadClient.first.c_str(), mainThreadClient.second.pid, mainThreadClient.second.pid,
-                    mainThreadClient.second.readThreadId);
+                    info.first.c_str(), info.second.pid, info.second.pid, info.second.readThreadId);
+                    return;
+                }
             }
-            if (!childThreadClient.first.empty()) {
+            if (!clientInfos_.empty()) {
+                auto it = clientInfos_.begin();
                 MMI_HILOGI("The application main thread and event reading thread are separated, such as:"
-                    "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
-                    childThreadClient.first.c_str(), childThreadClient.second.pid, childThreadClient.second.pid,
-                    childThreadClient.second.readThreadId);
+                "programName:%{public}s, pid:%{public}d, mainThreadId:%{public}d, readThreadId:%{public}" PRIu64,
+                it->first.c_str(), it->second.pid, it->second.pid, it->second.readThreadId);
             }
         });
     });
