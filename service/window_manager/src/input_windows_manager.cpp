@@ -22,6 +22,7 @@
 #include <unordered_map>
 
 #include "cJSON.h"
+#include "display_manager.h"
 #include "dfx_hisysevent.h"
 #include "event_log_helper.h"
 #include "fingersense_wrapper.h"
@@ -3400,7 +3401,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
-    if (IgnoreTouchEvent(pointerEvent)) {
+    if (Rosen::DisplayManager::GetInstance().IsFoldable() && IgnoreTouchEvent(pointerEvent)) {
         MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
         return RET_OK;
     };
