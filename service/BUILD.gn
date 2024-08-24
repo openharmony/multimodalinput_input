@@ -325,6 +325,7 @@ ohos_shared_library("libmmi-server") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
+    "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
