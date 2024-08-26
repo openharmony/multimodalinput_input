@@ -188,7 +188,7 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
 
 void EventMonitorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();

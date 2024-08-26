@@ -893,7 +893,7 @@ public:
 
     /**
      * @brief user IrEmitter with parameter number and pattern.
-     * @param number   Frequency of IrEmitter works .
+     * @param number Frequency of IrEmitter works .
      * @param pattern Pattern of signal transmission in alternate on/off mode, in microseconds.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12

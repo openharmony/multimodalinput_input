@@ -39,7 +39,7 @@ private:
 
 private:
     const int32_t deviceId_ { -1 };
-    std::shared_ptr<PointerEvent> pointerEvent_  { nullptr };
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

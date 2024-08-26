@@ -39,7 +39,7 @@ namespace MMI {
         (void)(x) \
     } while (0)
 
-#define UNLIKELY(x)    __builtin_expect(!!(x), 0)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
 
 static int g_fd = -1;
 
