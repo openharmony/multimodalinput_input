@@ -245,7 +245,7 @@ int32_t InputDeviceMgr::SerializeDevice(std::shared_ptr<IDevice> device, NetPack
     CALL_INFO_TRACE;
     packet << device->GetId() << device->GetDevPath() << device->GetSysPath() << device->GetBus() <<
     device->GetVendor() << device->GetProduct() << device->GetVersion() << device->GetName() <<
-    device->GetPhys() << device->GetUniq() << device->IsPointerDevice()  << device->IsKeyboard() <<
+    device->GetPhys() << device->GetUniq() << device->IsPointerDevice() << device->IsKeyboard() <<
     static_cast<int32_t> (device->GetKeyboardType());
     if (packet.ChkRWError()) {
         FI_HILOGE("Write packet failed");

@@ -431,7 +431,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_001, Test
     CALL_TEST_DEBUG;
     int32_t windowId = 100;
     std::vector<WindowInfo> windowsInfo;
-    int32_t ret = WIN_MGR->GetWindowPid(windowId,  windowsInfo);
+    int32_t ret = WIN_MGR->GetWindowPid(windowId, windowsInfo);
     EXPECT_EQ(ret, -1);
 }
 
@@ -3667,7 +3667,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
     inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     WindowInfo windowInfo;
     windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
-    windowInfo.pointerHotAreas.push_back({  100, 0, INT32_MAX, 0 });
+    windowInfo.pointerHotAreas.push_back({ 100, 0, INT32_MAX, 0 });
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
     inputWindowsManager.lastLogicX_ = 200;
     inputWindowsManager.lastLogicY_ = 200;

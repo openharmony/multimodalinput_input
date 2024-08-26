@@ -614,7 +614,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CHKPV(keyOption);
     MMI_HILOGD("Notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        NotifyKeyDownRightNow(keyEvent, subscribers,  keyOption->IsRepeat(), handled);
+        NotifyKeyDownRightNow(keyEvent, subscribers, keyOption->IsRepeat(), handled);
     } else {
         NotifyKeyDownDelay(keyEvent, subscribers, handled);
     }

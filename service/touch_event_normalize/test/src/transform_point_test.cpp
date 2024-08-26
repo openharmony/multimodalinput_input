@@ -32,7 +32,7 @@ constexpr int32_t WAIT_TIME_FOR_EVENTS { 10 };
 constexpr size_t DEFAULT_BUF_SIZE { 4096 };
 } // namespace
 
-#define ARRAY_LENGTH(arr)   (sizeof(arr) / sizeof((arr)[0]))
+#define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 class Context {
 public:
