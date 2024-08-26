@@ -23,6 +23,7 @@
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
 #include "client_death_handler.h"
+#include "display_event_monitor.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -123,11 +124,10 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-                [&] (int32_t pid) {
-                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-                }
-                );
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -201,6 +201,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
