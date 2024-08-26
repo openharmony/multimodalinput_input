@@ -23,7 +23,7 @@ namespace MMI {
 void kMsgLog(const char *fileName, int line, const char *kLevel, const char *fmt, ...);
 
 #ifndef MMI_FILE_NAME
-#define MMI_FILE_NAME   (strrchr((__FILE__), '/') ? strrchr((__FILE__), '/') + 1 : (__FILE__))
+#define MMI_FILE_NAME (strrchr((__FILE__), '/') ? strrchr((__FILE__), '/') + 1 : (__FILE__))
 #endif
 #define KMSG_LOGT(fmt, ...) kMsgLog((MMI_FILE_NAME), (__LINE__), "<7>", fmt"\n", ##__VA_ARGS__)
 #define KMSG_LOGD(fmt, ...) kMsgLog((MMI_FILE_NAME), (__LINE__), "<7>", fmt"\n", ##__VA_ARGS__)

@@ -65,7 +65,7 @@ void FakeInputDevice::Create()
 
     uinput_setup usetup{};
     usetup.id.bustype = BUS_USB;
-    usetup.id.vendor = 0x1234;  /* sample vendor */
+    usetup.id.vendor = 0x1234; /* sample vendor */
     usetup.id.product = 0x5678; /* sample product */
     std::string dev("Example device");
     std::copy(dev.begin(), dev.end(), usetup.name);
