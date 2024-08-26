@@ -1023,8 +1023,8 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
         id = mouseDownInfo_.id;
     }
     PointerEvent::PointerItem currentPointerItem;
-    currentPointerItem.SetWindowX(lastLogicX_-lastWindowInfo_.area.x);
-    currentPointerItem.SetWindowY(lastLogicY_-lastWindowInfo_.area.y);
+    currentPointerItem.SetWindowX(lastLogicX_- lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowY(lastLogicY_- lastWindowInfo_.area.y);
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
     currentPointerItem.SetPointerId(0);
@@ -1033,6 +1033,9 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
     pointerEvent->SetTargetWindowId(id);
     pointerEvent->SetAgentWindowId(id);
     pointerEvent->SetPointerId(0);
+    pointerEvent->SetButtonPressed(lastPointerEvent_->GetButtonId());
+    pointerEvent->SetButtonId(lastPointerEvent_->GetButtonId());
+    MMI_HILOGI("SetButtonId:%{public}d", lastPointerEvent_->GetButtonId());
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetOriginPointerAction(lastPointerEvent_->GetPointerAction());
@@ -2936,6 +2939,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
+        std::string window;
+        window += StringPrintf("windowId:[");
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+            for (auto iter = winMap.begin(); iter != winMap.end(); iter++) {
+                window += StringPrintf("%d|%d,", iter->first, iter->second);
+            }
+            window += StringPrintf("]\n");
+            MMI_HILOG_DISPATCH("%{public}s", window.c_str());
+        }
         auto it = touchItemDownInfos_.find(pointerId);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (it == touchItemDownInfos_.end() ||
