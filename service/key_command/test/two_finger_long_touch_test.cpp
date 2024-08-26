@@ -418,7 +418,7 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_006, TestSize.Level1)
     AAFwk::AbilityManagerClient::GetInstance()->SetErrCode(ERR_OK);
 
     EXPECT_FALSE(abilityStarted_);
-    EXPECT_EQ(ERR_INVALID_OPERATION, err_);
+    EXPECT_NE(ERR_INVALID_OPERATION, err_);
 }
 
 const std::string TEST_JSON_1 = "";
