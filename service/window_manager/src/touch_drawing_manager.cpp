@@ -781,7 +781,7 @@ void TouchDrawingManager::DestoryTouchWindow()
         return;
     }
     MMI_HILOGI("Destory touch window success, bubbleMode:%{public}d, pointerMode:%{public}d",
-            bubbleMode_.isShow, pointerMode_.isShow);
+        bubbleMode_.isShow, pointerMode_.isShow);
     CHKPV(surfaceNode_);
     surfaceNode_->ClearChildren();
     surfaceNode_.reset();
