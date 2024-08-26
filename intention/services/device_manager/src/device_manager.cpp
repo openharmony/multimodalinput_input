@@ -177,7 +177,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     struct stat statbuf;
 
     if (stat(devPath.c_str(), &statbuf) != 0) {
-        FI_HILOGD("Invalid device path:%{public}s", devPath.c_str());
+        FI_HILOGD("Invalid device path:%{private}s", devPath.c_str());
         return nullptr;
     }
     if (!S_ISCHR(statbuf.st_mode)) {
@@ -200,7 +200,7 @@ std::shared_ptr<IDevice> DeviceManager::AddDevice(const std::string &devNode)
     const std::string lSysPath { SYS_INPUT_PATH + devNode };
     char rpath[PATH_MAX];
     if (realpath(lSysPath.c_str(), rpath) == nullptr) {
-        FI_HILOGD("Invalid sysPath:%{public}s", lSysPath.c_str());
+        FI_HILOGD("Invalid sysPath:%{private}s", lSysPath.c_str());
         return nullptr;
     }
 
@@ -243,7 +243,7 @@ void DeviceManager::OnDeviceAdded(std::shared_ptr<IDevice> dev)
 {
     CHKPV(dev);
     FI_HILOGI("Add device %{public}d:%{public}s", dev->GetId(), dev->GetDevPath().c_str());
-    FI_HILOGI("  sysPath:       \"%{public}s\"", dev->GetSysPath().c_str());
+    FI_HILOGI("  sysPath:       \"%{private}s\"", dev->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", dev->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", dev->GetVendor());
     FI_HILOGI("  product:       %{public}04x", dev->GetProduct());
