@@ -60,6 +60,7 @@ public:
 private:
     int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
     MMIClientPtr client_ { nullptr };
+    std::mutex mutex_;
 };
 
 #define MMIEventHdl ::OHOS::Singleton<MultimodalEventHandler>::GetInstance()
