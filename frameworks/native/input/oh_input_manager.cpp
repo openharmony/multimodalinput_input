@@ -117,22 +117,22 @@ static const std::set<int32_t> g_keyCodeValueSet = {
 };
 
 static const std::vector<int32_t> g_pressKeyCodes = {
-    KeyEvent::KEYCODE_ALT_LEFT,
-    KeyEvent::KEYCODE_ALT_RIGHT,
-    KeyEvent::KEYCODE_SHIFT_LEFT,
-    KeyEvent::KEYCODE_SHIFT_RIGHT,
-    KeyEvent::KEYCODE_CTRL_LEFT,
-    KeyEvent::KEYCODE_CTRL_RIGHT
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT
 };
 static const std::vector<int32_t> g_finalKeyCodes = {
-    KeyEvent::KEYCODE_ALT_LEFT,
-    KeyEvent::KEYCODE_ALT_RIGHT,
-    KeyEvent::KEYCODE_SHIFT_LEFT,
-    KeyEvent::KEYCODE_SHIFT_RIGHT,
-    KeyEvent::KEYCODE_CTRL_LEFT,
-    KeyEvent::KEYCODE_CTRL_RIGHT,
-    KeyEvent::KEYCODE_META_LEFT,
-    KeyEvent::KEYCODE_META_RIGHT
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_META_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_META_RIGHT
 };
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
