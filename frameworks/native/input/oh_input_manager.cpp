@@ -115,8 +115,25 @@ static const std::set<int32_t> g_keyCodeValueSet = {
     KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
     KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
 };
-static const std::vector<int32_t> g_pressKeyCodes = { 2045, 2046, 2047, 2048, 2072, 2073 };
-static const std::vector<int32_t> g_finalKeyCodes = { 2045, 2046, 2047, 2048, 2072, 2073, 2076, 2077};
+
+static const std::vector<int32_t> g_pressKeyCodes = {
+    KeyEvent::KEYCODE_ALT_LEFT,
+    KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_SHIFT_LEFT,
+    KeyEvent::KEYCODE_SHIFT_RIGHT,
+    KeyEvent::KEYCODE_CTRL_LEFT,
+    KeyEvent::KEYCODE_CTRL_RIGHT
+};
+static const std::vector<int32_t> g_finalKeyCodes = {
+    KeyEvent::KEYCODE_ALT_LEFT,
+    KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_SHIFT_LEFT,
+    KeyEvent::KEYCODE_SHIFT_RIGHT,
+    KeyEvent::KEYCODE_CTRL_LEFT,
+    KeyEvent::KEYCODE_CTRL_RIGHT,
+    KeyEvent::KEYCODE_META_LEFT,
+    KeyEvent::KEYCODE_META_RIGHT
+};
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
