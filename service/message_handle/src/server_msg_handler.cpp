@@ -112,6 +112,15 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
+        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+            MMI_HILOGW("Current device has no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            MMI_HILOGW("Screen locked, no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -189,6 +198,15 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
+        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+            MMI_HILOGW("Current device has no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            MMI_HILOGW("Screen locked, no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
