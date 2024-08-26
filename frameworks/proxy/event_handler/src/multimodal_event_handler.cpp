@@ -121,6 +121,7 @@ int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)
 bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     if (client_ != nullptr) {
         if (eventHandler != nullptr) {
             client_->MarkIsEventHandlerChanged(eventHandler);
