@@ -2072,6 +2072,7 @@ int32_t MultimodalInputConnectProxy::GetHardwareCursorStats(uint32_t &frameCount
     return ret;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
@@ -2095,6 +2096,7 @@ int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
     CHKPR(*newPixelMapPtr, RET_ERR);
     return ret;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t MultimodalInputConnectProxy::SetTouchpadScrollRows(int32_t rows)
 {

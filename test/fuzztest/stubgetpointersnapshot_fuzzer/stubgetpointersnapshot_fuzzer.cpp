@@ -27,6 +27,7 @@ namespace OHOS {
 namespace MMI {
 const std::u16string FORMMGR_INTERFACE_TOKEN { u"ohos.multimodalinput.IConnectManager" };
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
 {
     MessageParcel datas;
@@ -41,6 +42,7 @@ bool StubGetPointerSnapshotFuzzTest(const uint8_t *data, size_t size)
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT), datas, reply, option);
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // MMI
 } // OHOS
 
@@ -52,6 +54,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     OHOS::MMI::StubGetPointerSnapshotFuzzTest(data, size);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return 0;
 }

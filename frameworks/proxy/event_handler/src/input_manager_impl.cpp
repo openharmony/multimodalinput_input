@@ -2067,6 +2067,7 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
@@ -2082,6 +2083,7 @@ int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t InputManagerImpl::SetTouchpadScrollRows(int32_t rows)
 {
