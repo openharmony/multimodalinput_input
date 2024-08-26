@@ -143,7 +143,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointe
 
 void EventInterceptorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         MMI_HILOGE("Init session is failed");
         return;
     }

@@ -76,7 +76,7 @@ bool VirtualDevice::SetUp()
             return false;
         }
     }
-    for (const auto &item :  GetProperties()) {
+    for (const auto &item : GetProperties()) {
         if (!DoIoctl(fd_, UI_SET_PROPBIT, item)) {
             MMI_HILOGE("Error setting property:%{public}u", item);
             return false;

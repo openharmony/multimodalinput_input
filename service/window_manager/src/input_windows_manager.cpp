@@ -2140,7 +2140,7 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
         Rect windowArea = windowInfo.area;
         windowArea.width = windowInfo.transform[SCALE_X] != 0 ? windowInfo.area.width / windowInfo.transform[SCALE_X]
             : windowInfo.area.width;
-        windowArea.height = windowInfo.transform[SCALE_Y] != 0 ?  windowInfo.area.height / windowInfo.transform[SCALE_Y]
+        windowArea.height = windowInfo.transform[SCALE_Y] != 0 ? windowInfo.area.height / windowInfo.transform[SCALE_Y]
             : windowInfo.area.height;
         std::vector<int32_t> pointerChangeAreas = windowInfo.pointerChangeAreas;
         UpdateTopBottomArea(windowArea, pointerChangeAreas, windowHotAreas);

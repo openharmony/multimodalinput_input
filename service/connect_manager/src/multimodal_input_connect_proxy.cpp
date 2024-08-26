@@ -2420,7 +2420,7 @@ int32_t MultimodalInputConnectProxy::GetAllSystemHotkeys(std::vector<std::unique
         MMI_HILOGD("Send request failed, ret:%{public}d", ret);
         return ret;
     }
-    int32_t  keyOptionsCount = -1;
+    int32_t keyOptionsCount = -1;
     if (!reply.ReadInt32(keyOptionsCount)) {
         MMI_HILOGE("Read keyOptionsCount failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
