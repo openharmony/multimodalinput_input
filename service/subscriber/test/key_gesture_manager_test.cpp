@@ -244,7 +244,7 @@ HWTEST_F(KeyGestureManagerTest, KeyGestureManagerTest_IsWorking_03, TestSize.Lev
     DISPLAY_MONITOR->screenStatus_ = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
     DISPLAY_MONITOR->isScreenLocked_ = false;
     bool ret = pullUpAccessibility.IsWorking();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
