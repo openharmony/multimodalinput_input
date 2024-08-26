@@ -42,7 +42,7 @@ std::string WatchdogTask::GetFirstLine(const std::string& path)
 {
     char checkPath[PATH_MAX] = { 0 };
     if (realpath(path.c_str(), checkPath) == nullptr) {
-        MMI_HILOGE("Canonicalize failed. path:%{public}s", path.c_str());
+        MMI_HILOGE("Canonicalize failed. path:%{private}s", path.c_str());
         return "";
     }
     std::ifstream inFile(checkPath);

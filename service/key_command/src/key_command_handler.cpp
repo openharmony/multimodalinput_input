@@ -880,7 +880,7 @@ bool KeyCommandHandler::ParseConfig()
         return ParseJson(defaultConfig);
     }
     std::string customConfig = filePath;
-    MMI_HILOGD("The configuration file path:%{public}s", customConfig.c_str());
+    MMI_HILOGD("The configuration file path:%{private}s", customConfig.c_str());
     return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
