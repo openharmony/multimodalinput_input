@@ -329,8 +329,9 @@ AccountManager::AccountSetting AccountManager::GetCurrentAccountSetting()
 void AccountManager::InitializeScreenLockStatus()
 {
     MMI_HILOGI("Initialize screen lock status");
-    DISPLAY_MONITOR->SetScreenLocked(
-        ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked());
+    auto screenLockPtr = ScreenLock::ScreenLockManager::GetInstance();
+    CHKPV(screenLockPtr);
+    DISPLAY_MONITOR->SetScreenLocked(screenLockPtr->IsScreenLocked());
 }
 #endif // SCREENLOCK_MANAGER_ENABLED
 
