@@ -282,17 +282,18 @@ bool TabletToolTransformProcessor::OnTipProximity(struct libinput_event* event)
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(DEFAULT_POINTER_ID, item)) {
         MMI_HILOGW("The pointer is expected, but not found");
-        pointerEvent_->SetActionStartTime(time);
-        pointerEvent_->SetTargetDisplayId(targetDisplayId);
-        pointerEvent_->SetDeviceId(deviceId_);
-        pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
-
-        item.SetPointerId(DEFAULT_POINTER_ID);
-        item.SetDeviceId(deviceId_);
-        item.SetDownTime(time);
-        item.SetPressed(false);
-        item.SetToolType(toolType);
     }
+
+    pointerEvent_->SetActionStartTime(time);
+    pointerEvent_->SetTargetDisplayId(targetDisplayId);
+    pointerEvent_->SetDeviceId(deviceId_);
+    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
+
+    item.SetPointerId(DEFAULT_POINTER_ID);
+    item.SetDeviceId(deviceId_);
+    item.SetDownTime(time);
+    item.SetPressed(false);
+    item.SetToolType(toolType);
     item.SetDisplayX(static_cast<int32_t>(tCoord.x));
     item.SetDisplayY(static_cast<int32_t>(tCoord.y));
     item.SetDisplayXPos(tCoord.x);

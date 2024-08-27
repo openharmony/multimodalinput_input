@@ -180,9 +180,9 @@ public:
 
     static constexpr int32_t POINTER_ACTION_FINGERPRINT_CLICK = 32;
 
-    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 34;
-
     static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
+
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 34;
 
     /**
      * Indicates that the pen proximity action.
