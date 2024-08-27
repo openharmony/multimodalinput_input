@@ -212,12 +212,6 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
     if (!CheckSystemKey(key, shortcut)) {
         MMI_HILOGE("Not system key ([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
             FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
-        ExceptionalSystemKey eSysKey {
-            .preKeys = key.modifiers,
-            .finalKey = key.finalKey,
-            .longPressTime = key.longPressTime,
-            .triggerType = key.triggerType,
-        };
         if (IsExceptionalSystemKey(eSysKey)) {
             auto shortcutId = GenerateId();
             MMI_HILOGI("Register exceptional system key [No.%{public}d]"
