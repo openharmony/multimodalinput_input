@@ -1024,8 +1024,8 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
         id = mouseDownInfo_.id;
     }
     PointerEvent::PointerItem currentPointerItem;
-    currentPointerItem.SetWindowX(lastLogicX_-lastWindowInfo_.area.x);
-    currentPointerItem.SetWindowY(lastLogicY_-lastWindowInfo_.area.y);
+    currentPointerItem.SetWindowX(lastLogicX_- lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowY(lastLogicY_- lastWindowInfo_.area.y);
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
     currentPointerItem.SetPointerId(0);
@@ -1034,6 +1034,8 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
     pointerEvent->SetTargetWindowId(id);
     pointerEvent->SetAgentWindowId(id);
     pointerEvent->SetPointerId(0);
+    pointerEvent->SetButtonPressed(lastPointerEvent_->GetButtonId());
+    pointerEvent->SetButtonId(lastPointerEvent_->GetButtonId());
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetOriginPointerAction(lastPointerEvent_->GetPointerAction());
