@@ -203,6 +203,61 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_02
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DrawMovePointer_03
+ * @tc.desc: Test DrawMovePointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 1;
+    int32_t physicalX = 100;
+    int32_t physicalY = 150;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 1;
+    pointerStyle.color = 0;
+
+    Direction direction;
+    direction = DIRECTION90;
+    PointerDrawingManager pointerDrawingManager;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    pointerDrawingManager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ != nullptr);
+
+    bool result = pointerDrawingManager.SetHardWareLocation(displayId, physicalX, physicalY);
+    EXPECT_TRUE(result);
+    int32_t ret = pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawMovePointer_04
+ * @tc.desc: Test DestroyPointerWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_DrawMovePointer_04, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t displayId = 2;
+    int32_t physicalX = 60;
+    int32_t physicalY = 80;
+    PointerStyle pointerStyle;
+    pointerStyle.id = 1;
+    pointerStyle.color = 0;
+
+    Direction direction;
+    direction = DIRECTION90;
+    PointerDrawingManager pointerDrawingManager;
+    ASSERT_TRUE(pointerDrawingManager.surfaceNode_ == nullptr);
+    int32_t ret = pointerDrawingManager.DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_DestroyPointerWindow_01
  * @tc.desc: Test DestroyPointerWindow
  * @tc.type: FUNC
