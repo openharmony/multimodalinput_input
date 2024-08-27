@@ -2939,16 +2939,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        std::string window;
-        window += StringPrintf("windowId:[");
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
-            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-            for (auto iter = winMap.begin(); iter != winMap.end(); iter++) {
-                window += StringPrintf("%d|%d,", iter->first, iter->second);
-            }
-            window += StringPrintf("]\n");
-            MMI_HILOG_DISPATCH("%{public}s", window.c_str());
-        }
         auto it = touchItemDownInfos_.find(pointerId);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (it == touchItemDownInfos_.end() ||
