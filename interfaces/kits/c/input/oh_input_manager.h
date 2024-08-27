@@ -265,6 +265,18 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
 /**
+ * @brief 定义一个回调函数用于设备id和设备类型
+ * @since 13
+ */
+typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, Input_DeviceType deviceType);
+
+/**
+ * @brief 定义一个回调函数用于设备id和设备类型
+ * @since 13
+ */
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, Input_DeviceType deviceType);
+
+/**
  * @brief Defines the structure for the interceptor of event callbacks,
  * including mouseCallback, touchCallback, and axisCallback.
  * @since 12
@@ -283,6 +295,35 @@ typedef struct Input_InterceptorEventCallback {
  * @since 12
  */
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
+
+/**
+ * @brief 设备类型
+ *
+ * @since 13
+ */
+typedef enum Input_DeviceType {
+    /** 设备类型未知 */
+    Input_Device_Type_UNKNOWN = 0,
+    /** 设备类型键盘 */
+    Input_Device_Type_KEYBOARD = 1 << 1,
+    /** 设备类型鼠标 */
+    Input_Device_Type_MOUSE = 1 << 2,
+    /** 设备类型触摸板 */
+    Input_Device_Type_TOUCHPAD = 1 << 3,
+    /** 设备类型触屏 */
+    Input_Device_Type_TOUCHSCREEN = 1 << 4,
+    /** 设备类型遥感 */
+    Input_Device_Type_JOYSTICK = 1 << 6,
+    /** 设备类型轨迹球 */
+    Input_Device_Type_TRACKBALL = 1 << 10,
+} Input_DeviceType;
+
+/**
+ * @brief 定义一个结构体用于监听设备设插拔
+ * 包含了 addedCallback, removedCallback
+ * @since 13
+ */
+typedef struct Input_DeviceListener Input_DeviceListener;
 
 /**
  * @brief Queries the key state.
@@ -1319,6 +1360,47 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
  * @since 13
  */
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
+
+/**
+ * @brief 按键键值转换成字符串
+ *
+ * @param keyCode 要转成字符串的按键键值
+
+ * @return KeyCodeToString status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} keyCode 键值不正确为-1或未知数据
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+const char* KeyCodeToString(int32_t keyCode);
+
+/**
+ * @brief 注册设备热插拔的监听器
+ *
+ * @param listener 用于监听设备热插拔的监听器.
+ *
+ * @return OH_Input_RegisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
+ *         {@link INPUT_SERVICE_EXCEPTION} listener 已被注册
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
+
+/**
+ * @brief 取消注册设备热插拔的监听器
+ *
+ * @param listener 用于监听设备热插拔的监听器.
+ *
+ * @return OH_Input_UnregisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL
+ *         {@link INPUT_SERVICE_EXCEPTION} listener 未注册或已被取消注册
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
 #ifdef __cplusplus
 }
 #endif
