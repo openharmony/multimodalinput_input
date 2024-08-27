@@ -2803,7 +2803,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             }
         }
         if (targetWindowId >= 0 &&
-            (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN || pointerItem.GetPressure() > 0)) {
+            (pointerItem.GetToolType() != PointerEvent::TOOL_TYPE_PEN || pointerItem.GetPressure() > 0)) {
             bool isUiExtentionWindow = false;
             for (auto &windowinfo : item.uiExtentionWindowInfo) {
                 if (windowinfo.id == targetWindowId) {
