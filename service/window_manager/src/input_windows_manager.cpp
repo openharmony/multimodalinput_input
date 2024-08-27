@@ -2010,14 +2010,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
                 (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas, item)) {
-                    if ((item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) &&
-                        ((pointerEvent->GetPressedButtons().empty()) ||
-                        (action == PointerEvent::POINTER_ACTION_PULL_UP) ||
-                        (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN) ||
-                        (action == PointerEvent::POINTER_ACTION_AXIS_UPDATE) ||
-                        (action == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) ||
-                        (action == PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) ||
-                        (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
+                    if (item.windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
                         winId2ZorderMap.insert({item.id, item.zOrder});
                         continue;
                     }
