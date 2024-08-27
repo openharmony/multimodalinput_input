@@ -2528,6 +2528,10 @@ int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, 
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
     std::shared_ptr<Media::PixelMap> pixelMap;
     int32_t ret = GetPointerSnapshot(&pixelMap);
     if (ret != RET_OK) {

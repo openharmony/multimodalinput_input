@@ -2068,11 +2068,10 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && (OHOS_BUILD_ENABLE_MAGICCURSOR)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSnapshot(pixelMapPtr);
     if (ret != RET_OK) {
@@ -2082,9 +2081,8 @@ int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 #else
     MMI_HILOGW("Pointer device module does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MAGICCURSOR
 }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t InputManagerImpl::SetTouchpadScrollRows(int32_t rows)
 {
