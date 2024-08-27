@@ -338,15 +338,75 @@
         },
         {
             "preKeys": [],
+            "finalKey": 2014,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
             "finalKey": 2015,
             "longPressTime": 0,
             "triggerType": "up"
         },
         {
             "preKeys": [],
+            "finalKey": 2015,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [],
             "finalKey": 2054,
             "longPressTime": 0,
             "triggerType": "up"
+        },
+        {
+            "preKeys": [ 2045 ],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2045 ],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2045 ],
+            "finalKey": 2014,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2045 ],
+            "finalKey": 2015,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2046 ],
+            "finalKey": 2012,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2046 ],
+            "finalKey": 2013,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2046 ],
+            "finalKey": 2014,
+            "longPressTime": 0,
+            "triggerType": "down"
+        },
+        {
+            "preKeys": [ 2046 ],
+            "finalKey": 2015,
+            "longPressTime": 0,
+            "triggerType": "down"
         }
     ]
 }
