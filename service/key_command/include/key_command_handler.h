@@ -197,7 +197,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
+    void InitKeyObserver();
 #ifdef UNIT_TEST
 public:
 #else
