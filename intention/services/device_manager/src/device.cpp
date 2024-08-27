@@ -71,7 +71,7 @@ int32_t Device::Open()
     CALL_DEBUG_ENTER;
     char buf[PATH_MAX] {};
     if (realpath(devPath_.c_str(), buf) == nullptr) {
-        FI_HILOGE("Not real path:%{public}s", devPath_.c_str());
+        FI_HILOGE("Not real path:%{private}s", devPath_.c_str());
         return RET_ERR;
     }
 
@@ -427,7 +427,7 @@ int32_t Device::ReadTomlFile(const std::string &filePath)
         FI_HILOGE("Not real path (\'%{public}s\'):%{public}s", filePath.c_str(), strerror(errno));
         return RET_ERR;
     }
-    FI_HILOGD("Config file path:%{public}s", temp);
+    FI_HILOGD("Config file path:%{private}s", temp);
 
     if (!Utility::DoesFileExist(temp)) {
         FI_HILOGE("File does not exist:%{public}s", temp);

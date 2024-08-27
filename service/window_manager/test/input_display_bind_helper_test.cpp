@@ -67,25 +67,25 @@ bool InputDisplayBindHelperTest::InitInputNode()
 {
     if (fs::exists(INPUT_NODE_PATH) && fs::is_directory(INPUT_NODE_PATH)) {
         if (fs::remove_all(INPUT_NODE_PATH) == 0) {
-            MMI_HILOGI("Clear success, path:%{public}s", INPUT_NODE_PATH.c_str());
+            MMI_HILOGI("Clear success, path:%{private}s", INPUT_NODE_PATH.c_str());
         } else {
-            MMI_HILOGE("Clear fail, path:%{public}s", INPUT_NODE_PATH.c_str());
+            MMI_HILOGE("Clear fail, path:%{private}s", INPUT_NODE_PATH.c_str());
         }
     }
     if (fs::create_directory(INPUT_NODE_PATH)) {
-        MMI_HILOGI("Create success, path:%{public}s", INPUT_NODE_PATH.c_str());
+        MMI_HILOGI("Create success, path:%{private}s", INPUT_NODE_PATH.c_str());
     } else {
-        MMI_HILOGE("Create fail, path:%{public}s", INPUT_NODE_PATH.c_str());
+        MMI_HILOGE("Create fail, path:%{private}s", INPUT_NODE_PATH.c_str());
         return false;
     }
     std::ofstream file(INPUT_DEVICE_NAME_FILE);
     if (!file.is_open()) {
-        MMI_HILOGE("Write fail, path:%{public}s", INPUT_DEVICE_NAME_FILE.c_str());
+        MMI_HILOGE("Write fail, path:%{private}s", INPUT_DEVICE_NAME_FILE.c_str());
         return false;
     }
     file << INPUT_NODE_NAME;
     file.close();
-    MMI_HILOGI("Write success, path:%{public}s", INPUT_DEVICE_NAME_FILE.c_str());
+    MMI_HILOGI("Write success, path:%{private}s", INPUT_DEVICE_NAME_FILE.c_str());
     return true;
 }
 
@@ -93,20 +93,20 @@ bool InputDisplayBindHelperTest::InitConfigFile()
 {
     if (fs::exists(INPUT_DEVICE_NAME_CONFIG)) {
         if (std::remove(INPUT_DEVICE_NAME_CONFIG.c_str()) == 0) {
-            MMI_HILOGI("Clear success, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+            MMI_HILOGI("Clear success, path:%{private}s", INPUT_DEVICE_NAME_CONFIG.c_str());
         } else {
-            MMI_HILOGE("Clear fail, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+            MMI_HILOGE("Clear fail, path:%{private}s", INPUT_DEVICE_NAME_CONFIG.c_str());
             return false;
         }
     }
     std::ofstream file(INPUT_DEVICE_NAME_CONFIG);
     if (!file.is_open()) {
-        MMI_HILOGE("Write fail, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+        MMI_HILOGE("Write fail, path:%{private}s", INPUT_DEVICE_NAME_CONFIG.c_str());
         return false;
     }
     file << DISPLAY_MAPPING;
     file.close();
-    MMI_HILOGI("Write success, path:%{public}s", INPUT_DEVICE_NAME_CONFIG.c_str());
+    MMI_HILOGI("Write success, path:%{private}s", INPUT_DEVICE_NAME_CONFIG.c_str());
     return true;
 }
 
