@@ -605,7 +605,7 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
             [shortcutKey](std::shared_ptr<KeyEvent> keyEvent) {});
         if (shortcutKey.shortcutId < 0) {
             MMI_HILOGE("RegisterSystemKey fail, error:%{public}d", shortcutKey.shortcutId);
-            return RET_ERR;
+            continue;
         }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::string key = GenerateKey(shortcutKey);
