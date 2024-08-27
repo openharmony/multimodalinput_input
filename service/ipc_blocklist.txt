@@ -12,6 +12,6 @@
 # limitations under the License.
 
 [cfi]
-test:*third_party/googletest/googletest/include/*
-test:*pointer_drawing_manager_test.cpp
-test:*touch_drawing_manager_test.cpp
+test:*third_party/googletest/*
+test:*third_party/cJSON/*
+test:*foundation/multimodalinput/input/service/*
