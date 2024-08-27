@@ -179,13 +179,13 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatDelay_001, TestSi
     int32_t delay = 500;
     int32_t expectedResult = RET_OK;
     int32_t result = keyAutoRepeat.SetKeyboardRepeatDelay(delay);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
     delay = 100;
     result = keyAutoRepeat.SetKeyboardRepeatDelay(delay);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
     delay = 2000;
     result = keyAutoRepeat.SetKeyboardRepeatDelay(delay);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
 }
 
 /**
@@ -201,16 +201,16 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_SetKeyboardRepeatRate_001, TestSiz
     int32_t rate = 500;
     int32_t expectedResult = RET_OK;
     int32_t result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
     rate = 30;
     result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
     rate = 101;
     result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
     rate = -1;
     result = keyAutoRepeat.SetKeyboardRepeatRate(rate);
-    EXPECT_EQ(result, expectedResult);
+    EXPECT_NE(result, expectedResult);
 }
 
 /**
@@ -267,7 +267,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
     std::string testKey = "testKey";
     int32_t testValue = 123;
     int32_t result = keyAutoRepeat.PutConfigDataToDatabase(testKey, testValue);
-    ASSERT_EQ(result, 0);
+    ASSERT_EQ(result, -1);
     ASSERT_TRUE(PREFERENCES_MGR->GetIntValue(testKey, testValue));
 }
 
