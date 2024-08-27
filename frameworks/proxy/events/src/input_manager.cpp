@@ -502,10 +502,12 @@ int32_t InputManager::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsy
     return InputMgrImpl.GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t InputManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     return InputMgrImpl.GetPointerSnapshot(pixelMapPtr);
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t InputManager::SetTouchpadScrollRows(int32_t rows)
 {

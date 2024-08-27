@@ -132,10 +132,12 @@ public:
     {
         return 0;
     }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
     {
         return 0;
     }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual void ForceClearPointerVisiableStatus() {}
     virtual void InitPointerObserver() {}
     virtual void OnSessionLost(int32_t pid) {}
