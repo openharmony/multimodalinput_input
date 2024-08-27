@@ -175,7 +175,9 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows(int32_t &rows);
 

@@ -355,10 +355,12 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     return 0;
 }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMap)
 {
     return 0;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
 void PointerDrawingManager::InitPointerCallback()

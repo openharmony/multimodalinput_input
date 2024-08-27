@@ -1090,20 +1090,20 @@ void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> p
     pixelMap_ = pixelMap;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
     *newPixelMapPtr = pixelMap_;
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
         MMI_HILOGE("magic pixelmap");
         *newPixelMapPtr = MAGIC_CURSOR->GetPixelMap();
     }
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     CHKPR(*newPixelMapPtr, ERROR_NULL_POINTER);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
 {
