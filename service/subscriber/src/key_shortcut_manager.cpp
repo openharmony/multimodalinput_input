@@ -202,6 +202,12 @@ KeyShortcutManager::KeyShortcutManager()
 int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
 {
     KeyShortcut shortcut {};
+    ExceptionalSystemKey eSysKey {
+        .preKeys = key.modifiers,
+        .finalKey = key.finalKey,
+        .longPressTime = key.longPressTime,
+        .triggerType = key.triggerType,
+    };
 
     if (!CheckSystemKey(key, shortcut)) {
         MMI_HILOGE("Not system key ([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
@@ -222,6 +228,13 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     if (!IsReservedSystemKey(shortcut)) {
+        if (IsExceptionalSystemKey(eSysKey)) {
+            auto shortcutId = GenerateId();
+            MMI_HILOGI("Register exceptional system key [No.%{public}d]"
+                "([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
+                shortcutId, FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
+            return shortcutId;
+        }
         MMI_HILOGE("The system application can only subscribe to reserved shortcuts");
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
