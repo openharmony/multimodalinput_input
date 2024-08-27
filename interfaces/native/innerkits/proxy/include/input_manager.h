@@ -772,7 +772,6 @@ public:
      */
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 
-#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     /**
      * @brief Get the pointer snapshot.
      * @param pixelMapPtr Indicates the image resource for this mouse icon. which realtype must be
@@ -781,7 +780,6 @@ public:
      * @since 12
      */
     int32_t GetPointerSnapshot(void *pixelMapPtr);
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
     /**
      * @brief Sets the number of the touchpad scrolling rows.
