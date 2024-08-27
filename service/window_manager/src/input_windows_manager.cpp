@@ -1035,7 +1035,6 @@ void InputWindowsManager::SetPointerEvent(int32_t pointerAction, std::shared_ptr
     pointerEvent->SetPointerId(0);
     pointerEvent->SetButtonPressed(lastPointerEvent_->GetButtonId());
     pointerEvent->SetButtonId(lastPointerEvent_->GetButtonId());
-    MMI_HILOGI("SetButtonId:%{public}d", lastPointerEvent_->GetButtonId());
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetOriginPointerAction(lastPointerEvent_->GetPointerAction());
