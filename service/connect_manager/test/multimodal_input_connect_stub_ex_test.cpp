@@ -642,6 +642,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_023, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: OnRemoteRequest_024
  * @tc.desc: Test the function OnRemoteRequest
@@ -660,6 +661,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_024, TestSize.Level1)
     uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT);
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
  * @tc.name: OnRemoteRequest_025

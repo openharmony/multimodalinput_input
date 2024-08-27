@@ -158,7 +158,9 @@ private:
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void ForceClearPointerVisiableStatus() override;
     void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -204,7 +206,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
 };
