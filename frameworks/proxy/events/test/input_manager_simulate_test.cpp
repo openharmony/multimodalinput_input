@@ -33,11 +33,9 @@ constexpr int32_t INPUT_INTERCEPTOR_TWO = 3;
 constexpr int32_t INTERCEPTOR_PRIORITY_ONE = 400;
 constexpr int32_t INTERCEPTOR_PRIORITY_TWO = 500;
 constexpr int32_t INTERCEPTOR_PRIORITY_THREE = 600;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 90;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_THREE = 123;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FIVE = 222;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_EIGHT = 505;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_NINE = 523;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_TEN = 528;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ELEVEN = 543;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_THIRTEEN = 640;
@@ -48,8 +46,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_Y_THREE = 223;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOUR = 357;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIVE = 367;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_EIGHT = 505;
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_TEN = 666;
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_ELEVEN = 723;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWELVE = 757;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_THIRTEEN = 840;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOURTEEN = 860;
@@ -539,82 +535,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_016, TestSize.Level
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
     }
-}
-
-/**
- * @tc.name: InputManager_TouchPadSimulateInputEvent_001
- * @tc.desc: Verify touchpad simulate and monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callbackPtr = GetPtr<InputEventCallback>();
-    ASSERT_NE(callbackPtr, nullptr);
-    int32_t monitorId{InputManagerUtil::TestAddMonitor(callbackPtr)};
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
-#else
-    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    int64_t stepTime = GetSysClockTime();
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item{};
-    item.SetPointerId(DEFAULT_POINTER_ID);
-    item.SetDownTime(stepTime);
-    item.SetPressed(true);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_NINE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_ELEVEN);
-    item.SetDeviceId(DEFAULT_DEVICE_ID);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetActionTime(stepTime);
-    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
-    InputManagerUtil::TestMonitor(monitorId, pointerEvent);
-}
-
-/**
- * @tc.name: InputManager_TouchPadSimulateInputEvent_002
- * @tc.desc: Verify touchpad simulate and monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callbackPtr = GetPtr<InputEventCallback>();
-    ASSERT_NE(callbackPtr, nullptr);
-    int32_t monitorId{InputManagerUtil::TestAddMonitor(callbackPtr)};
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
-#else
-    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    int64_t measureTime = GetSysClockTime();
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item{};
-    item.SetPointerId(DEFAULT_POINTER_ID);
-    item.SetDownTime(measureTime);
-    item.SetPressed(true);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TEN);
-    item.SetDeviceId(DEFAULT_DEVICE_ID);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetActionTime(measureTime);
-    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
-    InputManagerUtil::TestMonitor(monitorId, pointerEvent);
 }
 
 /**

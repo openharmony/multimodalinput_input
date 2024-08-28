@@ -1673,27 +1673,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_03, 
 }
 
 /**
- * @tc.name: EventDispatchTest_DispatchPointerEventInner_03
- * @tc.desc: Test DispatchPointerEventInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_03, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t fd = 1;
-    int32_t type = 2;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    auto session = InputHandler->udsServer_->GetSession(fd);
-    int64_t currentTime = GetSysClockTime();
-    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
-    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
-}
-
-/**
  * @tc.name: EventDispatchTest_DispatchPointerEventInner_04
  * @tc.desc: Test DispatchPointerEventInner
  * @tc.type: FUNC

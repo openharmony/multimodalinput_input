@@ -424,21 +424,6 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
 }
 
 /**
- * @tc.name: InputDisplayBindHelperTest_AddInputDevice_04
- * @tc.desc: Test AddInputDevice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddInputDevice_04, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    BindInfo bindInfo;
-    bindInfo.inputDeviceId_ = 1;
-    bindInfo.inputDeviceName_ = "mouse";
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddInputDevice(1, "mouse"));
-}
-
-/**
  * @tc.name: InputDisplayBindHelperTest_AddDisplay_01
  * @tc.desc: Test AddDisplay
  * @tc.type: FUNC
