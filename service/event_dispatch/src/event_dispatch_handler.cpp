@@ -171,6 +171,13 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (!windowInfo) {
             continue;
         }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (pointerEvent->GetTargetDisplayId() != windowInfo->displayId) {
+            continue;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
         auto fd = WIN_MGR->GetClientFd(pointerEvent, windowInfo->id);
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
@@ -273,6 +280,14 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
             windowStateErrorInfo_.pid = pid;
         }
     }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(point->GetTargetWindowId(), point->GetTargetDisplayId());
+    if (windowInfo && point->GetTargetDisplayId() != windowInfo->displayId) {
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
     DispatchPointerEventInner(point, fd);
 }
 
