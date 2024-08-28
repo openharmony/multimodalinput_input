@@ -230,11 +230,40 @@ typedef enum Input_Result {
 } Input_Result;
 
 /**
+ * @brief 设备类型
+ *
+ * @since 13
+ */
+typedef enum Input_DeviceType {
+    /** 设备类型未知 */
+    Input_Device_Type_UNKNOWN = 0,
+    /** 设备类型键盘 */
+    Input_Device_Type_KEYBOARD = 1 << 1,
+    /** 设备类型鼠标 */
+    Input_Device_Type_MOUSE = 1 << 2,
+    /** 设备类型触摸板 */
+    Input_Device_Type_TOUCHPAD = 1 << 3,
+    /** 设备类型触屏 */
+    Input_Device_Type_TOUCHSCREEN = 1 << 4,
+    /** 设备类型遥感 */
+    Input_Device_Type_JOYSTICK = 1 << 6,
+    /** 设备类型轨迹球 */
+    Input_Device_Type_TRACKBALL = 1 << 10,
+} Input_DeviceType;
+
+/**
  * @brief Defines the hot key structure.
  *
  * @since 13
  */
 typedef struct Input_Hotkey Input_Hotkey;
+
+/**
+ * @brief 定义一个结构体用于监听设备设插拔
+ * 包含了 addedCallback, removedCallback
+ * @since 13
+ */
+typedef struct Input_DeviceListener Input_DeviceListener;
 
 /**
  * @brief Defines a lifecycle callback for **keyEvent**.
@@ -295,35 +324,6 @@ typedef struct Input_InterceptorEventCallback {
  * @since 12
  */
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
-
-/**
- * @brief 设备类型
- *
- * @since 13
- */
-typedef enum Input_DeviceType {
-    /** 设备类型未知 */
-    Input_Device_Type_UNKNOWN = 0,
-    /** 设备类型键盘 */
-    Input_Device_Type_KEYBOARD = 1 << 1,
-    /** 设备类型鼠标 */
-    Input_Device_Type_MOUSE = 1 << 2,
-    /** 设备类型触摸板 */
-    Input_Device_Type_TOUCHPAD = 1 << 3,
-    /** 设备类型触屏 */
-    Input_Device_Type_TOUCHSCREEN = 1 << 4,
-    /** 设备类型遥感 */
-    Input_Device_Type_JOYSTICK = 1 << 6,
-    /** 设备类型轨迹球 */
-    Input_Device_Type_TRACKBALL = 1 << 10,
-} Input_DeviceType;
-
-/**
- * @brief 定义一个结构体用于监听设备设插拔
- * 包含了 addedCallback, removedCallback
- * @since 13
- */
-typedef struct Input_DeviceListener Input_DeviceListener;
 
 /**
  * @brief Queries the key state.
@@ -1381,8 +1381,8 @@ const char* KeyCodeToString(int32_t keyCode);
  *
  * @return OH_Input_RegisterDeviceListener status code, specifically,
  *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
- *         {@link INPUT_SERVICE_EXCEPTION} listener 已被注册
+ *         {@link INPUT_PARAMETER_ERROR} listener 为NULL 或 listener 已被注册
+ *         {@link INPUT_SERVICE_EXCEPTION} 服务端连接异常
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
@@ -1395,8 +1395,8 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
  *
  * @return OH_Input_UnregisterDeviceListener status code, specifically,
  *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL
- *         {@link INPUT_SERVICE_EXCEPTION} listener 未注册或已被取消注册
+ *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL, listener 未注册或已被取消注册
+ *         {@link INPUT_SERVICE_EXCEPTION} 服务端连接异常
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */

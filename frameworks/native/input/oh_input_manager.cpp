@@ -21,6 +21,7 @@
 #include "key_event.h"
 #include "mmi_log.h"
 #include "oh_axis_type.h"
+#include "oh_input_device_listener.h"
 #include "oh_input_interceptor.h"
 #include "oh_key_code.h"
 #include "permission_helper.h"
@@ -72,6 +73,11 @@ struct Input_AxisEvent {
     int32_t axisEventType { -1 };
 };
 
+struct Input_DeviceListener {
+    Input_DeviceAddedCallback OnDeviceAdded;
+    Input_DeviceRemovedCallback OnDeviceRemoved;
+};
+
 struct Input_Hotkey {
     std::set<int32_t> preKeys {};
     int32_t finalKey { -1 };
@@ -88,6 +94,7 @@ static std::set<Input_KeyEventCallback> g_keyMonitorCallbacks;
 static std::set<Input_MouseEventCallback> g_mouseMonitorCallbacks;
 static std::set<Input_TouchEventCallback> g_touchMonitorCallbacks;
 static std::set<Input_AxisEventCallback> g_axisMonitorAllCallbacks;
+static std::set<Input_DeviceListener*> g_ohDeviceListenerList;
 static std::map<InputEvent_AxisEventType, std::set<Input_AxisEventCallback>> g_axisMonitorCallbacks;
 static Input_KeyEventCallback g_keyInterceptorCallback = nullptr;
 static struct Input_InterceptorEventCallback *g_pointerInterceptorCallback = nullptr;
@@ -95,6 +102,8 @@ static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_pointerInterceptor =
     std::make_shared<OHOS::MMI::OHInputInterceptor>();
 static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_keyInterceptor =
     std::make_shared<OHOS::MMI::OHInputInterceptor>();
+static std::shared_ptr<OHOS::MMI::OHInputDeviceListener> g_deviceListener =
+    std::make_shared<OHOS::MMI::OHInputDeviceListener>();
 static std::mutex g_mutex;
 static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
 static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
@@ -1779,5 +1788,70 @@ Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyC
     CHKPR(hotkey, INPUT_PARAMETER_ERROR);
     CHKPR(finalKeyCode, INPUT_PARAMETER_ERROR);
     *finalKeyCode = hotkey->finalKey;
+    return INPUT_SUCCESS;
+}
+
+const char* KeyCodeToString(int32_t keyCode)
+{
+    return g_keyEvent->KeyCodeToString(keyCode);
+}
+
+static void DeviceAddedCallback(int32_t deviceId, const std::string& deviceType)
+{
+    for (auto listener : g_ohDeviceListenerList) {
+        listener->OnDeviceAdded(deviceId, Input_DeviceType::Input_Device_Type_KEYBOARD);
+    }
+}
+
+static void DeviceRemovedCallback(int32_t deviceId, const std::string& deviceType)
+{
+    for (auto listener : g_ohDeviceListenerList) {
+        listener->OnDeviceRemoved(deviceId, Input_DeviceType::Input_Device_Type_KEYBOARD);
+    }
+}
+
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
+{   
+    if (listener == nullptr) {
+        MMI_HILOGE("listener is null");
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto myListener = new Input_DeviceListener;
+    if (myListener == nullptr) {
+        MMI_HILOGE("myListener is null");
+        return INPUT_PARAMETER_ERROR;
+    }
+    *myListener = *listener;
+    g_ohDeviceListenerList.insert(myListener);
+    g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
+    g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
+    if (ret != RET_OK) {
+        MMI_HILOGE("RegisterDevListener fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
+{
+    if (listener == nullptr) {
+        MMI_HILOGE("listener is null");
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto it = g_ohDeviceListenerList.find(listener);
+    if (it == g_ohDeviceListenerList.end()) {
+        MMI_HILOGE("listener not found");
+        return INPUT_PARAMETER_ERROR;
+    }
+    delete listener;
+    g_ohDeviceListenerList.erase(it);
+    if (g_ohDeviceListenerList.empty()) {
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
+        if (ret != RET_OK) {
+            MMI_HILOGE("UnregisterDevListener fail");
+            return INPUT_SERVICE_EXCEPTION;
+        }
+    }
     return INPUT_SUCCESS;
 }
