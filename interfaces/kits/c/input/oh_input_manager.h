@@ -258,16 +258,6 @@ static const char* const Input_Device_Type_TRACKBALL = "ohos.input.device.trackb
 typedef struct Input_Hotkey Input_Hotkey;
 
 /**
- * @brief 定义一个结构体用于监听设备设插拔
- * 包含了 addedCallback, removedCallback
- * @since 13
- */
-typedef struct Input_DeviceListener {
-    Input_DeviceAddedCallback OnDeviceAdded;
-    Input_DeviceRemovedCallback OnDeviceRemoved;
-};
-
-/**
  * @brief Defines a lifecycle callback for **keyEvent**.
  * If the callback is triggered, **keyEvent** will be destroyed.
  * @since 12
@@ -299,13 +289,13 @@ typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
  * @brief 定义一个回调函数用于设备id和设备类型
  * @since 13
  */
-typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, Input_DeviceType deviceType);
+typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, const char* deviceType);
 
 /**
  * @brief 定义一个回调函数用于设备id和设备类型
  * @since 13
  */
-typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, Input_DeviceType deviceType);
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, const char* deviceType);
 
 /**
  * @brief Defines the structure for the interceptor of event callbacks,
@@ -320,6 +310,15 @@ typedef struct Input_InterceptorEventCallback {
     /** Defines a lifecycle callback for **axisEvent**. */
     Input_AxisEventCallback axisCallback;
 } Input_InterceptorEventCallback;
+
+/**
+ * @brief 定义一个结构体用于监听设备设插拔
+ * @since 13
+ */
+typedef struct Input_DeviceListener {
+    Input_DeviceAddedCallback OnDeviceAdded;
+    Input_DeviceRemovedCallback OnDeviceRemoved;
+};
 
 /**
  * @brief Defines event interceptor options.
