@@ -1816,13 +1816,7 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
         MMI_HILOGE("listener is null");
         return INPUT_PARAMETER_ERROR;
     }
-    auto myListener = new Input_DeviceListener;
-    if (myListener == nullptr) {
-        MMI_HILOGE("myListener is null");
-        return INPUT_PARAMETER_ERROR;
-    }
-    *myListener = *listener;
-    g_ohDeviceListenerList.insert(myListener);
+    g_ohDeviceListenerList.insert(listener);
     g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
     g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
@@ -1844,7 +1838,6 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
         MMI_HILOGE("listener not found");
         return INPUT_PARAMETER_ERROR;
     }
-    delete listener;
     g_ohDeviceListenerList.erase(it);
     if (g_ohDeviceListenerList.empty()) {
         int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
