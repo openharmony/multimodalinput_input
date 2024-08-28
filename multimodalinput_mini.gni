@@ -50,7 +50,7 @@ declare_args() {
   input_feature_crown = true
   input_feature_move_event_filters = false
   shortcut_key_manager_enabled = true
-  shortcut_key_rules_enabled = false
+  shortcut_key_rules_enabled = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_call_manager)) {
