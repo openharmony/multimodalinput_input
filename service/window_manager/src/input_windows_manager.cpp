@@ -199,7 +199,7 @@ bool InputWindowsManager::IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointer
         return false;
     }
     /* Fold status is indicated by 27th bit of long axis of touch. */
-    uint32_t longAxis = pointer.GetLongAxis();
+    uint32_t longAxis = static_cast<uint32_t>(pointer.GetLongAxis());
     if (cancelTouchStatus_) {
         if (longAxis & FOLD_STATUS_MASK) {
             // Screen in the process of folding, ignore this event
