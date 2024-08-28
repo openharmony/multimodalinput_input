@@ -2834,12 +2834,10 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
-    bool execRet = false;
     int32_t ret =
         delegateTasks_.PostSyncTask(
-            [this, pid, binderClientObject, &execRet] {
-                execRet = sMsgHandler_.OnTransferBinderClientSrv(binderClientObject, pid);
-                return execRet;
+            [this, pid, binderClientObject] {
+                return sMsgHandler_.OnTransferBinderClientSrv(binderClientObject, pid);
             }
         );
     if (ret != RET_OK) {
