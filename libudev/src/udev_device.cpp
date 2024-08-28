@@ -339,7 +339,7 @@ private:
         CHKPV(realpath(filename.c_str(), realPath));
         std::ifstream f(realPath, std::ios_base::in);
         if (!f.is_open()) {
-            MMI_HILOGE("ReadUeventFile(): path:%{public}s, error:%{public}s", realPath, std::strerror(errno));
+            MMI_HILOGE("ReadUeventFile(): path:%{private}s, error:%{public}s", realPath, std::strerror(errno));
             return;
         }
         ueventLoaded = true;
