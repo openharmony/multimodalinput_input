@@ -229,27 +229,26 @@ typedef enum Input_Result {
     INPUT_REPEAT_INTERCEPTOR = 4200001
 } Input_Result;
 
-/**
- * @brief 设备类型
- *
- * @since 13
- */
-typedef enum Input_DeviceType {
-    /** 设备类型未知 */
-    Input_Device_Type_UNKNOWN = 0,
-    /** 设备类型键盘 */
-    Input_Device_Type_KEYBOARD = 1 << 1,
-    /** 设备类型鼠标 */
-    Input_Device_Type_MOUSE = 1 << 2,
-    /** 设备类型触摸板 */
-    Input_Device_Type_TOUCHPAD = 1 << 3,
-    /** 设备类型触屏 */
-    Input_Device_Type_TOUCHSCREEN = 1 << 4,
-    /** 设备类型遥感 */
-    Input_Device_Type_JOYSTICK = 1 << 6,
-    /** 设备类型轨迹球 */
-    Input_Device_Type_TRACKBALL = 1 << 10,
-} Input_DeviceType;
+/** 设备类型未知 */
+static const char* const Input_Device_Type_UNKNOWN = "ohos.input.device.unknown";
+
+/** 设备类型键盘 */
+static const char* const Input_Device_Type_KEYBOARD = "ohos.input.device.keyboard";
+
+/** 设备类型鼠标 */
+static const char* const Input_Device_Type_MOUSE = "ohos.input.device.mouse";
+
+/** 设备类型触摸板 */
+static const char* const Input_Device_Type_TOUCHPAD = "ohos.input.device.touchpad";
+
+/** 设备类型触屏 */
+static const char* const Input_Device_Type_TOUCHSCREEN = "ohos.input.device.touchscreen";
+
+/** 设备类型遥感 */
+static const char* const Input_Device_Type_JOYSTICK = "ohos.input.device.joystick";
+
+/** 设备类型轨迹球 */
+static const char* const Input_Device_Type_TRACKBALL = "ohos.input.device.trackball";
 
 /**
  * @brief Defines the hot key structure.
@@ -263,7 +262,10 @@ typedef struct Input_Hotkey Input_Hotkey;
  * 包含了 addedCallback, removedCallback
  * @since 13
  */
-typedef struct Input_DeviceListener Input_DeviceListener;
+typedef struct Input_DeviceListener {
+    Input_DeviceAddedCallback OnDeviceAdded;
+    Input_DeviceRemovedCallback OnDeviceRemoved;
+};
 
 /**
  * @brief Defines a lifecycle callback for **keyEvent**.
@@ -1366,9 +1368,7 @@ Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
  *
  * @param keyCode 要转成字符串的按键键值
 
- * @return KeyCodeToString status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
- *         {@link INPUT_PARAMETER_ERROR} keyCode 键值不正确为-1或未知数据
+ * @return 如果返回一个字符串则表示成功，如果返回NULL则表示失败。
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
