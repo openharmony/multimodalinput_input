@@ -550,22 +550,11 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
 bool KeySubscriberHandler::IsPreKeysMatch(const std::set<int32_t> &preKeys,
                                           const std::vector<int32_t> &pressedKeys) const
 {
-    if (preKeys.size() == 0) {
-        return true;
-    }
-
-    if (preKeys.size() != pressedKeys.size()) {
-        return false;
-    }
-
-    for (const auto &pressedKey : pressedKeys) {
-        auto it = std::find(preKeys.begin(), preKeys.end(), pressedKey);
-        if (it == preKeys.end()) {
-            return false;
-        }
-    }
-
-    return true;
+    return std::all_of(preKeys.cbegin(), preKeys.cend(), [&pressedKeys](const auto preKey) {
+        return std::any_of(pressedKeys.cbegin(), pressedKeys.cend(), [preKey](const auto pressedKey) {
+            return (preKey == pressedKey);
+        });
+    });
 }
 
 bool KeySubscriberHandler::IsEqualPreKeys(const std::set<int32_t> &preKeys, const std::set<int32_t> &pressedKeys)
@@ -891,6 +880,9 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
     if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent)) {
+        if (keyEvent->GetPressedKeys().empty()) {
+            KEY_SHORTCUT_MGR->ResetCheckState();
+        }
         return false;
     }
 #endif // SHORTCUT_KEY_RULES_ENABLED
