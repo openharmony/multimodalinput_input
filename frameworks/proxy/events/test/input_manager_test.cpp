@@ -3320,5 +3320,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
     ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
     EXPECT_EQ(ret, 305);
 }
+
+/**
+ * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
+ * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyAction = 0X00000002;
+    int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
+    EXPECT_EQ(ret, -1);
+}
 } // namespace MMI
 } // namespace OHOS
