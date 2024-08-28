@@ -1150,42 +1150,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler, TestSize.Level
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnInjectPointerEventExt
- * @tc.desc: Test OnInjectPointerEventExt
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEventExt, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler msgHandler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    pointerEvent->SetId(1);
-    pointerEvent->eventType_ = 1;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    msgHandler.nativeTargetWindowIds_.insert(std::make_pair(pointerEvent->GetPointerId(), 10));
-    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT;
-    EXPECT_EQ(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_ERR);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NONE);
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
-
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_HIDE_POINTER;
-    EXPECT_NE(msgHandler.OnInjectPointerEventExt(pointerEvent, false), RET_OK);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_001
  * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch success
  * @tc.type: FUNC

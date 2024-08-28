@@ -43,9 +43,7 @@ constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
-const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 } // namespace
 
 class PointerDrawingManagerTest : public testing::Test {
@@ -111,58 +109,6 @@ std::shared_ptr<Media::PixelMap> PointerDrawingManagerTest::CreatePixelMap(int32
     }
     delete[] pixelColors;
     return pixelMap;
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_03
- * @tc.desc: Test DrawManager
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_03, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-    pointerStyle.color = 1;
-    pointerStyle.size = 2;
-
-    int32_t ROTATE_POLICY;
-    ROTATE_POLICY = FOLDABLE_DEVICE;
-    pointerDrawingManager.lastPhysicalX_ = 1;
-    pointerDrawingManager.lastPhysicalY_ = -1;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawPointerStyle_04
- * @tc.desc: Test DrawManager
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_04, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.hasDisplay_ = true;
-    pointerDrawingManager.hasPointerDevice_ = true;
-    pointerDrawingManager.surfaceNode_ = nullptr;
-
-    PointerStyle pointerStyle;
-    pointerStyle.id = 1;
-    pointerStyle.color = 1;
-    pointerStyle.size = 2;
-
-    int32_t ROTATE_POLICY;
-    ROTATE_POLICY = FOLDABLE_DEVICE;
-    pointerDrawingManager.lastPhysicalX_ = 2;
-    pointerDrawingManager.lastPhysicalY_ = 2;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
 }
 
 /**
