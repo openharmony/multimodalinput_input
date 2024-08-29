@@ -334,10 +334,6 @@ ohos_shared_library("libmmi-server") {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
-
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -422,10 +418,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "preferences:native_preferences",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("EventFilterDeathRecipientTest") {
@@ -1087,10 +1079,6 @@ ohos_unittest("InputWindowsManagerTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("InputWindowsManagerEXTest") {
@@ -1165,10 +1153,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
 
   if (call_manager_service_enabled) {
     external_deps += [ "call_manager:tel_call_manager_api" ]
-  }
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
   }
 }
 
@@ -1265,10 +1249,6 @@ ohos_unittest("SubscriberTest") {
       "window_manager:libwm",
     ]
   }
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("NapProcessTest") {
@@ -1331,10 +1311,6 @@ ohos_unittest("MonitorTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("ModuleLoaderTest") {
@@ -1379,10 +1355,6 @@ ohos_unittest("ModuleLoaderTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("KeyEventNormalizeTest") {
@@ -1484,10 +1456,6 @@ ohos_unittest("KeyCommandTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("StylusKeyTest") {
@@ -1612,10 +1580,6 @@ ohos_unittest("InterceptorExTest") {
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("KeyAutoRepeatExTest") {
@@ -1694,10 +1658,6 @@ ohos_unittest("EventHandlerTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("EventNormalizeHandlerTest") {
@@ -1807,10 +1767,6 @@ ohos_unittest("EventDispatchTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("LibinputAdapterTest") {
@@ -1885,10 +1841,6 @@ ohos_unittest("ServerMsgHandlerTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("PermissionHelperTest") {
@@ -2092,10 +2044,6 @@ ohos_unittest("ConnectManagerTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("ConnectManagerProxyEXTest") {
@@ -2166,6 +2114,7 @@ ohos_unittest("ConnectManagerEXTest") {
     "connect_manager/src/multimodal_input_connect_stub.cpp",
     "connect_manager/test/message_parcel_mock.cpp",
     "connect_manager/test/multimodal_input_connect_stub_ex_test.cpp",
+    "module_loader/src/input_screen_capture_agent.cpp",
   ]
 
   deps = [ "${mmi_path}/util:libmmi-util" ]
@@ -2186,10 +2135,6 @@ ohos_unittest("ConnectManagerEXTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("EventDumpTest") {
@@ -2226,10 +2171,6 @@ ohos_unittest("EventDumpTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("DfxHisysEventTest") {
