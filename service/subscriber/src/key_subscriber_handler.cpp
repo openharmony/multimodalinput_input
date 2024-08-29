@@ -565,7 +565,7 @@ bool KeySubscriberHandler::IsPreKeysMatch(const std::set<int32_t> &preKeys,
         }
     }
 
-    return true;;
+    return true;
 }
 
 bool KeySubscriberHandler::IsEqualPreKeys(const std::set<int32_t> &preKeys, const std::set<int32_t> &pressedKeys)
