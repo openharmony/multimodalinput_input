@@ -29,6 +29,7 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "app_debug_listener.h"
+#include "app_mgr_client.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
 #include "dfx_define.h"
@@ -63,6 +64,7 @@
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
+#include "running_process_info.h"
 #include "timer_manager.h"
 #include "tokenid_kit.h"
 #include "touch_event_normalize.h"
@@ -540,6 +542,18 @@ int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
 void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
+    #ifdef OHOS_BUILD_ENABLE_ANCO
+    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    int32_t userid = WIN_MGR->GetCurrentUserId();
+    std::vector<AppExecFwk::RunningProcessInfo> info;
+    appMgrClient->GetProcessRunningInfoByUserId(info, userid);
+    for(auto &item : info) {
+        if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
+            MMI_HILOGW("recond client process pid %{public}d", item.pid_);
+            shellAssistentPid_ = item.pid_;
+        }
+    }
+    #endif // OHOS_BUILD_ENABLE_ANCO
     MMI_HILOGI("fd:%{public}d", s->GetFd());
 }
 
@@ -552,8 +566,8 @@ void MMIService::OnDisconnected(SessionPtr s)
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName() == SHELL_ASSISTANT) {
-        MMI_HILOGW("clean all shell windows because of %{public}s", s->GetProgramName().c_str());
+    if (s->GetProgramName() == SHELL_ASSISTANT && shellAssistentPid_ == s->GetPid()) {
+        MMI_HILOGW("clean all shell windows because of %{public}s, pid: %{public}d", s->GetProgramName().c_str(), s->Getpid());
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
