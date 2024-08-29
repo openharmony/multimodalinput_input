@@ -14,4 +14,4 @@
 [cfi]
 test:*third_party/googletest/*
 test:*third_party/cJSON/*
-test:*foundation/multimodalinput/input/service/*
+test:*foundation/multimodalinput/input/service/window_manager/test/*
