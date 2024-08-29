@@ -29,7 +29,6 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "app_debug_listener.h"
-#include "app_mgr_client.h"
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
 #include "dfx_define.h"
@@ -64,7 +63,6 @@
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
-#include "running_process_info.h"
 #include "timer_manager.h"
 #include "tokenid_kit.h"
 #include "touch_event_normalize.h"
@@ -87,6 +85,11 @@
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    #include "app_mgr_client.h"
+    #include "running_process_info.h"
+    constexpr int32_t DEFAULT_USER_ID { 100 };
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 namespace OHOS {
 namespace MMI {
@@ -110,7 +113,6 @@ constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
-constexpr int32_t DEFAULT_USER_ID { 100 };
 const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
@@ -543,29 +545,31 @@ int32_t MMIService::RemoveInputEventFilter(int32_t filterId)
 void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
-    #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName == SHELL_ASSISTANT) {
-        auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
-        if ( appMgrClient != nullptr) {
-            int32_t userid = WIN_MGR->GetCurrentUserId();
-            if (userid < 0) {
-                userid = DEFAULT_USER_ID;
-            }
-            std::vector<AppExecFwk::RunningProcessInfo> info;
-            appMgrClient->GetProcessRunningInfosByUserId(info, userid);
-            for(auto &item : info) {
-                if (item.bundleNames.empty()){
-                    continue;
-                }
-                if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
-                    MMI_HILOGW("record client processes pid %{public}d", item.pid_);
-                    shellAssitentPid_ = item.pid_;
-                }
-            }
+    MMI_HILOGI("fd:%{public}d", s->GetFd());
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (s->GetProgramName != SHELL_ASSISTANT) {
+        return;
+    }
+    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    if (appMgrClient == nullptr) {
+        return;
+    }
+    int32_t userid = WIN_MGR->GetCurrentUserId();
+    if (userid < 0) {
+        userid = DEFAULT_USER_ID;
+    }
+    std::vector<AppExecFwk::RunningProcessInfo> info;
+    appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+    for (auto &item : info) {
+        if (item.bundleNames.empty()) {
+            continue;
+        }
+        if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
+            MMI_HILOGW("record client processes pid %{public}d", item.pid_);
+            shellAssitentPid_ = item.pid_;
         }
     }
-    #endif // OHOS_BUILD_ENABLE_ANCO
-    MMI_HILOGI("fd:%{public}d", s->GetFd());
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
