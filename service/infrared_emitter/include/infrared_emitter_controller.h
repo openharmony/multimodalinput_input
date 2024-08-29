@@ -16,6 +16,9 @@
 #ifndef INFRARED_EMMITTER_CONTROLLER_H
 #define INFRARED_EMMITTER_CONTROLLER_H
 
+#include <memory>
+#include <mutex>
+
 #include "nocopyable.h"
 #include "infrared_emitter_def.h"
 
@@ -45,6 +48,7 @@ private:
     static InfraredEmitterController *instance_;
     ConsumerIr *irInterface_ {nullptr};
     void *soIrHandle_ {nullptr};
+    std::mutex mutex_;
 };
 }
 }
