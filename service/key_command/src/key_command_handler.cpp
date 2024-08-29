@@ -163,10 +163,6 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
     }
-    if (!isKnuckleSwitchConfig_) {
-        CreateStatusConfigObserver(knuckleSwitch_);
-        isKnuckleSwitchConfig_ = true;
-    }
 
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_CANCEL:
@@ -1198,10 +1194,6 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
         ParseRepeatKeyMaxCount();
         isParseMaxCount_ = true;
     }
-    if (!isParseStatusConfig_) {
-        ParseStatusConfigObserver();
-        isParseStatusConfig_ = true;
-    }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP) {
         lastVolumeDownActionTime_ = key->GetActionTime();
     }
@@ -1250,6 +1242,18 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     repeatKeyCountMap_.clear();
     isDownStart_ = false;
     return false;
+}
+
+void KeyCommandHandler::InitKeyObserver()
+{
+    if (!isParseStatusConfig_) {
+        ParseStatusConfigObserver();
+        isParseStatusConfig_ = true;
+    }
+    if (!isKnuckleSwitchConfig_) {
+        CreateStatusConfigObserver(knuckleSwitch_);
+        isKnuckleSwitchConfig_ = true;
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
