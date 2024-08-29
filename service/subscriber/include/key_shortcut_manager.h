@@ -81,8 +81,8 @@ public:
     void UnregisterHotKey(int32_t shortcutId);
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     void ResetAll();
-    bool IsModifier(int32_t keyCode) const;
     void ResetCheckState();
+    bool IsCheckUpShortcut();
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys);
 
     bool HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
@@ -129,6 +129,7 @@ private:
     std::string FormatModifiers(const std::set<int32_t> &modifiers) const;
     int32_t GenerateId() const;
     bool IsExceptionalSystemKey(const ExceptionalSystemKey &sysKey) const;
+    bool IsModifier(int32_t keyCode) const;
     bool CheckSystemKey(const SystemShortcutKey &key, KeyShortcut &shortcut) const;
     bool IsValid(const ShortcutTriggerType triggerType) const;
     bool IsReservedSystemKey(const KeyShortcut &shortcut) const;

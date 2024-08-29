@@ -864,6 +864,15 @@ void KeyShortcutManager::ResetCheckState()
     isCheckShortcut_ = true;
 }
 
+bool KeyShortcutManager::IsCheckUpShortcut()
+{
+    if (isCheckShortcut_) {
+        isCheckShortcut_ = false;
+        return true;
+    }
+    return false;
+}
+
 int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
 {
     CALL_DEBUG_ENTER;
@@ -878,11 +887,7 @@ int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyO
 
 bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (isCheckShortcut_) {
-        isCheckShortcut_ = false;
-        return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
-    }
-    return true;
+    return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
 }
 
 void KeyShortcutManager::UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
