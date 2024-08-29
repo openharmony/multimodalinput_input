@@ -81,6 +81,10 @@
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
 
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "input_screen_capture_agent.h"
+#endif // PLAYER_FRAMEWORK_EXISTS
+
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
@@ -391,11 +395,6 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
-#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
-    MMI_HILOGI("Add system ability listener start");
-    AddSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
-    MMI_HILOGI("Add system ability listener end");
-#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -437,9 +436,6 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
-#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
-    RemoveSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
-#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1290,6 +1286,11 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
     uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    if (!PER_HELPER->VerifySystemApp() && handlerType == InputHandlerType::MONITOR) {
+        RegisterScreenCaptureCallback();
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -1574,14 +1575,25 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
-    if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
-        auto monitorHandler = InputHandler->GetMonitorHandler();
-        CHKPV(monitorHandler);
-        monitorHandler->RegisterScreenCaptureListener();
-    }
-#endif
 }
+
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+void MMIService::ScreenCaptureCallback(int32_t pid, bool isStart)
+{
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPV(monitorHandler);
+    monitorHandler->ProcessScreenCapture(pid, isStart);
+}
+
+void MMIService::RegisterScreenCaptureCallback()
+{
+    if (hasRegisterListener_) {
+        return;
+    }
+    InputScreenCaptureAgent::GetInstance().RegisterListener(ScreenCaptureCallback);
+    hasRegisterListener_ = true;
+}
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {

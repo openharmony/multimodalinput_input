@@ -170,6 +170,10 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    static void ScreenCaptureCallback(int32_t pid, bool isStart);
+    void RegisterScreenCaptureCallback();
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
@@ -273,6 +277,9 @@ private:
     };
     std::map<std::string, ClientInfo> clientInfos_;
     std::mutex mutex_;
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    bool hasRegisterListener_ { false };
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 };
 } // namespace MMI
 } // namespace OHOS
