@@ -30,8 +30,8 @@
 #include "pixel_map.h"
 #include "time_cost_chk.h"
 #ifdef PLAYER_FRAMEWORK_EXISTS
-#include "screen_capture_monitor.h"
-#endif
+#include "input_screen_capture_agent.h"
+#endif // PLAYER_FRAMEWORK_EXISTS
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -1162,8 +1162,8 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     if (!PER_HELPER->VerifySystemApp()) {
         if (handlerType == InputHandlerType::MONITOR) {
 #ifdef PLAYER_FRAMEWORK_EXISTS
-            int pid = GetCallingPid();
-            int capturePid = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+            int32_t pid = GetCallingPid();
+            int32_t capturePid = InputScreenCaptureAgent::GetInstance().IsScreenCaptureWorking();
             if (capturePid != pid) {
                 MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
                 return ERROR_NO_PERMISSION;

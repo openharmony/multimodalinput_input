@@ -79,6 +79,7 @@ group("multimodalinput_mmi_service") {
   deps = [
     "service:libmmi-server",
     "tools/inject_event:uinput",
+    "util/screen_capture:libmmi-screen_capture",
   ]
 }
 
