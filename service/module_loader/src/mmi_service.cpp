@@ -2840,10 +2840,7 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
                 return sMsgHandler_.OnTransferBinderClientSrv(binderClientObject, pid);
             }
         );
-    if (ret != RET_OK) {
-        MMI_HILOGE("TransferBinderClientSrv failed:%{public}d", ret);
-    }
-    MMI_HILOGE("TransferBinderClientSrv result:%{public}d", execRet);
+    MMI_HILOGI("TransferBinderClientSrv result:%{public}d", ret);
     return ret;
 }
 
