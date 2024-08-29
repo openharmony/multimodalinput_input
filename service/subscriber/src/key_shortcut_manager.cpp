@@ -859,6 +859,20 @@ void KeyShortcutManager::ResetAll()
     triggering_.clear();
 }
 
+void KeyShortcutManager::ResetCheckState()
+{
+    isCheckShortcut_ = true;
+}
+
+bool KeyShortcutManager::IsCheckUpShortcut()
+{
+    if (isCheckShortcut_) {
+        isCheckShortcut_ = false;
+        return true;
+    }
+    return false;
+}
+
 int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
 {
     CALL_DEBUG_ENTER;
@@ -892,6 +906,7 @@ void KeyShortcutManager::MarkShortcutConsumed(const ShortcutKey &shortcut)
     if (shortcut.triggerType == KeyEvent::KEY_ACTION_DOWN) {
         shortcutConsumed_.emplace(shortcut.finalKey);
     }
+    isCheckShortcut_ = false;
 }
 
 void KeyShortcutManager::MarkShortcutConsumed(const KeyOption &shortcut)
@@ -908,6 +923,7 @@ void KeyShortcutManager::MarkShortcutConsumed(const KeyOption &shortcut)
     shortcutConsumed_.erase(KeyEvent::KEYCODE_VOLUME_UP);
     shortcutConsumed_.erase(KeyEvent::KEYCODE_VOLUME_DOWN);
     shortcutConsumed_.erase(KeyEvent::KEYCODE_POWER);
+    isCheckShortcut_ = false;
 }
 
 void KeyShortcutManager::ResetTriggering(std::shared_ptr<KeyEvent> keyEvent)
