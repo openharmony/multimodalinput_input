@@ -313,7 +313,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) &&
          (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) &&
          (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_DOWN))) {
-        return RET_OK;
+             return RET_OK;
     }
     PointerEvent::PointerItem pointerItem {};
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
