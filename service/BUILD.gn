@@ -467,7 +467,10 @@ ohos_unittest("EventFilterDeathRecipientTest") {
 ohos_unittest("EventFilterHandlerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${mmi_path}/service/filter/include" ]
+  include_dirs = [
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/filter/test",
+  ]
 
   configs = [ ":libmmi_server_config" ]
 
@@ -481,6 +484,9 @@ ohos_unittest("EventFilterHandlerTest") {
     "${mmi_path}/service/filter/src/event_filter_handler.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_ex_test.cpp",
     "${mmi_path}/service/filter/test/event_filter_handler_test.cpp",
+    "${mmi_path}/service/filter/src/event_filter_proxy.cpp",
+    "${mmi_path}/service/filter/test/event_filter_proxy_test.cpp",
+    "${mmi_path}/service/filter/test/message_parcel_mock.cpp",
     "${mmi_path}/service/filter/test/mock.cpp",
   ]
 
