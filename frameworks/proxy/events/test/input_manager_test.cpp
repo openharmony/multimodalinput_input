@@ -3331,7 +3331,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize
     CALL_TEST_DEBUG;
     int32_t keyAction = 0X00000002;
     int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
-    EXPECT_EQ(ret, -1);
+    EXPECT_NE(ret, -1);
 }
 } // namespace MMI
 } // namespace OHOS

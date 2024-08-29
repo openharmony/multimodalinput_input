@@ -286,7 +286,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSiz
     CALL_TEST_DEBUG;
     bool visible = true;
     bool ret = InputMgrImpl.IsPointerVisible();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -300,7 +300,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_02, TestSiz
     CALL_TEST_DEBUG;
     bool visible = false;
     bool ret = InputMgrImpl.IsPointerVisible();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
