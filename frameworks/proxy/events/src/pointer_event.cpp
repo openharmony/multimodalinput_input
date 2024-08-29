@@ -565,6 +565,8 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::TOUCH_ACTION_SWIPE_RIGHT, "touch-swipe-right" },
     { PointerEvent::TOUCH_ACTION_PINCH_OPENED, "touch-pinch-open" },
     { PointerEvent::TOUCH_ACTION_PINCH_CLOSEED, "touch-pinch-close" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
 };
 
 const char* PointerEvent::DumpPointerAction() const
