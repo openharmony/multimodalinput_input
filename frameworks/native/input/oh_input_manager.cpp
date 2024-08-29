@@ -84,7 +84,6 @@ static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
 static constexpr size_t PRE_KEYS_SIZE { 2 };
 static constexpr size_t KEYS_SIZE { 3 };
-static int32_t MICROSECONDS = 1000;
 static std::mutex g_hotkeyCountsMutex;
 static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
 static constexpr int32_t INVALID_MONITOR_ID = -1;
@@ -1884,70 +1883,43 @@ static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
     return INPUT_SUCCESS;
 }
 
-static bool CheckHotkeyAction(bool isFinalKeydown, int32_t keyAction)
+static bool CheckHotkey(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, std::string &hotkeyEventName)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("isFinalKeydown:%{public}d, keyAction:%{public}d", isFinalKeydown, keyAction);
-    if (isFinalKeydown && keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
-        return true;
-    }
-    if (!isFinalKeydown && keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
-        return true;
-    }
-    MMI_HILOGE("isFinalKeydown not matched with keyAction");
-    return false;
-}
-
-static bool CheckHotkey(Input_HotkeyInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPF(monitorInfo);
     CHKPF(keyEvent);
-    auto keyOption = monitorInfo->keyOption;
-    CHKPF(keyOption);
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
-    int32_t infoFinalKey = keyOption->GetFinalKey();
+
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
-    bool isFinalKeydown = keyOption->IsFinalKeyDown();
-    MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
-    if (infoFinalKey != keyEventFinalKey || items.size() > KEYS_SIZE ||
-        !CheckHotkeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
+    if (items.size() > KEYS_SIZE || keyEvent->GetKeyAction() != OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
         MMI_HILOGD("Param invalid");
         return false;
     }
-    std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
-    int32_t infoSize = 0;
-    for (auto it = infoPreKeys.begin(); it != infoPreKeys.end(); ++it) {
-        if (*it >= 0) {
-            infoSize++;
-        }
-    }
-    int32_t count = 0;
+
+    bool isFinalKeyDown = true;
+    int32_t keyDownDuration = 0;
+    std::string hotkeyName = "";
+    bool isRepeat = keyEvent->IsRepeat();
+    std::set<int32_t> presskeys;
     for (const auto &item : items) {
-        if (item.GetKeyCode() == keyEventFinalKey) {
+        presskeys.insert(item.GetKeyCode());
+    }
+    for (const auto &item : presskeys) {
+        if (item == keyEventFinalKey) {
             continue;
         }
-        auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), item.GetKeyCode());
-        if (iter == infoPreKeys.end()) {
-            MMI_HILOGW("No keyCode in preKeys");
-            return false;
-        }
-        count++;
+        hotkeyName += std::to_string(item);
+        hotkeyName += ",";
     }
-    MMI_HILOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
-    std::optional<OHOS::MMI::KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
-    if (!keyItem) {
-        MMI_HILOGE("The keyItem is nullopt");
-        return false;
-    }
-    auto downTime = keyItem->GetDownTime();
-    auto upTime = keyEvent->GetActionTime();
-    auto curDurationTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * MICROSECONDS))) {
-        MMI_HILOGE("Skip, upTime - downTime >= duration");
-        return false;
-    }
-    return count == infoSize;
+    hotkeyName += std::to_string(keyEventFinalKey);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isFinalKeyDown);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(keyDownDuration);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isRepeat);
+    hotkeyEventName = hotkeyName;
+    MMI_HILOGD("hotkeyEventName:%{public}s", hotkeyEventName.c_str());
+    return true;
 }
 
 static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
@@ -1986,18 +1958,14 @@ static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     std::lock_guard guard(g_CallBacksMutex);
-    auto iter = g_callbacks.begin();
-    while (iter != g_callbacks.end()) {
-        auto &list = iter->second;
-        ++iter;
+    std::string hotkeyEventName = "";
+    if (CheckHotkey(keyEvent, hotkeyEventName)) {
+        auto list = g_callbacks[hotkeyEventName];
         MMI_HILOGD("list size:%{public}zu", list.size());
-        auto infoIter = list.begin();
-        while (infoIter != list.end()) {
-            auto monitorInfo = *infoIter;
-            if (CheckHotkey(monitorInfo, keyEvent)) {
-                OnNotifyCallbackWorkResult(monitorInfo);
+        for (const auto &info : list) {
+            if (info->hotkeyId == hotkeyEventName) {
+                OnNotifyCallbackWorkResult(info);
             }
-            ++infoIter;
         }
     }
 }
