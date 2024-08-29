@@ -546,11 +546,11 @@ void MMIService::OnConnected(SessionPtr s)
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
     int32_t userid = WIN_MGR->GetCurrentUserId();
     std::vector<AppExecFwk::RunningProcessInfo> info;
-    appMgrClient->GetProcessRunningInfoByUserId(info, userid);
+    appMgrClient->GetProcessRunningInfosByUserId(info, userid);
     for(auto &item : info) {
         if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
-            MMI_HILOGW("recond client process pid %{public}d", item.pid_);
-            shellAssistentPid_ = item.pid_;
+            MMI_HILOGW("record client processes pid %{public}d", item.pid_);
+            shellAssitentPid_ = item.pid_;
         }
     }
     #endif // OHOS_BUILD_ENABLE_ANCO
@@ -566,8 +566,9 @@ void MMIService::OnDisconnected(SessionPtr s)
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName() == SHELL_ASSISTANT && shellAssistentPid_ == s->GetPid()) {
-        MMI_HILOGW("clean all shell windows because of %{public}s, pid: %{public}d", s->GetProgramName().c_str(), s->Getpid());
+    if (s->GetProgramName() == SHELL_ASSISTANT && shellAssitentPid_ == s->GetPid()) {
+        MMI_HILOGW("clean all shell windows pid: %{public}d", s->GetPid());
+        shellAssitentPid_ = -1;
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
     }
 #endif // OHOS_BUILD_ENABLE_ANCO

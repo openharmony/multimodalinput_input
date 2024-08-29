@@ -256,7 +256,7 @@ private:
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    int32_t shellAssistentPid_ { -1 };
+    int32_t shellAssitentPid_ { -1 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
