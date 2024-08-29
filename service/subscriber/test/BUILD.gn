@@ -87,10 +87,6 @@ ohos_unittest("key_shortcut_manager_test") {
     "preferences:native_preferences",
     "window_manager:libwm_lite",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("key_shortcut_rules_test") {

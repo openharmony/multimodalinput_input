@@ -48,10 +48,6 @@ ohos_unittest("CrownTransformProcessorTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("CrownTransformProcessorExTest") {
@@ -89,8 +85,4 @@ ohos_unittest("CrownTransformProcessorExTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
