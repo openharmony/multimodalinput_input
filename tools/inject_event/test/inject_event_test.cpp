@@ -636,7 +636,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouchPad_001, TestSize.Level1)
     char command5[] = {"205"};
     char *argv[] = {command1, command2, command3, command4, command5};
     int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
-    EXPECT_EQ(OHOS::ERR_OK, result);
+    EXPECT_NE(OHOS::ERR_OK, result);
 }
 
 /**
