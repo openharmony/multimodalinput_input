@@ -36,6 +36,7 @@ InfraredEmitterController::InfraredEmitterController() {}
 InfraredEmitterController::~InfraredEmitterController()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     irInterface_ = nullptr;
     if (soIrHandle_ != nullptr) {
         dlclose(soIrHandle_);
@@ -45,6 +46,7 @@ InfraredEmitterController::~InfraredEmitterController()
 
 InfraredEmitterController *InfraredEmitterController::GetInstance()
 {
+    std::lock_guard<std::mutex> guard(mutex_);
     return instance_;
 }
 
@@ -90,6 +92,7 @@ void InfraredEmitterController::InitInfraredEmitter()
 bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<int64_t> pattern)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     CHKPF(irInterface_);
     int32_t tempCarrierFreq = carrierFreq;
@@ -118,6 +121,7 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
 bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo> &frequencyInfo)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     InitInfraredEmitter();
     if (!irInterface_) {
         MMI_HILOGE("Infrared emitter not init");
