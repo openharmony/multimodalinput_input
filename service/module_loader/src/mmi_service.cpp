@@ -110,6 +110,7 @@ constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 constexpr size_t MAX_FRAME_NUMS { 100 };
 constexpr int32_t THREAD_BLOCK_TIMER_SPAN_S { 3 };
 constexpr int32_t PRINT_INTERVAL_TIME { 30000 };
+constexpr int32_t DEFAULT_USER_ID { 100 };
 const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_FN, KeyEvent::KEYCODE_DPAD_UP, KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::KEYCODE_DPAD_LEFT,
     KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT,
@@ -543,14 +544,24 @@ void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
     #ifdef OHOS_BUILD_ENABLE_ANCO
-    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
-    int32_t userid = WIN_MGR->GetCurrentUserId();
-    std::vector<AppExecFwk::RunningProcessInfo> info;
-    appMgrClient->GetProcessRunningInfosByUserId(info, userid);
-    for(auto &item : info) {
-        if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
-            MMI_HILOGW("record client processes pid %{public}d", item.pid_);
-            shellAssitentPid_ = item.pid_;
+    if (s->GetProgramName == SHELL_ASSISTANT) {
+        auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+        if ( appMgrClient != nullptr) {
+            int32_t userid = WIN_MGR->GetCurrentUserId();
+            if (userid < 0) {
+                userid = DEFAULT_USER_ID;
+            }
+            std::vector<AppExecFwk::RunningProcessInfo> info;
+            appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+            for(auto &item : info) {
+                if (item.bundleNames.empty()){
+                    continue;
+                }
+                if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
+                    MMI_HILOGW("record client processes pid %{public}d", item.pid_);
+                    shellAssitentPid_ = item.pid_;
+                }
+            }
         }
     }
     #endif // OHOS_BUILD_ENABLE_ANCO
