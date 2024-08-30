@@ -277,10 +277,9 @@ typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, int32_t type);
 /**
  * @brief 回调函数，用于回调输入设备的下线事件。
  * @param deviceId 设备的id。
- * @param type 有关输入设备的能力信息，比如设备是触摸屏、触控板、键盘等;
  * @since 13
  */
-typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, int32_t type);
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId);
 
 /**
  * @brief Defines the structure for the interceptor of event callbacks,

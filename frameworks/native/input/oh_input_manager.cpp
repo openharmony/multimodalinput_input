@@ -2167,12 +2167,6 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 
 static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 {
-    int32_t deviceType = 0;
-    OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
-        [&deviceType](std::shared_ptr<OHOS::MMI::InputDevice> DeviceInfo){
-            deviceType = DeviceInfo->GetType();
-            return;
-        });
     for (auto listener : g_ohDeviceListenerList) {
         if (listener == nullptr){
             MMI_HILOGE("listener is nullptr");
@@ -2182,7 +2176,7 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
             MMI_HILOGE("OnDeviceRemoved is nullptr");
             continue;
         }
-        listener->OnDeviceRemoved(deviceId, deviceType);
+        listener->OnDeviceRemoved(deviceId);
     }
 }
 
