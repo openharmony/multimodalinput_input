@@ -2150,7 +2150,7 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(g_DeviceListerCallbackMutex);
     for (auto listener : g_ohDeviceListenerList) {
-        if (listener == nullptr){
+        if (listener == nullptr) {
             MMI_HILOGE("listener is nullptr");
             continue;
         }
@@ -2167,7 +2167,7 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(g_DeviceListerCallbackMutex);
     for (auto listener : g_ohDeviceListenerList) {
-        if (listener == nullptr){
+        if (listener == nullptr) {
             MMI_HILOGE("listener is nullptr");
             continue;
         }
@@ -2180,7 +2180,7 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 }
 
 Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
-{   
+{
     CALL_DEBUG_ENTER;
     if (listener == nullptr) {
         MMI_HILOGE("listener is null");
