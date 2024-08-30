@@ -230,28 +230,6 @@ typedef enum Input_Result {
 } Input_Result;
 
 /**
- * @brief 设备类型的枚举
- *
- * @since 13
- */
-typedef enum Input_DeviceType {
-    /** 设备类型未知 */
-    INPUT_DEVICE_TYPE_UNKNOWN = 0,
-    /** 设备类型键盘 */
-    INPUT_DEVICE_TYPE_KEYBOARD,
-    /** 设备类型鼠标 */
-    INPUT_DEVICE_TYPE_MOUSE,
-    /** 设备类型触摸板 */
-    INPUT_DEVICE_TYPE_TOUCHPAD,
-    /** 设备类型触屏 */
-    INPUT_DEVICE_TYPE_TOUCHSCREEN,
-    /** 设备类型摇杆 */
-    INPUT_DEVICE_TYPE_JOYSTICK,
-    /** 设备类型轨迹球 */
-    INPUT_DEVICE_TYPE_TRACKBALL,
-} Input_DeviceType;
-
-/**
  * @brief Defines the hot key structure.
  *
  * @since 13
@@ -289,22 +267,20 @@ typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
 
 /**
- * @brief 回调函数，用于回调输入设备的上线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
+ * @brief 回调函数，用于回调输入设备的上线事件。
  * @param deviceId 设备的id。
- * @param deviceTypes 设备类型的数组。
- * @param length 设备类型数组的长度。
+ * @param type 有关输入设备的能力信息，比如设备是触摸屏、触控板、键盘等;
  * @since 13
  */
-typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, int32_t* deviceTypes, int32_t length);
+typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, int32_t type);
 
 /**
- * @brief 回调函数，用于回调输入设备的下线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
+ * @brief 回调函数，用于回调输入设备的下线事件。
  * @param deviceId 设备的id。
- * @param deviceTypes 设备类型的数组。
- * @param length 设备类型数组的长度。
+ * @param type 有关输入设备的能力信息，比如设备是触摸屏、触控板、键盘等;
  * @since 13
  */
-typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, int32_t* deviceTypes, int32_t length);
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, int32_t type);
 
 /**
  * @brief Defines the structure for the interceptor of event callbacks,
@@ -1374,11 +1350,11 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
 
 /**
- * @brief 按键键值转换成字符串
+ * @brief 将按键值{@Link Input_KeyCode}转换为字符串描述
  *
- * @param keyCode 要转成字符串的按键键值
+ * @param keyCode 按键值{@Link Input_KeyCode}
 
- * @return 如果返回一个字符串则表示成功，如果返回NULL则表示失败。
+ * @return 成功时返回按键值的字符串描述，失败时返回NULL，可能的原因是传入非法的键值。
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
@@ -1387,11 +1363,11 @@ const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode);
 /**
  * @brief 注册设备热插拔的监听器
  *
- * @param listener 指向监听设备热插拔的监听器的指针.
+ * @param listener 指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
  *
  * @return OH_Input_RegisterDeviceListener 的返回值, 具体如下:
  *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为NULL 或 listener 已被注册
+ *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
  *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
@@ -1399,18 +1375,29 @@ const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode);
 Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
 
 /**
- * @brief 取消注册设备热插拔的监听器
+ * @brief 取消注册设备热插拔的监听
  *
- * @param listener 指向监听设备热插拔的监听器的指针.
+ * @param listener  指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
  *
  * @return OH_Input_UnregisterDeviceListener 的返回值, 具体如下:
  *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL, listener 未注册或已被取消注册
+ *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL 或者 listener 未被注册
  *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
+
+/**
+ * @brief 取消注册所有的设备热插拔的监听
+ *
+ * @return OH_Input_UnregisterDeviceListeners 的返回值, 具体如下:
+ *         {@link INPUT_SUCCESS} 调用成功;\n
+ *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListeners();
 
 void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
 
