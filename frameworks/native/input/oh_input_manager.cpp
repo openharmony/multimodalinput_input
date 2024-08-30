@@ -73,9 +73,17 @@ struct Input_AxisEvent {
     int32_t axisEventType { -1 };
 };
 
+struct Input_HotkeyInfo {
+    int32_t subscribeId;
+    std::string hotkeyId;
+    Input_HotkeyCallback callback { nullptr };
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption { nullptr };
+};
+
 struct Input_Hotkey {
     std::set<int32_t> preKeys {};
     int32_t finalKey { -1 };
+    bool isRepeat { true };
 };
 
 struct DeviceType {
@@ -84,6 +92,12 @@ struct DeviceType {
 };
 
 std::mutex g_hotkeyCountsMutex;
+typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
+static Callbacks g_callbacks = {};
+static std::mutex g_CallBacksMutex;
+static constexpr size_t PRE_KEYS_SIZE { 2 };
+static constexpr size_t KEYS_SIZE { 3 };
+static std::mutex g_hotkeyCountsMutex;
 static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
 static constexpr int32_t INVALID_MONITOR_ID = -1;
 static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
@@ -133,6 +147,25 @@ static const DeviceType g_deviceType[] = {
     { INPUT_DEVICE_TYPE_TOUCHSCREEN, DEVICE_TYPE_TOUCHSCREEN },
     { INPUT_DEVICE_TYPE_JOYSTICK, DEVICE_TYPE_JOYSTICK },
     { INPUT_DEVICE_TYPE_TRACKBALL, DEVICE_TYPE_TRACKBALL },
+};
+
+static const std::vector<int32_t> g_pressKeyCodes = {
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT
+};
+static const std::vector<int32_t> g_finalKeyCodes = {
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_META_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_META_RIGHT
 };
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
@@ -1902,6 +1935,253 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
     return INPUT_SUCCESS;
 }
 
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    hotkey->isRepeat  = isRepeat;
+    return;
+}
+
+Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(isRepeat, INPUT_PARAMETER_ERROR);
+    *isRepeat = hotkey->isRepeat;
+    return INPUT_SUCCESS;
+}
+
+std::string GetHotkeyName(std::set<int32_t> preKeys, int32_t finalKey, bool isRepeat,
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+{
+    bool isFinalKeyDown = true;
+    int32_t keyDownDuration = 0;
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(finalKey);
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    keyOption->SetFinalKeyDownDuration(keyDownDuration);
+    keyOption->SetRepeat(isRepeat);
+    std::string hotkeyName = "";
+    for (const auto &item : preKeys) {
+        hotkeyName += std::to_string(item);
+        hotkeyName += ",";
+    }
+    hotkeyName += std::to_string(finalKey);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isFinalKeyDown);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(keyDownDuration);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isRepeat);
+    return hotkeyName;
+}
+
+static int32_t MakeHotkeyInfo(const Input_Hotkey* hotkey, Input_HotkeyInfo* hotkeyInfo,
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(keyOption, INPUT_PARAMETER_ERROR);
+
+    if (hotkey->preKeys.empty()) {
+        MMI_HILOGE("pressedKeys not found");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::set<int32_t> preKeys = hotkey->preKeys;
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_HILOGE("preKeys size invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
+    for (const auto &item : preKeys) {
+        auto it = std::find(g_pressKeyCodes.begin(), g_pressKeyCodes.end(), item);
+        if (it == g_pressKeyCodes.end()) {
+            MMI_HILOGE("preKeys expect:{ctrl alt shift}");
+            return INPUT_PARAMETER_ERROR;
+        }
+    }
+
+    int32_t finalKey = hotkey->finalKey;
+    if (finalKey < 0) {
+        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto it = std::find(g_finalKeyCodes.begin(), g_finalKeyCodes.end(), finalKey);
+    if (it != g_finalKeyCodes.end()) {
+        MMI_HILOGE("finalKey cannot be {ctrl alt shift logo}");
+        return INPUT_PARAMETER_ERROR;
+    }
+
+    bool isRepeat = hotkey->isRepeat;
+    std::string hotkeyName = GetHotkeyName(preKeys, finalKey, isRepeat, keyOption);
+    hotkeyInfo->hotkeyId = hotkeyName;
+    MMI_HILOGD("hotkeyInfo->hotkeyId:%{public}s", hotkeyInfo->hotkeyId.c_str());
+    return INPUT_SUCCESS;
+}
+
+static int32_t GetSubscribeId(Input_HotkeyInfo* hotkeyInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+
+    auto it = g_callbacks.find(hotkeyInfo->hotkeyId);
+    if (it == g_callbacks.end() || it->second.empty()) {
+        MMI_HILOGD("The callbacks is empty");
+        return INPUT_PARAMETER_ERROR;
+    }
+
+    CHKPR(it->second.front(), INPUT_PARAMETER_ERROR);
+    return it->second.front()->subscribeId;
+}
+
+static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+    if (g_callbacks.find(hotkeyInfo->hotkeyId) == g_callbacks.end()) {
+        MMI_HILOGD("No callback in %{public}s", hotkeyInfo->hotkeyId.c_str());
+        g_callbacks[hotkeyInfo->hotkeyId] = {};
+    }
+    auto it = g_callbacks.find(hotkeyInfo->hotkeyId);
+    if (it != g_callbacks.end()) {
+        for (const auto &iter: it->second) {
+            if (iter->callback == hotkeyInfo->callback) {
+                MMI_HILOGI("Callback already exist");
+                return INPUT_SUCCESS;
+            }
+        }
+    }
+    it->second.push_back(hotkeyInfo);
+    return INPUT_SUCCESS;
+}
+
+static bool CheckHotkey(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, std::string &hotkeyEventName)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+
+    int32_t keyEventFinalKey = keyEvent->GetKeyCode();
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
+    if (items.size() > KEYS_SIZE || keyEvent->GetKeyAction() != OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        MMI_HILOGD("Param invalid");
+        return false;
+    }
+
+    bool isFinalKeyDown = true;
+    int32_t keyDownDuration = 0;
+    std::string hotkeyName = "";
+    bool isRepeat = keyEvent->IsRepeat();
+    std::set<int32_t> presskeys;
+    for (const auto &item : items) {
+        presskeys.insert(item.GetKeyCode());
+    }
+    for (const auto &item : presskeys) {
+        if (item == keyEventFinalKey) {
+            continue;
+        }
+        hotkeyName += std::to_string(item);
+        hotkeyName += ",";
+    }
+    hotkeyName += std::to_string(keyEventFinalKey);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isFinalKeyDown);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(keyDownDuration);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isRepeat);
+    hotkeyEventName = hotkeyName;
+    MMI_HILOGD("hotkeyEventName:%{public}s", hotkeyEventName.c_str());
+    return true;
+}
+
+static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(reportEvent);
+
+    Input_HotkeyInfo *info = new(std::nothrow) Input_HotkeyInfo();
+    if (info == nullptr) {
+        MMI_HILOGE("info is null");
+        return;
+    }
+    info->keyOption = reportEvent->keyOption;
+    if (info->keyOption == nullptr) {
+        delete info;
+        MMI_HILOGE("keyOption is null");
+        return;
+    }
+    info->callback = reportEvent->callback;
+    if (info->callback == nullptr) {
+        delete info;
+        MMI_HILOGE("callback is null");
+        return;
+    }
+
+    Input_Hotkey hotkey;
+    hotkey.preKeys = info->keyOption->GetPreKeys();
+    hotkey.finalKey = info->keyOption->GetFinalKey();
+    hotkey.isRepeat = info->keyOption->IsRepeat();
+    info->callback(&hotkey);
+    delete info;
+}
+
+static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::lock_guard guard(g_CallBacksMutex);
+    std::string hotkeyEventName = "";
+    if (CheckHotkey(keyEvent, hotkeyEventName)) {
+        auto list = g_callbacks[hotkeyEventName];
+        MMI_HILOGD("list size:%{public}zu", list.size());
+        for (const auto &info : list) {
+            if (info->hotkeyId == hotkeyEventName) {
+                OnNotifyCallbackWorkResult(info);
+            }
+        }
+    }
+}
+
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_CallBacksMutex);
+
+    Input_HotkeyInfo *hotkeyInfo = new (std::nothrow) Input_HotkeyInfo();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("MakeHotkeyInfo failed");
+        return INPUT_PARAMETER_ERROR;
+    }
+    hotkeyInfo->keyOption = keyOption;
+    hotkeyInfo->callback = callback;
+    int32_t preSubscribeId = GetSubscribeId(hotkeyInfo);
+    if (preSubscribeId == INPUT_PARAMETER_ERROR) {
+        MMI_HILOGD("hotkeyId:%{public}s", hotkeyInfo->hotkeyId.c_str());
+        int32_t subscribeId = -1;
+        subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, HandleKeyEvent);
+        if (subscribeId < 0) {
+            delete hotkeyInfo;
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+        hotkeyInfo->subscribeId = subscribeId;
+    } else {
+        hotkeyInfo->subscribeId = preSubscribeId;
+    }
+    if (AddHotkeySubscribe(hotkeyInfo) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("AddHotkeySubscribe fail");
+        return INPUT_PARAMETER_ERROR;
+    }
+    return INPUT_SUCCESS;
+}
+
 Input_Result OH_Input_UnregisterDeviceListener()
 {
     if (g_ohDeviceListenerList.empty()) {
@@ -1913,5 +2193,83 @@ Input_Result OH_Input_UnregisterDeviceListener()
         MMI_HILOGE("UnregisterDevListener fail");
         return INPUT_SERVICE_EXCEPTION;
     }
+}
+int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
+    Input_HotkeyCallback callback, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(&infos, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+
+    auto iter = infos.begin();
+    while (iter != infos.end()) {
+        if (*iter == nullptr) {
+            iter = infos.erase(iter);
+            continue;
+        }
+        if (callback == nullptr) {
+            Input_HotkeyInfo *monitorInfo = *iter;
+            infos.erase(iter++);
+            if (infos.empty()) {
+                subscribeId = monitorInfo->subscribeId;
+            }
+            delete monitorInfo;
+            MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
+            continue;
+        }
+        if ((*iter)->callback == callback) {
+            Input_HotkeyInfo *monitorInfo = *iter;
+            iter = infos.erase(iter);
+            if (infos.empty()) {
+                subscribeId = monitorInfo->subscribeId;
+            }
+            delete monitorInfo;
+            MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
+            return INPUT_SUCCESS;
+        }
+        ++iter;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t DelEventCallback(Input_HotkeyInfo* hotkeyInfo, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+    if (g_callbacks.count(hotkeyInfo->hotkeyId) <= 0) {
+        MMI_HILOGE("Callback doesn't exists");
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto &info = g_callbacks[hotkeyInfo->hotkeyId];
+    MMI_HILOGD("EventType:%{public}s, Input_HotkeyInfo:%{public}zu", hotkeyInfo->hotkeyId.c_str(), info.size());
+    return DelHotkeyMonitor(info, hotkeyInfo->callback, subscribeId);
+}
+
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_HotkeyCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_CallBacksMutex);
+
+    Input_HotkeyInfo *hotkeyInfo = new (std::nothrow) Input_HotkeyInfo();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("Get eventInfo failed");
+        return INPUT_PARAMETER_ERROR;
+    }
+    hotkeyInfo->callback = callback;
+    int32_t subscribeId = -1;
+    if (DelEventCallback(hotkeyInfo, subscribeId) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("DelEventCallback failed");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+    if (subscribeId >= 0) {
+        OHOS::MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    }
+    delete hotkeyInfo;
     return INPUT_SUCCESS;
 }

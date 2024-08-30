@@ -220,6 +220,7 @@ public:
     void OnWindowStateError(int32_t pid, int32_t windowId);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+    int32_t ConvertToCapiKeyAction(int32_t keyAction);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

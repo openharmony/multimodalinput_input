@@ -614,7 +614,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CHKPV(keyOption);
     MMI_HILOGD("Notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        NotifyKeyDownRightNow(keyEvent, subscribers,  keyOption->IsRepeat(), handled);
+        NotifyKeyDownRightNow(keyEvent, subscribers, keyOption->IsRepeat(), handled);
     } else {
         NotifyKeyDownDelay(keyEvent, subscribers, handled);
     }
@@ -832,6 +832,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    KEY_SHORTCUT_MGR->ResetCheckState();
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -890,7 +891,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
-    if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent)) {
+    if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent) || !KEY_SHORTCUT_MGR->IsCheckUpShortcut()) {
         return false;
     }
 #endif // SHORTCUT_KEY_RULES_ENABLED

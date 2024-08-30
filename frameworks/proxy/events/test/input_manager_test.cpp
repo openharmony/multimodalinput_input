@@ -3214,6 +3214,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Lev
     ASSERT_EQ(result, RET_OK);
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: InputManagerTest_GetPointerSnapshot
  * @tc.desc: Test GetPointerSnapshot
@@ -3225,6 +3226,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
     void *pixelMap = nullptr;
     EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
  * @tc.name: InputManagerTest_GetIntervalSinceLastInput001
@@ -3317,6 +3319,19 @@ HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level
     isSkip = false;
     ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
     EXPECT_EQ(ret, 305);
+}
+
+/**
+ * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
+ * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyAction = 0X00000002;
+    int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
+    EXPECT_NE(ret, -1);
 }
 } // namespace MMI
 } // namespace OHOS

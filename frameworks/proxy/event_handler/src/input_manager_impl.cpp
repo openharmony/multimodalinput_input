@@ -32,6 +32,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "oh_input_manager.h"
 #include "pixel_map.h"
 #include "switch_event_input_subscribe_manager.h"
 
@@ -50,6 +51,12 @@ constexpr uint8_t LOOP_COND { 2 };
 constexpr int32_t MAX_PKT_SIZE { 8 * 1024 };
 constexpr int32_t WINDOWINFO_RECT_COUNT { 2 };
 constexpr int32_t DISPLAY_STRINGS_MAX_SIZE { 27 * 2 };
+constexpr int32_t INVALID_KEY_ACTION = -1;
+const std::map<int32_t, int32_t> g_keyActionMap = {
+    {KeyEvent::KEY_ACTION_DOWN, KEY_ACTION_DOWN},
+    {KeyEvent::KEY_ACTION_UP, KEY_ACTION_UP},
+    {KeyEvent::KEY_ACTION_CANCEL, KEY_ACTION_CANCEL}
+};
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -372,6 +379,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
@@ -775,7 +783,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 #else
     MMI_HILOGW("Pointer/touchscreen device or monitor function does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR || OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
@@ -2063,7 +2071,7 @@ int32_t InputManagerImpl::GetHardwareCursorStats(uint32_t &frameCount, uint32_t 
 int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 {
     CALL_DEBUG_ENTER;
-#if defined OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MAGICCURSOR)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSnapshot(pixelMapPtr);
     if (ret != RET_OK) {
@@ -2073,7 +2081,7 @@ int32_t InputManagerImpl::GetPointerSnapshot(void *pixelMapPtr)
 #else
     MMI_HILOGW("Pointer device module does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
 int32_t InputManagerImpl::SetTouchpadScrollRows(int32_t rows)
@@ -2425,6 +2433,16 @@ int32_t InputManagerImpl::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOpt
     }
     count = static_cast<int32_t>(keyOptions.size());
     return RET_OK;
+}
+
+int32_t InputManagerImpl::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    auto iter = g_keyActionMap.find(keyAction);
+    if (iter == g_keyActionMap.end()) {
+        MMI_HILOGE("Convert keyAction:%{public}d to capi failed", keyAction);
+        return INVALID_KEY_ACTION;
+    }
+    return iter->second;
 }
 } // namespace MMI
 } // namespace OHOS

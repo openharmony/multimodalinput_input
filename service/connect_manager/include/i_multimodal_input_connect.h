@@ -145,9 +145,12 @@ public:
     virtual int32_t RemoveVirtualInputDevice(int32_t deviceId) = 0;
     virtual int32_t EnableHardwareCursorStats(bool enable) = 0;
     virtual int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) = 0;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr) = 0;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t SetTouchpadScrollRows(int32_t rows) = 0;
     virtual int32_t GetTouchpadScrollRows(int32_t &rows) = 0;
+    virtual int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) = 0;
     virtual int32_t GetIntervalSinceLastInput(int64_t &timeInterval) = 0;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;

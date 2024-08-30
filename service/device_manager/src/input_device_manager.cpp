@@ -51,7 +51,7 @@ constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
-    { ABS_MT_POSITION_X, "POSITION_X" },   { ABS_MT_POSITION_Y, "POSITION_Y" },   { ABS_MT_PRESSURE, "PRESSURE" },
+    { ABS_MT_POSITION_X, "POSITION_X" }, { ABS_MT_POSITION_Y, "POSITION_Y" }, { ABS_MT_PRESSURE, "PRESSURE" },
     { ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR" }, { ABS_MT_WIDTH_MINOR, "WIDTH_MINOR" }
 };
 
@@ -832,7 +832,7 @@ int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std
 
 void InputDeviceManager::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         MMI_HILOGE("Init session is failed");
         return;
     }

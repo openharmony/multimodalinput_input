@@ -240,7 +240,7 @@ HWTEST_F(InputManagerUpdateDisplayInfoTest, InputManagerTest_UpdateDisplayInfoSh
     displayinfo.displayMode = DisplayMode::FULL;
     displayGroupInfo.displaysInfo.push_back(displayinfo);
     std::vector<std::vector<int32_t>> maskSizeMatrix = { { 100, 300 }, { 30, 30 }, { 50, 50 }, { 80, 80 }, { 10, 8 },
-        { 5, 20 },    { 6, 10 },  { 30, 30 }, { 20, 30 }, { 40, 10 } };
+        { 5, 20 }, { 6, 10 }, { 30, 30 }, { 20, 30 }, { 40, 10 } };
     std::vector<std::shared_ptr<OHOS::Media::PixelMap>> vecPixelMap;
     for (uint32_t i = 0; i < maskSizeMatrix.size(); i++) {
         ASSERT_EQ(maskSizeMatrix[i].size(), 2);

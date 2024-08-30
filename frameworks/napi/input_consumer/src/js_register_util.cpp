@@ -82,6 +82,12 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
 std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
 {
     napi_value napiValue = {};
+    bool exist = false;
+    napi_status status = napi_has_named_property(env, object, name.c_str(), &exist);
+    if (status != napi_ok || !exist) {
+        MMI_HILOGD("Can not find %{public}s property", name.c_str());
+        return std::nullopt;
+    }
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
@@ -242,7 +248,8 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     return DelEventCallbackRef(env, info, eventHandler, subscribeId);
 }
 
-static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOption, napi_value &result)
+static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOption, napi_value &result,
+    std::string keyType)
 {
     CHKPV(keyOption);
     MMI_HILOGD("Status > 0 enter");
@@ -260,14 +267,17 @@ static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOptio
     std::string preKeysStr = "preKeys";
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, result, preKeysStr.c_str(), arr));
     MMI::SetNamedProperty(env, result, "finalKey", keyOption->GetFinalKey());
-    MMI::SetNamedProperty(env, result, "isFinalKeyDown", keyOption->IsFinalKeyDown());
-    MMI::SetNamedProperty(env, result, "finalKeyDownDuration", keyOption->GetFinalKeyDownDuration());
+    if (keyType == SUBSCRIBE_TYPE) {
+        MMI::SetNamedProperty(env, result, "isFinalKeyDown", keyOption->IsFinalKeyDown());
+        MMI::SetNamedProperty(env, result, "finalKeyDownDuration", keyOption->GetFinalKeyDownDuration());
+    }
     MMI::SetNamedProperty(env, result, "isRepeat", static_cast<int32_t>(keyOption->IsRepeat()));
 }
 
 struct KeyEventMonitorInfoWorker {
     napi_env env{nullptr};
     napi_ref callback{nullptr};
+    std::string name;
     std::shared_ptr<KeyOption> keyOption{nullptr};
 
     ~KeyEventMonitorInfoWorker()
@@ -321,7 +331,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
         return;
     }
     napi_value result = nullptr;
-    AsyncWorkFn(env, dataWorker->keyOption, result);
+    AsyncWorkFn(env, dataWorker->keyOption, result, dataWorker->name);
     napi_value callResult = nullptr;
     if ((napi_call_function(env, nullptr, callback, 1, &result, &callResult)) != napi_ok) {
         delete dataWorker;
@@ -347,6 +357,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 
     dataWorker->env = reportEvent->env;
     dataWorker->callback = reportEvent->callback;
+    dataWorker->name = reportEvent->name;
     // `callback` is "owned" by `reportEvent`, now `dataWorker` also reference to it, so add refcount.
     // `callback` reference will be released in destructor of `KeyEventMonitorInfo` or `KeyEventMonitorInfoWorker`.
     // it's up to which one has longer lifetime.

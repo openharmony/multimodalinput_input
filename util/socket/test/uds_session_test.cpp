@@ -36,7 +36,7 @@ public:
     int32_t writeFd_ = -1;
     int32_t readFd_ = -1;
     void SetUp() override;
-    void TearDown()  override;
+    void TearDown() override;
 };
 void UDSSessionTest::SetUp()
 {

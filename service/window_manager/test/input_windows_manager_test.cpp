@@ -431,7 +431,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_001, Test
     CALL_TEST_DEBUG;
     int32_t windowId = 100;
     std::vector<WindowInfo> windowsInfo;
-    int32_t ret = WIN_MGR->GetWindowPid(windowId,  windowsInfo);
+    int32_t ret = WIN_MGR->GetWindowPid(windowId, windowsInfo);
     EXPECT_EQ(ret, -1);
 }
 
@@ -3667,7 +3667,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer, TestS
     inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     WindowInfo windowInfo;
     windowInfo.flags = WindowInfo::FLAG_BIT_HANDWRITING;
-    windowInfo.pointerHotAreas.push_back({  100, 0, INT32_MAX, 0 });
+    windowInfo.pointerHotAreas.push_back({ 100, 0, INT32_MAX, 0 });
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(windowInfo);
     inputWindowsManager.lastLogicX_ = 200;
     inputWindowsManager.lastLogicY_ = 200;
@@ -6571,5 +6571,93 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindowInfo_001, 
     ASSERT_EQ(ret, WINDOW_UPDATE_ACTION::ADD);
 }
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
+/**
+ * @tc.name: InputWindowsManagerTest_IgnoreTouchEvent_002
+ * @tc.desc: Test the funcation IgnoreTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IgnoreTouchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EXPECT_FALSE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_FALSE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(10);
+    item.SetLongAxis(-1);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_FALSE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+    pointerEvent->SetPointerId(10);
+    inputWindowsManager.cancelTouchStatus_ = true;
+    EXPECT_TRUE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+    item.SetLongAxis(100);
+    pointerEvent->UpdatePointerItem(10, item);
+    EXPECT_FALSE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+    EXPECT_FALSE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+    item.SetLongAxis(-1);
+    pointerEvent->UpdatePointerItem(10, item);
+    EXPECT_TRUE(inputWindowsManager.IgnoreTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_ReissueCancelTouchEvent
+ * @tc.desc: Test the funcation ReissueCancelTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_ReissueCancelTouchEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    item.SetPointerId(100);
+    item.SetPressed(true);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.ReissueCancelTouchEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPointerEvent
+ * @tc.desc: Test the funcation SetPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetPointerEvent, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_DOWN;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    inputWindowsManager.lastPointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(100);
+    item.SetPressed(true);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    inputWindowsManager.lastPointerEvent_->SetTargetDisplayId(150);
+    inputWindowsManager.lastPointerEvent_->SetPointerId(100);
+    inputWindowsManager.lastPointerEvent_->AddPointerItem(item);
+    inputWindowsManager.lastWindowInfo_.id = 10;
+    inputWindowsManager.mouseDownInfo_.id = 100;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerEvent(pointerAction, pointerEvent));
+    item.SetPressed(false);
+    inputWindowsManager.lastPointerEvent_->UpdatePointerItem(100, item);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SetPointerEvent(pointerAction, pointerEvent));
+}
 } // namespace MMI
 } // namespace OHOS

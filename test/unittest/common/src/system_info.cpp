@@ -128,7 +128,7 @@ int32_t CpuInfo::GetProcOccupy(int32_t pid)
     static const std::string procPath = "/proc/" + std::to_string(pid) + "/stat";
     std::ifstream file(procPath);
     if (!file.is_open()) {
-        MMI_HILOGE("Failed to open path:%{public}s", procPath.c_str());
+        MMI_HILOGE("Failed to open path:%{private}s", procPath.c_str());
         return RET_ERR;
     }
 

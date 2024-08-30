@@ -42,7 +42,7 @@ public:
     // Microseconds per milliseconds.
     static constexpr int64_t US_PER_MS = 1000;
 
-    // Latency added during resampling.  A few milliseconds doesn't hurt much but
+    // Latency added during resampling. A few milliseconds doesn't hurt much but
     // reduces the impact of mispredicted touch positions.
     static constexpr int64_t RESAMPLE_LATENCY = 5 * US_PER_MS;
 
@@ -54,7 +54,7 @@ public:
     static constexpr int64_t RESAMPLE_MAX_DELTA = 20 * US_PER_MS;
 
     // Maximum time to predict forward from the last known state, to avoid predicting too
-    // far into the future.  This time is further bounded by 50% of the last time delta.
+    // far into the future. This time is further bounded by 50% of the last time delta.
     static constexpr int64_t RESAMPLE_MAX_PREDICTION = 4 * US_PER_MS;
 
     // Maximum history size to store samples
