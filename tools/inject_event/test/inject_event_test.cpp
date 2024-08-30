@@ -472,6 +472,66 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_015, TestSize.Level1)
 }
 
 /**
+ * @tc.name:InjectEvent_InjectKey_016
+ * @tc.desc: test inject keyevent of text. Combined commands is not supported.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_016, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-d"};
+    char command4[] = {"2017"};
+    char command5[] = {"-t"};
+    char command6[] = {"abc"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_017
+ * @tc.desc: test inject keyevent of text. Combined commands is not supported.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_017, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc"};
+    char command5[] = {"-d"};
+    char command6[] = {"2017"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
+ * @tc.name:InjectEvent_InjectKey_018
+ * @tc.desc: test inject keyevent of text. Combined commands is not supported.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectKey_018, TestSize.Level1)
+{
+    auto inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-K"};
+    char command3[] = {"-t"};
+    char command4[] = {"abc"};
+    char command5[] = {"-t"};
+    char command6[] = {"def"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6};
+    int32_t result = inputManagerCommand->ParseCommand(sizeof(argv) / sizeof(argv[0]), argv);
+    EXPECT_NE(OHOS::ERR_OK, result);
+}
+
+/**
  * @tc.name:InjectEvent_InjectTouch_001
  * @tc.desc: test inject touch screen smooth movement interface
  * @tc.type: FUNC

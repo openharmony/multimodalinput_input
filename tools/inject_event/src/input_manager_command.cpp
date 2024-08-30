@@ -703,7 +703,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 int64_t time = GetSysClockTime();
+                int32_t count = 0;
+                bool inputText = false;
                 while ((c = getopt_long(argc, argv, "d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
+                    // Prompt when combining other commands after using the text command. Ex: "uinput -d 2017 -t text"
+                    if (inputText) {
+                        std::cout << "The text command cannot be used with other commands." << std::endl;
+                        return RET_ERR;
+                    }
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -938,10 +945,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             break;
                         }
                         case 't': {
-                            int32_t ret = ProcessKeyboardTextInput(argc, argv);
+                            int32_t ret = ProcessKeyboardTextInput(optarg, count);
                             if (ret != ERR_OK) {
                                 return ret;
                             }
+                            inputText = true;
                             break;
                         }
                         default: {
@@ -951,6 +959,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
+                    count++;
                 }
                 for (size_t i = 0; i < downKey.size(); i++) {
                     std::cout << "you have a key " << downKey[i] << " not release" << std::endl;
@@ -1722,12 +1731,15 @@ int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPress
     return RET_OK;
 }
 
-int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[])
+int32_t InputManagerCommand::ProcessKeyboardTextInput(char *optarg, int32_t count)
 {
-    constexpr int32_t argcMin = 4; // 4: min number of command parameters
+    if (count != 0) { // Prompt when combining the text command after using other commands. Ex: "uinput -t text -t text"
+        std::cout << "The text command cannot be used with other commands." << std::endl;
+        return RET_ERR;
+    }
     constexpr int32_t textMaxLen = 2000; // 2000: max number of ascii characters
 
-    int32_t len = strlen(argv[argcMin -1]);
+    int32_t len = strlen(optarg);
     if (len <= 0) {
         std::cout << "The input is empty." << std::endl;
         return RET_ERR;
@@ -1738,11 +1750,11 @@ int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[]
         len = textMaxLen;
     }
 
-    char textChar = argv[argcMin - 1][0];
+    char textChar = optarg[0];
     bool isPressShift = false;
     int32_t keyCode = -1;
     for (int32_t i = 0; i < len; ++i) {
-        textChar = argv[argcMin - 1][i];
+        textChar = optarg[i];
         if ((textChar >= '0') && (textChar <= '9')) {
             isPressShift = false;
             keyCode = textChar - '0' + KeyEvent::KEYCODE_0;
@@ -1753,7 +1765,7 @@ int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[]
             isPressShift = true;
             keyCode = textChar - 'A' + KeyEvent::KEYCODE_A;
         } else if (!IsSpecialChar(textChar, keyCode, isPressShift)) {
-            std::cout << "The "<< i << "th character is an illegal character." << std::endl;
+            std::cout << "The character of index  "<< i << " is invalid." << std::endl;
             return RET_ERR;
         }
 
@@ -2302,7 +2314,8 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-t <text>                  --text <text>      -input text content" << std::endl;
+    std::cout << "-t <text>                  --text <text>      -input text content. ";
+    std::cout << "The text command cannot be used with other commands." << std::endl;
 }
 
 void InputManagerCommand::PrintStylusUsage()
