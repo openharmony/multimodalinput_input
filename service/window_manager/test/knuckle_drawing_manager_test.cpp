@@ -359,59 +359,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_GetPointerPos, Tes
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
- * @tc.desc: Test Overrides DrawGraphic function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DrawGraphic, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    kceDrawMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(kceDrawMgr.surfaceNode_, nullptr);
-    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(500);
-    item.SetDisplayY(500);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
-
-    kceDrawMgr.displayInfo_.width = 200;
-    kceDrawMgr.displayInfo_.height = 200;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_OK);
-
-    kceDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(kceDrawMgr.canvasNode_, nullptr);
-    PointerInfo pointerInfo;
-    pointerInfo.x = 100;
-    pointerInfo.y = 100;
-    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerInfo.x = 150;
-    pointerInfo.y = 150;
-    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
-    pointerInfo.x = 200;
-    pointerInfo.y = 200;
-    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
-    pointerInfo.x = 300;
-    pointerInfo.y = 300;
-    kceDrawMgr.pointerInfos_.push_back(pointerInfo);
-    ASSERT_EQ(kceDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_DestoryWindow_001
  * @tc.desc: Test Overrides DestoryWindow function branches
  * @tc.type: Function

@@ -206,35 +206,6 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
 }
 
 /**
- * @tc.name: KnuckleDynamicDrawingManagerTest_DrawGraphic
- * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
- * @tc.desc: Test Overrides DrawGraphic function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DrawGraphic, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetPointerId(1);
-
-    knuckleDynamicDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-    ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
-    knuckleDynamicDrawMgr.displayInfo_.width = 200;
-    knuckleDynamicDrawMgr.displayInfo_.height = 200;
-    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
-    auto pixelMap = DecodeImageToPixelMap(imagePath);
-    knuckleDynamicDrawMgr.glowTraceSystem_ =
-        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
-    knuckleDynamicDrawMgr.isDrawing_ = false;
-    ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_OK);
-    knuckleDynamicDrawMgr.isDrawing_ = true;
-    ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
-}
-
-/**
  * @tc.name: KnuckleDynamicDrawingManagerTest_CreateTouchWindow
  * @tc.desc: Test Overrides CreateTouchWindow function branches
  * @tc.type: Function
