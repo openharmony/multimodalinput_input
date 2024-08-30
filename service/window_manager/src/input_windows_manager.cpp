@@ -234,7 +234,6 @@ void InputWindowsManager::ReissueCancelTouchEvent(std::shared_ptr<PointerEvent> 
         tPointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         tPointerEvent->SetActionTime(GetSysClockTime());
         tPointerEvent->UpdateId();
-        tPointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleTouchEvent(tPointerEvent);
@@ -319,9 +318,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
-        if (ROTATE_POLICY == FOLDABLE_DEVICE) {
-            FoldScreenRotation(pointerEvent);
-        }
+        FoldScreenRotation(pointerEvent);
         MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
@@ -370,10 +367,6 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
     auto displayId = pointerEvent->GetTargetDisplayId();
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
-        MMI_HILOG_DISPATCHD("Not in the unfolded state of the folding screen");
-        return;
-    }
     if (lastDirection_ == static_cast<Direction>(-1)) {
         lastDirection_ = physicDisplayInfo->direction;
         return;
@@ -391,8 +384,17 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
                 return;
             }
         }
-        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
+            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_MOVE) {
             int32_t pointerAction = pointerEvent->GetPointerAction();
+            if (pointerAction == PointerEvent::POINTER_ACTION_HOVER_MOVE ||
+                pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
+                pointerAction == PointerEvent::POINTER_ACTION_HOVER_EXIT ||
+                pointerAction == PointerEvent::POINTER_ACTION_HOVER_CANCEL) {
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_CANCEL);
+            } else {
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            }
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             pointerEvent->SetOriginPointerAction(pointerAction);
             MMI_HILOG_DISPATCHI("touch event send cancel");
