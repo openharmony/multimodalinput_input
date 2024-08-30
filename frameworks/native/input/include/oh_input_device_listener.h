@@ -33,9 +33,10 @@ public:
     void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
     void SetDeviceAddedCallback(const std::function<void(int32_t deviceId, const std::string &type)> &callback);
     void SetDeviceRemovedCallback(const std::function<void(int32_t deviceId, const std::string &type)> &callback);
+
 private:
-    std::function<void(int32_t deviceId, const std::string &type)> addCallback_;
-    std::function<void(int32_t deviceId, const std::string &type)> removeCallback_;
+    std::function<void(int32_t deviceId, const std::string &type)> addCallbacks_;
+    std::function<void(int32_t deviceId, const std::string &type)> removeCallbacks_;
 };
 }
 }

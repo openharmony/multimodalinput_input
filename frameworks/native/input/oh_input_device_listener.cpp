@@ -32,28 +32,28 @@ OHInputDeviceListener::~OHInputDeviceListener() {}
 
 void OHInputDeviceListener::OnDeviceAdded(int32_t deviceId, const std::string &type)
 {
-    if (addCallback_ != nullptr) {
-        addCallback_(deviceId, type);
+    if (addCallbacks_ != nullptr) {
+        addCallbacks_(deviceId, type);
     }
 }
 
 void OHInputDeviceListener::OnDeviceRemoved(int32_t deviceId, const std::string &type)
 {
-    if (removeCallback_!= nullptr) {
-        removeCallback_(deviceId, type);
+    if (removeCallbacks_!= nullptr) {
+        removeCallbacks_(deviceId, type);
     }
 }
 
 void OHInputDeviceListener::SetDeviceAddedCallback(
     const std::function<void(int32_t deviceId, const std::string &type)> &callback)
 {
-    addCallback_ = callback;
+    addCallbacks_ = callback;
 }
 
 void OHInputDeviceListener::SetDeviceRemovedCallback(
     const std::function<void(int32_t deviceId, const std::string &type)> &callback)
 {
-    removeCallback_ = callback;
+    removeCallbacks_ = callback;
 }
 }
 }
