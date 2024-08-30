@@ -32,8 +32,10 @@ namespace {
 using namespace testing::ext;
 using namespace testing;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
 constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
@@ -257,12 +259,14 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
     int32_t SetMoveEventFilters(bool flag) { return 0; }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMap) override
     {
         std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMap);
         *newPixelMapPtr = pixelMap_;
         return retSnapshot_;
     }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t SetTouchpadScrollRows(int32_t rows) override
     {
         return touchpadScrollRows_;
@@ -272,6 +276,7 @@ public:
         rows = parameterRows_;
         return touchpadScrollRows_;
     }
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override { return retSetClientInfo_; }
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override { return timeInterval; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -332,6 +337,7 @@ public:
     int32_t retSetPointerStyle_ = 0;
     int32_t retSetCurrentUser_ = 0;
     int32_t getAllSystemHotkeys_ = 0;
+    int32_t retSetClientInfo_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -636,6 +642,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_023, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: OnRemoteRequest_024
  * @tc.desc: Test the function OnRemoteRequest
@@ -654,6 +661,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_024, TestSize.Level1)
     uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT);
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
  * @tc.name: OnRemoteRequest_025
@@ -7529,6 +7537,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_006, TestSize
     EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSnapshot
  * @tc.desc: Cover if (!IsRunning()) branch
@@ -7608,6 +7617,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSnapshot(data, reply));
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 /**

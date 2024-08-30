@@ -26,9 +26,6 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
-#ifdef PLAYER_FRAMEWORK_EXISTS
-#include "screen_capture_monitor.h"
-#endif
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -188,7 +185,7 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
 
 void EventMonitorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -602,29 +599,25 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
 }
 
 #ifdef PLAYER_FRAMEWORK_EXISTS
-void EventMonitorHandler::RegisterScreenCaptureListener()
+void EventMonitorHandler::ProcessScreenCapture(int32_t pid, bool isStart)
 {
-    screenCaptureMonitorListener_ = new (std::nothrow) InputScreenCaptureMonitorListener();
-    CHKPV(screenCaptureMonitorListener_);
-    Media::ScreenCaptureMonitor::GetInstance()->RegisterScreenCaptureMonitorListener(screenCaptureMonitorListener_);
-}
-
-void EventMonitorHandler::OnScreenCaptureStarted(SessionPtr session)
-{
-    if (!monitors_.HasMonitor(session) && !monitors_.HasScreenCaptureMonitor(session)) {
-        MMI_HILOGI("This process has no screen capture monitor");
-        return;
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPV(udsServerPtr);
+    SessionPtr session = udsServerPtr->GetSessionByPid(pid);
+    CHKPV(session);
+    if (isStart) {
+        if (!monitors_.HasMonitor(session) && !monitors_.HasScreenCaptureMonitor(session)) {
+            MMI_HILOGI("This process has no screen capture monitor");
+            return;
+        }
+        monitors_.RecoveryScreenCaptureMonitor(session);
+    } else {
+        if (!monitors_.HasMonitor(session)) {
+            MMI_HILOGI("This process has no screen capture monitor");
+            return;
+        }
+        monitors_.RemoveScreenCaptureMonitor(session);
     }
-    monitors_.RecoveryScreenCaptureMonitor(session);
-}
-
-void EventMonitorHandler::OnScreenCaptureFinished(SessionPtr session)
-{
-    if (!monitors_.HasMonitor(session)) {
-        MMI_HILOGI("This process has no screen capture monitor");
-        return;
-    }
-    monitors_.RemoveScreenCaptureMonitor(session);
 }
 #endif
 } // namespace MMI

@@ -402,6 +402,7 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);

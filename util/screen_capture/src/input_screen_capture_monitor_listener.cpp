@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
+#include "define_multimodal.h"
 #include "input_screen_capture_monitor_listener.h"
-#include "input_event_handler.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -26,25 +26,20 @@ namespace MMI {
 void InputScreenCaptureMonitorListener::OnScreenCaptureStarted(int32_t pid)
 {
     MMI_HILOGI("The process starts to record the screen, pid: %{public}d", pid);
-    auto monitorHandler = InputHandler->GetMonitorHandler();
-    CHKPV(monitorHandler);
-    auto udsServer = InputHandler->GetUDSServer();
-    CHKPV(udsServer);
-    auto sess = udsServer->GetSessionByPid(pid);
-    CHKPV(sess);
-    monitorHandler->OnScreenCaptureStarted(sess);
+    CHKPV(callback_);
+    callback_(pid, true);
 }
 
 void InputScreenCaptureMonitorListener::OnScreenCaptureFinished(int32_t pid)
 {
     MMI_HILOGI("The process screen recording finishs, pid: %{public}d", pid);
-    auto monitorHandler = InputHandler->GetMonitorHandler();
-    CHKPV(monitorHandler);
-    auto udsServer = InputHandler->GetUDSServer();
-    CHKPV(udsServer);
-    auto sess = udsServer->GetSessionByPid(pid);
-    CHKPV(sess);
-    monitorHandler->OnScreenCaptureFinished(sess);
+    CHKPV(callback_);
+    callback_(pid, false);
+}
+
+void InputScreenCaptureMonitorListener::SetScreenCaptureCallback(ScreenCaptureCallback callback)
+{
+    callback_ = callback;
 }
 #endif
 }

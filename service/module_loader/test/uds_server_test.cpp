@@ -385,7 +385,7 @@ HWTEST_F(UDSServerTest, OnEpollRecv_001, TestSize.Level1)
     int32_t toReturnClientFd = 1;
      
     udsServer.AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd, tokenType);
-    int32_t fd = epoll_create(size);    
+    int32_t fd = epoll_create(size);
     udsServer.OnEpollRecv(fd, ev);
 }
 
@@ -400,7 +400,7 @@ HWTEST_F(UDSServerTest, OnEpollRecv_002, TestSize.Level1)
     CALL_TEST_DEBUG;
     UDSServer udsServer;
     epoll_event ev;
-    int32_t fd = -1;  
+    int32_t fd = -1;
     int32_t tokenType = TokenType::TOKEN_SHELL;
     int32_t serverFd = 1;
     const std::string programName = "program";
@@ -424,7 +424,7 @@ HWTEST_F(UDSServerTest, AddEpollEvent_001, TestSize.Level1)
     CALL_TEST_DEBUG;
     UDSServer udsServer;
     std::shared_ptr<mmi_epoll_event> epollEvent=std::make_shared<mmi_epoll_event>();
-    int32_t fd = 1;  
+    int32_t fd = 1;
     int32_t tokenType = TokenType::TOKEN_SHELL;
     int32_t serverFd = 1;
     const std::string programName = "program";

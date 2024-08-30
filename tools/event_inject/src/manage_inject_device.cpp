@@ -80,7 +80,7 @@ int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray &inputEv
     }
     char realPath[PATH_MAX] = {};
     if (realpath(deviceNode.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error, path:%{public}s", deviceNode.c_str());
+        MMI_HILOGE("Path is error, path:%{private}s", deviceNode.c_str());
         return RET_ERR;
     }
     int32_t fd = open(realPath, O_RDWR);

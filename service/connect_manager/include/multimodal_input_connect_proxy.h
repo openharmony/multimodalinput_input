@@ -129,11 +129,14 @@ public:
     
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override;
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;

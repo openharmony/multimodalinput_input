@@ -57,7 +57,7 @@ protected:
 private:
     int32_t pid_;
     AuthorizeState state_ { AuthorizeState::STATE_UNAUTHORIZE };
-    std::atomic_bool isInit_  { false };
+    std::atomic_bool isInit_ { false };
     AuthorizeExitCallback exitCallback_ { nullptr };
     static std::mutex mutex_;
     static std::shared_ptr<AuthorizeHelper> instance_;

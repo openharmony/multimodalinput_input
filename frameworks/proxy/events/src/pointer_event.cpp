@@ -408,6 +408,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
+        out.WriteInt32(rawDisplayX_) &&
+        out.WriteInt32(rawDisplayY_) &&
         out.WriteInt32(targetWindowId_) &&
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
@@ -444,6 +446,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
+        in.ReadInt32(rawDisplayX_) &&
+        in.ReadInt32(rawDisplayY_) &&
         in.ReadInt32(targetWindowId_) &&
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
@@ -561,6 +565,8 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::TOUCH_ACTION_SWIPE_RIGHT, "touch-swipe-right" },
     { PointerEvent::TOUCH_ACTION_PINCH_OPENED, "touch-pinch-open" },
     { PointerEvent::TOUCH_ACTION_PINCH_CLOSEED, "touch-pinch-close" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
 };
 
 const char* PointerEvent::DumpPointerAction() const

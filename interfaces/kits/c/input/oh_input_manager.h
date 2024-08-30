@@ -286,6 +286,8 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
  */
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
+typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
+
 /**
  * @brief 回调函数，用于回调输入设备的上线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
  * @param deviceId 设备的id。
@@ -1409,6 +1411,13 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
  * @since 13
  */
 Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
+
+Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
+
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
+
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 #ifdef __cplusplus
 }
 #endif

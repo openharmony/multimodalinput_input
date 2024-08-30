@@ -33,7 +33,7 @@ namespace MMI {
 namespace {
 constexpr int32_t MAX_FINGERS_COUNT = 5;
 constexpr int32_t FOUR_FINGER_COUNT = 4;
-constexpr int32_t THREE_FINGER_COUNT = 3;
+constexpr uint32_t THREE_FINGER_COUNT = 3;
 constexpr int32_t ANGLE_PI = 180;
 
 constexpr double ANGLE_RIGHT_DOWN = -45.0;
@@ -160,8 +160,7 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
             MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
         }
     }
-    if (CalcMultiFingerMovement(movePoints) >
-        static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
+    if (CalcMultiFingerMovement(movePoints) > static_cast<int32_t>(downPoint_.size()) - MINIMUM_FINGER_COUNT_OFFSET) {
         GetureType type = JudgeOperationMode(movePoints);
         isRecognized_ = AntiJitter(event, type);
     }
@@ -222,7 +221,7 @@ bool TouchGestureDetector::WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent
 
 bool TouchGestureDetector::HandleFingerDown()
 {
-    int32_t fingersCount = downPoint_.size();
+    auto fingersCount = downPoint_.size();
     if (fingersCount < THREE_FINGER_COUNT) {
         return false;
     }
@@ -489,9 +488,9 @@ GetureType TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &mo
         lastDistance_.clear();
         lastDistance_ = tempDistance;
     }
-    if (closeCount >= static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
+    if (closeCount >= static_cast<int32_t>(downPoint_.size()) - MINIMUM_FINGER_COUNT_OFFSET) {
         type = GetureType::ACTION_PINCH_CLOSED;
-    } else if (openCount >= static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
+    } else if (openCount >= static_cast<int32_t>(downPoint_.size()) - MINIMUM_FINGER_COUNT_OFFSET) {
         type = GetureType::ACTION_PINCH_OPENED;
     }
     return type;

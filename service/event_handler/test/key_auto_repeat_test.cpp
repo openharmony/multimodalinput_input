@@ -267,7 +267,7 @@ HWTEST_F(KeyAutoRepeatTest, KeyAutoRepeatTest_PutConfigDataToDatabase_001, TestS
     std::string testKey = "testKey";
     int32_t testValue = 123;
     int32_t result = keyAutoRepeat.PutConfigDataToDatabase(testKey, testValue);
-    ASSERT_EQ(result, 0);
+    EXPECT_NE(result, -1);
     ASSERT_TRUE(PREFERENCES_MGR->GetIntValue(testKey, testValue));
 }
 

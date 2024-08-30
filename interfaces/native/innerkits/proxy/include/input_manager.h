@@ -893,7 +893,7 @@ public:
 
     /**
      * @brief user IrEmitter with parameter number and pattern.
-     * @param number   Frequency of IrEmitter works .
+     * @param number Frequency of IrEmitter works .
      * @param pattern Pattern of signal transmission in alternate on/off mode, in microseconds.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12
@@ -954,6 +954,14 @@ public:
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
+
+    /**
+     * @brief Converted to a Capi-defined key action value.
+     * @param keyAction The key action value of the return value of inner api.
+     * @return Returns Capi-defined key action value if success; returns a negative number value otherwise.
+     * @since 13
+     */
+    int32_t ConvertToCapiKeyAction(int32_t keyAction);
 
 private:
     InputManager() = default;
