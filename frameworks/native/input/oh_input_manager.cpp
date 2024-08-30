@@ -73,14 +73,14 @@ struct Input_AxisEvent {
     int32_t axisEventType { -1 };
 };
 
-struct Input_DeviceListener {
-    Input_DeviceAddedCallback OnDeviceAdded;
-    Input_DeviceRemovedCallback OnDeviceRemoved;
-};
-
 struct Input_Hotkey {
     std::set<int32_t> preKeys {};
     int32_t finalKey { -1 };
+};
+
+struct DeviceType {
+    int32_t deviceType;
+    uint32_t deviceTypeMask;
 };
 
 std::mutex g_hotkeyCountsMutex;
@@ -116,6 +116,23 @@ static const std::set<int32_t> g_keyCodeValueSet = {
     KEYCODE_CAPS_LOCK, KEYCODE_SCROLL_LOCK, KEYCODE_META_LEFT, KEYCODE_META_RIGHT, KEYCODE_SYSRQ, KEYCODE_BREAK,
     KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
     KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
+};
+static const uint32_t DEVICE_TYPE_MAX_NUM = 6;
+
+static const uint32_t DEVICE_TYPE_KEYBOARD = (1 << 1);
+static const uint32_t DEVICE_TYPE_MOUSE = (1 << 2);
+static const uint32_t DEVICE_TYPE_TOUCHPAD = (1 << 3);
+static const uint32_t DEVICE_TYPE_TOUCHSCREEN = (1 << 4);
+static const uint32_t DEVICE_TYPE_JOYSTICK = (1 << 6);
+static const uint32_t DEVICE_TYPE_TRACKBALL = (1 << 10);
+
+static const DeviceType g_deviceType[] = {
+    { INPUT_DEVICE_TYPE_KEYBOARD , DEVICE_TYPE_KEYBOARD },
+    { INPUT_DEVICE_TYPE_MOUSE, DEVICE_TYPE_MOUSE },
+    { INPUT_DEVICE_TYPE_TOUCHPAD, DEVICE_TYPE_TOUCHPAD },
+    { INPUT_DEVICE_TYPE_TOUCHSCREEN, DEVICE_TYPE_TOUCHSCREEN },
+    { INPUT_DEVICE_TYPE_JOYSTICK, DEVICE_TYPE_JOYSTICK },
+    { INPUT_DEVICE_TYPE_TRACKBALL, DEVICE_TYPE_TRACKBALL },
 };
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
@@ -1791,22 +1808,58 @@ Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyC
     return INPUT_SUCCESS;
 }
 
-const char* KeyCodeToString(int32_t keyCode)
+const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode)
 {
     return g_keyEvent->KeyCodeToString(keyCode);
 }
 
-static void DeviceAddedCallback(int32_t deviceId, const std::string& deviceType)
+static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
+    int32_t length = -1;
+    uint32_t deviceType = -1;
+    OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
+        [&deviceType](std::shared_ptr<OHOS::MMI::InputDevice> DeviceInfo){
+            deviceType = static_cast<uint32_t>(DeviceInfo->GetType());
+            return;
+        });
+    std::vector<int32_t> types;
+    for (auto item : g_deviceType) {
+        if ((deviceType & item.deviceTypeMask) > 0) {
+            types.push_back(item.deviceType);
+        }
+    }
+    length = static_cast<int32_t>(types.size());
+    int32_t deviceTypes[DEVICE_TYPE_MAX_NUM] = { 0 };
+    for (int32_t i = 0; i < length; ++i) {
+        deviceTypes[i] = static_cast<int32_t>(g_deviceType[i].deviceType);
+    }
     for (auto listener : g_ohDeviceListenerList) {
-        listener->OnDeviceAdded(deviceId, Input_DeviceType::Input_Device_Type_KEYBOARD);
+        listener->OnDeviceAdded(deviceId, deviceTypes, length);
     }
 }
 
-static void DeviceRemovedCallback(int32_t deviceId, const std::string& deviceType)
+static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 {
+    int32_t length = 0;
+    uint32_t deviceType = -1;
+    OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
+        [&deviceType](std::shared_ptr<OHOS::MMI::InputDevice> DeviceInfo){
+            deviceType = static_cast<uint32_t>(DeviceInfo->GetType());
+            return;
+        });
+    std::vector<int32_t> types;
+    for (auto item : g_deviceType) {
+        if ((deviceType & item.deviceTypeMask) > 0) {
+            types.push_back(item.deviceType);
+        }
+    }
+    length = static_cast<int32_t>(types.size());
+    int32_t deviceTypes[DEVICE_TYPE_MAX_NUM] = { 0 };
+    for (int32_t i = 0; i < length; ++i) {
+        deviceTypes[i] = static_cast<int32_t>(g_deviceType[i].deviceType);
+    }
     for (auto listener : g_ohDeviceListenerList) {
-        listener->OnDeviceRemoved(deviceId, Input_DeviceType::Input_Device_Type_KEYBOARD);
+        listener->OnDeviceRemoved(deviceId, deviceTypes, length);
     }
 }
 
@@ -1845,6 +1898,20 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
             MMI_HILOGE("UnregisterDevListener fail");
             return INPUT_SERVICE_EXCEPTION;
         }
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_UnregisterDeviceListener()
+{
+    if (g_ohDeviceListenerList.empty()) {
+        return INPUT_SUCCESS;
+    }
+    auto ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
+    g_ohDeviceListenerList.clear();
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnregisterDevListener fail");
+        return INPUT_SERVICE_EXCEPTION;
     }
     return INPUT_SUCCESS;
 }

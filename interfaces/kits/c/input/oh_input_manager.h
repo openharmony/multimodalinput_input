@@ -229,26 +229,27 @@ typedef enum Input_Result {
     INPUT_REPEAT_INTERCEPTOR = 4200001
 } Input_Result;
 
-/** 设备类型未知 */
-static const char* const Input_Device_Type_UNKNOWN = "ohos.input.device.unknown";
-
-/** 设备类型键盘 */
-static const char* const Input_Device_Type_KEYBOARD = "ohos.input.device.keyboard";
-
-/** 设备类型鼠标 */
-static const char* const Input_Device_Type_MOUSE = "ohos.input.device.mouse";
-
-/** 设备类型触摸板 */
-static const char* const Input_Device_Type_TOUCHPAD = "ohos.input.device.touchpad";
-
-/** 设备类型触屏 */
-static const char* const Input_Device_Type_TOUCHSCREEN = "ohos.input.device.touchscreen";
-
-/** 设备类型遥感 */
-static const char* const Input_Device_Type_JOYSTICK = "ohos.input.device.joystick";
-
-/** 设备类型轨迹球 */
-static const char* const Input_Device_Type_TRACKBALL = "ohos.input.device.trackball";
+/**
+ * @brief 设备类型的枚举
+ *
+ * @since 13
+ */
+typedef enum Input_DeviceType {
+    /** 设备类型未知 */
+    INPUT_DEVICE_TYPE_UNKNOWN = 0,
+    /** 设备类型键盘 */
+    INPUT_DEVICE_TYPE_KEYBOARD,
+    /** 设备类型鼠标 */
+    INPUT_DEVICE_TYPE_MOUSE,
+    /** 设备类型触摸板 */
+    INPUT_DEVICE_TYPE_TOUCHPAD,
+    /** 设备类型触屏 */
+    INPUT_DEVICE_TYPE_TOUCHSCREEN,
+    /** 设备类型摇杆 */
+    INPUT_DEVICE_TYPE_JOYSTICK,
+    /** 设备类型轨迹球 */
+    INPUT_DEVICE_TYPE_TRACKBALL,
+} Input_DeviceType;
 
 /**
  * @brief Defines the hot key structure.
@@ -286,16 +287,22 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
 /**
- * @brief 定义一个回调函数用于设备id和设备类型
+ * @brief 回调函数，用于回调输入设备的上线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
+ * @param deviceId 设备的id。
+ * @param deviceTypes 设备类型的数组。
+ * @param count 设备类型数组的长度。
  * @since 13
  */
-typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, const char* deviceType);
+typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, int32_t* deviceTypes, int32_t length);
 
 /**
- * @brief 定义一个回调函数用于设备id和设备类型
+ * @brief 回调函数，用于回调输入设备的下线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
+ * @param deviceId 设备的id。
+ * @param deviceTypes 设备类型的数组。
+ * @param count 设备类型数组的长度。
  * @since 13
  */
-typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, const char* deviceType);
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, int32_t* deviceTypes, int32_t length);
 
 /**
  * @brief Defines the structure for the interceptor of event callbacks,
@@ -316,9 +323,11 @@ typedef struct Input_InterceptorEventCallback {
  * @since 13
  */
 typedef struct Input_DeviceListener {
+    /** 定义一个回调函数用于回调设备上线事件 */
     Input_DeviceAddedCallback OnDeviceAdded;
+    /** 定义一个回调函数用于回调设备下线事件 */
     Input_DeviceRemovedCallback OnDeviceRemoved;
-};
+} Input_DeviceListener;
 
 /**
  * @brief Defines event interceptor options.
@@ -1371,17 +1380,17 @@ Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-const char* KeyCodeToString(int32_t keyCode);
+const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode);
 
 /**
  * @brief 注册设备热插拔的监听器
  *
- * @param listener 用于监听设备热插拔的监听器.
+ * @param listener 指向监听设备热插拔的监听器的指针.
  *
- * @return OH_Input_RegisterDeviceListener status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ * @return OH_Input_RegisterDeviceListener 的返回值, 具体如下:
+ *         {@link INPUT_SUCCESS} 调用成功;\n
  *         {@link INPUT_PARAMETER_ERROR} listener 为NULL 或 listener 已被注册
- *         {@link INPUT_SERVICE_EXCEPTION} 服务端连接异常
+ *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
@@ -1390,12 +1399,12 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
 /**
  * @brief 取消注册设备热插拔的监听器
  *
- * @param listener 用于监听设备热插拔的监听器.
+ * @param listener 指向监听设备热插拔的监听器的指针.
  *
- * @return OH_Input_UnregisterDeviceListener status code, specifically,
- *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ * @return OH_Input_UnregisterDeviceListener 的返回值, 具体如下:
+ *         {@link INPUT_SUCCESS} 调用成功;\n
  *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL, listener 未注册或已被取消注册
- *         {@link INPUT_SERVICE_EXCEPTION} 服务端连接异常
+ *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
