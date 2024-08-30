@@ -2189,14 +2189,14 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
     std::lock_guard guard(g_DeviceListerCallbackMutex);
     if (g_ohDeviceListenerList.empty()) {
         int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
+        g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
+        g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
         if (ret != RET_OK) {
             MMI_HILOGE("RegisterDevListener fail");
             return INPUT_SERVICE_EXCEPTION;
         }
     }
     g_ohDeviceListenerList.insert(listener);
-    g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
-    g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
     return INPUT_SUCCESS;
 }
 
