@@ -1,0 +1,328 @@
+{
+    "Hotkeys": [
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2068
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2068
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2020
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2020
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2055
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2055
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2030
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2030
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2019
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2019
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2017
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2017
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2045 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2046 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2047, 2045 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2047, 2046 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2048, 2045 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2048, 2046 ],
+            "finalKey": 2049
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2029
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2029
+        },
+        {
+            "preKeys": [ 2045 ],
+            "finalKey": 2093
+        },
+        {
+            "preKeys": [ 2046 ],
+            "finalKey": 2093
+        },
+        {
+            "preKeys": [ 2045, 2047 ],
+            "finalKey": 2093
+        },
+        {
+            "preKeys": [ 2045, 2048 ],
+            "finalKey": 2093
+        },
+        {
+            "preKeys": [ 2046, 2047 ],
+            "finalKey": 2093
+        },
+        {
+            "preKeys": [ 2046, 2048 ],
+            "finalKey": 2093
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2014
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2015
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2014
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2015
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2013
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2013
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2044
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2044
+        },
+        {
+            "preKeys": [ 2076, 2047 ],
+            "finalKey": 2014
+        },
+        {
+            "preKeys": [ 2076, 2048 ],
+            "finalKey": 2014
+        },
+        {
+            "preKeys": [ 2077, 2047 ],
+            "finalKey": 2014
+        },
+        {
+            "preKeys": [ 2077, 2048 ],
+            "finalKey": 2014
+        },
+        {
+            "preKeys": [ 2076, 2047 ],
+            "finalKey": 2015
+        },
+        {
+            "preKeys": [ 2076, 2048 ],
+            "finalKey": 2015
+        },
+        {
+            "preKeys": [ 2077, 2047 ],
+            "finalKey": 2015
+        },
+        {
+            "preKeys": [ 2077, 2048 ],
+            "finalKey": 2015
+        },
+        {
+            "preKeys": [ 2076, 2047 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2076, 2048 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2077, 2047 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2077, 2048 ],
+            "finalKey": 2012
+        },
+        {
+            "preKeys": [ 2076, 2047 ],
+            "finalKey": 2013
+        },
+        {
+            "preKeys": [ 2076, 2048 ],
+            "finalKey": 2013
+        },
+        {
+            "preKeys": [ 2077, 2047 ],
+            "finalKey": 2013
+        },
+        {
+            "preKeys": [ 2077, 2048 ],
+            "finalKey": 2013
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2028
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2028
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2035
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2035
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2022
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2022
+        },
+        {
+            "preKeys": [ 2076, 2047 ],
+            "finalKey": 2035
+        },
+        {
+            "preKeys": [ 2076, 2048 ],
+            "finalKey": 2035
+        },
+        {
+            "preKeys": [ 2077, 2047 ],
+            "finalKey": 2035
+        },
+        {
+            "preKeys": [ 2077, 2048 ],
+            "finalKey": 2035
+        },
+        {
+            "preKeys": [ 2079 ],
+            "finalKey": -1
+        },
+        {
+            "preKeys": [ 2072, 2047 ],
+            "finalKey": -1
+        },
+        {
+            "preKeys": [ 2072, 2048 ],
+            "finalKey": -1
+        },
+        {
+            "preKeys": [ 2073, 2047 ],
+            "finalKey": -1
+        },
+        {
+            "preKeys": [ 2073, 2048 ],
+            "finalKey": -1
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2050
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2050
+        },
+        {
+            "preKeys": [ 2072 ],
+            "finalKey": 2050
+        },
+        {
+            "preKeys": [ 2073 ],
+            "finalKey": 2050
+        },
+        {
+            "preKeys": [ 2072, 2047 ],
+            "finalKey": 2070
+        },
+        {
+            "preKeys": [ 2072, 2048 ],
+            "finalKey": 2070
+        },
+        {
+            "preKeys": [ 2073, 2047 ],
+            "finalKey": 2070
+        },
+        {
+            "preKeys": [ 2073, 2048 ],
+            "finalKey": 2070
+        },
+        {
+            "preKeys": [ 2076 ],
+            "finalKey": 2064
+        },
+        {
+            "preKeys": [ 2077 ],
+            "finalKey": 2064
+        }
+    ]
+}
