@@ -549,7 +549,7 @@ void MMIService::OnConnected(SessionPtr s)
     CHKPV(s);
     MMI_HILOGI("fd:%{public}d", s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName != SHELL_ASSISTANT) {
+    if (s->GetProgramName() != SHELL_ASSISTANT) {
         return;
     }
     auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
