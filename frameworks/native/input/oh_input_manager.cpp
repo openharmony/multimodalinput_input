@@ -88,6 +88,7 @@ struct Input_Hotkey {
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
+static std::mutex g_DeviceListerCallbackMutex;
 static constexpr size_t PRE_KEYS_SIZE { 2 };
 static constexpr size_t KEYS_SIZE { 3 };
 static std::mutex g_hotkeyCountsMutex;
@@ -2146,6 +2147,8 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
 
 static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
     for (auto listener : g_ohDeviceListenerList) {
         if (listener == nullptr){
             MMI_HILOGE("listener is nullptr");
@@ -2161,6 +2164,8 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 
 static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 {
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
     for (auto listener : g_ohDeviceListenerList) {
         if (listener == nullptr){
             MMI_HILOGE("listener is nullptr");
@@ -2176,10 +2181,12 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 
 Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
 {   
+    CALL_DEBUG_ENTER;
     if (listener == nullptr) {
         MMI_HILOGE("listener is null");
         return INPUT_PARAMETER_ERROR;
     }
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
     if (g_ohDeviceListenerList.empty()) {
         int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
         if (ret != RET_OK) {
@@ -2195,10 +2202,12 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
 
 Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
 {
+    CALL_DEBUG_ENTER;
     if (listener == nullptr) {
         MMI_HILOGE("listener is null");
         return INPUT_PARAMETER_ERROR;
     }
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
     auto it = g_ohDeviceListenerList.find(listener);
     if (it == g_ohDeviceListenerList.end()) {
         MMI_HILOGE("listener not found");
@@ -2217,6 +2226,8 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
 
 Input_Result OH_Input_UnregisterDeviceListeners()
 {
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
     if (g_ohDeviceListenerList.empty()) {
         return INPUT_SUCCESS;
     }
