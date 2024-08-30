@@ -1411,6 +1411,7 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
  * @since 13
  */
 Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
+
 void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
 
 Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
