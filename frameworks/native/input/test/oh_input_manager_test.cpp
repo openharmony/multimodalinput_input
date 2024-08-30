@@ -349,5 +349,145 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode, TestSize.Le
     keyState.keyCode = KEYCODE_F1;
     EXPECT_NO_FATAL_FAILURE(OH_Input_SetKeyCode(&keyState, keyCode));
 }
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_KeyCodeToString
+ * @tc.desc: Test the funcation OH_Input_KeyCodeToString
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_KeyCodeToString, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string  str = OH_Input_KeyCodeToString(KEYCODE_F1);
+    EXPECT_STREQ(str.c_str(), "KEYCODE_F1");
+    str = OH_Input_KeyCodeToString(KEYCODE_F12);
+    EXPECT_STREQ(str.c_str(), "KEYCODE_F12");
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_RegisterDeviceListener
+ * @tc.desc: Test the funcation OH_Input_RegisterDeviceListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener, TestSize.Level1)
+{
+    auto listener1 = new (std::nothrow) Input_DeviceListener();
+    if (listener1 == nullptr) {
+        MMI_HILOGE("Failed to new Input_DeviceListener");
+        return;
+    }
+    listener1->OnDeviceAdded = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceAdded1: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    listener1->OnDeviceRemoved = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceRemoved1: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    EXPECT_EQ(OH_Input_RegisterDeviceListener(listener1), INPUT_SUCCESS);
+
+    auto listener2 = new (std::nothrow) Input_DeviceListener();
+    if (listener2 == nullptr) {
+        MMI_HILOGE("Failed to new Input_DeviceListener");
+        return;
+    }
+    listener2->OnDeviceAdded = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceAdded2: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    listener2->OnDeviceRemoved = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceRemoved2: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener1), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener2), INPUT_SUCCESS);
+    delete listener1;
+    delete listener2;
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_UnregisterDeviceListener
+ * @tc.desc: Test the funcation OH_Input_UnregisterDeviceListener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListener, TestSize.Level1)
+{
+    auto listener1 = new (std::nothrow) Input_DeviceListener();
+    if (listener1 == nullptr) {
+        MMI_HILOGE("Failed to new Input_DeviceListener");
+        return;
+    }
+    listener1->OnDeviceAdded = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceAdded1: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    listener1->OnDeviceRemoved = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceRemoved1: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    EXPECT_EQ(OH_Input_RegisterDeviceListener(listener1), INPUT_SUCCESS);
+
+    auto listener2 = new (std::nothrow) Input_DeviceListener();
+    if (listener2 == nullptr) {
+        MMI_HILOGE("Failed to new Input_DeviceListener");
+        return;
+    }
+    listener2->OnDeviceAdded = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceAdded2: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    listener2->OnDeviceRemoved = [](int32_t deviceId, int32_t* deviceTypes, int32_t count) {
+        MMI_HILOGI("OnDeviceRemoved2: deviceId: %d", deviceId);
+        if (deviceTypes == nullptr || count <= 0) {
+            return;
+        }
+        for (int32_t i = 0; i < count; i++) {
+            MMI_HILOGI("deviceType: %d", deviceTypes[i]);
+        }
+    };
+    EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
+    EXPECT_EQ(OH_Input_UnregisterDeviceListener(), INPUT_SUCCESS);
+    delete listener1;
+    delete listener2;
+}
 } // namespace MMI
 } // namespace OHOS
