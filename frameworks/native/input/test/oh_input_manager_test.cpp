@@ -383,8 +383,11 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         MMI_HILOGI("OnDeviceRemoved2:deviceId:%d,deviceType:%d", deviceId, deviceType);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::seconds(20));
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener1), INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::seconds(20));
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener2), INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::seconds(20));
     delete listener1;
     delete listener2;
 }
@@ -422,7 +425,9 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         MMI_HILOGI("OnDeviceRemoved2:deviceId:%d,deviceType:%d", deviceId, deviceType);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::seconds(20));
     EXPECT_EQ(OH_Input_UnregisterDeviceListeners(), INPUT_SUCCESS);
+    std::this_thread::sleep_for(std::chrono::seconds(20));
     delete listener1;
     delete listener2;
 }

@@ -24,7 +24,8 @@
 
 namespace OHOS {
 namespace MMI {
-class OHInputDeviceListener : public OHOS::MMI::IInputDeviceListener, public std::enable_shared_from_this<OHInputDeviceListener> {
+class OHInputDeviceListener : public OHOS::MMI::IInputDeviceListener,
+    public std::enable_shared_from_this<OHInputDeviceListener> {
 public:    
     OHInputDeviceListener();
     ~OHInputDeviceListener();

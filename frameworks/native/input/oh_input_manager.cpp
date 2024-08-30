@@ -85,7 +85,6 @@ struct Input_Hotkey {
     int32_t finalKey { -1 };
     bool isRepeat { true };
 };
-
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
@@ -2145,11 +2144,6 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
     return INPUT_SUCCESS;
 }
 
-const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode)
-{
-    return g_keyEvent->KeyCodeToString(keyCode);
-}
-
 static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
     int32_t deviceType = -1;
@@ -2159,6 +2153,14 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
             return;
         });
     for (auto listener : g_ohDeviceListenerList) {
+        if (listener!= nullptr){
+            MMI_HILOGE("listener is nullptr");
+            continue;
+        }
+        if (listener->OnDeviceAdded == nullptr) {
+            MMI_HILOGE("OnDeviceAdded is nullptr");
+            continue;
+        }
         listener->OnDeviceAdded(deviceId, deviceType);
     }
 }
@@ -2172,6 +2174,14 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
             return;
         });
     for (auto listener : g_ohDeviceListenerList) {
+        if (listener!= nullptr){
+            MMI_HILOGE("listener is nullptr");
+            continue;
+        }
+        if (listener->OnDeviceRemoved == nullptr) {
+            MMI_HILOGE("OnDeviceRemoved is nullptr");
+            continue;
+        }
         listener->OnDeviceRemoved(deviceId, deviceType);
     }
 }
@@ -2182,14 +2192,16 @@ Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
         MMI_HILOGE("listener is null");
         return INPUT_PARAMETER_ERROR;
     }
+    if (g_ohDeviceListenerList.empty()) {
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
+        if (ret != RET_OK) {
+            MMI_HILOGE("RegisterDevListener fail");
+            return INPUT_SERVICE_EXCEPTION;
+        }
+    }
     g_ohDeviceListenerList.insert(listener);
     g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
     g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
-    int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
-    if (ret != RET_OK) {
-        MMI_HILOGE("RegisterDevListener fail");
-        return INPUT_SERVICE_EXCEPTION;
-    }
     return INPUT_SUCCESS;
 }
 
