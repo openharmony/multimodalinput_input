@@ -2569,47 +2569,15 @@ int32_t MMIService::HasIrEmitter(bool &hasIrEmitter)
     return RET_OK;
 }
 
-int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys)
+int32_t MMIService::GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, &requencys] {
-            return this->OnGetInfraredFrequencies(requencys);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("OnGetInfraredFrequencies failed, returnCode:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
-int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(
-        [this, number, &pattern] {
-            return this->OnTransmitInfrared(number, pattern);
-        }
-        );
-    if (ret != RET_OK) {
-        MMI_HILOGE("OnTransmitInfrared failed, returnCode:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
-int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
-{
-    hasIrEmitter = false;
-    return RET_OK;
-}
-
-int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &frequencies)
-{
     MMI_HILOGI("start get infrared frequency");
     std::vector<InfraredFrequencyInfo> infos;
-    InfraredEmitterController::GetInstance()->GetFrequencies(infos);
+    if (!InfraredEmitterController::GetInstance()->GetFrequencies(infos)) {
+        MMI_HILOGE("Failed to get frequencies");
+        return RET_ERR;
+    }
     for (auto &item : infos) {
         InfraredFrequency info;
         info.min_ = item.min_;
@@ -2626,15 +2594,25 @@ int32_t MMIService::OnGetInfraredFrequencies(std::vector<InfraredFrequency> &fre
     return RET_OK;
 }
 
-int32_t MMIService::OnTransmitInfrared(int64_t infraredFrequency, std::vector<int64_t> &pattern)
+int32_t MMIService::TransmitInfrared(int64_t number, std::vector<int64_t>& pattern)
 {
-    std::string context = "infraredFrequency:" + std::to_string(infraredFrequency) + ";";
+    CALL_DEBUG_ENTER;
+    std::string context = "infraredFrequency:" + std::to_string(number) + ";";
     int32_t size = static_cast<int32_t>(pattern.size());
     for (int32_t i = 0; i < size; i++) {
         context = context + "index:" + std::to_string(i) + ": pattern:" + std::to_string(pattern[i]) + ";";
     }
-    InfraredEmitterController::GetInstance()->Transmit(infraredFrequency, pattern);
     MMI_HILOGI("TransmitInfrared para context:%{public}s", context.c_str());
+    if (!InfraredEmitterController::GetInstance()->Transmit(number, pattern)) {
+        MMI_HILOGE("Failed to transmit");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnHasIrEmitter(bool &hasIrEmitter)
+{
+    hasIrEmitter = false;
     return RET_OK;
 }
 
