@@ -1537,7 +1537,7 @@ void PointerDrawingManager::DrawManager()
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    if (HasMagicCursor() && lastDrawPointerStyle_.id != currentMouseStyle_.id 
+    if (HasMagicCursor() && lastDrawPointerStyle_.id != currentMouseStyle_.id
         && (lastDrawPointerStyle_.id == DEVELOPER_DEFINED_ICON
         || currentMouseStyle_.id == DEVELOPER_DEFINED_ICON)) {
         if (surfaceNode_ != nullptr) {
