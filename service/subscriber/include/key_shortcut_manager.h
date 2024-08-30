@@ -118,6 +118,13 @@ private:
         std::function<void(std::shared_ptr<KeyEvent>)> callback;
     };
 
+    struct SystemHotkey {
+        std::set<int32_t> preKeys;
+        int32_t finalKey;
+
+        bool operator<(const SystemHotkey &other) const;
+    };
+
     void LoadSystemKeys();
     void ReadSystemKeys(const std::string &cfgPath);
     int32_t ReadSystemKey(cJSON *jsonSysKey);
@@ -150,6 +157,10 @@ private:
     bool WillResetOnKeyDown(int32_t keyCode, const KeyShortcut &shortcut) const;
     bool WillResetOnKeyUp(int32_t keyCode, const KeyShortcut &shortcut) const;
     void ResetTriggering(int32_t shortcutId);
+    void LoadHotkeys();
+    void ReadHotkeys(const std::string &cfgPath);
+    int32_t ReadHotkey(cJSON *jsonSysKey);
+    int32_t AddHotkey(const std::set<int32_t> &preKeys, int32_t finalKey);
 
     std::set<int32_t> shortcutConsumed_;
     std::set<SystemKey> systemKeys_;
@@ -157,10 +168,10 @@ private:
     std::map<int32_t, KeyShortcut> shortcuts_;
     std::map<int32_t, int32_t> triggering_;
     static const std::map<int32_t, uint32_t> modifiers_;
-    static const std::list<std::pair<std::set<int32_t>, int32_t>> systemHotkeys_;
     static std::mutex mutex_;
     static std::shared_ptr<KeyShortcutManager> instance_;
     bool isCheckShortcut_ { true };
+    std::set<SystemHotkey> hotkeys_;
 };
 
 #define KEY_SHORTCUT_MGR KeyShortcutManager::GetInstance()
