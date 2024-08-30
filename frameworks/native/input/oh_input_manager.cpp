@@ -2153,7 +2153,7 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
             return;
         });
     for (auto listener : g_ohDeviceListenerList) {
-        if (listener!= nullptr){
+        if (listener == nullptr){
             MMI_HILOGE("listener is nullptr");
             continue;
         }
@@ -2174,7 +2174,7 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
             return;
         });
     for (auto listener : g_ohDeviceListenerList) {
-        if (listener!= nullptr){
+        if (listener == nullptr){
             MMI_HILOGE("listener is nullptr");
             continue;
         }
