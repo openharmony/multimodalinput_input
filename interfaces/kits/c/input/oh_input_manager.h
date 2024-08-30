@@ -1348,17 +1348,6 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
 
 /**
- * @brief 将按键值{@Link Input_KeyCode}转换为字符串描述
- *
- * @param keyCode 按键值{@Link Input_KeyCode}
-
- * @return 成功时返回按键值的字符串描述，失败时返回NULL，可能的原因是传入非法的键值。
- * @syscap SystemCapability.MultimodalInput.Input.Core
- * @since 13
- */
-const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode);
-
-/**
  * @brief 注册设备热插拔的监听器
  *
  * @param listener 指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
