@@ -4216,6 +4216,11 @@ bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupI
     }
     return false;
 }
+
+int32_t InputWindowsManager::GetCurrentUserId()
+{
+    return currentUserId_;
+}
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS

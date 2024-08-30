@@ -80,6 +80,10 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "app_mgr_client.h"
+#include "running_process_info.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 #ifdef PLAYER_FRAMEWORK_EXISTS
 #include "input_screen_capture_agent.h"
@@ -125,6 +129,9 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
     KeyEvent::KEYCODE_NUM_LOCK
 };
+#ifdef OHOS_BUILD_ENABLE_ANCO
+constexpr int32_t DEFAULT_USER_ID { 100 };
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
@@ -537,6 +544,30 @@ void MMIService::OnConnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGI("fd:%{public}d", s->GetFd());
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (s->GetProgramName != SHELL_ASSISTANT) {
+        return;
+    }
+    auto appMgrClient = DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance();
+    if (appMgrClient == nullptr) {
+        return;
+    }
+    int32_t userid = WIN_MGR->GetCurrentUserId();
+    if (userid < 0) {
+        userid = DEFAULT_USER_ID;
+    }
+    std::vector<AppExecFwk::RunningProcessInfo> info;
+    appMgrClient->GetProcessRunningInfosByUserId(info, userid);
+    for (auto &item : info) {
+        if (item.bundleNames.empty()) {
+            continue;
+        }
+        if (SHELL_ASSISTANT == item.bundleNames[0].c_str()) {
+            MMI_HILOGW("record client processes pid %{public}d", item.pid_);
+            shellAssitentPid_ = item.pid_;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 void MMIService::OnDisconnected(SessionPtr s)
@@ -548,8 +579,9 @@ void MMIService::OnDisconnected(SessionPtr s)
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (s->GetProgramName() == SHELL_ASSISTANT) {
-        MMI_HILOGW("clean all shell windows because of %{public}s", s->GetProgramName().c_str());
+    if (s->GetProgramName() == SHELL_ASSISTANT && shellAssitentPid_ == s->GetPid()) {
+        MMI_HILOGW("clean all shell windows pid: %{public}d", s->GetPid());
+        shellAssitentPid_ = -1;
         IInputWindowsManager::GetInstance()->CleanShellWindowIds();
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
