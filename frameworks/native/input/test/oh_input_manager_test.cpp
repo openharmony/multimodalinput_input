@@ -364,10 +364,10 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         return;
     }
     listener1->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded1:deviceId:%d,eviceType:%d", deviceId, deviceType);
+        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d,eviceType:%{public}d", deviceId, deviceType);
     };
-    listener1->OnDeviceRemoved = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceRemoved1:deviceId:%d,deviceTypes:%d", deviceId, deviceType);
+    listener1->OnDeviceRemoved = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceRemoved1:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener1), INPUT_SUCCESS);
 
@@ -377,17 +377,16 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         return;
     }
     listener2->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded2:deviceId:%d,deviceType:%d", deviceId, deviceType);
+        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d,deviceType:%{public}d", deviceId, deviceType);
     };
-    listener2->OnDeviceRemoved = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceRemoved2:deviceId:%d,deviceType:%d", deviceId, deviceType);
+    listener2->OnDeviceRemoved = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceRemoved2:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
     std::this_thread::sleep_for(std::chrono::seconds(20));
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener1), INPUT_SUCCESS);
     std::this_thread::sleep_for(std::chrono::seconds(20));
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener2), INPUT_SUCCESS);
-    std::this_thread::sleep_for(std::chrono::seconds(20));
     delete listener1;
     delete listener2;
 }
@@ -406,10 +405,10 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         return;
     }
     listener1->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded1:deviceId:%d,eviceType:%d", deviceId, deviceType);
+        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d,eviceType:%{public}d", deviceId, deviceType);
     };
-    listener1->OnDeviceRemoved = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceRemoved1:deviceId:%d,deviceTypes:%d", deviceId, deviceType);
+    listener1->OnDeviceRemoved = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceRemoved1:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener1), INPUT_SUCCESS);
 
@@ -419,15 +418,14 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         return;
     }
     listener2->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded2:deviceId:%d,deviceType:%d", deviceId, deviceType);
+        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d,deviceType:%{public}d", deviceId, deviceType);
     };
-    listener2->OnDeviceRemoved = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceRemoved2:deviceId:%d,deviceType:%d", deviceId, deviceType);
+    listener2->OnDeviceRemoved = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceRemoved2:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
     std::this_thread::sleep_for(std::chrono::seconds(20));
     EXPECT_EQ(OH_Input_UnregisterDeviceListeners(), INPUT_SUCCESS);
-    std::this_thread::sleep_for(std::chrono::seconds(20));
     delete listener1;
     delete listener2;
 }
