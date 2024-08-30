@@ -363,8 +363,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener1->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d,eviceType:%{public}d", deviceId, deviceType);
+    listener1->OnDeviceAdded = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d", deviceId);
     };
     listener1->OnDeviceRemoved = [](int32_t deviceId) {
         MMI_HILOGI("OnDeviceRemoved1:deviceId:%{public}d", deviceId);
@@ -376,8 +376,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener2->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d,deviceType:%{public}d", deviceId, deviceType);
+    listener2->OnDeviceAdded = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d", deviceId);
     };
     listener2->OnDeviceRemoved = [](int32_t deviceId) {
         MMI_HILOGI("OnDeviceRemoved2:deviceId:%{public}d", deviceId);
@@ -404,8 +404,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener1->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d,eviceType:%{public}d", deviceId, deviceType);
+    listener1->OnDeviceAdded = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d", deviceId);
     };
     listener1->OnDeviceRemoved = [](int32_t deviceId) {
         MMI_HILOGI("OnDeviceRemoved1:deviceId:%{public}d", deviceId);
@@ -417,8 +417,8 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener2->OnDeviceAdded = [](int32_t deviceId, int32_t deviceType) {
-        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d,deviceType:%{public}d", deviceId, deviceType);
+    listener2->OnDeviceAdded = [](int32_t deviceId) {
+        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d", deviceId);
     };
     listener2->OnDeviceRemoved = [](int32_t deviceId) {
         MMI_HILOGI("OnDeviceRemoved2:deviceId:%{public}d", deviceId);

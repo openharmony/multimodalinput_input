@@ -2146,12 +2146,6 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
 
 static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
-    int32_t deviceType = -1;
-    OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
-        [&deviceType](std::shared_ptr<OHOS::MMI::InputDevice> DeviceInfo){
-            deviceType = DeviceInfo->GetType();
-            return;
-        });
     for (auto listener : g_ohDeviceListenerList) {
         if (listener == nullptr){
             MMI_HILOGE("listener is nullptr");
@@ -2161,7 +2155,7 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
             MMI_HILOGE("OnDeviceAdded is nullptr");
             continue;
         }
-        listener->OnDeviceAdded(deviceId, deviceType);
+        listener->OnDeviceAdded(deviceId);
     }
 }
 
