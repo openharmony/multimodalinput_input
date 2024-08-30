@@ -80,6 +80,10 @@
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
 #include "setting_datashare.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "app_mgr_client.h"
+#include "running_process_info.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -122,8 +126,6 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_NUM_LOCK
 };
 #ifdef OHOS_BUILD_ENABLE_ANCO
-#include "app_mgr_client.h"
-#include "running_process_info.h"
 constexpr int32_t DEFAULT_USER_ID { 100 };
 #endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace
