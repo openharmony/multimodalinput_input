@@ -359,7 +359,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_SetKeyCode, TestSize.Le
 HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_KeyCodeToString, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::string  str = OH_Input_KeyCodeToString(KEYCODE_F1);
+    std::string str = OH_Input_KeyCodeToString(KEYCODE_F1);
     EXPECT_STREQ(str.c_str(), "KEYCODE_F1");
     str = OH_Input_KeyCodeToString(KEYCODE_F12);
     EXPECT_STREQ(str.c_str(), "KEYCODE_F12");
