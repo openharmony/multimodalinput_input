@@ -292,7 +292,7 @@ typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
  * @brief 回调函数，用于回调输入设备的上线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
  * @param deviceId 设备的id。
  * @param deviceTypes 设备类型的数组。
- * @param count 设备类型数组的长度。
+ * @param length 设备类型数组的长度。
  * @since 13
  */
 typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, int32_t* deviceTypes, int32_t length);
@@ -301,7 +301,7 @@ typedef void (*Input_DeviceAddedCallback)(int32_t deviceId, int32_t* deviceTypes
  * @brief 回调函数，用于回调输入设备的下线事件，deviceTypes生命周期为回调函数内，出了回调函数，deviceTypes的内存将会被释放。
  * @param deviceId 设备的id。
  * @param deviceTypes 设备类型的数组。
- * @param count 设备类型数组的长度。
+ * @param length 设备类型数组的长度。
  * @since 13
  */
 typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId, int32_t* deviceTypes, int32_t length);
