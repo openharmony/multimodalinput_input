@@ -84,6 +84,18 @@ struct Input_Hotkey {
     int32_t finalKey { -1 };
     bool isRepeat { true };
 };
+
+constexpr int32_t SIZE_ARRAY = 64;
+struct Input_DeviceInfo {
+    int32_t id;
+    char name[SIZE_ARRAY] {};
+    int32_t ability;
+    int32_t product;
+    int32_t vendor;
+    int32_t version;
+    char phys[SIZE_ARRAY] {};
+};
+
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
@@ -2137,5 +2149,166 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         OHOS::MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
     delete hotkeyInfo;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *outSize)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceIds, INPUT_PARAMETER_ERROR);
+    CHKPR(outSize, INPUT_PARAMETER_ERROR);
+    auto nativeCallback = [&](std::vector<int32_t> &ids) {
+        auto deviceIdslength = static_cast<int32_t>(ids.size());
+        if (inSize > deviceIdslength) {
+            *outSize = deviceIdslength;
+        }
+        if (inSize < deviceIdslength) {
+            *outSize = inSize;
+        }
+        for (int32_t i = 0; i < *outSize; ++i) {
+            *(deviceIds + i) = ids[i];
+        }
+    };
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDeviceIds(nativeCallback);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDeviceIds fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_DeviceInfo* OH_Input_CreateDeviceInfo(void)
+{
+    CALL_DEBUG_ENTER;
+    Input_DeviceInfo* deviceInfo = new (std::nothrow) Input_DeviceInfo();
+    if (deviceInfo == nullptr) {
+        MMI_HILOGE("deviceInfo is null");
+        return nullptr;
+    }
+    return deviceInfo;
+}
+
+void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(deviceInfo);
+    CHKPV(*deviceInfo);
+    delete *deviceInfo;
+    *deviceInfo = nullptr;
+}
+
+Input_Result OH_Input_GetDevice(int32_t deviceId, Input_DeviceInfo **deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    if (deviceId < 0) {
+        MMI_HILOGE("Invalid deviceId:%{public}d", deviceId);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(*deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    auto nativeCallback = [deviceInfo](std::shared_ptr<OHOS::MMI::InputDevice> device) {
+        CHKPV(*deviceInfo);
+        (*deviceInfo)->id = device->GetId();
+        if (strcpy_s((*deviceInfo)->name, device->GetName().size() + 1, device->GetName().c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            return;
+        }
+        (*deviceInfo)->product = device->GetProduct();
+        (*deviceInfo)->vendor = device->GetVendor();
+        (*deviceInfo)->version = device->GetVersion();
+        if (strcpy_s((*deviceInfo)->phys, device->GetPhys().size() + 1, device->GetPhys().c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            return;
+        }
+        (*deviceInfo)->ability = device->GetType();
+    };
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId, nativeCallback);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDevice fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *KeyboardType)
+{
+    CALL_DEBUG_ENTER;
+    if (deviceId < 0) {
+        MMI_HILOGE("Invalid deviceId:%{public}d", deviceId);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(KeyboardType, INPUT_PARAMETER_ERROR);
+    auto nativeCallback = [KeyboardType](int32_t keyboardTypes) {
+        *KeyboardType = keyboardTypes;
+    };
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetKeyboardType(deviceId, nativeCallback);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardType fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(name, INPUT_PARAMETER_ERROR);
+    *name = deviceInfo->name;
+    return INPUT_SUCCESS;
+}
+
+
+Input_Result OH_Input_GetDevicePhys(Input_DeviceInfo *deviceInfo, char **phys)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(phys, INPUT_PARAMETER_ERROR);
+    *phys = deviceInfo->phys;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(id, INPUT_PARAMETER_ERROR);
+    *id = deviceInfo->id;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *capabilities)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(capabilities, INPUT_PARAMETER_ERROR);
+    *capabilities = deviceInfo->ability;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *version)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(version, INPUT_PARAMETER_ERROR);
+    *version = deviceInfo->version;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *product)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(product, INPUT_PARAMETER_ERROR);
+    *product = deviceInfo->product;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *vendor)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(vendor, INPUT_PARAMETER_ERROR);
+    *vendor = deviceInfo->vendor;
     return INPUT_SUCCESS;
 }
