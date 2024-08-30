@@ -86,11 +86,6 @@ struct Input_Hotkey {
     bool isRepeat { true };
 };
 
-struct DeviceType {
-    int32_t deviceType;
-    uint32_t deviceTypeMask;
-};
-
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
@@ -129,23 +124,6 @@ static const std::set<int32_t> g_keyCodeValueSet = {
     KEYCODE_CAPS_LOCK, KEYCODE_SCROLL_LOCK, KEYCODE_META_LEFT, KEYCODE_META_RIGHT, KEYCODE_SYSRQ, KEYCODE_BREAK,
     KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
     KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
-};
-static const uint32_t DEVICE_TYPE_MAX_NUM = 6;
-
-static const uint32_t DEVICE_TYPE_KEYBOARD = (1 << 1);
-static const uint32_t DEVICE_TYPE_MOUSE = (1 << 2);
-static const uint32_t DEVICE_TYPE_TOUCHPAD = (1 << 3);
-static const uint32_t DEVICE_TYPE_TOUCHSCREEN = (1 << 4);
-static const uint32_t DEVICE_TYPE_JOYSTICK = (1 << 6);
-static const uint32_t DEVICE_TYPE_TRACKBALL = (1 << 10);
-
-static const DeviceType g_deviceType[] = {
-    { INPUT_DEVICE_TYPE_KEYBOARD , DEVICE_TYPE_KEYBOARD },
-    { INPUT_DEVICE_TYPE_MOUSE, DEVICE_TYPE_MOUSE },
-    { INPUT_DEVICE_TYPE_TOUCHPAD, DEVICE_TYPE_TOUCHPAD },
-    { INPUT_DEVICE_TYPE_TOUCHSCREEN, DEVICE_TYPE_TOUCHSCREEN },
-    { INPUT_DEVICE_TYPE_JOYSTICK, DEVICE_TYPE_JOYSTICK },
-    { INPUT_DEVICE_TYPE_TRACKBALL, DEVICE_TYPE_TRACKBALL },
 };
 
 static const std::vector<int32_t> g_pressKeyCodes = {
@@ -2174,51 +2152,27 @@ const char* OH_Input_KeyCodeToString(Input_KeyCode keyCode)
 
 static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
 {
-    int32_t length = -1;
-    uint32_t deviceType = -1;
+    int32_t deviceType = -1;
     OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
         [&deviceType](std::shared_ptr<OHOS::MMI::InputDevice> DeviceInfo){
-            deviceType = static_cast<uint32_t>(DeviceInfo->GetType());
+            deviceType = DeviceInfo->GetType();
             return;
         });
-    std::vector<int32_t> types;
-    for (auto item : g_deviceType) {
-        if ((deviceType & item.deviceTypeMask) > 0) {
-            types.push_back(item.deviceType);
-        }
-    }
-    length = static_cast<int32_t>(types.size());
-    int32_t deviceTypes[DEVICE_TYPE_MAX_NUM] = { 0 };
-    for (int32_t i = 0; i < length; ++i) {
-        deviceTypes[i] = static_cast<int32_t>(g_deviceType[i].deviceType);
-    }
     for (auto listener : g_ohDeviceListenerList) {
-        listener->OnDeviceAdded(deviceId, deviceTypes, length);
+        listener->OnDeviceAdded(deviceId, deviceType);
     }
 }
 
 static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 {
-    int32_t length = 0;
-    uint32_t deviceType = -1;
+    int32_t deviceType = 0;
     OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId,
         [&deviceType](std::shared_ptr<OHOS::MMI::InputDevice> DeviceInfo){
-            deviceType = static_cast<uint32_t>(DeviceInfo->GetType());
+            deviceType = DeviceInfo->GetType();
             return;
         });
-    std::vector<int32_t> types;
-    for (auto item : g_deviceType) {
-        if ((deviceType & item.deviceTypeMask) > 0) {
-            types.push_back(item.deviceType);
-        }
-    }
-    length = static_cast<int32_t>(types.size());
-    int32_t deviceTypes[DEVICE_TYPE_MAX_NUM] = { 0 };
-    for (int32_t i = 0; i < length; ++i) {
-        deviceTypes[i] = static_cast<int32_t>(g_deviceType[i].deviceType);
-    }
     for (auto listener : g_ohDeviceListenerList) {
-        listener->OnDeviceRemoved(deviceId, deviceTypes, length);
+        listener->OnDeviceRemoved(deviceId, deviceType);
     }
 }
 
@@ -2261,7 +2215,7 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
     return INPUT_SUCCESS;
 }
 
-Input_Result OH_Input_UnregisterDeviceListener()
+Input_Result OH_Input_UnregisterDeviceListeners()
 {
     if (g_ohDeviceListenerList.empty()) {
         return INPUT_SUCCESS;
@@ -2272,4 +2226,5 @@ Input_Result OH_Input_UnregisterDeviceListener()
         MMI_HILOGE("UnregisterDevListener fail");
         return INPUT_SERVICE_EXCEPTION;
     }
+    return INPUT_SUCCESS;
 }
