@@ -85,11 +85,6 @@
 #define MMI_LOG_TAG "MMIService"
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    #include "app_mgr_client.h"
-    #include "running_process_info.h"
-    constexpr int32_t DEFAULT_USER_ID { 100 };
-#endif // OHOS_BUILD_ENABLE_ANCO
 
 namespace OHOS {
 namespace MMI {
@@ -126,6 +121,11 @@ const std::set<int32_t> g_keyCodeValueSet = {
     KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_F12,
     KeyEvent::KEYCODE_NUM_LOCK
 };
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "app_mgr_client.h"
+#include "running_process_info.h"
+constexpr int32_t DEFAULT_USER_ID { 100 };
+#endif // OHOS_BUILD_ENABLE_ANCO
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
