@@ -264,6 +264,8 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
  */
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
+typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
+
 /**
  * @brief Defines the structure for the interceptor of event callbacks,
  * including mouseCallback, touchCallback, and axisCallback.
@@ -1319,6 +1321,14 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
  * @since 13
  */
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
+
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
+
+Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
+
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
+
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 #ifdef __cplusplus
 }
 #endif
