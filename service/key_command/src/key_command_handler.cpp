@@ -1301,7 +1301,6 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
-    MMI_HILOGE("Handle event failed");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
