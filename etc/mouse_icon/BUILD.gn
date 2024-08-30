@@ -371,6 +371,13 @@ ohos_prebuilt_etc("multimodalinput.config.system_keys") {
   relative_install_dir = "multimodalinput"
 }
 
+ohos_prebuilt_etc("multimodalinput.config.system_hotkeys") {
+  source = "${mmi_path}/etc/system_hotkeys_config.json"
+  part_name = "${mmi_part_name}"
+  subsystem_name = "${mmi_subsystem_name}"
+  relative_install_dir = "multimodalinput"
+}
+
 group("input_mouse_icon") {
   deps = [
     ":drawing_pointer_image_Colorsucker",
@@ -419,6 +426,7 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_Zoom_In",
     ":drawing_pointer_image_Zoom_Out",
     ":multimodalinput.config.exceptional_system_keys",
+    ":multimodalinput.config.system_hotkeys",
     ":multimodalinput.config.system_keys",
     ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
