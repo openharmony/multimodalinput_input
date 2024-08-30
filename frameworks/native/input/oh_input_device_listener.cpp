@@ -44,12 +44,14 @@ void OHInputDeviceListener::OnDeviceRemoved(int32_t deviceId, const std::string 
     }
 }
 
-void OHInputDeviceListener::SetDeviceAddedCallback(const std::function<void(int32_t deviceId, const std::string &type)> &callback)
+void OHInputDeviceListener::SetDeviceAddedCallback(
+    const std::function<void(int32_t deviceId, const std::string &type)> &callback)
 {
     addCallback_ = callback;
 }
 
-void OHInputDeviceListener::SetDeviceRemovedCallback(const std::function<void(int32_t deviceId, const std::string &type)> &callback)
+void OHInputDeviceListener::SetDeviceRemovedCallback(
+    const std::function<void(int32_t deviceId, const std::string &type)> &callback)
 {
     removeCallback_ = callback;
 }
