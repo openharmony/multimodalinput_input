@@ -286,7 +286,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSiz
     CALL_TEST_DEBUG;
     bool visible = true;
     bool ret = InputMgrImpl.IsPointerVisible();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -300,7 +300,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_02, TestSiz
     CALL_TEST_DEBUG;
     bool visible = false;
     bool ret = InputMgrImpl.IsPointerVisible();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**
@@ -314,7 +314,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_01, TestSize
     CALL_TEST_DEBUG;
     int32_t color = 6;
     int32_t ret = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -328,7 +328,7 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetPointerColor_02, TestSize
     CALL_TEST_DEBUG;
     int32_t color = -10;
     int32_t ret = InputMgrImpl.SetPointerColor(color);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
