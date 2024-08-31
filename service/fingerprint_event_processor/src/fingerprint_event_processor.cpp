@@ -28,10 +28,11 @@ namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 namespace {
-constexpr int32_t POWER_KEY_INIT { 0 };
-constexpr int32_t POWER_KEY_DOWN { 1 };
-constexpr int32_t POWER_KEY_UP { 2 };
+constexpr int32_t KEY_INIT { 0 };
+constexpr int32_t KEY_DOWN { 1 };
+constexpr int32_t KEY_UP { 2 };
 constexpr int32_t POWER_KEY_UP_TIME { 1000 }; // 1000ms
+constexpr int32_t VOLUME_KEY_UP_TIME { 500 }; // 1000ms
 }
 FingerprintEventProcessor::FingerprintEventProcessor()
 {}
@@ -55,14 +56,17 @@ bool FingerprintEventProcessor::IsFingerprintEvent(struct libinput_event* event)
         CHKPR(keyBoard, false);
         auto key = libinput_event_keyboard_get_key(keyBoard);
         if (key != FINGERPRINT_CODE_DOWN && key != FINGERPRINT_CODE_UP
-            && key != FINGERPRINT_CODE_CLICK && key != FINGERPRINT_CODE_RETOUCH) {
+            && key != FINGERPRINT_CODE_CLICK && key != FINGERPRINT_CODE_RETOUCH
+            && key != FINGERPRINT_CODE_CANCEL
+            ) {
             MMI_HILOGD("Not FingerprintEvent event");
             return false;
         }
     }
     return true;
 }
-void FingerprintEventProcessor::SetPowerKeyState(struct libinput_event* event)
+
+void FingerprintEventProcessor::SetPowerAndVolumeKeyState(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);
@@ -71,19 +75,115 @@ void FingerprintEventProcessor::SetPowerKeyState(struct libinput_event* event)
     auto data = libinput_event_get_keyboard_event(event);
     CHKPV(data);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
-    if (keyCode != KEY_POWER) {
-        MMI_HILOGD("current keycode is not power, return");
+    auto iter = keyStateMap_.find(keyCode);
+    if (iter == keyStateMap_.end()) {
+        MMI_HILOGD("current keycode is not mistouch key, keycode is %{private}d", keyCode);
         return;
     }
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
-    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        powerKeyState_ = POWER_KEY_DOWN;
+    MMI_HILOGD("current keycode is %{private}d, keyaction is %{private}d", keyCode, keyAction);
+    if (keyAction ==  KeyEvent::KEY_ACTION_DOWN) {
+        iter->second.first = KEY_DOWN;
         SendFingerprintCancelEvent();
     } else {
-        powerKeyState_ = POWER_KEY_UP;
-        lastUpTime_ = std::chrono::steady_clock::now();
+        iter->second.first = KEY_UP;
+        iter->second.second = std::chrono::steady_clock::now();
     }
+}
+
+void FingerprintEventProcessor::SetScreenState(struct libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(event);
+    auto type = libinput_event_get_type(event);
+    MMI_HILOGD("smart key screen state is %{public}d", type);
+    switch (type) {
+        case LIBINPUT_EVENT_TOUCH_DOWN: {
+            screenState_ = true;
+            break;
+        }
+        case LIBINPUT_EVENT_TOUCH_UP: {
+            screenState_ = false;
+            break;
+        }
+        default: {
+            MMI_HILOGD("Unknown event type, touchType:%{public}d", type);
+            return;
+        }
+    }
+    ChangeScreenMissTouchFlag(screenState_, cancelState_);
+}
+ 
+// 屏幕down 智xxdown 屏幕up 智xx up  ==> 直接操作智xx 无响应
+ 
+/*
+* This is a poorly designed state machine for handling screen touch errors, SAD :(
+*/
+void FingerprintEventProcessor::ChangeScreenMissTouchFlag(bool screen, bool cancel)
+{
+    int32_t flag = screenMissTouchFlag_ ? 1 : 0;
+    MMI_HILOGD("screenMissTouchFlag_ : %{private}d, screen : %{private}d, cancel : %{private}d", flag, screen, screen);
+    if (screenMissTouchFlag_ == false) {
+        if (screen == true) {
+            screenMissTouchFlag_ = true;
+            // 上报cancel的逻辑是手指按下屏幕
+            SendFingerprintCancelEvent();
+            return;
+        }
+    } else {
+        // 手指没有在屏幕，且目前为止收到cancel事件
+        if (screen == false && cancel == true) {
+            screenMissTouchFlag_ = false;
+            return;
+        }
+    }
+}
+ 
+bool FingerprintEventProcessor::CheckMisTouchState()
+{
+    // 不太清楚
+    if (CheckKeyMisTouchState() || CheckScreenMisTouchState()) {
+        return true;
+    }
+    return false;
+}
+ 
+bool FingerprintEventProcessor::CheckScreenMisTouchState()
+{
+    int32_t flag = screenMissTouchFlag_ ? 1 : 0;
+    MMI_HILOGD("screenMissTouchFlag_ is %{public}d", flag);
+    return screenMissTouchFlag_;
+}
+ 
+bool FingerprintEventProcessor::CheckKeyMisTouchState()
+{
+    CALL_DEBUG_ENTER;
+    bool ret = false;
+    for (auto &[key, value] : keyStateMap_) {
+        auto keystate = value.first;
+        MMI_HILOGD("keycode : %{private}d, state : %{public}d", key, value.first);
+        if (keystate == KEY_DOWN) {
+            ret = true;
+        } else if (keystate == KEY_UP) {
+            auto currentTime = std::chrono::steady_clock::now();
+            auto duration = currentTime - value.second;
+            auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+            int32_t time = POWER_KEY_UP_TIME;
+            if (key != KEY_POWER) {
+                time = VOLUME_KEY_UP_TIME;
+            }
+            if (durationMs < time) {
+                MMI_HILOGD("Dont report because time diff < threshold, keycode : %{private}d, state : %{public}d",
+                    key, value.first);
+                ret = true;
+            } else {
+                value.first = KEY_INIT;
+            }
+        }
+    }
+    MMI_HILOGD("KeyMisTouchState is %{public}d", ret);
+    return ret;
 }
 
 int32_t FingerprintEventProcessor::SendFingerprintCancelEvent()
@@ -110,20 +210,6 @@ int32_t FingerprintEventProcessor::SendFingerprintCancelEvent()
 int32_t FingerprintEventProcessor::HandleFingerprintEvent(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
-    if (powerKeyState_ == POWER_KEY_DOWN) {
-        MMI_HILOGD("Dont report because current state is powerkey down");
-        return 0;
-    } else if (powerKeyState_ == POWER_KEY_UP) {
-        auto currentTime = std::chrono::steady_clock::now();
-        auto duration = currentTime - lastUpTime_;
-        auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-        if (durationMs < POWER_KEY_UP_TIME) {
-            MMI_HILOGD("Dont report because time diff < 1s");
-            return 0;
-        } else {
-            powerKeyState_ = POWER_KEY_INIT;
-        }
-    }
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
     CHKPR(device, PARAM_INPUT_INVALID);
@@ -154,8 +240,16 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     switch (key) {
         case FINGERPRINT_CODE_DOWN: {
+            cancelState_ = false;
+            ChangeScreenMissTouchFlag(screenState_, true);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN);
             break;
+        }
+        case FINGERPRINT_CODE_CANCEL: {
+            cancelState_ = true;
+            ChangeScreenMissTouchFlag(screenState_, cancelState_);
+            MMI_HILOGI("change cancel state and dont send point event");
+            return RET_OK;
         }
         case FINGERPRINT_CODE_UP: {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_FINGERPRINT_UP);
@@ -179,6 +273,10 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
+    if (CheckMisTouchState()) {
+        MMI_HILOGD("in mistouch state, dont report event");
+        return ERR_OK;
+    }
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {
@@ -206,6 +304,10 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGD("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
+    if (CheckMisTouchState()) {
+        MMI_HILOGD("in mistouch state, dont report event");
+        return ERR_OK;
+    }
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {
