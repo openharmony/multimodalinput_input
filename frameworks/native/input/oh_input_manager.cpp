@@ -2154,11 +2154,11 @@ static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
             MMI_HILOGE("listener is nullptr");
             continue;
         }
-        if (listener->OnDeviceAdded == nullptr) {
+        if (listener->deviceAddedCallback == nullptr) {
             MMI_HILOGE("OnDeviceAdded is nullptr");
             continue;
         }
-        listener->OnDeviceAdded(deviceId);
+        listener->deviceAddedCallback(deviceId);
     }
 }
 
@@ -2171,11 +2171,11 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
             MMI_HILOGE("listener is nullptr");
             continue;
         }
-        if (listener->OnDeviceRemoved == nullptr) {
+        if (listener->deviceRemovedCallback == nullptr) {
             MMI_HILOGE("OnDeviceRemoved is nullptr");
             continue;
         }
-        listener->OnDeviceRemoved(deviceId);
+        listener->deviceRemovedCallback(deviceId);
     }
 }
 

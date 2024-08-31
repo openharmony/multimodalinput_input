@@ -300,9 +300,9 @@ typedef struct Input_InterceptorEventCallback {
  */
 typedef struct Input_DeviceListener {
     /** 定义一个回调函数用于回调设备上线事件 */
-    Input_DeviceAddedCallback OnDeviceAdded;
+    Input_DeviceAddedCallback deviceAddedCallback;
     /** 定义一个回调函数用于回调设备下线事件 */
-    Input_DeviceRemovedCallback OnDeviceRemoved;
+    Input_DeviceRemovedCallback deviceRemovedCallback;
 } Input_DeviceListener;
 
 /**
