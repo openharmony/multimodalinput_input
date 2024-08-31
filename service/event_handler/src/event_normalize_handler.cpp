@@ -314,7 +314,7 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-    FingerprintEventHdr->SetPowerKeyState(event);
+    FingerprintEventHdr->SetPowerAndVolumeKeyState(event);
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
@@ -533,6 +533,9 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
+#ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+    FingerprintEventHdr->SetScreenState(event);
+#endif // OHOS_BUILD_ENABLE_FINGERPRINT
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     BytraceAdapter::StartPackageEvent("package touchEvent");
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
