@@ -21,6 +21,7 @@
 #include "key_event.h"
 #include "mmi_log.h"
 #include "oh_axis_type.h"
+#include "oh_input_device_listener.h"
 #include "oh_input_interceptor.h"
 #include "oh_key_code.h"
 #include "permission_helper.h"
@@ -99,6 +100,7 @@ struct Input_DeviceInfo {
 typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
 static Callbacks g_callbacks = {};
 static std::mutex g_CallBacksMutex;
+static std::mutex g_DeviceListerCallbackMutex;
 static constexpr size_t PRE_KEYS_SIZE { 2 };
 static constexpr size_t KEYS_SIZE { 3 };
 static std::mutex g_hotkeyCountsMutex;
@@ -112,6 +114,7 @@ static std::set<Input_KeyEventCallback> g_keyMonitorCallbacks;
 static std::set<Input_MouseEventCallback> g_mouseMonitorCallbacks;
 static std::set<Input_TouchEventCallback> g_touchMonitorCallbacks;
 static std::set<Input_AxisEventCallback> g_axisMonitorAllCallbacks;
+static std::set<Input_DeviceListener*> g_ohDeviceListenerList;
 static std::map<InputEvent_AxisEventType, std::set<Input_AxisEventCallback>> g_axisMonitorCallbacks;
 static Input_KeyEventCallback g_keyInterceptorCallback = nullptr;
 static struct Input_InterceptorEventCallback *g_pointerInterceptorCallback = nullptr;
@@ -119,6 +122,8 @@ static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_pointerInterceptor =
     std::make_shared<OHOS::MMI::OHInputInterceptor>();
 static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_keyInterceptor =
     std::make_shared<OHOS::MMI::OHInputInterceptor>();
+static std::shared_ptr<OHOS::MMI::OHInputDeviceListener> g_deviceListener =
+    std::make_shared<OHOS::MMI::OHInputDeviceListener>();
 static std::mutex g_mutex;
 static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
 static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
@@ -2149,6 +2154,101 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_Hotk
         OHOS::MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
     delete hotkeyInfo;
+    return INPUT_SUCCESS;
+}
+
+static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    for (auto listener : g_ohDeviceListenerList) {
+        if (listener == nullptr) {
+            MMI_HILOGE("listener is nullptr");
+            continue;
+        }
+        if (listener->deviceAddedCallback == nullptr) {
+            MMI_HILOGE("OnDeviceAdded is nullptr");
+            continue;
+        }
+        listener->deviceAddedCallback(deviceId);
+    }
+}
+
+static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    for (auto listener : g_ohDeviceListenerList) {
+        if (listener == nullptr) {
+            MMI_HILOGE("listener is nullptr");
+            continue;
+        }
+        if (listener->deviceRemovedCallback == nullptr) {
+            MMI_HILOGE("OnDeviceRemoved is nullptr");
+            continue;
+        }
+        listener->deviceRemovedCallback(deviceId);
+    }
+}
+
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
+{
+    CALL_DEBUG_ENTER;
+    if (listener == nullptr) {
+        MMI_HILOGE("listener is null");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    if (g_ohDeviceListenerList.empty()) {
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
+        g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
+        g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
+        if (ret != RET_OK) {
+            MMI_HILOGE("RegisterDevListener fail");
+            return INPUT_SERVICE_EXCEPTION;
+        }
+    }
+    g_ohDeviceListenerList.insert(listener);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
+{
+    CALL_DEBUG_ENTER;
+    if (listener == nullptr) {
+        MMI_HILOGE("listener is null");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    auto it = g_ohDeviceListenerList.find(listener);
+    if (it == g_ohDeviceListenerList.end()) {
+        MMI_HILOGE("listener not found");
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_ohDeviceListenerList.erase(it);
+    if (g_ohDeviceListenerList.empty()) {
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
+        if (ret != RET_OK) {
+            MMI_HILOGE("UnregisterDevListener fail");
+            return INPUT_SERVICE_EXCEPTION;
+        }
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_UnregisterDeviceListeners()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    if (g_ohDeviceListenerList.empty()) {
+        return INPUT_SUCCESS;
+    }
+    auto ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
+    g_ohDeviceListenerList.clear();
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnregisterDevListener fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
     return INPUT_SUCCESS;
 }
 

@@ -287,6 +287,20 @@ typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
 
 /**
+ * @brief 回调函数，用于回调输入设备的上线事件。
+ * @param deviceId 设备的id。
+ * @since 13
+ */
+typedef void (*Input_DeviceAddedCallback)(int32_t deviceId);
+
+/**
+ * @brief 回调函数，用于回调输入设备的下线事件。
+ * @param deviceId 设备的id。
+ * @since 13
+ */
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId);
+
+/**
  * @brief Defines the structure for the interceptor of event callbacks,
  * including mouseCallback, touchCallback, and axisCallback.
  * @since 12
@@ -299,6 +313,17 @@ typedef struct Input_InterceptorEventCallback {
     /** Defines a lifecycle callback for **axisEvent**. */
     Input_AxisEventCallback axisCallback;
 } Input_InterceptorEventCallback;
+
+/**
+ * @brief 定义一个结构体用于监听设备设插拔
+ * @since 13
+ */
+typedef struct Input_DeviceListener {
+    /** 定义一个回调函数用于回调设备上线事件 */
+    Input_DeviceAddedCallback deviceAddedCallback;
+    /** 定义一个回调函数用于回调设备下线事件 */
+    Input_DeviceRemovedCallback deviceRemovedCallback;
+} Input_DeviceListener;
 
 /**
  * @brief Defines event interceptor options.
@@ -1348,6 +1373,45 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
  * @since 13
  */
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
+
+/**
+ * @brief 注册设备热插拔的监听器
+ *
+ * @param listener 指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
+ *
+ * @return OH_Input_RegisterDeviceListener 的返回值, 具体如下:
+ *         {@link INPUT_SUCCESS} 调用成功;\n
+ *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
+ *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
+
+/**
+ * @brief 取消注册设备热插拔的监听
+ *
+ * @param listener  指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
+ *
+ * @return OH_Input_UnregisterDeviceListener 的返回值, 具体如下:
+ *         {@link INPUT_SUCCESS} 调用成功;\n
+ *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL 或者 listener 未被注册
+ *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
+
+/**
+ * @brief 取消注册所有的设备热插拔的监听
+ *
+ * @return OH_Input_UnregisterDeviceListeners 的返回值, 具体如下:
+ *         {@link INPUT_SUCCESS} 调用成功;\n
+ *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListeners();
 
 void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
 
