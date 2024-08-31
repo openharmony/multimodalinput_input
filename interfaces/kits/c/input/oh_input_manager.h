@@ -174,6 +174,26 @@ typedef enum InputEvent_SourceType {
 } InputEvent_SourceType;
 
 /**
+ * @brief 键盘输入设备的类型。
+ *
+ * @since 13
+ */
+typedef enum Input_KeyboardType {
+    /** 表示无按键设备。 */
+    KEYBOARD_TYPE_NONE = 0,
+    /** 表示未知按键设备。 */
+    KEYBOARD_TYPE_UNKNOWN = 1,
+    /** 表示全键盘设备。 */
+    KEYBOARD_TYPE_ALPHABETIC = 2,
+    /** 表示小键盘设备。 */
+    KEYBOARD_TYPE_DIGITAL = 3,
+    /** 表示手写笔设备。 */
+    KEYBOARD_TYPE_HANDWRITING_PEN = 4,
+    /** 表示遥控器设备。 */
+    KEYBOARD_TYPE_REMOTE_CONTROL = 5,
+} Input_KeyboardType;
+
+/**
  * @brief Defines key information, which identifies a key pressing behavior.
  * For example, the Ctrl key information contains the key value and key type.
  *
@@ -310,6 +330,13 @@ typedef struct Input_DeviceListener {
  * @since 12
  */
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
+
+/**
+ * @brief 输入设备信息。
+ *
+ * @since 13
+ */
+typedef struct Input_DeviceInfo Input_DeviceInfo;
 
 /**
  * @brief Queries the key state.
@@ -1393,6 +1420,159 @@ Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
 Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 
 Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
+
+/**
+ * @brief 获取所有输入设备的id列表。
+ *
+ * @param deviceIds 用于保存输入设备id的数组。
+ * @param inSize 用于保存输入设备id数组的大小。
+ * @param outSize 出参，输出输入设备id列表的长度，该值不会大于inSize。
+ * @param size 出参，指向设备id数组长度的指针。
+ * @return OH_Input_GetDeviceIds 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@INPUT_SERVICE_EXCEPTION} 由于服务异常，获取设备id列表失败。
+ *         {@link INPUT_PARAMETER_ERROR} deviceIds或outSize为空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *outSize);
+
+/**
+ * @brief 获取输入设备信息。
+ *
+ * @param deviceId 设备id。
+ * @param deviceInfo 出参，指向输入设备信息{@Link Input_DeviceInfo}的指针。
+ * @return OH_Input_GetDevice 的返回值如下,
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@INPUT_SERVICE_EXCEPTION} 由于服务异常，获取输入设备信息失败。
+ *         {@link INPUT_PARAMETER_ERROR} 设备id为无效值或者deviceInfo是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDevice(int32_t deviceId, Input_DeviceInfo **deviceInfo);
+
+/**
+ * @brief 创建输入设备信息的对象。
+ *
+ * @return 如果操作成功，返回设备信息{@Link Input_DeviceInfo}实例的指针。否则返回空指针，可能的原因是分配内存失败。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_DeviceInfo* OH_Input_CreateDeviceInfo(void);
+
+/**
+ * @brief 销毁输入设备信息的对象。
+ *
+ * @param deviceInfo 设备信息的对象。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo);
+
+/**
+ * @brief 获取输入设备的键盘类型。
+ *
+ * @param deviceId 设备id。
+ * @param KeyboardType 出参，指向键盘输入设备类型的指针。
+ * @return OH_Input_GetKeyboardType 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@INPUT_SERVICE_EXCEPTION} 由于服务异常，获取输入设备的键盘类型失败。
+ *         {@link INPUT_PARAMETER_ERROR} 设备id为无效值或者KeyboardType是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *KeyboardType);
+
+/**
+ * @brief 获取输入设备的id。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param id 出参，指向输入设备id的指针。
+ * @return OH_Input_GetDeviceId 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者id是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id);
+
+/**
+ * @brief 获取输入设备的名称。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param name 出参，指向输入设备名称的指针。
+ * @return OH_Input_GetDeviceName 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者name是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name);
+
+/**
+ * @brief 获取有关输入设备能力信息，比如设备是触摸屏、触控板、键盘等，详情请参考示例代码。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param capabilities 出参，指向输入设备能力信息的指针。
+ * @return OH_Input_GetCapabilities 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者capabilities是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *capabilities);
+
+/**
+ * @brief 获取输入设备的版本信息。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param version 出参，指向输入设备版本信息的指针。
+ * @return OH_Input_GetDeviceVersion 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者version是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *version);
+
+/**
+ * @brief 获取输入设备的产品信息。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param product 出参，指向输入设备产品信息的指针。
+ * @return OH_Input_GetDeviceProduct 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者product是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *product);
+
+/**
+ * @brief 获取输入设备的厂商信息。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param vendor 出参，指向输入设备厂商信息的指针。
+ * @return OH_Input_GetDeviceVendor 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者vendor是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *vendor);
+
+/**
+ * @brief 获取输入设备的物理地址。
+ *
+ * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
+ * @param phys 出参，指向输入设备物理地址的指针。
+ * @return OH_Input_GetDevicePhys 的返回值如下，
+ *         {@link INPUT_SUCCESS} 操作成功。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者phys是空指针。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDevicePhys(Input_DeviceInfo *deviceInfo, char **phys);
 #ifdef __cplusplus
 }
 #endif
