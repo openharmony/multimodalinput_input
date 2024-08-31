@@ -363,11 +363,11 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener1->OnDeviceAdded = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d", deviceId);
+    listener1->deviceAddedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceAddedCallback1:deviceId:%{public}d", deviceId);
     };
-    listener1->OnDeviceRemoved = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceRemoved1:deviceId:%{public}d", deviceId);
+    listener1->deviceRemovedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceRemovedCallback1:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener1), INPUT_SUCCESS);
 
@@ -376,11 +376,11 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener,
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener2->OnDeviceAdded = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d", deviceId);
+    listener2->deviceAddedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceAddedCallback2:deviceId:%{public}d", deviceId);
     };
-    listener2->OnDeviceRemoved = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceRemoved2:deviceId:%{public}d", deviceId);
+    listener2->deviceRemovedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceRemovedCallback2:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
     EXPECT_EQ(OH_Input_UnregisterDeviceListener(listener1), INPUT_SUCCESS);
@@ -402,11 +402,11 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener1->OnDeviceAdded = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceAdded1:deviceId:%{public}d", deviceId);
+    listener1->deviceAddedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceAddedCallback1:deviceId:%{public}d", deviceId);
     };
-    listener1->OnDeviceRemoved = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceRemoved1:deviceId:%{public}d", deviceId);
+    listener1->deviceRemovedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceRemovedCallback1:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener1), INPUT_SUCCESS);
 
@@ -415,11 +415,11 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
         MMI_HILOGE("Failed to new Input_DeviceListener");
         return;
     }
-    listener2->OnDeviceAdded = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceAdded2:deviceId:%{public}d", deviceId);
+    listener2->deviceAddedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceAddedCallback2:deviceId:%{public}d", deviceId);
     };
-    listener2->OnDeviceRemoved = [](int32_t deviceId) {
-        MMI_HILOGI("OnDeviceRemoved2:deviceId:%{public}d", deviceId);
+    listener2->deviceRemovedCallback = [](int32_t deviceId) {
+        MMI_HILOGI("deviceRemovedCallback2:deviceId:%{public}d", deviceId);
     };
     EXPECT_EQ(OH_Input_RegisterDeviceListener(listener2), INPUT_SUCCESS);
     EXPECT_EQ(OH_Input_UnregisterDeviceListeners(), INPUT_SUCCESS);
