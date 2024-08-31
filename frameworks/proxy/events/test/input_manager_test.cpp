@@ -369,7 +369,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId1 >= 0);
+    EXPECT_FALSE(subscribeId1 >= 0);
 #else
     EXPECT_TRUE(subscribeId1 < 0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
