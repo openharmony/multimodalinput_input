@@ -435,9 +435,9 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_UnregisterDeviceListene
  */
 HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDeviceIds_001, TestSize.Level1)
 {
-    int32_t inSize = 0;
+    const int32_t inSize = 64;
     int32_t outSize = 0;
-    int32_t *deviceIds = new int32_t[inSize];
+    int32_t deviceIds[inSize] = { 0 };
     Input_Result retResult = OH_Input_GetDeviceIds(deviceIds, inSize, &outSize);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 }
@@ -464,7 +464,7 @@ HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetKeyboardType_001, TestS
  */
 HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDevice_001, TestSize.Level1)
 {
-    int32_t deviceId = 3;
+    int32_t deviceId = 0;
     Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
     Input_Result retResult = OH_Input_GetDevice(deviceId, &deviceInfo);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
@@ -473,8 +473,8 @@ HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDevice_001, TestSize.Le
     retResult = OH_Input_GetDeviceName(deviceInfo, &name);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 
-    char *phys = nullptr;
-    retResult = OH_Input_GetDevicePhys(deviceInfo, &phys);
+    char *address = nullptr;
+    retResult = OH_Input_GetDeviceAddress(deviceInfo, &address);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
 
     int32_t id = -1;
