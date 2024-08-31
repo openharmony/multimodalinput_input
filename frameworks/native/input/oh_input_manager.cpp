@@ -2194,8 +2194,9 @@ static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
 Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
 {
     CALL_DEBUG_ENTER;
-    if (listener == nullptr) {
-        MMI_HILOGE("listener is null");
+    if (listener == nullptr || listener->deviceAddedCallback == nullptr ||
+        listener->deviceRemovedCallback == nullptr) {
+        MMI_HILOGE("listener or callback is null");
         return INPUT_PARAMETER_ERROR;
     }
     std::lock_guard guard(g_DeviceListerCallbackMutex);
@@ -2216,7 +2217,7 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
 {
     CALL_DEBUG_ENTER;
     if (listener == nullptr) {
-        MMI_HILOGE("listener is null");
+        MMI_HILOGE("listener is nullptr");
         return INPUT_PARAMETER_ERROR;
     }
     std::lock_guard guard(g_DeviceListerCallbackMutex);
