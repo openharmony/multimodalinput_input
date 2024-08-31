@@ -25,6 +25,12 @@
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
+
+struct SmartKeySwitch {
+    std::string keyString { "" };
+    std::string valueString { "1" };
+};
+
 class FingerprintEventProcessor {
     DECLARE_DELAYED_SINGLETON(FingerprintEventProcessor);
 
@@ -54,6 +60,13 @@ private:
     bool CheckMisTouchState();
     bool CheckScreenMisTouchState();
     bool CheckKeyMisTouchState();
+    template <class T>
+    void CreateStatusConfigObserver(T& item);
+    void StartSmartKeyIfNeeded();
+    bool StartSmartKey(bool isShowDialog);
+    void ProcessSlideEvent();
+    void ProcessClickEvent();
+    void ReportResSched(uint32_t resType, int64_t value);
 
     const std::string FINGERPRINT_SOURCE_KEY { "fingerprint" };
     const std::string FINGERPRINT_SOURCE_POINT { "hw_fingerprint_mouse" };
@@ -73,6 +86,11 @@ private:
     std::atomic_bool screenState_ { false };
     std::atomic_bool cancelState_ { false };
     std::atomic_bool screenMissTouchFlag_ { false };
+    std::atomic_bool isStartedSmartKeyBySlide_ { false };
+    std::atomic_bool isStartedSmartKey_ { false };
+    std::atomic_bool isCreatedObserver_ { false };
+    std::mutex mutex_;
+    struct SmartKeySwitch smartKeySwitch_;
 };
 #define FingerprintEventHdr ::OHOS::DelayedSingleton<FingerprintEventProcessor>::GetInstance()
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
