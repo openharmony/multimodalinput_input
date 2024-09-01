@@ -185,10 +185,10 @@ typedef enum Input_KeyboardType {
     KEYBOARD_TYPE_UNKNOWN = 1,
     /** 表示全键盘设备。 */
     KEYBOARD_TYPE_ALPHABETIC = 2,
-    /** 表示小键盘设备。 */
+    /** 表示数字键盘设备。 */
     KEYBOARD_TYPE_DIGITAL = 3,
     /** 表示手写笔设备。 */
-    KEYBOARD_TYPE_HANDWRITING_PEN = 4,
+    KEYBOARD_TYPE_STYLUS = 4,
     /** 表示遥控器设备。 */
     KEYBOARD_TYPE_REMOTE_CONTROL = 5,
 } Input_KeyboardType;
@@ -1426,11 +1426,9 @@ Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_Hotk
  * @param deviceIds 用于保存输入设备id的数组。
  * @param inSize 用于保存输入设备id数组的大小。
  * @param outSize 出参，输出输入设备id列表的长度，该值不会大于inSize。
- * @param size 出参，指向设备id数组长度的指针。
  * @return OH_Input_GetDeviceIds 的返回值如下，
  *         {@link INPUT_SUCCESS} 操作成功。
- *         {@INPUT_SERVICE_EXCEPTION} 由于服务异常，获取设备id列表失败。
- *         {@link INPUT_PARAMETER_ERROR} deviceIds或outSize为空指针。
+ *         {@link INPUT_PARAMETER_ERROR} deviceIds或outSize为空指针或inSize小于0。
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
@@ -1443,8 +1441,8 @@ Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *
  * @param deviceInfo 出参，指向输入设备信息{@Link Input_DeviceInfo}的指针。
  * @return OH_Input_GetDevice 的返回值如下,
  *         {@link INPUT_SUCCESS} 操作成功。
- *         {@INPUT_SERVICE_EXCEPTION} 由于服务异常，获取输入设备信息失败。
- *         {@link INPUT_PARAMETER_ERROR} 设备id为无效值或者deviceInfo是空指针。
+ *         {@link INPUT_PARAMETER_ERROR} 如果deviceInfo为空指针或deviceId无效。
+ * 可以通过{@Link OH_Input_GetDeviceIds}接口查询系统支持的设备id。
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
@@ -1472,15 +1470,14 @@ void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo);
  * @brief 获取输入设备的键盘类型。
  *
  * @param deviceId 设备id。
- * @param KeyboardType 出参，指向键盘输入设备类型的指针。
+ * @param keyboardType 出参，指向键盘输入设备类型的指针。
  * @return OH_Input_GetKeyboardType 的返回值如下，
  *         {@link INPUT_SUCCESS} 操作成功。
- *         {@INPUT_SERVICE_EXCEPTION} 由于服务异常，获取输入设备的键盘类型失败。
- *         {@link INPUT_PARAMETER_ERROR} 设备id为无效值或者KeyboardType是空指针。
+ *         {@link INPUT_PARAMETER_ERROR} 设备id为无效值或者keyboardType是空指针。
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *KeyboardType);
+Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *keyboardType);
 
 /**
  * @brief 获取输入设备的id。
@@ -1564,14 +1561,14 @@ Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *ven
  * @brief 获取输入设备的物理地址。
  *
  * @param deviceInfo 输入设备信息{@Link Input_DeviceInfo}。
- * @param phys 出参，指向输入设备物理地址的指针。
- * @return OH_Input_GetDevicePhys 的返回值如下，
+ * @param address 出参，指向输入设备物理地址的指针。
+ * @return OH_Input_GetDeviceAddress 的返回值如下，
  *         {@link INPUT_SUCCESS} 操作成功。
- *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者phys是空指针。
+ *         {@link INPUT_PARAMETER_ERROR} deviceInfo或者address是空指针。
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-Input_Result OH_Input_GetDevicePhys(Input_DeviceInfo *deviceInfo, char **phys);
+Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address);
 #ifdef __cplusplus
 }
 #endif
