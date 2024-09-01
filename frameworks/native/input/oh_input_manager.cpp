@@ -2256,6 +2256,10 @@ Input_Result OH_Input_UnregisterDeviceListeners()
 Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *outSize)
 {
     CALL_DEBUG_ENTER;
+    if (inSize < 0) {
+        MMI_HILOGE("Invalid inSize:%{public}d", inSize);
+        return INPUT_PARAMETER_ERROR;
+    }
     CHKPR(deviceIds, INPUT_PARAMETER_ERROR);
     CHKPR(outSize, INPUT_PARAMETER_ERROR);
     auto nativeCallback = [&](std::vector<int32_t> &ids) {
@@ -2273,7 +2277,7 @@ Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDeviceIds(nativeCallback);
     if (ret != RET_OK) {
         MMI_HILOGE("GetDeviceIds fail");
-        return INPUT_SERVICE_EXCEPTION;
+        return INPUT_PARAMETER_ERROR;
     }
     return INPUT_SUCCESS;
 }
@@ -2326,7 +2330,7 @@ Input_Result OH_Input_GetDevice(int32_t deviceId, Input_DeviceInfo **deviceInfo)
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId, nativeCallback);
     if (ret != RET_OK) {
         MMI_HILOGE("GetDevice fail");
-        return INPUT_SERVICE_EXCEPTION;
+        return INPUT_PARAMETER_ERROR;
     }
     return INPUT_SUCCESS;
 }
@@ -2345,7 +2349,7 @@ Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *KeyboardType)
     int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetKeyboardType(deviceId, nativeCallback);
     if (ret != RET_OK) {
         MMI_HILOGE("GetKeyboardType fail");
-        return INPUT_SERVICE_EXCEPTION;
+        return INPUT_PARAMETER_ERROR;
     }
     return INPUT_SUCCESS;
 }
@@ -2360,12 +2364,12 @@ Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name)
 }
 
 
-Input_Result OH_Input_GetDevicePhys(Input_DeviceInfo *deviceInfo, char **phys)
+Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address)
 {
     CALL_DEBUG_ENTER;
     CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
-    CHKPR(phys, INPUT_PARAMETER_ERROR);
-    *phys = deviceInfo->phys;
+    CHKPR(address, INPUT_PARAMETER_ERROR);
+    *address = deviceInfo->phys;
     return INPUT_SUCCESS;
 }
 
