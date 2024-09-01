@@ -1382,7 +1382,6 @@ Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
  * @return OH_Input_RegisterDeviceListener 的返回值, 具体如下:
  *         {@link INPUT_SUCCESS} 调用成功;\n
  *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
- *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
