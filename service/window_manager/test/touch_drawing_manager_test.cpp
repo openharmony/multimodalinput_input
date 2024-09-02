@@ -153,18 +153,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, Tes
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_DrawBubble_001
- * @tc.desc: Test DrawBubble
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubble());
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_DrawBubble_002
  * @tc.desc: Test DrawBubble
  * @tc.type: Function

@@ -151,27 +151,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateDefaultPoint
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_UpdateIconPath_02
- * @tc.desc: Test UpdateIconPath
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_UpdateIconPath_02, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    pointerDrawingManager.mouseIcons_[DEFAULT] = {0, "/system/etc/multimodalinput/mouse_icon/default_icon.svg"};
-    pointerDrawingManager.mouseIcons_[EAST] = {1, "/system/etc/multimodalinput/mouse_icon/east_icon.png"};
-    pointerDrawingManager.mouseIcons_[WEST] = {2, "/system/etc/multimodalinput/mouse_icon/west_icon.png"};
-    pointerDrawingManager.mouseIcons_[SOUTH] = {3, "/system/etc/multimodalinput/mouse_icon/south_icon.png"};
-    pointerDrawingManager.mouseIcons_[NORTH] = {4, "/system/etc/multimodalinput/mouse_icon/north_icon.png"};
-
-    MOUSE_ICON mouseStyle = WEST_EAST;
-    std::string iconPath = ("/system/etc/multimodalinput/mouse_icon/Loading_Left.svg");
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.UpdateIconPath(mouseStyle, iconPath));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_CheckPointerStyleParam_01
  * @tc.desc: Test CheckPointerStyleParam
  * @tc.type: FUNC

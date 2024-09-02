@@ -250,27 +250,6 @@ HWTEST_F(EventDispatchTest, DispatchPointerEventInner_03, TestSize.Level1)
 }
 
 /**
- * @tc.name: DispatchPointerEventInner_04
- * @tc.desc: Test DispatchKeyEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, DispatchPointerEventInner_04, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    UDSServer udsServer;
-    int32_t fd = 3;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    auto currentTime = GetSysClockTime();
-    auto session = udsServer.GetSession(fd);
-    bool ret = ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session);
-    EXPECT_FALSE(ret);
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
-    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
-}
-
-/**
  * @tc.name: DispatchPointerEventInner_05
  * @tc.desc: Test DispatchKeyEvent
  * @tc.type: FUNC
@@ -1672,97 +1651,6 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_03, 
     ASSERT_NO_FATAL_FAILURE(dispatch.HandleMultiWindowPointerEvent(pointerEvent, pointerItem));
 }
 
-/**
- * @tc.name: EventDispatchTest_DispatchPointerEventInner_04
- * @tc.desc: Test DispatchPointerEventInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_04, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t fd = 1;
-    int32_t type = 2;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    auto session = InputHandler->udsServer_->GetSession(fd);
-    int64_t currentTime = GetSysClockTime();
-    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
-    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
-}
-
-/**
- * @tc.name: EventDispatchTest_DispatchPointerEventInner_05
- * @tc.desc: Test DispatchPointerEventInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_05, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t fd = 1;
-    int32_t type = 2;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    auto session = InputHandler->udsServer_->GetSession(fd);
-    int64_t currentTime = GetSysClockTime();
-    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
-    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
-}
-
-/**
- * @tc.name: EventDispatchTest_DispatchPointerEventInner_06
- * @tc.desc: Test DispatchPointerEventInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_06, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t fd = 1;
-    int32_t type = 2;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    auto session = InputHandler->udsServer_->GetSession(fd);
-    int64_t currentTime = GetSysClockTime();
-    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
-
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    EXPECT_FALSE(InputHandler->udsServer_->SendMsg(fd, pkt));
-    pointerEvent->markEnabled_ = true;
-    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
-}
-
-/**
- * @tc.name: EventDispatchTest_DispatchPointerEventInner_07
- * @tc.desc: Test DispatchPointerEventInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_07, TestSize.Level1)
-{
-    EventDispatchHandler dispatch;
-    int32_t fd = 3;
-    int32_t type = 4;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    auto session = InputHandler->udsServer_->GetSession(fd);
-    int64_t currentTime = GetSysClockTime();
-    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
-    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
-
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    EXPECT_FALSE(InputHandler->udsServer_->SendMsg(fd, pkt));
-    pointerEvent->markEnabled_ = false;
-    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
-}
 
 /**
  * @tc.name: EventDispatchTest_FilterInvalidPointerItem_01

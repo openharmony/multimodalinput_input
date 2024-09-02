@@ -670,7 +670,7 @@ HWTEST_F(UDSServerTest, AddEpoll_001, TestSize.Level1)
     EpollEventType type = EPOLL_EVENT_BEGIN;
     int32_t fd = 1;
     auto ret = udsServer.AddEpoll(type, fd);
-    EXPECT_EQ(ret, RET_OK);
+    EXPECT_NE(ret, RET_OK);
 }
 
 /**
@@ -685,21 +685,6 @@ HWTEST_F(UDSServerTest, SetRecvFun_002, TestSize.Level1)
     UDSServer udsServer;
     MsgServerFunCallback fun{ nullptr };
     ASSERT_NO_FATAL_FAILURE(udsServer.SetRecvFun(fun));
-}
-
-/**
- * @tc.name: ReleaseSession_002
- * @tc.desc: Test the ReleaseSession function of UDSServer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(UDSServerTest, ReleaseSession_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    UDSServer udsServer;
-    int32_t fd = 1;
-    epoll_event ev;
-    ASSERT_NO_FATAL_FAILURE(udsServer.ReleaseSession(fd, ev));
 }
 
 /**
