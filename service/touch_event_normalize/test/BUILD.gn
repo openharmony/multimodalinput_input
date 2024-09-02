@@ -29,6 +29,8 @@ ohos_unittest("TouchEventNormalizeTest") {
     "-Dprotected=public",
   ]
 
+  cflags_cc = [ "-Wno-string-conversion" ]
+
   sources = [
     "src/joystick_transform_processor_test.cpp",
     "src/touch_event_normalize_test.cpp",
@@ -45,8 +47,10 @@ ohos_unittest("TouchEventNormalizeTest") {
   ]
 
   external_deps = [
+    "c_utils:utilsbase",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
@@ -712,7 +716,9 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
   ]
 
   sources = [
+    "${mmi_path}/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "${mmi_path}/service/app_state_manager/src/app_state_observer.cpp",
+    "${mmi_path}/service/delegate_task/src/delegate_interface.cpp",
     "${mmi_path}/service/device_config/src/device_config_file_parser.cpp",
     "${mmi_path}/service/device_manager/src/input_device_manager.cpp",
     "${mmi_path}/service/device_state_manager/src/device_event_monitor.cpp",
@@ -730,12 +736,20 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "${mmi_path}/service/module_loader/src/uds_server.cpp",
     "${mmi_path}/service/monitor/src/event_monitor_handler.cpp",
     "${mmi_path}/service/mouse_event_normalize/src/mouse_device_state.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_event_normalize.cpp",
+    "${mmi_path}/service/mouse_event_normalize/src/mouse_transform_processor.cpp",
     "${mmi_path}/service/nap_process/src/nap_process.cpp",
     "${mmi_path}/service/subscriber/src/key_subscriber_handler.cpp",
     "${mmi_path}/service/timer_manager/src/timer_manager.cpp",
     "${mmi_path}/service/touch_event_normalize/src/touchpad_transform_processor.cpp",
     "${mmi_path}/service/window_manager/src/i_pointer_drawing_manager.cpp",
     "${mmi_path}/service/window_manager/src/input_display_bind_helper.cpp",
+    "${mmi_path}/service/window_manager/src/input_windows_manager.cpp",
+    "${mmi_path}/service/window_manager/src/knuckle_divergent_point.cpp",
+    "${mmi_path}/service/window_manager/src/knuckle_drawing_manager.cpp",
+    "${mmi_path}/service/window_manager/src/knuckle_dynamic_drawing_manager.cpp",
+    "${mmi_path}/service/window_manager/src/knuckle_glow_point.cpp",
+    "${mmi_path}/service/window_manager/src/knuckle_glow_trace_system.cpp",
     "${mmi_path}/service/window_manager/src/touch_drawing_manager.cpp",
     "src/touchpad_transform_processor_mock_test.cpp",
   ]
@@ -778,11 +792,13 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
     "hilog:libhilog",
@@ -797,6 +813,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
 

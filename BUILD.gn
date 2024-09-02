@@ -83,6 +83,14 @@ group("multimodalinput_mmi_service") {
   ]
 }
 
+group("input-third-mmi") {
+  external_deps = [
+    "libevdev:libevdev",
+    "libinput:libinput-third-mmi",
+    "mtdev:libmtdev-third-mmi",
+  ]
+}
+
 group("input_jsapi_group") {
   deps = []
   if (support_jsapi) {
