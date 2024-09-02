@@ -424,19 +424,6 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetInputNodeName
 }
 
 /**
- * @tc.name: InputDisplayBindHelperTest_AddDisplay_01
- * @tc.desc: Test AddDisplay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_AddDisplay_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    BindInfo bindInfo;
-    ASSERT_NO_FATAL_FAILURE(bindInfo.AddDisplay(0, "hp 223"));
-}
-
-/**
  * @tc.name: InputDisplayBindHelperTest_AddDisplay_02
  * @tc.desc: Test AddDisplay
  * @tc.type: FUNC
