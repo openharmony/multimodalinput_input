@@ -37,7 +37,8 @@ public:
 
 class MyGestureListener : public TouchGestureDetector::GestureListener {
 public:
-    bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode) override {
+    bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode) override
+    {
         return true;
     }
 };
