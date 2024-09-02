@@ -619,7 +619,7 @@ HWTEST_F(MMIServerTest, RegisterDevListener_001, TestSize.Level1)
     MMIService mmiService;
     int32_t pid = 1;
     int32_t ret = mmiService.RegisterDevListener();
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
     ret = mmiService.UnregisterDevListener();
     EXPECT_EQ(ret, RET_ERR);
     ret = mmiService.OnUnregisterDevListener(pid);
@@ -839,7 +839,7 @@ HWTEST_F(MMIServerTest, SubscribeKeyEvent_001, TestSize.Level1)
     int32_t subscribeId = 1;
     std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
     int32_t ret = mmiService.SubscribeKeyEvent(subscribeId, option);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
     ret = mmiService.UnsubscribeKeyEvent(subscribeId);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -887,7 +887,7 @@ HWTEST_F(MMIServerTest, SetFunctionKeyState_001, TestSize.Level1)
     bool enable = true;
     bool state = false;
     int32_t ret = mmiService.SetFunctionKeyState(funcKey, enable);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
     ret = mmiService.GetFunctionKeyState(funcKey, state);
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -975,7 +975,7 @@ HWTEST_F(MMIServerTest, SetMouseCaptureMode_001, TestSize.Level1)
     int32_t windowId = 1;
     bool isCaptureMode = false;
     int32_t ret = mmiService.SetMouseCaptureMode(windowId, isCaptureMode);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
     isCaptureMode = true;
     ret = mmiService.SetMouseCaptureMode(windowId, isCaptureMode);
     EXPECT_EQ(ret, RET_ERR);

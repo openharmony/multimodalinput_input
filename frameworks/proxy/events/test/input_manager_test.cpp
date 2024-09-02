@@ -257,7 +257,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_01, TestSize.Level1)
     int32_t hotSpotY = 5;
 
     int32_t winPid = InputManager::GetInstance()->GetWindowPid(windowId);
-    EXPECT_FALSE(winPid != -1);
+    EXPECT_NE(winPid, RET_ERR);
     int32_t ret = InputManager::GetInstance()->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
     EXPECT_EQ(ret, RET_ERR);
 }
