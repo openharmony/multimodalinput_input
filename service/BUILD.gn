@@ -373,6 +373,7 @@ ohos_unittest("event_resample_test") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwm",
@@ -407,15 +408,22 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -450,6 +458,7 @@ ohos_unittest("EventFilterDeathRecipientTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "window_manager:libwm",
@@ -576,11 +585,14 @@ ohos_unittest("TimerManagerTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
   ]
 }
@@ -669,10 +681,13 @@ ohos_unittest("KnuckleGlowPointTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -716,10 +731,13 @@ ohos_unittest("KnuckleDivergentPointTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -763,10 +781,13 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -785,6 +806,8 @@ ohos_unittest("PointerDrawingManagerTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -808,13 +831,18 @@ ohos_unittest("PointerDrawingManagerTest") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -833,6 +861,8 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
 
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -855,13 +885,18 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -906,10 +941,13 @@ ohos_unittest("TouchDrawingManagerAiTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -954,10 +992,13 @@ ohos_unittest("TouchDrawingManagerTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -997,10 +1038,13 @@ ohos_unittest("KnuckleDrawingManagerTest") {
     "c_utils:utils",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -1040,10 +1084,13 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
     "c_utils:utils",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
@@ -1073,15 +1120,22 @@ ohos_unittest("InputWindowsManagerTest") {
   external_deps = [
     "ability_runtime:dataobs_manager",
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
     "graphic_2d:2d_graphics",
+    "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -1134,11 +1188,13 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",
     "ffrt:libffrt",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
     "hdf_core:libhdi",
@@ -1153,6 +1209,7 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
@@ -1199,6 +1256,7 @@ ohos_unittest("AccountManagerTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
   ]
 }
 
@@ -1241,7 +1299,10 @@ ohos_unittest("SubscriberTest") {
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_core",
+    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
   ]
 
   if (call_manager_service_enabled) {
@@ -1281,7 +1342,9 @@ ohos_unittest("NapProcessTest") {
     "cJSON:cjson",
     "c_utils:utils",
     "graphic_2d:2d_graphics",
+    "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_core",
   ]
 }
 
@@ -1314,7 +1377,9 @@ ohos_unittest("MonitorTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
   ]
 }
@@ -1356,8 +1421,12 @@ ohos_unittest("ModuleLoaderTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "node:node_header_notice",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -1387,12 +1456,14 @@ ohos_unittest("KeyEventNormalizeTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
@@ -1418,7 +1489,11 @@ ohos_unittest("KeyEventValueTransformationTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "c_utils:utilsbase",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
+  ]
 }
 
 ohos_unittest("KeyCommandTest") {
@@ -1453,13 +1528,21 @@ ohos_unittest("KeyCommandTest") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
+    "graphic_2d:librender_service_base",
     "graphic_2d:librender_service_client",
+    "graphic_2d:window_animation",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
+    "jsoncpp:jsoncpp",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
 }
@@ -1493,6 +1576,7 @@ ohos_unittest("StylusKeyTest") {
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
   ]
 }
 
@@ -1518,11 +1602,14 @@ ohos_unittest("InfraredEmitterTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "init:libbegetutil",
+    "ipc:ipc_core",
   ]
 }
 
@@ -1548,10 +1635,13 @@ ohos_unittest("InterceptorTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "init:libbegetutil",
+    "ipc:ipc_core",
   ]
 }
 
@@ -1578,11 +1668,14 @@ ohos_unittest("InterceptorExTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "data_share:datashare_consumer",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
   ]
@@ -1620,7 +1713,9 @@ ohos_unittest("KeyAutoRepeatExTest") {
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
   ]
 }
 
@@ -1636,6 +1731,8 @@ ohos_unittest("EventHandlerTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  cflags_cc = [ "-Wno-string-conversion" ]
 
   sources = [
     "event_handler/test/anr_manager_test.cpp",
@@ -1659,9 +1756,12 @@ ohos_unittest("EventHandlerTest") {
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
   ]
 }
@@ -1679,6 +1779,8 @@ ohos_unittest("EventNormalizeHandlerTest") {
     "-Dprotected=public",
   ]
 
+  cflags_cc = [ "-Wno-string-conversion" ]
+
   sources = [ "event_handler/test/event_normalize_handler_test.cpp" ]
 
   deps = [
@@ -1694,6 +1796,8 @@ ohos_unittest("EventNormalizeHandlerTest") {
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
@@ -1769,7 +1873,9 @@ ohos_unittest("EventDispatchTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
@@ -1797,8 +1903,10 @@ ohos_unittest("LibinputAdapterTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "libinput:libinput-third-mmi",
   ]
 }
@@ -1844,6 +1952,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
+    "preferences:native_preferences",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -1909,12 +2018,16 @@ ohos_unittest("DisplayStateManagerTest") {
   external_deps = [
     "ability_base:want",
     "cJSON:cjson",
+    "c_utils:utils",
+    "c_utils:utilsbase",
+    "common_event_service:cesfwk_core",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
@@ -1933,6 +2046,8 @@ ohos_unittest("DeviceManagerTest") {
     "-Dprotected=public",
   ]
 
+  cflags_cc = [ "-Wno-string-conversion" ]
+
   sources = [ "device_manager/test/input_device_manager_test.cpp" ]
 
   deps = [
@@ -1942,11 +2057,14 @@ ohos_unittest("DeviceManagerTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
   ]
 }
@@ -2009,9 +2127,11 @@ ohos_unittest("DelegateTaskTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "init:libbegetutil",
     "napi:ace_napi",
   ]
@@ -2040,13 +2160,19 @@ ohos_unittest("ConnectManagerTest") {
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "data_share:datashare_consumer",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
+    "hilog:libhilog",
+    "hilog:libhilog_base",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -2087,6 +2213,8 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
+    "c_utils:utils",
+    "c_utils:utilsbase",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
@@ -2095,6 +2223,8 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -2115,6 +2245,8 @@ ohos_unittest("ConnectManagerEXTest") {
     "-Dprotected=public",
   ]
 
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
+
   sources = [
     "connect_manager/src/multimodal_input_connect_def_parcel.cpp",
     "connect_manager/src/multimodal_input_connect_stub.cpp",
@@ -2129,15 +2261,20 @@ ohos_unittest("ConnectManagerEXTest") {
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "cJSON:cjson",
+    "c_utils:utils",
     "data_share:datashare_consumer",
     "googletest:gmock_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
+    "hilog:libhilog_base",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -2167,14 +2304,18 @@ ohos_unittest("EventDumpTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utils",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
   ]
 }
@@ -2203,9 +2344,12 @@ ohos_unittest("DfxHisysEventTest") {
 
   external_deps = [
     "cJSON:cjson",
+    "c_utils:utilsbase",
     "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "hilog:libhilog_base",
+    "hisysevent:libhisysevent",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
   ]

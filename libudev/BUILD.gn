@@ -70,11 +70,10 @@ ohos_unittest("libudev-test") {
     "test/custom_udev_test.cpp",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
-
-  deps = [
-    "//third_party/googletest:gmock_main",
-    "//third_party/libevdev",
+  external_deps = [
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "libevdev:libevdev",
   ]
 
   defines += [ "MMI_DISABLE_LOG_TRACE" ]
@@ -86,9 +85,14 @@ ohos_unittest("e2e-libudev-test") {
 
   sources = [ "test/e2e_udev_test.cpp" ]
 
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "//third_party/googletest:gmock_main",
-    "//third_party/libevdev",
+  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
+
+  external_deps = [
+    "c_utils:utilsbase",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "hilog:libhilog_base",
+    "ipc:ipc_core",
+    "libevdev:libevdev",
   ]
 }
