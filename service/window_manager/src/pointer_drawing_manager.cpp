@@ -1603,6 +1603,14 @@ void PointerDrawingManager::UpdatePointerVisible()
 bool PointerDrawingManager::IsPointerVisible()
 {
     CALL_DEBUG_ENTER;
+    if (!pidInfos_.empty()) {
+        auto info = pidInfos_.back();
+        if (!info.visible) {
+            MMI_HILOGI("High priority visible property:%{public}zu.%{public}d-visible:%{public}s",
+                pidInfos_.size(), info.pid, info.visible?"true":"false");
+            return info.visible;
+        }
+    }
     if (!hapPidInfos_.empty() && (pidInfos_.empty() || pidInfos_.back().priority < DEFUALT_COOPERATE_PRIORITY)) {
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
