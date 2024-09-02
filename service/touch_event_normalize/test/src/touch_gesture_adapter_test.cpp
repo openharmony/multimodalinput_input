@@ -296,7 +296,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureEvent_001, Te
     ASSERT_EQ(ret, true);
     mode = GetureType::ACTION_UNKNOW;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
-    ASSERT_EQ(ret, false);  
+    ASSERT_EQ(ret, false);
 }
 } // namespace MMI
 } // namespace OHOS
