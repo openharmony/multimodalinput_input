@@ -4504,6 +4504,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_CROWN)
 /**
  * @tc.name: InputWindowsManagerTest_UpdateCrownTarget_001
  * @tc.desc: Test the funcation UpdateCrownTarget
@@ -4529,6 +4530,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCrownTarget_001,
     ret = inputWindowsManager.UpdateCrownTarget(pointerEvent);
     EXPECT_NE(ret, RET_OK);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
 
 /**
  * @tc.name: InputWindowsManagerTest_PrintChangedWindowByEvent_001
@@ -6100,6 +6102,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PullEnterLeaveEvent, T
     EXPECT_NO_FATAL_FAILURE(inputWindowsMgr.PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, &touchWindow));
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_CROWN)
 /**
  * @tc.name: InputWindowsManagerTest_UpdateCrownTarget
  * @tc.desc: Test UpdateCrownTarget
@@ -6123,6 +6126,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateCrownTarget, Tes
     inputWindowsMgr.displayGroupInfo_.windowsInfo.push_back(winInfo);
     EXPECT_EQ(inputWindowsMgr.UpdateCrownTarget(pointerEvent), RET_OK);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
 
 /**
  * @tc.name: InputWindowsManagerTest_DrawTouchGraphic
