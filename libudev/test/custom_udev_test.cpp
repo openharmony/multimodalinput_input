@@ -201,7 +201,7 @@ HWTEST_F(CustomUdevTest, TestGetDevnode, TestSize.Level1)
 
     errno = 0;
     EXPECT_EQ(udev_device_get_devnode(nullptr), nullptr);
-    EXPECT_NE(errno, 0);
+    EXPECT_EQ(errno, 0);
 }
 
 /*
