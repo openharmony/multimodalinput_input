@@ -1605,7 +1605,15 @@ void PointerDrawingManager::UpdatePointerVisible()
 bool PointerDrawingManager::IsPointerVisible()
 {
     CALL_DEBUG_ENTER;
-    if (!hapPidInfos_.empty()) {
+    if (!pidInfos_.empty()) {
+        auto info = pidInfos_.back();
+        if (!info.visible) {
+            MMI_HILOGI("High priority visible property:%{public}zu.%{public}d-visible:%{public}s",
+                pidInfos_.size(), info.pid, info.visible?"true":"false");
+            return info.visible;
+        }
+    }
+    if (!hapPidInfos_.empty() && (pidInfos_.empty() || pidInfos_.back().priority < DEFUALT_COOPERATE_PRIORITY)) {
         for (auto& item : hapPidInfos_) {
             if (item.pid == pid_) {
                 MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
@@ -1619,8 +1627,8 @@ bool PointerDrawingManager::IsPointerVisible()
         return true;
     }
     auto info = pidInfos_.back();
-    MMI_HILOGI("Visible property:%{public}zu.%{public}d-visible:%{public}s",
-        pidInfos_.size(), info.pid, info.visible ? "true" : "false");
+    MMI_HILOGI("Visible property:%{public}zu.%{public}d-priority:%{public}d-visible:%{public}s",
+        pidInfos_.size(), info.pid, info.priority, info.visible ? "true" : "false");
     return info.visible;
 }
 
@@ -1695,19 +1703,33 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int3
         MMI_HILOGE("current is drag state, can not set pointer visible");
         return RET_ERR;
     }
-    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
-        if (it->pid == pid) {
-            pidInfos_.erase(it);
-            break;
-        }
-    }
-    PidInfo info = { .pid = pid, .visible = visible };
+    DeletPidInfo(pid);
+    PidInfo info = { .pid = pid, .priority = priority, .visible = visible };
     pidInfos_.push_back(info);
     if (pidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
         pidInfos_.pop_front();
     }
+    if (priority != DEFUALT_COOPERATE_PRIORITY) {
+        if (!visible) {
+            pidInfos_.sort([](const PidInfo &lpidInfo, const PidInfo &rpidInfo) -> bool {
+                return lpidInfo.priority < rpidInfo.priority;
+            });
+        } else {
+            DeletPidInfo(pid);
+        }
+    }
     UpdatePointerVisible();
     return RET_OK;
+}
+
+void PointerDrawingManager::DeletPidInfo(int32_t pid)
+{
+    for (auto it = hapPidInfos_.begin(); it != hapPidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            hapPidInfos_.erase(it);
+            break;
+        }
+    }
 }
 
 void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
