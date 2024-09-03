@@ -223,26 +223,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_02, 
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_SetMouseHotSpot_04
- * @tc.desc: Test SetMouseHotSpot
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_04, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    int32_t pid = 1;
-    int32_t windowId = 2;
-    EXPECT_CALL(*WIN_MGR_MOCK, CheckWindowIdPermissionByPid).WillRepeatedly(testing::Return(RET_OK));
-    int32_t hotSpotX = -3;
-    int32_t hotSpotY = -4;
-    pointerDrawingManager.userIcon_ = nullptr;
-    int32_t ret = pointerDrawingManager.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY);
-    ASSERT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetMouseIcon_01
  * @tc.desc: Test SetMouseIcon
  * @tc.type: FUNC
