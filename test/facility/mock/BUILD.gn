@@ -25,6 +25,8 @@ ohos_source_set("mmi_mock_sources") {
     debug = false
   }
 
+  cflags_cc = [ "-Wno-inconsistent-missing-override" ]
+
   testonly = true
 
   include_dirs = [
@@ -57,6 +59,7 @@ ohos_source_set("mmi_mock_sources") {
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 
   part_name = "${mmi_part_name}"

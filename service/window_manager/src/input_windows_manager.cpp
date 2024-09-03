@@ -84,7 +84,7 @@ const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/De
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
+[[ maybe_unused ]] constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 } // namespace
 

@@ -48,10 +48,12 @@ ohos_unittest("InputNativeTest") {
   }
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
+    "ipc:ipc_core",
   ]
 
   subsystem_name = "multimodalinput"
