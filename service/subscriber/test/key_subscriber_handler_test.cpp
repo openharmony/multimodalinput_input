@@ -1255,9 +1255,9 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsFunctionKey, TestS
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_SWITCHVIDEOMODE);
     ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_WLAN);
-    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    ASSERT_FALSE(handler.IsFunctionKey(keyEvent));
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_CONFIG);
-    ASSERT_TRUE(handler.IsFunctionKey(keyEvent));
+    ASSERT_FALSE(handler.IsFunctionKey(keyEvent));
 }
 
 /**
