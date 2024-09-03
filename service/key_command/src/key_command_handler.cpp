@@ -1477,6 +1477,7 @@ int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
     }
     isFreezePowerKey_ = true;
     count_ = 0;
+    launchAbilityCount_ = 0;
     repeatKeyCountMap_.clear();
     if (sosDelayTimerId_ >= 0) {
         TimerMgr->RemoveTimer(sosDelayTimerId_);
@@ -2107,6 +2108,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
             isFreezePowerKey_ = true;
             count_ = 0;
+            launchAbilityCount_ = 0;
             repeatKeyCountMap_.clear();
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;
