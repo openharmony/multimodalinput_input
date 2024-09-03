@@ -86,7 +86,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, reportData->deviceId, &deviceId), CREATE_INT32, scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
             scope);
-        BytraceAdapter::StartDevListener(REMOVE_EVENT, reportData->deviceId);
+        BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
         MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
             REMOVE_EVENT.c_str(), reportData->deviceId);
         napi_value ret = nullptr;
