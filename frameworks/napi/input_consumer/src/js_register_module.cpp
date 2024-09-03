@@ -491,7 +491,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     std::string keyType = "";
     size_t argc = 3;
     napi_value argv[3] = { 0 };
-    CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER_MAX) {
         MMI_HILOGE("parameter number error argc:%{public}zu", argc);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
