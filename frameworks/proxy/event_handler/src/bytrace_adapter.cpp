@@ -359,6 +359,17 @@ void BytraceAdapter::StopSocketHandle()
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }
 
+void BytraceAdapter::StartDevListener(const std::string& type, int32_t deviceId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT,
+        "device listener type:" + type + ", deviceid:" + std::to_string(deviceId));
+}
+
+void BytraceAdapter::StopDevListener()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
 void BytraceAdapter::StartLaunchAbility(int32_t type, const std::string& bundleName)
 {
     StartTrace(HITRACE_TAG_MULTIMODALINPUT,
