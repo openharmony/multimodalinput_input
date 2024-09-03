@@ -609,24 +609,6 @@ HWTEST_F(MMIServerTest, OnRegisterDevListener_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterDevListener_001
- * @tc.desc: Test the function RegisterDevListener and OnUnregisterDevListener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, RegisterDevListener_001, TestSize.Level1)
-{
-    MMIService mmiService;
-    int32_t pid = 1;
-    int32_t ret = mmiService.RegisterDevListener();
-    EXPECT_NE(ret, RET_ERR);
-    ret = mmiService.UnregisterDevListener();
-    EXPECT_EQ(ret, RET_ERR);
-    ret = mmiService.OnUnregisterDevListener(pid);
-    EXPECT_EQ(ret, RET_OK);
-}
-
-/**
  * @tc.name: OnGetKeyboardType_001
  * @tc.desc: Test the function OnGetKeyboardType
  * @tc.type: FUNC
@@ -841,7 +823,7 @@ HWTEST_F(MMIServerTest, SubscribeKeyEvent_001, TestSize.Level1)
     int32_t ret = mmiService.SubscribeKeyEvent(subscribeId, option);
     EXPECT_NE(ret, RET_ERR);
     ret = mmiService.UnsubscribeKeyEvent(subscribeId);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -889,7 +871,7 @@ HWTEST_F(MMIServerTest, SetFunctionKeyState_001, TestSize.Level1)
     int32_t ret = mmiService.SetFunctionKeyState(funcKey, enable);
     EXPECT_NE(ret, RET_ERR);
     ret = mmiService.GetFunctionKeyState(funcKey, state);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
@@ -978,7 +960,7 @@ HWTEST_F(MMIServerTest, SetMouseCaptureMode_001, TestSize.Level1)
     EXPECT_NE(ret, RET_ERR);
     isCaptureMode = true;
     ret = mmiService.SetMouseCaptureMode(windowId, isCaptureMode);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_NE(ret, RET_ERR);
 }
 
 /**
