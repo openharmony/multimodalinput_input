@@ -438,7 +438,7 @@ bool GetEventType(napi_env env, napi_callback_info info, KeyEventMonitorInfo* ev
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < INPUT_PARAMETER_MAX) {
+    if (argc < INPUT_PARAMETER_MIDDLE) {
         MMI_HILOGE("parameter number error argc:%{public}zu", argc);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return false;
@@ -489,6 +489,15 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType = "";
+    size_t argc = 3;
+    napi_value argv[3] = { 0 };
+    CHKRF(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER_MAX) {
+        MMI_HILOGE("parameter number error argc:%{public}zu", argc);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        delete event;
+        return nullptr;
+    }
     if (!GetEventType(env, info, event, keyType)) {
         MMI_HILOGE("GetEventType fail, type must be key or hotkey");
         delete event;
