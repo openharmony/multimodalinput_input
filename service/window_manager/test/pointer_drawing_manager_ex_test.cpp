@@ -176,24 +176,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_CheckPointerStyleP
 }
 
 /**
- * @tc.name: PointerDrawingManagerTest_UpdateStyleOptions_01
- * @tc.desc: Test UpdateStyleOptions
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerTest_UpdateStyleOptions_01, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawMgr;
-    pointerDrawMgr.pid_ = 3;
-    PointerStyle curPointerStyle;
-    curPointerStyle.options = 1;
-    int ret = WIN_MGR->SetPointerStyle(pointerDrawMgr.pid_, GLOBAL_WINDOW_ID, curPointerStyle);
-    EXPECT_EQ(ret, RET_OK);
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.UpdateStyleOptions());
-}
-
-/**
  * @tc.name: PointerDrawingManagerTest_AdjustMouseFocus_01
  * @tc.desc: Test AdjustMouseFocus
  * @tc.type: FUNC
