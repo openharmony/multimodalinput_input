@@ -36,7 +36,6 @@ private:
     bool isEnableState_ { false };
     [[ maybe_unused ]] bool isEnable_ { false };
     uint32_t devId_ { 0 };
-    sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
