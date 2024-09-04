@@ -315,7 +315,7 @@ typedef struct Input_InterceptorEventCallback {
 } Input_InterceptorEventCallback;
 
 /**
- * @brief 定义一个结构体用于监听设备设插拔
+ * @brief 定义一个结构体用于监听设备热插拔
  * @since 13
  */
 typedef struct Input_DeviceListener {

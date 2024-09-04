@@ -1461,8 +1461,10 @@ int32_t InputManagerImpl::SendWindowInfo()
 int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
-    if (!MMISceneBoardJudgement::IsSceneBoardEnabled()) {
-        MMI_HILOGE("SceneBoard is not enabled");
+    const std::string sceneboard = "com.ohos.sceneboard";
+    const std::string programName(GetProgramName());
+    if (programName != sceneboard) {
+        MMI_HILOGE("Not sceneboard paogramName");
         return RET_ERR;
     }
     CHKPR(callback, RET_ERR);
