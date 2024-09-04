@@ -81,9 +81,9 @@ public:
     void UnregisterHotKey(int32_t shortcutId);
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     void ResetAll();
-    void ResetCheckState();
-    bool IsCheckUpShortcut();
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys);
+    void ResetCheckState();
+    bool IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent);
 
     bool HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
     void UpdateShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent);
@@ -170,8 +170,8 @@ private:
     static const std::map<int32_t, uint32_t> modifiers_;
     static std::mutex mutex_;
     static std::shared_ptr<KeyShortcutManager> instance_;
-    bool isCheckShortcut_ { true };
     std::set<SystemHotkey> hotkeys_;
+    bool isCheckShortcut_ { true };
 };
 
 #define KEY_SHORTCUT_MGR KeyShortcutManager::GetInstance()

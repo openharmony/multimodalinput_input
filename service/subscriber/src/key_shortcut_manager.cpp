@@ -763,9 +763,22 @@ void KeyShortcutManager::ResetCheckState()
 {
     isCheckShortcut_ = true;
 }
-
-bool KeyShortcutManager::IsCheckUpShortcut()
+ 
+static const std::vector<int32_t> specialKeyCodes = {
+    KeyEvent::KEYCODE_ALT_LEFT,
+    KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_TAB,
+    KeyEvent::KEYCODE_VOLUME_UP,
+    KeyEvent::KEYCODE_VOLUME_DOWN,
+    KeyEvent::KEYCODE_POWER
+};
+ 
+bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent)
 {
+    auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
+    if (it != specialKeyCodes.end() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        return true;
+    }
     if (isCheckShortcut_) {
         isCheckShortcut_ = false;
         return true;
@@ -787,6 +800,10 @@ int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyO
 
 bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
+    auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
+    if (it != specialKeyCodes.end() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        return false;
+    }
     return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
 }
 
