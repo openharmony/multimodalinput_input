@@ -494,7 +494,7 @@ HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_RegisterDeviceListener_
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDeviceIds_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_001, TestSize.Level1)
 {
     const int32_t inSize = 64;
     int32_t outSize = 0;
@@ -504,12 +504,27 @@ HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDeviceIds_001, TestSize
 }
 
 /**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDeviceIds
+ * @tc.desc: Test the funcation OH_Input_GetDeviceIds
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDeviceIds_002, TestSize.Level1)
+{
+    const int32_t inSize = 64;
+    int32_t *outSize = nullptr;
+    int32_t deviceIds[inSize] = { 0 };
+    Input_Result retResult = OH_Input_GetDeviceIds(deviceIds, inSize, outSize);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
  * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
  * @tc.desc: Test the funcation OH_Input_GetKeyboardType
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetKeyboardType_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_001, TestSize.Level1)
 {
     int32_t deviceId = 3;
     int32_t KeyboardType = -1;
@@ -518,12 +533,40 @@ HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetKeyboardType_001, TestS
 }
 
 /**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
+ * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_002, TestSize.Level1)
+{
+    int32_t deviceId = -1;
+    int32_t KeyboardType = -1;
+    Input_Result retResult = OH_Input_GetKeyboardType(deviceId, &KeyboardType);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetKeyboardType
+ * @tc.desc: Test the funcation OH_Input_GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetKeyboardType_003, TestSize.Level1)
+{
+    int32_t deviceId = 3;
+    int32_t *KeyboardType = nullptr;
+    Input_Result retResult = OH_Input_GetKeyboardType(deviceId, KeyboardType);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
  * @tc.name: OHInputManagerTest_OH_Input_GetDevice
  * @tc.desc: Test the funcation OH_Input_GetDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDevice_001, TestSize.Level1)
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_001, TestSize.Level1)
 {
     int32_t deviceId = 0;
     Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
@@ -557,6 +600,77 @@ HWTEST_F(OHInputManagerTest, InputNativeTest_OH_Input_GetDevice_001, TestSize.Le
     int32_t vendor = -1;
     retResult = OH_Input_GetDeviceVendor(deviceInfo, &vendor);
     EXPECT_EQ(retResult, INPUT_SUCCESS);
+    OH_Input_DestroyDeviceInfo(&deviceInfo);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDevice
+ * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_002, TestSize.Level1)
+{
+    int32_t deviceId = 100;
+    Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
+    Input_Result retResult = OH_Input_GetDevice(deviceId, &deviceInfo);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDevice
+ * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_003, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    Input_DeviceInfo *deviceInfo = nullptr;
+    Input_Result retResult = OH_Input_GetDevice(deviceId, &deviceInfo);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+/**
+ * @tc.name: OHInputManagerTest_OH_Input_GetDevice
+ * @tc.desc: Test the funcation OH_Input_GetDevice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(OHInputManagerTest, OHInputManagerTest_OH_Input_GetDevice_004, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    Input_DeviceInfo *deviceInfo = OH_Input_CreateDeviceInfo();
+    Input_Result retResult = OH_Input_GetDevice(deviceId, &deviceInfo);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+
+    char **name = nullptr;
+    retResult = OH_Input_GetDeviceName(deviceInfo, name);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+
+    char **address = nullptr;
+    retResult = OH_Input_GetDeviceAddress(deviceInfo, address);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+
+    int32_t *id = nullptr;
+    retResult = OH_Input_GetDeviceId(deviceInfo, id);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+
+    int32_t *capabilities = nullptr;
+    retResult = OH_Input_GetCapabilities(deviceInfo, capabilities);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+
+    int32_t *version = nullptr;
+    retResult = OH_Input_GetDeviceVersion(deviceInfo, version);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+
+    int32_t *product = nullptr;
+    retResult = OH_Input_GetDeviceProduct(deviceInfo, product);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+
+    int32_t *vendor = nullptr;
+    retResult = OH_Input_GetDeviceVendor(deviceInfo, vendor);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
     OH_Input_DestroyDeviceInfo(&deviceInfo);
 }
 } // namespace MMI
