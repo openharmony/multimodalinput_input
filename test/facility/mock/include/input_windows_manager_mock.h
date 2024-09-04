@@ -109,6 +109,7 @@ public:
     void SetWindowStateNotifyPid(int32_t pid) override {}
     int32_t GetWindowStateNotifyPid() override { return 0; }
     int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
     MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
