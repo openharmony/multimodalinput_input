@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "pointer_event.h"
 #include "touch_gesture_detector.h"
 
 namespace OHOS {
@@ -27,10 +26,10 @@ class TouchGestureAdapter final :
     public TouchGestureDetector::GestureListener,
     public std::enable_shared_from_this<TouchGestureAdapter> {
 public:
-    TouchGestureAdapter(AdapterType type, std::shared_ptr<TouchGestureAdapter> next);
+    TouchGestureAdapter(TouchGestureType type, std::shared_ptr<TouchGestureAdapter> next);
     static std::shared_ptr<TouchGestureAdapter> GetGestureFactory();
     void process(std::shared_ptr<PointerEvent> event);
-    void SetGestureEnable(bool isEnable);
+    void SetGestureCondition(bool flag, TouchGestureType type, int32_t fingers);
 
 private:
     enum class GestureState {
@@ -47,13 +46,13 @@ private:
     void OnSwipeGesture(std::shared_ptr<PointerEvent> event);
     void OnPinchGesture(std::shared_ptr<PointerEvent> event);
     void OnGestureSuccessful(std::shared_ptr<PointerEvent> event);
-    virtual bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode) override;
+    virtual bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode) override;
 
 private:
     bool hasCancel_ { false };
     bool gestureStarted_ { false };
     bool shouldDeliverToNext_ { true };
-    AdapterType getureType_ { -1 };
+    TouchGestureType gestureType_ { TOUCH_GESTURE_TYPE_NONE };
     inline static GestureState state_ { GestureState::IDLE };
     std::shared_ptr<TouchGestureDetector> gestureDetector_ { nullptr };
     std::shared_ptr<TouchGestureAdapter> nextAdapter_ { nullptr };

@@ -128,6 +128,8 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_SYSTEM_EVENT_TIME_INTERVAL = 102,
     GET_ALL_SYSTEM_HOT_KEY = 103,
     SET_CLIENT_INFO = 104,
+    ADD_GESTURE_MONITOR = 105,
+    REMOVE_GESTURE_MONITOR = 106,
 };
 
 enum class MultimodalinputEventObserverCode {

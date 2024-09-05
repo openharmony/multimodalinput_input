@@ -39,6 +39,14 @@ napi_value JsGestureEvent::GetNapiInt32(napi_env env, int32_t code)
     return ret;
 }
 
+napi_value JsGestureEvent::GetNapiString(napi_env env, std::string str)
+{
+    CALL_DEBUG_ENTER;
+    napi_value ret = nullptr;
+    CHKRP(napi_create_string_utf8(env, str.c_str(), NAPI_AUTO_LENGTH, &ret), CREATE_STRING_UTF8);
+    return ret;
+}
+
 napi_value JsGestureEvent::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -82,6 +90,15 @@ napi_value JsGestureEvent::Export(napi_env env, napi_value exports)
     CHKRP(napi_define_class(env, "TouchGesturAction", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(gestureActionArr) / sizeof(*gestureActionArr), gestureActionArr, &gestureActionType), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "TouchGesturAction", gestureActionType), SET_NAMED_PROPERTY);
+
+    napi_property_descriptor gestureTypeArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("SWIPE", GetNapiString(env, TOUCH_SWIPE_GESTURE)),
+        DECLARE_NAPI_STATIC_PROPERTY("PINCH", GetNapiString(env, TOUCH_PINCH_GESTURE)),
+    };
+    napi_value touchGestureType = nullptr;
+    CHKRP(napi_define_class(env, "touchGestureType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(gestureTypeArr) / sizeof(gestureTypeArr[0]), gestureTypeArr, &touchGestureType), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "touchGestureType", touchGestureType), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI

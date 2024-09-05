@@ -84,6 +84,10 @@ public:
         uint32_t deviceTags);
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
+    int32_t AddGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t MarkEventConsumed(int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
