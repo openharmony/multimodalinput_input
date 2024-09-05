@@ -3331,5 +3331,53 @@ HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize
     int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
     EXPECT_NE(ret, -1);
 }
+
+/**
+ * @tc.name: InputManagerTest_GestureMonitor_001
+ * @tc.desc: Gesture Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_ALL, 1);
+    ASSERT_TRUE(monitorId == INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerTest_GestureMonitor_002
+ * @tc.desc: Gesture Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_PINCH, 3);
+    ASSERT_TRUE(monitorId == INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerTest_GestureMonitor_003
+ * @tc.desc: Gesture Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_ALL, 0);
+    ASSERT_TRUE(monitorId != INVALID_HANDLER_ID);
+
+    int32_t ret = InputManager::GetInstance()->RemoveGestureMonitor(monitorId);
+    ASSERT_TRUE(ret == RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

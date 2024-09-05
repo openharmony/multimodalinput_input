@@ -104,12 +104,12 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler mon {handlerType, eventType, nullptr, callback};
+    SessionHandler mon { handlerType, eventType, nullptr, callback };
     return monitors_.AddMonitor(mon);
 }
 
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+    HandleEventType eventType, SessionPtr session, TouchGestureType gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -118,7 +118,7 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler mon { handlerType, eventType, session };
+    SessionHandler mon { handlerType, eventType, session, gestureType, fingers };
     return monitors_.AddMonitor(mon);
 }
 
@@ -134,11 +134,11 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType,
 }
 
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    SessionPtr session)
+    SessionPtr session, TouchGestureType gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
     if (handlerType == InputHandlerType::MONITOR) {
-        SessionHandler monitor { handlerType, eventType, session };
+        SessionHandler monitor { handlerType, eventType, session, gestureType, fingers };
         monitors_.RemoveMonitor(monitor);
     }
 }
@@ -221,11 +221,14 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
+    if (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
+        !GestureMonitorHandler::IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount())) {
+        return;
+    }
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
     }
 }
 
@@ -237,17 +240,24 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         return RET_ERR;
     }
     bool isFound = false;
+    SessionHandler handler = monitor;
     auto iter = monitors_.find(monitor);
     if (iter != monitors_.end()) {
-        if (iter->eventType_ == monitor.eventType_) {
+        if (iter->eventType_ == monitor.eventType_ &&
+            ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
             MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
             return RET_OK;
+        }
+        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+            auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
+            gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
+            handler(gestureHandler);
         }
         isFound = true;
         monitors_.erase(iter);
     }
 
-    auto [sIter, isOk] = monitors_.insert(monitor);
+    auto [sIter, isOk] = monitors_.insert(handler);
     if (!isOk) {
         if (isFound) {
             MMI_HILOGE("Internal error: monitor has been removed");
@@ -267,12 +277,18 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
 
 void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
+    SessionHandler handler = monitor;
     auto iter = monitors_.find(monitor);
     if (iter == monitors_.cend()) {
         MMI_HILOGE("Monitor does not exist");
         return;
     }
 
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
+        gestureHandler.RemoveGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        handler(gestureHandler);
+    }
     monitors_.erase(iter);
     if (monitor.session_) {
         int32_t pid = monitor.session_->GetPid();
@@ -292,7 +308,7 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
         return;
     }
 
-    auto [sIter, isOk] = monitors_.insert(monitor);
+    auto [sIter, isOk] = monitors_.insert(handler);
     if (!isOk) {
         MMI_HILOGE("Internal error, monitor has been removed");
         return;
@@ -517,8 +533,8 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
                 monitor.SendToClient(pointerEvent, pkt);
                 continue;
             }
-            if (monitor.callback) {
-                monitor.callback->OnInputEvent(monitor.handlerType_, pointerEvent);
+            if (monitor.callback_) {
+                monitor.callback_->OnInputEvent(monitor.handlerType_, pointerEvent);
             }
         }
     }

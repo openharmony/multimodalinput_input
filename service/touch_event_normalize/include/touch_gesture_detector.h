@@ -22,11 +22,8 @@
 
 namespace OHOS {
 namespace MMI {
-using AdapterType = uint32_t;
-constexpr AdapterType SwipeAdapterType { 0x0 };
-constexpr AdapterType PinchAdapterType { 0x1 };
-enum class GetureType {
-    ACTION_UNKNOW,
+enum class GestureMode {
+    ACTION_UNKNOWN,
     ACTION_SWIPE_DOWN,
     ACTION_SWIPE_UP,
     ACTION_SWIPE_LEFT,
@@ -51,16 +48,14 @@ public:
     public:
         GestureListener() = default;
         virtual ~GestureListener() = default;
-        virtual bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode) = 0;
+        virtual bool OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode) = 0;
     };
 
-    TouchGestureDetector(AdapterType type, std::shared_ptr<GestureListener> listener)
-        : getureType_(type), listener_(listener) {}
+    TouchGestureDetector(TouchGestureType type, std::shared_ptr<GestureListener> listener)
+        : gestureType_(type), listener_(listener) {}
     bool OnTouchEvent(std::shared_ptr<PointerEvent> event);
-    inline void SetGestureEnable(bool isEnable)
-    {
-        gestureEnable_ = isEnable;
-    }
+    void AddGestureFingers(int32_t fingers);
+    void RemoveGestureFingers(int32_t fingers);
 
 private:
     enum class SlideState {
@@ -70,11 +65,14 @@ private:
         DIRECTION_LEFT,
         DIRECTION_RIGHT
     };
+
     void ReleaseData();
+    bool IsMatchGesture(int32_t count) const;
+    bool IsMatchGesture(GestureMode action, int32_t count) const;
     void HandleDownEvent(std::shared_ptr<PointerEvent> event);
     void HandleMoveEvent(std::shared_ptr<PointerEvent> event);
     void HandleUpEvent(std::shared_ptr<PointerEvent> event);
-    bool NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode);
+    bool NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode);
     bool WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent> event);
 
     Point CalcGravityCenter(std::map<int32_t, Point> &map);
@@ -82,13 +80,13 @@ private:
     void CalcAndStoreDistance(std::map<int32_t, Point> &map);
     int32_t CalcMultiFingerMovement(std::map<int32_t, Point> &map);
     void HandlePinchMoveEvent(std::shared_ptr<PointerEvent> event);
-    GetureType JudgeOperationMode(std::map<int32_t, Point> &movePoint);
-    bool AntiJitter(std::shared_ptr<PointerEvent> event, GetureType mode);
+    GestureMode JudgeOperationMode(std::map<int32_t, Point> &movePoint);
+    bool AntiJitter(std::shared_ptr<PointerEvent> event, GestureMode mode);
 
     bool HandleFingerDown();
     int64_t GetMaxDownInterval();
     float GetMaxFingerSpacing();
-    GetureType ChangeToGetureType(SlideState state);
+    GestureMode ChangeToGestureMode(SlideState state);
     SlideState GetSlidingDirection(double angle);
     void HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event);
     bool IsFingerMove(float startX, float startY, float endX, float endY);
@@ -96,7 +94,8 @@ private:
     SlideState ClacFingerMoveDirection(std::shared_ptr<PointerEvent> event);
 
 private:
-    AdapterType getureType_ { -1 };
+    std::set<int32_t> fingers_;
+    TouchGestureType gestureType_ { TOUCH_GESTURE_TYPE_NONE };
     bool isRecognized_ { false };
     bool gestureEnable_ { false };
     bool isFingerReady_ { false };

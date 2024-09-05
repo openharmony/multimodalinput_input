@@ -149,6 +149,10 @@ public:
         int32_t priority, uint32_t deviceTags) override { return priority; }
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override { return priority; }
+    int32_t AddGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
+        TouchGestureType gestureType, int32_t fingers) override { return RET_OK; }
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
+        TouchGestureType gestureType, int32_t fingers) override { return RET_OK; }
     int32_t MarkEventConsumed(int32_t eventId) override { return eventId; }
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override { return offsetX; }
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override
