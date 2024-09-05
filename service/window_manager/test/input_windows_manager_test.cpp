@@ -3230,7 +3230,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo, Test
     WindowGroupInfo windowGroupInfo;
     windowGroupInfo.windowsInfo.push_back(windowInfo);
     inputWindowsManager.windowsPerDisplay_.insert(std::make_pair(desplayId, windowGroupInfo));
-    inputWindowsManager.firstBtnDownWindowId_ = 10;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
     inputWindowsManager.extraData_.appended = false;
     inputWindowsManager.extraData_.sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ROTATE_BEGIN);
@@ -3695,7 +3695,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DispatchPointer_002, T
     item.SetDisplayY(100);
     inputWindowsManager.lastPointerEvent_->AddPointerItem(item);
     inputWindowsManager.lastPointerEvent_->SetPointerId(0);
-    inputWindowsManager.firstBtnDownWindowId_ = 1;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 1;
     inputWindowsManager.lastPointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     inputWindowsManager.lastPointerEvent_->SetTargetDisplayId(-1);
     WindowInfo windowInfo;
@@ -3942,7 +3942,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget001, 
     item.SetDisplayY(300);
     pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), item);
 
-    inputWindowsManager.firstBtnDownWindowId_ = 5;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 5;
     WindowGroupInfo windowGroupInfo;
     WindowInfo windowInfo;
     windowInfo.id = 10;
@@ -3951,7 +3951,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget001, 
     inputWindowsManager.mouseDownInfo_.id = -1;
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
 
-    inputWindowsManager.firstBtnDownWindowId_ = 10;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     inputWindowsManager.SetHoverScrollState(false);
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_OK);
@@ -3987,7 +3987,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_002,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(1);
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
-    inputWindowsManager.firstBtnDownWindowId_ = 10;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
     WindowGroupInfo windowGroupInfo;
     WindowInfo windowInfo;
     windowInfo.id = 10;
@@ -4043,7 +4043,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateMouseTarget_003,
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(1);
     EXPECT_EQ(inputWindowsManager.UpdateMouseTarget(pointerEvent), RET_ERR);
-    inputWindowsManager.firstBtnDownWindowId_ = 10;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 10;
     WindowGroupInfo windowGroupInfo;
     WindowInfo windowInfo;
     windowInfo.id = 10;
@@ -4461,7 +4461,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, 
     int32_t logicalY = 200;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
-    inputWindowsManager.firstBtnDownWindowId_ = -1;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = -1;
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN;
     PointerEvent::PointerItem pointerItem;
     pointerItem.targetWindowId_ = 0;
@@ -4499,7 +4499,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_003, 
     inputEvent->targetDisplayId_ = 11;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_BUTTON_DOWN;
-    inputWindowsManager.firstBtnDownWindowId_ = 1;
+    inputWindowsManager.firstBtnDownWindowInfo_.first = 1;
     inputEvent->targetDisplayId_ = 1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.SelectWindowInfo(logicalX, logicalY, pointerEvent));
 }
