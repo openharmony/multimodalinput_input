@@ -1103,7 +1103,8 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_WillResetOnKeyUp_001, Te
     ASSERT_EQ(ret, false);
 }
 
-void myCallback(std::shared_ptr<KeyEvent> event) {
+void myCallback(std::shared_ptr<KeyEvent> event)
+{
     std::cout << "Callback triggered!" << std::endl;
 }
 
