@@ -19,7 +19,6 @@
 
 #include <linux/input-event-codes.h>
 
-#include "hitrace_meter.h"
 #include "transaction/rs_interfaces.h"
 
 #include "anr_manager.h"

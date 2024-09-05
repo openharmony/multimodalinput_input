@@ -16,7 +16,9 @@
 #include "stationary_server.h"
 
 #include "hisysevent.h"
+#ifdef HITRACE_ENABLED
 #include "hitrace_meter.h"
+#endif // HITRACE_ENABLED
 
 #include "default_params.h"
 #include "devicestatus_define.h"
@@ -136,9 +138,13 @@ void StationaryServer::Subscribe(CallingContext &context, Type type, ActivityEve
     appInfo->type = type;
     appInfo->callback = callback;
     DS_DUMPER->SaveAppInfo(appInfo);
+#ifdef HITRACE_ENABLED
     StartTrace(HITRACE_TAG_MSDP, "serviceSubscribeStart");
+#endif // HITRACE_ENABLED
     manager_.Subscribe(type, event, latency, callback);
+#ifdef HITRACE_ENABLED
     FinishTrace(HITRACE_TAG_MSDP);
+#endif // HITRACE_ENABLED
     ReportSensorSysEvent(context, type, true);
     WriteSubscribeHiSysEvent(appInfo->uid, appInfo->packageName, type);
 }

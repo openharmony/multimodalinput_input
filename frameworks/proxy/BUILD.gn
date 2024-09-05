@@ -145,12 +145,15 @@ ohos_shared_library("libmmi-client") {
     "ffrt:libffrt",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  if (hitrace_enabled ) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("ut-mmi-proxy-out") {
@@ -262,7 +265,6 @@ ohos_unittest("InputHandlerManagerTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -274,6 +276,10 @@ ohos_unittest("InputHandlerManagerTest") {
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled ) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("SwitchEventInputSubscribeManagerTest") {
@@ -376,13 +382,16 @@ ohos_unittest("InputManagerImplTest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled ) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("InputManagerTest") {

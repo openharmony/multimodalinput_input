@@ -317,7 +317,6 @@ ohos_shared_library("libmmi-server") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -329,6 +328,10 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled ) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
@@ -1201,7 +1204,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -1213,6 +1215,10 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled ) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (call_manager_service_enabled) {
     external_deps += [ "call_manager:tel_call_manager_api" ]
@@ -1427,9 +1433,13 @@ ohos_unittest("ModuleLoaderTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
 }
 
 ohos_unittest("KeyEventNormalizeTest") {
@@ -1953,9 +1963,13 @@ ohos_unittest("ServerMsgHandlerTest") {
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
 }
 
 ohos_unittest("PermissionHelperTest") {
@@ -1988,8 +2002,11 @@ ohos_unittest("PermissionHelperTest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
-    "security_component_manager:libsecurity_component_sdk",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
 }
 
 ohos_unittest("DisplayStateManagerTest") {
@@ -2173,9 +2190,13 @@ ohos_unittest("ConnectManagerTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
 }
 
 ohos_unittest("ConnectManagerProxyEXTest") {
@@ -2225,9 +2246,12 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "libinput:libinput-third-mmi",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
 }
 
 ohos_unittest("ConnectManagerEXTest") {
@@ -2275,9 +2299,13 @@ ohos_unittest("ConnectManagerEXTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
 }
 
 ohos_unittest("EventDumpTest") {
