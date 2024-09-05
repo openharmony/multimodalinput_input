@@ -2135,6 +2135,9 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
         std::vector<Rect> windowHotAreas;
         int32_t windowId = windowInfo.id;
         Rect windowArea = windowInfo.area;
+        if (windowInfo.transform.size() <= 0) {
+            continue;
+        }
         windowArea.width = windowInfo.transform[SCALE_X] != 0 ? windowInfo.area.width / windowInfo.transform[SCALE_X]
             : windowInfo.area.width;
         windowArea.height = windowInfo.transform[SCALE_Y] != 0 ? windowInfo.area.height / windowInfo.transform[SCALE_Y]
@@ -2154,7 +2157,9 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
 void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
-    UpdatePointerChangeAreas(displayGroupInfoTmp_);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        UpdatePointerChangeAreas(displayGroupInfoTmp_);
+    }
 }
 
 void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
