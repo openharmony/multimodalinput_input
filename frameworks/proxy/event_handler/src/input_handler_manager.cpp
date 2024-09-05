@@ -131,7 +131,7 @@ int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandle
         MMI_HILOGE("No handler(%{public}d) with specified", handlerId);
         return RET_ERR;
     }
-    const auto &gestureHandler = iter->second.gestureHandler_;
+    const auto gestureHandler = iter->second.gestureHandler_;
     monitorHandlers_.erase(iter);
     const HandleEventType newType = GetEventType();
 
