@@ -83,6 +83,7 @@ config("libmmi_server_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
+    "crown_transform_processor/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
@@ -93,10 +94,6 @@ config("libmmi_server_config") {
 
   if (input_feature_fingerprint) {
     include_dirs += [ "fingerprint_event_processor/include" ]
-  }
-
-  if (input_feature_crown) {
-    include_dirs += [ "crown_transform_processor/include" ]
   }
 
   if (input_ext_feature_anco) {
@@ -200,6 +197,7 @@ ohos_shared_library("libmmi-server") {
     sources += [ "touch_event_normalize/src/touch_event_normalize.cpp" ]
     if (input_feature_mouse) {
       sources += [
+        "crown_transform_processor/src/crown_transform_processor.cpp",
         "mouse_event_normalize/src/mouse_device_state.cpp",
         "mouse_event_normalize/src/mouse_event_normalize.cpp",
         "mouse_event_normalize/src/mouse_transform_processor.cpp",
@@ -225,9 +223,6 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_fingerprint) {
     sources +=
         [ "fingerprint_event_processor/src/fingerprint_event_processor.cpp" ]
-  }
-  if (input_feature_crown) {
-    sources += [ "crown_transform_processor/src/crown_transform_processor.cpp" ]
   }
   if (input_feature_joystick) {
     sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
