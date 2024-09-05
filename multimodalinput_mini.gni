@@ -47,7 +47,7 @@ declare_args() {
   input_ext_feature_fingersense = true
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
-  input_feature_crown = true
+  input_feature_crown = false
   input_feature_move_event_filters = false
   shortcut_key_manager_enabled = true
   shortcut_key_rules_enabled = true
