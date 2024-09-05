@@ -683,6 +683,33 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+int32_t ServerMsgHandler::OnAddGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        return monitorHandler->AddInputHandler(handlerType, eventType, sess, gestureType, fingers);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        monitorHandler->RemoveInputHandler(handlerType, eventType, sess, gestureType, fingers);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)
 {
