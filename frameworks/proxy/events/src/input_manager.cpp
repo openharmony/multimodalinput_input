@@ -138,6 +138,17 @@ void InputManager::RemoveMonitor(int32_t monitorId)
     InputMgrImpl.RemoveMonitor(monitorId);
 }
 
+int32_t InputManager::AddGestureMonitor(
+    std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
+{
+    return InputMgrImpl.AddGestureMonitor(consumer, type, fingers);
+}
+
+int32_t InputManager::RemoveGestureMonitor(int32_t monitorId)
+{
+    return InputMgrImpl.RemoveGestureMonitor(monitorId);
+}
+
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputMgrImpl.MarkConsumed(monitorId, eventId);

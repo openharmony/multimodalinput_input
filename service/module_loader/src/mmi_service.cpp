@@ -1284,30 +1284,6 @@ int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    if (((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
-        if (!touchGestureAdapter_) {
-            touchGestureAdapter_ = TouchGestureAdapter::GetGestureFactory();
-        }
-        if (touchGestureAdapter_) {
-            touchGestureAdapter_->SetGestureEnable(true);
-        }
-        int32_t ret = RET_OK;
-        if (delegateInterface_ && !delegateInterface_->HasHandler("touchGesture")) {
-            auto fun = [this](std::shared_ptr<PointerEvent> event) -> int32_t {
-                CHKPR(touchGestureAdapter_, ERROR_NULL_POINTER);
-                touchGestureAdapter_->process(event);
-            return RET_OK;
-        };
-        ret = delegateInterface_->AddHandler(InputHandlerType::MONITOR,
-            {"touchGesture", HANDLE_EVENT_TYPE_POINTER, HandlerMode::SYNC, 0, 0, fun});
-        }
-        if (ret != RET_OK) {
-            MMI_HILOGE("Failed to add gesture recognizer");
-            return ret;
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
@@ -1357,17 +1333,6 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    auto monitorHandler = InputHandler->GetMonitorHandler();
-    if (monitorHandler && monitorHandler->CheckHasInputHandler(HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
-        if (delegateInterface_ && delegateInterface_->HasHandler("touchGesture")) {
-            delegateInterface_->RemoveHandler(InputHandlerType::MONITOR, "touchGesture");
-            if (touchGestureAdapter_) {
-                touchGestureAdapter_->SetGestureEnable(false);
-            }
-        }
-    }
-#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
@@ -1405,6 +1370,87 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
         }
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t MMIService::AddGestureMonitor(InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, handlerType, eventType, gestureType, fingers]() -> int32_t {
+            if (((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
+                MMI_HILOGE("Illegal type:%{public}d", eventType);
+                return RET_ERR;
+            }
+            if (!GestureMonitorHandler::CheckMonitorValid(gestureType, fingers)) {
+                MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
+                return RET_ERR;
+            }
+            if (touchGestureAdapter_ == nullptr) {
+                touchGestureAdapter_ = TouchGestureAdapter::GetGestureFactory();
+            }
+            if (touchGestureAdapter_ != nullptr) {
+                touchGestureAdapter_->SetGestureCondition(true, gestureType, fingers);
+            }
+            if (delegateInterface_ != nullptr && !delegateInterface_->HasHandler("touchGesture")) {
+                auto fun = [this](std::shared_ptr<PointerEvent> event) -> int32_t {
+                    CHKPR(touchGestureAdapter_, ERROR_NULL_POINTER);
+                    touchGestureAdapter_->process(event);
+                    return RET_OK;
+                };
+                int32_t ret = delegateInterface_->AddHandler(InputHandlerType::MONITOR,
+                    {"touchGesture", HANDLE_EVENT_TYPE_POINTER, HandlerMode::SYNC, 0, 0, fun});
+                if (ret != RET_OK) {
+                    MMI_HILOGE("Failed to add gesture recognizer, ret:%{public}d", ret);
+                    return ret;
+                }
+            }
+            auto sess = GetSessionByPid(pid);
+            CHKPR(sess, ERROR_NULL_POINTER);
+            return sMsgHandler_.OnAddGestureMonitor(sess, handlerType, eventType, gestureType, fingers);
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Add gesture handler failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t MMIService::RemoveGestureMonitor(InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, pid, handlerType, eventType, gestureType, fingers]() -> int32_t {
+            auto sess = GetSessionByPid(pid);
+            CHKPR(sess, ERROR_NULL_POINTER);
+            int32_t ret = sMsgHandler_.OnRemoveGestureMonitor(sess, handlerType, eventType, gestureType, fingers);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Failed to remove gesture recognizer, ret:%{public}d", ret);
+                return ret;
+            }
+            auto monitorHandler = InputHandler->GetMonitorHandler();
+            if (monitorHandler && !monitorHandler->CheckHasInputHandler(HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
+                if (delegateInterface_ && delegateInterface_->HasHandler("touchGesture")) {
+                    delegateInterface_->RemoveHandler(InputHandlerType::MONITOR, "touchGesture");
+                }
+            }
+            if (touchGestureAdapter_) {
+                touchGestureAdapter_->SetGestureCondition(false, gestureType, fingers);
+            }
+            return RET_OK;
+        });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove gesture handler failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 

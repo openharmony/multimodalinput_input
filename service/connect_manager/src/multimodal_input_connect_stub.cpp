@@ -235,6 +235,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
             ret = StubRemoveInputHandler(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR):
+            ret = StubAddGestureMonitor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_GESTURE_MONITOR):
+            ret = StubRemoveInputHandler(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
             ret = StubMarkEventConsumed(data, reply);
             break;
@@ -1241,6 +1247,57 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveGestureMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    return HandleGestureMonitor(MultimodalinputConnectInterfaceCode::REMOVE_GESTURE_MONITOR, data, reply);
+}
+
+int32_t MultimodalInputConnectStub::StubAddGestureMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    return HandleGestureMonitor(MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR, data, reply);
+}
+
+int32_t MultimodalInputConnectStub::HandleGestureMonitor(
+    MultimodalinputConnectInterfaceCode code, MessageParcel& data, MessageParcel& reply)
+{
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (handlerType != InputHandlerType::MONITOR) {
+        MMI_HILOGE("Illegal type:%{public}d", handlerType);
+        return RET_ERR;
+    }
+    uint32_t eventType = 0;
+    READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+    uint32_t gestureType = 0u;
+    READUINT32(data, gestureType, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t fingers = 0;
+    READINT32(data, fingers, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RET_OK;
+    if (MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR == code) {
+        ret = AddGestureMonitor(static_cast<InputHandlerType>(handlerType),
+            eventType, static_cast<TouchGestureType>(gestureType), fingers);
+    } else {
+        ret = RemoveGestureMonitor(static_cast<InputHandlerType>(handlerType),
+            eventType, static_cast<TouchGestureType>(gestureType), fingers);
+    }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call AddGestureMonitor/RemoveGestureMonitor failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)

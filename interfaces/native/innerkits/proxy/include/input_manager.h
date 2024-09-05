@@ -963,6 +963,25 @@ public:
      */
     int32_t ConvertToCapiKeyAction(int32_t keyAction);
 
+    /**
+     * @brief 添加手势事件监视器。添加这样的监视器后，手势事件会被分发到到监视器。
+     * @param consumer 表示手势事件监视器。手势事件产生后，将调用监视器对象的函数。
+     * @param type 表示监视的手势类型。
+     * @param fingers 表示监视的手势达成的手指数量。
+     * @return 返回监视器ID，该ID唯一标识进程中的监视器。如果value的值大于等于0，表示添加成功。否则，添加监视器失败。
+     * @since 13
+     */
+    int32_t AddGestureMonitor(std::shared_ptr<IInputEventConsumer> consumer,
+        TouchGestureType type, int32_t fingers = 0);
+
+    /**
+     * @brief 删除一个手势监听器。
+     * @param monitorId 表示手势事件监视器，即AddGestureMonitor的返回值。
+     * @return void
+     * @since 13
+     */
+    int32_t RemoveGestureMonitor(int32_t monitorId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

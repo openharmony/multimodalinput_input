@@ -26,11 +26,23 @@ inline constexpr int32_t MAX_HANDLER_ID { 100000 };
 inline constexpr int32_t INVALID_HANDLER_ID { -1 };
 inline constexpr int32_t ERROR_EXCEED_MAX_COUNT { -4100001 };
 inline constexpr int32_t DEFUALT_INTERCEPTOR_PRIORITY { 500 };
+inline constexpr int32_t ALL_FINGER_COUNT = 0;
+inline constexpr int32_t THREE_FINGER_COUNT = 3;
+inline constexpr int32_t FOUR_FINGER_COUNT = 4;
+inline constexpr int32_t MAX_FINGERS_COUNT = 5;
 
 enum InputHandlerType : int32_t {
     NONE,
     INTERCEPTOR,
     MONITOR,
+};
+
+using TouchGestureType = uint32_t;
+inline constexpr TouchGestureType TOUCH_GESTURE_TYPE_NONE { 0x0 };
+inline constexpr TouchGestureType TOUCH_GESTURE_TYPE_PINCH { 1u };
+inline constexpr TouchGestureType TOUCH_GESTURE_TYPE_SWIPE { 1u << 1 };
+inline constexpr TouchGestureType TOUCH_GESTURE_TYPE_ALL {
+    TOUCH_GESTURE_TYPE_PINCH | TOUCH_GESTURE_TYPE_SWIPE
 };
 
 using HandleEventType = uint32_t;
