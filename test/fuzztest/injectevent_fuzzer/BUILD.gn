@@ -97,7 +97,6 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "hilog:libhilog",
     "hilog:libhilog_base",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -110,6 +109,10 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled ) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]

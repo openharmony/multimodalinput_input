@@ -25,6 +25,7 @@ c_utils_root = "//commonlibrary/c_utils"
 hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
+  hitrace_enabled = false
   call_manager_service_enabled = false
   resource_schedule_service_enabled = false
   screenlock_manager_enabled = false
@@ -51,11 +52,6 @@ declare_args() {
   input_feature_move_event_filters = false
   shortcut_key_manager_enabled = true
   shortcut_key_rules_enabled = true
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.telephony_call_manager)) {
-    call_manager_service_enabled = true
-  }
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -413,4 +409,20 @@ if (enable_player_framework) {
 
 if (shortcut_key_rules_enabled) {
   shortcut_key_manager_enabled = true
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_call_manager)) {
+  call_manager_service_enabled = true
+  input_default_defines += [ "CALL_MANAGER_SERVICE_ENABLED" ]
+} else {
+  call_manager_service_enabled = false
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_hitrace)) {
+  hitrace_enabled = true
+  input_default_defines += [ "HITRACE_ENABLED" ]
+} else {
+  hitrace_enabled = false
 }
