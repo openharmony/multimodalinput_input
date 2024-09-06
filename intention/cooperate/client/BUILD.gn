@@ -60,7 +60,7 @@ ohos_source_set("intention_cooperate_client") {
     "input:libmmi-client",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 
