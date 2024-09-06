@@ -1055,7 +1055,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                             std::cout << "invalid coordinate value" << std::endl;
                                             return EVENT_REG_FAIL;
                                     }
-                                    if ((startX < 0) || (startX < 0) || (endX < 0) || (endY < 0)) {
+                                    if ((startX < 0) || (startY < 0) || (endX < 0) || (endY < 0)) {
                                         std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                         return RET_ERR;
                                     }
@@ -2345,9 +2345,11 @@ void InputManagerCommand::PrintTouchUsage()
     std::cout << std::endl;
     std::cout << "                                                             ms, default value is 0; smooth time:";
     std::cout << std::endl;
-    std::cout << "                                                             move time, default value is 1000 ms";
+    std::cout << "                                                             move time, default value is 1000 ms,";
     std::cout << std::endl;
-    std::cout << "   Support for multiple finger movements at the same time, for example:" << std::endl;
+    std::cout << "                                                             the max value is 15000 ms";
+    std::cout << std::endl;
+    std::cout << "   Supports up to three finger movement at the same time, for example:" << std::endl;
     std::cout << "   uinput -T -m 300 900 600 900 900 900 600 900, (300, 900) move to (600, 900), (900, 900) move to";
     std::cout << std::endl;
     std::cout << "   (600, 900)" << std::endl;
