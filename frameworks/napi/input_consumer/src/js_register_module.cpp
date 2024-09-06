@@ -34,6 +34,8 @@ constexpr size_t EVENT_NAME_LEN { 64 };
 constexpr size_t PRE_KEYS_SIZE { 4 };
 constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
 constexpr size_t INPUT_PARAMETER_MAX { 3 };
+constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
+constexpr int32_t OCCUPIED_BY_OTHER = -4;
 } // namespace
 
 static Callbacks callbacks = {};
@@ -112,13 +114,13 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, KeyEventMon
     for (const auto &item : preKeys) {
         auto it = std::find(pressKeyCodes.begin(), pressKeyCodes.end(), item);
         if (it == pressKeyCodes.end()) {
-            MMI_HILOGE("preKeys expect:{ctrl alt shift}");
+            MMI_HILOGE("preKeys is not expect");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
             return nullptr;
         }
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
-        MMI_HILOGD("preKeys:%{public}d", item);
+        MMI_HILOGD("preKeys:%{private}d", item);
     }
     std::optional<int32_t> finalKeyOption = GetNamedPropertyInt32(env, argv[1], "finalKey");
     if (!finalKeyOption) {
@@ -127,27 +129,26 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, KeyEventMon
     }
     int32_t finalKey = finalKeyOption.value();
     if (finalKey < 0) {
-        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
+        MMI_HILOGE("finalKey:%{private}d is less 0, can not process", finalKey);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
         return nullptr;
     }
     auto it = std::find(finalKeyCodes.begin(), finalKeyCodes.end(), finalKey);
     if (it != finalKeyCodes.end()) {
-        MMI_HILOGE("finalKey cannot be {ctrl alt shift logo}");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey is not expect key");
+        MMI_HILOGE("finalKey is not expect");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey is not expect");
         return nullptr;
     }
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
-    MMI_HILOGD("FinalKey:%{public}d", finalKey);
+    MMI_HILOGD("FinalKey:%{private}d", finalKey);
 
     bool isFinalKeyDown = true;
     subKeyNames += std::to_string(isFinalKeyDown);
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
-    MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
-        (isFinalKeyDown == true ? 1 : 0), subKeyNames.c_str());
+    MMI_HILOGD("IsFinalKeyDown:%{private}d,", (isFinalKeyDown == true ? 1 : 0));
 
     int32_t finalKeyDownDuration = 0;
     subKeyNames += std::to_string(finalKeyDownDuration);
@@ -199,7 +200,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     for (const auto &item : preKeys) {
         subKeyNames += std::to_string(item);
         subKeyNames += ",";
-        MMI_HILOGD("preKeys:%{public}d", item);
+        MMI_HILOGD("preKeys:%{private}d", item);
     }
     std::optional<int32_t> tempFinalKey = GetNamedPropertyInt32(env, argv[1], "finalKey");
     if (!tempFinalKey) {
@@ -208,14 +209,14 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     }
     int32_t finalKey = tempFinalKey.value();
     if (finalKey < 0) {
-        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
+        MMI_HILOGE("finalKey:%{private}d is less 0, can not process", finalKey);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
         return nullptr;
     }
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
-    MMI_HILOGD("FinalKey:%{public}d", finalKey);
+    MMI_HILOGD("FinalKey:%{private}d", finalKey);
     bool isFinalKeyDown;
     if (!GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
         MMI_HILOGE("GetNamedPropertyBool failed");
@@ -224,7 +225,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     subKeyNames += std::to_string(isFinalKeyDown);
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
-    MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
+    MMI_HILOGD("IsFinalKeyDown:%{private}d,map_key:%{private}s",
         (isFinalKeyDown == true ? 1 : 0), subKeyNames.c_str());
     std::optional<int32_t> tempKeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
     if (!tempKeyDownDuration) {
@@ -279,7 +280,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     bool isFinalKeydown = keyOption->IsFinalKeyDown();
-    MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
+    MMI_HILOGD("infoFinalKey:%{private}d,keyEventFinalKey:%{private}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
         !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
         MMI_HILOGD("key Param invalid");
@@ -350,7 +351,7 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
     while (iter != hotkeyCallbacks.end()) {
         auto &list = iter->second;
         ++iter;
-        MMI_HILOGD("list size:%{public}zu", list.size());
+        MMI_HILOGD("callback list size:%{public}zu", list.size());
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
@@ -375,7 +376,7 @@ napi_value SubscribeKey(napi_env env, napi_callback_info info, KeyEventMonitorIn
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(callbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+        MMI_HILOGD("eventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
@@ -409,12 +410,17 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, KeyEventMonito
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(hotkeyCallbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGD("eventType:%{public}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
+        MMI_HILOGD("eventType:%{private}s, eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubHotkeyEventCallback);
-        if (subscribeId < 0) {
+        if (subscribeId == OCCUPIED_BY_SYSTEM) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            THROWERR_CUSTOM(env, OTHER_ERROR, "SubscribeId invalid");
+            THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_SYSTEM, "SubscribeId invalid");
+            return nullptr;
+        }
+        if (subscribeId == OCCUPIED_BY_OTHER) {
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_OTHER, "SubscribeId invalid");
             return nullptr;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -488,7 +494,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    std::string keyType = "";
+    std::string keyType;
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -530,7 +536,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    std::string keyType = "";
+    std::string keyType;
     if (!GetEventType(env, info, event, keyType)) {
         MMI_HILOGE("GetEventType fail, type must be key or hotkey");
         return nullptr;
