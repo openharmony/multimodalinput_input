@@ -189,7 +189,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 

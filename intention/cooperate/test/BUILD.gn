@@ -67,7 +67,7 @@ ohos_unittest("CooperateClientTest") {
     "samgr:samgr_proxy",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 }
@@ -145,7 +145,7 @@ ohos_unittest("CooperateServerTest") {
     "samgr:samgr_proxy",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 }

@@ -203,7 +203,7 @@ ohos_unittest("GestureTransformTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 
@@ -361,7 +361,7 @@ ohos_unittest("TabletToolTranformTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 
@@ -532,7 +532,7 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 
@@ -674,7 +674,7 @@ ohos_unittest("TouchpadGestureTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 
@@ -829,7 +829,7 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 

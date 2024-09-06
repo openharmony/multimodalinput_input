@@ -151,7 +151,7 @@ ohos_shared_library("libmmi-client") {
     "samgr:samgr_proxy",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 }
@@ -277,7 +277,7 @@ ohos_unittest("InputHandlerManagerTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 }
@@ -389,7 +389,7 @@ ohos_unittest("InputManagerImplTest") {
     "window_manager:libwsutils",
   ]
 
-  if (hitrace_enabled ) {
+  if (hitrace_enabled) {
     external_deps += [ "hitrace:hitrace_meter" ]
   }
 }
