@@ -819,6 +819,38 @@ int32_t InputManagerImpl::RemoveMonitor(int32_t monitorId)
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
+int32_t InputManagerImpl::AddGestureMonitor(
+    std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return IMonitorMgr->AddGestureMonitor(consumer, type, fingers);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
+}
+
+int32_t InputManagerImpl::RemoveGestureMonitor(int32_t monitorId)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return IMonitorMgr->RemoveGestureMonitor(monitorId);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
+}
+
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     CALL_INFO_TRACE;
@@ -1461,8 +1493,10 @@ int32_t InputManagerImpl::SendWindowInfo()
 int32_t InputManagerImpl::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
-    if (!MMISceneBoardJudgement::IsSceneBoardEnabled()) {
-        MMI_HILOGE("SceneBoard is not enabled");
+    const std::string sceneboard = "com.ohos.sceneboard";
+    const std::string programName(GetProgramName());
+    if (programName != sceneboard) {
+        MMI_HILOGE("Not sceneboard paogramName");
         return RET_ERR;
     }
     CHKPR(callback, RET_ERR);

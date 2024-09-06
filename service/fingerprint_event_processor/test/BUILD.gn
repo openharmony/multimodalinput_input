@@ -78,6 +78,7 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",

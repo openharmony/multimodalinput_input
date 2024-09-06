@@ -78,7 +78,7 @@ enum TypeName : int32_t {
     TOUCH_GESTURE = 10
 };
 
-std::map<std::string, int32_t> TO_GESTURE_TYPE = {
+std::map<std::string, int32_t> TO_MONITOR_TYPE = {
     { "touch", TOUCH },
     { "mouse", MOUSE },
     { "pinch", PINCH },
@@ -86,10 +86,12 @@ std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "fourFingersSwipe", FOUR_FINGERS_SWIPE },
     { "rotate", ROTATE },
     { "threeFingersTap", THREE_FINGERS_TAP },
-    { "joystick", JOYSTICK},
-    { "fingerprint", FINGERPRINT},
-    { "swipeInward", SWIPE_INWARD},
-    { "touchGesture", TOUCH_GESTURE},
+    { "joystick", JOYSTICK },
+    { "fingerprint", FINGERPRINT },
+    { "swipeInward", SWIPE_INWARD },
+    { TOUCH_SWIPE_GESTURE, TOUCH_GESTURE },
+    { TOUCH_PINCH_GESTURE, TOUCH_GESTURE },
+    { TOUCH_ALL_GESTURE, TOUCH_GESTURE },
 };
 
 struct MonitorInfo {
@@ -141,8 +143,10 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
 };
 
-std::map<std::string, int32_t> TO_HANDLE_EVENT_TYPE = {
-    {"touchGesture", HANDLE_EVENT_TYPE_TOUCH_GESTURE},
+std::map<std::string, TouchGestureType> TO_GESTURE_TYPE = {
+    { TOUCH_PINCH_GESTURE, TOUCH_GESTURE_TYPE_PINCH },
+    { TOUCH_SWIPE_GESTURE, TOUCH_GESTURE_TYPE_SWIPE },
+    { TOUCH_ALL_GESTURE, TOUCH_GESTURE_TYPE_ALL },
 };
 
 void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
@@ -163,9 +167,9 @@ int32_t InputMonitor::Start(const std::string &typeName)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        auto it = TO_HANDLE_EVENT_TYPE.find(typeName.c_str());
-        if (it != TO_HANDLE_EVENT_TYPE.end()) {
-            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this(), it->second);
+        auto it = TO_GESTURE_TYPE.find(typeName);
+        if (it != TO_GESTURE_TYPE.end()) {
+            monitorId_ = InputManager::GetInstance()->AddGestureMonitor(shared_from_this(), it->second, fingers_);
         } else {
             monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
         }
@@ -181,9 +185,13 @@ void InputMonitor::Stop()
         MMI_HILOGE("Invalid values");
         return;
     }
-    InputManager::GetInstance()->RemoveMonitor(monitorId_);
+    auto it = TO_GESTURE_TYPE.find(typeName_);
+    if (it != TO_GESTURE_TYPE.end()) {
+        InputManager::GetInstance()->RemoveGestureMonitor(monitorId_);
+    } else {
+        InputManager::GetInstance()->RemoveMonitor(monitorId_);
+    }
     monitorId_ = -1;
-    return;
 }
 
 std::string InputMonitor::GetTypeName() const
@@ -223,7 +231,8 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             return;
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (typeName != "touch" && typeName != "touchGesture") {
+            if (typeName != "touch" && typeName != TOUCH_SWIPE_GESTURE &&
+                typeName != TOUCH_PINCH_GESTURE && typeName != TOUCH_ALL_GESTURE) {
                 return;
             }
             SetConsumeState(pointerEvent);
@@ -1532,7 +1541,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer),
                                 CREATE_OBJECT, scope, pointerEventItem);
         auto ret = RET_ERR;
-        switch (TO_GESTURE_TYPE[typeName.c_str()]) {
+        switch (TO_MONITOR_TYPE[typeName.c_str()]) {
             case TypeName::TOUCH: {
                 ret = TransformPointerEvent(pointerEventItem, napiPointer);
                 break;
@@ -1637,7 +1646,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
             typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward" ||
-            typeName == "touchGesture";
+            typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE;
         if (typeNameFlag) {
             if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
                 pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {

@@ -273,7 +273,6 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             break;
         }
     }
-    previousUpTime_ = touchEvent->GetActionTime();
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -349,6 +348,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    previousUpTime_ = touchEvent->GetActionTime();
     size_t pointercnt = touchEvent->GetPointerIds().size();
     if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
@@ -1477,6 +1477,7 @@ int32_t KeyCommandHandler::SetIsFreezePowerKey(const std::string pageName)
     }
     isFreezePowerKey_ = true;
     count_ = 0;
+    launchAbilityCount_ = 0;
     repeatKeyCountMap_.clear();
     if (sosDelayTimerId_ >= 0) {
         TimerMgr->RemoveTimer(sosDelayTimerId_);
@@ -2107,6 +2108,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         if (err == ERR_OK && ability.bundleName == SOS_BUNDLE_NAME) {
             isFreezePowerKey_ = true;
             count_ = 0;
+            launchAbilityCount_ = 0;
             repeatKeyCountMap_.clear();
             sosDelayTimerId_ = TimerMgr->AddTimer(SOS_DELAY_TIMES / SECONDS_SYSTEM, 1, [this] () {
                 isFreezePowerKey_ = false;

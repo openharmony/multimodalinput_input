@@ -68,6 +68,9 @@ ohos_fuzztest("RemoveInputEventObserverFuzzTest") {
     "ipc:ipc_single",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]

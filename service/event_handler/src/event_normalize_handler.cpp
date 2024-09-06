@@ -16,9 +16,7 @@
 #include "event_normalize_handler.h"
 
 #include "bytrace_adapter.h"
-#ifdef OHOS_BUILD_ENABLE_CROWN
 #include "crown_transform_processor.h"
-#endif // OHOS_BUILD_ENABLE_CROWN
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
@@ -387,11 +385,15 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_CROWN)
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (CROWN_EVENT_HDR->IsCrownEvent(event)) {
+#ifdef OHOS_BUILD_ENABLE_CROWN
         return CROWN_EVENT_HDR->NormalizeRotateEvent(event);
+#else
+        return RET_ERR;
+#endif // OHOS_BUILD_ENABLE_CROWN
     }
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_CROWN
+#endif // OHOS_BUILD_ENABLE_POINTER
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     BytraceAdapter::StartPackageEvent("package mouseEvent");

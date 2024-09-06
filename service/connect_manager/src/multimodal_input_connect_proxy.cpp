@@ -1048,6 +1048,43 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
     return ret;
 }
 
+int32_t MultimodalInputConnectProxy::HandleGestureMonitor(uint32_t code,
+    InputHandlerType handlerType, HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, static_cast<uint32_t>(gestureType), ERR_INVALID_VALUE);
+    WRITEINT32(data, fingers, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(code, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::AddGestureMonitor(
+    InputHandlerType handlerType, HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    return HandleGestureMonitor(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR),
+        handlerType, eventType, gestureType, fingers);
+}
+
+int32_t MultimodalInputConnectProxy::RemoveGestureMonitor(
+    InputHandlerType handlerType, HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    return HandleGestureMonitor(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_GESTURE_MONITOR),
+        handlerType, eventType, gestureType, fingers);
+}
+
 int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;

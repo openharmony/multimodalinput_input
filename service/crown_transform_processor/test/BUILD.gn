@@ -45,7 +45,9 @@ ohos_unittest("CrownTransformProcessorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
   ]
 }
