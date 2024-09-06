@@ -251,9 +251,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
-                TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
-            }
+            TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
@@ -515,7 +513,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform;
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
