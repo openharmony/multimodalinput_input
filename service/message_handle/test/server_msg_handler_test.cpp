@@ -137,7 +137,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_03, TestSize
     ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = ServerMsgHandlerTest::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t result = servermsghandler.SetPixelMapData(infoId, (void *)pixelMap.get());
@@ -1755,10 +1754,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_002, TestS
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
     int32_t pid = 12345;
     handler.injectNotice_ =nullptr;
-    bool ret = handler.InitInjectNoticeSource();
+    handler.InitInjectNoticeSource();
     handler.injectNotice_->isStartSrv_ = true;
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     EXPECT_NE(nullptr, manager.connectionCallback_);

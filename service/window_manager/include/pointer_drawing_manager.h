@@ -39,6 +39,8 @@
 
 namespace OHOS {
 namespace MMI {
+inline constexpr int32_t DEFUALT_COOPERATE_PRIORITY { 10 };
+
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
@@ -163,6 +165,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void ForceClearPointerVisiableStatus() override;
     void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
+    void DeletPidInfo(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateBindDisplayId(int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -170,6 +173,7 @@ private:
 private:
     struct PidInfo {
         int32_t pid { 0 };
+        int32_t priority { 0 };
         bool visible { false };
     };
     bool hasDisplay_ { false };

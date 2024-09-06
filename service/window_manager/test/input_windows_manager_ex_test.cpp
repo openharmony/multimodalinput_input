@@ -537,8 +537,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_004,
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
-
     libinput_event_tablet_tool event {};
     Direction direction;
     direction = DIRECTION90;
@@ -562,8 +560,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_005,
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
-
     libinput_event_tablet_tool event {};
     Direction direction;
     direction = DIRECTION270;
@@ -587,8 +583,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006,
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
-
     libinput_event_tablet_tool event {};
     Direction direction;
     direction = DIRECTION0;

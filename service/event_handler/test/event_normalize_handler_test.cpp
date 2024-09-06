@@ -391,29 +391,6 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_ProcessNullEvent_0
     ASSERT_FALSE(ret);
 }
 
-/**
- * @tc.name: EventNormalizeHandlerTest_HandleKeyboardEvent_001
- * @tc.desc: Test the function HandleKeyboardEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_HandleKeyboardEvent_001, TestSize.Level1)
-{
-    EventNormalizeHandler handler;
-    libinput_event* event = nullptr;
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->pressedKeys_.push_back(1);
-    pointerEvent->pressedKeys_.push_back(2);
-    pointerEvent->pressedKeys_.push_back(3);
-    pointerEvent->pressedKeys_.push_back(4);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
-    event = new (std::nothrow) libinput_event;
-    ASSERT_NE(event, nullptr);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyboardEvent(event));
-}
-
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 /**
  * @tc.name: EventNormalizeHandlerTest_SetMoveEventFilters_001

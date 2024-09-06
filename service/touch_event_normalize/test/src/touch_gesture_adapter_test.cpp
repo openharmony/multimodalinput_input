@@ -45,17 +45,12 @@ public:
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_SetGestureEnable_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = TOUCH_GESTURE_TYPE_SWIPE;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
-    bool isEnable = true;
     touchGestureAdapter->Init();
-    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureEnable(isEnable));
-    touchGestureAdapter->gestureDetector_ = nullptr;
-    touchGestureAdapter->nextAdapter_ = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
-    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureEnable(isEnable));
-    touchGestureAdapter->nextAdapter_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureEnable(isEnable));
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(false, adapterType, 0));
 }
 
 /**
@@ -67,7 +62,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_SetGestureEnable_001, 
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
@@ -94,7 +89,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_process_001, TestSize.
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_Init_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->Init());
@@ -115,7 +110,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_Init_001, TestSize.Lev
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_GetGestureFactory_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->GetGestureFactory());
@@ -130,7 +125,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_GetGestureFactory_001,
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
@@ -156,11 +151,11 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_001, Test
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
     touchGestureAdapter->gestureStarted_ = true;
     event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    touchGestureAdapter->getureType_ = SwipeAdapterType;
+    touchGestureAdapter->gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
-    touchGestureAdapter->getureType_ = PinchAdapterType;
+    touchGestureAdapter->gestureType_ = TOUCH_GESTURE_TYPE_PINCH;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
-    touchGestureAdapter->getureType_ = 2;
+    touchGestureAdapter->gestureType_ = 2;
     event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::SWIPE;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
@@ -175,7 +170,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_001, Test
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
@@ -184,7 +179,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_002, Test
     event->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     touchGestureAdapter->gestureStarted_ = true;
     event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    touchGestureAdapter->getureType_ = 2;
+    touchGestureAdapter->gestureType_ = 2;
     touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::IDLE;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
     event->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -213,7 +208,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_002, Test
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureSuccessful_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
@@ -229,7 +224,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureSuccessful_00
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnSwipeGesture_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
@@ -250,7 +245,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnSwipeGesture_001, Te
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnPinchGesture_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
@@ -271,30 +266,30 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnPinchGesture_001, Te
 HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    AdapterType adapterType = 2;
+    TouchGestureType adapterType = 5;
     std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
     auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     InputHandler->eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
-    GetureType mode = GetureType::ACTION_SWIPE_DOWN;
+    GestureMode mode = GestureMode::ACTION_SWIPE_DOWN;
     bool ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, true);
-    mode = GetureType::ACTION_SWIPE_UP;
+    mode = GestureMode::ACTION_SWIPE_UP;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, true);
-    mode = GetureType::ACTION_SWIPE_LEFT;
+    mode = GestureMode::ACTION_SWIPE_LEFT;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, true);
-    mode = GetureType::ACTION_SWIPE_RIGHT;
+    mode = GestureMode::ACTION_SWIPE_RIGHT;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, true);
-    mode = GetureType::ACTION_PINCH_CLOSED;
+    mode = GestureMode::ACTION_PINCH_CLOSED;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, true);
-    mode = GetureType::ACTION_PINCH_OPENED;
+    mode = GestureMode::ACTION_PINCH_OPENED;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, true);
-    mode = GetureType::ACTION_UNKNOW;
+    mode = GestureMode::ACTION_UNKNOWN;
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, false);
 }

@@ -61,6 +61,8 @@ constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
 constexpr int32_t SCALE_X { 0 };
 constexpr int32_t SCALE_Y { 4 };
+constexpr int32_t ANCHOR_POINT_X { 6 };
+constexpr int32_t ANCHOR_POINT_Y { 7 };
 constexpr int32_t TOP_LEFT_AREA { 0 };
 constexpr int32_t TOP_AREA { 1 };
 constexpr int32_t TOP_RIGHT_AREA { 2 };
@@ -84,7 +86,7 @@ const std::string DEFAULT_ICON_PATH { "/system/etc/multimodalinput/mouse_icon/De
 const std::string NAVIGATION_SWITCH_NAME { "settings.input.stylus_navigation_hint" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
-constexpr int32_t FOLDABLE_DEVICE { 2 };
+[[ maybe_unused ]] constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr uint32_t FOLD_STATUS_MASK { 1U << 27U };
 } // namespace
 
@@ -267,6 +269,24 @@ const std::vector<WindowInfo> &InputWindowsManager::GetWindowGroupInfoByDisplayI
         return displayGroupInfo_.windowsInfo;
     }
     return iter->second.windowsInfo;
+}
+
+bool InputWindowsManager::GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+        if (iter != touchItemDownInfos_.end()) {
+            return iter->second.flag;
+        }
+        return true;
+    } else if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE ||
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        if (mouseDownInfo_.pid != -1) {
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -2135,6 +2155,9 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
         std::vector<Rect> windowHotAreas;
         int32_t windowId = windowInfo.id;
         Rect windowArea = windowInfo.area;
+        if (windowInfo.transform.size() <= 0) {
+            continue;
+        }
         windowArea.width = windowInfo.transform[SCALE_X] != 0 ? windowInfo.area.width / windowInfo.transform[SCALE_X]
             : windowInfo.area.width;
         windowArea.height = windowInfo.transform[SCALE_Y] != 0 ? windowInfo.area.height / windowInfo.transform[SCALE_Y]
@@ -2154,7 +2177,9 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
 void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
-    UpdatePointerChangeAreas(displayGroupInfoTmp_);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        UpdatePointerChangeAreas(displayGroupInfoTmp_);
+    }
 }
 
 void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
@@ -3718,6 +3743,23 @@ void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> poin
     MMI_HILOG_DISPATCHD("pointerAction:%{public}s", pointerEvent->DumpPointerAction());
 }
 
+void InputWindowsManager::DumpDisplayInfo(int32_t fd)
+{
+    mprintf(fd, "Displays information:\t");
+    mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
+        mprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
+                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%u \t",
+                item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
+                item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode);
+        if (item.transform.size() == MATRIX3_SIZE) {
+            mprintf(fd, "\t transform: scaleX:%f | scaleY:%f | anchorPointX:%f | anchorPointY:%f \t",
+                    item.transform[SCALE_X], item.transform[SCALE_Y], item.transform[ANCHOR_POINT_X],
+                    item.transform[ANCHOR_POINT_Y]);
+        }
+    }
+}
+
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
@@ -3755,14 +3797,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             mprintf(fd, "%s", line.c_str());
         }
     }
-    mprintf(fd, "Displays information:\t");
-    mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
-    for (const auto &item : displayGroupInfo_.displaysInfo) {
-        mprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
-                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%u \t",
-                item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-                item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode);
-    }
+    DumpDisplayInfo(fd);
     mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     std::string ancoWindows;
