@@ -849,6 +849,36 @@ WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &dis
     return action;
 }
 
+void InputWindowsManager::HandleWindowPositionChange()
+{
+    CALL_INFO_TRACE;
+    for (auto it = touchItemDownInfos_.begin; it != touchItemDownInfos_.end(); ++it) {
+        int32_t pointerId = it->first;
+        int32_t windowId = it->second.window.id;
+        auto iter = std::find_if(displayGroupInfo_.windowsInfo.begin(), displayGroupInfo_.windowsInfo.end(),
+            [windowId](const auto& windowInfo) {
+            return windowId == windowInfo.id && windowInfo.rectChangeBySystem;
+        });
+        if (iter != displayGroupInfo_.windowsInfo.end()) {
+            MMI_HILOGI("Dispatch cancel event pointerId:%{public}d", pointerId);
+            CHKPV(lastPointerEventforWindowChange_);
+            PointerEvent::PointerItem pointerItem;
+            if (!lastPointerEventforWindowChange_->GetPointerItem(pointerId, pointerItem)) {
+                MMI_HILOGE("Can not find pointer item pointerid:%{public}d", pointerId);
+                return;
+            }
+            auto tmpEvent = std::make_shared<PointerEvent>(lastPointerEventforWindowChange_);
+            tmpEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            tmpEvent->SetPointerId(pointerId);
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+            CHKPV(inputEventNormalizeHandler);
+            inputEventNormalizeHandler->HandleTouchEvent(tmpEvent);
+            it->second.flag = true;
+            iter->rectChangeBySystem = false;
+        }
+    }
+}
+
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
     auto action = UpdateWindowInfo(displayGroupInfo);
@@ -865,6 +895,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
             CleanInvalidPiexMap();
             displayGroupInfo_ = displayGroupInfoTmp_;
             UpdateWindowsInfoPerDisplay(displayGroupInfo);
+            HandleWindowPositionChange();
         }
     }
     PrintDisplayInfo();
@@ -3141,7 +3172,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
+    lastPointerEventforWindowChange_ = pointerEvent;
     pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
         pointerAction == PointerEvent::POINTER_ACTION_HOVER_ENTER) {
