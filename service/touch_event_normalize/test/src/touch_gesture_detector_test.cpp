@@ -173,6 +173,14 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleMoveEvent_01, 
     TouchGestureDetector detector(type, listener);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
+
+    detector.fingers_.insert(1);
+    detector.fingers_.insert(0);
+    detector.fingers_.insert(3);
+    EXPECT_TRUE(detector.IsMatchGesture(ALL_FINGER_COUNT));
 
     detector.isRecognized_ = false;
     ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
@@ -200,8 +208,34 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleMoveEvent_02, 
     TouchGestureDetector detector(type, listener);
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
+    detector.downPoint_[3] = Point(5.0f, 6.0f);
 
+    detector.fingers_.insert(1);
+    detector.fingers_.insert(0);
+    detector.fingers_.insert(3);
     detector.isRecognized_ = true;
+    ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_HandleMoveEvent_03
+ * @tc.desc: Test HandleMoveEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleMoveEvent_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    detector.downPoint_[1] = Point(1.0f, 2.0f);
+    detector.downPoint_[2] = Point(3.0f, 4.0f);
     ASSERT_NO_FATAL_FAILURE(detector.HandleMoveEvent(pointerEvent));
 }
 
@@ -569,7 +603,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_ChangeToGestureMode_
     TouchGestureDetector::SlideState state;
     state = TouchGestureDetector::SlideState::DIRECTION_UP;
     EXPECT_EQ(detector.ChangeToGestureMode(state), GestureMode::ACTION_SWIPE_UP);
-    
+
     state = TouchGestureDetector::SlideState::DIRECTION_DOWN;
     EXPECT_EQ(detector.ChangeToGestureMode(state), GestureMode::ACTION_SWIPE_DOWN);
 
@@ -926,6 +960,110 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AntiJitter_01, TestS
 
     mode = GestureMode::ACTION_UNKNOWN;
     EXPECT_FALSE(detector.AntiJitter(pointerEvent, mode));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_AddGestureFingers_01
+ * @tc.desc: Test AddGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_AddGestureFingers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    detector.fingers_.insert(1);
+    detector.fingers_.insert(2);
+    detector.fingers_.insert(3);
+    int32_t fingers = 1;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers));
+    fingers = 4;
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers));
+
+    detector.fingers_.clear();
+    ASSERT_NO_FATAL_FAILURE(detector.AddGestureFingers(fingers));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_RemoveGestureFingers_01
+ * @tc.desc: Test RemoveGestureFingers
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_RemoveGestureFingers_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    detector.fingers_.insert(1);
+    detector.fingers_.insert(2);
+    detector.fingers_.insert(3);
+    int32_t fingers = 1;
+    ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(fingers));
+    fingers = 4;
+    ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(fingers));
+
+    detector.fingers_.clear();
+    ASSERT_NO_FATAL_FAILURE(detector.RemoveGestureFingers(fingers));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_IsMatchGesture_01
+ * @tc.desc: Test IsMatchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_IsMatchGesture_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    detector.fingers_.insert(1);
+    detector.fingers_.insert(2);
+    detector.fingers_.insert(3);
+
+    int32_t count = 1;
+    GestureMode mode;
+    mode = GestureMode::ACTION_SWIPE_DOWN;
+    EXPECT_TRUE(detector.IsMatchGesture(mode, count));
+    mode = GestureMode::ACTION_SWIPE_UP;
+    EXPECT_TRUE(detector.IsMatchGesture(mode, count));
+    mode = GestureMode::ACTION_SWIPE_LEFT;
+    EXPECT_TRUE(detector.IsMatchGesture(mode, count));
+    mode = GestureMode::ACTION_SWIPE_RIGHT;
+    EXPECT_TRUE(detector.IsMatchGesture(mode, count));
+    mode = GestureMode::ACTION_PINCH_OPENED;
+    EXPECT_FALSE(detector.IsMatchGesture(mode, count));
+    mode = GestureMode::ACTION_PINCH_CLOSED;
+    EXPECT_FALSE(detector.IsMatchGesture(mode, count));
+    mode = GestureMode::ACTION_UNKNOWN;
+    EXPECT_FALSE(detector.IsMatchGesture(mode, count));
+}
+
+/**
+ * @tc.name: TouchGestureDetectorTest_IsMatchGesture_02
+ * @tc.desc: Test IsMatchGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_IsMatchGesture_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto listener = std::make_shared<MyGestureListener>();
+    TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
+    TouchGestureDetector detector(type, listener);
+    detector.fingers_.insert(1);
+    detector.fingers_.insert(2);
+    detector.fingers_.insert(3);
+
+    int32_t count = 4;
+    GestureMode mode;
+    mode = GestureMode::ACTION_UNKNOWN;
+    EXPECT_FALSE(detector.IsMatchGesture(mode, count));
 }
 
 /**
