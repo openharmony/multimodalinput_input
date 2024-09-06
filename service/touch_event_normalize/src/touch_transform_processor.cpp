@@ -87,7 +87,6 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     return true;
 }
 
@@ -170,7 +169,6 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     return true;
 }
 __attribute__((no_sanitize("cfi")))
@@ -207,7 +205,6 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     return true;
 }
 
