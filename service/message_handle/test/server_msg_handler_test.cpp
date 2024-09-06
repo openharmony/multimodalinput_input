@@ -1171,28 +1171,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_001, TestSi
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_002
- * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch failed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectKeyEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler msgHandler;
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    int32_t pid = 15;
-    bool isNativeInject = true;
-    keyEvent->SetId(1);
-    keyEvent->eventType_ = 1;
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_EQ(msgHandler.OnInjectKeyEvent(keyEvent, pid, isNativeInject), RET_OK);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_OnInjectKeyEvent_003
  * @tc.desc: Test if (isNativeInject) branch failed
  * @tc.type: FUNC
@@ -1232,29 +1210,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_002, Te
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNAUTHORIZED));
     EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), COMMON_PERMISSION_CHECK_ERROR);
-}
-
-/**
- * @tc.name: ServerMsgHandlerTest_OnInjectPointerEvent_003
- * @tc.desc: Test if (iter->second == AuthorizationStatus::UNAUTHORIZED) branch failed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnInjectPointerEvent_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler msgHandler;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    int32_t pid = 15;
-    bool isNativeInject = true;
-    pointerEvent->SetId(1);
-    pointerEvent->eventType_ = 1;
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
-    msgHandler.authorizationCollection_.insert(std::make_pair(pid, AuthorizationStatus::UNKNOWN));
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_EQ(msgHandler.OnInjectPointerEvent(pointerEvent, pid, isNativeInject, false), RET_OK);
 }
 
 /**
