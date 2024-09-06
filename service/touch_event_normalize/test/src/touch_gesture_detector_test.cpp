@@ -490,7 +490,7 @@ HWTEST_F(TouchGestureDetectorTest, TouchGestureDetectorTest_HandleFingerDown_04,
     TouchGestureType type = TOUCH_GESTURE_TYPE_SWIPE;
     TouchGestureDetector detector(type, listener);
     detector.downPoint_[1] = Point(0.0f, 0.0f, 50000);
-    detector.downPoint_[2] = Point(100.0f, 100.0f ,150000);
+    detector.downPoint_[2] = Point(100.0f, 100.0f, 150000);
     detector.downPoint_[3] = Point(200.0f, 200.0f, 250000);
     EXPECT_FALSE(detector.HandleFingerDown());
 }
