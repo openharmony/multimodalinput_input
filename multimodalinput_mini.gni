@@ -415,14 +415,10 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_call_manager)) {
   call_manager_service_enabled = true
   input_default_defines += [ "CALL_MANAGER_SERVICE_ENABLED" ]
-} else {
-  call_manager_service_enabled = false
 }
 
 if (defined(global_parts_info) &&
     defined(global_parts_info.hiviewdfx_hitrace)) {
   hitrace_enabled = true
   input_default_defines += [ "HITRACE_ENABLED" ]
-} else {
-  hitrace_enabled = false
 }
