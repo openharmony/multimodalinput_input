@@ -2065,7 +2065,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_SYSTEM;
         }
-        if (subscribeId == OCCUPIED_BY_OTHER){
+        if (subscribeId == OCCUPIED_BY_OTHER) {
             delete hotkeyInfo;
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
             return INPUT_OCCUPIED_BY_OTHER;

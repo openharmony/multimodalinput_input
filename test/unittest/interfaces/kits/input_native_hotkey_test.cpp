@@ -72,7 +72,8 @@ HapInfoParams g_infoManagerTestInfoParams = {
 
 class InputNativeHotkeyTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {
+    static void SetUpTestCase(void)
+    {
         AccessTokenIDEx tokenIdEx = {0};
         tokenIdEx = AccessTokenKit::AllocHapToken(g_infoManagerTestInfoParams, g_infoManagerTestPolicyParams);
         tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
@@ -80,7 +81,8 @@ public:
         ASSERT_NE(0, tokenID_);
         ASSERT_EQ(0, SetSelfTokenID(tokenID_));
     }
-    static void TearDownTestCase(void) {
+    static void TearDownTestCase(void)
+    {
         ASSERT_NE(0, tokenID_);
         int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
         ASSERT_EQ(INPUT_SUCCESS, ret);
