@@ -1439,7 +1439,6 @@ ohos_unittest("ModuleLoaderTest") {
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
-
 }
 
 ohos_unittest("KeyEventNormalizeTest") {
@@ -1969,7 +1968,6 @@ ohos_unittest("ServerMsgHandlerTest") {
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
-
 }
 
 ohos_unittest("PermissionHelperTest") {
@@ -2196,7 +2194,6 @@ ohos_unittest("ConnectManagerTest") {
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
-
 }
 
 ohos_unittest("ConnectManagerProxyEXTest") {
@@ -2305,7 +2302,6 @@ ohos_unittest("ConnectManagerEXTest") {
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
   }
-
 }
 
 ohos_unittest("EventDumpTest") {
