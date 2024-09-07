@@ -591,7 +591,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType;
         OnUiExtentionWindowInfo(pkt, info);
-        pkg >> info.rectChangeBySystem;
+        pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
