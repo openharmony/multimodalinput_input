@@ -330,7 +330,7 @@ struct WindowInfo {
 
     std::vector<WindowInfo> uiExtentionWindowInfo;
 
-    bool rectChangeBySystem;
+    bool rectChangeBySystem { false };
 };
 
 /**
