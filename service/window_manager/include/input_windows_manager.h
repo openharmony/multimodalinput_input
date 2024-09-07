@@ -83,6 +83,7 @@ public:
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
     std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
     int32_t GetCurrentUserId();
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
