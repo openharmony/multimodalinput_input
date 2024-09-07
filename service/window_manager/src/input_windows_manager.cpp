@@ -1999,7 +1999,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
 {
     CALL_DEBUG_ENTER;
     int32_t action = pointerEvent->GetPointerAction();
-    bool checkFlag = (firstBtnDownWindowId_ == -1) ||
+    bool checkFlag = (firstBtnDownWindowInfo_.first == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
         (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) ||
@@ -2036,9 +2036,10 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                         winId2ZorderMap.insert({item.id, item.zOrder});
                         continue;
                     }
-                    firstBtnDownWindowId_ = item.id;
+                    firstBtnDownWindowInfo_.first = item.id;
+                    firstBtnDownWindowInfo_.second = item.displayId;
                     MMI_HILOG_DISPATCHD("Mouse event select pull window, window:%{public}d, pid:%{public}d",
-                        firstBtnDownWindowId_, item.pid);
+                        firstBtnDownWindowInfo_.first, item.pid);
                     break;
                 } else {
                     winId2ZorderMap.insert({item.id, item.zOrder});
@@ -2053,14 +2054,16 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                     (action == PointerEvent::POINTER_ACTION_AXIS_END))) {
                     continue;
                 }
-                firstBtnDownWindowId_ = item.id;
+                firstBtnDownWindowInfo_.first = item.id;
+                firstBtnDownWindowInfo_.second = item.displayId;
                 if (!item.uiExtentionWindowInfo.empty()) {
                     // Determine whether the landing point as a safety sub window
                     CheckUIExtentionWindowPointerHotArea(logicalX, logicalY,
-                        item.uiExtentionWindowInfo, firstBtnDownWindowId_);
+                        item.uiExtentionWindowInfo, firstBtnDownWindowInfo_.first);
                 }
                 MMI_HILOG_DISPATCHD("Find out the dispatch window of this pointer event when the targetWindowId "
-                    "hasn't been set up yet, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
+                    "hasn't been set up yet, window:%{public}d, pid:%{public}d",
+                    firstBtnDownWindowInfo_.first, item.pid);
                 bool isSpecialWindow = HandleWindowInputType(item, pointerEvent);
                 if (isSpecialWindow) {
                     AddTargetWindowIds(pointerEvent->GetPointerId(), pointerEvent->GetSourceType(), item.id);
@@ -2074,16 +2077,18 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 }
 
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
-                firstBtnDownWindowId_ = targetWindowId;
+                firstBtnDownWindowInfo_.first = targetWindowId;
+                firstBtnDownWindowInfo_.second = item.displayId;
                 MMI_HILOG_DISPATCHD("Find out the dispatch window of this pointer event when the targetWindowId "
-                    "has been set up already, window:%{public}d, pid:%{public}d", firstBtnDownWindowId_, item.pid);
+                    "has been set up already, window:%{public}d, pid:%{public}d",
+                    firstBtnDownWindowInfo_.first, item.pid);
                 break;
             } else {
                 winId2ZorderMap.insert({item.id, item.zOrder});
                 MMI_HILOG_DISPATCHD("Continue searching for the dispatch window of this pointer event");
             }
         }
-        if ((firstBtnDownWindowId_ < 0) && (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) &&
+        if ((firstBtnDownWindowInfo_.first < 0) && (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) &&
             (pointerEvent->GetPressedButtons().size() == 1)) {
             for (const auto &iter : winId2ZorderMap) {
                 MMI_HILOG_DISPATCHI("%{public}d, %{public}d", iter.first, iter.second);
@@ -2091,15 +2096,29 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         }
         winId2ZorderMap.clear();
     }
-    MMI_HILOG_DISPATCHD("firstBtnDownWindowId_:%{public}d", firstBtnDownWindowId_);
+    MMI_HILOG_DISPATCHD("firstBtnDownWindowInfo_.first:%{public}d", firstBtnDownWindowInfo_.first);
     for (const auto &item : windowsInfo) {
         for (const auto &windowInfo : item.uiExtentionWindowInfo) {
-            if (windowInfo.id == firstBtnDownWindowId_) {
+            if (windowInfo.id == firstBtnDownWindowInfo_.first) {
                 return std::make_optional(windowInfo);
             }
         }
-        if (item.id == firstBtnDownWindowId_) {
+        if (item.id == firstBtnDownWindowInfo_.first) {
             return std::make_optional(item);
+        }
+    }
+    if (pointerEvent->GetTargetDisplayId() != firstBtnDownWindowInfo_.second) {
+        std::vector<WindowInfo> firstBtnDownWindowsInfo =
+            GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
+        for (const auto &item : firstBtnDownWindowsInfo) {
+            for (const auto &windowInfo : item.uiExtentionWindowInfo) {
+                if (windowInfo.id == firstBtnDownWindowInfo_.first) {
+                    return std::make_optional(windowInfo);
+                }
+            }
+            if (item.id == firstBtnDownWindowInfo_.first) {
+                return std::make_optional(item);
+            }
         }
     }
     return std::nullopt;
