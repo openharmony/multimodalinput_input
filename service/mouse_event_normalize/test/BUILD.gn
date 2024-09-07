@@ -177,7 +177,6 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -189,6 +188,10 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     external_deps += [

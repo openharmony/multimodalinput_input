@@ -191,7 +191,6 @@ ohos_unittest("GestureTransformTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -203,6 +202,10 @@ ohos_unittest("GestureTransformTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     external_deps += [
@@ -346,7 +349,6 @@ ohos_unittest("TabletToolTranformTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -358,6 +360,10 @@ ohos_unittest("TabletToolTranformTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     external_deps += [
@@ -514,7 +520,6 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -526,6 +531,10 @@ ohos_unittest("TouchTransformProcessorTestWithMock") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     external_deps += [
@@ -653,7 +662,6 @@ ohos_unittest("TouchpadGestureTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -665,6 +673,10 @@ ohos_unittest("TouchpadGestureTest") {
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     external_deps += [
@@ -804,7 +816,6 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "graphic_2d:window_animation",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
@@ -817,6 +828,10 @@ ohos_unittest("TouchPadTransformProcessorMockTest") {
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 
   if (input_ext_feature_magiccursor) {
     external_deps += [
