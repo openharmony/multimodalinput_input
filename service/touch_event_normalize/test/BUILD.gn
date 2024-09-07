@@ -859,6 +859,7 @@ ohos_unittest("TouchGestureAdapterTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./../ipc_blocklist.txt"
   }
 
   include_dirs = [ "${mmi_path}/service/touch_event_normalize/include" ]
