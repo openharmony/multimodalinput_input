@@ -1882,37 +1882,37 @@ static int32_t MakeHotkeyInfo(const Input_Hotkey* hotkey, Input_HotkeyInfo* hotk
     CHKPR(keyOption, INPUT_PARAMETER_ERROR);
 
     if (hotkey->preKeys.empty()) {
-        MMI_HILOGE("pressedKeys not found");
+        MMI_HILOGE("PressedKeys not found");
         return INPUT_PARAMETER_ERROR;
     }
     std::set<int32_t> preKeys = hotkey->preKeys;
     if (preKeys.size() > PRE_KEYS_SIZE) {
-        MMI_HILOGE("preKeys size invalid");
+        MMI_HILOGE("PreKeys size invalid");
         return INPUT_PARAMETER_ERROR;
     }
     for (const auto &item : preKeys) {
         auto it = std::find(g_pressKeyCodes.begin(), g_pressKeyCodes.end(), item);
         if (it == g_pressKeyCodes.end()) {
-            MMI_HILOGE("preKeys is not expect");
+            MMI_HILOGE("PreKeys is not expect");
             return INPUT_PARAMETER_ERROR;
         }
     }
 
     int32_t finalKey = hotkey->finalKey;
     if (finalKey < 0) {
-        MMI_HILOGE("finalKey:%{private}d is less 0, can not process", finalKey);
+        MMI_HILOGE("FinalKey:%{private}d is less 0, can not process", finalKey);
         return INPUT_PARAMETER_ERROR;
     }
     auto it = std::find(g_finalKeyCodes.begin(), g_finalKeyCodes.end(), finalKey);
     if (it != g_finalKeyCodes.end()) {
-        MMI_HILOGE("finalKey is not expect");
+        MMI_HILOGE("FinalKey is not expect");
         return INPUT_PARAMETER_ERROR;
     }
 
     bool isRepeat = hotkey->isRepeat;
     std::string hotkeyName = GetHotkeyName(preKeys, finalKey, isRepeat, keyOption);
     hotkeyInfo->hotkeyId = hotkeyName;
-    MMI_HILOGI("hotkeyId is :%{private}s", hotkeyInfo->hotkeyId.c_str());
+    MMI_HILOGI("HotkeyId is :%{private}s", hotkeyInfo->hotkeyId.c_str());
     return INPUT_SUCCESS;
 }
 
@@ -1960,7 +1960,7 @@ static bool CheckHotkey(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, std::stri
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
     if (items.size() > KEYS_SIZE || keyEvent->GetKeyAction() != OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
-        MMI_HILOGE("prekeys num more than three or finalkey is not down");
+        MMI_HILOGE("Prekeys num more than three or finalkey is not down");
         return false;
     }
 
@@ -1987,7 +1987,7 @@ static bool CheckHotkey(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, std::stri
     hotkeyName += ",";
     hotkeyName += std::to_string(isRepeat);
     hotkeyEventName = hotkeyName;
-    MMI_HILOGD("hotkeyEventName:%{private}s", hotkeyEventName.c_str());
+    MMI_HILOGD("HotkeyEventName:%{private}s", hotkeyEventName.c_str());
     return true;
 }
 
@@ -1998,19 +1998,19 @@ static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
 
     Input_HotkeyInfo *info = new(std::nothrow) Input_HotkeyInfo();
     if (info == nullptr) {
-        MMI_HILOGE("info is null");
+        MMI_HILOGE("Info is null");
         return;
     }
     info->keyOption = reportEvent->keyOption;
     if (info->keyOption == nullptr) {
         delete info;
-        MMI_HILOGE("keyOption is null");
+        MMI_HILOGE("KeyOption is null");
         return;
     }
     info->callback = reportEvent->callback;
     if (info->callback == nullptr) {
         delete info;
-        MMI_HILOGE("callback is null");
+        MMI_HILOGE("Callback is null");
         return;
     }
 
@@ -2030,7 +2030,7 @@ static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
     std::string hotkeyEventName;
     if (CheckHotkey(keyEvent, hotkeyEventName)) {
         auto list = g_callbacks[hotkeyEventName];
-        MMI_HILOGD("callback list size:%{public}zu", list.size());
+        MMI_HILOGD("Callback list size:%{public}zu", list.size());
         for (const auto &info : list) {
             if (info->hotkeyId == hotkeyEventName) {
                 OnNotifyCallbackWorkResult(info);
@@ -2057,7 +2057,7 @@ Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyC
     hotkeyInfo->callback = callback;
     int32_t preSubscribeId = GetSubscribeId(hotkeyInfo);
     if (preSubscribeId == INPUT_PARAMETER_ERROR) {
-        MMI_HILOGD("hotkeyId:%{private}s", hotkeyInfo->hotkeyId.c_str());
+        MMI_HILOGD("HotkeyId:%{private}s", hotkeyInfo->hotkeyId.c_str());
         int32_t subscribeId = -1;
         subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, HandleKeyEvent);
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
