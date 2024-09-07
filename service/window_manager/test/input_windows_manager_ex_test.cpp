@@ -2520,7 +2520,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_001, 
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
-    inputWindowsManager->firstBtnDownWindowId_ = -1;
+    inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.targetWindowId_ = 2;
     inputWindowsManager->extraData_.appended = true;
@@ -2570,7 +2570,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, 
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
-    inputWindowsManager->firstBtnDownWindowId_ = -1;
+    inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.targetWindowId_ = 2;
     inputWindowsManager->extraData_.appended = false;
@@ -2590,7 +2590,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
-    inputWindowsManager->firstBtnDownWindowId_ = 1;
+    inputWindowsManager->firstBtnDownWindowInfo_.first = 1;
     pointerEvent->pressedButtons_.insert(2);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     inputWindowsManager->extraData_.appended = false;

@@ -19,7 +19,9 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#ifdef CALL_MANAGER_SERVICE_ENABLED
 #include "call_manager_client.h"
+#endif // CALL_MANAGER_SERVICE_ENABLED
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -48,7 +50,9 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+#ifdef CALL_MANAGER_SERVICE_ENABLED
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
+#endif // CALL_MANAGER_SERVICE_ENABLED
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -419,6 +423,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("There is no need to set mute");
         return false;
     }
+#ifdef CALL_MANAGER_SERVICE_ENABLED
     int32_t ret = -1;
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
         if (callManagerClientPtr == nullptr) {
@@ -449,6 +454,10 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return false;
+#else
+    MMI_HILOGD("call manager service is not enabled, skip");
+    return true;
+#endif // CALL_MANAGER_SERVICE_ENABLED
 }
 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
