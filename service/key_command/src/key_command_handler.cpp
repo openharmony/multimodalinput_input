@@ -320,13 +320,13 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (!lastPointerDownTime_.empty()) {
-        int64_t diffTime = item->GetDownTime() - lastPointerDownTime_[0];
-        if(diffTime > TWO_FINGERS_TIME_LIMIT) {
+        int64_t diffTime = item.GetDownTime() - lastPointerDownTime_[0];
+        if (diffTime > TWO_FINGERS_TIME_LIMIT) {
             MMI_HILOGE("Invalid double knuckle event, diffTime:%{public}zu", diffTime);
             return;
         }
     }
-    lastPointerDownTime_[id] = item->GetDownTime();
+    lastPointerDownTime_[id] = item.GetDownTime();
 
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
