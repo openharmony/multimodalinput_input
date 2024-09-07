@@ -554,7 +554,9 @@ HWTEST_F(InputNativeHotkeyTest, InputNativeHotkeyTest_AddHotkeyMonitor_021, Test
 
     int32_t prekeys[2] = { KEYCODE_ALT_LEFT, KEYCODE_ALT_RIGHT };
     OH_Input_SetPreKeys(hotkey, prekeys, 2);
-    int32_t *pressedKeys[2] = { &prekeys[1], &prekeys[0] };
+    int32_t key = 0;
+    int32_t key1 = 0;
+    int32_t *pressedKeys[2] = { &key, &key1 };
     int32_t pressedKeyNum = 0;
     Input_Result result = OH_Input_GetPreKeys(hotkey, pressedKeys, &pressedKeyNum);
     EXPECT_EQ(result, INPUT_SUCCESS);
