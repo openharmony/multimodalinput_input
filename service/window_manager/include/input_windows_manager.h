@@ -179,6 +179,7 @@ public:
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
     void CleanInvalidPiexMap();
+    void HandleWindowPositionChange();
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -371,6 +372,7 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
     bool cancelTouchStatus_ { false };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;

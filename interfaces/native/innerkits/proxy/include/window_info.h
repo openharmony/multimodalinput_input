@@ -329,6 +329,8 @@ struct WindowInfo {
     bool privacyUIFlag { false };
 
     std::vector<WindowInfo> uiExtentionWindowInfo;
+
+    bool rectChangeBySystem { false };
 };
 
 /**
