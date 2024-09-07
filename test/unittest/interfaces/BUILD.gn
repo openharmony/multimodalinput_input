@@ -12,211 +12,95 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("./multimodalinput_mini.gni")
+import("//build/test.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("coverage_flags") {
-  if (input_feature_coverage) {
-    cflags = [ "--coverage" ]
-    ldflags = [ "--coverage" ]
-    cflags_cc = [ "--coverage" ]
-  }
-}
+module_output_path = "multimodalinput/mmi_unit_out"
 
-ohos_prebuilt_etc("mmi_uinput.rc") {
-  source = "mmi_uinput.rc"
-  relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
-ohos_prebuilt_etc("multimodalinput.rc") {
-  source = "multimodalinput.cfg"
-  relative_install_dir = "init"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
-ohos_executable("uinput_inject") {
-  install_enable = true
-
-  sources = uinput_inject_sources
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  include_dirs = [
-    "${mmi_path}/service/nap_process/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_input:libinput_proxy_1.0",
-    "hilog:libhilog",
-  ]
-
-  defines = [ "MMI_DISABLE_LOG_TRACE" ]
-
-  cflags = [ "-fstack-protector-strong" ]
-
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-}
-
-group("multimodalinput_mmi_base") {
-  deps = []
-}
-
-group("multimodalinput_mmi_frameworks") {
-  deps = [ "frameworks/proxy:libmmi-client" ]
-}
-
-group("multimodalinput_mmi_service") {
-  deps = [
-    "service:libmmi-server",
-    "tools/inject_event:uinput",
-    "util/screen_capture:libmmi-screen_capture",
-  ]
-}
-
-group("input-third-mmi") {
-  external_deps = [
-    "libevdev:libevdev",
-    "libinput:libinput-third-mmi",
-    "mtdev:libmtdev-third-mmi",
-  ]
-}
-
-group("input_jsapi_group") {
-  deps = []
-  if (support_jsapi) {
-    deps += [
-      "frameworks/napi/gesture_event:gestureevent",
-      "frameworks/napi/intention_code:intentioncode",
-      "frameworks/napi/joystick_event:joystickevent",
-      "frameworks/napi/key_code:keycode",
-      "frameworks/napi/key_event:keyevent",
-      "frameworks/napi/mouse_event:mouseevent",
-      "frameworks/napi/touch_event:touchevent",
-    ]
-    if (input_feature_monitor) {
-      deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
-    }
-    if (input_feature_mouse) {
-      deps += [ "frameworks/napi/pointer:pointer" ]
-    }
-    if (input_feature_keyboard) {
-      deps += [
-        "frameworks/napi/input_consumer:inputconsumer",
-        "frameworks/napi/input_event_client:inputeventclient",
-      ]
-    }
-    if (input_feature_input_device) {
-      deps += [ "frameworks/napi/input_device:inputdevice" ]
-    }
-    if (input_feature_short_key) {
-      deps += [ "frameworks/napi/short_key:shortkey" ]
-    }
-    deps += [ "frameworks/napi/infrared_emitter:infraredemitter" ]
-  }
-}
-
-group("mmi_tests") {
-  testonly = true
-  deps = [
-    "common/anco/comm:AncoChannelStubTest",
-    "frameworks/native/input:OHInputManagerTest",
-    "frameworks/proxy:InputHandlerManagerTest",
-    "frameworks/proxy:InputManagerFilterManualTest",
-    "frameworks/proxy:InputManagerImplTest",
-    "frameworks/proxy:InputManagerInjectTest",
-    "frameworks/proxy:InputManagerManualTest",
-    "frameworks/proxy:InputManagerTest",
-    "frameworks/proxy:KeyEventTest",
-    "frameworks/proxy:PointerEventTest",
-    "frameworks/proxy:ut-mmi-proxy-out",
-    "libudev:test",
-    "service:AccountManagerTest",
-    "service:ApplicationStateObserverTest",
-    "service:ConnectManagerEXTest",
-    "service:ConnectManagerProxyEXTest",
-    "service:ConnectManagerTest",
-    "service:DelegateTaskTest",
-    "service:DeviceConfigTest",
-    "service:DeviceManagerTest",
-    "service:DfxHisysEventTest",
-    "service:DisplayStateManagerTest",
-    "service:EventDispatchTest",
-    "service:EventDumpTest",
-    "service:EventFilterDeathRecipientTest",
-    "service:EventFilterHandlerTest",
-    "service:EventHandlerTest",
-    "service:EventNormalizeHandlerTest",
-    "service:InfraredEmitterTest",
-    "service:InputDisplayBindHelperTest",
-    "service:InputWindowsManagerEXTest",
-    "service:InputWindowsManagerTest",
-    "service:InterceptorExTest",
-    "service:InterceptorTest",
-    "service:KeyAutoRepeatExTest",
-    "service:KeyCommandTest",
-    "service:KeyEventNormalizeTest",
-    "service:KeyEventValueTransformationTest",
-    "service:KnuckleDivergentPointTest",
-    "service:KnuckleDrawingManagerTest",
-    "service:KnuckleDynamicDrawingManagerTest",
-    "service:KnuckleGlowPointTest",
-    "service:KnuckleGlowTraceSystemTest",
-    "service:LibinputAdapterTest",
-    "service:ModuleLoaderTest",
-    "service:MonitorTest",
-    "service:NapProcessTest",
-    "service:PointerDrawingManagerExTest",
-    "service:PointerDrawingManagerTest",
-    "service:ServerMsgHandlerTest",
-    "service:StylusKeyTest",
-    "service:StylusKeyTest",
-    "service:SubscriberTest",
-    "service:TimerManagerTest",
-    "service:TouchDrawingManagerAiTest",
-    "service:TouchDrawingManagerTest",
-    "service:TwoFingerLongTouchTest",
-    "service:event_resample_test",
-    "service:mmi-service-tests",
-    "service/crown_transform_processor/test:CrownTransformProcessorTest",
-    "service/fingerprint_event_processor/test:FingerprintEventProcessorTest",
-    "service/mouse_event_normalize/test:MouseEventNormalizeTest",
-    "service/subscriber/test:mmi_subscriber_tests",
-    "service/touch_event_normalize/test:TouchEventNormalizeTests",
-    "service/touch_event_normalize/test:TouchGestureAdapterTest",
-    "test/fuzztest:test",
-    "test/unittest/interfaces:InputNativeHotkeyTest",
-    "test/unittest/interfaces:InputNativeTest",
-    "tools/inject_event:InjectEventTest",
-    "util:UdsClientTest",
-  ]
-
-  if (input_feature_switch) {
-    deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
-  }
-
-  if (!use_clang_coverage) {
-    deps += [
-      "service:rust_mmi_test",
-      "util:rust_mmi_key_config_test",
-      "util:ut-mmi-util-out",
-    ]
-  }
+ohos_unittest("InputNativeTest") {
+  module_out_path = module_output_path
+  defines = []
+  include_dirs = [ "${mmi_path}/interfaces/kits/c/input" ]
 
   if (input_ext_feature_anco) {
-    deps += [ "${mmi_path}/frameworks/proxy/events/test:InputManagerAncoTest" ]
+    include_dirs += [ "${mmi_path}/interfaces/native/innerkits/event/include" ]
   }
+
+  sources =
+      [ "${mmi_path}/test/unittest/interfaces/kits/input_native_test.cpp" ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/frameworks/proxy:libmmi_test_util",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/native/input:oh_input_manager",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  if (input_ext_feature_anco && input_feature_product != "pc") {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
+  }
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_core",
+  ]
+
+  subsystem_name = "multimodalinput"
+  part_name = "input"
 }
 
-group("examples_group") {
-  deps = [ "examples/input_device_display_bind:input_device_display_bind" ]
+ohos_unittest("InputNativeHotkeyTest") {
+  module_out_path = module_output_path
+  defines = []
+  include_dirs = [ "${mmi_path}/interfaces/kits/c/input" ]
+
+  if (input_ext_feature_anco) {
+    include_dirs += [ "${mmi_path}/interfaces/native/innerkits/event/include" ]
+  }
+
+  sources = [
+    "${mmi_path}/test/unittest/interfaces/kits/input_native_hotkey_test.cpp",
+  ]
+
+  configs = [
+    "${mmi_path}:coverage_flags",
+    "${mmi_path}/frameworks/proxy:libmmi_test_util",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/native/input:oh_input_manager",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+
+  if (input_ext_feature_anco && input_feature_product != "pc") {
+    external_deps += [
+      "drivers_interface_rtos_extra:libconsumerir_proxy_1.0",
+      "hdf_core:libhdi",
+    ]
+  }
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "image_framework:image_native",
+  ]
+
+  subsystem_name = "multimodalinput"
+  part_name = "input"
 }
