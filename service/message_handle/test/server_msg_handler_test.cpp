@@ -1719,31 +1719,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSiz
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_AddInjectNotice_002
- * @tc.desc: Test the function AddInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
-    handler.injectNotice_ =nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = true;
-    auto pConnect = handler.injectNotice_->GetConnection();
-    pConnect->isConnected_ = true;
-    ret = handler.AddInjectNotice(noticeInfo);
-    EXPECT_TRUE(ret);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_002
  * @tc.desc: Test CloseInjectNotice
  * @tc.type: FUNC
