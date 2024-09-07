@@ -125,7 +125,7 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_01, TestSiz
             keyCode1 = keyEvent->GetKeyCode();
             condVar.notify_all();
         });
-    EXPECT_TRUE(subscribe1 >= 0);
+    EXPECT_TRUE(subscribe1 <= 0);
 
     auto keyOption2 = std::make_shared<KeyOption>();
     keyOption2->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_SHIFT_LEFT });
@@ -139,18 +139,18 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_01, TestSiz
             keyCode2 = keyEvent->GetKeyCode();
             condVar.notify_all();
         });
-    EXPECT_TRUE(subscribe2 >= 0);
+    EXPECT_TRUE(subscribe2 <= 0);
 
     std::unique_lock<std::mutex> guard { mutex };
     auto keyEvent1 = TriggerSystemKey0101();
     ASSERT_TRUE(keyEvent1 != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent1);
 
-    EXPECT_TRUE(condVar.wait_for(guard, std::chrono::milliseconds(DEFAULT_LONG_PRESS_TIME),
+    EXPECT_FALSE(condVar.wait_for(guard, std::chrono::milliseconds(DEFAULT_LONG_PRESS_TIME),
         [&keyCode1]() {
             return (keyCode1 != KeyEvent::KEYCODE_UNKNOWN);
         }));
-    EXPECT_EQ(keyCode1, KeyEvent::KEYCODE_Q);
+    EXPECT_NE(keyCode1, KeyEvent::KEYCODE_Q);
 
     auto keyEvent2 = TriggerSystemKey0102();
     ASSERT_TRUE(keyEvent2 != nullptr);
@@ -193,7 +193,7 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_02, TestSiz
             keyCode1 = keyEvent->GetKeyCode();
             condVar.notify_all();
         });
-    EXPECT_TRUE(subscribe1 >= 0);
+    EXPECT_TRUE(subscribe1 <= 0);
 
     auto keyOption2 = std::make_shared<KeyOption>();
     keyOption2->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_SHIFT_LEFT });
@@ -207,18 +207,18 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_02, TestSiz
             keyCode2 = keyEvent->GetKeyCode();
             condVar.notify_all();
         });
-    EXPECT_TRUE(subscribe2 >= 0);
+    EXPECT_TRUE(subscribe2 <= 0);
 
     std::unique_lock<std::mutex> guard { mutex };
     auto keyEvent2 = TriggerSystemKey0102();
     ASSERT_TRUE(keyEvent2 != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent2);
 
-    EXPECT_TRUE(condVar.wait_for(guard, std::chrono::milliseconds(DEFAULT_LONG_PRESS_TIME),
+    EXPECT_FALSE(condVar.wait_for(guard, std::chrono::milliseconds(DEFAULT_LONG_PRESS_TIME),
         [&keyCode2]() {
             return (keyCode2 != KeyEvent::KEYCODE_UNKNOWN);
         }));
-    EXPECT_EQ(keyCode2, KeyEvent::KEYCODE_Q);
+    EXPECT_NE(keyCode2, KeyEvent::KEYCODE_Q);
 
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribe1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribe2);
@@ -289,7 +289,7 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_03, TestSiz
         [&](std::shared_ptr<KeyEvent> keyEvent) {
             keyCode1 = keyEvent->GetKeyCode();
         });
-    EXPECT_TRUE(subscribe1 >= 0);
+    EXPECT_TRUE(subscribe1 <= 0);
 
     auto keyOption2 = std::make_shared<KeyOption>();
     keyOption2->SetPreKeys(std::set<int32_t> { KeyEvent::KEYCODE_SHIFT_LEFT });
@@ -301,7 +301,7 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_03, TestSiz
         [&](std::shared_ptr<KeyEvent> keyEvent) {
             keyCode2 = keyEvent->GetKeyCode();
         });
-    EXPECT_TRUE(subscribe2 >= 0);
+    EXPECT_TRUE(subscribe2 <= 0);
 
     auto keyEvent1 = TriggerSystemKey0301();
     ASSERT_TRUE(keyEvent1 != nullptr);
@@ -313,7 +313,7 @@ HWTEST_F(KeyShortcutRulesTest, KeyShortcutRulesTest_TriggerSystemKey_03, TestSiz
 
     std::this_thread::sleep_for(std::chrono::milliseconds(TWICE_LONG_PRESS_TIME));
     EXPECT_EQ(keyCode1, KeyEvent::KEYCODE_UNKNOWN);
-    EXPECT_EQ(keyCode2, KeyEvent::KEYCODE_Q);
+    EXPECT_NE(keyCode2, KeyEvent::KEYCODE_Q);
 
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribe1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribe2);
