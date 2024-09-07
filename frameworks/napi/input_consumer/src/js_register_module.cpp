@@ -34,8 +34,8 @@ constexpr size_t EVENT_NAME_LEN { 64 };
 constexpr size_t PRE_KEYS_SIZE { 4 };
 constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
 constexpr size_t INPUT_PARAMETER_MAX { 3 };
-constexpr int32_t OCCUPIED_BY_SYSTEM = -4;
-constexpr int32_t OCCUPIED_BY_OTHER = -3;
+constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
+constexpr int32_t OCCUPIED_BY_OTHER = -4;
 } // namespace
 
 static Callbacks callbacks = {};
@@ -415,12 +415,12 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, KeyEventMonito
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubHotkeyEventCallback);
         if (subscribeId == OCCUPIED_BY_SYSTEM) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_SYSTEM, "SubscribeId invalid");
+            THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_SYSTEM, "hotkey occupied by system");
             return nullptr;
         }
         if (subscribeId == OCCUPIED_BY_OTHER) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_OTHER, "SubscribeId invalid");
+            THROWERR_CUSTOM(env, INPUT_OCCUPIED_BY_OTHER, "hotkey occupied by other");
             return nullptr;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -505,7 +505,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (!GetEventType(env, info, event, keyType)) {
-        MMI_HILOGE("GetEventType fail, type must be key or hotkey");
+        MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
         delete event;
         return nullptr;
     }
@@ -538,7 +538,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
     if (!GetEventType(env, info, event, keyType)) {
-        MMI_HILOGE("GetEventType fail, type must be key or hotkey");
+        MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
         return nullptr;
     }
     event->name = keyType;
