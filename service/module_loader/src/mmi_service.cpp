@@ -1359,7 +1359,7 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, 
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+    uint32_t deviceTags, std::vector<int32_t> actionsType)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
