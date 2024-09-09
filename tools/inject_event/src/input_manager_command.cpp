@@ -1108,6 +1108,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 PointerEvent::PointerItem item;
                                 item.SetDisplayX(fingerList[i].startX);
                                 item.SetDisplayY(fingerList[i].startY);
+                                item.SetRawDisplayX(fingerList[i].startX);
+                                item.SetRawDisplayY(fingerList[i].startY);
                                 item.SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
@@ -1145,6 +1147,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         fingerList[i].startX, fingerList[i].endX));
                                     item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
                                         fingerList[i].startY, fingerList[i].endY));
+                                    item.SetRawDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
+                                        fingerList[i].startX, fingerList[i].endX));
+                                    item.SetRawDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
+                                        fingerList[i].startY, fingerList[i].endY));
                                     pointerEvent->UpdatePointerItem(pointerId, item);
                                     pointerEvent->SetPointerId(pointerId);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1166,6 +1172,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 item.SetDisplayX(fingerList[i].endX);
                                 item.SetDisplayY(fingerList[i].endY);
+                                item.SetRawDisplayX(fingerList[i].endX);
+                                item.SetRawDisplayY(fingerList[i].endY);
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1190,6 +1198,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         }
                                         item.SetDisplayX(fingerList[i].endX);
                                         item.SetDisplayY(fingerList[i].endY);
+                                        item.SetRawDisplayX(fingerList[i].endX);
+                                        item.SetRawDisplayY(fingerList[i].endY);
                                         pointerEvent->UpdatePointerItem(pointerId, item);
                                         pointerEvent->SetPointerId(pointerId);
                                         pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1237,8 +1247,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
+                            item.SetRawDisplayY(py1);
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->AddPointerItem(item);
@@ -1265,8 +1277,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
+                            item.SetRawDisplayY(py1);
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -1314,6 +1328,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
                             item.SetDisplayY(py1);
+                            item.SetRawDisplayX(px1);
+                            item.SetRawDisplayY(py1);
                             item.SetPressed(true);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->AddPointerItem(item);
@@ -1325,6 +1341,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPressed(false);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayY(py1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1403,6 +1421,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayY(py1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1426,6 +1446,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 if (currentTimeMs > downTimeMs) {
                                     item.SetDisplayX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
                                     item.SetDisplayY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
+                                    item.SetRawDisplayX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
+                                    item.SetRawDisplayY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
                                     pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1436,6 +1458,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
+                            item.SetRawDisplayX(px2);
+                            item.SetRawDisplayY(py2);
                             pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1920,6 +1944,8 @@ int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item.SetDisplayX(downX);
     item.SetDisplayY(downY);
+    item.SetRawDisplayX(downX);
+    item.SetRawDisplayY(downY);
     item.SetPressed(true);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -1930,6 +1956,8 @@ int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetPressed(false);
     item.SetDisplayY(downY);
     item.SetDisplayX(downX);
+    item.SetRawDisplayY(downY);
+    item.SetRawDisplayX(downX);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->UpdatePointerItem(0, item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1947,6 +1975,8 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item.SetDisplayX(downX);
     item.SetDisplayY(downY);
+    item.SetRawDisplayX(downX);
+    item.SetRawDisplayY(downY);
     item.SetPressed(true);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -1955,6 +1985,8 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item2.SetDisplayX(downX);
     item2.SetDisplayY(downY);
+    item2.SetRawDisplayX(downX);
+    item2.SetRawDisplayY(downY);
     item2.SetPressed(true);
     pointerEvent->SetPointerId(1);
     pointerEvent->AddPointerItem(item2);
@@ -1965,10 +1997,14 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetPressed(false);
     item.SetDisplayY(downY);
     item.SetDisplayX(downX);
+    item.SetRawDisplayY(downY);
+    item.SetRawDisplayX(downX);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item2.SetPressed(false);
     item2.SetDisplayY(downY);
     item2.SetDisplayX(downX);
+    item2.SetRawDisplayY(downY);
+    item2.SetRawDisplayX(downX);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->UpdatePointerItem(0, item);
     pointerEvent->UpdatePointerItem(1, item2);
