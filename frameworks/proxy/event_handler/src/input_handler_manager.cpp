@@ -209,7 +209,7 @@ int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType h
                 return ret;
             }
             MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ",
-                   handlerType, handlerId, currentType, currentTags);
+                handlerType, handlerId, currentType, currentTags);
         }
         return ret;
     }
@@ -362,6 +362,21 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     return RET_OK;
 }
 
+void InputHandlerManager::UpdateAddToServerActions()
+{
+    std::vector<int32_t> addToServerActions;
+    for (const auto &[key, value] : actionsMonitorHandlers_) {
+        for (auto action : value.actionsType_) {
+            if (std::find(addToServerActions.begin(), addToServerActions.end(), action) ==
+                addToServerActions.end()) {
+                addToServerActions.push_back(action);
+            }
+        }
+    }
+    addToServerActions_.clear();
+    addToServerActions_ = addToServerActions;
+}
+
 int32_t InputHandlerManager::RemoveLocalActions(int32_t handlerId, InputHandlerType handlerType)
  
 {
@@ -376,17 +391,7 @@ int32_t InputHandlerManager::RemoveLocalActions(int32_t handlerId, InputHandlerT
             return RET_ERR;
         }
         actionsMonitorHandlers_.erase(iter);
-        std::vector<int32_t> addToServerActions;
-        for (const auto &[key, value] : actionsMonitorHandlers_) {
-            for (auto action : value.actionsType_) {
-                if (std::find(addToServerActions.begin(), addToServerActions.end(), action) ==
-                    addToServerActions.end()) {
-                    addToServerActions.push_back(action);
-                }
-            }
-        }
-        addToServerActions_.clear();
-        addToServerActions_ = addToServerActions;
+        UpdateAddToServerActions();
     }
     return RET_OK;
 }

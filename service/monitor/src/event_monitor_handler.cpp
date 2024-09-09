@@ -290,19 +290,19 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
         return RET_OK;
     } else if (isFound && !iter->actionsType_.empty()) {
-        if (IsNeedInsertToMonitors(iter->actionsType_)) {
-            monitors_.erase(iter);
-            auto [sIter, isOk] = monitors_.insert(monitor);
-            if (!isOk) {
-                if (isFound) {
-                    MMI_HILOGE("Internal error: monitor has been removed");
-                } else {
-                    MMI_HILOGE("Failed to add monitor");
-                }
-                return RET_ERR;
-            }
-            MMI_HILOGD("Actions type is updated");
+        if (!IsNeedInsertToMonitors(iter->actionsType_)) {
+            return RET_OK;
         }
+        monitors_.erase(iter);
+        auto [sIter, isOk] = monitors_.insert(monitor);
+        if (!isOk && isFound) {
+            MMI_HILOGE("Internal error: monitor has been removed");
+            return RET_ERR;
+        } else if (!isOk && !isFound) {
+            MMI_HILOGE("Failed to add monitor");
+            return RET_ERR;
+        }
+        MMI_HILOGD("Actions type is updated");
         return RET_OK;
     }
  
@@ -336,7 +336,7 @@ bool EventMonitorHandler::MonitorCollection::IsNeedInsertToMonitors(std::vector<
             insertToMonitorsActions_.push_back(action);
             isNeedInsertToMonitors = true;
         }
-     }
+    }
     return isNeedInsertToMonitors;
 }
 
