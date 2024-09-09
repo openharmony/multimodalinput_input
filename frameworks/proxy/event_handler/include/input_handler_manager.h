@@ -98,6 +98,7 @@ private:
         uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>());
     bool IsNeedAddToServer(std::vector<int32_t> actionsType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType, uint32_t &deviceTags);
+    void UpdateAddToServerActions();
     int32_t RemoveLocalActions(int32_t handlerId, InputHandlerType handlerType);
     int32_t RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags, std::vector<int32_t> actionsType = std::vector<int32_t>());
