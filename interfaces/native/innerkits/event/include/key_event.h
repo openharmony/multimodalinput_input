@@ -3236,6 +3236,8 @@ public:
 
     virtual void Reset() override;
 
+    virtual std::string ToString() override;
+
     /**
      * @brief Obtains the key code of this key event.
      * @return Returns the key code.

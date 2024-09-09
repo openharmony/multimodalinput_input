@@ -27,6 +27,7 @@
 
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
+#include "event_statistic.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -224,9 +225,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 break;
             }
             case 'e': {
-                auto eventHandler = InputHandler->GetEventNormalizeHandler();
-                CHKPV(eventHandler);
-                eventHandler->Dump(fd, args);
+                EventStatistic::Dump(fd, args);
                 break;
             }
             default: {

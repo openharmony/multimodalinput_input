@@ -48,7 +48,7 @@ public:
     {
         return switchType_;
     }
-    
+
     int32_t GetSwitchValue() const
     {
         return switchValue_;
@@ -72,6 +72,16 @@ public:
     void SetSwitchMask(int32_t switchMask)
     {
         updateSwitchMask_ = switchMask;
+    }
+
+    virtual std::string ToString() override
+    {
+        std::string eventStr = InputEvent::ToString();
+        eventStr += ",deviceId:" + std::to_string(deviceId_);
+        eventStr += ",switchValue:" + std::to_string(switchValue_);
+        eventStr += ",updateSwitchMask:" + std::to_string(updateSwitchMask_);
+        eventStr += ",switchType:" + std::to_string(switchType_);
+        return eventStr;
     }
 
     explicit SwitchEvent(int32_t value)

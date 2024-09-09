@@ -976,6 +976,28 @@ void KeyEvent::Reset()
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 }
 
+std::string KeyEvent::ToString()
+{
+    std::string eventStr = InputEvent::ToString();
+    eventStr += ",deviceId:" + std::to_string(deviceId_);
+    eventStr += ",keyCode:" + std::to_string(keyCode_);
+    eventStr += ",keyAction:" + std::to_string(keyAction_);
+    eventStr += ",keyItems:[";
+    for (size_t i = 0; i < keys_.size(); i++) {
+        int32_t pressed = keys_[i].IsPressed() ? 1 : 0;
+        eventStr += "{pressed:" + std::to_string(pressed);
+        eventStr += ",deviceId:" + std::to_string(keys_[i].GetDeviceId());
+        eventStr += ",keyCode:" + std::to_string(keys_[i].GetKeyCode());
+        eventStr += ",downTime:" + std::to_string(keys_[i].GetDownTime());
+        eventStr += ",unicode:" + std::to_string(keys_[i].GetUnicode()) + "}";
+        if (i != keys_.size() - 1) {
+            eventStr += ",";
+        }
+    }
+    eventStr += "]";
+    return eventStr;
+}
+
 int32_t KeyEvent::GetKeyCode() const
 {
     return keyCode_;

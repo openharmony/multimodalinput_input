@@ -505,6 +505,42 @@ void PointerEvent::Reset()
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 }
 
+std::string PointerEvent::ToString()
+{
+    std::string eventStr = InputEvent::ToString();
+    eventStr += ",deviceId:" + std::to_string(deviceId_);
+    eventStr += ",pointerId:" + std::to_string(pointerId_);
+    eventStr += ",sourceType:" + std::to_string(sourceType_);
+    eventStr += ",pointerAction:" + std::to_string(pointerAction_);
+    eventStr += ",buttonId:" + std::to_string(buttonId_);
+    eventStr += ",pointers:[";
+    size_t pointerSize = 0;
+    for (auto it = pointers_.begin(); it != pointers_.end(); it++) {
+        pointerSize++;
+        eventStr += "{displayX:" + std::to_string((*it).GetDisplayX());
+        eventStr += ",displayY:" + std::to_string((*it).GetDisplayY());
+        eventStr += ",windowX:" + std::to_string((*it).GetWindowX());
+        eventStr += ",windowY:" + std::to_string((*it).GetWindowY());
+        eventStr += ",targetWindowId:" + std::to_string((*it).GetTargetWindowId());
+        eventStr += ",longAxis:" + std::to_string((*it).GetLongAxis());
+        eventStr += ",shortAxis:" + std::to_string((*it).GetShortAxis()) + "}";
+        if (pointerSize != pointers_.size()) {
+            eventStr += ",";
+        }
+    }
+    eventStr += "],pressedButtons:[";
+    size_t buttonsSize = 0;
+    for (auto it = pressedButtons_.begin(); it != pressedButtons_.end(); it++) {
+        buttonsSize++;
+        eventStr += std::to_string(*it);
+        if (buttonsSize != pressedButtons_.size()) {
+            eventStr += ",";
+        }
+    }
+    eventStr += "]";
+    return eventStr;
+}
+
 int32_t PointerEvent::GetPointerAction() const
 {
     return pointerAction_;

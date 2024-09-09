@@ -71,6 +71,13 @@ void InputEvent::Reset()
     markEnabled_ = true;
 }
 
+std::string InputEvent::ToString()
+{
+    std::string eventStr = "eventType:" + std::to_string(eventType_);
+    eventStr += ",actionTime:" + std::to_string(actionTime_);
+    return eventStr;
+}
+
 std::shared_ptr<InputEvent> InputEvent::Create()
 {
     auto event = std::shared_ptr<InputEvent>(new (std::nothrow) InputEvent(InputEvent::EVENT_TYPE_BASE));
