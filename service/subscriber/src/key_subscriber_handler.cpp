@@ -277,7 +277,7 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
     }
     if (subscriber->shortcutId_ < 0) {
         MMI_HILOGE("Register shortcut fail, error:%{public}d", subscriber->shortcutId_);
-        return RET_ERR;
+        return subscriber->shortcutId_;
     }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
     for (auto &iter : subscriberMap_) {

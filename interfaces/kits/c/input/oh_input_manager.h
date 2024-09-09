@@ -246,7 +246,11 @@ typedef enum Input_Result {
     /** Service error */
     INPUT_SERVICE_EXCEPTION = 3800001,
     /** Interceptor repeatedly created for an application */
-    INPUT_REPEAT_INTERCEPTOR = 4200001
+    INPUT_REPEAT_INTERCEPTOR = 4200001,
+    /** @error Already occupied by the system */
+    INPUT_OCCUPIED_BY_SYSTEM = 4200002,
+    /** @error Already occupied by the other */
+    INPUT_OCCUPIED_BY_OTHER = 4200003
 } Input_Result;
 
 /**
@@ -284,6 +288,10 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
  */
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
+/**
+ * @brief Callback used to return shortcut key events.
+ * @since 13
+ */
 typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
 
 /**
@@ -1412,12 +1420,57 @@ Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener);
  */
 Input_Result OH_Input_UnregisterDeviceListeners();
 
+/**
+ * @brief Specifies whether to report repeated key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param isRepeat Whether to report repeated key events.
+ * The value <b>true</b> means to report repeated key events, and the value <b>false</b> means the opposite.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
 void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat);
 
-Input_Result OH_Input_IsRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
+/**
+ * @brief Checks whether to report repeated key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param isRepeat Whether a key event is repeated.
+ * @return OH_Input_GetIsRepeat status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} otherwise.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat);
 
+/**
+ * @brief Subscribes to shortcut key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param callback Callback used to return shortcut key events.
+ * @return OH_Input_AddHotkeyMonitor status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if hotkey or callback is NULL;\n
+ *         {@link INPUT_HOTKEY_ALREADY_REGISTER} Subscription has been enabled;\n
+ *         {@link INPUT_REPEAT_INTERCEPTOR} The shortcut key has been occupied.
+ *         You can use {@link getAllSystemHotkeys} to query all system shortcut keys.\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
 Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 
+/**
+ * @brief Unsubscribes from shortcut key events.
+ *
+ * @param hotkey Shortcut key object.
+ * @param callback Callback used to return shortcut key events.
+ * @return OH_Input_RemoveHotkeyMonitor status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if hotkey or callback is NULL;\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
 Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback);
 
 /**
