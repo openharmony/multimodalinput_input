@@ -372,6 +372,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
     if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
