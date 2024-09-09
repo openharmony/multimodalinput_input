@@ -64,6 +64,8 @@ public:
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t OnRemoveGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
         HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
+    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, std::vector<int32_t> actionsType);
+    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, std::vector<int32_t> actionsType);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);

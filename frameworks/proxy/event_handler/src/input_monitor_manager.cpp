@@ -50,6 +50,13 @@ int32_t InputMonitorManager::RemoveMonitor(int32_t monitorId)
     return RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
 
+int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
+    std::vector<int32_t> actionsType)
+{
+    CHKPR(monitor, INVALID_HANDLER_ID);
+    return AddHandler(InputHandlerType::MONITOR, monitor, actionsType);
+}
+
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);

@@ -122,6 +122,16 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     return monitors_.AddMonitor(mon);
 }
 
+int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
+    std::vector<int32_t> actionsType, SessionPtr session)
+{
+    CALL_INFO_TRACE;
+    CHKPR(session, RET_ERR);
+    InitSessionLostCallback();
+    SessionHandler mon { handlerType, HANDLE_EVENT_TYPE_NONE, session, actionsType };
+    return monitors_.AddMonitor(mon);
+}
+
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
 {
@@ -129,6 +139,16 @@ void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType,
     CHKPV(callback);
     if (handlerType == InputHandlerType::MONITOR) {
         SessionHandler monitor {handlerType, eventType, nullptr, callback};
+        monitors_.RemoveMonitor(monitor);
+    }
+}
+
+void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, std::vector<int32_t> actionsType,
+    SessionPtr session)
+{
+    CALL_INFO_TRACE;
+    if (handlerType == InputHandlerType::MONITOR) {
+        SessionHandler monitor { handlerType, HANDLE_EVENT_TYPE_NONE, session, actionsType };
         monitors_.RemoveMonitor(monitor);
     }
 }
@@ -243,6 +263,9 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
     SessionHandler handler = monitor;
     auto iter = monitors_.find(monitor);
     if (iter != monitors_.end()) {
+        isFound = true;
+    }
+    if (isFound && iter->actionsType_.empty()) {
         if (iter->eventType_ == monitor.eventType_ &&
             ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
             MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
@@ -253,11 +276,45 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
             gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
             handler(gestureHandler);
         }
-        isFound = true;
+ 
         monitors_.erase(iter);
+        auto [sIter, isOk] = monitors_.insert(handler);
+        if (!isOk) {
+            if (isFound) {
+                MMI_HILOGE("Internal error: monitor has been removed");
+            } else {
+                MMI_HILOGE("Failed to add monitor");
+            }
+            return RET_ERR;
+        }
+        MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
+        return RET_OK;
+    } else if (isFound && !iter->actionsType_.empty()) {
+        if (IsNeedInsertToMonitors(iter->actionsType_)) {
+            monitors_.erase(iter);
+            auto [sIter, isOk] = monitors_.insert(monitor);
+            if (!isOk) {
+                if (isFound) {
+                    MMI_HILOGE("Internal error: monitor has been removed");
+                } else {
+                    MMI_HILOGE("Failed to add monitor");
+                }
+                return RET_ERR;
+            }
+            MMI_HILOGD("Actions type is updated");
+        }
+        return RET_OK;
     }
-
-    auto [sIter, isOk] = monitors_.insert(handler);
+ 
+    if (!monitor.actionsType_.empty()) {
+        for (auto action : monitor.actionsType_) {
+            if (std::find(insertToMonitorsActions_.begin(), insertToMonitorsActions_.end(), action) ==
+                insertToMonitorsActions_.end()) {
+                insertToMonitorsActions_.push_back(action);
+            }
+        }
+    }
+    auto [sIter, isOk] = monitors_.insert(monitor);
     if (!isOk) {
         if (isFound) {
             MMI_HILOGE("Internal error: monitor has been removed");
@@ -266,14 +323,23 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         }
         return RET_ERR;
     }
-
-    if (isFound) {
-        MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
-    } else {
-        MMI_HILOGD("Service Add Monitor Success");
-    }
+    MMI_HILOGD("Service Add Monitor Success");
     return RET_OK;
 }
+
+bool EventMonitorHandler::MonitorCollection::IsNeedInsertToMonitors(std::vector<int32_t> actionsType)
+{
+    bool isNeedInsertToMonitors = false;
+    for (auto action : actionsType) {
+        if (std::find(insertToMonitorsActions_.begin(), insertToMonitorsActions_.end(), action) ==
+            insertToMonitorsActions_.end()) {
+            insertToMonitorsActions_.push_back(action);
+            isNeedInsertToMonitors = true;
+        }
+     }
+    return isNeedInsertToMonitors;
+}
+
 
 void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
@@ -536,6 +602,14 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
             if (monitor.callback_) {
                 monitor.callback_->OnInputEvent(monitor.handlerType_, pointerEvent);
             }
+        }
+        if (monitor.actionsType_.empty()) {
+            continue;
+        }
+        auto iter = std::find(monitor.actionsType_.begin(), monitor.actionsType_.end(),
+            pointerEvent->GetPointerAction());
+        if (iter != monitor.actionsType_.end() && monitor.session_) {
+            monitor.SendToClient(pointerEvent, pkt);
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
