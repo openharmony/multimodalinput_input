@@ -55,6 +55,8 @@ public:
         SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
     void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
+    int32_t AddInputHandler(InputHandlerType handlerType, std::vector<int32_t> actionsType, SessionPtr session);
+    void RemoveInputHandler(InputHandlerType handlerType, std::vector<int32_t> actionsType, SessionPtr session);
     void MarkConsumed(int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
@@ -85,6 +87,10 @@ private:
         {
             AddGestureMonitor(gestureType, fingers);
         }
+        SessionHandler(InputHandlerType handlerType, uint32_t eventType, SessionPtr session,
+            std::vector<int32_t> actionsType, std::shared_ptr<IInputEventConsumer> cb = nullptr)
+            : handlerType_(handlerType), eventType_(eventType), session_(session), actionsType_(actionsType),
+              callback_(cb) {}
         SessionHandler(const SessionHandler& other)
         {
             handlerType_ = other.handlerType_;
@@ -94,6 +100,7 @@ private:
             gestureType_ = other.gestureType_;
             fingers_ = other.fingers_;
             touchGestureInfo_ = other.touchGestureInfo_;
+            actionsType_ = other.actionsType_;
         }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
@@ -110,6 +117,7 @@ private:
         InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
+        std::vector<int32_t> actionsType_;
         std::shared_ptr<IInputEventConsumer> callback_ { nullptr };
     };
 
@@ -125,6 +133,7 @@ private:
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t eventId, SessionPtr session);
+        bool IsNeedInsertToMonitors(std::vector<int32_t> actionsType);
 
         bool HasMonitor(SessionPtr session);
         bool HasScreenCaptureMonitor(SessionPtr session);
@@ -149,6 +158,7 @@ private:
         std::set<SessionHandler> monitors_;
         std::map<int32_t, std::set<SessionHandler>> endScreenCaptureMonitors_;
         std::unordered_map<int32_t, ConsumptionState> states_;
+        std::vector<int32_t> insertToMonitorsActions_;
     };
 
 private:

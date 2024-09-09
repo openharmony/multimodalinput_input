@@ -684,6 +684,38 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
+
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
+    std::vector<int32_t> actionsType)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    MMI_HILOGD("handlerType:%{public}d", handlerType);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        return monitorHandler->AddInputHandler(handlerType, actionsType, sess);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+ 
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
+    std::vector<int32_t> actionsType)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d", handlerType);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        monitorHandler->RemoveInputHandler(handlerType, actionsType, sess);
+        ANRMgr->RemoveTimersByType(sess, ANR_MONITOR);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t ServerMsgHandler::OnAddGestureMonitor(SessionPtr sess, InputHandlerType handlerType,

@@ -101,6 +101,7 @@ public:
     int32_t AddGestureMonitor(std::shared_ptr<IInputEventConsumer> consumer,
         TouchGestureType type, int32_t fingers);
     int32_t RemoveGestureMonitor(int32_t monitorId);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, std::vector<int32_t> actionsType);
 
     int32_t RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);

@@ -807,6 +807,23 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
+int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer, std::vector<int32_t> actionsType)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return IMonitorMgr->AddMonitor(consumer, actionsType);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
+}
+
 int32_t InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     CALL_DEBUG_ENTER;
