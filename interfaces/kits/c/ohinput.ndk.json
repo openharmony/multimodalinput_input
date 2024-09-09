@@ -369,7 +369,7 @@
     },
     {
         "first_introduced": "13",
-        "name": "OH_Input_IsRepeat"
+        "name": "OH_Input_GetRepeat"
     },
     {
         "first_introduced": "13",
