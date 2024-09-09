@@ -330,6 +330,38 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
+
+    if (windowInfo == nullptr && pointerEvent->GetTargetDisplayId() != firstBtnDownWindowInfo_.second) {
+        std::vector<WindowInfo> firstBtnDownWindowsInfo =
+            GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
+        for (const auto &item : firstBtnDownWindowsInfo) {
+            bool checkUIExtentionWindow = false;
+            // Determine whether it is a safety sub window
+            for (auto &uiExtentionWindowInfo : item.uiExtentionWindowInfo) {
+                if (uiExtentionWindowInfo.id == pointerEvent->GetTargetWindowId()) {
+                    MMI_HILOGD("Find windowInfo by window id %{public}d", uiExtentionWindowInfo.id);
+                    windowInfo = &uiExtentionWindowInfo;
+                    checkUIExtentionWindow = true;
+                    break;
+                }
+            }
+            if (checkUIExtentionWindow) {
+                break;
+            }
+            bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+                !IsValidZorderWindow(item, pointerEvent);
+            if (checkWindow) {
+                MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
+                    "window:%{public}d, flags:%{public}d", item.id, item.flags);
+                continue;
+            }
+            if (item.id == pointerEvent->GetTargetWindowId()) {
+                MMI_HILOG_DISPATCHD("find windowinfo by window id %{public}d", item.id);
+                windowInfo = &item;
+                break;
+            }
+        }
+    }
     if (windowInfo == nullptr) {
         MMI_HILOG_DISPATCHD("window info is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
         if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
@@ -1046,6 +1078,16 @@ void InputWindowsManager::DispatchPointerCancel(int32_t displayId)
         if (item.id == mouseDownInfo_.id) {
             windowInfo = std::make_optional(item);
             break;
+        }
+    }
+    if (windowInfo == std::nullopt && displayId != firstBtnDownWindowInfo_.second) {
+        std::vector<WindowInfo> firstBtnDownWindowsInfo =
+            GetWindowGroupInfoByDisplayId(firstBtnDownWindowInfo_.second);
+        for (const auto &item : firstBtnDownWindowsInfo) {
+            if (item.id == mouseDownInfo_.id) {
+                windowInfo = std::make_optional(item);
+                break;
+            }
         }
     }
     if (windowInfo != std::nullopt) {
