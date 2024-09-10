@@ -213,7 +213,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_IsSpecialType_003,
     CALL_TEST_DEBUG;
     int32_t keyCode = 16;
     SpecialType type = SpecialType::SPECIAL_ALL;
-    EXPECT_TRUE(OHOS::MMI::IsSpecialType(keyCode, type));
+    EXPECT_FALSE(OHOS::MMI::IsSpecialType(keyCode, type));
 }
 
 /**

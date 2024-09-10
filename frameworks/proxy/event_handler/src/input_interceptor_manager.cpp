@@ -40,9 +40,9 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
     return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType, priority, deviceTags);
 }
 
-void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
+int32_t InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
+    return RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
 }
 } // namespace MMI
 } // namespace OHOS

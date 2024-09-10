@@ -282,7 +282,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSi
     ASSERT_NE(monitorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR || OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -1261,7 +1261,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_001, Test
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
     } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);  // errors occur
+        ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
     }
@@ -1288,7 +1288,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_002, Test
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
     } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);  // errors occur
+        ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
     }
@@ -1728,7 +1728,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_001, T
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
     } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);  // errors occur
+        ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
     }
@@ -1755,7 +1755,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_002, T
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
     } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);  // errors occur
+        ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
     }
@@ -1808,7 +1808,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_004, T
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
     } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);  // errors occur
+        ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
     }
@@ -1836,7 +1836,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, T
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
     } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);  // errors occur
+        ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
     }

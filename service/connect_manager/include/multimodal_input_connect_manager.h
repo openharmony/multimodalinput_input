@@ -84,6 +84,10 @@ public:
         uint32_t deviceTags);
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
+    int32_t AddGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
     int32_t MarkEventConsumed(int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject);
@@ -125,6 +129,7 @@ public:
     int32_t HasIrEmitter(bool &hasIrEmitter);
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
+    int32_t SetMoveEventFilters(bool flag);
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
@@ -133,16 +138,23 @@ public:
     int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag);
     int32_t EnableHardwareCursorStats(bool enable);
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows(int32_t &rows);
+    int32_t SkipPointerLayer(bool isSkip);
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
 
 private:
     MultimodalInputConnectManager() = default;

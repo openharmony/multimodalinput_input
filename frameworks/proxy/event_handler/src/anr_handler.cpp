@@ -20,6 +20,7 @@
 #include "ffrt.h"
 #include "ffrt_inner.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "input_manager_impl.h"
 #include "multimodal_input_connect_manager.h"
@@ -32,12 +33,11 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME { 3500000 };
-constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
-constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
-constexpr int32_t TIME_TRANSITION { 1000 };
-constexpr int32_t PRINT_INTERVAL_COUNT { 50 };
-constexpr int32_t PRINT_MARK_COUNT { 30 };
+[[ maybe_unused ]] constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME { 3500000 };
+[[ maybe_unused ]] constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME { 50000 };
+[[ maybe_unused ]] constexpr int32_t INVALID_OR_PROCESSED_ID { -1 };
+[[ maybe_unused ]] constexpr int32_t TIME_TRANSITION { 1000 };
+constexpr int32_t PRINT_INTERVAL_COUNT { 30 };
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -61,20 +61,19 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
 void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
+    BytraceAdapter::StartMarkedTracker(eventId);
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
     {
         std::lock_guard<std::mutex> guard(mutex_);
         idList_.push_back(eventId);
-        if (idList_.size() >= PRINT_MARK_COUNT) {
-            std::string idList = "";
-            for (auto e : idList_) {
-                idList += std::to_string(e) + " ";
-            }
+        if (idList_.size() >= PRINT_INTERVAL_COUNT) {
+            std::string idList = std::to_string(idList_.front()) + " " + std::to_string(idList_.back());
             MMI_HILOG_FREEZEI("Ffrt PE: %{public}s", idList.c_str());
             idList_.clear();
         }
     }
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->MarkProcessed(eventType, eventId);
+    BytraceAdapter::StopMarkedTracker();
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }

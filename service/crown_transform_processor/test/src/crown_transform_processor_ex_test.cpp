@@ -19,7 +19,6 @@
 #include <cstdio>
 
 #include "crown_transform_processor.h"
-#include "display_manager.h"
 #include "general_crown.h"
 #include "i_input_windows_manager.h"
 #include "input_device_manager.h"

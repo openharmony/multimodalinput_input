@@ -14,6 +14,9 @@
  */
 
 #include "key_command_handler_util.h"
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+#include "key_shortcut_manager.h"
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
 
 namespace OHOS {
 namespace MMI {
@@ -563,6 +566,22 @@ std::string GenerateKey(const ShortcutKey& key)
     return std::string(ss.str());
 }
 
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+static int32_t RegisterSystemKey(const ShortcutKey &shortcutKey,
+    std::function<void(std::shared_ptr<KeyEvent>)> callback)
+{
+    KeyShortcutManager::SystemShortcutKey sysKey {
+        .modifiers = shortcutKey.preKeys,
+        .finalKey = shortcutKey.finalKey,
+        .longPressTime = shortcutKey.keyDownDuration,
+        .triggerType = (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN ?
+            KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_DOWN : KeyShortcutManager::SHORTCUT_TRIGGER_TYPE_UP),
+        .callback = callback,
+    };
+    return KEY_SHORTCUT_MGR->RegisterSystemKey(sysKey);
+}
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
+
 bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap,
     std::vector<std::string>& businessIds)
 {
@@ -581,10 +600,18 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
         if (!ConvertToShortcutKey(shortkey, shortcutKey, businessIds)) {
             continue;
         }
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+        shortcutKey.shortcutId = RegisterSystemKey(shortcutKey,
+            [shortcutKey](std::shared_ptr<KeyEvent> keyEvent) {});
+        if (shortcutKey.shortcutId < 0) {
+            MMI_HILOGE("RegisterSystemKey fail, error:%{public}d", shortcutKey.shortcutId);
+            continue;
+        }
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::string key = GenerateKey(shortcutKey);
         if (shortcutKeyMap.find(key) == shortcutKeyMap.end()) {
             if (!shortcutKeyMap.emplace(key, shortcutKey).second) {
-                MMI_HILOGW("Duplicate shortcutKey:%{public}s", key.c_str());
+                MMI_HILOGW("Duplicate shortcutKey:%s", key.c_str());
             }
         }
     }
@@ -635,7 +662,8 @@ bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& exclude
     return true;
 }
 
-bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec)
+bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec,
+    std::map<int32_t, int32_t>& repeatKeyMaxTimes)
 {
     cJSON* repeatKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "RepeatKeys");
     if (!cJSON_IsArray(repeatKeys)) {
@@ -653,6 +681,12 @@ bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKey
             continue;
         }
         repeatKeyVec.push_back(rep);
+        if (repeatKeyMaxTimes.find(rep.keyCode) == repeatKeyMaxTimes.end()) {
+            repeatKeyMaxTimes.insert(std::make_pair(rep.keyCode, rep.times));
+        }
+        if (repeatKeyMaxTimes[rep.keyCode] < rep.times) {
+            repeatKeyMaxTimes[rep.keyCode] = rep.times;
+        }
     }
 
     return true;
@@ -722,7 +756,7 @@ float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent>
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(id, item);
     return static_cast<float>(sqrt(pow(knuckleGesture.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
-        pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE)));
+        pow(knuckleGesture.lastDownPointer.y - item.GetDisplayY(), POW_SQUARE)));
 }
 
 bool IsEqual(float f1, float f2)

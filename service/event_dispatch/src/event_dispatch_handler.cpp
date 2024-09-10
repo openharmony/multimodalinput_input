@@ -19,7 +19,6 @@
 
 #include <linux/input-event-codes.h>
 
-#include "hitrace_meter.h"
 #include "transaction/rs_interfaces.h"
 
 #include "anr_manager.h"
@@ -44,8 +43,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int64_t ERROR_TIME {3000000};
 constexpr int32_t INTERVAL_TIME { 3000 }; // log time interval is 3 seconds.
 constexpr int32_t INTERVAL_DURATION { 10 };
+constexpr int32_t THREE_FINGERS { 3 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -122,7 +123,9 @@ bool EventDispatchHandler::ReissueEvent(std::shared_ptr<PointerEvent> &point, in
             windowInfo = std::make_optional(*curInfo);
             MMI_HILOG_DISPATCHI("Touch event send cancel to window:%{public}d", windowId);
         } else {
-            MMI_HILOGE("Window:%{public}d is nullptr", windowId);
+            if (point->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+                MMI_HILOGE("Window:%{public}d is nullptr", windowId);
+            }
             return false;
         }
     }
@@ -167,11 +170,18 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (!windowInfo) {
             continue;
         }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+        if (pointerEvent->GetTargetDisplayId() != windowInfo->displayId) {
+            continue;
+        }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
         auto fd = WIN_MGR->GetClientFd(pointerEvent, windowInfo->id);
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
             CHKPV(udsServer);
-            udsServer->GetClientFd(windowInfo->id);
+            udsServer->GetClientFd(windowInfo->pid);
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
@@ -192,7 +202,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
-        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
         WIN_MGR->ClearTargetWindowId(pointerId);
     }
 }
@@ -200,7 +211,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, programName, pid, pointCnt);
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -221,6 +232,24 @@ bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event
     return true;
 }
 
+void EventDispatchHandler::SendWindowStateError(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    auto udsServer = InputHandler->GetUDSServer();
+    auto sess = udsServer->GetSessionByPid(WIN_MGR->GetWindowStateNotifyPid());
+    if (sess != nullptr) {
+        NetPacket pkt(MmiMessageId::WINDOW_STATE_ERROR_NOTIFY);
+        pkt << pid << windowId;
+        if (!sess->SendMsg(pkt)) {
+            MMI_HILOGE("SendMsg failed");
+            return;
+        }
+        windowStateErrorInfo_.windowId = -1;
+        windowStateErrorInfo_.startTime = -1;
+        windowStateErrorInfo_.pid = -1;
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -231,35 +260,62 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return;
     }
-
     std::vector<int32_t> windowIds;
     WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), point->GetSourceType(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
+    auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
+    auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
+    if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
+        pid != -1 && point->GetTargetWindowId() != -1) {
+        if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
+            if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
+                SendWindowStateError(pid, point->GetTargetWindowId());
+            }
+        } else {
+            windowStateErrorInfo_.windowId = point->GetTargetWindowId();
+            windowStateErrorInfo_.startTime = GetSysClockTime();
+            windowStateErrorInfo_.pid = pid;
+        }
+    }
+
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(point->GetTargetWindowId(), point->GetTargetDisplayId());
+    if (windowInfo && point->GetTargetDisplayId() != windowInfo->displayId) {
+        return;
+    }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+
     DispatchPointerEventInner(point, fd);
 }
 
 void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEvent> point, int32_t fd)
 {
-    CALL_DEBUG_ENTER;
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
-        MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
+        if (point->GetPointerCount() < THREE_FINGERS &&
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+            point->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+            MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
+        }
         return;
     }
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
-    auto session = udsServer->GetSession(fd);
-    CHKPV(session);
+    auto sess = udsServer->GetSession(fd);
+    if (sess == nullptr) {
+        return;
+    }
     auto currentTime = GetSysClockTime();
-    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
-            "application not response. PointerEvent(deviceid:%{public}d, action:%{public}s)",
-            point->GetId(), point->GetDeviceId(), point->DumpPointerAction());
+    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, sess)) {
+        MMI_HILOGD("The pointer event does not report normally,app not respon. PointerEvent(deviceid:%{public}d,"
+            "action:%{public}s)", point->GetDeviceId(), point->DumpPointerAction());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -271,26 +327,25 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN
-        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
-        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_DOWN
-        || pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
-        int32_t pointerCnt = pointerEvent->GetPointerCount();
-        NotifyPointerEventToRS(pointerEvent->GetPointerAction(), session->GetProgramName(),
-            static_cast<uint32_t>(session->GetPid()), pointerCnt);
+    int32_t pointerAc = pointerEvent->GetPointerAction();
+    if (pointerAc == PointerEvent::POINTER_ACTION_PULL_DOWN || pointerAc == PointerEvent::POINTER_ACTION_UP ||
+        pointerAc == PointerEvent::POINTER_ACTION_DOWN || pointerAc == PointerEvent::POINTER_ACTION_PULL_UP) {
+        NotifyPointerEventToRS(pointerAc, sess->GetProgramName(),
+            static_cast<uint32_t>(sess->GetPid()), pointerEvent->GetPointerCount());
     }
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
-            session->GetProgramName().c_str(), session->GetPid());
+    if (pointerAc != PointerEvent::POINTER_ACTION_MOVE && pointerAc != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_ROTATE_UPDATE &&
+        pointerAc != PointerEvent::POINTER_ACTION_PULL_MOVE) {
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d, action:%{public}d",
+            sess->GetProgramName().c_str(), sess->GetPid(), pointerEvent->GetPointerAction());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
-        MMI_HILOGD("Session pid:%{public}d", session->GetPid());
-        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    if (sess->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid() && pointerEvent->IsMarkEnabled()) {
+        MMI_HILOGD("Session pid:%{public}d", sess->GetPid());
+        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, sess);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
@@ -301,8 +356,10 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     int32_t ret = RET_OK;
-    auto vecTarget = WIN_MGR->UpdateTarget(key);
-    for (const auto &item : vecTarget) {
+    // 1.Determine whether the key event is a focus type event or an operation type event,
+    // 2.Determine whether the current focus window has a safety sub window.
+    auto secSubWindowTargets = WIN_MGR->UpdateTarget(key);
+    for (const auto &item : secSubWindowTargets) {
         key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
         if (item.second.privacyMode == SecureFlag::PRIVACY_MODE) {
             key->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
@@ -325,7 +382,7 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{public}d, Action:%{public}d, EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server, KeyEvent:KeyCode:%{private}d, Action:%{public}d, EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
@@ -337,7 +394,7 @@ int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer,
                 key->GetDeviceId(), key->GetKeyAction());
         } else {
             MMI_HILOGW("The key event does not report normally, application not response."
-                "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+                "KeyEvent(deviceid:%{public}d, keycode:%{private}d, key action:%{public}d)",
                 key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
         }
         return RET_OK;

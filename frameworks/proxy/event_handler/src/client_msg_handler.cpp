@@ -79,6 +79,8 @@ void ClientMsgHandler::Init()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         { MmiMessageId::NOTIFY_BUNDLE_NAME, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->NotifyBundleName(client, pkt); }},
+        { MmiMessageId::WINDOW_STATE_ERROR_NOTIFY, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->NotifyWindowStateError(client, pkt); }},
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -92,7 +94,7 @@ void ClientMsgHandler::InitProcessedCallback()
 {
     CALL_DEBUG_ENTER;
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
-    if (tokenType == TokenType::TOKEN_HAP) {
+    if (tokenType == TokenType::TOKEN_HAP || tokenType == TokenType::TOKEN_SYSTEM_HAP) {
         MMI_HILOGD("Current session is hap");
         dispatchCallback_ = [] (int32_t eventId, int64_t actionTime) {
             return ClientMsgHandler::OnDispatchEventProcessed(eventId, actionTime);
@@ -184,11 +186,16 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     MMI_HILOG_FREEZEI("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
-    std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
-    aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
-        std::to_string(pointerEvent->GetId()));
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
+        std::string logInfo = std::string("ac: ") + pointerEvent->DumpPointerAction();
+        aggregator_.Record({MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__}, logInfo.c_str(),
+            std::to_string(pointerEvent->GetId()));
+    }
     EventLogHelper::PrintEventData(pointerEvent, {MMI_LOG_DISPATCH, INPUT_KEY_FLOW, __FUNCTION__, __LINE__});
-    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
+    if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction() ||
+        PointerEvent::POINTER_ACTION_HOVER_CANCEL == pointerEvent->GetPointerAction() ||
+        PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOG_DISPATCHI("Operation canceled");
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
@@ -233,7 +240,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
                 keyEvent->GetEventType(), keyEvent->GetFlag());
         } else {
             MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-                "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+                "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
                 "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
             subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
             keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
@@ -241,7 +248,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         }
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-            "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+            "KeyCode:%{private}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
             "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
         subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
         keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
@@ -393,5 +400,22 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
     InputMgrImpl.OnAnr(pid, eventId);
     return RET_OK;
 }
+
+int32_t ClientMsgHandler::NotifyWindowStateError(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = 0;
+    int32_t windowId = 0;
+    pkt >> pid;
+    pkt >> windowId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOG_ANRDETECTE("Packet read data failed");
+        return RET_ERR;
+    }
+    MMI_HILOG_ANRDETECTI("Client pid:%{public}d windowId:%{public}d", pid, windowId);
+    InputMgrImpl.OnWindowStateError(pid, windowId);
+    return RET_OK;
+}
+
 } // namespace MMI
 } // namespace OHOS

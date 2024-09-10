@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,12 +33,18 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ACCESSIBILITY_UID { 1103 };
+} // namespace
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
+    if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
+        return;
+    }
     if (OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{private}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
@@ -121,6 +127,12 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (WIN_MGR->IsKnuckleOnAncoWindow(pointerEvent)) {
+        MMI_HILOGI("Knuckle in ancowindow need to be intercepted");
+        return true;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
         MMI_HILOGW("This event has been tagged as not to be intercepted");
         return false;
@@ -131,7 +143,7 @@ bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointe
 
 void EventInterceptorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         MMI_HILOGE("Init session is failed");
         return;
     }
@@ -145,6 +157,23 @@ void EventInterceptorHandler::InitSessionLostCallback()
 void EventInterceptorHandler::OnSessionLost(SessionPtr session)
 {
     interceptors_.OnSessionLost(session);
+}
+
+bool EventInterceptorHandler::CheckInputDeviceSource(
+    const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags)
+{
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) ||
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL)))) {
+        return true;
+    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
+        return true;
+    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) &&
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
+        return true;
+    }
+    return false;
 }
 
 void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
@@ -169,6 +198,10 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
 void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
+    CHKPV(session_);
+    if (session_->GetUid() == ACCESSIBILITY_UID) {
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    }
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
     pkt << handlerType_ << deviceTags_;
@@ -225,23 +258,6 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-bool EventInterceptorHandler::InterceptorCollection::CheckInputDeviceSource(
-    const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const
-{
-    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) ||
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL)))) {
-        return true;
-    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
-        return true;
-    } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) &&
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
-        return true;
-    }
-    return false;
-}
-
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -269,7 +285,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             MMI_HILOGD("Interceptor cap does not have pointer or touch");
             continue;
         }
-        if (!CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
+        if (!EventInterceptorHandler::CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
             continue;
         }
 #ifndef OHOS_BUILD_EMULATOR
@@ -370,7 +386,7 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "handlerType:%d | eventType:%u | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s | ProgramName:%s \t",
                 item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
@@ -378,6 +394,19 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
                 session->GetEarliestEventTime(), session->GetDescript().c_str(),
                 session->GetProgramName().c_str());
     }
+}
+
+bool EventInterceptorHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
+{
+    CHKPF(event);
+    CHKPF(nextHandler_);
+    if (event->GetKeyAction() != KNUCKLE_1F_DOUBLE_CLICK &&
+        event->GetKeyAction() != KNUCKLE_2F_DOUBLE_CLICK) {
+        return false;
+    }
+    MMI_HILOGI("Current is touchPad knuckle double click action");
+    nextHandler_->HandleKeyEvent(event);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

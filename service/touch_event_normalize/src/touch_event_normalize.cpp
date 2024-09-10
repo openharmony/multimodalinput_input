@@ -17,9 +17,13 @@
 #include "gesture_transform_processor.h"
 #include "input_device_manager.h"
 #include "joystick_transform_processor.h"
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "tablet_tool_tranform_processor.h"
 #include "touch_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
 #include "touchpad_transform_processor.h"
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH
@@ -101,6 +105,7 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::GetPointerEvent(int32_t devic
     return nullptr;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t TouchEventNormalize::SetTouchpadPinchSwitch(bool switchFlag) const
 {
     return TouchPadTransformProcessor::SetTouchpadPinchSwitch(switchFlag);
@@ -150,5 +155,6 @@ int32_t TouchEventNormalize::GetTouchpadScrollRows() const
 {
     return TouchPadTransformProcessor::GetTouchpadScrollRows();
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS

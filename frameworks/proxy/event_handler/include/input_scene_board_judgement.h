@@ -27,7 +27,7 @@ public:
 private:
     // Dealing with Windows type end of line "\r\n".
     static std::ifstream& SafeGetLine(std::ifstream& configFile, std::string& line);
-    static void InitWithConfigFile(const char* filePath, bool& enabled);
+    static bool InitWithConfigFile(const char* filePath, bool& enabled);
 };
 } // namespace MMI
 } // namespace OHOS

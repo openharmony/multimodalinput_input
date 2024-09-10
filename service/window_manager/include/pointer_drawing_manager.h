@@ -39,6 +39,8 @@
 
 namespace OHOS {
 namespace MMI {
+inline constexpr int32_t DEFUALT_COOPERATE_PRIORITY { 10 };
+
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
@@ -55,7 +57,7 @@ struct PixelMapReleaseContext {
 private:
     std::shared_ptr<Media::PixelMap> pixelMap_ { nullptr };
 };
-
+class DelegateInterface;
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
@@ -73,7 +75,7 @@ public:
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
-    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
+    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap) override;
     bool GetPointerVisible(int32_t pid) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
         bool isUiExtension = false) override;
@@ -102,9 +104,19 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void InitPointerCallback() override;
     void InitPointerObserver() override;
+    void OnSessionLost(int32_t pid) override;
+    int32_t SkipPointerLayer(bool isSkip) override;
+    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) override
+    {
+        delegateProxy_ = proxy;
+    }
+    void DestroyPointerWindow() override;
+    void DrawScreenCenterPointer(const PointerStyle& pointerStyle) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -138,6 +150,7 @@ private:
     int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
+    bool IsWindowRotation();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
@@ -147,12 +160,20 @@ private:
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void ForceClearPointerVisiableStatus() override;
+    void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
+    void DeletPidInfo(int32_t pid);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    void UpdateBindDisplayId(int32_t displayId);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     struct PidInfo {
         int32_t pid { 0 };
+        int32_t priority { 0 };
         bool visible { false };
     };
     bool hasDisplay_ { false };
@@ -162,6 +183,7 @@ private:
     int32_t lastPhysicalY_ { -1 };
     PointerStyle lastMouseStyle_ {};
     PointerStyle currentMouseStyle_ {};
+    PointerStyle lastDrawPointerStyle_ {};
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
@@ -170,6 +192,7 @@ private:
     int32_t canvasHeight_ = 64;
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
+    std::list<PidInfo> hapPidInfos_;
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
@@ -183,10 +206,15 @@ private:
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
+    bool isInit_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
+    int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
 };
 } // namespace MMI
 } // namespace OHOS

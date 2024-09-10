@@ -17,14 +17,16 @@
 
 #include <cinttypes>
 
+#include "securec.h"
+
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
-#include "util_napi_value.h"
+#include "js_gesture_event.h"
 #include "napi_constants.h"
-#include "securec.h"
 #include "util_napi_error.h"
+#include "util_napi_value.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsInputMonitor"
@@ -46,17 +48,20 @@ constexpr int32_t AXIS_END { 6 };
 constexpr int32_t MIDDLE { 1 };
 constexpr int32_t RIGHT { 2 };
 constexpr int32_t MOUSE_FLOW { 10 };
+constexpr int32_t ONE_FINGERS { 1 };
 constexpr int32_t THREE_FINGERS { 3 };
 constexpr int32_t FOUR_FINGERS { 4 };
 constexpr int32_t GESTURE_BEGIN { 1 };
 constexpr int32_t GESTURE_UPDATE { 2 };
 constexpr int32_t GESTURE_END { 3 };
+const std::string INVALID_TYPE_NAME { "" };
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 constexpr int32_t FINGERPRINT_DOWN { 0 };
 constexpr int32_t FINGERPRINT_UP { 1 };
 constexpr int32_t FINGERPRINT_SLIDE { 2 };
 constexpr int32_t FINGERPRINT_RETOUCH { 3 };
 constexpr int32_t FINGERPRINT_CLICK { 4 };
+constexpr int32_t FINGERPRINT_CANCEL { 5 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -69,9 +74,11 @@ enum TypeName : int32_t {
     THREE_FINGERS_TAP = 6,
     JOYSTICK = 7,
     FINGERPRINT = 8,
+    SWIPE_INWARD = 9,
+    TOUCH_GESTURE = 10
 };
 
-std::map<std::string, int32_t> TO_GESTURE_TYPE = {
+std::map<std::string, int32_t> TO_MONITOR_TYPE = {
     { "touch", TOUCH },
     { "mouse", MOUSE },
     { "pinch", PINCH },
@@ -79,8 +86,12 @@ std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "fourFingersSwipe", FOUR_FINGERS_SWIPE },
     { "rotate", ROTATE },
     { "threeFingersTap", THREE_FINGERS_TAP },
-    { "joystick", JOYSTICK},
-    { "fingerprint", FINGERPRINT},
+    { "joystick", JOYSTICK },
+    { "fingerprint", FINGERPRINT },
+    { "swipeInward", SWIPE_INWARD },
+    { TOUCH_SWIPE_GESTURE, TOUCH_GESTURE },
+    { TOUCH_PINCH_GESTURE, TOUCH_GESTURE },
+    { TOUCH_ALL_GESTURE, TOUCH_GESTURE },
 };
 
 struct MonitorInfo {
@@ -132,6 +143,12 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
 };
 
+std::map<std::string, TouchGestureType> TO_GESTURE_TYPE = {
+    { TOUCH_PINCH_GESTURE, TOUCH_GESTURE_TYPE_PINCH },
+    { TOUCH_SWIPE_GESTURE, TOUCH_GESTURE_TYPE_SWIPE },
+    { TOUCH_ALL_GESTURE, TOUCH_GESTURE_TYPE_ALL },
+};
+
 void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
 {
     if (*monitorInfo != nullptr) {
@@ -145,12 +162,17 @@ void CleanData(MonitorInfo** monitorInfo, uv_work_t** work)
 }
 } // namespace
 
-int32_t InputMonitor::Start()
+int32_t InputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
+        auto it = TO_GESTURE_TYPE.find(typeName);
+        if (it != TO_GESTURE_TYPE.end()) {
+            monitorId_ = InputManager::GetInstance()->AddGestureMonitor(shared_from_this(), it->second, fingers_);
+        } else {
+            monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
+        }
     }
     return monitorId_;
 }
@@ -163,9 +185,13 @@ void InputMonitor::Stop()
         MMI_HILOGE("Invalid values");
         return;
     }
-    InputManager::GetInstance()->RemoveMonitor(monitorId_);
+    auto it = TO_GESTURE_TYPE.find(typeName_);
+    if (it != TO_GESTURE_TYPE.end()) {
+        InputManager::GetInstance()->RemoveGestureMonitor(monitorId_);
+    } else {
+        InputManager::GetInstance()->RemoveMonitor(monitorId_);
+    }
     monitorId_ = -1;
-    return;
 }
 
 std::string InputMonitor::GetTypeName() const
@@ -199,21 +225,20 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(mutex_);
-        auto monitor = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_);
-        if (monitor == nullptr) {
+        auto typeName = JS_INPUT_MONITOR_MGR.GetMonitorTypeName(id_, fingers_);
+        if (typeName == INVALID_TYPE_NAME) {
             MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
             return;
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "touch") {
+            if (typeName != "touch" && typeName != TOUCH_SWIPE_GESTURE &&
+                typeName != TOUCH_PINCH_GESTURE && typeName != TOUCH_ALL_GESTURE) {
                 return;
             }
             SetConsumeState(pointerEvent);
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "mouse" &&
-                JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "pinch" &&
-                JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "rotate") {
+            if (typeName != "mouse" && typeName != "pinch" && typeName != "rotate") {
                 return;
             }
             SetConsumeState(pointerEvent);
@@ -248,9 +273,12 @@ void InputMonitor::SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) c
 bool InputMonitor::IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPF(pointerEvent);
-    auto ret = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName();
+    auto jsMonitor = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_);
+    CHKPF(jsMonitor);
+    auto ret = jsMonitor->GetTypeName();
     if (ret != "pinch" && ret != "threeFingersSwipe" &&
-        ret != "fourFingersSwipe" && ret != "threeFingersTap") {
+        ret != "fourFingersSwipe" && ret != "threeFingersTap" &&
+        ret != "swipeInward") {
         return false;
     }
     if (pointerEvent->GetPointerIds().size() == 1) {
@@ -453,6 +481,34 @@ int32_t JsInputMonitor::GetAction(int32_t action) const
     }
 }
 
+int32_t JsInputMonitor::GetGestureAction(int32_t action) const
+{
+    switch (action) {
+        case PointerEvent::TOUCH_ACTION_SWIPE_DOWN: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_DOWN);
+        }
+        case PointerEvent::TOUCH_ACTION_SWIPE_UP: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_UP);
+        }
+        case PointerEvent::TOUCH_ACTION_SWIPE_RIGHT: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_RIGHT);
+        }
+        case PointerEvent::TOUCH_ACTION_SWIPE_LEFT: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::SWIPE_LEFT);
+        }
+        case PointerEvent::TOUCH_ACTION_PINCH_OPENED: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::PINCH_OPENED);
+        }
+        case PointerEvent::TOUCH_ACTION_PINCH_CLOSEED: {
+            return static_cast<int32_t>(JsGestureEvent::TouchGesturAction::PINCH_CLOSED);
+        }
+        default: {
+            MMI_HILOGW("unknow action, action:%{public}d", action);
+            return RET_ERR;
+        }
+    }
+}
+
 int32_t JsInputMonitor::GetSourceType(int32_t sourceType) const
 {
     switch (sourceType) {
@@ -615,7 +671,9 @@ int32_t JsInputMonitor::TransformSwipeEvent(std::shared_ptr<PointerEvent> pointe
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = GetSwipeAction(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Get action value failed");
+        if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+            MMI_HILOGE("Get action value failed");
+        }
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
@@ -686,6 +744,54 @@ int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
     }
 }
 
+int32_t JsInputMonitor::TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t actionValue = pointerEvent->GetPointerAction();
+    if (actionValue == RET_ERR) {
+        MMI_HILOGE("Get action value failed");
+        return RET_ERR;
+    }
+    int32_t actionTypeTemp = actionValue;
+    switch (actionTypeTemp) {
+        case PointerEvent::POINTER_ACTION_DOWN: {
+            actionValue = GESTURE_BEGIN;
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            actionValue = GESTURE_UPDATE;
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
+            actionValue = GESTURE_END;
+            break;
+        }
+        default: {
+            MMI_HILOGE("Abnormal pointer action in swipe event");
+            return RET_ERR;
+        }
+    }
+    if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
+        MMI_HILOGE("Set type property failed");
+        return RET_ERR;
+    }
+    PointerEvent::PointerItem pointeritem;
+    int32_t pointerId = 0;
+    if (!pointerEvent->GetPointerItem(pointerId, pointeritem)) {
+        MMI_HILOGE("Can't find this pointerItem");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "x", pointeritem.GetDisplayX()) != napi_ok) {
+        MMI_HILOGE("Set displayX property failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "y", pointeritem.GetDisplayY()) != napi_ok) {
+        MMI_HILOGE("Set displayY property failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
 {
@@ -705,6 +811,9 @@ int32_t JsInputMonitor::GetFingerprintAction(int32_t action) const
         }
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK: {
             return FINGERPRINT_CLICK;
+        }
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL: {
+            return FINGERPRINT_CANCEL;
         }
         default: {
             MMI_HILOGE("wrong action is %{public}d", action);
@@ -1109,7 +1218,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(std::shared_ptr<PointerEvent>
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Transform action value failed");
+        MMI_HILOGD("Transform action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
@@ -1222,7 +1331,40 @@ int32_t JsInputMonitor::TransformFingerprintEvent(const std::shared_ptr<PointerE
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
-int32_t JsInputMonitor::Start()
+int32_t JsInputMonitor::TransformGestureEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (SetNameProperty(jsEnv_, result, "action", GetGestureAction(pointerEvent->GetPointerAction())) != napi_ok) {
+        MMI_HILOGE("Set action property failed");
+        return RET_ERR;
+    }
+    napi_value pointers = nullptr;
+    CHKRR(napi_create_array(jsEnv_, &pointers), "napi_create_array is", RET_ERR);
+    std::vector<PointerEvent::PointerItem> pointerItems;
+    for (const auto &item : pointerEvent->GetPointerIds()) {
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(item, pointerItem)) {
+            MMI_HILOGE("Get pointer item failed");
+            return RET_ERR;
+        }
+        pointerItems.push_back(pointerItem);
+    }
+    uint32_t index = 0;
+    for (const auto &it : pointerItems) {
+        napi_value element = nullptr;
+        CHKRR(napi_create_object(jsEnv_, &element), "napi_create_object is", RET_ERR);
+        if (GetJsPointerItem(it, element) != RET_OK) {
+            MMI_HILOGE("Transform pointerItem failed");
+            return RET_ERR;
+        }
+        CHKRR(napi_set_element(jsEnv_, pointers, index, element), "napi_set_element is", RET_ERR);
+        ++index;
+    }
+    CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
+    return RET_OK;
+}
+
+int32_t JsInputMonitor::Start(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
@@ -1230,7 +1372,7 @@ int32_t JsInputMonitor::Start()
         MMI_HILOGW("Js is monitoring");
         return RET_OK;
     }
-    int32_t ret = monitor_->Start();
+    int32_t ret = monitor_->Start(typeName);
     if (ret >= 0) {
         isMonitoring_ = true;
     }
@@ -1351,7 +1493,7 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     auto temp = static_cast<MonitorInfo*>(work->data);
     delete work;
     work = nullptr;
-    auto& jsMonitor { JS_INPUT_MONITOR_MGR.GetMonitor(temp->monitorId, temp->fingers) };
+    auto jsMonitor { JS_INPUT_MONITOR_MGR.GetMonitor(temp->monitorId, temp->fingers) };
     CHKPV(jsMonitor);
     jsMonitor->OnPointerEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
     delete temp;
@@ -1361,103 +1503,126 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32_t fingers)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    if (!isMonitoring_) {
-        MMI_HILOGE("Js monitor stop");
-        return;
-    }
-    CHKPV(jsEnv_);
-    CHKPV(receiver_);
-    while (!evQueue_.empty()) {
+    {
+        std::lock_guard<std::mutex> guard(mutex_);
         if (!isMonitoring_) {
-            MMI_HILOGE("Js monitor stop handle callback");
-            break;
+            MMI_HILOGE("Js monitor stop");
+            return;
         }
+        CHKPV(jsEnv_);
+        CHKPV(receiver_);
+        while (!evQueue_.empty()) {
+            if (!isMonitoring_) {
+                MMI_HILOGE("Js monitor stop handle callback");
+                break;
+            }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(jsEnv_, &scope);
+            CHKPV(scope);
+            auto pointerEvent = evQueue_.front();
+            if (pointerEvent == nullptr) {
+                MMI_HILOGE("scope is nullptr");
+                napi_close_handle_scope(jsEnv_, scope);
+                continue;
+            }
+            evQueue_.pop();
+            pointerQueue_.push(pointerEvent);
+        }
+    }
+    std::lock_guard<std::mutex> guard(resourcemutex_);
+    while (!pointerQueue_.empty()) {
+        auto pointerEventItem = pointerQueue_.front();
+        pointerQueue_.pop();
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
-        auto pointerEvent = evQueue_.front();
-        LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-        if (pointerEvent == nullptr) {
-            MMI_HILOGE("scope is nullptr");
-            napi_close_handle_scope(jsEnv_, scope);
-            continue;
-        }
-        evQueue_.pop();
+        LogTracer lt(pointerEventItem->GetId(), pointerEventItem->GetEventType(), pointerEventItem->GetPointerAction());
         napi_value napiPointer = nullptr;
-        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer), CREATE_OBJECT, scope, pointerEvent);
+        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer),
+                                CREATE_OBJECT, scope, pointerEventItem);
         auto ret = RET_ERR;
-        switch (TO_GESTURE_TYPE[typeName.c_str()]) {
+        switch (TO_MONITOR_TYPE[typeName.c_str()]) {
             case TypeName::TOUCH: {
-                ret = TransformPointerEvent(pointerEvent, napiPointer);
+                ret = TransformPointerEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::MOUSE: {
-                ret = TransformMousePointerEvent(pointerEvent, napiPointer);
+                ret = TransformMousePointerEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::ROTATE: {
-                if (!IsRotate(pointerEvent)) {
+                if (!IsRotate(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformRotateEvent(pointerEvent, napiPointer);
+                ret = TransformRotateEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::PINCH: {
-                if (!IsPinch(pointerEvent, fingers)) {
+                if (!IsPinch(pointerEventItem, fingers)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformPinchEvent(pointerEvent, napiPointer);
+                ret = TransformPinchEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::THREE_FINGERS_SWIPE: {
                 bool canUse = false;
-                if (IsThreeFingersSwipe(pointerEvent)) {
+                if (IsThreeFingersSwipe(pointerEventItem)) {
                     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                 }
                 if (!canUse) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformSwipeEvent(pointerEvent, napiPointer);
+                ret = TransformSwipeEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::FOUR_FINGERS_SWIPE: {
-                if (!IsFourFingersSwipe(pointerEvent)) {
+                if (!IsFourFingersSwipe(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformSwipeEvent(pointerEvent, napiPointer);
+                ret = TransformSwipeEvent(pointerEventItem, napiPointer);
                 break;
             }
             case TypeName::THREE_FINGERS_TAP: {
                 bool canUse = false;
                 InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
                 if (canUse) {
-                    ret = TransformMultiTapEvent(pointerEvent, napiPointer);
+                    ret = TransformMultiTapEvent(pointerEventItem, napiPointer);
                 }
                 break;
             }
             case TypeName::JOYSTICK:{
-                if (!IsJoystick(pointerEvent)) {
+                if (!IsJoystick(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformJoystickPointerEvent(pointerEvent, napiPointer);
+                ret = TransformJoystickPointerEvent(pointerEventItem, napiPointer);
+                break;
+            }
+            case TypeName::SWIPE_INWARD: {
+                if (!IsSwipeInward(pointerEventItem)) {
+                    napi_close_handle_scope(jsEnv_, scope);
+                    continue;
+                }
+                ret = TransformSwipeInwardEvent(pointerEventItem, napiPointer);
                 break;
             }
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
             case TypeName::FINGERPRINT: {
-                if (!IsFingerprint(pointerEvent)) {
+                if (!IsFingerprint(pointerEventItem)) {
                     napi_close_handle_scope(jsEnv_, scope);
                     continue;
                 }
-                ret = TransformFingerprintEvent(pointerEvent, napiPointer);
+                ret = TransformFingerprintEvent(pointerEventItem, napiPointer);
                 break;
             }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+            case TypeName::TOUCH_GESTURE:
+                ret = TransformGestureEvent(pointerEventItem, napiPointer);
+                break;
             default: {
                 MMI_HILOGE("This event is invalid");
                 break;
@@ -1470,23 +1635,27 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
         napi_value callback = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
-            GET_REFERENCE_VALUE, scope, pointerEvent);
+            GET_REFERENCE_VALUE, scope, pointerEventItem);
         napi_value result = nullptr;
         if (monitor_->GetRectTotal() == 0
             || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectArea())) {
             CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
-                CALL_FUNCTION, scope, pointerEvent);
+                CALL_FUNCTION, scope, pointerEventItem);
         }
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
-            typeName == "joystick" || typeName == "fingerprint";
+            typeName == "joystick" || typeName == "fingerprint" || typeName == "swipeInward" ||
+            typeName == TOUCH_SWIPE_GESTURE || typeName == TOUCH_PINCH_GESTURE || typeName == TOUCH_ALL_GESTURE;
         if (typeNameFlag) {
-            MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent->GetPointerId(),
-                pointerEvent->DumpPointerAction());
+            if (pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
+                pointerEventItem->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) {
+                MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEventItem->GetPointerId(),
+                    pointerEventItem->DumpPointerAction());
+            }
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
-            CheckConsumed(retValue, pointerEvent);
+            CheckConsumed(retValue, pointerEventItem);
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
@@ -1608,13 +1777,32 @@ bool JsInputMonitor::IsJoystick(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE));
 }
 
+bool JsInputMonitor::IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPF(pointerEvent);
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
+        MMI_HILOGE("failed to do swipe inward, wrong source: %{public}d ", pointerEvent->GetSourceType());
+        return false;
+    } else if (pointerEvent->GetPointerCount() != ONE_FINGERS) {
+        MMI_HILOGE("failed to do swipe inward, more than one finger");
+        return false;
+    } else if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_DOWN &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+        MMI_HILOGE("failed to do swipe inward, wrong action");
+        return false;
+    }
+    return true;
+}
+
 bool JsInputMonitor::IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_FINGERPRINT &&
-        (PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
-        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK)) {
-            return true;
+        ((PointerEvent::POINTER_ACTION_FINGERPRINT_DOWN <= pointerEvent->GetPointerAction() &&
+        pointerEvent->GetPointerAction() <= PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK) ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL)) {
+        return true;
     }
     MMI_HILOGD("not fingerprint event");
     return false;

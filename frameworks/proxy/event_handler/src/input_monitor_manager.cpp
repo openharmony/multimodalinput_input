@@ -32,9 +32,22 @@ int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> mon
     return AddHandler(InputHandlerType::MONITOR, monitor, eventType);
 }
 
-void InputMonitorManager::RemoveMonitor(int32_t monitorId)
+int32_t InputMonitorManager::AddGestureMonitor(
+    std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
 {
-    RemoveHandler(monitorId, InputHandlerType::MONITOR);
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    return InputHandlerManager::AddGestureMonitor(InputHandlerType::MONITOR,
+        consumer, HANDLE_EVENT_TYPE_TOUCH_GESTURE, type, fingers);
+}
+
+int32_t InputMonitorManager::RemoveGestureMonitor(int32_t monitorId)
+{
+    return InputHandlerManager::RemoveGestureMonitor(monitorId, InputHandlerType::MONITOR);
+}
+
+int32_t InputMonitorManager::RemoveMonitor(int32_t monitorId)
+{
+    return RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
 
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -48,6 +61,29 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+}
+
+bool InputMonitorManager::CheckMonitorValid(TouchGestureType type, int32_t fingers)
+{
+    TouchGestureType ret = TOUCH_GESTURE_TYPE_NONE;
+    if (fingers == ALL_FINGER_COUNT) {
+        return true;
+    }
+    if (((type & TOUCH_GESTURE_TYPE_SWIPE) == TOUCH_GESTURE_TYPE_SWIPE) &&
+        (THREE_FINGER_COUNT <= fingers && fingers <= MAX_FINGERS_COUNT)) {
+        ret = TOUCH_GESTURE_TYPE_SWIPE;
+    } else if (((type & TOUCH_GESTURE_TYPE_PINCH) == TOUCH_GESTURE_TYPE_PINCH) &&
+        (FOUR_FINGER_COUNT <= fingers && fingers <= MAX_FINGERS_COUNT)) {
+        ret = TOUCH_GESTURE_TYPE_PINCH;
+    }
+    if (ret != TOUCH_GESTURE_TYPE_NONE) {
+        if ((type = type ^ ret) != TOUCH_GESTURE_TYPE_NONE) {
+            return CheckMonitorValid(type, fingers);
+        }
+    } else {
+        return false;
+    }
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

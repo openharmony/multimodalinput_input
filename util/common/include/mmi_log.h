@@ -60,7 +60,7 @@ void ResetLogTrace();
 #define MMI_FUNC_FMT "[%{public}s][%{public}s:%{public}d] "
 #define MMI_FUNC_NOLINE_FMT "[%{public}s][%{public}s] "
 #define INPUT_KEY_FLOW "InputKeyFlow"
-#define MMI_TRACE_ID  (OHOS::MMI::FormatLogTrace()),
+#define MMI_TRACE_ID (OHOS::MMI::FormatLogTrace()),
 #else
 #define MMI_FUNC_FMT "[%{public}s:%{public}d] "
 #define MMI_FUNC_NOLINE_FMT "[%{public}s] "
@@ -106,11 +106,11 @@ void ResetLogTrace();
 #endif
 
 #ifndef MMI_FILE_NAME
-#define MMI_FILE_NAME   (strrchr((__FILE__), '/') ? strrchr((__FILE__), '/') + 1 : (__FILE__))
+#define MMI_FILE_NAME (strrchr((__FILE__), '/') ? strrchr((__FILE__), '/') + 1 : (__FILE__))
 #endif
 
 #ifndef MMI_LINE_INFO
-#define MMI_LINE_INFO   MMI_FILE_NAME, __LINE__
+#define MMI_LINE_INFO MMI_FILE_NAME, __LINE__
 #endif
 
 #define MMI_HILOG_BASE(type, level, domain, tag, fmt, ...) do { \
@@ -489,7 +489,7 @@ struct LogHeader {
 #define CALL_DEBUG_ENTER ::OHOS::MMI::InnerFunctionTracer __innerFuncTracer_Debug___ \
     { LOG_DEBUG, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
 #define CALL_INFO_TRACE ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
-    { LOG_INFO, MMI_LOG_TAG, __FUNCTION__, __LINE__  }
+    { LOG_INFO, MMI_LOG_TAG, __FUNCTION__, __LINE__ }
 #define CALL_TEST_DEBUG ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___ \
     { LOG_DEBUG, MMI_LOG_TAG, test_info_ == nullptr ? "TestBody" : test_info_->name(), __LINE__ }
 #endif // MMI_LOG_H

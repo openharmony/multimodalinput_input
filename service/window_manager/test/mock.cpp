@@ -119,11 +119,17 @@ void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callba
 
 SessionPtr UDSServer::GetSession(int32_t fd) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return nullptr;
+    }
     return DfsMessageParcel::messageParcel->GetSession(fd);
 }
 
 int32_t UDSServer::GetClientFd(int32_t pid) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return 0;
+    }
     return DfsMessageParcel::messageParcel->GetClientFd(pid);
 }
 
@@ -178,12 +184,18 @@ void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callba
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputDeviceManager::HasPointerDevice()
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->HasPointerDevice();
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return nullptr;
+    }
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
 
@@ -221,6 +233,14 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
     int32_t &physicalX, int32_t &physicalY)
 {}
 
+bool TouchDrawingManager::IsWindowRotation()
+{
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
+    return DfsMessageParcel::messageParcel->IsWindowRotation();
+}
+
 PointerDrawingManager::PointerDrawingManager() {}
 
 std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
@@ -244,7 +264,7 @@ bool PointerDrawingManager::Init()
     return true;
 }
 void PointerDrawingManager::DeletePointerVisible(int32_t pid) {}
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
 {
     return 0;
 }
@@ -283,6 +303,9 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y) {}
 void PointerDrawingManager::SetMouseDisplayState(bool state) {}
 bool PointerDrawingManager::GetMouseDisplayState() const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetMouseDisplayState();
 }
 int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId,
@@ -332,17 +355,29 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     return 0;
 }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMap)
 {
     return 0;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
 void PointerDrawingManager::InitPointerCallback()
 {}
 void PointerDrawingManager::InitPointerObserver()
 {}
-
+void PointerDrawingManager::OnSessionLost(int pid)
+{}
+int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
+{
+    return 0;
+}
+void PointerDrawingManager::DestroyPointerWindow()
+{
+}
+void PointerDrawingManager::DrawScreenCenterPointer(const PointerStyle &pointerStyle)
+{}
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
@@ -368,6 +403,9 @@ int32_t MultiModalInputPreferencesManager::GetIntValue(const std::string &key, i
 
 bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, bool defaultValue)
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->GetBoolValue(key, defaultValue);
 }
 
@@ -407,6 +445,11 @@ std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandl
     return nullptr;
 }
 
+std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
+{
+    return eventKeyCommandHandler_;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {}
@@ -418,7 +461,7 @@ MouseEventNormalize::~MouseEventNormalize() {}
 
 int32_t MouseEventNormalize::GetDisplayId() const
 {
-    return 0;
+    return DfsMessageParcel::messageParcel->GetDisplayId();
 }
 
 KnuckleDrawingManager::KnuckleDrawingManager()
@@ -437,6 +480,9 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 {}
 
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
+{}
+
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
 {}
 
 SettingDataShare::~SettingDataShare() {}
@@ -473,30 +519,19 @@ FingersenseWrapper::FingersenseWrapper() {}
 
 FingersenseWrapper::~FingersenseWrapper() {}
 
-bool Rosen::DisplayManager::IsFoldable()
-{
-    return DfsMessageParcel::messageParcel->IsFoldable();
-}
-
 bool UDSSession::SendMsg(NetPacket &pkt) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->SendMsg(pkt);
-}
-
-Rosen::DMError Rosen::DisplayManager::RegisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->RegisterFoldStatusListener(listener);
-}
-
-Rosen::DMError Rosen::DisplayManager::UnregisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->UnregisterFoldStatusListener(listener);
 }
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return false;
+    }
     return DfsMessageParcel::messageParcel->IsSceneBoardEnabled();
 }
 
@@ -510,5 +545,18 @@ int32_t InputWindowsManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> c
 {
     return ERR_OK;
 }
+
+void InputWindowsManager::CleanShellWindowIds()
+{}
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return false;
+}
+
+bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    return false;
+}
 } // namespace OHOS

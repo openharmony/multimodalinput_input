@@ -32,6 +32,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t DEVICE_TAGS { 1 };
+} // namespace
 InputHandlerManager::InputHandlerManager()
 {
     monitorCallback_ =
@@ -90,7 +93,61 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     return handlerId;
 }
 
-void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t InputHandlerManager::AddGestureMonitor(
+    InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    CHKPR(consumer, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    CHKFR(((monitorHandlers_.size() + interHandlers_.size()) < MAX_N_INPUT_HANDLERS), ERROR_EXCEED_MAX_COUNT,
+          "The number of handlers exceeds the maximum");
+    int32_t handlerId = GetNextId();
+    CHKFR((handlerId != INVALID_HANDLER_ID), INVALID_HANDLER_ID,
+        "Exceeded limit of 32-bit maximum number of integers");
+    CHKFR((eventType != HANDLE_EVENT_TYPE_NONE), INVALID_HANDLER_ID, "Invalid event type");
+    int32_t ret = AddGestureToLocal(handlerId, eventType, gestureType, fingers, consumer);
+    if (ret == RET_OK) {
+        const HandleEventType newType = GetEventType();
+        ret = MULTIMODAL_INPUT_CONNECT_MGR->AddGestureMonitor(handlerType, newType, gestureType, fingers);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Add gesture handler:%{public}d to server failed, ret:%{public}d", gestureType, ret);
+            uint32_t deviceTags = 0;
+            RemoveLocal(handlerId, handlerType, deviceTags);
+            return INVALID_HANDLER_ID;
+        }
+        MMI_HILOGI("Finish add gesture handler(%{public}d:%{public}d:%{public}d:%{public}d) to server",
+            handlerId, eventType, gestureType, fingers);
+    } else {
+        handlerId = INVALID_HANDLER_ID;
+    }
+    return handlerId;
+}
+
+int32_t InputHandlerManager::RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType)
+{
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    auto iter = monitorHandlers_.find(handlerId);
+    if (iter == monitorHandlers_.end()) {
+        MMI_HILOGE("No handler(%{public}d) with specified", handlerId);
+        return RET_ERR;
+    }
+    const auto gestureHandler = iter->second.gestureHandler_;
+    monitorHandlers_.erase(iter);
+    const HandleEventType newType = GetEventType();
+
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveGestureMonitor(handlerType, newType,
+        gestureHandler.gestureType, gestureHandler.fingers);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove gesture handler:%{public}d to server failed, ret:%{public}d",
+            gestureHandler.gestureType, ret);
+    } else {
+        MMI_HILOGI("Finish remove gesture handler:%{public}d:%{public}d:%{public}d,(%{public}d,%{public}d)",
+            handlerType, newType, handlerId, gestureHandler.gestureType, gestureHandler.fingers);
+    }
+    return ret;
+}
+
+int32_t InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType handlerType)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
@@ -98,22 +155,64 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
     const HandleEventType currentType = GetEventType();
     uint32_t currentTags = GetDeviceTags();
     uint32_t deviceTags = 0;
-    if (RET_OK == RemoveLocal(handlerId, handlerType, deviceTags)) {
+    int32_t ret = RemoveLocal(handlerId, handlerType, deviceTags);
+    if (ret == RET_OK) {
         const HandleEventType newType = GetEventType();
         const int32_t newLevel = GetPriority();
         const uint64_t newTags = GetDeviceTags();
         if (currentType != newType || ((currentTags & deviceTags) != 0)) {
-            RemoveFromServer(handlerType, newType, newLevel, newTags);
+            ret = RemoveFromServer(handlerType, newType, newLevel, newTags);
+            if (ret != RET_OK) {
+                return ret;
+            }
+        }
+        MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ",
+                   handlerType, handlerId, currentType, currentTags);
+    }
+    return ret;
+}
+
+int32_t InputHandlerManager::AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
+    TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer)
+{
+    if ((eventType & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+        MMI_HILOGE("Illegal type:%{public}d", eventType);
+        return RET_ERR;
+    }
+    if (!CheckMonitorValid(gestureType, fingers)) {
+        MMI_HILOGE("Wrong number of fingers:%{public}d", fingers);
+        return RET_ERR;
+    }
+    for (const auto &handler : monitorHandlers_) {
+        if (handler.second.eventType_ == eventType &&
+            handler.second.gestureHandler_.gestureType == gestureType &&
+            handler.second.gestureHandler_.fingers == fingers) {
+            MMI_HILOGE("Gesture(%{public}d) listener already exists", gestureType);
+            return RET_ERR;
         }
     }
-    MMI_HILOGI("Remove Handler:%{public}d:%{public}d, (eventType,deviceTag): (%{public}d:%{public}d) ", handlerType,
-               handlerId, currentType, currentTags);
+    InputHandlerManager::Handler handler {
+        .handlerId_ = handlerId,
+        .handlerType_ = InputHandlerType::MONITOR,
+        .eventType_ = eventType,
+        .consumer_ = consumer,
+        .gestureHandler_ {
+            .gestureType = gestureType,
+            .fingers = fingers
+        }
+    };
+    auto ret = monitorHandlers_.emplace(handlerId, handler);
+    if (!ret.second) {
+        MMI_HILOGE("Duplicate handler:%{public}d", handlerId);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor)
 {
-    InputHandlerManager::Handler handler{
+    InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .eventType_ = eventType,
@@ -182,13 +281,14 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     return RET_OK;
 }
 
-void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+int32_t InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+    return ret;
 }
 
 int32_t InputHandlerManager::GetNextId()
@@ -234,7 +334,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
         }
     }
@@ -247,7 +347,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
             std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
-            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{public}d",
+            MMI_HILOG_DISPATCHD("Key event id:%{public}d keyCode:%{private}d",
                 handlerId, keyEvent->GetKeyCode());
             break;
         }
@@ -279,6 +379,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
         consumerCount = GetMonitorConsumerInfos(pointerEvent, consumerInfos);
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
@@ -308,7 +409,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         return;
     }
     int32_t tokenType = MULTIMODAL_INPUT_CONNECT_MGR->GetTokenType();
-    if (tokenType != TokenType::TOKEN_HAP) {
+    if (tokenType != TokenType::TOKEN_HAP && tokenType != TokenType::TOKEN_SYSTEM_HAP) {
         return;
     }
     AddMouseEventId(pointerEvent);
@@ -334,9 +435,13 @@ int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEven
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
     int32_t consumerCount = 0;
+    CHKPR(pointerEvent, consumerCount);
     MMI_HILOG_DISPATCHD("id:%{public}d ac:%{public}d recv", pointerEvent->GetId(), pointerEvent->GetPointerAction());
     for (const auto &item : monitorHandlers_) {
-        if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+        if ((item.second.eventType_ & pointerEvent->GetHandlerEventType()) != pointerEvent->GetHandlerEventType()) {
+            continue;
+        }
+        if (!IsMatchGesture(item.second, pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount())) {
             continue;
         }
         int32_t handlerId = item.first;
@@ -372,6 +477,44 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+template<typename T>
+bool InputHandlerManager::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
+{
+    CALL_INFO_TRACE;
+    CHKPF(lastPointerEvent_);
+    int32_t pointerAction = lastPointerEvent_->GetPointerAction();
+    for (const auto &it : pointerActionEvents) {
+        if (pointerAction == it) {
+            PointerEvent::PointerItem item;
+            int32_t pointerId = lastPointerEvent_->GetPointerId();
+            if (!lastPointerEvent_->GetPointerItem(pointerId, item)) {
+                MMI_HILOG_DISPATCHD("Get pointer item failed. pointer:%{public}d",
+                    pointerId);
+                return false;
+            }
+            item.SetPressed(false);
+            lastPointerEvent_->UpdatePointerItem(pointerId, item);
+            lastPointerEvent_->SetPointerAction(pointerActionEvent);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+            OnInputEvent(lastPointerEvent_, DEVICE_TAGS);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+            return true;
+        }
+    }
+    return false;
+}
+
+void InputHandlerManager::OnDisconnected()
+{
+    CALL_INFO_TRACE;
+    std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
+        PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
+    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        MMI_HILOGE("Swipe end event for service exception re-sending");
+        return;
+    }
+}
+
 void InputHandlerManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
@@ -475,6 +618,35 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
         return;
     }
     ANRHDL->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
+}
+
+bool InputHandlerManager::IsMatchGesture(const Handler &handler, int32_t action, int32_t count) const
+{
+    if ((handler.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+        return true;
+    }
+    TouchGestureType type = TOUCH_GESTURE_TYPE_NONE;
+    switch (action) {
+        case PointerEvent::TOUCH_ACTION_SWIPE_DOWN:
+        case PointerEvent::TOUCH_ACTION_SWIPE_UP:
+        case PointerEvent::TOUCH_ACTION_SWIPE_RIGHT:
+        case PointerEvent::TOUCH_ACTION_SWIPE_LEFT:
+            type = TOUCH_GESTURE_TYPE_SWIPE;
+            break;
+        case PointerEvent::TOUCH_ACTION_PINCH_OPENED:
+        case PointerEvent::TOUCH_ACTION_PINCH_CLOSEED:
+            type = TOUCH_GESTURE_TYPE_PINCH;
+            break;
+        default: {
+            MMI_HILOGW("Unknown action:%{public}d", action);
+            return false;
+        }
+    }
+    if (((handler.gestureHandler_.gestureType & type) == type) &&
+        (handler.gestureHandler_.fingers == count || handler.gestureHandler_.fingers == ALL_FINGER_COUNT)) {
+        return true;
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -26,9 +26,9 @@ namespace {
 constexpr int32_t MIN_DELAY { -1 };
 constexpr int32_t MIN_INTERVAL { 36 };
 constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t MAX_LONG_INTERVAL_MS { 30000 };
 constexpr int32_t MAX_TIMER_COUNT { 64 };
 constexpr int32_t NONEXISTENT_ID { -1 };
-std::mutex timerMutex_;
 } // namespace
 
 TimerManager::TimerManager() {}
@@ -36,6 +36,21 @@ TimerManager::~TimerManager() {}
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
+    if (intervalMs < MIN_INTERVAL) {
+        intervalMs = MIN_INTERVAL;
+    } else if (intervalMs > MAX_INTERVAL_MS) {
+        intervalMs = MAX_INTERVAL_MS;
+    }
+    return AddTimerInternal(intervalMs, repeatCount, callback);
+}
+
+int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+{
+    if (intervalMs < MIN_INTERVAL) {
+        intervalMs = MIN_INTERVAL;
+    } else if (intervalMs > MAX_LONG_INTERVAL_MS) {
+        intervalMs = MAX_INTERVAL_MS;
+    }
     return AddTimerInternal(intervalMs, repeatCount, callback);
 }
 
@@ -68,7 +83,7 @@ int32_t TimerManager::TakeNextTimerId()
 {
     uint64_t timerSlot = 0;
     uint64_t one = 1;
-
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (const auto &timer : timers_) {
         timerSlot |= (one << timer->id);
     }
@@ -83,11 +98,6 @@ int32_t TimerManager::TakeNextTimerId()
 
 int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
-    if (intervalMs < MIN_INTERVAL) {
-        intervalMs = MIN_INTERVAL;
-    } else if (intervalMs > MAX_INTERVAL_MS) {
-        intervalMs = MAX_INTERVAL_MS;
-    }
     if (!callback) {
         return NONEXISTENT_ID;
     }
@@ -112,7 +122,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
 
 int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 {
-    std::lock_guard<std::mutex> lock(timerMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             timers_.erase(it);
@@ -124,7 +134,7 @@ int32_t TimerManager::RemoveTimerInternal(int32_t timerId)
 
 int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 {
-    std::lock_guard<std::mutex> lock(timerMutex_);
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             auto timer = std::move(*it);
@@ -144,6 +154,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
 
 bool TimerManager::IsExistInternal(int32_t timerId)
 {
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->id == timerId) {
             return true;
@@ -154,6 +165,7 @@ bool TimerManager::IsExistInternal(int32_t timerId)
 
 void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
             timers_.insert(it, std::move(timer));
@@ -166,6 +178,7 @@ void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 int32_t TimerManager::CalcNextDelayInternal()
 {
     auto delay = MIN_DELAY;
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     if (!timers_.empty()) {
         auto nowTime = GetMillisTime();
         const auto& item = *timers_.begin();
@@ -180,6 +193,7 @@ int32_t TimerManager::CalcNextDelayInternal()
 
 void TimerManager::ProcessTimersInternal()
 {
+    std::lock_guard<std::recursive_mutex> lock(timerMutex_);
     if (timers_.empty()) {
         return;
     }

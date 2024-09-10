@@ -54,6 +54,9 @@ void OnDisconnected(const IfMMIClient &client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnDisconnected();
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    IMonitorMgr->OnDisconnected();
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
@@ -133,6 +136,12 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
         MMI_HILOGE("The client fails to start");
         return false;
     }
+    EventHandlerPtr eventHandlerPtr = client_->GetEventHandler();
+    CHKPF(eventHandlerPtr);
+    if (!eventHandlerPtr->PostTask([this] { SetClientInfo(GetPid(), GetThisThreadId()); })) {
+        MMI_HILOGE("Send reconnect event failed");
+        return false;
+    }
     return true;
 }
 
@@ -191,6 +200,13 @@ int32_t MultimodalEventHandler::CancelInjection()
         return RET_ERR;
     }
     return RET_OK;
+}
+
+int32_t MultimodalEventHandler::SetClientInfo(int32_t pid, uint64_t readThreadId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetClientInfo(pid, readThreadId);
 }
 } // namespace MMI
 } // namespace OHOS

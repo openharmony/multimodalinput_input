@@ -17,6 +17,7 @@
 #include "js_util.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsEventTarget"
@@ -85,10 +86,14 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, reportData->deviceId, &deviceId), CREATE_INT32, scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
             scope);
+        BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
+            REMOVE_EVENT.c_str(), reportData->deviceId);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
         napi_close_handle_scope(item->env, scope);
+        BytraceAdapter::StopDevListener();
     }
 }
 
@@ -132,10 +137,14 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         napi_value handler = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
             scope);
+        BytraceAdapter::StartDevListener(REMOVE_EVENT, reportData->deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, deviceid:%{public}d",
+            REMOVE_EVENT.c_str(), reportData->deviceId);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
         napi_close_handle_scope(item->env, scope);
+        BytraceAdapter::StopDevListener();
     }
 }
 
@@ -1346,6 +1355,56 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sp
         CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
     return promise;
+}
+
+void JsEventTarget::EmitJsGetIntervalSinceLastInput(sptr<JsUtil::CallbackInfo> cb, int64_t timeInterval)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.IntervalSinceLastInput = timeInterval;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret = 0;
+    ret = uv_queue_work_with_qos(
+        loop, work,
+        [](uv_work_t *work) {
+            MMI_HILOGD("uv_queue_work callback function is called");
+        },
+        CallIntervalSinceLastInputPromise, uv_qos_user_initiated);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        cb->DecStrongRef(nullptr);
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
+void JsEventTarget::CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    if (work->data == nullptr) {
+        JsUtil::DeletePtr<uv_work_t *>(work);
+        MMI_HILOGE("Check data is nullptr");
+        return;
+    }
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t *>(work);
+    cb->DecStrongRef(nullptr);
+    CHKPV(cb->env);
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
+    CHKPV(scope);
+    napi_value callResult;
+    CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult),
+        CREATE_INT64, scope);
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::ResetEnv()

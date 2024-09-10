@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace MMI {
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
+
 InputManager *InputManager::GetInstance()
 {
     return instance_;
@@ -137,6 +138,17 @@ void InputManager::RemoveMonitor(int32_t monitorId)
     InputMgrImpl.RemoveMonitor(monitorId);
 }
 
+int32_t InputManager::AddGestureMonitor(
+    std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
+{
+    return InputMgrImpl.AddGestureMonitor(consumer, type, fingers);
+}
+
+int32_t InputManager::RemoveGestureMonitor(int32_t monitorId)
+{
+    return InputMgrImpl.RemoveGestureMonitor(monitorId);
+}
+
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     InputMgrImpl.MarkConsumed(monitorId, eventId);
@@ -189,6 +201,14 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     pointerEvent->SetZOrder(zOrder);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
+}
+
+void InputManager::SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    InputMgrImpl.SimulateTouchPadEvent(pointerEvent);
 }
 
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
@@ -583,6 +603,11 @@ int32_t InputManager::SetCurrentUser(int32_t userId)
     return InputMgrImpl.SetCurrentUser(userId);
 }
 
+int32_t InputManager::SetMoveEventFilters(bool flag)
+{
+    return InputMgrImpl.SetMoveEventFilters(flag);
+}
+
 int32_t InputManager::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     return InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
@@ -606,6 +631,31 @@ int32_t InputManager::AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer)
 int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer)
 {
     return InputMgrImpl.AncoRemoveChannel(consumer);
+}
+
+int32_t InputManager::SkipPointerLayer(bool isSkip)
+{
+    return InputMgrImpl.SkipPointerLayer(isSkip);
+}
+
+int32_t InputManager::RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback)
+{
+    return InputMgrImpl.RegisterWindowStateErrorCallback(callback);
+}
+
+int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    return InputMgrImpl.GetIntervalSinceLastInput(timeInterval);
+}
+
+int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
+{
+    return InputMgrImpl.GetAllSystemHotkeys(keyOptions, count);
+}
+
+int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -24,6 +24,7 @@
 #include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"
+#include "delegate_interface.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,7 +44,7 @@ public:
         return true;
     }
     virtual void DeletePointerVisible(int32_t pid) {}
-    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority)
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
     {
         return 0;
     }
@@ -131,12 +132,22 @@ public:
     {
         return 0;
     }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
     {
         return 0;
     }
-    virtual void ForceClearPointerVisiableStatus();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    virtual void ForceClearPointerVisiableStatus() {}
     virtual void InitPointerObserver() {}
+    virtual void OnSessionLost(int32_t pid) {}
+    virtual int32_t SkipPointerLayer(bool isSkip)
+    {
+        return 0;
+    }
+    virtual void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy) {}
+    virtual void DestroyPointerWindow() {}
+    virtual void DrawScreenCenterPointer(const PointerStyle &pointerStyle) {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

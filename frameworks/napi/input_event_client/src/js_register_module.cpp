@@ -79,6 +79,7 @@ std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
 {
+    CHKPV(keyEvent);
     keyEvent->SetRepeat(true);
     bool isPressed = false;
     if (GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed) != RET_OK) {
@@ -102,7 +103,7 @@ static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEve
         MMI_HILOGE("Get keyCode failed");
     }
     if (keyCode < 0) {
-        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
+        MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyCode);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
     }
     keyEvent->SetKeyCode(keyCode);

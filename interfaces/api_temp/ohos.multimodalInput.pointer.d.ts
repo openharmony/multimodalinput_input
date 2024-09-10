@@ -23,7 +23,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function setTouchpadScrollRows(rows: number, callback: AsyncCallback<void>): void;
 
@@ -37,7 +37,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function setTouchpadScrollRows(rows: number): Promise<void>;
 
@@ -50,7 +50,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function getTouchpadScrollRows(callback: AsyncCallback<number>): void;
 
@@ -63,7 +63,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function getTouchpadScrollRows(): Promise<number>;
 
@@ -78,7 +78,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function setTouchpadThreeFingersTapSwitch(state: boolean, callback: AsyncCallback<void>): void;
 
@@ -93,7 +93,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function setTouchpadThreeFingersTapSwitch(state: boolean): Promise<void>;
 
@@ -106,7 +106,7 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function getTouchpadThreeFingersTapSwitch(callback: AsyncCallback<boolean>): void;
 
@@ -119,6 +119,6 @@
    * <br>2. Incorrect parameter types; 3. Parameter verification failed.
    * @syscap SystemCapability.MultimodalInput.Input.Pointer
    * @systemapi hide for inner use.
-   * @since 12
+   * @since 13
    */
   function getTouchpadThreeFingersTapSwitch(): Promise<boolean>;

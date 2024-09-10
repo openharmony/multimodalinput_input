@@ -42,8 +42,12 @@ namespace {
 const std::string SETTING_COLUMN_KEYWORD { "KEYWORD" };
 const std::string SETTING_COLUMN_VALUE { "VALUE" };
 const std::string SETTING_URI_PROXY { "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true" };
+const std::string SETTING_URI_USER_PROXY {
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true" };
 const std::string SETTINGS_DATA_EXT_URI { "datashare:///com.ohos.settingsdata.DataAbility" };
 constexpr int32_t DECIMAL_BASE { 10 };
+constexpr const int32_t E_OK{ 0 };
+constexpr const int32_t E_DATA_SHARE_NOT_READY { 1055 };
 } // namespace
 
 SettingDataShare::~SettingDataShare() {}
@@ -198,7 +202,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     const int32_t tmpRow = 0;
     resultSet->GoToRow(tmpRow);
     int32_t ret = resultSet->GetString(tmpRow, value);
-    if (ret != NativeRdb::E_OK) {
+    if (ret != RET_OK) {
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_VALUE;
     }
@@ -263,10 +267,39 @@ bool SettingDataShare::ReleaseDataShareHelper(std::shared_ptr<DataShare::DataSha
 Uri SettingDataShare::AssembleUri(const std::string& key, const std::string &strUri)
 {
     if (strUri.empty()) {
+        if (key == "close_fingerprint_nav_event_key" || key == "close_fingerprint_event_key") {
+            return Uri(SETTING_URI_USER_PROXY + "&key=" + key);
+        }
         return Uri(SETTING_URI_PROXY + "&key=" + key);
     } else {
         return Uri(strUri + "&key=" + key);
     }
+}
+
+bool SettingDataShare::CheckIfSettingsDataReady()
+{
+    if (isDataShareReady_) {
+        return true;
+    }
+    std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
+            DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
+    MMI_HILOGD("create data_share helper, ret=%{public}d", ret.first);
+    if (ret.first == E_OK) {
+        MMI_HILOGD("create data_share helper success");
+        auto helper = ret.second;
+        if (helper != nullptr) {
+            bool releaseRet = helper->Release();
+            MMI_HILOGD("release data_share helper, releaseRet=%{public}d", releaseRet);
+        }
+        isDataShareReady_ = true;
+        return true;
+    } else if (ret.first == E_DATA_SHARE_NOT_READY) {
+        MMI_HILOGE("create data_share helper failed");
+        isDataShareReady_ = false;
+        return false;
+    }
+    MMI_HILOGE("data_share unknown");
+    return true;
 }
 }
 } // namespace OHOS

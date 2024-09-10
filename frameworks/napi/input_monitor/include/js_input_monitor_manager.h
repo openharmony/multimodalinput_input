@@ -43,6 +43,7 @@ public:
     void RemoveMonitor(napi_env jsEnv);
     void OnPointerEventByMonitorId(int32_t id, int32_t fingers, std::shared_ptr<PointerEvent> pointEvent);
     const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id, int32_t fingers);
+    std::string GetMonitorTypeName(int32_t id, int32_t fingers);
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
     void RemoveEnv(napi_env env);
     void ThrowError(napi_env env, int32_t code);
@@ -63,6 +64,7 @@ private:
     std::map<napi_env, napi_ref> envManager_;
     int32_t nextId_ { 0 };
     std::mutex mutex_;
+    std::mutex envMutex_;
 };
 
 #define JS_INPUT_MONITOR_MGR JsInputMonitorManager::GetInstance()

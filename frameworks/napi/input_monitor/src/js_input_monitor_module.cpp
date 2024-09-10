@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <string>
+#include <unordered_set>
 #include <uv.h>
 
 #include "define_multimodal.h"
@@ -31,9 +32,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::set<std::string> ACTION_TYPE = {
+const std::unordered_set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
-    "fingerprint"
+    "fingerprint", "swipeInward", TOUCH_SWIPE_GESTURE, TOUCH_PINCH_GESTURE
 };
 constexpr int32_t TWO_PARAMETERS { 2 };
 constexpr int32_t THREE_PARAMETERS { 3 };

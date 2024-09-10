@@ -46,12 +46,13 @@ ohos_fuzztest("StubSetMouseIconFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubsetmouseicon_fuzzer.cpp" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
@@ -66,10 +67,20 @@ ohos_fuzztest("StubSetMouseIconFuzzTest") {
     "image_framework:image_native",
     "ipc:ipc_single",
     "ipc:ipc_single",
-    "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
+    "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
+
+  if (enable_player_framework) {
+    external_deps += [ "player_framework:media_client" ]
+  }
 }
 
 ###############################################################################

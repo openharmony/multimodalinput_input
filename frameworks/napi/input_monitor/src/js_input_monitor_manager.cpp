@@ -49,7 +49,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, hotRectArea,
         rectTotal, callback, nextId_++, fingers);
-    int32_t ret = monitor->Start();
+    int32_t ret = monitor->Start(typeName);
     if (ret < 0) {
         MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
@@ -70,7 +70,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, fingers);
-    int32_t ret = monitor->Start();
+    int32_t ret = monitor->Start(typeName);
     if (ret < 0) {
         MMI_HILOGE("Js monitor startup failed");
         ThrowError(jsEnv, ret);
@@ -184,6 +184,19 @@ const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t 
     return nullptr;
 }
 
+std::string JsInputMonitorManager::GetMonitorTypeName(int32_t id, int32_t fingers)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if ((item != nullptr) && (item->GetId() == id && item->GetFingers() == fingers)) {
+            return item->GetTypeName();
+        }
+    }
+    MMI_HILOGD("No monitor found");
+    return "";
+}
+
 bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
 {
     CALL_DEBUG_ENTER;
@@ -224,6 +237,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
         MMI_HILOGE("napi_create_reference failed");
         return false;
     }
+    std::lock_guard<std::mutex> lock(envMutex_);
     auto iter = envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
     if (!iter.second) {
         MMI_HILOGE("Insert value failed");
@@ -235,6 +249,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
 void JsInputMonitorManager::RemoveEnv(napi_env env)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(envMutex_);
     auto it = envManager_.find(env);
     if (it == envManager_.end()) {
         MMI_HILOGD("No env found");
@@ -254,6 +269,7 @@ void JsInputMonitorManager::RemoveEnv(std::map<napi_env, napi_ref>::iterator it)
 void JsInputMonitorManager::RemoveAllEnv()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(envMutex_);
     for (auto it = envManager_.begin(); it != envManager_.end();) {
         RemoveEnv(it++);
     }
@@ -262,6 +278,7 @@ void JsInputMonitorManager::RemoveAllEnv()
 bool JsInputMonitorManager::IsExisting(napi_env env)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> lock(envMutex_);
     auto it = envManager_.find(env);
     if (it == envManager_.end()) {
         MMI_HILOGD("No env found");

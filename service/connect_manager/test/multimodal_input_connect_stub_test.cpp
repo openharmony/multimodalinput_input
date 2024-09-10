@@ -19,10 +19,18 @@
 #include "multimodal_input_connect_stub.h"
 #include "mmi_service.h"
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 namespace OHOS {
 namespace MMI {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
+uint64_t g_tokenID { 0 };
+const std::string SYSTEM_BASIC { "system_basic" };
+const char* g_basics[] = { "ohos.permission.COOPERATE_MANAGER" };
 } // namespace
 
 class MultimodalInputConnectStubTest : public testing::Test {
@@ -31,7 +39,29 @@ public:
     static void TearDownTestCase(void) {}
     void SetUp() {}
     void TearDown() {}
+    static void SetPermission(const std::string &level, const char** perms, size_t permAmount);
 };
+
+void MultimodalInputConnectStubTest::SetPermission(const std::string &level, const char** perms, size_t permAmount)
+{
+    if (perms == nullptr || permAmount == 0) {
+        return;
+    }
+
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permAmount,
+        .aclsNum = 0,
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "ConnectManagerTest",
+        .aplStr = level.c_str(),
+    };
+    g_tokenID = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(g_tokenID);
+    OHOS::Security::AccessToken::AccessTokenKit::AccessTokenKit::ReloadNativeTokenInfo();
+}
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubSetMouseHotSpot
@@ -1414,7 +1444,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubAddInputHandler_001, TestSize.Level
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    int32_t returnCode = 65142800;
+    int32_t returnCode = 201;
     int32_t ret = stub->StubAddInputHandler(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
@@ -1430,7 +1460,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputHandler_001, TestSize.Le
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIService>();
     MessageParcel data;
     MessageParcel reply;
-    int32_t returnCode = 65142800;
+    int32_t returnCode = 201;
     int32_t ret = stub->StubRemoveInputHandler(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
@@ -1748,7 +1778,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubEnableInputDevice(data, reply);
-    EXPECT_NE(ret, RET_OK);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -2538,6 +2568,92 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_002, TestSize
     state_ = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubGetTouchpadScrollRows(data, reply);
     EXPECT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: StubAddInputEventFilter_111
+ * @tc.desc: Test the function StubAddInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAddInputEventFilter_111, TestSize.Level1)
+{
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubAddInputEventFilter(data, reply);
+    int32_t returnCode = -201;
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubRemoveInputEventFilter_111
+ * @tc.desc: Test the function StubRemoveInputEventFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubRemoveInputEventFilter_111, TestSize.Level1)
+{
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubRemoveInputEventFilter(data, reply);
+    int32_t returnCode = -201;
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetPointerLocation_111
+ * @tc.desc: Test the function StubSetPointerLocation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerLocation_111, TestSize.Level1)
+{
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubSetPointerLocation(data, reply);
+    int32_t returnCode = -201;
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubAuthorize_111
+ * @tc.desc: Test the function StubAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubAuthorize_111, TestSize.Level1)
+{
+    SetPermission(SYSTEM_BASIC, g_basics, sizeof(g_basics) / sizeof(g_basics[0]));
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t ret = stub->StubAuthorize(data, reply);
+    int32_t returnCode = -201;
+    EXPECT_EQ(ret, returnCode);
+}
+
+/**
+ * @tc.name: StubSetCurrentUser_111
+ * @tc.desc: Test the function StubSetCurrentUser
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, StubSetCurrentUser_111, TestSize.Level1)
+{
+    std::shared_ptr<MultimodalInputConnectStub>stub = std::make_shared<MMIService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t userId = 100;
+    data.WriteInt32(userId);
+    int32_t returnCode = -1;
+    int32_t ret = stub->StubSetCurrentUser(data, reply);
+    EXPECT_EQ(ret, returnCode);
 }
 } // namespace MMI
 } // namespace OHOS

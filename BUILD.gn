@@ -61,6 +61,8 @@ ohos_executable("uinput_inject") {
 
   defines = [ "MMI_DISABLE_LOG_TRACE" ]
 
+  cflags = [ "-fstack-protector-strong" ]
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
@@ -77,6 +79,15 @@ group("multimodalinput_mmi_service") {
   deps = [
     "service:libmmi-server",
     "tools/inject_event:uinput",
+    "util/screen_capture:libmmi-screen_capture",
+  ]
+}
+
+group("input-third-mmi") {
+  external_deps = [
+    "libevdev:libevdev",
+    "libinput:libinput-third-mmi",
+    "mtdev:libmtdev-third-mmi",
   ]
 }
 
@@ -114,32 +125,11 @@ group("input_jsapi_group") {
   }
 }
 
-group("mmi_debug_tools") {
-  deps = [
-    "patch/diff_libinput_mmi:libinput-analyze-mmi",
-    "patch/diff_libinput_mmi:libinput-debug-mmi",
-    "patch/diff_libinput_mmi:libinput-list-mmi",
-    "patch/diff_libinput_mmi:libinput-measure-mmi",
-    "patch/diff_libinput_mmi:libinput-quirks-mmi",
-    "patch/diff_libinput_mmi:libinput-record-mmi",
-    "patch/diff_libinput_mmi:libinput-tablet-mmi",
-    "tools/event_inject:mmi-event-injection",
-    "tools/vuinput:vuinput",
-  ]
-}
-
-group("ut_mmi_debug_tools") {
-  testonly = true
-  deps = [
-    "tools/event_inject:ut-event-injection-out",
-    "tools/vuinput:ut-virtual-device-out",
-  ]
-}
-
 group("mmi_tests") {
   testonly = true
   deps = [
     "common/anco/comm:AncoChannelStubTest",
+    "frameworks/native/input:OHInputManagerTest",
     "frameworks/proxy:InputHandlerManagerTest",
     "frameworks/proxy:InputManagerFilterManualTest",
     "frameworks/proxy:InputManagerImplTest",
@@ -150,6 +140,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
+    "service:AccountManagerTest",
     "service:ApplicationStateObserverTest",
     "service:ConnectManagerEXTest",
     "service:ConnectManagerProxyEXTest",
@@ -164,6 +155,7 @@ group("mmi_tests") {
     "service:EventFilterDeathRecipientTest",
     "service:EventFilterHandlerTest",
     "service:EventHandlerTest",
+    "service:EventNormalizeHandlerTest",
     "service:InfraredEmitterTest",
     "service:InputDisplayBindHelperTest",
     "service:InputWindowsManagerEXTest",
@@ -173,40 +165,51 @@ group("mmi_tests") {
     "service:KeyAutoRepeatExTest",
     "service:KeyCommandTest",
     "service:KeyEventNormalizeTest",
+    "service:KeyEventValueTransformationTest",
     "service:KnuckleDivergentPointTest",
     "service:KnuckleDrawingManagerTest",
     "service:KnuckleDynamicDrawingManagerTest",
     "service:KnuckleGlowPointTest",
     "service:KnuckleGlowTraceSystemTest",
     "service:LibinputAdapterTest",
-    "service:ModuleLoaderExTest",
     "service:ModuleLoaderTest",
     "service:MonitorTest",
     "service:NapProcessTest",
+    "service:PointerDrawingManagerExTest",
     "service:PointerDrawingManagerTest",
     "service:ServerMsgHandlerTest",
     "service:StylusKeyTest",
     "service:StylusKeyTest",
     "service:SubscriberTest",
     "service:TimerManagerTest",
+    "service:TouchDrawingManagerAiTest",
     "service:TouchDrawingManagerTest",
     "service:TwoFingerLongTouchTest",
     "service:event_resample_test",
     "service:mmi-service-tests",
-    "service:rust_mmi_test",
     "service/crown_transform_processor/test:CrownTransformProcessorTest",
+    "service/fingerprint_event_processor/test:FingerprintEventProcessorTest",
     "service/mouse_event_normalize/test:MouseEventNormalizeTest",
-    "service/mouse_event_normalize/test:MouseTransformProcessorMockTest",
+    "service/subscriber/test:mmi_subscriber_tests",
     "service/touch_event_normalize/test:TouchEventNormalizeTests",
+    "service/touch_event_normalize/test:TouchGestureAdapterTest",
     "test/fuzztest:test",
+    "test/unittest/interfaces:InputNativeHotkeyTest",
     "test/unittest/interfaces:InputNativeTest",
     "tools/inject_event:InjectEventTest",
-    "util:rust_mmi_key_config_test",
-    "util:ut-mmi-util-out",
+    "util:UdsClientTest",
   ]
 
   if (input_feature_switch) {
     deps += [ "frameworks/proxy:SwitchEventInputSubscribeManagerTest" ]
+  }
+
+  if (!use_clang_coverage) {
+    deps += [
+      "service:rust_mmi_test",
+      "util:rust_mmi_key_config_test",
+      "util:ut-mmi-util-out",
+    ]
   }
 
   if (input_ext_feature_anco) {

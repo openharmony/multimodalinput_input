@@ -42,8 +42,8 @@ private:
     double lifespan_ { -1.0 };
     double pointX_ { 0.0 };
     double pointY_ { 0.0 };
-    int64_t lastUpdateTimeMillis_  { 0 };
-    float traceSize_  { 0.f };
+    int64_t lastUpdateTimeMillis_ { 0 };
+    float traceSize_ { 0.f };
 
     Rosen::Drawing::Matrix traceMatrix_;
     std::shared_ptr<OHOS::Media::PixelMap> traceShadow_ { nullptr };

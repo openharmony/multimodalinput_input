@@ -140,6 +140,34 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerTest::SetMouseIconTest(const 
 }
 
 /**
+ * @tc.name: InputManagerTest_SetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the funcation SetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the funcation GetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: InputManagerTest_SetKeyDownDuration_01
  * @tc.desc: Test SetKeyDownDuration
  * @tc.type: FUNC
@@ -184,7 +212,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -341,7 +369,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_TRUE(subscribeId1 >= 0);
+    EXPECT_FALSE(subscribeId1 >= 0);
 #else
     EXPECT_TRUE(subscribeId1 < 0);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1627,7 +1655,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_001, TestSize.L
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_002, TestSize.Level1)
 {
-    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), INVAID_VALUE);
+    ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(nullptr), -2);
 }
 
 /**
@@ -1643,7 +1671,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeSwitchEvent_003, TestSize.L
             event->GetSwitchType(), event->GetSwitchValue());
     };
     ASSERT_EQ(InputManager::GetInstance()->SubscribeSwitchEvent(
-        fun, SwitchEvent::SwitchType(INVAID_VALUE)), INVAID_VALUE);
+        fun, SwitchEvent::SwitchType(INVAID_VALUE)), -2);
 }
 
 /**
@@ -1790,54 +1818,6 @@ HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_003, TestSize.Level1)
     item.SetDisplayY(200);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_004
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G
- */
-HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_005
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:AR000GJG6G
- */
-HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -2658,7 +2638,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManager_SimulateEvent_001
+ * @tc.name: InputManager_SimulateEvent_002
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
  * @tc.require:AR20240223308600
@@ -2675,7 +2655,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManager_SimulateEvent_001
+ * @tc.name: InputManager_SimulateEvent_003
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
  * @tc.require:AR20240223308600
@@ -2692,7 +2672,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManager_SimulateEvent_001
+ * @tc.name: InputManager_SimulateEvent_004
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
  * @tc.require:AR20240223308600
@@ -2701,6 +2681,74 @@ HWTEST_F(InputManagerTest, InputManager_SimulateEvent_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = InputManagerUtil::SetupSimulateEvent004();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_005
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent005();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_006
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_006, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent006();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_007
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_007, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent007();
+    MMI_HILOGI("Before handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    MMI_HILOGI("After handle SimulateInputEvent");
+    InputManagerUtil::PrintPointerEventId(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateEvent_008
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR20240223308600
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateEvent_008, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = InputManagerUtil::SetupSimulateEvent008();
     MMI_HILOGI("Before handle SimulateInputEvent");
     InputManagerUtil::PrintPointerEventId(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -3017,7 +3065,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
 {
     int32_t userId = 10;
     int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
-    EXPECT_TRUE(ret == RET_OK);
+    EXPECT_FALSE(ret == RET_OK);
 }
 
 /**
@@ -3164,6 +3212,172 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Lev
     result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
     ASSERT_EQ(rows, 100);
     ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    void *pixelMap = nullptr;
+    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetIntervalSinceLastInput001
+ * @tc.desc: GetIntervalSinceLastInput interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int64_t timeInterval = -1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetIntervalSinceLastInput002
+ * @tc.desc: GetIntervalSinceLastInput interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    int64_t timeInterval = 0;
+    int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetIntervalSinceLastInput003
+ * @tc.desc: GetIntervalSinceLastInput interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem itemSecond;
+    itemSecond.SetKeyCode(KeyEvent::KEYCODE_R);
+    itemSecond.SetPressed(true);
+    itemSecond.SetDownTime(500);
+    keyEvent->AddKeyItem(itemSecond);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    int64_t timeInterval = 0;
+    int32_t result =InputManager::GetInstance()->GetIntervalSinceLastInput(timeInterval);
+    ASSERT_EQ(result, RET_OK);
+    EXPECT_GE(timeInterval, (TIME_WAIT_FOR_OP * SLEEP_MILLISECONDS));
+}
+
+/**
+ * @tc.name: InputManagerTest_GetAllSystemHotkey
+ * @tc.desc: Obtains all hot keys supported by the system.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetAllSystemHotkey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, count);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SkipPointerLayer_001
+ * @tc.desc: Test SkipPointerLayer
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SkipPointerLayer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isSkip = true;
+    int32_t ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
+    isSkip = false;
+    ret = InputManager::GetInstance()->SkipPointerLayer(isSkip);
+    EXPECT_EQ(ret, 305);
+}
+
+/**
+ * @tc.name: InputManagerTest_ConvertToCapiKeyAction_001
+ * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ConvertToCapiKeyAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyAction = 0X00000002;
+    int32_t ret = InputManager::GetInstance()->ConvertToCapiKeyAction(keyAction);
+    EXPECT_NE(ret, -1);
+}
+
+/**
+ * @tc.name: InputManagerTest_GestureMonitor_001
+ * @tc.desc: Gesture Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_ALL, 1);
+    ASSERT_TRUE(monitorId == INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerTest_GestureMonitor_002
+ * @tc.desc: Gesture Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_PINCH, 3);
+    ASSERT_TRUE(monitorId == INVALID_HANDLER_ID);
+}
+
+/**
+ * @tc.name: InputManagerTest_GestureMonitor_003
+ * @tc.desc: Gesture Monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_ALL, 0);
+    ASSERT_TRUE(monitorId != INVALID_HANDLER_ID);
+
+    int32_t ret = InputManager::GetInstance()->RemoveGestureMonitor(monitorId);
+    ASSERT_TRUE(ret == RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

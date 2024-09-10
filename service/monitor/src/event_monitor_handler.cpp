@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -89,8 +89,27 @@ void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> p
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+bool EventMonitorHandler::CheckHasInputHandler(HandleEventType eventType)
+{
+    return monitors_.CheckHasInputHandler(eventType);
+}
+
 int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
+{
+    CALL_INFO_TRACE;
+    CHKPR(callback, RET_ERR);
+    if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGE("Invalid event type");
+        return RET_ERR;
+    }
+    InitSessionLostCallback();
+    SessionHandler mon { handlerType, eventType, nullptr, callback };
+    return monitors_.AddMonitor(mon);
+}
+
+int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, SessionPtr session, TouchGestureType gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -99,16 +118,27 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler mon { handlerType, eventType, session };
+    SessionHandler mon { handlerType, eventType, session, gestureType, fingers };
     return monitors_.AddMonitor(mon);
 }
 
+void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback)
+{
+    CALL_INFO_TRACE;
+    CHKPV(callback);
+    if (handlerType == InputHandlerType::MONITOR) {
+        SessionHandler monitor {handlerType, eventType, nullptr, callback};
+        monitors_.RemoveMonitor(monitor);
+    }
+}
+
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    SessionPtr session)
+    SessionPtr session, TouchGestureType gestureType, int32_t fingers)
 {
     CALL_INFO_TRACE;
     if (handlerType == InputHandlerType::MONITOR) {
-        SessionHandler monitor { handlerType, eventType, session };
+        SessionHandler monitor { handlerType, eventType, session, gestureType, fingers };
         monitors_.RemoveMonitor(monitor);
     }
 }
@@ -155,7 +185,7 @@ bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEve
 
 void EventMonitorHandler::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         return;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -176,6 +206,7 @@ void EventMonitorHandler::OnSessionLost(SessionPtr session)
 void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const
 {
     CHKPV(keyEvent);
+    CHKPV(session_);
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -190,11 +221,14 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
+    if (((eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) &&
+        !GestureMonitorHandler::IsMatchGesture(pointerEvent->GetPointerAction(), pointerEvent->GetPointerCount())) {
+        return;
+    }
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
     }
 }
 
@@ -206,17 +240,24 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         return RET_ERR;
     }
     bool isFound = false;
+    SessionHandler handler = monitor;
     auto iter = monitors_.find(monitor);
     if (iter != monitors_.end()) {
-        if (iter->eventType_ == monitor.eventType_) {
+        if (iter->eventType_ == monitor.eventType_ &&
+            ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
             MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
             return RET_OK;
+        }
+        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+            auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
+            gestureHandler.AddGestureMonitor(monitor.gestureType_, monitor.fingers_);
+            handler(gestureHandler);
         }
         isFound = true;
         monitors_.erase(iter);
     }
 
-    auto [sIter, isOk] = monitors_.insert(monitor);
+    auto [sIter, isOk] = monitors_.insert(handler);
     if (!isOk) {
         if (isFound) {
             MMI_HILOGE("Internal error: monitor has been removed");
@@ -236,19 +277,38 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
 
 void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
+    SessionHandler handler = monitor;
     auto iter = monitors_.find(monitor);
     if (iter == monitors_.cend()) {
         MMI_HILOGE("Monitor does not exist");
         return;
     }
 
+    if ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) == HANDLE_EVENT_TYPE_TOUCH_GESTURE) {
+        auto gestureHandler = static_cast<GestureMonitorHandler>(*iter);
+        gestureHandler.RemoveGestureMonitor(monitor.gestureType_, monitor.fingers_);
+        handler(gestureHandler);
+    }
     monitors_.erase(iter);
+    if (monitor.session_) {
+        int32_t pid = monitor.session_->GetPid();
+        auto it = endScreenCaptureMonitors_.find(pid);
+        if (it != endScreenCaptureMonitors_.end()) {
+            auto setIter = endScreenCaptureMonitors_[pid].find(monitor);
+            if (setIter != endScreenCaptureMonitors_[pid].end()) {
+                endScreenCaptureMonitors_[pid].erase(setIter);
+            }
+            if (endScreenCaptureMonitors_[pid].empty()) {
+                endScreenCaptureMonitors_.erase(it);
+            }
+        }
+    }
     if (monitor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGD("Unregister monitor successfully");
         return;
     }
 
-    auto [sIter, isOk] = monitors_.insert(monitor);
+    auto [sIter, isOk] = monitors_.insert(handler);
     if (!isOk) {
         MMI_HILOGE("Internal error, monitor has been removed");
         return;
@@ -315,6 +375,9 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
         for (const auto &mon : monitors_) {
             OHOS::MMI::NapProcess::NapStatusData napData;
             auto sess = mon.session_;
+            if (!sess) {
+                continue;
+            }
             napData.pid = sess->GetPid();
             napData.uid = sess->GetUid();
             napData.bundleName = sess->GetProgramName();
@@ -351,6 +414,50 @@ bool EventMonitorHandler::MonitorCollection::HasMonitor(SessionPtr session)
 {
     SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
     return (monitors_.find(monitor) != monitors_.end());
+}
+
+bool EventMonitorHandler::MonitorCollection::HasScreenCaptureMonitor(SessionPtr session)
+{
+    int32_t pid = session->GetPid();
+    return (endScreenCaptureMonitors_.find(pid) != endScreenCaptureMonitors_.end());
+}
+
+void EventMonitorHandler::MonitorCollection::RemoveScreenCaptureMonitor(SessionPtr session)
+{
+    if (session->GetTokenType() != TokenType::TOKEN_HAP) {
+        return;
+    }
+    int32_t pid = session->GetPid();
+    std::set<SessionHandler> monitorSet;
+    for (const auto &monitor : monitors_) {
+        if (monitor.session_ == session) {
+            SessionHandler screenCaptureMointor(monitor);
+            monitorSet.insert(screenCaptureMointor);
+        }
+    }
+    for (const auto &monitor : monitorSet) {
+        auto it = monitors_.find(monitor);
+        if (it != monitors_.end()) {
+            monitors_.erase(it);
+        }
+    }
+    endScreenCaptureMonitors_.emplace(pid, monitorSet);
+}
+
+void EventMonitorHandler::MonitorCollection::RecoveryScreenCaptureMonitor(SessionPtr session)
+{
+    if (session->GetTokenType() != TokenType::TOKEN_HAP) {
+        return;
+    }
+    int32_t pid = session->GetPid();
+    auto it = endScreenCaptureMonitors_.find(pid);
+    if (it != endScreenCaptureMonitors_.end()) {
+        for (auto &monitor : endScreenCaptureMonitors_[pid]) {
+            SessionHandler screenCaptureMointor(monitor);
+            monitors_.insert(screenCaptureMointor);
+        }
+        endScreenCaptureMonitors_.erase(it);
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -422,7 +529,13 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     }
     for (const auto &monitor : monitors_) {
         if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
-            monitor.SendToClient(pointerEvent, pkt);
+            if (monitor.session_) {
+                monitor.SendToClient(pointerEvent, pkt);
+                continue;
+            }
+            if (monitor.callback_) {
+                monitor.callback_->OnInputEvent(monitor.handlerType_, pointerEvent);
+            }
         }
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
@@ -430,6 +543,9 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         for (const auto &mon : monitors_) {
             OHOS::MMI::NapProcess::NapStatusData napData;
             auto sess = mon.session_;
+            if (!sess) {
+                continue;
+            }
             napData.pid = sess->GetPid();
             napData.uid = sess->GetUid();
             napData.bundleName = sess->GetProgramName();
@@ -454,6 +570,22 @@ void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
             cItr = monitors_.erase(cItr);
         }
     }
+    CHKPV(session);
+    int32_t pid = session->GetPid();
+    auto it = endScreenCaptureMonitors_.find(pid);
+    if (it != endScreenCaptureMonitors_.end()) {
+        endScreenCaptureMonitors_.erase(it);
+    }
+}
+
+bool EventMonitorHandler::MonitorCollection::CheckHasInputHandler(HandleEventType eventType)
+{
+    for (const auto &item : monitors_) {
+        if ((item.eventType_ & eventType) == eventType) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void EventMonitorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -468,7 +600,9 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
     mprintf(fd, "monitors: count=%zu", monitors_.size());
     for (const auto &item : monitors_) {
         SessionPtr session = item.session_;
-        CHKPV(session);
+        if (!session) {
+            continue;
+        }
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s "
@@ -479,5 +613,28 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
                 item.eventType_, session->GetProgramName().c_str());
     }
 }
+
+#ifdef PLAYER_FRAMEWORK_EXISTS
+void EventMonitorHandler::ProcessScreenCapture(int32_t pid, bool isStart)
+{
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPV(udsServerPtr);
+    SessionPtr session = udsServerPtr->GetSessionByPid(pid);
+    CHKPV(session);
+    if (isStart) {
+        if (!monitors_.HasMonitor(session) && !monitors_.HasScreenCaptureMonitor(session)) {
+            MMI_HILOGI("This process has no screen capture monitor");
+            return;
+        }
+        monitors_.RecoveryScreenCaptureMonitor(session);
+    } else {
+        if (!monitors_.HasMonitor(session)) {
+            MMI_HILOGI("This process has no screen capture monitor");
+            return;
+        }
+        monitors_.RemoveScreenCaptureMonitor(session);
+    }
+}
+#endif
 } // namespace MMI
 } // namespace OHOS

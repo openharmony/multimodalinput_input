@@ -26,6 +26,9 @@ ohos_source_set("input-manager") {
   include_dirs = [
     "include",
     "${mmi_path}/util/common/include",
+    "${mmi_path}/frameworks/proxy/events/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
   ]
 
   deps = [
@@ -35,9 +38,11 @@ ohos_source_set("input-manager") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
+    "ipc:ipc_core",
   ]
   subsystem_name = "multimodalinput"
   part_name = "input"
@@ -46,7 +51,10 @@ ohos_source_set("input-manager") {
 ohos_executable("uinput") {
   sources = [ "src/main.cpp" ]
   configs = [ "${mmi_path}:coverage_flags" ]
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+  ]
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
@@ -78,8 +86,11 @@ ohos_unittest("InjectEventTest") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
+    "ipc:ipc_core",
   ]
 }
 

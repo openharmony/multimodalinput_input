@@ -35,7 +35,9 @@ public:
     void UpdateDisplayInfo(DisplayGroupInfo&) override {}
     void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo&, bool) override {}
     void UpdateWindowInfo(const WindowGroupInfo&) override {}
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     void SetWindowPointerStyle(WindowArea area, int32_t, int32_t) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(int32_t, ClearWindowPointerStyle, (int32_t, int32_t));
     void Dump(int32_t, const std::vector<std::string>&) override {}
     MOCK_METHOD(int32_t, GetWindowPid, (int32_t), (const));
@@ -48,6 +50,7 @@ public:
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
     MOCK_METHOD(const std::vector<WindowInfo>&, GetWindowGroupInfoByDisplayId, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
+    MOCK_METHOD((std::pair<double, double>), TransformDisplayXY, (const DisplayInfo&, double, double), (const));
     void ClearTargetWindowId(int32_t pointerId) override {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -56,18 +59,29 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     MOCK_METHOD(int32_t, CheckWindowIdPermissionByPid, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, GetCurrentUserId, ());
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(MouseLocation, GetMouseInfo, ());
     MOCK_METHOD(CursorPosition, GetCursorPos, ());
     MOCK_METHOD(CursorPosition, ResetCursorPos, ());
     void UpdateAndAdjustMouseLocation(int32_t&, double&, double&, bool) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
     MOCK_METHOD(int32_t, SetHoverScrollState, (bool));
     MOCK_METHOD(bool, GetHoverScrollState, (), (const));
+    MOCK_METHOD(bool, IsMouseSimulate, (), (const));
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     MOCK_METHOD(int32_t, SetPointerStyle, (int32_t, int32_t, PointerStyle, bool));
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(bool, IsNeedRefreshLayer, (int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -78,6 +92,7 @@ public:
     MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&), (const));
     MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
+    MOCK_METHOD(void, SendCancelEventWhenLock, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -86,11 +101,16 @@ public:
     MOCK_METHOD(const DisplayInfo*, GetPhysicalDisplay, (int32_t), (const));
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void UpdatePointerChangeAreas() override {}
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
     MOCK_METHOD(std::optional<WindowInfo>, GetWindowAndDisplayInfo, (int32_t, int32_t));
+    void SetWindowStateNotifyPid(int32_t pid) override {}
+    int32_t GetWindowStateNotifyPid() override { return 0; }
+    int32_t GetPidByWindowId(int32_t pid) override { return 0; }
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent) { return false; }
+    MOCK_METHOD(int32_t, SetPixelMapData, (int32_t infoId, void *pixelMap), (override));
 
     void GetTargetWindowIds(int32_t, int32_t, std::vector<int32_t>&) override {}
     MOCK_METHOD(int32_t, SetCurrentUser, (int32_t));
@@ -98,6 +118,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
+    MOCK_METHOD(void, CleanShellWindowIds, ());
+    MOCK_METHOD(bool, IsKnuckleOnAncoWindow, (std::shared_ptr<PointerEvent>));
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();

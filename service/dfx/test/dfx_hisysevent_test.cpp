@@ -248,6 +248,14 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfInvalidTimeTest_001, T
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime));
+
+    intervalTime = 1000001;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime));
+
+    item.SetPointerId(2);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfInvalidTime(pointerEvent, intervalTime));
 }
 
 /**
@@ -299,7 +307,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = -1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = -1;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -312,7 +321,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = 0;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = 0;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -325,7 +335,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = 10;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = 10;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -338,7 +349,8 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportSingleKnuckleDoubleClickEven
 {
     CALL_TEST_DEBUG;
     int32_t intervalTime = 10000;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime));
+    int32_t distanceInterval = 10000;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, distanceInterval));
 }
 
 /**
@@ -434,8 +446,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportTouchpadSettingState_006, Te
 HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFaildTimes_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t failedTimes = 1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFaildTimes(failedTimes));
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFaildTimes());
 }
 
 /**
@@ -447,8 +458,7 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFaildTimes_001
 HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleDrawSSuccessTimes_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t successTimes = 1;
-    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleDrawSSuccessTimes(successTimes));
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleDrawSSuccessTimes());
 }
 
 /**
@@ -475,6 +485,40 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFromSuccessToF
     CALL_TEST_DEBUG;
     int64_t intervalTime = 1;
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(intervalTime));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfKnockTooFast_001
+ * @tc.desc: ReportFailIfKnockTooFast
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfKnockTooFast_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfKnockTooFast());
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportFailIfOneSuccTwoFail_001
+ * @tc.desc: ReportFailIfOneSuccTwoFail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportFailIfOneSuccTwoFail_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDeviceId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfOneSuccTwoFail(pointerEvent));
+
+    item.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportFailIfOneSuccTwoFail(pointerEvent));
 }
 
 } // namespace MMI

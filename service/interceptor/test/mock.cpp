@@ -41,7 +41,16 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisib
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t deviceId, bool checked) const
 {
+    if (DfsMessageParcel::messageParcel == nullptr) {
+        return nullptr;
+    }
     return DfsMessageParcel::messageParcel->GetInputDevice(deviceId, checked);
 }
+
+void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType)
+{}
+
+void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn)
+{}
 } // namespace MMI
 } // namespace OHOS

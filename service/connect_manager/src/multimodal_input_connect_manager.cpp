@@ -374,6 +374,22 @@ int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handl
     return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
 }
 
+int32_t MultimodalInputConnectManager::AddGestureMonitor(InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddGestureMonitor(handlerType, eventType, gestureType, fingers);
+}
+
+int32_t MultimodalInputConnectManager::RemoveGestureMonitor(InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemoveGestureMonitor(handlerType, eventType, gestureType, fingers);
+}
+
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -459,7 +475,7 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
-bool MultimodalInputConnectManager::ConnectMultimodalInputService()
+bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -788,6 +804,13 @@ int32_t MultimodalInputConnectManager::GetTouchpadThreeFingersTapSwitch(bool &sw
     return multimodalInputConnectService_->GetTouchpadThreeFingersTapSwitch(switchFlag);
 }
 
+int32_t MultimodalInputConnectManager::SetMoveEventFilters(bool flag)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMoveEventFilters(flag);
+}
+
 int32_t MultimodalInputConnectManager::EnableHardwareCursorStats(bool enable)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
@@ -800,12 +823,14 @@ int32_t MultimodalInputConnectManager::GetHardwareCursorStats(uint32_t &frameCou
     return multimodalInputConnectService_->GetHardwareCursorStats(frameCount, vsyncCount);
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t MultimodalInputConnectManager::GetPointerSnapshot(void *pixelMapPtr)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetPointerSnapshot(pixelMapPtr);
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t MultimodalInputConnectManager::SetTouchpadScrollRows(int32_t rows)
 {
@@ -848,5 +873,33 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
     return multimodalInputConnectService_->AncoRemoveChannel(channel);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SkipPointerLayer(isSkip);
+}
+
+int32_t MultimodalInputConnectManager::SetClientInfo(int32_t pid, uint64_t readThreadId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetClientInfo(pid, readThreadId);
+}
+
+int32_t MultimodalInputConnectManager::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetIntervalSinceLastInput(timeInterval);
+}
+
+int32_t MultimodalInputConnectManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetAllSystemHotkeys(keyOptions);
+}
 } // namespace MMI
 } // namespace OHOS

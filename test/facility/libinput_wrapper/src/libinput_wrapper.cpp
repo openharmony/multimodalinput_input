@@ -55,7 +55,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         char realPath[PATH_MAX] = {};
         if (realpath(path, realPath) == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
-            MMI_HILOGWK("The error path is %{public}s", path);
+            MMI_HILOGWK("The error path is %{private}s", path);
             return RET_ERR;
         }
         int32_t fd;
@@ -67,7 +67,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
         }
         int32_t errNo = errno;
-        MMI_HILOGWK("Libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        MMI_HILOGWK("Libinput .open_restricted path:%{private}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)

@@ -39,6 +39,8 @@ struct DeviceConfig {
     int32_t keyboardType { 0 };
 };
 
+typedef void (*ScreenCaptureCallback)(int32_t pid, bool isStart);
+
 int64_t GetSysClockTime();
  
 int64_t GetMillisTime();

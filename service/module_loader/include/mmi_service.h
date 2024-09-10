@@ -21,32 +21,30 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "singleton.h"
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
+#include "delegate_interface.h"
 #include "delegate_tasks.h"
-#include "display_manager.h"
+#include "infrared_frequency_info.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
+#include "nap_process.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
-#include "nap_process.h"
-#include "infrared_frequency_info.h"
 
 namespace OHOS {
 namespace MMI {
-
+class TouchGestureAdapter;
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
-    DECLARE_DELAYED_SINGLETON(MMIService);
     DECLARE_SYSTEM_ABILITY(MMIService);
-    DISALLOW_COPY_AND_MOVE(MMIService);
 
 public:
     void OnStart() override;
     void OnStop() override;
+    static MMIService* GetInstance();
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd, int32_t &tokenType) override;
@@ -92,6 +90,10 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override;
+    int32_t AddGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
@@ -134,13 +136,15 @@ public:
     int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
+    int32_t SetMoveEventFilters(bool flag) override;
+#ifdef OHOS_RSS_CLIENT
+    void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
+#endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
-    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
-    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies);
-    int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
@@ -149,11 +153,16 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
+    int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override;
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
@@ -163,6 +172,13 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    static void ScreenCaptureCallback(int32_t pid, bool isStart);
+    void RegisterScreenCaptureCallback();
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
+
+    int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
 
 protected:
     void OnConnected(SessionPtr s) override;
@@ -210,14 +226,12 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
         int32_t pid, bool isNativeInject, bool isShell);
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
     bool InitDelegateTasks();
     int32_t Init();
+    void InitPreferences();
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
@@ -234,24 +248,43 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
-
+    void InitPrintClientInfo();
+private:
+    MMIService();
+    ~MMIService();
 private:
     int32_t CheckPidPermission(int32_t pid);
+    void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
+    void OnSessionDelete(SessionPtr session);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
-    bool isCesStart_ { false };
+    std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
-    sptr<Rosen::Display> displays_[2] = { nullptr, nullptr };
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t shellAssitentPid_ { -1 };
+#endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif // OHOS_RSS_CLIENT
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    std::shared_ptr<TouchGestureAdapter> touchGestureAdapter_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
     sptr<AppDebugListener> appDebugListener_;
-
     std::atomic_bool threadStatusFlag_ { false };
+    struct ClientInfo {
+        int32_t pid { -1 };
+        uint64_t readThreadId { -1 };
+    };
+    std::map<std::string, ClientInfo> clientInfos_;
+    std::mutex mutex_;
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    bool hasRegisterListener_ { false };
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 };
 } // namespace MMI
 } // namespace OHOS

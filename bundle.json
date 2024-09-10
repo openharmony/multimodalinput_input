@@ -35,7 +35,14 @@
       "input_feature_touchscreen",
       "input_feature_short_key",
       "input_feature_fingerprint",
-      "input_feature_crown"
+      "input_feature_crown",
+      "input_ext_feature_anco",
+      "input_ext_feature_fingersense",
+      "input_ext_feature_gesturesense",
+      "input_ext_feature_magiccursor",
+      "input_feature_infrared_emitter",
+      "input_feature_joystick",
+      "input_feature_coverage"
     ],
     "adapted_system_type": [
       "standard"
@@ -80,7 +87,16 @@
         "graphic_2d_ext",
         "hdf_core",
         "bounds_checking_function",
-        "call_manager"
+        "call_manager",
+        "libinput",
+        "libevdev",
+        "mtdev",
+        "screenlock_mgr",
+        "FreeBSD",
+        "googletest",
+        "skia",
+        "player_framework",
+        "cJSON"
       ],
       "third_party": [
         "cJSON",
@@ -88,7 +104,8 @@
         "libuv",
         "libevdev",
         "mtdev",
-        "libinput"
+        "libinput",
+        "rust"
       ]
     },
     "build": {
@@ -105,10 +122,9 @@
           "//foundation/multimodalinput/input:multimodalinput_mmi_service",
           "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
           "//foundation/multimodalinput/input:multimodalinput.rc",
-          "//foundation/multimodalinput/input/patch:patch_packages",
-          "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
-          "//foundation/multimodalinput/input:mmi_uinput.rc"
+          "//foundation/multimodalinput/input:mmi_uinput.rc",
+          "//foundation/multimodalinput/input:input-third-mmi"
         ]
       },
       "inner_kits": [
@@ -147,6 +163,9 @@
             "header_base": "//foundation/multimodalinput/input/util/napi/include"
           },
           "type": "so"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/libudev:mmi_libudev"
         }
       ],
       "test": [

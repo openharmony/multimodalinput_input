@@ -42,6 +42,7 @@ constexpr int32_t MT_TOOL_PALM { 2 };
 
 InputEventHandler::InputEventHandler()
 {
+    lastEventBeginTime_ = GetSysClockTime();
     udsServer_ = nullptr;
 }
 
@@ -72,6 +73,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     CHKPV(lpEvent);
     int32_t eventType = libinput_event_get_type(lpEvent);
     int64_t beginTime = GetSysClockTime();
+    lastEventBeginTime_ = beginTime;
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     if (IsTouchpadMistouch(lpEvent)) {
@@ -200,6 +202,13 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     return RET_OK;
 }
 
+int32_t InputEventHandler::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    int64_t currentSystemTime = GetSysClockTime();
+    timeInterval = currentSystemTime - lastEventBeginTime_;
+    return RET_OK;
+}
+
 UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
@@ -243,6 +252,18 @@ std::shared_ptr<EventFilterHandler> InputEventHandler::GetFilterHandler() const
 std::shared_ptr<EventDispatchHandler> InputEventHandler::GetEventDispatchHandler() const
 {
     return eventDispatchHandler_;
+}
+
+int32_t InputEventHandler::SetMoveEventFilters(bool flag)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    CHKPR(eventNormalizeHandler_, INVALID_HANDLER_ID);
+    return eventNormalizeHandler_->SetMoveEventFilters(flag);
+#else
+    MMI_HILOGW("Set move event filters does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 }
 } // namespace MMI
 } // namespace OHOS

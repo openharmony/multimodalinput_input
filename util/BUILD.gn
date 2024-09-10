@@ -102,7 +102,6 @@ ohos_unittest("ut-mmi-util-out") {
   configs = [ "${mmi_path}:coverage_flags" ]
   module_out_path = module_output_path
   include_dirs = [
-    "//third_party/googletest/googletest/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -121,9 +120,20 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "$root_out_dir/diff_libinput_mmi/export_include",
+
+    "${mmi_path}/util/napi",
+    "${mmi_path}/util/napi/include",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   sources = [
+    "napi/src/key_event_napi.cpp",
+    "napi/src/util_napi_value.cpp",
+    "network/test/circle_stream_buffer_test.cpp",
     "network/test/net_packet_test.cpp",
     "socket/test/stream_buffer_test.cpp",
     "socket/test/uds_client_test.cpp",
@@ -134,12 +144,70 @@ ohos_unittest("ut-mmi-util-out") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
+    "napi:ace_napi",
+  ]
+}
+
+ohos_unittest("UdsClientTest") {
+  configs = [ "${mmi_path}:coverage_flags" ]
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/util/common",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket",
+    "${mmi_path}/util/socket/include",
+    "${mmi_path}/frameworks/proxy/event_handle",
+    "${mmi_path}/frameworks/proxy/event_handle/include",
+    "${mmi_path}/frameworks/proxy/module_loader",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+
+    "${mmi_path}/util/napi",
+    "${mmi_path}/util/napi/include",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sources = [
+    "napi/src/key_event_napi.cpp",
+    "napi/src/util_napi_value.cpp",
+    "network/test/circle_stream_buffer_test.cpp",
+    "network/test/net_packet_test.cpp",
+    "socket/test/stream_buffer_test.cpp",
+    "socket/test/uds_client_test.cpp",
+    "socket/test/uds_session_test.cpp",
+    "socket/test/uds_socket_test.cpp",
+  ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+  ]
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "napi:ace_napi",
   ]
 }

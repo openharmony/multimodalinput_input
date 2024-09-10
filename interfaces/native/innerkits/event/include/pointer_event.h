@@ -182,6 +182,34 @@ public:
 
     static constexpr int32_t POINTER_ACTION_HOVER_CANCEL = 33;
 
+    static constexpr int32_t POINTER_ACTION_FINGERPRINT_CANCEL = 34;
+
+    /**
+     * Indicates that the pen proximity action.
+     *
+     * @since 12
+     */
+    static constexpr int32_t POINTER_ACTION_PROXIMITY_IN = 35;
+
+    static constexpr int32_t POINTER_ACTION_PROXIMITY_OUT = 36;
+
+    /**
+     * 表示触屏手势动作
+     *
+     * @since 12
+     */
+    static constexpr int32_t TOUCH_ACTION_SWIPE_DOWN = 100;
+
+    static constexpr int32_t TOUCH_ACTION_SWIPE_UP = 101;
+
+    static constexpr int32_t TOUCH_ACTION_SWIPE_RIGHT = 102;
+
+    static constexpr int32_t TOUCH_ACTION_SWIPE_LEFT = 103;
+
+    static constexpr int32_t TOUCH_ACTION_PINCH_OPENED = 104;
+
+    static constexpr int32_t TOUCH_ACTION_PINCH_CLOSEED = 105;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -686,6 +714,27 @@ public:
      */
     static constexpr int32_t JOYSTICK_BUTTON_MODE = 28;
 
+    enum AxisEventType {
+        /**
+         * Indicates an unknown axis events.
+         *
+         * @since 12
+         */
+        AXIS_EVENT_TYPE_UNKNOWN = -1,
+        /**
+         * Indicates two-finger pinch events. The axis value can be AXIS_TYPE_PINCH or AXIS_TYPE_ROTATE.
+         *
+         * @since 12
+         */
+        AXIS_EVENT_TYPE_PINCH = 1,
+        /**
+         * Indicates scroll axis events. The axis value can be AXIS_TYPE_SCROLL_VERTICAL or AXIS_TYPE_SCROLL_HORIZONTAL.
+         * Wherein, the value of AXIS_TYPE_SCROLL_HORIZONTAL is 0 for a mouse wheel event.
+         *
+         * @since 12
+         */
+        AXIS_EVENT_TYPE_SCROLL = 2,
+    };
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
@@ -1004,6 +1053,21 @@ public:
         void SetPressure(double pressure);
 
         /**
+         * @brief Obtains the moveflag in this event.
+         * @return Returns the moveflag.
+         * @since 12
+         */
+        int32_t GetMoveFlag() const;
+
+        /**
+         * @brief Sets the moveflag for this event.
+         * @param moveflag Indicates the moveflag to set.
+         * @return void
+         * @since 12
+         */
+        void SetMoveFlag(int32_t moveFlag);
+
+        /**
          * @brief Obtains the long axis of the touch point area.
          * @return Returns the long axis of the touch point area.
          * @since 9
@@ -1123,6 +1187,38 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
+
+         /**
+         * @brief Sets the raw X coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param rawDisplayX Indicates the raw X coordinate to set.
+         * @return void
+         * @since 12
+         */
+        void SetRawDisplayX(int32_t rawDisplayX);
+ 
+        /**
+         * @brief Obtains the raw X coordinate relative to the upper left corner of the screen.
+         * @return Returns the raw X coordinate.
+         * @since 12
+         */
+        int32_t GetRawDisplayX() const;
+ 
+        /**
+         * @brief Sets the raw Y coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param rawDisplayY Indicates the raw Y coordinate to set.
+         * @return void
+         * @since 12
+         */
+ 
+        void SetRawDisplayY(int32_t rawDisplayY);
+        /**
+         * @brief Obtains the raw Y coordinate relative to the upper left corner of the screen..
+         * @return Returns the raw Y coordinate.
+         * @since 12
+         */
+        int32_t GetRawDisplayY() const;
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1145,6 +1241,7 @@ public:
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double pressure_ {};
+        int32_t moveFlag_ { -1 };
         int32_t longAxis_ {};
         int32_t shortAxis_ {};
         int32_t deviceId_ {};
@@ -1154,6 +1251,8 @@ public:
         int32_t originPointerId_ { 0 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
+        int32_t rawDisplayX_ {};
+        int32_t rawDisplayY_ {};
     };
 
 public:
@@ -1486,7 +1585,7 @@ public:
      * @return void.
      * @since 10
      */
-    void SetEnhanceData(std::vector<uint8_t> enhanceData);
+    void SetEnhanceData(const std::vector<uint8_t>& enhanceData);
     /**
      * @brief Obtains the enhance data.
      * @return Returns the enhance data.
@@ -1570,6 +1669,21 @@ public:
      */
     void SetOriginPointerAction(int32_t pointerAction);
 
+    /**
+     * @brief Obtains the axis event type.
+     * @return Returns the axis event type.
+     * @since 12
+     */
+    int32_t GetAxisEventType() const;
+
+    /**
+     * @brief Sets axis event type.
+     * @param axisEventType Indicates the axis event type to set.
+     * @return void
+     * @since 12
+     */
+    void SetAxisEventType(int32_t axisEventType);
+
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     /**
      * @brief Set the fingerprint distance X.
@@ -1636,6 +1750,7 @@ private:
     double velocity_ { 0.0 };
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+    int32_t axisEventType_ { AXIS_EVENT_TYPE_UNKNOWN };
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     double fingerprintDistanceX_ { 0.0 };
     double fingerprintDistanceY_ { 0.0 };

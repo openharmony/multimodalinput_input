@@ -25,6 +25,7 @@ inline constexpr std::string_view CALL_FUNCTION = "napi_call_function";
 inline constexpr std::string_view CREATE_OBJECT = "napi_create_object";
 inline constexpr std::string_view CREATE_INT32 = "napi_create_int32";
 inline constexpr std::string_view CREATE_UINT32 = "napi_create_uint32";
+inline constexpr std::string_view CREATE_INT64 = "napi_create_int64";
 inline constexpr std::string_view CREATE_PROMISE = "napi_create_promise";
 inline constexpr std::string_view CREATE_REFERENCE = "napi_create_reference";
 inline constexpr std::string_view CREATE_ASYNC_WORK = "napi_create_async_work";
@@ -60,9 +61,13 @@ inline constexpr std::string_view SET_ELEMENT = "napi_set_element";
 inline constexpr std::string_view CREATE_STRING_UTF8 = "napi_create_string_utf8";
 inline const std::string CHANGED_TYPE = "change";
 inline const std::string SUBSCRIBE_TYPE = "key";
+inline const std::string HOTKEY_SUBSCRIBE_TYPE = "hotkeyChange";
 inline constexpr std::string_view DELETE_ASYNC_WORK = "napi_delete_async_work";
 inline constexpr std::string_view COERCE_TO_BOOL = "napi_coerce_to_bool";
 inline constexpr std::string_view CREATE_ERROR = "napi_create_error";
+inline const std::string TOUCH_SWIPE_GESTURE = "touchSwipeGesture";
+inline const std::string TOUCH_PINCH_GESTURE = "touchPinchGesture";
+inline const std::string TOUCH_ALL_GESTURE = "touchAllGesture";
 
 inline constexpr size_t MAX_STRING_LEN { 1024 };
 

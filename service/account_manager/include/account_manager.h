@@ -82,6 +82,9 @@ public:
     AccountSetting GetCurrentAccountSetting();
 
 private:
+#ifdef SCREENLOCK_MANAGER_ENABLED
+    void InitializeScreenLockStatus();
+#endif // SCREENLOCK_MANAGER_ENABLED
     void SubscribeCommonEvent();
     void UnsubscribeCommonEvent();
     void SetupMainAccount();

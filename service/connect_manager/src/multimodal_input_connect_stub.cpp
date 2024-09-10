@@ -29,6 +29,9 @@
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "input_screen_capture_agent.h"
+#endif // PLAYER_FRAMEWORK_EXISTS
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -42,6 +45,7 @@ constexpr int32_t MAX_AXIS_INFO { 64 };
 constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
+constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -113,11 +117,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    ResetLogTrace();
     BytraceAdapter::StartIpcServer(code);
     int32_t ret = RET_ERR;
     switch (code) {
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD):
-            ret =  StubHandleAllocSocketFd(data, reply);
+            ret = StubHandleAllocSocketFd(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_EVENT_FILTER):
             ret = StubAddInputEventFilter(data, reply);
@@ -228,6 +233,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubAddInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER):
+            ret = StubRemoveInputHandler(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR):
+            ret = StubAddGestureMonitor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_GESTURE_MONITOR):
             ret = StubRemoveInputHandler(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
@@ -371,6 +382,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS):
+            ret = StubSetMoveEventFilters(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             ret = StubSetCurrentUser(data, reply);
             break;
@@ -386,9 +400,11 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TOUCHPAD_SCROLL_ROWS):
             ret = StubGetTouchpadScrollRows(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT):
             ret = StubGetPointerSnapshot(data, reply);
             break;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE):
             ret = StubAddVirtualInputDevice(data, reply);
             break;
@@ -411,6 +427,15 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
 #endif // OHOS_BUILD_ENABLE_ANCO
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CLIENT_INFO):
+            ret = StubSetClientInfo(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL):
+            ret = StubGetIntervalSinceLastInput(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_SYSTEM_HOT_KEY):
+            ret = StubGetAllSystemHotkeys(data, reply);
             break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
@@ -950,12 +975,22 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId = 0;
     READINT32(data, windowId, RET_ERR);
+    if (!PER_HELPER->VerifySystemApp()) {
+        if (windowId < 0) {
+            MMI_HILOGE("windowId is negative number and not system hap, set pointerStyle failed");
+            return ERROR_NOT_SYSAPI;
+        }
+    }
     PointerStyle pointerStyle;
     READINT32(data, pointerStyle.size, RET_ERR);
     READINT32(data, pointerStyle.color, RET_ERR);
     READINT32(data, pointerStyle.id, RET_ERR);
     bool isUiExtension;
     READBOOL(data, isUiExtension, RET_ERR);
+    if (windowId == -1 && !PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("can not set global winid, because this is not sys app");
+        return ERROR_NOT_SYSAPI;
+    }
     int32_t ret = SetPointerStyle(windowId, pointerStyle, isUiExtension);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
@@ -1123,17 +1158,30 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        if (handlerType == InputHandlerType::MONITOR) {
+#ifdef PLAYER_FRAMEWORK_EXISTS
+            int32_t pid = GetCallingPid();
+            int32_t capturePid = InputScreenCaptureAgent::GetInstance().IsScreenCaptureWorking();
+            if (capturePid != pid) {
+                MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+                return ERROR_NO_PERMISSION;
+            }
+#else
+            return ERROR_NOT_SYSAPI;
+#endif
+        } else if (handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
     }
 
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType = 0;
-    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;
@@ -1160,17 +1208,19 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        if (handlerType != InputHandlerType::MONITOR && handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
     }
 
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType = 0;
-    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;
@@ -1192,6 +1242,57 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveGestureMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    return HandleGestureMonitor(MultimodalinputConnectInterfaceCode::REMOVE_GESTURE_MONITOR, data, reply);
+}
+
+int32_t MultimodalInputConnectStub::StubAddGestureMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    return HandleGestureMonitor(MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR, data, reply);
+}
+
+int32_t MultimodalInputConnectStub::HandleGestureMonitor(
+    MultimodalinputConnectInterfaceCode code, MessageParcel& data, MessageParcel& reply)
+{
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->CheckMonitor()) {
+        MMI_HILOGE("Monitor permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (handlerType != InputHandlerType::MONITOR) {
+        MMI_HILOGE("Illegal type:%{public}d", handlerType);
+        return RET_ERR;
+    }
+    uint32_t eventType = 0;
+    READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+    uint32_t gestureType = 0u;
+    READUINT32(data, gestureType, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t fingers = 0;
+    READINT32(data, fingers, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RET_OK;
+    if (MultimodalinputConnectInterfaceCode::ADD_GESTURE_MONITOR == code) {
+        ret = AddGestureMonitor(static_cast<InputHandlerType>(handlerType),
+            eventType, static_cast<TouchGestureType>(gestureType), fingers);
+    } else {
+        ret = RemoveGestureMonitor(static_cast<InputHandlerType>(handlerType),
+            eventType, static_cast<TouchGestureType>(gestureType), fingers);
+    }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call AddGestureMonitor/RemoveGestureMonitor failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
@@ -1219,11 +1320,6 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1248,11 +1344,6 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -1670,17 +1761,8 @@ int32_t MultimodalInputConnectStub::StubEnableCombineKey(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    bool enable;
-    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = EnableInputDevice(enable);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call EnableInputDevice failed, ret:%{public}d", ret);
-    }
-    return ret;
+    MMI_HILOGW("EnableInputDevice is not supported yet");
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
@@ -2206,6 +2288,10 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     bool isAuthorize { false };
     READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = Authorize(isAuthorize);
@@ -2329,6 +2415,26 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetMoveEventFilters Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool flag = false;
+    READBOOL(data, flag, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMoveEventFilters failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2338,6 +2444,15 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t callingUid = GetCallingUid();
+    if (callingUid < UID_TRANSFORM_DIVISOR) {
+        MMI_HILOGE("CallingUid is not within the range:%{public}d", callingUid);
+        return RET_ERR;
+    }
+    if (callingUid / UID_TRANSFORM_DIVISOR != userId) {
+        MMI_HILOGE("Invalid CallingUid:%{public}d", callingUid);
+        return RET_ERR;
+    }
     int32_t ret = SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);
@@ -2391,7 +2506,6 @@ int32_t MultimodalInputConnectStub::StubEnableHardwareCursorStats(MessageParcel&
         MMI_HILOGE("Call EnableHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success enable:%{public}d, pid:%{public}d", enable, GetCallingPid());
     return RET_OK;
 }
 
@@ -2405,8 +2519,6 @@ int32_t MultimodalInputConnectStub::StubGetHardwareCursorStats(MessageParcel& da
         MMI_HILOGE("Call GetHardwareCursorStats failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success frameCount:%{public}d, vsyncCount:%{public}d, pid:%{public}d", frameCount,
-        vsyncCount, GetCallingPid());
     WRITEUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     WRITEUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
@@ -2460,12 +2572,17 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadScrollRows(MessageParcel& dat
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
     }
     std::shared_ptr<Media::PixelMap> pixelMap;
     int32_t ret = GetPointerSnapshot(&pixelMap);
@@ -2481,6 +2598,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSnapshot(MessageParcel &data, 
     pixelMap->Marshalling(reply);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& data, MessageParcel& reply)
 {
@@ -2574,6 +2692,72 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
     }
     WRITEINT32(reply, ret);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool isSkip = true;
+    READBOOL(data, isSkip, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SkipPointerLayer(isSkip);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetClientInfo(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t pid = 0;
+    uint64_t readThreadId = 0;
+    READINT32(data, pid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT64(data, readThreadId, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetClientInfo(pid, readThreadId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call SetClientInfo, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubGetIntervalSinceLastInput(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int64_t timeInterval = 0;
+    int32_t ret = GetIntervalSinceLastInput(timeInterval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to call StubGetIntervalSinceLastInput ret:%{public}d", ret);
+    } else {
+        WRITEINT64(reply, timeInterval);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubGetAllSystemHotkeys(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = GetAllSystemHotkeys(keyOptions);
+    if (ret != RET_OK) {
+        MMI_HILOGD("Call GetAllSystemHotkeys failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, static_cast<int32_t>(keyOptions.size()), IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("keyOptionsCount size:%{public}d", static_cast<int32_t>(keyOptions.size()));
+    for (const auto &item : keyOptions) {
+        if (!item->WriteToParcel(reply)) {
+            MMI_HILOGE("Write keyOption failed");
+            return IPC_STUB_WRITE_PARCEL_ERR;
+        }
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

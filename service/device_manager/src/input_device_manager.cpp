@@ -51,7 +51,7 @@ constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
-    { ABS_MT_POSITION_X, "POSITION_X" },   { ABS_MT_POSITION_Y, "POSITION_Y" },   { ABS_MT_PRESSURE, "PRESSURE" },
+    { ABS_MT_POSITION_X, "POSITION_X" }, { ABS_MT_POSITION_Y, "POSITION_Y" }, { ABS_MT_PRESSURE, "PRESSURE" },
     { ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR" }, { ABS_MT_WIDTH_MINOR, "WIDTH_MINOR" }
 };
 
@@ -288,7 +288,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        MMI_HILOGE("Failed to search for the deviceID");
+        MMI_HILOGD("Failed to search for the deviceID");
         return COMMON_PARAMETER_ERROR;
     }
     if (!iter->second.enable) {
@@ -377,7 +377,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     }
     if (!inDevice.sysUid.empty()) {
         devCallbacks_(deviceId, inDevice.sysUid, "add");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:add",
             deviceId, inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
@@ -432,24 +432,24 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     NotifyDevCallback(deviceId, info);
     if (!hasPointer && info.isPointerDevice) {
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         if (HasTouchDevice()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         NotifyPointerDevice(true, true, true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
         MMI_HILOGI("Set para input.pointer.device true");
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (IsPointerDevice(inputDevice)) {
+        WIN_MGR->UpdatePointerChangeAreas();
+    }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-        WIN_MGR->UpdatePointerChangeAreas();
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
@@ -483,18 +483,16 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     if (!sysUid.empty()) {
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:remove",
             deviceId, sysUid.c_str());
     }
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
         WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (enable) {
         for (const auto& item : devListeners_) {
             CHKPV(item);
@@ -531,6 +529,10 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
     std::string name = libinput_device_get_name(device);
     if (name == "hw_fingerprint_mouse") {
         return false;
+    }
+    if (name.find("TouchPad") == std::string::npos) {
+        return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
+            EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
     }
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
         EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
@@ -830,7 +832,7 @@ int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std
 
 void InputDeviceManager::InitSessionLostCallback()
 {
-    if (sessionLostCallbackInitialized_)  {
+    if (sessionLostCallbackInitialized_) {
         MMI_HILOGE("Init session is failed");
         return;
     }

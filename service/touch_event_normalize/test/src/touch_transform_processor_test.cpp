@@ -16,10 +16,9 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "display_manager.h"
-
 #include "define_multimodal.h"
 #include "general_touchscreen.h"
+#include "general_uwb_remote_control.h"
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "libinput-private.h"
@@ -30,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t MAX_MOVE_FLAG = 6;
 } // namespace
 
 class TouchTransformProcessorTest : public testing::Test {
@@ -38,15 +38,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void UpdateDisplayInfo();
     
 private:
     static void SetupTouchscreen();
+    static void SetupUwbRemoteControl();
     static void CloseTouchscreen();
+    static void CloseUwbRemoteControl();
+    static GeneralUwbRemoteControl vUwbRemoteControl_;
     static GeneralTouchscreen vTouchscreen_;
     static LibinputWrapper libinput_;
 };
 
+GeneralUwbRemoteControl TouchTransformProcessorTest::vUwbRemoteControl_;
 GeneralTouchscreen TouchTransformProcessorTest::vTouchscreen_;
 LibinputWrapper TouchTransformProcessorTest::libinput_;
 
@@ -54,12 +57,13 @@ void TouchTransformProcessorTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupTouchscreen();
-    UpdateDisplayInfo();
+    SetupUwbRemoteControl();
 }
 
 void TouchTransformProcessorTest::TearDownTestCase(void)
 {
     CloseTouchscreen();
+    CloseUwbRemoteControl();
 }
 
 void TouchTransformProcessorTest::SetupTouchscreen()
@@ -74,27 +78,28 @@ void TouchTransformProcessorTest::SetupTouchscreen()
     ASSERT_TRUE(device != nullptr);
 }
 
+void TouchTransformProcessorTest::SetupUwbRemoteControl()
+{
+    ASSERT_TRUE(vUwbRemoteControl_.SetUp());
+    std::cout << "device node name: " << vUwbRemoteControl_.GetDevPath() << std::endl;
+    ASSERT_TRUE(libinput_.AddPath(vUwbRemoteControl_.GetDevPath()));
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
+    struct libinput_device *device = libinput_event_get_device(event);
+    ASSERT_TRUE(device != nullptr);
+}
+
 void TouchTransformProcessorTest::CloseTouchscreen()
 {
     libinput_.RemovePath(vTouchscreen_.GetDevPath());
     vTouchscreen_.Close();
 }
 
-void TouchTransformProcessorTest::UpdateDisplayInfo()
+void TouchTransformProcessorTest::CloseUwbRemoteControl()
 {
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    ASSERT_TRUE(display != nullptr);
-    DisplayGroupInfo displays {
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-        .focusWindowId = -1,
-    };
-    displays.displaysInfo.push_back(DisplayInfo {
-        .name = "default display",
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-    });
-    WIN_MGR->UpdateDisplayInfo(displays);
+    libinput_.RemovePath(vUwbRemoteControl_.GetDevPath());
+    vUwbRemoteControl_.Close();
 }
 
 void TouchTransformProcessorTest::SetUp()
@@ -143,6 +148,8 @@ HWTEST_F(TouchTransformProcessorTest, UpdatePointerItemProperties_001, TestSize.
     ASSERT_EQ(item.GetDisplayY(), touchInfo.point.y);
     ASSERT_EQ(item.GetDisplayXPos(), touchInfo.point.x);
     ASSERT_EQ(item.GetDisplayYPos(), touchInfo.point.y);
+    ASSERT_EQ(item.GetRawDisplayX(), touchInfo.point.x);
+    ASSERT_EQ(item.GetRawDisplayY(), touchInfo.point.y);
     ASSERT_EQ(item.GetToolDisplayX(), touchInfo.toolRect.point.x);
     ASSERT_EQ(item.GetToolDisplayY(), touchInfo.toolRect.point.y);
     ASSERT_EQ(item.GetToolWidth(), touchInfo.toolRect.width);
@@ -258,7 +265,7 @@ HWTEST_F(TouchTransformProcessorTest, OnEventTouchDown_002, TestSize.Level1)
     auto device = libinput_event_get_device(event);
     ASSERT_TRUE(device != nullptr);
     ret = processor.OnEventTouchDown(event);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 /**
@@ -440,6 +447,95 @@ HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_OnEvent_003, T
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
     EXPECT_NO_FATAL_FAILURE(processor.OnEvent(event));
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_TouchTransformProcessorTest_MoveFlag_001
+ * @tc.desc: Test the field MoveFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_MoveFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_.DrainEvents();
+    int32_t varMoveFlag = 0;
+    for (varMoveFlag = 1; varMoveFlag <= MAX_MOVE_FLAG; varMoveFlag++) {
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + varMoveFlag*30);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_PRESSURE, 321);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TOUCH_MAJOR, 198);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TOUCH_MINOR, 180);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_ORIENTATION, -64);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_BLOB_ID, 2);
+        vUwbRemoteControl_.SendEvent(EV_SYN, SYN_MT_REPORT, 0);
+        if (varMoveFlag != MAX_MOVE_FLAG) {
+            vUwbRemoteControl_.SendEvent(EV_KEY, BTN_TOUCH, 1);
+        } else {
+            vUwbRemoteControl_.SendEvent(EV_KEY, BTN_TOUCH, 0);
+        }
+        vUwbRemoteControl_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    }
+    libinput_event *event = libinput_.Dispatch();
+    while (event != nullptr) {
+        auto type = libinput_event_get_type(event);
+        if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+            event = libinput_.Dispatch();
+            continue;
+        }
+        auto touch = libinput_event_get_touch_event(event);
+        ASSERT_TRUE(touch != nullptr);
+        int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
+        ASSERT_EQ(moveFlag, -1);
+        event = libinput_.Dispatch();
+    }
+}
+
+/**
+ * @tc.name: TouchTransformProcessorTest_TouchTransformProcessorTest_MoveFlag_002
+ * @tc.desc: Test the field MoveFlag
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchTransformProcessorTest, TouchTransformProcessorTest_MoveFlag_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    libinput_.DrainEvents();
+    int32_t varMoveFlag = 0;
+    for (varMoveFlag = 1; varMoveFlag <= MAX_MOVE_FLAG; varMoveFlag++) {
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TRACKING_ID, 0);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_X, 5190 + varMoveFlag*30);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_POSITION_Y, 8306);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_PRESSURE, 321);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_MOVEFLAG, varMoveFlag);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TOUCH_MAJOR, 198);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_TOUCH_MINOR, 180);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_ORIENTATION, -64);
+        vUwbRemoteControl_.SendEvent(EV_ABS, ABS_MT_BLOB_ID, 2);
+        vUwbRemoteControl_.SendEvent(EV_SYN, SYN_MT_REPORT, 0);
+        if (varMoveFlag != MAX_MOVE_FLAG) {
+            vUwbRemoteControl_.SendEvent(EV_KEY, BTN_TOUCH, 1);
+        } else {
+            vUwbRemoteControl_.SendEvent(EV_KEY, BTN_TOUCH, 0);
+        }
+        vUwbRemoteControl_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    }
+    libinput_event *event = libinput_.Dispatch();
+    varMoveFlag = 1;
+    while (event != nullptr) {
+        auto type = libinput_event_get_type(event);
+        if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
+            event = libinput_.Dispatch();
+            continue;
+        }
+        auto touch = libinput_event_get_touch_event(event);
+        ASSERT_TRUE(touch != nullptr);
+        int32_t moveFlag = libinput_event_touch_get_move_flag(touch);
+        ASSERT_EQ(moveFlag, varMoveFlag);
+        varMoveFlag++;
+        event = libinput_.Dispatch();
+    }
 }
 } // namespace MMI
 } // namespace OHOS

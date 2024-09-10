@@ -22,9 +22,11 @@
 #include "pixel_map.h"
 #include "sec_comp_enhance_kit.h"
 
+#include "authorize_helper.h"
 #include "define_multimodal.h"
 #include "image_source.h"
 #include "inject_notice_manager.h"
+#include "input_device_manager.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "server_msg_handler.h"
@@ -48,6 +50,18 @@ constexpr int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
+
+class RemoteObjectTest : public IRemoteObject {
+public:
+    explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
+    ~RemoteObjectTest() {}
+
+    int32_t GetObjectRefCount() { return 0; }
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { return 0; }
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient) { return true; }
+    int Dump(int fd, const std::vector<std::u16string> &args) { return 0; }
+};
 } // namespace
 
 class ServerMsgHandlerTest : public testing::Test {
@@ -123,7 +137,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_03, TestSize
     ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = ServerMsgHandlerTest::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t result = servermsghandler.SetPixelMapData(infoId, (void *)pixelMap.get());
@@ -834,7 +847,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, Test
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -859,7 +872,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_002, Test
     pointerEvent->SetPointerId(0);
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -884,7 +897,23 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_003, Test
     pointerEvent->SetPointerId(0);
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_004
+ * @tc.desc: Test the function SaveTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -1443,21 +1472,21 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, 
     InjectNoticeManager manager;
     handler.injectNotice_ =nullptr;
     bool ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     handler.injectNotice_ = std::make_shared<InjectNoticeManager>();
     manager.isStartSrv_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.isStartSrv_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     manager.connectionCallback_->isConnected_ = false;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     manager.connectionCallback_->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -1574,6 +1603,265 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnDisplayInfo, TestSize.Leve
         << displayGroupInfo.focusWindowId << displayGroupInfo.currentUserId << num;
     pkt.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_WRITE;
     EXPECT_EQ(handler.OnDisplayInfo(sess, pkt), RET_ERR);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnTransferBinderClientSrv_001
+ * @tc.desc: Test OnTransferBinderClientSrv
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    sptr<RemoteObjectTest> binderClientObject = new RemoteObjectTest(u"test");
+    int32_t pid = 12345;
+    EXPECT_EQ(RET_OK, handler.OnTransferBinderClientSrv(binderClientObject, pid));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnTransferBinderClientSrv_002
+ * @tc.desc: Test OnTransferBinderClientSrv
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnTransferBinderClientSrv_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    sptr<IRemoteObject> binderClientObject = nullptr;
+    int32_t pid = 12345;
+    EXPECT_EQ(RET_ERR, handler.OnTransferBinderClientSrv(binderClientObject, pid));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_001
+ * @tc.desc: Test CloseInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.InitInjectNoticeSource();
+    int32_t pid = 12345;
+    bool result = handler.CloseInjectNotice(pid);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_002
+ * @tc.desc: Test the function InitInjectNoticeSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = false;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_InitInjectNoticeSource_003
+ * @tc.desc: Test the function InitInjectNoticeSource
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = true;
+    ret = handler.InitInjectNoticeSource();
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_AddInjectNotice_001
+ * @tc.desc: Test the function AddInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    InjectNoticeInfo noticeInfo;
+    handler.injectNotice_ =nullptr;
+    bool ret = handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = false;
+    ret = handler.AddInjectNotice(noticeInfo);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_002
+ * @tc.desc: Test CloseInjectNotice
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    InjectNoticeManager manager;
+    int32_t pid = 12345;
+    handler.injectNotice_ =nullptr;
+    handler.InitInjectNoticeSource();
+    handler.injectNotice_->isStartSrv_ = true;
+    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
+    EXPECT_NE(nullptr, manager.connectionCallback_);
+    auto connection = handler.injectNotice_->GetConnection();
+    connection->isConnected_ = true;
+    auto pConnect = handler.injectNotice_->GetConnection();
+    pConnect->isConnected_ = true;
+    bool result = handler.CloseInjectNotice(pid);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnCancelInjection_002
+ * @tc.desc: Test the function OnCancelInjection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnCancelInjection_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.authorizationCollection_.insert(std::make_pair(12, AuthorizationStatus::AUTHORIZED));
+    int32_t CurrentPID_ = 12;
+    AUTHORIZE_HELPER->state_ = AuthorizeState::STATE_AUTHORIZE;
+    int32_t ret = handler.OnCancelInjection();
+    EXPECT_EQ(ret, ERR_OK);
+    CurrentPID_ = 1;
+    ret = handler.OnCancelInjection();
+    EXPECT_EQ(ret, ERR_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_002
+ * @tc.desc: Test the function OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.CurrentPID_ = 12345;
+    handler.authorizationCollection_.clear();
+    int32_t result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::UNAUTHORIZED);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnAuthorize_004
+ * @tc.desc: Test the function OnAuthorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnAuthorize_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    handler.CurrentPID_ = 12345;
+    handler.authorizationCollection_[12345] = AuthorizationStatus::UNAUTHORIZED;
+    int32_t result = handler.OnAuthorize(false);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_EQ(handler.authorizationCollection_[12345], AuthorizationStatus::UNAUTHORIZED);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMoveMouse_002
+ * @tc.desc: Test the function OnMoveMouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMoveMouse_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    std::shared_ptr<PointerEvent> pointerEvent_ = PointerEvent::Create();
+    ASSERT_NE(pointerEvent_, nullptr);
+    int32_t ret = handler.OnMoveMouse(offsetX, offsetY);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnMsgHandler_001
+ * @tc.desc: Test if (callback == nullptr) branch success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnMsgHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler msgHandler;
+    MsgHandler<int, int> handler;
+    handler.callbacks_[0] = 1;
+    SessionPtr sess = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
+    MmiMessageId idMsg = MmiMessageId::INVALID;
+    NetPacket pkt(idMsg);
+    EXPECT_NO_FATAL_FAILURE(msgHandler.OnMsgHandler(sess, pkt));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSetFunctionKeyState_001
+ * @tc.desc: Test the function OnSetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t funcKey = 1;
+    bool enable = true;
+    EXPECT_EQ(handler.OnSetFunctionKeyState(funcKey, enable), ERROR_NULL_POINTER);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_OnSetFunctionKeyState_002
+ * @tc.desc: Test the function OnSetFunctionKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_OnSetFunctionKeyState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    int32_t funcKey = 1;
+    bool enable = true;
+    INPUT_DEV_MGR->IsKeyboardDevice(nullptr);
+    EXPECT_EQ(handler.OnSetFunctionKeyState(funcKey, enable), ERROR_NULL_POINTER);
 }
 } // namespace MMI
 } // namespace OHOS
