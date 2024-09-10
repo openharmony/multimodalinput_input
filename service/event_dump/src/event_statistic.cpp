@@ -33,8 +33,8 @@ const int32_t FUNC_EXE_OK = 0;
 const int32_t STRING_WIDTH = 3;
 }
 
-std::queue<std::shared_ptr<InputEvent>> EventStatistic::eventQueue_;
-std::list<std::shared_ptr<InputEvent>> EventStatistic::dumperEventList_;
+std::queue<std::string> EventStatistic::eventQueue_;
+std::list<std::string> EventStatistic::dumperEventList_;
 std::mutex EventStatistic::queueMutex_;
 std::condition_variable EventStatistic::queueCondition_;
 bool EventStatistic::writeFileEnabled_ = false;
@@ -81,31 +81,32 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 void EventStatistic::PushEvent(std::shared_ptr<InputEvent> eventPtr)
 {
     std::lock_guard<std::mutex> lock(queueMutex_);
-    dumperEventList_.push_back(eventPtr);
+    std::string eventStr = ConvertEventToStr(eventPtr);
+    dumperEventList_.push_back(eventStr);
     if (dumperEventList_.size() > EVENT_OUT_SIZE) {
         dumperEventList_.pop_front();
     }
     if (writeFileEnabled_) {
-        eventQueue_.push(eventPtr);
+        eventQueue_.push(eventStr);
         queueCondition_.notify_all();
     }
 }
 
-std::shared_ptr<InputEvent> EventStatistic::PopEvent()
+std::string EventStatistic::PopEvent()
 {
     std::unique_lock<std::mutex> lock(queueMutex_);
     if (eventQueue_.empty()) {
         queueCondition_.wait(lock, []() { return !eventQueue_.empty(); });
     }
-    std::shared_ptr<InputEvent> eventPtr = eventQueue_.front();
+    std::string eventStr = eventQueue_.front();
     eventQueue_.pop();
-    return eventPtr;
+    return eventStr;
 }
 
 void EventStatistic::WriteEventFile()
 {
     while (writeFileEnabled_) {
-        std::string eventStr = ConvertEventToStr(PopEvent());
+        std::string eventStr = PopEvent();
         struct stat statbuf;
         int fileSize = 0;
         if (stat(EVENT_FILE_NAME.c_str(), &statbuf) == FUNC_EXE_OK) {
@@ -134,8 +135,7 @@ void EventStatistic::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     std::lock_guard<std::mutex> lock(queueMutex_);
     for (auto it = dumperEventList_.begin(); it != dumperEventList_.end(); it++) {
-        std::string eventStr = "{" + (*it)->ToString() + "}";
-        mprintf(fd, eventStr.c_str());
+        mprintf(fd, (*it).c_str());
     }
 }
 } // namespace MMI
