@@ -33,12 +33,12 @@ constexpr auto DEVICE_DELAY_STEP = 10ms;
 class TestDeviceListener : public OHOS::MMI::IInputDeviceListener {
 public:
     ~TestDeviceListener() override = default;
-    void OnDeviceAdded(int32_t deviceId, const std::string& type)
+    void OnDeviceAdded(int32_t deviceId, const std::string& type) override
     {
         added_ = true;
         deviceId_ = deviceId;
     }
-    void OnDeviceRemoved(int32_t deviceId, const std::string& type)
+    void OnDeviceRemoved(int32_t deviceId, const std::string& type) override
     {
         removed_ = true;
         deviceId_ = deviceId;

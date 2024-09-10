@@ -81,7 +81,6 @@ ohos_shared_library("intention_cooperate") {
     "input:libmmi-client",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwmutil_base",
   ]
 

@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_CROWN
 class CrownTransformProcessor final : public std::enable_shared_from_this<CrownTransformProcessor> {
     DECLARE_DELAYED_SINGLETON(CrownTransformProcessor);
 
@@ -51,7 +50,6 @@ private:
     uint64_t lastTime_ { 0 };
 };
 #define CROWN_EVENT_HDR ::OHOS::DelayedSingleton<CrownTransformProcessor>::GetInstance()
-#endif // OHOS_BUILD_ENABLE_CROWN
 } // namespace MMI
 } // namespace OHOS
 #endif // CROWN_TRANSFORM_PROCESSOR_H

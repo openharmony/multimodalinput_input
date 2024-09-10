@@ -14,12 +14,15 @@
  */
 
 #include "touch_drawing_manager.h"
+
 #include "bytrace_adapter.h"
+#include "delegate_interface.h"
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
 
 #include "i_multimodal_input_connect.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "table_dump.h"
 
@@ -90,14 +93,15 @@ void TouchDrawingManager::RecordLabelsInfo()
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", currentPointerId_);
         return;
     }
+    auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
     if (pointerItem.IsPressed()) {
-        currentPt_.SetX(pointerItem.GetDisplayX());
-        currentPt_.SetY(pointerItem.GetDisplayY());
+        currentPt_.SetX(displayXY.first);
+        currentPt_.SetY(displayXY.second);
         pressure_ = pointerItem.GetPressure();
     }
     if (isFirstDownAction_) {
-        firstPt_.SetX(pointerItem.GetDisplayX());
-        firstPt_.SetY(pointerItem.GetDisplayY());
+        firstPt_.SetX(displayXY.first);
+        firstPt_.SetY(displayXY.second);
         isFirstDownAction_ = false;
     }
     int64_t actionTime = pointerEvent_->GetActionTime();
@@ -172,42 +176,35 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
     int32_t &physicalX, int32_t &physicalY)
 {
+    MMI_HILOGD("direction:%{public}d", direction);
     switch (direction) {
         case DIRECTION0: {
-            MMI_HILOGD("direction is DIRECTION0");
             break;
         }
         case DIRECTION90: {
             int32_t temp = physicalY;
             physicalY = width - physicalX;
             physicalX = temp;
-            MMI_HILOGD("direction is DIRECTION90, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
-                physicalX, physicalY);
             break;
         }
         case DIRECTION180: {
             physicalX = width - physicalX;
             physicalY = height - physicalY;
-            MMI_HILOGD("direction is DIRECTION180, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
-                physicalX, physicalY);
             break;
         }
         case DIRECTION270: {
             int32_t temp = physicalX;
             physicalX = height - physicalY;
             physicalY = temp;
-            MMI_HILOGD("direction is DIRECTION270, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
-                physicalX, physicalY);
             break;
         }
         default: {
-            MMI_HILOGW("direction is invalid, direction:%{public}d", direction);
             break;
         }
     }
 }
 
-void TouchDrawingManager::UpdateLabels()
+int32_t TouchDrawingManager::UpdateLabels()
 {
     CALL_DEBUG_ENTER;
     if (pointerMode_.isShow) {
@@ -219,17 +216,19 @@ void TouchDrawingManager::UpdateLabels()
         DestoryTouchWindow();
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
+    return RET_OK;
 }
 
-void TouchDrawingManager::UpdateBubbleData()
+int32_t TouchDrawingManager::UpdateBubbleData()
 {
     if (!bubbleMode_.isShow) {
-        CHKPV(surfaceNode_);
+        CHKPR(surfaceNode_, ERROR_NULL_POINTER);
         surfaceNode_->RemoveChild(bubbleCanvasNode_);
         bubbleCanvasNode_.reset();
         DestoryTouchWindow();
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    return RET_OK;
 }
 
 void TouchDrawingManager::RotationScreen()
@@ -289,14 +288,15 @@ template <class T>
 void TouchDrawingManager::CreateBubbleObserver(T &item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpdateBubbleData();
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -313,14 +313,15 @@ template <class T>
 void TouchDrawingManager::CreatePointerObserver(T &item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpdateLabels();
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateLabels, this));
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -466,7 +467,8 @@ void TouchDrawingManager::DrawBubble()
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
         if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
                 pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
@@ -477,9 +479,8 @@ void TouchDrawingManager::DrawBubble()
             MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
             return;
         }
-        int32_t physicalX = pointerItem.GetDisplayX();
-        int32_t physicalY = pointerItem.GetDisplayY();
-        Rosen::Drawing::Point centerPt(physicalX, physicalY);
+        auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
+        Rosen::Drawing::Point centerPt(displayXY.first, displayXY.second);
         Rosen::Drawing::Pen pen;
         pen.SetColor(Rosen::Drawing::Color::COLOR_BLACK);
         pen.SetAntiAlias(true);
@@ -498,9 +499,9 @@ void TouchDrawingManager::DrawBubble()
         canvas->DetachBrush();
         if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
             pointerEvent_->GetPointerId() == pointerId) {
-            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
-                " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
-                physicalX, physicalY);
+            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{private}d,"
+                " physicalY:%{private}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
+                displayXY.first, displayXY.second);
         }
     }
     bubbleCanvasNode_->FinishRecording();
@@ -523,11 +524,10 @@ void TouchDrawingManager::DrawPointerPositionHandler()
             MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
             return;
         }
-        int32_t displayX = pointerItem.GetDisplayX();
-        int32_t displayY = pointerItem.GetDisplayY();
-        DrawTracker(displayX, displayY, pointerId);
+        auto displayXY = CalcDrawCoordinate(displayInfo_, pointerItem);
+        DrawTracker(displayXY.first, displayXY.second, pointerId);
         if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
-            DrawCrosshairs(canvas, displayX, displayY);
+            DrawCrosshairs(canvas, displayXY.first, displayXY.second);
             UpdateLastPointerItem(pointerItem);
         }
     }
@@ -593,8 +593,9 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
     bool find = false;
     for (auto &item : lastPointerItem_) {
         if (item.GetPointerId() == pointerId) {
-            lastPt.SetX(item.GetDisplayX());
-            lastPt.SetY(item.GetDisplayY());
+            auto displayXY = CalcDrawCoordinate(displayInfo_, item);
+            lastPt.SetX(displayXY.first);
+            lastPt.SetY(displayXY.second);
             find = true;
             break;
         }
@@ -779,6 +780,8 @@ void TouchDrawingManager::DestoryTouchWindow()
     if (bubbleMode_.isShow || pointerMode_.isShow) {
         return;
     }
+    MMI_HILOGI("Destory touch window success, bubbleMode:%{public}d, pointerMode:%{public}d",
+        bubbleMode_.isShow, pointerMode_.isShow);
     CHKPV(surfaceNode_);
     surfaceNode_->ClearChildren();
     surfaceNode_.reset();
@@ -810,7 +813,8 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
 {
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
-        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) {
         return true;
     }
     return false;
@@ -851,6 +855,20 @@ void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
 
     std::string dumpInfo = oss.str();
     dprintf(fd, dumpInfo.c_str());
+}
+
+std::pair<int32_t, int32_t> TouchDrawingManager::CalcDrawCoordinate(const DisplayInfo& displayInfo,
+    PointerEvent::PointerItem pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    double physicalX = pointerItem.GetRawDisplayX();
+    double physicalY = pointerItem.GetRawDisplayY();
+    if (!displayInfo.transform.empty()) {
+        auto displayXY = WIN_MGR->TransformDisplayXY(displayInfo, physicalX, physicalY);
+        physicalX = displayXY.first;
+        physicalY = displayXY.second;
+    }
+    return {static_cast<int32_t>(physicalX), static_cast<int32_t>(physicalY)};
 }
 } // namespace MMI
 } // namespace OHOS

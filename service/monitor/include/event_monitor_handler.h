@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 
 #include "nocopyable.h"
 
+#include "gesture_monitor_handler.h"
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
 #include "input_handler_type.h"
@@ -45,8 +46,15 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
-    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
+    bool CheckHasInputHandler(HandleEventType eventType);
+    int32_t AddInputHandler(InputHandlerType handlerType,
+        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
+    void RemoveInputHandler(InputHandlerType handlerType,
+        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
+    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
     void MarkConsumed(int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
@@ -55,26 +63,54 @@ public:
     bool OnHandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    void ProcessScreenCapture(int32_t pid, bool isStart);
+#endif
 
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
 
 private:
-    class SessionHandler {
+    class SessionHandler : public GestureMonitorHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
+            SessionPtr session, std::shared_ptr<IInputEventConsumer> cb = nullptr)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session) {}
+              session_(session), callback_(cb) {}
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
+            SessionPtr session, TouchGestureType gestureType, int32_t fingers)
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
+              session_(session)
+        {
+            AddGestureMonitor(gestureType, fingers);
+        }
+        SessionHandler(const SessionHandler& other)
+        {
+            handlerType_ = other.handlerType_;
+            eventType_ = other.eventType_;
+            session_ = other.session_;
+            callback_ = other.callback_;
+            gestureType_ = other.gestureType_;
+            fingers_ = other.fingers_;
+            touchGestureInfo_ = other.touchGestureInfo_;
+        }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
         bool operator<(const SessionHandler& other) const
         {
             return (session_ < other.session_);
         }
+        void operator()(const GestureMonitorHandler& other)
+        {
+            gestureType_ = other.gestureType_;
+            fingers_ = other.fingers_;
+            touchGestureInfo_ = other.touchGestureInfo_;
+        }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
+        std::shared_ptr<IInputEventConsumer> callback_ { nullptr };
     };
 
     class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
@@ -85,11 +121,15 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        bool CheckHasInputHandler(HandleEventType eventType);
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t eventId, SessionPtr session);
 
         bool HasMonitor(SessionPtr session);
+        bool HasScreenCaptureMonitor(SessionPtr session);
+        void RemoveScreenCaptureMonitor(SessionPtr session);
+        void RecoveryScreenCaptureMonitor(SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -107,6 +147,7 @@ private:
 
     private:
         std::set<SessionHandler> monitors_;
+        std::map<int32_t, std::set<SessionHandler>> endScreenCaptureMonitors_;
         std::unordered_map<int32_t, ConsumptionState> states_;
     };
 

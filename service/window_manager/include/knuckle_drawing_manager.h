@@ -33,14 +33,20 @@ struct PointerInfo {
     float y { 0.0F };
 };
 
+struct ScreenReadState {
+    std::string switchName;
+    std::string state;
+};
+
 class KnuckleDrawingManager {
 public:
     void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
-    static void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
-    static bool CheckRotatePolicy(const DisplayInfo& displayInfo);
+    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
+    bool CheckRotatePolicy(const DisplayInfo& displayInfo);
+    std::string GetScreenReadState();
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);
@@ -50,10 +56,14 @@ private:
     int32_t GetPointerPos(std::shared_ptr<PointerEvent> touchEvent);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
     bool IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEvent> touchEvent);
+    int32_t DestoryWindow();
+    void CreateObserver();
+    template <class T>
+    void CreateScreenReadObserver(T& item);
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
     std::vector<PointerInfo> pointerInfos_;
     Rosen::Drawing::Paint paint_;
     Rosen::Drawing::Path path_;
@@ -66,6 +76,9 @@ private:
     int32_t scaleW_ { 0 };
     int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
+    bool hasScreenReadObserver_ { false };
+    ScreenReadState screenReadState_ { };
+    int32_t pointerNum_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

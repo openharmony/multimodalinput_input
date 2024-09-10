@@ -98,7 +98,7 @@ public:
     static void StatisticTouchpadGesture(std::shared_ptr<PointerEvent> pointerEvent);
     static void ReportKnuckleClickEvent();
     static void ReportScreenCaptureGesture();
-    static void ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime);
+    static void ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime, int32_t distanceInterval);
     static void ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> touchEvent, int32_t intervalTime);
     static void ReportFailIfInvalidDistance(const std::shared_ptr<PointerEvent> touchEvent, float distance);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -107,14 +107,19 @@ public:
     static void ReportMagicCursorSizeChange(std::string fill_Code, std::string mouse_Size);
     static void ReportMagicCursorFault(std::string error_Code, std::string error_Name);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    static void ReportSmartShotSuccTimes(int32_t smartShotSuccTimes);
+    static void ReportSmartShotSuccTimes();
     static void ReportKnuckleGestureTrackLength(int32_t knuckleGestureTrackLength);
     static void ReportKnuckleGestureTrackTime(const std::vector<int64_t> &gestureTimeStamps);
-    static void ReportKnuckleGestureFaildTimes(int32_t failedTimes);
-    static void ReportKnuckleDrawSSuccessTimes(int32_t successTimes);
+    static void ReportKnuckleGestureFaildTimes();
+    static void ReportKnuckleDrawSSuccessTimes();
     static void ReportKnuckleGestureFromFailToSuccessTime(int32_t intervalTime);
     static void ReportKnuckleGestureFromSuccessToFailTime(int32_t intervalTime);
-    static void ReportScreenRecorderGesture(int32_t successTimes, int32_t intervalTime);
+    static void ReportScreenRecorderGesture(int32_t intervalTime);
+    static void ReportFailIfKnockTooFast();
+    static void ReportFailIfOneSuccTwoFail(const std::shared_ptr<PointerEvent> touchEvent);
+    static std::string GetTpVendorName();
+    static std::string GetAccVendorName();
+    static std::string GetLcdInfo();
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };

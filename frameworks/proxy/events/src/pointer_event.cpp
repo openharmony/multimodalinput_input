@@ -271,6 +271,16 @@ void PointerEvent::PointerItem::SetPressure(double pressure)
     }
 }
 
+int32_t PointerEvent::PointerItem::GetMoveFlag() const
+{
+    return moveFlag_;
+}
+
+void PointerEvent::PointerItem::SetMoveFlag(int32_t moveFlag)
+{
+    moveFlag_ = moveFlag;
+}
+
 int32_t PointerEvent::PointerItem::GetLongAxis() const
 {
     return longAxis_;
@@ -351,6 +361,26 @@ void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
     rawDy_ = rawDy;
 }
 
+int32_t PointerEvent::PointerItem::GetRawDisplayX() const
+{
+    return rawDisplayX_;
+}
+ 
+void PointerEvent::PointerItem::SetRawDisplayX(int32_t rawDisplayX)
+{
+    rawDisplayX_ = rawDisplayX;
+}
+ 
+int32_t PointerEvent::PointerItem::GetRawDisplayY() const
+{
+    return rawDisplayY_;
+}
+ 
+void PointerEvent::PointerItem::SetRawDisplayY(int32_t rawDisplayY)
+{
+    rawDisplayY_ = rawDisplayY;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -378,6 +408,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_) &&
+        out.WriteInt32(rawDisplayX_) &&
+        out.WriteInt32(rawDisplayY_) &&
         out.WriteInt32(targetWindowId_) &&
         out.WriteDouble(displayXPos_) &&
         out.WriteDouble(displayYPos_) &&
@@ -414,6 +446,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_) &&
+        in.ReadInt32(rawDisplayX_) &&
+        in.ReadInt32(rawDisplayY_) &&
         in.ReadInt32(targetWindowId_) &&
         in.ReadDouble(displayXPos_) &&
         in.ReadDouble(displayYPos_) &&
@@ -431,7 +465,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       pointerAction_(other.pointerAction_), originPointerAction_(other.originPointerAction_),
       buttonId_(other.buttonId_), fingerCount_(other.fingerCount_), zOrder_(other.zOrder_),
       axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
-      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
+      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_), axisEventType_(other.axisEventType_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -463,6 +497,7 @@ void PointerEvent::Reset()
     axes_ = 0U;
     axisValues_.fill(0.0);
     velocity_ = 0.0;
+    axisEventType_ = AXIS_EVENT_TYPE_UNKNOWN;
     pressedKeys_.clear();
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     fingerprintDistanceX_ = 0.0;
@@ -524,6 +559,14 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_FINGERPRINT_SLIDE, "fingerprint-slide" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_RETOUCH, "fingerprint-retouch" },
     { PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK, "fingerprint-click" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_DOWN, "touch-swipe-down" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_UP, "touch-swipe-up" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_LEFT, "touch-swipe-left" },
+    { PointerEvent::TOUCH_ACTION_SWIPE_RIGHT, "touch-swipe-right" },
+    { PointerEvent::TOUCH_ACTION_PINCH_OPENED, "touch-pinch-open" },
+    { PointerEvent::TOUCH_ACTION_PINCH_CLOSEED, "touch-pinch-close" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_IN, "pen-proximity-in" },
+    { PointerEvent::POINTER_ACTION_PROXIMITY_OUT, "pen-proximity-out" },
 };
 
 const char* PointerEvent::DumpPointerAction() const
@@ -581,7 +624,6 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
     for (auto &item : pointers_) {
         if (item.GetPointerId() == pointerId) {
             item = pointerItem;
-            MMI_HILOGD("Pointer:%{public}d is already exists", pointerId);
             return;
         }
     }
@@ -596,7 +638,6 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
-    MMI_HILOGD("Pointer:%{public}d is not found", pointerId);
     AddPointerItem(pointerItem);
 }
 
@@ -773,8 +814,18 @@ std::vector<int32_t> PointerEvent::GetPressedKeys() const
     return pressedKeys_;
 }
 
+int32_t PointerEvent::GetAxisEventType() const
+{
+    return axisEventType_;
+}
+
+void PointerEvent::SetAxisEventType(int32_t axisEventType)
+{
+    axisEventType_ = axisEventType;
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void PointerEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
+void PointerEvent::SetEnhanceData(const std::vector<uint8_t>& enhanceData)
 {
     enhanceData_ = enhanceData;
 }
@@ -835,6 +886,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
     WRITEDOUBLE(out, velocity_);
+
+    WRITEINT32(out, axisEventType_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -900,6 +953,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READDOUBLE(in, velocity_);
 
+    READINT32(in, axisEventType_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
         return false;
@@ -1274,6 +1328,8 @@ std::string_view PointerEvent::ActionToShortStr(int32_t action)
             return "P:FR:";
         case PointerEvent::POINTER_ACTION_FINGERPRINT_CLICK:
             return "P:FC:";
+        case PointerEvent::POINTER_ACTION_FINGERPRINT_CANCEL:
+            return "P:FCA:";
         case PointerEvent::POINTER_ACTION_UNKNOWN:
             return "P:UK:";
         default:

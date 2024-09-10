@@ -200,11 +200,11 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 break;
             }
             case 'c': {
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
                 IPointerDrawingManager::GetInstance()->Dump(fd, args);
 #else
                 mprintf(fd, "Pointer device does not support");
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_TOUCH
                 TOUCH_DRAWING_MGR->Dump(fd, args);
 #else

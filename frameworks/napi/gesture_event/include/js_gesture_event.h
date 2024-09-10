@@ -24,11 +24,20 @@ namespace OHOS {
 namespace MMI {
 class JsGestureEvent final {
 public:
+    enum class TouchGesturAction : int32_t {
+        SWIPE_DOWN = 0,
+        SWIPE_UP,
+        SWIPE_LEFT,
+        SWIPE_RIGHT,
+        PINCH_CLOSED,
+        PINCH_OPENED
+    };
     JsGestureEvent() = default;
     ~JsGestureEvent() = default;
     DISALLOW_COPY_AND_MOVE(JsGestureEvent);
     static napi_value Export(napi_env env, napi_value exports);
 private:
+    static napi_value GetNapiString(napi_env env, std::string str);
     static napi_value GetNapiInt32(napi_env env, int32_t code);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 };

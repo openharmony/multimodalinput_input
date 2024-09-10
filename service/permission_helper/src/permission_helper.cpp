@@ -28,9 +28,6 @@
 
 namespace OHOS {
 namespace MMI {
-PermissionHelper::PermissionHelper() {}
-PermissionHelper::~PermissionHelper() {}
-
 bool PermissionHelper::VerifySystemApp()
 {
     MMI_HILOGD("Verify system App");
@@ -107,6 +104,13 @@ bool PermissionHelper::CheckInfraredEmmit()
     return CheckHapPermission(infraredEmmitPermissionCode);
 }
 
+bool PermissionHelper::CheckAuthorize()
+{
+    CALL_DEBUG_ENTER;
+    std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
+    return CheckHapPermission(injectPermissionCode);
+}
+
 bool PermissionHelper::CheckHapPermission(const std::string permissionCode)
 {
     CALL_DEBUG_ENTER;
@@ -167,6 +171,10 @@ int32_t PermissionHelper::GetTokenType()
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        uint64_t accessTokenIdEx = IPCSkeleton::GetCallingFullTokenID();
+        if (OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(accessTokenIdEx)) {
+            return TokenType::TOKEN_SYSTEM_HAP;
+        }
         return TokenType::TOKEN_HAP;
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return TokenType::TOKEN_NATIVE;

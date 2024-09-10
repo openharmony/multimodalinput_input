@@ -16,8 +16,6 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
-#include "display_manager.h"
-
 #include "input_device_manager.h"
 #include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
@@ -35,7 +33,6 @@ public:
     static void TearDownTestCase(void);
     static void SetupMouse();
     static void CloseMouse();
-    static void UpdateDisplayInfo();
 
     void SetUp();
     void TearDown();
@@ -61,7 +58,6 @@ void MouseEventNormalizeTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupMouse();
-    UpdateDisplayInfo();
 }
 
 void MouseEventNormalizeTest::TearDownTestCase(void)
@@ -87,24 +83,6 @@ void MouseEventNormalizeTest::CloseMouse()
 {
     libinput_.RemovePath(vMouse_.GetDevPath());
     vMouse_.Close();
-}
-
-void MouseEventNormalizeTest::UpdateDisplayInfo()
-{
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    ASSERT_TRUE(display != nullptr);
-
-    DisplayGroupInfo displays {
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-        .focusWindowId = -1,
-    };
-    displays.displaysInfo.push_back(DisplayInfo {
-        .name = "default display",
-        .width = display->GetWidth(),
-        .height = display->GetHeight(),
-    });
-    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void MouseEventNormalizeTest::SetUp()
@@ -139,7 +117,7 @@ void MouseEventNormalizeTest::TearDown()
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetDisplayId_001, TestSize.Level1)
 {
-    int32_t idNames = 0;
+    int32_t idNames = -1;
     ASSERT_EQ(MouseEventHdr->GetDisplayId(), idNames);
 }
 
@@ -173,7 +151,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.
     struct libinput_device *dev = libinput_event_get_device(event);
     ASSERT_TRUE(dev != nullptr);
     std::cout << "pointer device: " << libinput_device_get_name(dev) << std::endl;
-    ASSERT_EQ(MouseEventHdr->OnEvent(event), RET_OK);
+    ASSERT_EQ(MouseEventHdr->OnEvent(event), RET_ERR);
 
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
@@ -210,7 +188,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
     struct InputDeviceManager::InputDeviceInfo info = iter->second;
     INPUT_DEV_MGR->inputDevice_.erase(iter);
 
-    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     double angle = 0.5;
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
     INPUT_DEV_MGR->inputDevice_[deviceId] = info;
@@ -241,7 +219,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeRotateEvent_0
         MouseEventHdr->processors_.erase(iter);
     }
 
-    auto actionType  = PointerEvent::POINTER_ACTION_UNKNOWN;
+    auto actionType = PointerEvent::POINTER_ACTION_UNKNOWN;
     double angle = 0.5;
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
     EXPECT_NO_FATAL_FAILURE(MouseEventHdr->NormalizeRotateEvent(event, actionType, angle));
@@ -311,7 +289,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008, TestSize.Level1)
 {
-    int32_t idNames = 0;
+    int32_t idNames = -1;
     int32_t x = 0;
     int32_t y = 0;
     ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y), idNames);

@@ -201,7 +201,7 @@ public:
      * the monitor fails to be added.
      * @since 9
      */
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
 
     /**
      * @brief Removes a monitor.
@@ -281,6 +281,16 @@ public:
      * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder);
+
+    /**
+     * @brief Simulates a touchpad input event.
+     * because some event for touchpad is very different from other input,
+     *  especially pointer.id must be same as actual data 0, 1, 2.
+     * @param pointerEvent Indicates the touchpad input event.
+     * @return void
+     * @since 12
+     */
+    void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
      * @brief Starts listening for an input device event.
@@ -858,6 +868,14 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
     /**
+     * @brief Set touch move event filters.
+     * @param flag if set move event filters or not.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 12
+     */
+    int32_t SetMoveEventFilters(bool flag);
+
+    /**
      * @brief Get whether System has IrEmitter.
      * @param hasIrEmitter the para takes the value which Indicates the device has IrEmitter or not.
      * @return 0 if success; returns a non-0 value otherwise.
@@ -875,7 +893,7 @@ public:
 
     /**
      * @brief user IrEmitter with parameter number and pattern.
-     * @param number   Frequency of IrEmitter works .
+     * @param number Frequency of IrEmitter works .
      * @param pattern Pattern of signal transmission in alternate on/off mode, in microseconds.
      * @return 0 if success; returns a non-0 value otherwise.
      * @since 12
@@ -923,6 +941,46 @@ public:
 
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
+
+    int32_t SkipPointerLayer(bool isSkip);
+
+    int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
+    /**
+     * @brief Get Interval Since Last Input.
+     * @param timeInterval the value which Indicates the time interval since last input.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 13
+     */
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
+
+    /**
+     * @brief Converted to a Capi-defined key action value.
+     * @param keyAction The key action value of the return value of inner api.
+     * @return Returns Capi-defined key action value if success; returns a negative number value otherwise.
+     * @since 13
+     */
+    int32_t ConvertToCapiKeyAction(int32_t keyAction);
+
+    /**
+     * @brief 添加手势事件监视器。添加这样的监视器后，手势事件会被分发到到监视器。
+     * @param consumer 表示手势事件监视器。手势事件产生后，将调用监视器对象的函数。
+     * @param type 表示监视的手势类型。
+     * @param fingers 表示监视的手势达成的手指数量。
+     * @return 返回监视器ID，该ID唯一标识进程中的监视器。如果value的值大于等于0，表示添加成功。否则，添加监视器失败。
+     * @since 13
+     */
+    int32_t AddGestureMonitor(std::shared_ptr<IInputEventConsumer> consumer,
+        TouchGestureType type, int32_t fingers = 0);
+
+    /**
+     * @brief 删除一个手势监听器。
+     * @param monitorId 表示手势事件监视器，即AddGestureMonitor的返回值。
+     * @return void
+     * @since 13
+     */
+    int32_t RemoveGestureMonitor(int32_t monitorId);
 
 private:
     InputManager() = default;

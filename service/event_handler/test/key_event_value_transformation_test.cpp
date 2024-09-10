@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -489,6 +489,406 @@ HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_Transf
     ASSERT_NE(KeyEvent, nullptr);
     int32_t nonExistingKeyValue = 999;
     KeyEventValueTransformation result = TransferKeyValue(nonExistingKeyValue);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_002
+ * @tc.desc: Transfer F1 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 59;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F1);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_003
+ * @tc.desc: Transfer F2 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 60;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F2);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_004
+ * @tc.desc: Transfer F3 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 61;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F3);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_005
+ * @tc.desc: Transfer F4 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 62;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F4);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_006
+ * @tc.desc: Transfer F5 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 63;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F5);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_007
+ * @tc.desc: Transfer F6 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_007, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 64;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F6);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_008
+ * @tc.desc: Transfer F7 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_008, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 65;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F7);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_009
+ * @tc.desc: Transfer F8 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_009, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 66;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F8);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_010
+ * @tc.desc: Transfer F9 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_010, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 67;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F9);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_011
+ * @tc.desc: Transfer F10 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_011, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 68;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F10);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_012
+ * @tc.desc: Transfer F11 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_012, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 87;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F11);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_013
+ * @tc.desc: Transfer F12 key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_013, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 88;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_F12);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_014
+ * @tc.desc: Transfer Brightness Down key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_014, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 224;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_BRIGHTNESS_DOWN);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_015
+ * @tc.desc: Transfer Brightness Up key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_015, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 225;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_BRIGHTNESS_UP);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_016
+ * @tc.desc: Transfer Volume Mute key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_016, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 113;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_VOLUME_MUTE);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_017
+ * @tc.desc: Transfer Volume Down key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_017, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 114;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_VOLUME_DOWN);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_018
+ * @tc.desc: Transfer Volume Up key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_018, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 115;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_VOLUME_UP);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_019
+ * @tc.desc: Transfer Mute key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_019, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 248;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_MUTE);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_020
+ * @tc.desc: Transfer Switch Video Mode key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_020, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 595;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_SWITCHVIDEOMODE);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_021
+ * @tc.desc: Transfer Search key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_021, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 594;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_SEARCH);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_022
+ * @tc.desc: Transfer Media Record key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_022, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 597;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_MEDIA_RECORD);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_023
+ * @tc.desc: Transfer Sysrq key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_023, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 99;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_SYSRQ);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_024
+ * @tc.desc: Transfer Insert key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_024, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 110;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_INSERT);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_025
+ * @tc.desc: Transfer Sound key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_025, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 249;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_SOUND);
+}
+
+/**
+ * @tc.name: KeyEventValueTransformationTest_TransferKeyValue_026
+ * @tc.desc: Transfer Assistant key value
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventValueTransformationTest, KeyEventValueTransformationTest_TransferKeyValue_026, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    int32_t keyValue = 251;
+    KeyEventValueTransformation result = TransferKeyValue(keyValue);
+    EXPECT_EQ(result.sysKeyValue, KeyEvent::KEYCODE_ASSISTANT);
 }
 
 /**

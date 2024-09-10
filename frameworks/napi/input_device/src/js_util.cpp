@@ -15,6 +15,8 @@
 
 #include "js_util.h"
 
+#include <unordered_map>
+
 #include <linux/input.h>
 
 #include "mmi_log.h"
@@ -27,7 +29,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-std::map<int32_t, std::string> axisType = {
+std::unordered_map<int32_t, std::string> axisType = {
     { ABS_MT_TOUCH_MAJOR, "touchmajor" },
     { ABS_MT_TOUCH_MINOR, "touchminor" },
     { ABS_MT_ORIENTATION, "orientation" },
@@ -56,9 +58,17 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     napi_value handlerTemp = nullptr;
-    CHKRF(napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE);
+    if (napi_get_reference_value(env, ref, &handlerTemp) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(GET_REFERENCE_VALUE).c_str());
+        napi_close_handle_scope(env, scope);
+        return false;
+    }
     bool isEqual = false;
-    CHKRF(napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
+    if (napi_strict_equals(env, handle, handlerTemp, &isEqual) != napi_ok) {
+        MMI_HILOGE("%{public}s failed", std::string(STRICT_EQUALS).c_str());
+        napi_close_handle_scope(env, scope);
+        return false;
+    }
     napi_close_handle_scope(env, scope);
     return isEqual;
 }

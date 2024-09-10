@@ -41,7 +41,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
     : keyOption_(keyOption), callback_(callback)
 {
-    if (KeyEventInputSubscribeManager::subscribeIdManager_ >= INT_MAX) {
+    if (KeyEventInputSubscribeManager::subscribeIdManager_ >= std::numeric_limits<int32_t>::max()) {
         subscribeId_ = -1;
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
         return;
@@ -112,10 +112,11 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGW("Subscription is duplicated");
         return tIter->GetSubscribeId();
     }
-    if (MMIEventHdl.SubscribeKeyEvent(*tIter) != RET_OK) {
+    int32_t ret = MMIEventHdl.SubscribeKeyEvent(*tIter);
+    if (ret != RET_OK) {
         MMI_HILOGE("Subscribing key event failed");
         subscribeInfos_.erase(tIter);
-        return INVALID_SUBSCRIBE_ID;
+        return ret;
     }
 
     MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
@@ -179,7 +180,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
     callback(event);
-    MMI_HILOGD("Key event id:%{public}d, keyCode:%{public}d", subscribeId, event->GetKeyCode());
+    MMI_HILOGD("Key event id:%{public}d, keyCode:%{private}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }
 

@@ -97,9 +97,12 @@ public:
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+        HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
+    int32_t AddGestureMonitor(std::shared_ptr<IInputEventConsumer> consumer,
+        TouchGestureType type, int32_t fingers);
+    int32_t RemoveGestureMonitor(int32_t monitorId);
 
-    void RemoveMonitor(int32_t monitorId);
+    int32_t RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
@@ -109,11 +112,12 @@ public:
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
         int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
-    void RemoveInterceptor(int32_t interceptorId);
+    int32_t RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject = false);
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void HandleSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateTouchPadEvent(std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject = false);
     void OnConnected();
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     template<typename T>
@@ -208,11 +212,18 @@ public:
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
+    int32_t SetMoveEventFilters(bool flag);
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t SkipPointerLayer(bool isSkip);
+    int32_t RegisterWindowStateErrorCallback(std::function<void(int32_t, int32_t)> callback);
+    void OnWindowStateError(int32_t pid, int32_t windowId);
+    int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
+    int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+    int32_t ConvertToCapiKeyAction(int32_t keyAction);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -263,6 +274,7 @@ private:
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::function<void(int32_t, int32_t)> windowStatecallback_;
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     uint8_t* enhanceCfg_ = nullptr;
     uint32_t enhanceCfgLen_ = 0;

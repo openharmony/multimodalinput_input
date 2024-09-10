@@ -15,11 +15,20 @@
 
 #include "oh_input_manager.h"
 
+#include "error_multimodal.h"
 #include "input_manager.h"
 #include "input_manager_impl.h"
 #include "key_event.h"
 #include "mmi_log.h"
+#include "oh_axis_type.h"
+#include "oh_input_device_listener.h"
+#include "oh_input_interceptor.h"
 #include "oh_key_code.h"
+#include "permission_helper.h"
+#ifdef PLAYER_FRAMEWORK_EXISTS
+#include "screen_capture_monitor.h"
+#include "ipc_skeleton.h"
+#endif // PLAYER_FRAMEWORK_EXISTS
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManager"
@@ -54,16 +63,112 @@ struct Input_TouchEvent {
     int64_t actionTime { -1 };
 };
 
+struct Input_AxisEvent {
+    int32_t axisAction;
+    float displayX;
+    float displayY;
+    std::map<int32_t, double> axisValues;
+    int64_t actionTime { -1 };
+    int32_t sourceType;
+    int32_t axisEventType { -1 };
+};
+
+struct Input_HotkeyInfo {
+    int32_t subscribeId;
+    std::string hotkeyId;
+    Input_HotkeyCallback callback { nullptr };
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption { nullptr };
+};
+
+struct Input_Hotkey {
+    std::set<int32_t> preKeys {};
+    int32_t finalKey { -1 };
+    bool isRepeat { true };
+};
+
+constexpr int32_t SIZE_ARRAY = 64;
+struct Input_DeviceInfo {
+    int32_t id;
+    char name[SIZE_ARRAY] {};
+    int32_t ability;
+    int32_t product;
+    int32_t vendor;
+    int32_t version;
+    char phys[SIZE_ARRAY] {};
+};
+
+typedef std::map<std::string, std::list<Input_HotkeyInfo *>> Callbacks;
+static Callbacks g_callbacks = {};
+static std::mutex g_CallBacksMutex;
+static std::mutex g_DeviceListerCallbackMutex;
+static constexpr size_t PRE_KEYS_SIZE { 2 };
+static constexpr size_t KEYS_SIZE { 3 };
+static std::mutex g_hotkeyCountsMutex;
+static std::unordered_map<Input_Hotkey**, int32_t> g_hotkeyCounts;
+static constexpr int32_t INVALID_MONITOR_ID = -1;
+static constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
+static constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
+static constexpr int32_t OCCUPIED_BY_OTHER = -4;
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_mouseEvent = OHOS::MMI::PointerEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
+static std::set<Input_KeyEventCallback> g_keyMonitorCallbacks;
+static std::set<Input_MouseEventCallback> g_mouseMonitorCallbacks;
+static std::set<Input_TouchEventCallback> g_touchMonitorCallbacks;
+static std::set<Input_AxisEventCallback> g_axisMonitorAllCallbacks;
+static std::set<Input_DeviceListener*> g_ohDeviceListenerList;
+static std::map<InputEvent_AxisEventType, std::set<Input_AxisEventCallback>> g_axisMonitorCallbacks;
+static Input_KeyEventCallback g_keyInterceptorCallback = nullptr;
+static struct Input_InterceptorEventCallback *g_pointerInterceptorCallback = nullptr;
+static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_pointerInterceptor =
+    std::make_shared<OHOS::MMI::OHInputInterceptor>();
+static std::shared_ptr<OHOS::MMI::OHInputInterceptor> g_keyInterceptor =
+    std::make_shared<OHOS::MMI::OHInputInterceptor>();
+static std::shared_ptr<OHOS::MMI::OHInputDeviceListener> g_deviceListener =
+    std::make_shared<OHOS::MMI::OHInputDeviceListener>();
+static std::mutex g_mutex;
+static int32_t g_keyMonitorId = INVALID_MONITOR_ID;
+static int32_t g_pointerMonitorId = INVALID_MONITOR_ID;
+static int32_t g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
+static int32_t g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
+static const std::set<int32_t> g_keyCodeValueSet = {
+    KEYCODE_FN, KEYCODE_DPAD_UP, KEYCODE_DPAD_DOWN, KEYCODE_DPAD_LEFT, KEYCODE_DPAD_RIGHT, KEYCODE_ALT_LEFT,
+    KEYCODE_ALT_RIGHT, KEYCODE_SHIFT_LEFT, KEYCODE_SHIFT_RIGHT, KEYCODE_TAB, KEYCODE_ENTER, KEYCODE_DEL, KEYCODE_MENU,
+    KEYCODE_PAGE_UP, KEYCODE_PAGE_DOWN, KEYCODE_ESCAPE, KEYCODE_FORWARD_DEL, KEYCODE_CTRL_LEFT, KEYCODE_CTRL_RIGHT,
+    KEYCODE_CAPS_LOCK, KEYCODE_SCROLL_LOCK, KEYCODE_META_LEFT, KEYCODE_META_RIGHT, KEYCODE_SYSRQ, KEYCODE_BREAK,
+    KEYCODE_MOVE_HOME, KEYCODE_MOVE_END, KEYCODE_INSERT, KEYCODE_F1, KEYCODE_F2, KEYCODE_F3, KEYCODE_F4, KEYCODE_F5,
+    KEYCODE_F6, KEYCODE_F7, KEYCODE_F8, KEYCODE_F9, KEYCODE_F10, KEYCODE_F11, KEYCODE_F12, KEYCODE_NUM_LOCK
+};
+
+static const std::vector<int32_t> g_pressKeyCodes = {
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT
+};
+static const std::vector<int32_t> g_finalKeyCodes = {
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_ALT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_SHIFT_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_CTRL_RIGHT,
+    OHOS::MMI::KeyEvent::KEYCODE_META_LEFT,
+    OHOS::MMI::KeyEvent::KEYCODE_META_RIGHT
+};
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{public}d", keyState->keyCode);
+        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyState->keyCode);
+        return INPUT_PARAMETER_ERROR;
+    }
+    if (g_keyCodeValueSet.find(keyState->keyCode) == g_keyCodeValueSet.end()) {
+        MMI_HILOGE("keyCode is not within the query range, keyCode:%{private}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -108,7 +213,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("keyCode is invalid, keyCode:%{public}d", keyCode);
+        MMI_HILOGE("keyCode is invalid, keyCode:%{private}d", keyCode);
         return;
     }
     keyState->keyCode = keyCode;
@@ -154,7 +259,7 @@ static void HandleKeyAction(const struct Input_KeyEvent* keyEvent, OHOS::MMI::Ke
         if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
-            MMI_HILOGW("Find pressed key failed, keyCode:%{public}d", keyEvent->keyCode);
+            MMI_HILOGW("Find pressed key failed, keyCode:%{private}d", keyEvent->keyCode);
         }
         g_keyEvent->RemoveReleasedKeyItems(item);
         g_keyEvent->AddPressedKeyItems(item);
@@ -166,7 +271,7 @@ int32_t OH_Input_InjectKeyEvent(const struct Input_KeyEvent* keyEvent)
     MMI_HILOGI("Input_KeyEvent injectEvent");
     CHKPR(keyEvent, INPUT_PARAMETER_ERROR);
     if (keyEvent->keyCode < 0) {
-        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyEvent->keyCode);
+        MMI_HILOGE("keyCode:%{private}d is less 0, can not process", keyEvent->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     CHKPR(g_keyEvent, INPUT_PARAMETER_ERROR);
@@ -701,4 +806,1620 @@ void OH_Input_CancelInjection()
 {
     CALL_DEBUG_ENTER;
     OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().CancelInjection();
+}
+
+static bool SetAxisValueByAxisEventType(std::shared_ptr<OHOS::MMI::PointerEvent> event,
+    struct Input_AxisEvent *axisEvent, int32_t axisEventType)
+{
+    CHKPR(event, false);
+    CHKPR(axisEvent, false);
+    if (axisEventType == OHOS::MMI::PointerEvent::AXIS_EVENT_TYPE_PINCH) {
+        double value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_PINCH);
+        axisEvent->axisValues.insert(std::make_pair(AXIS_TYPE_PINCH, value));
+        value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_ROTATE);
+        axisEvent->axisValues.insert(std::make_pair(AXIS_TYPE_ROTATE, value));
+    } else if (axisEventType == OHOS::MMI::PointerEvent::AXIS_EVENT_TYPE_SCROLL) {
+        double value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
+        axisEvent->axisValues.insert(std::make_pair(AXIS_TYPE_SCROLL_VERTICAL, value));
+        value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+        axisEvent->axisValues.insert(std::make_pair(AXIS_TYPE_SCROLL_HORIZONTAL, value));
+    } else {
+        MMI_HILOGE("Undefined axisEventType: %{public}d", axisEventType);
+        return false;
+    }
+    axisEvent->axisEventType = axisEventType;
+    return true;
+}
+
+static bool IsAxisEvent(int32_t action)
+{
+    if (action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END) {
+        return false;
+    }
+    return true;
+}
+
+Input_AxisEvent* OH_Input_CreateAxisEvent(void)
+{
+    Input_AxisEvent* axisEvent = new (std::nothrow) Input_AxisEvent();
+    CHKPP(axisEvent);
+    return axisEvent;
+}
+
+Input_Result OH_Input_DestroyAxisEvent(Input_AxisEvent** axisEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (axisEvent == nullptr || *axisEvent == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    delete *axisEvent;
+    *axisEvent = nullptr;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventAction(Input_AxisEvent* axisEvent, InputEvent_AxisAction action)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->axisAction = action;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventAction(const Input_AxisEvent* axisEvent, InputEvent_AxisAction *action)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(action, INPUT_PARAMETER_ERROR);
+    *action = InputEvent_AxisAction(axisEvent->axisAction);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventDisplayX(Input_AxisEvent* axisEvent, float displayX)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->displayX = displayX;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventDisplayX(const Input_AxisEvent* axisEvent, float* displayX)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(displayX, INPUT_PARAMETER_ERROR);
+    *displayX = axisEvent->displayX;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventDisplayY(Input_AxisEvent* axisEvent, float displayY)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->displayY = displayY;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventDisplayY(const Input_AxisEvent* axisEvent, float* displayY)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(displayY, INPUT_PARAMETER_ERROR);
+    *displayY = axisEvent->displayY;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventAxisValue(Input_AxisEvent* axisEvent,
+    InputEvent_AxisType axisType, double axisValue)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->axisValues.emplace(axisType, axisValue);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventAxisValue(const Input_AxisEvent* axisEvent,
+    InputEvent_AxisType axisType, double* axisValue)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(axisValue, INPUT_PARAMETER_ERROR);
+    auto it = axisEvent->axisValues.find(axisType);
+    if (it == axisEvent->axisValues.end()) {
+        MMI_HILOGE("There is no axis value of axisType: %{public}d in the axisEvent", axisType);
+        return INPUT_PARAMETER_ERROR;
+    }
+    *axisValue = it->second;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventActionTime(Input_AxisEvent* axisEvent, int64_t actionTime)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->actionTime = actionTime;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventActionTime(const Input_AxisEvent* axisEvent, int64_t* actionTime)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(actionTime, INPUT_PARAMETER_ERROR);
+    *actionTime = axisEvent->actionTime;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventType(Input_AxisEvent* axisEvent, InputEvent_AxisEventType axisEventType)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->axisEventType = axisEventType;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventType(const Input_AxisEvent* axisEvent, InputEvent_AxisEventType* axisEventType)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(axisEventType, INPUT_PARAMETER_ERROR);
+    *axisEventType = InputEvent_AxisEventType(axisEvent->axisEventType);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_SetAxisEventSourceType(Input_AxisEvent* axisEvent, InputEvent_SourceType sourceType)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    axisEvent->sourceType = sourceType;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetAxisEventSourceType(const Input_AxisEvent* axisEvent, InputEvent_SourceType* sourceType)
+{
+    CHKPR(axisEvent, INPUT_PARAMETER_ERROR);
+    CHKPR(sourceType, INPUT_PARAMETER_ERROR);
+    *sourceType = InputEvent_SourceType(axisEvent->sourceType);
+    return INPUT_SUCCESS;
+}
+
+static Input_Result NormalizeResult(int32_t result)
+{
+    if (result < RET_OK) {
+        if (result == OHOS::MMI::ERROR_NO_PERMISSION) {
+            MMI_HILOGE("Permisson denied");
+            return INPUT_PERMISSION_DENIED;
+        }
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+static bool SetKeyEventAction(Input_KeyEvent* keyEvent, int32_t action)
+{
+    CHKPF(keyEvent);
+    if (action == OHOS::MMI::KeyEvent::KEY_ACTION_CANCEL) {
+        keyEvent->action = KEY_ACTION_CANCEL;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        keyEvent->action = KEY_ACTION_DOWN;
+    } else if (action == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        keyEvent->action = KEY_ACTION_UP;
+    } else {
+        MMI_HILOGE("Invalid key event action");
+        return false;
+    }
+    return true;
+}
+
+static void KeyEventMonitorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
+{
+    CHKPV(event);
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    CHKPV(keyEvent);
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
+    keyEvent->keyCode = event->GetKeyCode();
+    keyEvent->actionTime = event->GetActionTime();
+    std::lock_guard guard(g_mutex);
+    for (auto &callback : g_keyMonitorCallbacks) {
+        callback(keyEvent);
+    }
+    OH_Input_DestroyKeyEvent(&keyEvent);
+}
+
+static bool IsScreenCaptureWorking()
+{
+    CALL_DEBUG_ENTER;
+#ifdef PLAYER_FRAMEWORK_EXISTS
+    int32_t pid = OHOS::IPCSkeleton::GetCallingPid();
+    int32_t capturePid = OHOS::Media::ScreenCaptureMonitor::GetInstance()->IsScreenCaptureWorking();
+    if (capturePid != pid) {
+        MMI_HILOGE("Calling pid is: %{public}d, but screen capture pid is: %{public}d", pid, capturePid);
+        return false;
+    }
+    return true;
+#else
+    return false;
+#endif // PLAYER_FRAMEWORK_EXISTS
+}
+
+Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    if (g_keyMonitorId == INVALID_MONITOR_ID) {
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(KeyEventMonitorCallback);
+        retCode = NormalizeResult(ret);
+        if (retCode != INPUT_SUCCESS) {
+            return retCode;
+        }
+        g_keyMonitorId = ret;
+    }
+    g_keyMonitorCallbacks.insert(callback);
+    return retCode;
+}
+
+static bool SetTouchEventAction(Input_TouchEvent* touchEvent, int32_t action)
+{
+    CHKPF(touchEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL:
+            touchEvent->action = TOUCH_ACTION_CANCEL;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_DOWN:
+            touchEvent->action = TOUCH_ACTION_DOWN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE:
+            touchEvent->action = TOUCH_ACTION_MOVE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_UP:
+            touchEvent->action = TOUCH_ACTION_UP;
+            break;
+        default:
+            MMI_HILOGE("Invalid touch event action");
+            return false;
+    }
+    return true;
+}
+
+static void TouchEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    CHKPV(touchEvent);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event->GetPointerItem(event->GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    if (!SetTouchEventAction(touchEvent, event->GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    touchEvent->id = event->GetPointerId();
+    touchEvent->displayX = item.GetDisplayX();
+    touchEvent->displayY = item.GetDisplayY();
+    touchEvent->actionTime = event->GetActionTime();
+    std::lock_guard guard(g_mutex);
+    for (auto &callback : g_touchMonitorCallbacks) {
+        callback(touchEvent);
+    }
+    OH_Input_DestroyTouchEvent(&touchEvent);
+}
+
+static bool SetMouseEventAction(Input_MouseEvent* mouseEvent, int32_t action)
+{
+    CHKPF(mouseEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_CANCEL:
+            mouseEvent->action = MOUSE_ACTION_CANCEL;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_MOVE:
+            mouseEvent->action = MOUSE_ACTION_MOVE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+            mouseEvent->action = MOUSE_ACTION_BUTTON_DOWN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_BUTTON_UP:
+            mouseEvent->action = MOUSE_ACTION_BUTTON_UP;
+            break;
+        default:
+            MMI_HILOGE("Invalid mouse event action");
+            return false;
+    }
+    return true;
+}
+
+static bool SetMouseEventButton(Input_MouseEvent* mouseEvent, int32_t button)
+{
+    CHKPF(mouseEvent);
+    switch (button) {
+        case OHOS::MMI::PointerEvent::BUTTON_NONE:
+            mouseEvent->button = MOUSE_BUTTON_NONE;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_LEFT:
+            mouseEvent->button = MOUSE_BUTTON_LEFT;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_MIDDLE:
+            mouseEvent->button = MOUSE_BUTTON_MIDDLE;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_RIGHT:
+            mouseEvent->button = MOUSE_BUTTON_RIGHT;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_FORWARD:
+            mouseEvent->button = MOUSE_BUTTON_FORWARD;
+            break;
+        case OHOS::MMI::PointerEvent::MOUSE_BUTTON_BACK:
+            mouseEvent->button = MOUSE_BUTTON_BACK;
+            break;
+        default:
+            MMI_HILOGE("Invalid mouse event button");
+            return false;
+    }
+    return true;
+}
+
+static void MouseEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    CHKPV(mouseEvent);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event->GetPointerItem(event->GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventAction(mouseEvent, event->GetPointerAction())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventButton(mouseEvent, event->GetButtonId())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    mouseEvent->displayX = item.GetDisplayX();
+    mouseEvent->displayY = item.GetDisplayY();
+    mouseEvent->actionTime = event->GetActionTime();
+    std::lock_guard guard(g_mutex);
+    for (auto &callback : g_mouseMonitorCallbacks) {
+        callback(mouseEvent);
+    }
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+}
+
+static void SetAxisEventAction(Input_AxisEvent* axisEvent, int32_t action)
+{
+    CHKPV(axisEvent);
+    switch (action) {
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN:
+            axisEvent->axisAction = AXIS_ACTION_BEGIN;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE:
+            axisEvent->axisAction = AXIS_ACTION_UPDATE;
+            break;
+        case OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END:
+            axisEvent->axisAction = AXIS_ACTION_END;
+            break;
+        default:
+            break;
+    }
+}
+
+static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
+    CHKPV(axisEvent);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event->GetPointerItem(event->GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyAxisEvent(&axisEvent);
+        return;
+    }
+    if (!SetAxisValueByAxisEventType(event, axisEvent, event->GetAxisEventType())) {
+        OH_Input_DestroyAxisEvent(&axisEvent);
+        return;
+    }
+    SetAxisEventAction(axisEvent, event->GetPointerAction());
+    axisEvent->displayX = item.GetDisplayX();
+    axisEvent->displayY = item.GetDisplayY();
+    axisEvent->actionTime = event->GetActionTime();
+    axisEvent->sourceType = event->GetSourceType();
+    std::lock_guard guard(g_mutex);
+    for (auto &callback : g_axisMonitorAllCallbacks) {
+        callback(axisEvent);
+    }
+    auto it = g_axisMonitorCallbacks.find(InputEvent_AxisEventType(event->GetAxisEventType()));
+    if (it != g_axisMonitorCallbacks.end()) {
+        for (auto &callback : it->second) {
+            callback(axisEvent);
+        }
+    }
+    OH_Input_DestroyAxisEvent(&axisEvent);
+}
+
+static void PointerEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    if (event->GetSourceType() == SOURCE_TYPE_TOUCHSCREEN) {
+        TouchEventMonitorCallback(event);
+    } else if (event->GetSourceType() == SOURCE_TYPE_MOUSE && !IsAxisEvent(event->GetPointerAction())) {
+        MouseEventMonitorCallback(event);
+    } else if (IsAxisEvent(event->GetPointerAction()) && event->GetSourceType() != SOURCE_TYPE_TOUCHSCREEN) {
+        AxisEventMonitorCallback(event);
+    } else {
+        MMI_HILOGE("Undefined event type");
+    }
+}
+
+static Input_Result AddPointerEventMonitor()
+{
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    if (g_pointerMonitorId == INVALID_MONITOR_ID) {
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(
+            PointerEventMonitorCallback);
+        retCode = NormalizeResult(ret);
+        if (retCode != INPUT_SUCCESS) {
+            MMI_HILOGE("Add pointer event monitor failed.");
+            return retCode;
+        }
+        g_pointerMonitorId = ret;
+    }
+    return retCode;
+}
+
+Input_Result OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
+    Input_Result ret = AddPointerEventMonitor();
+    if (ret != INPUT_SUCCESS) {
+        return ret;
+    }
+    std::lock_guard guard(g_mutex);
+    g_mouseMonitorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
+    Input_Result ret = AddPointerEventMonitor();
+    if (ret != INPUT_SUCCESS) {
+        return ret;
+    }
+    std::lock_guard guard(g_mutex);
+    g_touchMonitorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_AddAxisEventMonitorForAll(Input_AxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
+    Input_Result ret = AddPointerEventMonitor();
+    if (ret != INPUT_SUCCESS) {
+        return ret;
+    }
+    std::lock_guard guard(g_mutex);
+    g_axisMonitorAllCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_AddAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    if (!OHOS::MMI::PermissionHelper::GetInstance()->VerifySystemApp()) {
+        if (!IsScreenCaptureWorking()) {
+            MMI_HILOGE("The screen capture is not working");
+            return INPUT_PERMISSION_DENIED;
+        }
+    }
+    Input_Result ret = AddPointerEventMonitor();
+    if (ret != INPUT_SUCCESS) {
+        return ret;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_axisMonitorCallbacks.find(axisEventType);
+    if (it == g_axisMonitorCallbacks.end()) {
+        std::set<Input_AxisEventCallback> callbacks;
+        callbacks.insert(callback);
+        g_axisMonitorCallbacks.insert(std::make_pair(axisEventType, callbacks));
+    } else {
+        it->second.insert(callback);
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    auto it = g_keyMonitorCallbacks.find(callback);
+    if (it == g_keyMonitorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_keyMonitorCallbacks.erase(it);
+    if (g_keyMonitorCallbacks.empty()) {
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_keyMonitorId);
+        retCode = NormalizeResult(ret);
+        if (retCode != INPUT_SUCCESS) {
+            return retCode;
+        }
+        g_keyMonitorId = INVALID_MONITOR_ID;
+    }
+    return retCode;
+}
+
+static bool IsNeedRemoveMonitor()
+{
+    if (g_mouseMonitorCallbacks.empty() && g_touchMonitorCallbacks.empty() &&
+        g_axisMonitorCallbacks.empty() && g_axisMonitorAllCallbacks.empty()) {
+        return true;
+    }
+    return false;
+}
+
+static Input_Result RemovePointerEventMonitor()
+{
+    Input_Result retCode = INPUT_SUCCESS;
+    if (IsNeedRemoveMonitor()) {
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_pointerMonitorId);
+        retCode = NormalizeResult(ret);
+        if (retCode != INPUT_SUCCESS) {
+            return retCode;
+        }
+        g_pointerMonitorId = INVALID_MONITOR_ID;
+    }
+    return retCode;
+}
+
+Input_Result OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_mutex);
+    auto it = g_mouseMonitorCallbacks.find(callback);
+    if (it == g_mouseMonitorCallbacks.end()) {
+        MMI_HILOGE("The callback has not been added.");
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_mouseMonitorCallbacks.erase(it);
+    return RemovePointerEventMonitor();
+}
+
+Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_mutex);
+    auto it = g_touchMonitorCallbacks.find(callback);
+    if (it == g_touchMonitorCallbacks.end()) {
+        MMI_HILOGE("The callback has not been added.");
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_touchMonitorCallbacks.erase(it);
+    return RemovePointerEventMonitor();
+}
+
+Input_Result OH_Input_RemoveAxisEventMonitorForAll(Input_AxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_mutex);
+    auto it = g_axisMonitorAllCallbacks.find(callback);
+    if (it == g_axisMonitorAllCallbacks.end()) {
+        MMI_HILOGE("The callback has not been added.");
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_axisMonitorAllCallbacks.erase(it);
+    return RemovePointerEventMonitor();
+}
+
+Input_Result OH_Input_RemoveAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_mutex);
+    if (g_axisMonitorCallbacks.find(axisEventType) == g_axisMonitorCallbacks.end()) {
+        MMI_HILOGE("The axis event type has not been added.");
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto it = g_axisMonitorCallbacks[axisEventType].find(callback);
+    if (it == g_axisMonitorCallbacks[axisEventType].end()) {
+        MMI_HILOGE("The callback has not been added.");
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_axisMonitorCallbacks[axisEventType].erase(it);
+    if (g_axisMonitorCallbacks[axisEventType].empty()) {
+        g_axisMonitorCallbacks.erase(axisEventType);
+    }
+    return RemovePointerEventMonitor();
+}
+
+static void KeyEventInterceptorCallback(std::shared_ptr<OHOS::MMI::KeyEvent> event)
+{
+    CHKPV(event);
+    Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+    CHKPV(keyEvent);
+    if (!SetKeyEventAction(keyEvent, event->GetKeyAction())) {
+        OH_Input_DestroyKeyEvent(&keyEvent);
+        return;
+    }
+    keyEvent->keyCode = event->GetKeyCode();
+    keyEvent->actionTime = event->GetActionTime();
+    std::lock_guard guard(g_mutex);
+    if (g_keyInterceptorCallback != nullptr) {
+        g_keyInterceptorCallback(keyEvent);
+    }
+    OH_Input_DestroyKeyEvent(&keyEvent);
+}
+
+Input_Result OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback, Input_InterceptorOptions *option)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    if (g_keyInterceptorId != INVALID_INTERCEPTOR_ID) {
+        MMI_HILOGE("Another key event interceptor has been added");
+        return INPUT_REPEAT_INTERCEPTOR;
+    }
+    g_keyInterceptor->SetCallback(KeyEventInterceptorCallback);
+    int32_t ret = g_keyInterceptor->Start(OHOS::MMI::INTERCEPTOR_TYPE_KEY);
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Add key event interceptor failed.");
+        return retCode;
+    }
+    g_keyInterceptorId = ret;
+    g_keyInterceptorCallback = callback;
+    return retCode;
+}
+
+static void TouchEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    std::lock_guard guard(g_mutex);
+    CHKPV(g_pointerInterceptorCallback);
+    if (g_pointerInterceptorCallback->touchCallback == nullptr) {
+        MMI_HILOGE("There is no callback for mouse event interceptor");
+        return;
+    }
+    Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+    CHKPV(touchEvent);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event->GetPointerItem(event->GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    if (!SetTouchEventAction(touchEvent, event->GetPointerAction())) {
+        OH_Input_DestroyTouchEvent(&touchEvent);
+        return;
+    }
+    touchEvent->id = event->GetPointerId();
+    touchEvent->displayX = item.GetDisplayX();
+    touchEvent->displayY = item.GetDisplayY();
+    touchEvent->actionTime = event->GetActionTime();
+    g_pointerInterceptorCallback->touchCallback(touchEvent);
+    OH_Input_DestroyTouchEvent(&touchEvent);
+}
+
+static void MouseEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    std::lock_guard guard(g_mutex);
+    CHKPV(g_pointerInterceptorCallback);
+    if (g_pointerInterceptorCallback->mouseCallback == nullptr) {
+        MMI_HILOGE("There is no callback for mouse event interceptor");
+        return;
+    }
+    Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+    CHKPV(mouseEvent);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event->GetPointerItem(event->GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventAction(mouseEvent, event->GetPointerAction())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    if (!SetMouseEventButton(mouseEvent, event->GetButtonId())) {
+        OH_Input_DestroyMouseEvent(&mouseEvent);
+        return;
+    }
+    mouseEvent->displayX = item.GetDisplayX();
+    mouseEvent->displayY = item.GetDisplayY();
+    mouseEvent->actionTime = event->GetActionTime();
+    g_pointerInterceptorCallback->mouseCallback(mouseEvent);
+    OH_Input_DestroyMouseEvent(&mouseEvent);
+}
+
+static void AxisEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    std::lock_guard guard(g_mutex);
+    CHKPV(g_pointerInterceptorCallback);
+    if (g_pointerInterceptorCallback->axisCallback == nullptr) {
+        MMI_HILOGE("There is no callback for axis event interceptor");
+        return;
+    }
+    Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
+    CHKPV(axisEvent);
+    OHOS::MMI::PointerEvent::PointerItem item;
+    if (!(event->GetPointerItem(event->GetPointerId(), item))) {
+        MMI_HILOGE("Can not get pointerItem for the pointer event");
+        OH_Input_DestroyAxisEvent(&axisEvent);
+        return;
+    }
+    if (!SetAxisValueByAxisEventType(event, axisEvent, event->GetAxisEventType())) {
+        MMI_HILOGE("Fail to set axis value");
+        OH_Input_DestroyAxisEvent(&axisEvent);
+        return;
+    }
+    SetAxisEventAction(axisEvent, event->GetPointerAction());
+    axisEvent->displayX = item.GetDisplayX();
+    axisEvent->displayY = item.GetDisplayY();
+    axisEvent->actionTime = event->GetActionTime();
+    axisEvent->sourceType = event->GetSourceType();
+    g_pointerInterceptorCallback->axisCallback(axisEvent);
+    OH_Input_DestroyAxisEvent(&axisEvent);
+}
+
+static void PointerEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> event)
+{
+    CHKPV(event);
+    if (event->GetSourceType() == SOURCE_TYPE_TOUCHSCREEN) {
+        TouchEventInterceptorCallback(event);
+    } else if (event->GetSourceType() == SOURCE_TYPE_MOUSE && !IsAxisEvent(event->GetPointerAction())) {
+        MouseEventInterceptorCallback(event);
+    } else if (IsAxisEvent(event->GetPointerAction()) && event->GetSourceType() != SOURCE_TYPE_TOUCHSCREEN) {
+        AxisEventInterceptorCallback(event);
+    } else {
+        MMI_HILOGE("Undefined event type");
+    }
+}
+
+Input_Result OH_Input_AddInputEventInterceptor(Input_InterceptorEventCallback *callback,
+                                               Input_InterceptorOptions *option)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    if (g_pointerInterceptorId != INVALID_INTERCEPTOR_ID) {
+        MMI_HILOGE("Another interceptor for input event has been added");
+        return INPUT_REPEAT_INTERCEPTOR;
+    }
+    g_pointerInterceptor->SetCallback(PointerEventInterceptorCallback);
+    int32_t ret = g_pointerInterceptor->Start(OHOS::MMI::INTERCEPTOR_TYPE_POINTER);
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Add pointer event interceptor failed.");
+        return retCode;
+    }
+    g_pointerInterceptorId = ret;
+    g_pointerInterceptorCallback = callback;
+    return retCode;
+}
+
+Input_Result OH_Input_RemoveKeyEventInterceptor(void)
+{
+    CALL_DEBUG_ENTER;
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    int32_t ret = g_keyInterceptor->Stop(OHOS::MMI::INTERCEPTOR_TYPE_KEY);
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Remove key event interceptor failed.");
+        return retCode;
+    }
+    g_keyInterceptorCallback = nullptr;
+    g_keyInterceptorId = INVALID_INTERCEPTOR_ID;
+    return retCode;
+}
+
+Input_Result OH_Input_RemoveInputEventInterceptor(void)
+{
+    CALL_DEBUG_ENTER;
+    Input_Result retCode = INPUT_SUCCESS;
+    std::lock_guard guard(g_mutex);
+    int32_t ret = g_pointerInterceptor->Stop(OHOS::MMI::INTERCEPTOR_TYPE_POINTER);
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Remove pointer event interceptor failed.");
+        return retCode;
+    }
+    g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
+    g_pointerInterceptorCallback = nullptr;
+    return retCode;
+}
+
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
+    int64_t interval = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(interval);
+    *intervalSinceLastInput = interval;
+    Input_Result retCode = INPUT_SUCCESS;
+    retCode = NormalizeResult(ret);
+    if (retCode != INPUT_SUCCESS) {
+        MMI_HILOGE("Get Interval Since Last Input failed");
+        return retCode;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Hotkey **OH_Input_CreateAllSystemHotkeys(int32_t count)
+{
+    if (count <= 0) {
+        MMI_HILOGE("Invalid count:%{public}d", count);
+        return nullptr;
+    }
+    std::vector<std::unique_ptr<OHOS::MMI::KeyOption>> keyOptions;
+    int32_t hotkeyCount = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, hotkeyCount);
+    if (ret != RET_OK || hotkeyCount < 0) {
+        MMI_HILOGE("GetAllSystemHotkeys fail");
+        return nullptr;
+    }
+    if (count != hotkeyCount) {
+        MMI_HILOGE("Parameter error");
+        return nullptr;
+    }
+    auto hotkeys = new (std::nothrow)Input_Hotkey *[count];
+    for (int32_t i = 0; i < count; ++i) {
+        hotkeys[i] = new (std::nothrow)Input_Hotkey();
+    }
+    std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
+    g_hotkeyCounts.insert(std::make_pair(hotkeys, count));
+    return hotkeys;
+}
+
+void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count)
+{
+    std::lock_guard<std::mutex> lock(g_hotkeyCountsMutex);
+    if (g_hotkeyCounts.find(hotkeys) != g_hotkeyCounts.end()) {
+        if (count != g_hotkeyCounts[hotkeys]) {
+                MMI_HILOGW("Parameter inconsistency");
+            }
+        for (int32_t i = 0; i < g_hotkeyCounts[hotkeys]; ++i) {
+            if (hotkeys[i] != nullptr) {
+                delete hotkeys[i];
+                hotkeys[i] = nullptr;
+            }
+        }
+        if (hotkeys != nullptr) {
+            delete[] hotkeys;
+            hotkeys = nullptr;
+        }
+        g_hotkeyCounts.erase(hotkeys);
+    }
+}
+
+Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count)
+{
+    CALL_DEBUG_ENTER;
+    if (count == nullptr) {
+        MMI_HILOGE("Parameter error");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::vector<std::unique_ptr<OHOS::MMI::KeyOption>> keyOptions;
+    int32_t hotkeyCount = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetAllSystemHotkeys(keyOptions, hotkeyCount);
+    if (ret != RET_OK || hotkeyCount < 0) {
+        MMI_HILOGE("GetAllSystemHotkeys fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    if (hotkey == nullptr) {
+        *count = static_cast<int32_t>(hotkeyCount);
+        MMI_HILOGD("Hot key count:%{public}d", *count);
+        return INPUT_SUCCESS;
+    }
+    if ((static_cast<int32_t>(hotkeyCount) != *count) && (*count <= 0)) {
+        MMI_HILOGE("Count:%{public}d is invalid, should be:%{public}d", *count, hotkeyCount);
+        return INPUT_PARAMETER_ERROR;
+    }
+    for (int32_t i = 0; i < hotkeyCount; ++i) {
+        if (hotkey[i] == nullptr) {
+            MMI_HILOGE("hotkey is null, i:%{public}d", i);
+            return INPUT_PARAMETER_ERROR;
+        }
+        hotkey[i]->preKeys = keyOptions[i]->GetPreKeys();
+        hotkey[i]->finalKey = keyOptions[i]->GetFinalKey();
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Hotkey* OH_Input_CreateHotkey(void)
+{
+    CALL_DEBUG_ENTER;
+    Input_Hotkey* hotkey = new (std::nothrow) Input_Hotkey();
+    if (hotkey == nullptr) {
+        MMI_HILOGE("hotkey is null");
+        return nullptr;
+    }
+    return hotkey;
+}
+
+void OH_Input_DestroyHotkey(Input_Hotkey **hotkey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    CHKPV(*hotkey);
+    delete *hotkey;
+    *hotkey = nullptr;
+}
+
+void OH_Input_SetPreKeys(Input_Hotkey *hotkey, int32_t *preKeys, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    CHKPV(preKeys);
+    if (size <= 0) {
+        MMI_HILOGE("PreKeys does not exist");
+        return;
+    }
+
+    for (int32_t i = 0; i < size; ++i) {
+        hotkey->preKeys.insert(preKeys[i]);
+    }
+    return;
+}
+
+Input_Result OH_Input_GetPreKeys(const Input_Hotkey *hotkey, int32_t **preKeys, int32_t *preKeyCount)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(preKeys, INPUT_PARAMETER_ERROR);
+    CHKPR(*preKeys, INPUT_PARAMETER_ERROR);
+    CHKPR(preKeyCount, INPUT_PARAMETER_ERROR);
+    std::set<int32_t> preKey = hotkey->preKeys;
+    int32_t size = preKey.size();
+    if (size <= 0) {
+        MMI_HILOGE("The pressKeys not exit");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    int32_t index = 0;
+    for (auto it = preKey.begin(); it != preKey.end(); ++it) {
+        *preKeys[index++] = *it;
+    }
+    *preKeyCount = size;
+    return INPUT_SUCCESS;
+}
+
+void OH_Input_SetFinalKey(Input_Hotkey *hotkey, int32_t finalKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    hotkey->finalKey = finalKey;
+    return;
+}
+
+Input_Result OH_Input_GetFinalKey(const Input_Hotkey *hotkey, int32_t *finalKeyCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(finalKeyCode, INPUT_PARAMETER_ERROR);
+    *finalKeyCode = hotkey->finalKey;
+    return INPUT_SUCCESS;
+}
+
+void OH_Input_SetRepeat(Input_Hotkey* hotkey, bool isRepeat)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(hotkey);
+    hotkey->isRepeat  = isRepeat;
+}
+
+Input_Result OH_Input_GetRepeat(const Input_Hotkey* hotkey, bool *isRepeat)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(isRepeat, INPUT_PARAMETER_ERROR);
+    *isRepeat = hotkey->isRepeat;
+    return INPUT_SUCCESS;
+}
+
+std::string GetHotkeyName(std::set<int32_t> preKeys, int32_t finalKey, bool isRepeat,
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+{
+    bool isFinalKeyDown = true;
+    int32_t keyDownDuration = 0;
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(finalKey);
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    keyOption->SetFinalKeyDownDuration(keyDownDuration);
+    keyOption->SetRepeat(isRepeat);
+    std::string hotkeyName;
+    for (const auto &item : preKeys) {
+        hotkeyName += std::to_string(item);
+        hotkeyName += ",";
+    }
+    hotkeyName += std::to_string(finalKey);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isFinalKeyDown);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(keyDownDuration);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isRepeat);
+    return hotkeyName;
+}
+
+static int32_t MakeHotkeyInfo(const Input_Hotkey* hotkey, Input_HotkeyInfo* hotkeyInfo,
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(keyOption, INPUT_PARAMETER_ERROR);
+
+    if (hotkey->preKeys.empty()) {
+        MMI_HILOGE("PressedKeys not found");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::set<int32_t> preKeys = hotkey->preKeys;
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_HILOGE("PreKeys size invalid");
+        return INPUT_PARAMETER_ERROR;
+    }
+    for (const auto &item : preKeys) {
+        auto it = std::find(g_pressKeyCodes.begin(), g_pressKeyCodes.end(), item);
+        if (it == g_pressKeyCodes.end()) {
+            MMI_HILOGE("PreKeys is not expect");
+            return INPUT_PARAMETER_ERROR;
+        }
+    }
+
+    int32_t finalKey = hotkey->finalKey;
+    if (finalKey < 0) {
+        MMI_HILOGE("FinalKey:%{private}d is less 0, can not process", finalKey);
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto it = std::find(g_finalKeyCodes.begin(), g_finalKeyCodes.end(), finalKey);
+    if (it != g_finalKeyCodes.end()) {
+        MMI_HILOGE("FinalKey is not expect");
+        return INPUT_PARAMETER_ERROR;
+    }
+
+    bool isRepeat = hotkey->isRepeat;
+    std::string hotkeyName = GetHotkeyName(preKeys, finalKey, isRepeat, keyOption);
+    hotkeyInfo->hotkeyId = hotkeyName;
+    MMI_HILOGI("HotkeyId is :%{private}s", hotkeyInfo->hotkeyId.c_str());
+    return INPUT_SUCCESS;
+}
+
+static int32_t GetSubscribeId(Input_HotkeyInfo* hotkeyInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+
+    auto it = g_callbacks.find(hotkeyInfo->hotkeyId);
+    if (it == g_callbacks.end() || it->second.empty()) {
+        MMI_HILOGD("The callbacks is empty");
+        return INPUT_PARAMETER_ERROR;
+    }
+
+    CHKPR(it->second.front(), INPUT_PARAMETER_ERROR);
+    return it->second.front()->subscribeId;
+}
+
+static int32_t AddHotkeySubscribe(Input_HotkeyInfo* hotkeyInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+    if (g_callbacks.find(hotkeyInfo->hotkeyId) == g_callbacks.end()) {
+        MMI_HILOGD("No callback in %{private}s", hotkeyInfo->hotkeyId.c_str());
+        g_callbacks[hotkeyInfo->hotkeyId] = {};
+    }
+    auto it = g_callbacks.find(hotkeyInfo->hotkeyId);
+    if (it != g_callbacks.end()) {
+        for (const auto &iter: it->second) {
+            if (iter->callback == hotkeyInfo->callback) {
+                MMI_HILOGI("Callback already exist");
+                return INPUT_SUCCESS;
+            }
+        }
+    }
+    it->second.push_back(hotkeyInfo);
+    return INPUT_SUCCESS;
+}
+
+static bool CheckHotkey(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent, std::string &hotkeyEventName)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+
+    int32_t keyEventFinalKey = keyEvent->GetKeyCode();
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
+    if (items.size() > KEYS_SIZE || keyEvent->GetKeyAction() != OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        MMI_HILOGE("Prekeys num more than three or finalkey is not down");
+        return false;
+    }
+
+    bool isFinalKeyDown = true;
+    int32_t keyDownDuration = 0;
+    std::string hotkeyName;
+    bool isRepeat = keyEvent->IsRepeat();
+    std::set<int32_t> presskeys;
+    for (const auto &item : items) {
+        presskeys.insert(item.GetKeyCode());
+    }
+    for (const auto &item : presskeys) {
+        if (item == keyEventFinalKey) {
+            continue;
+        }
+        hotkeyName += std::to_string(item);
+        hotkeyName += ",";
+    }
+    hotkeyName += std::to_string(keyEventFinalKey);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isFinalKeyDown);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(keyDownDuration);
+    hotkeyName += ",";
+    hotkeyName += std::to_string(isRepeat);
+    hotkeyEventName = hotkeyName;
+    MMI_HILOGD("HotkeyEventName:%{private}s", hotkeyEventName.c_str());
+    return true;
+}
+
+static void OnNotifyCallbackWorkResult(Input_HotkeyInfo* reportEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(reportEvent);
+
+    Input_HotkeyInfo *info = new(std::nothrow) Input_HotkeyInfo();
+    if (info == nullptr) {
+        MMI_HILOGE("Info is null");
+        return;
+    }
+    info->keyOption = reportEvent->keyOption;
+    if (info->keyOption == nullptr) {
+        delete info;
+        MMI_HILOGE("KeyOption is null");
+        return;
+    }
+    info->callback = reportEvent->callback;
+    if (info->callback == nullptr) {
+        delete info;
+        MMI_HILOGE("Callback is null");
+        return;
+    }
+
+    Input_Hotkey hotkey;
+    hotkey.preKeys = info->keyOption->GetPreKeys();
+    hotkey.finalKey = info->keyOption->GetFinalKey();
+    hotkey.isRepeat = info->keyOption->IsRepeat();
+    info->callback(&hotkey);
+    delete info;
+}
+
+static void HandleKeyEvent(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::lock_guard guard(g_CallBacksMutex);
+    std::string hotkeyEventName;
+    if (CheckHotkey(keyEvent, hotkeyEventName)) {
+        auto list = g_callbacks[hotkeyEventName];
+        MMI_HILOGD("Callback list size:%{public}zu", list.size());
+        for (const auto &info : list) {
+            if (info->hotkeyId == hotkeyEventName) {
+                OnNotifyCallbackWorkResult(info);
+            }
+        }
+    }
+}
+
+Input_Result OH_Input_AddHotkeyMonitor(const Input_Hotkey* hotkey, Input_HotkeyCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_CallBacksMutex);
+
+    Input_HotkeyInfo *hotkeyInfo = new (std::nothrow) Input_HotkeyInfo();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("MakeHotkeyInfo failed");
+        return INPUT_PARAMETER_ERROR;
+    }
+    hotkeyInfo->keyOption = keyOption;
+    hotkeyInfo->callback = callback;
+    int32_t preSubscribeId = GetSubscribeId(hotkeyInfo);
+    if (preSubscribeId == INPUT_PARAMETER_ERROR) {
+        MMI_HILOGD("HotkeyId:%{private}s", hotkeyInfo->hotkeyId.c_str());
+        int32_t subscribeId = -1;
+        subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, HandleKeyEvent);
+        if (subscribeId == OCCUPIED_BY_SYSTEM) {
+            delete hotkeyInfo;
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            return INPUT_OCCUPIED_BY_SYSTEM;
+        }
+        if (subscribeId == OCCUPIED_BY_OTHER) {
+            delete hotkeyInfo;
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            return INPUT_OCCUPIED_BY_OTHER;
+        }
+        MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+        hotkeyInfo->subscribeId = subscribeId;
+    } else {
+        hotkeyInfo->subscribeId = preSubscribeId;
+    }
+    if (AddHotkeySubscribe(hotkeyInfo) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("AddHotkeySubscribe fail");
+        return INPUT_PARAMETER_ERROR;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t DelHotkeyMonitor(std::list<Input_HotkeyInfo *> &infos,
+    Input_HotkeyCallback callback, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(&infos, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+
+    auto iter = infos.begin();
+    while (iter != infos.end()) {
+        if (*iter == nullptr) {
+            iter = infos.erase(iter);
+            continue;
+        }
+        if (callback == nullptr) {
+            Input_HotkeyInfo *monitorInfo = *iter;
+            infos.erase(iter++);
+            if (infos.empty()) {
+                subscribeId = monitorInfo->subscribeId;
+            }
+            delete monitorInfo;
+            MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
+            continue;
+        }
+        if ((*iter)->callback == callback) {
+            Input_HotkeyInfo *monitorInfo = *iter;
+            iter = infos.erase(iter);
+            if (infos.empty()) {
+                subscribeId = monitorInfo->subscribeId;
+            }
+            delete monitorInfo;
+            MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
+            return INPUT_SUCCESS;
+        }
+        ++iter;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t DelEventCallback(Input_HotkeyInfo* hotkeyInfo, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkeyInfo, INPUT_PARAMETER_ERROR);
+    if (g_callbacks.count(hotkeyInfo->hotkeyId) <= 0) {
+        MMI_HILOGE("Callback doesn't exists");
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto &info = g_callbacks[hotkeyInfo->hotkeyId];
+    MMI_HILOGD("HotkeyId is :%{private}s, Input_HotkeyInfo:%{public}zu", hotkeyInfo->hotkeyId.c_str(), info.size());
+    return DelHotkeyMonitor(info, hotkeyInfo->callback, subscribeId);
+}
+
+Input_Result OH_Input_RemoveHotkeyMonitor(const Input_Hotkey *hotkey, Input_HotkeyCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(hotkey, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_CallBacksMutex);
+
+    Input_HotkeyInfo *hotkeyInfo = new (std::nothrow) Input_HotkeyInfo();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    if (MakeHotkeyInfo(hotkey, hotkeyInfo, keyOption) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("MakeHotkeyInfo failed");
+        return INPUT_PARAMETER_ERROR;
+    }
+    hotkeyInfo->callback = callback;
+    int32_t subscribeId = -1;
+    if (DelEventCallback(hotkeyInfo, subscribeId) != INPUT_SUCCESS) {
+        delete hotkeyInfo;
+        MMI_HILOGE("DelEventCallback failed");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+    if (subscribeId >= 0) {
+        OHOS::MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    }
+    delete hotkeyInfo;
+    return INPUT_SUCCESS;
+}
+
+static void DeviceAddedCallback(int32_t deviceId, const std::string& Type)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    for (auto listener : g_ohDeviceListenerList) {
+        if (listener == nullptr) {
+            MMI_HILOGE("listener is nullptr");
+            continue;
+        }
+        if (listener->deviceAddedCallback == nullptr) {
+            MMI_HILOGE("OnDeviceAdded is nullptr");
+            continue;
+        }
+        listener->deviceAddedCallback(deviceId);
+    }
+}
+
+static void DeviceRemovedCallback(int32_t deviceId, const std::string& Type)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    for (auto listener : g_ohDeviceListenerList) {
+        if (listener == nullptr) {
+            MMI_HILOGE("listener is nullptr");
+            continue;
+        }
+        if (listener->deviceRemovedCallback == nullptr) {
+            MMI_HILOGE("OnDeviceRemoved is nullptr");
+            continue;
+        }
+        listener->deviceRemovedCallback(deviceId);
+    }
+}
+
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener)
+{
+    CALL_DEBUG_ENTER;
+    if (listener == nullptr || listener->deviceAddedCallback == nullptr ||
+        listener->deviceRemovedCallback == nullptr) {
+        MMI_HILOGE("listener or callback is null");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    if (g_ohDeviceListenerList.empty()) {
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->RegisterDevListener("change", g_deviceListener);
+        g_deviceListener->SetDeviceAddedCallback(DeviceAddedCallback);
+        g_deviceListener->SetDeviceRemovedCallback(DeviceRemovedCallback);
+        if (ret != RET_OK) {
+            MMI_HILOGE("RegisterDevListener fail");
+            return INPUT_SERVICE_EXCEPTION;
+        }
+    }
+    g_ohDeviceListenerList.insert(listener);
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener* listener)
+{
+    CALL_DEBUG_ENTER;
+    if (listener == nullptr) {
+        MMI_HILOGE("listener is nullptr");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    auto it = g_ohDeviceListenerList.find(listener);
+    if (it == g_ohDeviceListenerList.end()) {
+        MMI_HILOGE("listener not found");
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_ohDeviceListenerList.erase(it);
+    if (g_ohDeviceListenerList.empty()) {
+        int32_t ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
+        if (ret != RET_OK) {
+            MMI_HILOGE("UnregisterDevListener fail");
+            return INPUT_SERVICE_EXCEPTION;
+        }
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_UnregisterDeviceListeners()
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(g_DeviceListerCallbackMutex);
+    if (g_ohDeviceListenerList.empty()) {
+        return INPUT_SUCCESS;
+    }
+    auto ret = OHOS::MMI::InputManager::GetInstance()->UnregisterDevListener("change", g_deviceListener);
+    g_ohDeviceListenerList.clear();
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnregisterDevListener fail");
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *outSize)
+{
+    CALL_DEBUG_ENTER;
+    if (inSize < 0) {
+        MMI_HILOGE("Invalid inSize:%{public}d", inSize);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(deviceIds, INPUT_PARAMETER_ERROR);
+    CHKPR(outSize, INPUT_PARAMETER_ERROR);
+    auto nativeCallback = [&](std::vector<int32_t> &ids) {
+        auto deviceIdslength = static_cast<int32_t>(ids.size());
+        if (inSize > deviceIdslength) {
+            *outSize = deviceIdslength;
+        }
+        if (inSize < deviceIdslength) {
+            *outSize = inSize;
+        }
+        for (int32_t i = 0; i < *outSize; ++i) {
+            *(deviceIds + i) = ids[i];
+        }
+    };
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDeviceIds(nativeCallback);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDeviceIds fail");
+        return INPUT_PARAMETER_ERROR;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_DeviceInfo* OH_Input_CreateDeviceInfo(void)
+{
+    CALL_DEBUG_ENTER;
+    Input_DeviceInfo* deviceInfo = new (std::nothrow) Input_DeviceInfo();
+    if (deviceInfo == nullptr) {
+        MMI_HILOGE("deviceInfo is null");
+        return nullptr;
+    }
+    return deviceInfo;
+}
+
+void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(deviceInfo);
+    CHKPV(*deviceInfo);
+    delete *deviceInfo;
+    *deviceInfo = nullptr;
+}
+
+Input_Result OH_Input_GetDevice(int32_t deviceId, Input_DeviceInfo **deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    if (deviceId < 0) {
+        MMI_HILOGE("Invalid deviceId:%{public}d", deviceId);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(*deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    auto nativeCallback = [deviceInfo](std::shared_ptr<OHOS::MMI::InputDevice> device) {
+        CHKPV(*deviceInfo);
+        (*deviceInfo)->id = device->GetId();
+        if (strcpy_s((*deviceInfo)->name, device->GetName().size() + 1, device->GetName().c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            return;
+        }
+        (*deviceInfo)->product = device->GetProduct();
+        (*deviceInfo)->vendor = device->GetVendor();
+        (*deviceInfo)->version = device->GetVersion();
+        if (strcpy_s((*deviceInfo)->phys, device->GetPhys().size() + 1, device->GetPhys().c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            return;
+        }
+        (*deviceInfo)->ability = device->GetType();
+    };
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetDevice(deviceId, nativeCallback);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDevice fail");
+        return INPUT_PARAMETER_ERROR;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *KeyboardType)
+{
+    CALL_DEBUG_ENTER;
+    if (deviceId < 0) {
+        MMI_HILOGE("Invalid deviceId:%{public}d", deviceId);
+        return INPUT_PARAMETER_ERROR;
+    }
+    CHKPR(KeyboardType, INPUT_PARAMETER_ERROR);
+    auto nativeCallback = [KeyboardType](int32_t keyboardTypes) {
+        *KeyboardType = keyboardTypes;
+    };
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetKeyboardType(deviceId, nativeCallback);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardType fail");
+        return INPUT_PARAMETER_ERROR;
+    }
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(name, INPUT_PARAMETER_ERROR);
+    *name = deviceInfo->name;
+    return INPUT_SUCCESS;
+}
+
+
+Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(address, INPUT_PARAMETER_ERROR);
+    *address = deviceInfo->phys;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(id, INPUT_PARAMETER_ERROR);
+    *id = deviceInfo->id;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *capabilities)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(capabilities, INPUT_PARAMETER_ERROR);
+    *capabilities = deviceInfo->ability;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *version)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(version, INPUT_PARAMETER_ERROR);
+    *version = deviceInfo->version;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *product)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(product, INPUT_PARAMETER_ERROR);
+    *product = deviceInfo->product;
+    return INPUT_SUCCESS;
+}
+
+Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *vendor)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(deviceInfo, INPUT_PARAMETER_ERROR);
+    CHKPR(vendor, INPUT_PARAMETER_ERROR);
+    *vendor = deviceInfo->vendor;
+    return INPUT_SUCCESS;
 }

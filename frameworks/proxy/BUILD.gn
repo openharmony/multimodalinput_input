@@ -23,6 +23,7 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
+    "${mmi_path}/interfaces/kits/c/input",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
@@ -55,7 +56,6 @@ config("libmmi_test_util") {
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
-    "//third_party/googletest/googletest/include",
   ]
 }
 
@@ -143,13 +143,17 @@ ohos_shared_library("libmmi-client") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "hicollie:libhicollie",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("ut-mmi-proxy-out") {
@@ -166,12 +170,12 @@ ohos_unittest("ut-mmi-proxy-out") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
@@ -195,8 +199,6 @@ ohos_unittest("KeyEventTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -204,6 +206,9 @@ ohos_unittest("KeyEventTest") {
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
     "window_manager:libwm",
@@ -248,8 +253,10 @@ ohos_unittest("InputHandlerManagerTest") {
     "data_share:datashare_consumer",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",
     "ffrt:libffrt",
+    "googletest:gtest_main",
     "graphic_2d:2d_graphics",
     "graphic_2d:libcomposer",
     "graphic_2d:librender_service_client",
@@ -258,19 +265,21 @@ ohos_unittest("InputHandlerManagerTest") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
     "preferences:native_preferences",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "window_manager:libdm",
+    "samgr:samgr_proxy",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("SwitchEventInputSubscribeManagerTest") {
@@ -301,8 +310,6 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -311,6 +318,8 @@ ohos_unittest("SwitchEventInputSubscribeManagerTest") {
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -331,6 +340,9 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   sources = [
+    "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
+    "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
+    "${mmi_path}/frameworks/proxy/events/src/i_anco_consumer.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_server.cpp",
     "${mmi_path}/service/connect_manager/src/input_binder_client_stub.cpp",
     "${mmi_path}/service/connect_manager/src/multimodal_input_connect_death_recipient.cpp",
@@ -357,21 +369,29 @@ ohos_unittest("InputManagerImplTest") {
     "-Dprotected=public",
   ]
 
-  deps = [ "${mmi_path}/util:libmmi-util" ]
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+  ]
 
   external_deps = [
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
+
+  if (hitrace_enabled) {
+    external_deps += [ "hitrace:hitrace_meter" ]
+  }
 }
 
 ohos_unittest("InputManagerTest") {
@@ -402,8 +422,6 @@ ohos_unittest("InputManagerTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -412,6 +430,8 @@ ohos_unittest("InputManagerTest") {
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
@@ -446,8 +466,6 @@ ohos_unittest("InputManagerInjectTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -456,6 +474,8 @@ ohos_unittest("InputManagerInjectTest") {
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "init:libbegetutil",
@@ -478,14 +498,15 @@ ohos_unittest("InputManagerManualTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
@@ -504,14 +525,15 @@ ohos_unittest("InputManagerFilterManualTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken_shared",
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
@@ -540,8 +562,6 @@ ohos_unittest("PointerEventTest") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "ability_runtime:abilitykit_native",
@@ -550,6 +570,8 @@ ohos_unittest("PointerEventTest") {
     "access_token:libtokensetproc_shared",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",

@@ -16,6 +16,7 @@
 #include "server_msg_handler.h"
 
 #include <cinttypes>
+#include "ipc_skeleton.h"
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
@@ -23,9 +24,11 @@
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
 #include "client_death_handler.h"
+#include "display_event_monitor.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
+#include "event_log_helper.h"
 #include "hos_key_event.h"
 #include "input_device_manager.h"
 #include "input_event.h"
@@ -54,9 +57,11 @@ namespace {
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
-constexpr int32_t DEFAULT_POINTER_ID { 10000 };
+[[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
-constexpr int32_t WINDOW_ROTATE { 0 };
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_PC = "2in1";
+[[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
 
@@ -66,10 +71,14 @@ void ServerMsgHandler::Init(UDSServer &udsServer)
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnDisplayInfo(sess, pkt); }},
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         {MmiMessageId::WINDOW_AREA_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnWindowAreaInfo(sess, pkt); }},
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::WINDOW_INFO, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnWindowGroupInfo(sess, pkt); }},
+        {MmiMessageId::WINDOW_STATE_ERROR_CALLBACK, [this] (SessionPtr sess, NetPacket &pkt) {
+            return this->RegisterWindowStateErrorCallback(sess, pkt); }},
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         {MmiMessageId::SCINFO_CONFIG, [this] (SessionPtr sess, NetPacket &pkt) {
             return this->OnEnhanceConfig(sess, pkt); }},
@@ -110,6 +119,15 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
+        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+            MMI_HILOGW("Current device has no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            MMI_HILOGW("Screen locked, no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -122,11 +140,10 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-                [&] (int32_t pid) {
-                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-                }
-                );
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -139,7 +156,11 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
-    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("Inject keyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    } else {
+        MMI_HILOGD("Inject keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    }
     return RET_OK;
 }
 
@@ -184,6 +205,15 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
+        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+            MMI_HILOGW("Current device has no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            MMI_HILOGW("Screen locked, no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -196,6 +226,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -204,6 +238,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         }
     }
     return OnInjectPointerEventExt(pointerEvent, isShell);
+}
+
+bool ServerMsgHandler::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    return pointerEvent->GetZOrder() > 0;
 }
 
 int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
@@ -215,14 +254,19 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    bool isStoreWindowId = true;
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+            isStoreWindowId = pointerEvent->GetTargetWindowId() <= 0;
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-            TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
+                !IsNavigationWindowInjectEvent(pointerEvent)) {
+                TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+            }
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
@@ -240,12 +284,14 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             UpdatePointerEvent(pointerEvent);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             CHKPR(pointerEvent, ERROR_NULL_POINTER);
-            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0);
+            if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+                break;
+            } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0, false);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
             }
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
@@ -255,16 +301,19 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             break;
         }
     }
-    return SaveTargetWindowId(pointerEvent, isShell);
+    return SaveTargetWindowId(pointerEvent, isShell, isStoreWindowId);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
         (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) ||
         ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) &&
-         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE))) {
-        return RET_OK;
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) &&
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_DOWN))) {
+            return RET_OK;
     }
     PointerEvent::PointerItem pointerItem {};
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
@@ -283,7 +332,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -303,8 +352,13 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
-        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("Cursor move to (x:%{public}.2f, y:%{public}.2f, DisplayId:%{public}d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    } else {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    }
     return RET_OK;
 }
 
@@ -324,7 +378,9 @@ void ServerMsgHandler::CalculateOffset(Direction direction, Offset &offset)
         offset.dy = tmp;
     }
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
@@ -343,9 +399,13 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
-int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
+    bool isStoreWindowId)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!isStoreWindowId) {
+        return RET_OK;
+    }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -387,6 +447,9 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
+    }
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        return true;
     }
     if (isShell) {
         auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
@@ -431,7 +494,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.defaultHotAreas >> extensionInfo.pointerHotAreas >> extensionInfo.agentWindowId
             >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
             >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
-            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag;
+            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag
+            >> extensionInfo.rectChangeBySystem;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -462,11 +526,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
 
-        if (byteCount != 0) {
-            MMI_HILOGD("byteCount:%{public}d", byteCount);
-            SetWindowInfo(info.id, info);
-        }
         OnUiExtentionWindowInfo(pkt, info);
+        pkt >> info.rectChangeBySystem;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -477,7 +538,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -492,6 +553,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_DEBUG_ENTER;
@@ -508,6 +570,7 @@ int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
     WIN_MGR->SetWindowPointerStyle(area, pid, windowId);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
 {
@@ -528,6 +591,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType;
         OnUiExtentionWindowInfo(pkt, info);
+        pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -535,6 +599,15 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
         }
     }
     WIN_MGR->UpdateWindowInfo(windowGroupInfo);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::RegisterWindowStateErrorCallback(SessionPtr sess, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = sess->GetPid();
+    WIN_MGR->SetWindowStateNotifyPid(pid);
+    MMI_HILOGI("pid:%{public}d", pid);
     return RET_OK;
 }
 
@@ -613,6 +686,33 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+int32_t ServerMsgHandler::OnAddGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        return monitorHandler->AddInputHandler(handlerType, eventType, sess, gestureType, fingers);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        monitorHandler->RemoveInputHandler(handlerType, eventType, sess, gestureType, fingers);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)
 {
@@ -642,7 +742,7 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
-    int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+    int32_t subscribeId, const std::shared_ptr<KeyOption> option, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -650,10 +750,10 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
-    return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option);
+    return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option, isSystem);
 }
 
-int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId, bool isSystem)
 {
     CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
@@ -661,7 +761,7 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
     CHKPR(subscriberHandler, ERROR_NULL_POINTER);
-    return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
+    return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId, isSystem);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -690,7 +790,7 @@ int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t p
 }
 #endif // OHOS_BUILD_ENABLE_SWITCH
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
 int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     int32_t filterId, int32_t priority, uint32_t deviceTags, int32_t clientPid)
 {
@@ -705,7 +805,7 @@ int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filt
     CHKPR(filterHandler, ERROR_NULL_POINTER);
     return filterHandler->RemoveInputEventFilter(clientPid, filterId);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH || OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::SetShieldStatus(int32_t shieldMode, bool isShield)
@@ -796,7 +896,7 @@ void ServerMsgHandler::SetWindowInfo(int32_t infoId, WindowInfo &info)
     info.pixelMap = transparentWins_[infoId].get();
 }
 
-int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
+int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap) __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     if (infoId < 0 || pixelMap == nullptr) {
@@ -804,10 +904,7 @@ int32_t ServerMsgHandler::SetPixelMapData(int32_t infoId, void *pixelMap)
         return ERR_INVALID_VALUE;
     }
 
-    std::unique_ptr<OHOS::Media::PixelMap> pixelMapPtr(static_cast<OHOS::Media::PixelMap*>(pixelMap));
-    MMI_HILOGD("byteCount:%{public}d, width:%{public}d, height:%{public}d",
-        pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
-    transparentWins_.insert_or_assign(infoId, std::move(pixelMapPtr));
+    WIN_MGR->SetPixelMapData(infoId, pixelMap);
     return RET_OK;
 }
 
@@ -851,7 +948,7 @@ bool ServerMsgHandler::AddInjectNotice(const InjectNoticeInfo &noticeInfo)
         MMI_HILOGE("InitinjectNotice_ Source error");
         return false;
     }
-    MMI_HILOGD("SendNotice submit  begin");
+    MMI_HILOGD("SendNotice submit begin");
     ffrt::submit([this, noticeInfo] {
         MMI_HILOGD("SendNotice submit enter");
         CHKPV(injectNotice_);

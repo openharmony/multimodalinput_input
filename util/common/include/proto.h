@@ -36,6 +36,8 @@ enum class MmiMessageId : int32_t {
     WINDOW_AREA_INFO,
     NOTIFY_BUNDLE_NAME,
     WINDOW_INFO,
+    WINDOW_STATE_ERROR_CALLBACK,
+    WINDOW_STATE_ERROR_NOTIFY,
 };
 
 enum TokenType : int32_t {
@@ -43,6 +45,7 @@ enum TokenType : int32_t {
     TOKEN_HAP = 0,
     TOKEN_NATIVE,
     TOKEN_SHELL,
+    TOKEN_SYSTEM_HAP,
 };
 
 enum ANTTimeOutTime : int64_t {

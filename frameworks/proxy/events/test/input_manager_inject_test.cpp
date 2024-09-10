@@ -661,38 +661,6 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_005, TestSiz
 }
 
 /**
- * @tc.name: InputManager_InjectMouseEvent_006
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_006");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
  * @tc.name: InputManager_InjectMouseEvent_007
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
@@ -781,99 +749,6 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_009, TestSize.Lev
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_010
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_010, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_010");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_011
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_011, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_011");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-}
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_012
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_012, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGI("Add monitor InjectMouseEvent_012");
-    };
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
-    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
-
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_RIGHT);
-
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);
-    item.SetDisplayX(200);
-    item.SetDisplayY(200);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->AddPointerItem(item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
@@ -1863,6 +1738,171 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Lev
     InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
     ASSERT_NE(frameCount, 1);
     ASSERT_NE(vsyncCount, 1);
+}
+
+HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_001, TestSize.Level1)
+{
+    int32_t disPlayX[3] = {893, 52, 81 };
+    int32_t disPlayY[3] = {620, 37, 46 };
+
+    int32_t fingerCount = 3;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(0);
+    pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetPointerId(fingerCount - 1);
+    int64_t actionTimeBase = GetSysClockTime();
+    pointerEvent->SetActionTime(actionTimeBase);
+    pointerEvent->SetActionStartTime(actionTimeBase);
+    PointerEvent::PointerItem item;
+    item.SetDownTime(pointerEvent->GetActionStartTime());
+    item.SetDisplayX(disPlayX[0]);
+    item.SetDisplayY(disPlayY[0]);
+    pointerEvent->AddPointerItem(item);
+    for (int32_t j = 1; j < fingerCount; j++) {
+        PointerEvent::PointerItem itemFirst;
+        itemFirst.SetPointerId(j);
+        itemFirst.SetDownTime(actionTimeBase);
+        itemFirst.SetDisplayX(disPlayX[j - 1]);
+        itemFirst.SetDisplayY(disPlayY[j - 1]);
+        itemFirst.SetPressed(1);
+        pointerEvent->AddPointerItem(itemFirst);
+    }
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
+}
+
+HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_002, TestSize.Level1)
+{
+    int32_t disPlayX[3] = {0, 52, 81};
+    int32_t disPlayY[3] = {0, 37, 46};
+    int32_t fingerCount = 3;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(0);
+    pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetPointerId(fingerCount - 1);
+    int64_t actionTimeBase = GetSysClockTime();
+    pointerEvent->SetActionTime(actionTimeBase);
+    pointerEvent->SetActionStartTime(actionTimeBase);
+    PointerEvent::PointerItem item;
+    item.SetDownTime(pointerEvent->GetActionStartTime());
+    item.SetDisplayX(disPlayX[0]);
+    item.SetDisplayY(disPlayY[0]);
+    pointerEvent->AddPointerItem(item);
+    for (int32_t j = 1; j < fingerCount; j++) {
+        PointerEvent::PointerItem itemFirst;
+        itemFirst.SetPointerId(j);
+        itemFirst.SetDownTime(actionTimeBase);
+        itemFirst.SetDisplayX(disPlayX[j - 1]);
+        itemFirst.SetDisplayY(disPlayY[j - 1]);
+        itemFirst.SetPressed(1);
+        pointerEvent->AddPointerItem(itemFirst);
+    }
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
+}
+
+HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_003, TestSize.Level1)
+{
+    int32_t disPlayX[3] = {894, 52, 81};
+    int32_t disPlayY[3] = {562, 33, 42};
+    int32_t fingerCount = 3;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(0);
+    pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetPointerId(fingerCount - 1);
+    int64_t actionTimeBase = GetSysClockTime();
+    pointerEvent->SetActionTime(actionTimeBase);
+    pointerEvent->SetActionStartTime(actionTimeBase);
+    PointerEvent::PointerItem item;
+    item.SetDownTime(pointerEvent->GetActionStartTime());
+    item.SetDisplayX(disPlayX[0]);
+    item.SetDisplayY(disPlayY[0]);
+    pointerEvent->AddPointerItem(item);
+    for (int32_t j = 1; j < fingerCount; j++) {
+        PointerEvent::PointerItem itemFirst;
+        itemFirst.SetPointerId(j);
+        itemFirst.SetDownTime(actionTimeBase);
+        itemFirst.SetDisplayX(disPlayX[j - 1]);
+        itemFirst.SetDisplayY(disPlayY[j - 1]);
+        itemFirst.SetPressed(1);
+        pointerEvent->AddPointerItem(itemFirst);
+    }
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
+}
+
+HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_004, TestSize.Level1)
+{
+    int32_t fingerCount = 2;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(0);
+    pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetPointerId(fingerCount - 1);
+    int64_t actionTimeBase = GetSysClockTime();
+    pointerEvent->SetActionTime(actionTimeBase);
+    pointerEvent->SetActionStartTime(actionTimeBase);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, 0.87);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetDownTime(actionTimeBase);
+    itemFirst.SetDisplayX(135);
+    itemFirst.SetDisplayY(105);
+    itemFirst.SetWindowX(135);
+    itemFirst.SetWindowY(105);
+    itemFirst.SetToolType(0);
+    pointerEvent->AddPointerItem(itemFirst);
+    PointerEvent::PointerItem itemSecond;
+    itemSecond.SetPointerId(1);
+    itemSecond.SetDownTime(actionTimeBase);
+    itemSecond.SetDisplayX(95);
+    itemSecond.SetDisplayY(95);
+    itemSecond.SetWindowX(85);
+    itemSecond.SetWindowY(85);
+    itemSecond.SetPressed(0);
+    pointerEvent->AddPointerItem(itemSecond);
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
+}
+
+HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_005, TestSize.Level1)
+{
+    int32_t fingerCount = 2;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetId(0);
+    pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetFingerCount(fingerCount);
+    pointerEvent->SetPointerId(fingerCount - 1);
+    int64_t actionTimeBase = GetSysClockTime();
+    pointerEvent->SetActionTime(actionTimeBase);
+    pointerEvent->SetActionStartTime(actionTimeBase);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, 0.87);
+    PointerEvent::PointerItem itemFirst;
+    itemFirst.SetDownTime(actionTimeBase);
+    itemFirst.SetDisplayX(125);
+    itemFirst.SetDisplayY(100);
+    itemFirst.SetWindowX(125);
+    itemFirst.SetWindowY(100);
+    itemFirst.SetToolType(0);
+    pointerEvent->AddPointerItem(itemFirst);
+    PointerEvent::PointerItem itemSecond;
+    itemSecond.SetPointerId(1);
+    itemSecond.SetDownTime(actionTimeBase);
+    itemSecond.SetDisplayX(98);
+    itemSecond.SetDisplayY(98);
+    itemSecond.SetWindowX(89);
+    itemSecond.SetWindowY(89);
+    itemSecond.SetPressed(0);
+    pointerEvent->AddPointerItem(itemSecond);
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -329,6 +329,8 @@ struct WindowInfo {
     bool privacyUIFlag { false };
 
     std::vector<WindowInfo> uiExtentionWindowInfo;
+
+    bool rectChangeBySystem { false };
 };
 
 /**
@@ -410,6 +412,14 @@ struct DisplayInfo {
      * @since 9
      */
     DisplayMode displayMode { DisplayMode::UNKNOWN };
+
+    /**
+     * Number of transform in the screen which is used to calculate the display x and display y by logic x and logic y.
+     * The value must be POINTER_CHANGEAREA_COUNT.
+     *
+     * @since 12
+     */
+    std::vector<float> transform;
 };
 
 /**

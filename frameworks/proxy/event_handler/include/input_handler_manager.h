@@ -41,7 +41,10 @@ public:
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+    template<typename T>
+    bool RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
     void OnConnected();
+    void OnDisconnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     bool HasHandler(int32_t handlerId);
     virtual InputHandlerType GetHandlerType() const = 0;
@@ -50,29 +53,44 @@ public:
     uint32_t GetDeviceTags() const;
 
 protected:
+    int32_t AddGestureMonitor(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
+    int32_t RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType);
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_KP, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
-    void RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
+    int32_t RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
 private:
+    struct GestureHandler {
+        TouchGestureType gestureType { TOUCH_GESTURE_TYPE_NONE };
+        int32_t fingers { 0 };
+    };
     struct Handler {
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
-        HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
+        HandleEventType eventType_ { HANDLE_EVENT_TYPE_KP };
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
+        GestureHandler gestureHandler_;
     };
 
 private:
     int32_t GetNextId();
+    virtual bool CheckMonitorValid(TouchGestureType type, int32_t fingers)
+    {
+        return false;
+    }
+    bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count) const;
+    int32_t AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
+        TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer);
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);
     int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType, uint32_t &deviceTags);
-    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+    int32_t RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
@@ -95,6 +113,7 @@ private:
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

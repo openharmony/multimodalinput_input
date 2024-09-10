@@ -42,7 +42,6 @@ constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
 constexpr int32_t FINGER_TAP_THREE { 3 };
-constexpr int32_t FINGER_MOTION_MAX { 30 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 constexpr int32_t MIN_ROWS { 1 };
@@ -127,7 +126,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event 
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem item;
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
-        MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
+        MMI_HILOGD("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
                    seatSlot, PARAM_INPUT_FAIL);
         return RET_ERR;
     }
@@ -226,19 +225,11 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
             ret = OnEventTouchPadSwipeEnd(event);
             break;
         }
-
-        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            ret = OnEventTouchPadPinchBegin(event);
+        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN:
+        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE:
+        case LIBINPUT_EVENT_GESTURE_PINCH_END:
+            OnEventTouchPadPinchGesture(event);
             break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            ret = OnEventTouchPadPinchUpdate(event);
-            break;
-        }
-        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            ret = OnEventTouchPadPinchEnd(event);
-            break;
-        }
         default: {
             MMI_HILOGW("Touch pad action is not found");
             return nullptr;
@@ -257,9 +248,12 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         pointerEvent_->GetPointerIds().size(), MMI_LOG_FREEZE);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
-    aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
-        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
-        std::to_string(pointerEvent_->GetId()));
+    if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE) {
+        aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
+            std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
+            std::to_string(pointerEvent_->GetId()));
+    }
 
     return pointerEvent_;
 }
@@ -372,6 +366,7 @@ int32_t TouchPadTransformProcessor::AddItemForEventWhileSetSwipeData(int64_t tim
     pointerItem.SetDisplayY(sumY / fingerCount);
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     return RET_OK;
@@ -403,45 +398,12 @@ void TouchPadTransformProcessor::SetTouchPadMultiTapData()
     pointerEvent_->SetFingerCount(static_cast<int32_t>(state));
 }
 
-int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *event, int32_t action)
-{
-    CALL_DEBUG_ENTER;
-
-    bool tpPinchSwitch = true;
-    GetTouchpadPinchSwitch(tpPinchSwitch);
-
-    CHKPR(event, RET_ERR);
-    auto gesture = libinput_event_get_gesture_event(event);
-    CHKPR(gesture, RET_ERR);
-    int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
-    if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
-        MMI_HILOGE("Finger count is invalid");
-        return RET_ERR;
-    }
-
-    if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
-        MMI_HILOGD("Touchpad pinch switch is false");
-        return RET_ERR;
-    }
-
-    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
-    double scale = libinput_event_gesture_get_scale(gesture);
-
-    pointerEvent_->SetActionTime(GetSysClockTime());
-    pointerEvent_->SetActionStartTime(time);
-
-    SetPinchPointerItem(time);
-
-    ProcessTouchPadPinchDataEvent(fingerCount, action, scale);
-
-    return RET_OK;
-}
-
 void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
 {
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
@@ -452,8 +414,10 @@ void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
 }
 
-void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale)
+void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent
+    (int32_t fingerCount, int32_t action, double scale, double angle)
 {
+    CALL_DEBUG_ENTER;
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
@@ -468,14 +432,20 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->SetPointerAction(action);
-    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+    if (!MMI_EQ(scale, 0.0)) {
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+    }
+    if (!MMI_EQ(angle, 0.0)) {
+        rotateAngle_ += angle;
+        MMI_HILOGD("The rotate angle is %{public}f", rotateAngle_);
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, rotateAngle_);
+    }
 
     if (fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
         pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+        pointerEvent_->SetAxisEventType(PointerEvent::AXIS_EVENT_TYPE_PINCH);
     } else {
         pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
     }
 
     if (pointerEvent_->GetFingerCount() == TP_SYSTEM_PINCH_FINGER_CNT) {
@@ -489,22 +459,71 @@ void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCou
     }
 }
 
-int32_t TouchPadTransformProcessor::OnEventTouchPadPinchBegin(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadPinchGesture(libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    return SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    CHKPR(event, RET_ERR);
+    auto type = libinput_event_get_type(event);
+    auto gesture = libinput_event_get_gesture_event(event);
+    CHKPR(gesture, RET_ERR);
+    double scale = libinput_event_gesture_get_scale(gesture);
+    double angle = libinput_event_gesture_get_angle_delta(gesture);
+    auto action = GetPinchGestureType(type, angle);
+    MMI_HILOGD("The action is %{public}d, scale is %{public}f, angle is %{public}f", action, scale, angle);
+    int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
+    MMI_HILOGD("The finger count is %{public}d", fingerCount);
+    if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
+        MMI_HILOGE("Finger count is invalid");
+        return RET_ERR;
+    }
+    bool tpPinchSwitch = false;
+    GetTouchpadPinchSwitch(tpPinchSwitch);
+    if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT &&
+        (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
+        action == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+        action == PointerEvent::POINTER_ACTION_AXIS_END)) {
+        MMI_HILOGD("Touchpad pinch switch is false");
+        return RET_ERR;
+    }
+    bool tpRotateSwitch = false;
+    GetTouchpadPinchSwitch(tpRotateSwitch);
+    if (!tpRotateSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT &&
+        (action == PointerEvent::POINTER_ACTION_ROTATE_BEGIN ||
+        action == PointerEvent::POINTER_ACTION_ROTATE_UPDATE ||
+        action == PointerEvent::POINTER_ACTION_ROTATE_END)) {
+        MMI_HILOGD("Touchpad rotate switch is false");
+        return RET_ERR;
+    }
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
+    pointerEvent_->SetActionTime(GetSysClockTime());
+    pointerEvent_->SetActionStartTime(time);
+    SetPinchPointerItem(time);
+    ProcessTouchPadPinchDataEvent(fingerCount, action, scale, angle);
+    return RET_OK;
 }
 
-int32_t TouchPadTransformProcessor::OnEventTouchPadPinchUpdate(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::GetPinchGestureType(int32_t type, double angle)
 {
-    CALL_DEBUG_ENTER;
-    return SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-}
-
-int32_t TouchPadTransformProcessor::OnEventTouchPadPinchEnd(struct libinput_event *event)
-{
-    CALL_DEBUG_ENTER;
-    return SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_END);
+    switch (type) {
+        case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
+            rotateAngle_ = 0.0;
+            isRotateGesture_ = MMI_EQ(angle, 0.0) ? false : true;
+            return MMI_EQ(angle, 0.0) ? PointerEvent::POINTER_ACTION_AXIS_BEGIN :
+                PointerEvent::POINTER_ACTION_ROTATE_BEGIN;
+        }
+        case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
+            return isRotateGesture_ ? PointerEvent::POINTER_ACTION_ROTATE_UPDATE :
+                PointerEvent::POINTER_ACTION_AXIS_UPDATE;
+        }
+        case LIBINPUT_EVENT_GESTURE_PINCH_END: {
+            return isRotateGesture_ ? PointerEvent::POINTER_ACTION_ROTATE_END :
+                PointerEvent::POINTER_ACTION_AXIS_END;
+        }
+        default:
+            break;
+    }
+    MMI_HILOGE("Check pinch gesture failed. type:%{public}d", type);
+    return RET_ERR;
 }
 
 void TouchPadTransformProcessor::InitToolType()
@@ -651,13 +670,6 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     } else if ((type == LIBINPUT_EVENT_TOUCHPAD_UP) && !CanUnsetPointerItem(event)) {
         upCnt++;
         tapTrends_ = TapTrends::UPING;
-    } else if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION) {
-        motionCnt++;
-        if ((motionCnt >= FINGER_MOTION_MAX) || IsInvalidMulTapGesture(event)) {
-            MMI_HILOGD("The motion is too much");
-            SetMULTI_FINGERTAP_HDRDefault();
-            return RET_OK;
-        }
     }
 
     if ((upCnt == downCnt) && (upCnt >= FINGER_TAP_MIN) && (upCnt <= FINGER_COUNT_MAX)) {
@@ -671,7 +683,6 @@ void MultiFingersTapHandler::SetMULTI_FINGERTAP_HDRDefault(bool isAlldefault)
 {
     downCnt = 0;
     upCnt = 0;
-    motionCnt = 0;
     tapTrends_ = TapTrends::BEGIN;
     beginTime = 0;
     lastTime = 0;
@@ -707,27 +718,6 @@ bool MultiFingersTapHandler::CanAddToPointerMaps(struct libinput_event_touch *ev
     auto currentY = libinput_event_touchpad_get_y(event);
     pointerMaps[seatSlot] = {currentX, currentY};
     return true;
-}
-
-bool MultiFingersTapHandler::IsInvalidMulTapGesture(struct libinput_event_touch *event)
-{
-    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(event);
-    if (pointerMaps.find(seatSlot) == pointerMaps.end()) {
-        MMI_HILOGD("The pointerMaps can not find the seatSlot");
-        return true;
-    } else if (pointerMaps[seatSlot].first < 0 || pointerMaps[seatSlot].second < 0) {
-        MMI_HILOGD("The value linked by seatSlot is [%{public}f , %{public}f]", pointerMaps[seatSlot].first,
-            pointerMaps[seatSlot].second);
-        return true;
-    }
-    auto currentX = libinput_event_touchpad_get_x(event);
-    auto currentY = libinput_event_touchpad_get_y(event);
-    auto [ lastX, lastY ] = pointerMaps[seatSlot];
-    auto deltaX = abs(currentX - lastX);
-    auto deltaY = abs(currentY - lastY);
-    auto distance = deltaX + deltaY;
-    pointerMaps[seatSlot] = {currentX, currentY};
-    return ((deltaX > distanceThreshold) || (deltaY > distanceThreshold) || (distance > distanceThreshold));
 }
 
 bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *event)

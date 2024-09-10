@@ -25,6 +25,7 @@ namespace OHOS {
 namespace MMI {
 napi_status KeyEventNapi::CreateKeyEvent(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out)
 {
+    CHKPR(in, napi_invalid_arg);
     auto status = SetNameProperty(env, out, "action", in->GetKeyAction() - KeyEvent::KEY_ACTION_CANCEL);
     CHKRR(status, "set action property", status);
 

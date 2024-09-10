@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,6 +72,17 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     return RET_OK;
 }
 
+bool KeyAutoRepeat::JudgeKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    return (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) || (keyEvent->GetKeyAction() ==
+            KeyEvent::KEY_ACTION_CANCEL);
+}
+
+bool KeyAutoRepeat::JudgeLimitPrint(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    return !EventLogHelper::IsBetaVersion() || keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+}
+
 void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -88,36 +99,55 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
             if (!EventLogHelper::IsBetaVersion()) {
                 MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d", timerId_);
             } else {
-                MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d",
-                    timerId_, keyEvent_->GetKeyCode());
+                if (keyEvent_->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%d",
+                        timerId_, keyEvent_->GetKeyCode());
+                } else {
+                    MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{private}d",
+                        timerId_, keyEvent_->GetKeyCode());
+                }
             }
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
+            repeatKeyCode_ = -1;
         }
         int32_t delayTime = GetDelayTime();
         AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
     }
-    if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
+    if (JudgeKeyEvent(keyEvent_) && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("Stop autorepeat, keyCode:%{public}d, repeatKeyCode:%{public}d",
-                keyEvent_->GetKeyCode(), repeatKeyCode_);
+        if (!JudgeLimitPrint(keyEvent_)) {
+            MMI_HILOGI("Stop autorepeat, keyCode:%{private}d, repeatKeyCode:%{private}d, keyAction:%{public}d",
+                keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
+        } else {
+            MMI_HILOGI("Stop autorepeat, keyCode:%d, repeatKeyCode:%d, keyAction: %d",
+                keyEvent_->GetKeyCode(), repeatKeyCode_, keyEvent_->GetKeyAction());
         }
-        if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
+        if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && repeatKeyCode_ != keyEvent_->GetKeyCode()) {
             std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
             if (pressedKeyItem) {
                 keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
             } else {
                 MMI_HILOGW("The pressedKeyItem is nullopt");
             }
+            pressedKeyItem = keyEvent_->GetKeyItem(repeatKeyCode_);
+            if (!pressedKeyItem) {
+                return;
+            }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
             int32_t delayTime = GetDelayTime();
             AddHandleTimer(delayTime);
-            MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
+            if (!JudgeLimitPrint(keyEvent_)) {
+                MMI_HILOGD("The end keyboard autorepeat, keyCode:%{private}d", keyEvent_->GetKeyCode());
+            } else {
+                MMI_HILOGD("The end keyboard autorepeat, keyCode:%d", keyEvent_->GetKeyCode());
+            }
+        } else {
+            repeatKeyCode_ = -1;
         }
     }
 }
@@ -269,6 +299,11 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
     }
     MMI_HILOGD("Get keyboard repeat rate:%{public}d", rate);
     return RET_OK;
+}
+
+int32_t KeyAutoRepeat::GetRepeatKeyCode() const
+{
+    return repeatKeyCode_;
 }
 
 int32_t KeyAutoRepeat::PutConfigDataToDatabase(std::string &key, int32_t value)

@@ -31,6 +31,9 @@ void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    if (TouchPadKnuckleDoubleClickHandle(keyEvent)) {
+        return;
+    }
     if (HandleKeyEventFilter(keyEvent)) {
         MMI_HILOGD("Key event is filtered");
         return;
@@ -45,7 +48,6 @@ void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> 
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
-        MMI_HILOGD("Pointer event is filtered");
         return;
     }
     CHKPV(nextHandler_);
@@ -204,6 +206,19 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
         }
     }
     return false;
+}
+
+bool EventFilterHandler::TouchPadKnuckleDoubleClickHandle(std::shared_ptr<KeyEvent> event)
+{
+    CHKPF(event);
+    CHKPF(nextHandler_);
+    if (event->GetKeyAction() != KNUCKLE_1F_DOUBLE_CLICK &&
+        event->GetKeyAction() != KNUCKLE_2F_DOUBLE_CLICK) {
+        return false;
+    }
+    MMI_HILOGI("Current is touchPad knuckle double click action");
+    nextHandler_->HandleKeyEvent(event);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -130,7 +130,6 @@ void SocketSessionManager::Dispatch(const struct epoll_event &ev)
         DispatchOne();
     } else if ((ev.events & (EPOLLHUP | EPOLLERR)) != 0) {
         FI_HILOGE("Epoll hangup:%{public}s", ::strerror(errno));
-        /// TODO: Add error handling here.
     }
 }
 

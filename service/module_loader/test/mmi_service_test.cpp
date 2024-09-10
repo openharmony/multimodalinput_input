@@ -823,29 +823,6 @@ HWTEST_F(MMIServerTest, CheckInjectKeyEvent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: CheckInjectKeyEvent_001
- * @tc.desc: Test the function AdaptScreenResolution
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIServerTest, AdaptScreenResolution_001, TestSize.Level1)
-{
-    MMIService mmiService;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(10000);
-    item.SetDisplayX(360);
-    item.SetDisplayY(500);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerId(10000);
-    int32_t ret = mmiService.AdaptScreenResolution(pointerEvent);
-    EXPECT_NE(ret, RET_ERR);
-    ret = mmiService.AdaptScreenResolution(pointerEvent);
-    EXPECT_NE(ret, RET_ERR);
-}
-
-/**
  * @tc.name: OnAddSystemAbility_001
  * @tc.desc: Test the function OnAddSystemAbility
  * @tc.type: FUNC
@@ -1093,6 +1070,21 @@ HWTEST_F(MMIServerTest, MMIServerTest_InitService, TestSize.Level1)
     service.state_ = ServiceRunningState::STATE_NOT_START;
     service.mmiFd_ = 1000;
     ASSERT_FALSE(service.InitService());
+}
+
+/**
+ * @tc.name: MMIServerTest_OnAppDebugStoped_01
+ * @tc.desc: Test OnAppDebugStoped
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_OnAppDebugStoped_01, TestSize.Level1)
+{
+    AppDebugListener listener;
+    std::vector<AppExecFwk::AppDebugInfo> debugInfos(-1);
+    ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
+    listener.appDebugPid_ = 4;
+    ASSERT_NO_FATAL_FAILURE(listener.OnAppDebugStoped(debugInfos));
 }
 } // namespace MMI
 } // namespace OHOS

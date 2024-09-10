@@ -40,6 +40,7 @@ extern "C" {
         DEVICE_KLV = 1,
         DEVICE_SOFT_HARDEN = 2,
         DEVICE_HARD_HARDEN = 3,
+        DEVICE_WEBER = 4,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
@@ -98,6 +99,7 @@ private:
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
     void CalculateOffset(Direction direction, Offset &offset);
     double HandleAxisAccelateTouchPad(double axisValue);
+    bool IsWindowRotation(const DisplayInfo* displayInfo);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);

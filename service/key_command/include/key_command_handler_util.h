@@ -86,8 +86,8 @@ enum SpecialType {
 };
 const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
     { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
-    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
-    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SPECIAL_ALL }
+    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::KEY_DOWN_ACTION },
+    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::KEY_DOWN_ACTION }
 };
 struct JsonParser {
     JsonParser() = default;
@@ -131,7 +131,8 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
     std::vector<std::string>& businessIds);
 bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec);
 bool ParseExcludeKeys(const JsonParser& parser, std::vector<ExcludeKey>& excludeKeyVec);
-bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec);
+bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec,
+    std::map<int32_t, int32_t>& repeatKeyMaxTimes);
 bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture);
 bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture, Ability &launchAbility);
 bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, KnuckleGesture &knuckleGesture);

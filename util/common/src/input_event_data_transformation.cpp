@@ -29,6 +29,7 @@ namespace MMI {
 int32_t InputEventDataTransformation::KeyEventToNetPacket(
     const std::shared_ptr<KeyEvent> key, NetPacket &pkt)
 {
+    CHKPR(key, RET_ERR);
     if (SerializeInputEvent(key, pkt) != RET_OK) {
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
@@ -206,15 +207,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         return RET_ERR;
     }
     SerializeFingerprint(event, pkt);
-    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
-        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
-        << event->GetZOrder() << event->GetDispatchTimes() << event->GetAxes();
-    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
-        if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
-            pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
-        }
-    }
-    pkt << event->GetVelocity();
+    SerializePointerEvent(event, pkt);
     std::set<int32_t> pressedBtns { event->GetPressedButtons() };
     pkt << pressedBtns.size();
     for (int32_t btnId : pressedBtns) {
@@ -254,6 +247,21 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
+void InputEventDataTransformation::SerializePointerEvent(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+    pkt << event->GetPointerAction() << event->GetOriginPointerAction() << event->GetPointerId()
+        << event->GetSourceType() << event->GetButtonId() << event->GetFingerCount()
+        << event->GetZOrder() << event->GetDispatchTimes() << event->GetHandlerEventType()
+        << event->GetAxes();
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
+            pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
+        }
+    }
+    pkt << event->GetVelocity();
+    pkt << event->GetAxisEventType();
+}
+
 void InputEventDataTransformation::SerializeFingerprint(const std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
@@ -281,6 +289,9 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     event->SetZOrder(tField);
     pkt >> tField;
     event->SetDispatchTimes(tField);
+    uint32_t type = 0u;
+    pkt >> type;
+    event->SetHandlerEventType(type);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
@@ -378,6 +389,9 @@ void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<P
     double velocity;
     pkt >> velocity;
     event->SetVelocity(velocity);
+    int32_t axisEventType;
+    pkt >> axisEventType;
+    event->SetAxisEventType(axisEventType);
 }
 
 int32_t InputEventDataTransformation::SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)
@@ -428,7 +442,6 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         pkt << 0;
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
-        MMI_HILOGD("GetPointerEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;
@@ -486,7 +499,6 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Key
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
         pkt << 0;
-        MMI_HILOGD("GetKeyEventEnhanceData failed");
         return RET_ERR;
     }
     pkt << enHanceDataLen;

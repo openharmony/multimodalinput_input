@@ -44,11 +44,13 @@ public:
     static void ExecRegisterCb(const sptr<SettingObserver>& observer);
     ErrCode RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri = std::string());
     ErrCode UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri = std::string());
+    bool CheckIfSettingsDataReady();
 
 private:
     static std::shared_ptr<SettingDataShare> instance_;
     static std::mutex mutex_;
     static sptr<IRemoteObject> remoteObj_;
+    bool isDataShareReady_ = false;
 
     static std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(const std::string &strUri);
     static bool ReleaseDataShareHelper(std::shared_ptr<DataShare::DataShareHelper>& helper);

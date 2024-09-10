@@ -58,6 +58,7 @@ public:
     int32_t CancelInjection();
 
 private:
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId);
     MMIClientPtr client_ { nullptr };
 };
 

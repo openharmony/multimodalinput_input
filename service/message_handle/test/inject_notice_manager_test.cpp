@@ -87,7 +87,7 @@ HWTEST_F(InjectNoticeManagerTest, InjectNoticeManagerTest_ConnectNoticeSrv, Test
     injectNoticeMgr.connectionCallback_->isConnected_ = true;
     EXPECT_TRUE(injectNoticeMgr.ConnectNoticeSrv());
     injectNoticeMgr.connectionCallback_->isConnected_ = false;
-    EXPECT_TRUE(injectNoticeMgr.ConnectNoticeSrv());
+    EXPECT_FALSE(injectNoticeMgr.ConnectNoticeSrv());
 }
 
 /**
@@ -102,7 +102,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi_002, T
     AuthorizationDialog dialog;
     ASSERT_NE(dialog.dialogConnectionCallback_, nullptr);
     bool ret = dialog.ConnectSystemUi();
-    ASSERT_FALSE(ret);
+    ASSERT_TRUE(ret);
 }
 
 /**

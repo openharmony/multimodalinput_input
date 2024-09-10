@@ -33,7 +33,8 @@ int64_t g_nextEventId = 1;
 constexpr uint32_t DATA_LENGTH_LIMIT { 1024 }; // 1024: max length
 } // namespace
 
-thread_local std::string  EventLogHelper::userType_ = "";
+std::string EventLogHelper::userType_ = "";
+std::once_flag EventLogHelper::betaFlag_;
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 {
@@ -391,6 +392,9 @@ void RefreshTraceStr()
 {
     g_traceStr.clear();
     for (auto item = g_traceIds.begin(); item < g_traceIds.end(); ++item) {
+        if (item->Id == -1) {
+            continue;
+        }
         if (item != g_traceIds.begin()) {
             g_traceStr += "/";
         }
@@ -417,6 +421,9 @@ void StartLogTraceId(int64_t traceId, int32_t eventType, int32_t action)
         }
         return;
     }
+    if (g_traceIds.size() <= iter->second) {
+        return;
+    }
     LogTraceKey &old = g_traceIds.at(iter->second);
     if (old.evtType != eventType || old.action != action) {
         old.evtType = eventType;
@@ -440,10 +447,13 @@ void EndLogTraceId(int64_t id)
 
     if (idCount == idx + 1) {
         g_traceIds.pop_back();
+        while (!g_traceIds.empty() && g_traceIds.back().Id == -1) {
+            g_traceIds.pop_back();
+        }
     } else {
-        auto item = g_traceIds.begin();
-        item += idx;
-        g_traceIds.erase(item);
+        // can't erase it, erase it will make the index of other elem changed.
+        LogTraceKey &toDelete = g_traceIds.at(idx);
+        toDelete.Id = -1;
     }
     RefreshTraceStr();
 }

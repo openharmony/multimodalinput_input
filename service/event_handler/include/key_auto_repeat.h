@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,8 @@ class KeyAutoRepeat final {
 public:
     DISALLOW_COPY_AND_MOVE(KeyAutoRepeat);
     int32_t AddDeviceConfig(struct libinput_device *device);
+    bool JudgeLimitPrint(const std::shared_ptr<KeyEvent>& keyEvent);
+    bool JudgeKeyEvent(const std::shared_ptr<KeyEvent>& keyEvent);
     void SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent);
     void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
@@ -43,6 +45,7 @@ public:
     int32_t SetKeyboardRepeatRate(int32_t rate);
     int32_t GetKeyboardRepeatDelay(int32_t &delay);
     int32_t GetKeyboardRepeatRate(int32_t &rate);
+    int32_t GetRepeatKeyCode() const;
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
     DeviceConfig GetAutoSwitch(int32_t deviceId);

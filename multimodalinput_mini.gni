@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/multimodalinput/cursor_config.gni")
 import("//build/ohos.gni")
 
 mmi_part_name = "input"
@@ -24,7 +25,10 @@ c_utils_root = "//commonlibrary/c_utils"
 hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
+  hitrace_enabled = false
+  call_manager_service_enabled = false
   resource_schedule_service_enabled = false
+  screenlock_manager_enabled = false
   input_feature_product = "default"
   input_feature_enable_pgo = false
   input_feature_pgo_path = ""
@@ -44,13 +48,19 @@ declare_args() {
   input_ext_feature_fingersense = true
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
-  input_feature_crown = true
-  input_ext_feature_magiccursor = false
-  input_feature_infrared_emitter = true
+  input_feature_crown = false
+  input_feature_move_event_filters = false
+  shortcut_key_manager_enabled = true
+  shortcut_key_rules_enabled = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     resource_schedule_service_enabled = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.theme_screenlock_mgr)) {
+    screenlock_manager_enabled = true
   }
 
   if (is_emulator) {
@@ -94,6 +104,7 @@ declare_args() {
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "$mmi_path/frameworks/proxy/event_handler/src/scene_board_judgement.cpp",
     "app_state_manager/src/app_state_observer.cpp",
+    "delegate_task/src/delegate_interface.cpp",
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
@@ -103,7 +114,6 @@ declare_args() {
     "event_dump/src/event_dump.cpp",
     "event_handler/src/anr_manager.cpp",
     "event_handler/src/event_normalize_handler.cpp",
-    "event_handler/src/gesture_handler.cpp",
     "event_handler/src/input_event_handler.cpp",
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
@@ -246,6 +256,7 @@ declare_args() {
     "src/virtual_trackpad.cpp",
     "src/virtual_trackpad_mouse.cpp",
     "src/virtual_trackpad_sys_ctrl.cpp",
+    "src/virtual_uwb_remote_control.cpp",
   ]
 
   libmmi_util_sources = [
@@ -276,7 +287,7 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
-print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
 
@@ -343,6 +354,10 @@ if (input_ext_feature_gesturesense) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
 }
 
+if (input_feature_move_event_filters) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS" ]
+}
+
 if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
@@ -374,7 +389,36 @@ if (input_ext_feature_magiccursor) {
     "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/lru_cache.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
+}
+
+if (defined(global_parts_info.multimedia_player_framework)) {
+  enable_player_framework = true
+  input_default_defines += [ "PLAYER_FRAMEWORK_EXISTS" ]
+} else {
+  enable_player_framework = false
+}
+
+if (enable_player_framework) {
+  libmmi_service_sources +=
+      [ "module_loader/src/input_screen_capture_agent.cpp" ]
+}
+
+if (shortcut_key_rules_enabled) {
+  shortcut_key_manager_enabled = true
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_call_manager)) {
+  call_manager_service_enabled = true
+  input_default_defines += [ "CALL_MANAGER_SERVICE_ENABLED" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_hitrace)) {
+  hitrace_enabled = true
+  input_default_defines += [ "HITRACE_ENABLED" ]
 }
