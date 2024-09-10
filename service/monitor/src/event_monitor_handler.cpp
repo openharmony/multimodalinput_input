@@ -266,7 +266,32 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         isFound = true;
     }
     if (isFound && iter->actionsType_.empty()) {
-        if (iter->eventType_ == monitor.eventType_ &&
+        reteun UpdateEventTypeMonitor(iter, monitor, handler, isFound);
+    } else if (isFound && !iter->actionsType_.empty()) {
+        return UpdateActionsTypeMonitor(iter, monitor, isFound);
+    }
+ 
+    if (!monitor.actionsType_.empty()) {
+        for (auto action : monitor.actionsType_) {
+            if (std::find(insertToMonitorsActions_.begin(), insertToMonitorsActions_.end(), action) ==
+                insertToMonitorsActions_.end()) {
+                insertToMonitorsActions_.push_back(action);
+            }
+        }
+    }
+    auto [sIter, isOk] = monitors_.insert(monitor);
+    if (!isOk) {
+        MMI_HILOGE("Failed to add monitor");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Service Add Monitor Success");
+    return RET_OK;
+}
+
+int32_t EventMonitorHandler::MonitorCollection::UpdateEventTypeMonitor(const std::set<SessionHandler>::iterator &iter,
+    const SessionHandler &monitor, SessionHandler &handler, bool isFound)
+{
+    if (iter->eventType_ == monitor.eventType_ &&
             ((monitor.eventType_ & HANDLE_EVENT_TYPE_TOUCH_GESTURE) != HANDLE_EVENT_TYPE_TOUCH_GESTURE)) {
             MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
             return RET_OK;
@@ -289,8 +314,12 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         }
         MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
         return RET_OK;
-    } else if (isFound && !iter->actionsType_.empty()) {
-        if (!IsNeedInsertToMonitors(iter->actionsType_)) {
+}
+
+int32_t EventMonitorHandler::MonitorCollection::UpdateActionsTypeMonitor(const std::set<SessionHandler>::iterator &iter,
+    const SessionHandler &monitor, bool isFound)
+{
+    if (!IsNeedInsertToMonitors(iter->actionsType_)) {
             return RET_OK;
         }
         monitors_.erase(iter);
@@ -304,27 +333,6 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         }
         MMI_HILOGD("Actions type is updated");
         return RET_OK;
-    }
- 
-    if (!monitor.actionsType_.empty()) {
-        for (auto action : monitor.actionsType_) {
-            if (std::find(insertToMonitorsActions_.begin(), insertToMonitorsActions_.end(), action) ==
-                insertToMonitorsActions_.end()) {
-                insertToMonitorsActions_.push_back(action);
-            }
-        }
-    }
-    auto [sIter, isOk] = monitors_.insert(monitor);
-    if (!isOk) {
-        if (isFound) {
-            MMI_HILOGE("Internal error: monitor has been removed");
-        } else {
-            MMI_HILOGE("Failed to add monitor");
-        }
-        return RET_ERR;
-    }
-    MMI_HILOGD("Service Add Monitor Success");
-    return RET_OK;
 }
 
 bool EventMonitorHandler::MonitorCollection::IsNeedInsertToMonitors(std::vector<int32_t> actionsType)
@@ -579,6 +587,28 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler &monitor,
+    std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt)
+{
+    if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
+        if (monitor.session_) {
+            monitor.SendToClient(pointerEvent, pkt);
+             return;
+        }
+        if (monitor.callback_) {
+            monitor.callback_->OnInputEvent(monitor.handlerType_, pointerEvent);
+        }
+    }
+    if (monitor.actionsType_.empty()) {
+        return;
+    }
+    auto iter = std::find(monitor.actionsType_.begin(), monitor.actionsType_.end(),
+    pointerEvent->GetPointerAction());
+    if (iter != monitor.actionsType_.end() && monitor.session_) {
+        monitor.SendToClient(pointerEvent, pkt);
+    }
+}
+
 void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
@@ -594,23 +624,7 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
         return;
     }
     for (const auto &monitor : monitors_) {
-        if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
-            if (monitor.session_) {
-                monitor.SendToClient(pointerEvent, pkt);
-                continue;
-            }
-            if (monitor.callback_) {
-                monitor.callback_->OnInputEvent(monitor.handlerType_, pointerEvent);
-            }
-        }
-        if (monitor.actionsType_.empty()) {
-            continue;
-        }
-        auto iter = std::find(monitor.actionsType_.begin(), monitor.actionsType_.end(),
-            pointerEvent->GetPointerAction());
-        if (iter != monitor.actionsType_.end() && monitor.session_) {
-            monitor.SendToClient(pointerEvent, pkt);
-        }
+        IsSendToClient(monitor, pointerEvent, pkt);
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
         NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {

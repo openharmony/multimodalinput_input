@@ -46,6 +46,22 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
+struct ParseData {
+    int32_t actionsTypeSize;
+    uint32_t eventType;
+    int32_t priority;
+    int32_t deviceTags;
+    std::vector<int32_t> actionsType;
+
+    ParseData()
+    {
+        actionsTypeSize = -1;
+        eventType = 0;
+        priority = 0;
+        deviceTags = 0;
+    }
+};
+
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -1154,6 +1170,27 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::ParseAddInputHandlerData(MessageParcel& data, ParseData& parseData)
+{
+    READINT32(data, parseData.actionsTypeSize, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<int32_t> actionsType;
+    if (parseData.actionsTypeSize == 0) {
+        READUINT32(data, parseData.eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, parseData.priority, IPC_PROXY_DEAD_OBJECT_ERR);
+        READINT32(data, parseData.deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    } else {
+        if (parseData.actionsTypeSize < 0 || parseData.actionsTypeSize > ExtraData::MAX_BUFFER_SIZE) {
+            MMI_HILOGE("Invalid actionsTypeSize:%{public}d", parseData.actionsTypeSize);
+            return RET_ERR;
+        }
+        int32_t key = 0;
+        for (int32_t i = 0; i < parseData.actionsTypeSize; ++i) {
+            READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
+            parseData.actionsType.push_back(key);
+        }
+    }
+}
+
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -1189,29 +1226,10 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         MMI_HILOGE("Monitor permission check failed");
         return ERROR_NO_PERMISSION;
     }
-    int32_t actionsTypeSize = -1;
-    READINT32(data, actionsTypeSize, IPC_PROXY_DEAD_OBJECT_ERR);
-    uint32_t eventType = 0;
-    int32_t priority = 0;
-    int32_t deviceTags = 0;
-    std::vector<int32_t> actionsType;
-    if (actionsTypeSize == 0) {
-        READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-        READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-        READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
-    } else {
-        if (actionsTypeSize < 0 || actionsTypeSize > ExtraData::MAX_BUFFER_SIZE) {
-            MMI_HILOGE("Invalid actionsTypeSize:%{public}d", actionsTypeSize);
-            return RET_ERR;
-        }
-        int32_t key = 0;
-        for (int32_t i = 0; i < actionsTypeSize; ++i) {
-            READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
-            actionsType.push_back(key);
-        }
-    }
-    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
-        deviceTags, actionsType);
+    ParseData parseData;
+    ParseAddInputHandlerData(data, parseData);
+    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), parseData.eventType, parseData.priority,
+        parseData.deviceTags, parseData.actionsType);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -1243,29 +1261,10 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         MMI_HILOGE("Monitor permission check failed");
         return ERROR_NO_PERMISSION;
     }
-    int32_t actionsTypeSize = -1;
-    uint32_t eventType = 0;
-    int32_t priority = 0;
-    int32_t deviceTags = 0;
-    std::vector<int32_t> actionsType;
-    READINT32(data, actionsTypeSize, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (actionsTypeSize == 0) {
-        READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-        READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-        READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
-    } else {
-        if (actionsTypeSize < 0 || actionsTypeSize > ExtraData::MAX_BUFFER_SIZE) {
-            MMI_HILOGE("Invalid actionsTypeSize:%{public}d", actionsTypeSize);
-            return RET_ERR;
-        }
-        int32_t key = 0;
-        for (int32_t i = 0; i < actionsTypeSize; ++i) {
-            READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
-            actionsType.push_back(key);
-        }
-    }
-    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
-        deviceTags, actionsType);
+    ParseData parseData;
+    ParseAddInputHandlerData(data, parseData);
+    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), parseData.eventType,
+        parseData.priority, parseData.deviceTags, parseData.actionsType);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RemoveInputHandler failed ret:%{public}d", ret);
         return ret;

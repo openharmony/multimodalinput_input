@@ -130,6 +130,10 @@ private:
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         bool CheckHasInputHandler(HandleEventType eventType);
+        int32_t UpdateEventTypeMonitor(const std::set<SessionHandler>::iterator &iter,
+            const SessionHandler &monitor, SessionHandler &handler, bool isFound);
+        int32_t UpdateActionsTypeMonitor(const std::set<SessionHandler>::iterator &iter,
+            const SessionHandler &monitor, bool isFound);
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
         void MarkConsumed(int32_t eventId, SessionPtr session);
@@ -143,6 +147,8 @@ private:
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+        void IsSendToClient(const SessionHandler &monitor, std::shared_ptr<PointerEvent> pointerEvent,
+            NetPacket &pkt);
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
