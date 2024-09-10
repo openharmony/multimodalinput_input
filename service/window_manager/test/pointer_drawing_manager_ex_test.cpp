@@ -36,6 +36,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+using namespace testing;
 using namespace testing::ext;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
@@ -65,7 +66,6 @@ public:
     {}
 
     std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
-private:
 };
 
 std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManagerExTest::SetMouseIconTest(const std::string iconPath)
@@ -1625,11 +1625,74 @@ HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseIcon, 
 HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpot, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(Return(RET_OK));
     PointerDrawingManager pointerDrawMgr;
     int32_t pid = 10;
     int32_t windowId = 100;
     int32_t hotSpotX = -1;
     int32_t hotSpotY = 100;
+    EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SetMouseHotSpot_001
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpot_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(Return(RET_OK));
+    PointerDrawingManager pointerDrawMgr;
+    int32_t pid = 10;
+    int32_t windowId = 100;
+    int32_t hotSpotX = 100;
+    int32_t hotSpotY = -1;
+    EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SetMouseHotSpot_002
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpot_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(Return(RET_OK));
+    PointerDrawingManager pointerDrawMgr;
+    int32_t pid = 10;
+    int32_t windowId = 100;
+    int32_t hotSpotX = 100;
+    int32_t hotSpotY = 100;
+    pointerDrawMgr.userIcon_ = nullptr;
+    EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerExTest_SetMouseHotSpot_003
+ * @tc.desc: Test SetCustomCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerExTest, PointerDrawingManagerExTest_SetMouseHotSpot_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::DEFAULT;
+    auto winmgrmock = std::make_shared<InputWindowsManagerMock>();
+    EXPECT_CALL(*winmgrmock, CheckWindowIdPermissionByPid).WillRepeatedly(Return(RET_OK));
+    PointerDrawingManager pointerDrawMgr;
+    int32_t pid = 10;
+    int32_t windowId = 100;
+    int32_t hotSpotX = 100;
+    int32_t hotSpotY = 100;
+    pointerDrawMgr.userIcon_ = std::make_unique<OHOS::Media::PixelMap>();
     EXPECT_EQ(pointerDrawMgr.SetMouseHotSpot(pid, windowId, hotSpotX, hotSpotY), RET_ERR);
 }
 } // namespace MMI
