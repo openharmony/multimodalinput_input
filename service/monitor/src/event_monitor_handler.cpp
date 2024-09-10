@@ -593,7 +593,7 @@ void EventMonitorHandler::MonitorCollection::IsSendToClient(const SessionHandler
     if ((monitor.eventType_ & pointerEvent->GetHandlerEventType()) == pointerEvent->GetHandlerEventType()) {
         if (monitor.session_) {
             monitor.SendToClient(pointerEvent, pkt);
-             return;
+            return;
         }
         if (monitor.callback_) {
             monitor.callback_->OnInputEvent(monitor.handlerType_, pointerEvent);
