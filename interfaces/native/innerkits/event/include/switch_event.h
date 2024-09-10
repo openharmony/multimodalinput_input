@@ -77,7 +77,6 @@ public:
     virtual std::string ToString() override
     {
         std::string eventStr = InputEvent::ToString();
-        eventStr += ",deviceId:" + std::to_string(deviceId_);
         eventStr += ",switchValue:" + std::to_string(switchValue_);
         eventStr += ",updateSwitchMask:" + std::to_string(updateSwitchMask_);
         eventStr += ",switchType:" + std::to_string(switchType_);
