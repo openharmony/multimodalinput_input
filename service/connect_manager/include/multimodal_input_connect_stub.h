@@ -28,6 +28,21 @@
 
 namespace OHOS {
 namespace MMI {
+struct ParseData {
+    int32_t actionsTypeSize;
+    uint32_t eventType;
+    int32_t priority;
+    int32_t deviceTags;
+    std::vector<int32_t> actionsType;
+
+    ParseData()
+    {
+        actionsTypeSize = -1;
+        eventType = 0;
+        priority = 0;
+        deviceTags = 0;
+    }
+};
 class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
     MultimodalInputConnectStub() = default;
