@@ -266,7 +266,7 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
         isFound = true;
     }
     if (isFound && iter->actionsType_.empty()) {
-        reteun UpdateEventTypeMonitor(iter, monitor, handler, isFound);
+        return UpdateEventTypeMonitor(iter, monitor, handler, isFound);
     } else if (isFound && !iter->actionsType_.empty()) {
         return UpdateActionsTypeMonitor(iter, monitor, isFound);
     }
