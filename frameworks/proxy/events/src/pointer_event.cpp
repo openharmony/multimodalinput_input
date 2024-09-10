@@ -508,7 +508,6 @@ void PointerEvent::Reset()
 std::string PointerEvent::ToString()
 {
     std::string eventStr = InputEvent::ToString();
-    eventStr += ",deviceId:" + std::to_string(deviceId_);
     eventStr += ",pointerId:" + std::to_string(pointerId_);
     eventStr += ",sourceType:" + std::to_string(sourceType_);
     eventStr += ",pointerAction:" + std::to_string(pointerAction_);

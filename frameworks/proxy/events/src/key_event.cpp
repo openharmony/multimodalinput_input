@@ -979,7 +979,6 @@ void KeyEvent::Reset()
 std::string KeyEvent::ToString()
 {
     std::string eventStr = InputEvent::ToString();
-    eventStr += ",deviceId:" + std::to_string(deviceId_);
     eventStr += ",keyCode:" + std::to_string(keyCode_);
     eventStr += ",keyAction:" + std::to_string(keyAction_);
     eventStr += ",keyItems:[";

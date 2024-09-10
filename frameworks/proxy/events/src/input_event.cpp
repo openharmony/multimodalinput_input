@@ -75,6 +75,7 @@ std::string InputEvent::ToString()
 {
     std::string eventStr = "eventType:" + std::to_string(eventType_);
     eventStr += ",actionTime:" + std::to_string(actionTime_);
+    eventStr += ",deviceId:" + std::to_string(deviceId_);
     return eventStr;
 }
 
