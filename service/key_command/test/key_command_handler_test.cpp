@@ -4886,5 +4886,58 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CalcDrawCoordinate_002, Te
     EXPECT_EQ(retPair.first, 21);
     EXPECT_EQ(retPair.second, 21);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsMatchedAbility
+ * @tc.desc: Test IsMatchedAbility
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsMatchedAbility, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::vector<float> gesturePoints;
+    float gestureLastX = 100.0f;
+    float gestureLastY = 100.0f;
+    gesturePoints.push_back(10.0f);
+    EXPECT_FALSE(handler.IsMatchedAbility(gesturePoints, gestureLastX, gestureLastY));
+
+    gesturePoints.push_back(15.0f);
+    gesturePoints.push_back(20.0f);
+    EXPECT_TRUE(handler.IsMatchedAbility(gesturePoints, gestureLastX, gestureLastY));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ParseRepeatKeyMaxCount
+ * @tc.desc: Test ParseRepeatKeyMaxCount
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ParseRepeatKeyMaxCount, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    EXPECT_NO_FATAL_FAILURE(handler.ParseRepeatKeyMaxCount());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_SetIsFreezePowerKey
+ * @tc.desc: Test SetIsFreezePowerKey
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_SetIsFreezePowerKey, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::string pageName = "SosCountup";
+    EXPECT_EQ(handler.SetIsFreezePowerKey(pageName), RET_OK);
+    pageName = "SosCountdown";
+    handler.sosDelayTimerId_ = 100;
+    EXPECT_EQ(handler.SetIsFreezePowerKey(pageName), RET_OK);
+    handler.sosDelayTimerId_ = -1;
+    EXPECT_EQ(handler.SetIsFreezePowerKey(pageName), RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS
