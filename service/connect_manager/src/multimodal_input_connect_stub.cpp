@@ -1174,6 +1174,7 @@ int32_t MultimodalInputConnectStub::ParseAddInputHandlerData(MessageParcel& data
             parseData.actionsType.push_back(key);
         }
     }
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
@@ -1212,7 +1213,9 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         return ERROR_NO_PERMISSION;
     }
     ParseData parseData;
-    ParseAddInputHandlerData(data, parseData);
+    if (RET_ERR == ParseAddInputHandlerData(data, parseData)) {
+        return RET_ERR;
+    }
     int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), parseData.eventType, parseData.priority,
         parseData.deviceTags, parseData.actionsType);
     if (ret != RET_OK) {
@@ -1247,7 +1250,9 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         return ERROR_NO_PERMISSION;
     }
     ParseData parseData;
-    ParseAddInputHandlerData(data, parseData);
+    if (RET_ERR == ParseAddInputHandlerData(data, parseData)) {
+        return RET_ERR;
+    }
     int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), parseData.eventType,
         parseData.priority, parseData.deviceTags, parseData.actionsType);
     if (ret != RET_OK) {
