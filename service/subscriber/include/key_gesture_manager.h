@@ -56,6 +56,11 @@ class KeyGestureManager final {
             longPressTime_ = longPressTime;
         }
 
+        std::shared_ptr<KeyEvent> GetKeyEvent()
+        {
+            return keyEvent_;
+        }
+
         void ResetTimer();
         void Trigger(std::shared_ptr<KeyEvent> keyEvent);
         void Run(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -99,7 +104,6 @@ class KeyGestureManager final {
         std::vector<Handler> handlers_;
     };
 
-private:
     class LongPressSingleKey : public KeyGesture {
     public:
         LongPressSingleKey(int32_t keyCode) : keyCode_(keyCode) {}
