@@ -120,6 +120,7 @@ private:
     void PrintKeyOption(const std::shared_ptr<KeyOption> keyOption);
     void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
     void GetForegroundPids(std::set<int32_t> &pidList);
+    void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     SubscriberCollection subscriberMap_;

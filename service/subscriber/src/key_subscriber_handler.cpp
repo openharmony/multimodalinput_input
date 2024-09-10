@@ -22,6 +22,8 @@
 #ifdef CALL_MANAGER_SERVICE_ENABLED
 #include "call_manager_client.h"
 #endif // CALL_MANAGER_SERVICE_ENABLED
+#include "common_event_data.h"
+#include "common_event_manager.h"
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -37,6 +39,7 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "timer_manager.h"
 #include "util_ex.h"
+#include "want.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -413,6 +416,18 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
     return true;
 }
 
+void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    OHOS::AAFwk::Want want;
+    want.SetAction("multimodal.event.MUTE_KEY_PRESS");
+    want.SetParam("keyCode", keyEvent->GetKeyCode());
+    EventFwk::CommonEventPublishInfo publishInfo;
+    std::vector<std::string> permissionVec {"ohos.permission.INPUT_MONITORING"};
+    publishInfo.SetSubscriberPermissions(permissionVec);
+    EventFwk::CommonEventData commonData {want};
+    EventFwk::CommonEventManager::PublishCommonEvent(commonData, publishInfo);
+}
+
 bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -425,6 +440,7 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
     }
 #ifdef CALL_MANAGER_SERVICE_ENABLED
     int32_t ret = -1;
+    PublishKeyPressCommonEvent(keyEvent);
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
         if (callManagerClientPtr == nullptr) {
             callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
