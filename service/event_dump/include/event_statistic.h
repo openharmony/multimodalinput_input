@@ -46,15 +46,15 @@ class EventStatistic final {
 public:
     static void PushEvent(std::shared_ptr<InputEvent> eventPtr);
     static void PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr);
-    static std::shared_ptr<InputEvent> PopEvent();
+    static std::string PopEvent();
     static void WriteEventFile();
     static void Dump(int32_t fd, const std::vector<std::string> &args);
     static std::string ConvertEventToStr(const std::shared_ptr<InputEvent> eventPtr);
     static std::string ConvertTimeToStr(int64_t timestamp);
 
 private:
-    static std::queue<std::shared_ptr<InputEvent>> eventQueue_;
-    static std::list<std::shared_ptr<InputEvent>> dumperEventList_;
+    static std::queue<std::string> eventQueue_;
+    static std::list<std::string> dumperEventList_;
     static std::mutex queueMutex_;
     static std::condition_variable queueCondition_;
     static bool writeFileEnabled_;
