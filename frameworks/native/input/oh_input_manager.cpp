@@ -88,12 +88,12 @@ struct Input_Hotkey {
 
 constexpr int32_t SIZE_ARRAY = 64;
 struct Input_DeviceInfo {
-    int32_t id;
+    int32_t id {-1};
     char name[SIZE_ARRAY] {};
-    int32_t ability;
-    int32_t product;
-    int32_t vendor;
-    int32_t version;
+    int32_t ability {-1};
+    int32_t product {-1};
+    int32_t vendor {-1};
+    int32_t version {-1};
     char phys[SIZE_ARRAY] {};
 };
 
