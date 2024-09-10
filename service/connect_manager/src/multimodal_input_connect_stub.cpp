@@ -433,6 +433,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SYSTEM_EVENT_TIME_INTERVAL):
             ret = StubGetIntervalSinceLastInput(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_SYSTEM_HOT_KEY):
             ret = StubGetAllSystemHotkeys(data, reply);
             break;
