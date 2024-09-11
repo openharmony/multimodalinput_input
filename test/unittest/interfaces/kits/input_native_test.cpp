@@ -114,6 +114,24 @@ HWTEST_F(InputNativeTest, InputNativeTest_KeySwitch_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputNativeTest_GetKeyState_001
+ * @tc.desc: Verify the GetKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_GetKeyState_001, TestSize.Level1)
+{
+    struct Input_KeyState* keyState = OH_Input_CreateKeyState();
+    ASSERT_NE(keyState, nullptr);
+    OH_Input_SetKeyCode(keyState, 22);
+    OH_Input_GetKeyState(keyState);
+    ASSERT_EQ(OH_Input_GetKeyPressed(keyState), KEY_RELEASED);
+    ASSERT_EQ(OH_Input_GetKeySwitch(keyState), KEY_DEFAULT);
+    ASSERT_EQ(OH_Input_GetKeyState(keyState), INPUT_SUCCESS);
+    OH_Input_DestroyKeyState(&keyState);
+}
+
+/**
  * @tc.name: InputNativeTest_InjectKeyEvent_001
  * @tc.desc: Verify the InjectKeyEvent
  * @tc.type: FUNC
