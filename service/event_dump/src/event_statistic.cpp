@@ -27,10 +27,10 @@ namespace MMI {
 namespace {
 const std::string EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
 const std::string EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
-const int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
-const int32_t EVENT_OUT_SIZE = 30;
-const int32_t FUNC_EXE_OK = 0;
-const int32_t STRING_WIDTH = 3;
+constexpr int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
+constexpr int32_t EVENT_OUT_SIZE = 30;
+constexpr int32_t FUNC_EXE_OK = 0;
+constexpr int32_t STRING_WIDTH = 3;
 }
 
 std::queue<std::string> EventStatistic::eventQueue_;
@@ -69,6 +69,7 @@ std::string EventStatistic::ConvertTimeToStr(int64_t timestamp)
 
 void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 {
+    CHKPV(eventPtr);
     int32_t pointerAction = eventPtr->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
         eventPtr->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
@@ -81,6 +82,7 @@ void EventStatistic::PushPointerEvent(std::shared_ptr<PointerEvent> eventPtr)
 void EventStatistic::PushEvent(std::shared_ptr<InputEvent> eventPtr)
 {
     std::lock_guard<std::mutex> lock(queueMutex_);
+    CHKPV(eventPtr);
     std::string eventStr = ConvertEventToStr(eventPtr);
     dumperEventList_.push_back(eventStr);
     if (dumperEventList_.size() > EVENT_OUT_SIZE) {
@@ -108,17 +110,17 @@ void EventStatistic::WriteEventFile()
     while (writeFileEnabled_) {
         std::string eventStr = PopEvent();
         struct stat statbuf;
-        int fileSize = 0;
+        int32_t fileSize = 0;
         if (stat(EVENT_FILE_NAME.c_str(), &statbuf) == FUNC_EXE_OK) {
-            fileSize = statbuf.st_size;
+            fileSize = static_cast<int32_t>(statbuf.st_size);
         }
         if (fileSize >= FILE_MAX_SIZE) {
             if (access(EVENT_FILE_NAME_HISTORY.c_str(), F_OK) == FUNC_EXE_OK &&
                 remove(EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
-                MMI_HILOGE("remove %{public}s failed", EVENT_FILE_NAME_HISTORY.c_str());
+                MMI_HILOGE("remove history file failed");
             }
             if (rename(EVENT_FILE_NAME.c_str(), EVENT_FILE_NAME_HISTORY.c_str()) != FUNC_EXE_OK) {
-                MMI_HILOGE("rename %{public}s failed", EVENT_FILE_NAME.c_str());
+                MMI_HILOGE("rename file failed");
             }
         }
         std::ofstream file(EVENT_FILE_NAME, std::ios::app);
@@ -126,7 +128,7 @@ void EventStatistic::WriteEventFile()
             file << eventStr << std::endl;
             file.close();
         } else {
-            MMI_HILOGE("open %{public}s failed", EVENT_FILE_NAME.c_str());
+            MMI_HILOGE("open file failed");
         }
     }
 }
@@ -134,7 +136,7 @@ void EventStatistic::WriteEventFile()
 void EventStatistic::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     std::lock_guard<std::mutex> lock(queueMutex_);
-    for (auto it = dumperEventList_.begin(); it != dumperEventList_.end(); it++) {
+    for (auto it = dumperEventList_.begin(); it != dumperEventList_.end(); ++it) {
         mprintf(fd, (*it).c_str());
     }
 }
