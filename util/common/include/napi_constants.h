@@ -24,6 +24,7 @@ namespace MMI {
 inline constexpr std::string_view CALL_FUNCTION = "napi_call_function";
 inline constexpr std::string_view CREATE_OBJECT = "napi_create_object";
 inline constexpr std::string_view CREATE_INT32 = "napi_create_int32";
+inline constexpr std::string_view CREATE_UINT32 = "napi_create_uint32";
 inline constexpr std::string_view CREATE_PROMISE = "napi_create_promise";
 inline constexpr std::string_view CREATE_REFERENCE = "napi_create_reference";
 inline constexpr std::string_view CREATE_ASYNC_WORK = "napi_create_async_work";
