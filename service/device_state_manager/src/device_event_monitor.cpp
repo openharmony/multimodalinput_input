@@ -81,6 +81,7 @@ void DeviceEventMonitor::InitCommonEventSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_CHANGED);
     matchingSkills.AddEvent(SOS_PAGE_CHANGE_EVENTS);
     EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
+    commonEventSubscribeInfo.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DeviceChangedReceiver>(commonEventSubscribeInfo));
 }
