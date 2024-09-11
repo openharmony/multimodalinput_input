@@ -253,6 +253,25 @@ int32_t KeySubscriberHandler::RegisterHotKey(std::shared_ptr<KeyOption> option,
     };
     return KEY_SHORTCUT_MGR->RegisterHotKey(hotKey);
 }
+
+void KeySubscriberHandler::UnregisterSystemKey(int32_t shortcutId)
+{
+    KEY_SHORTCUT_MGR->UnregisterSystemKey(shortcutId);
+}
+ 
+void KeySubscriberHandler::UnregisterHotKey(int32_t shortcutId)
+{
+    KEY_SHORTCUT_MGR->UnregisterHotKey(shortcutId);
+}
+ 
+void KeySubscriberHandler::DeleteShortcutId(std::shared_ptr<Subscriber> subscriber)
+{
+    if (subscriber->isSystem) {
+        UnregisterSystemKey(subscriber->shortcutId_);
+    } else {
+        UnregisterHotKey(subscriber->shortcutId_);
+    }
+}
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 
 int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
@@ -265,11 +284,13 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CHKPR(subscriber->sess_, RET_ERR);
     if (isSystem) {
+        subscriber->isSystem = true;
         subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
             });
     } else {
+        subscriber->isSystem = false;
         subscriber->shortcutId_ = RegisterHotKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
@@ -525,6 +546,9 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
         for (auto it = subscribers.begin(); it != subscribers.end();) {
             if ((*it)->sess_ == sess) {
                 ClearTimer(*it);
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+                DeleteShortcutId(*it);
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
                 subscribers.erase(it++);
                 continue;
             }
