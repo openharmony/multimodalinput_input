@@ -70,6 +70,7 @@ ohos_fuzztest("StubGetMousePrimaryButtonFuzzTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 
