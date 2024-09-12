@@ -25,17 +25,22 @@ namespace OHOS {
 namespace MMI {
 class HardwareCursorPointerManager {
 public:
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     HardwareCursorPointerManager() = default;
     ~HardwareCursorPointerManager() = default;
     void SetTargetDevice(uint32_t devId);
+    void SetHdiServiceState(bool hdiServiceState);
     bool IsSupported();
     int32_t SetPosition(int32_t x, int32_t y);
     int32_t EnableStats(bool enable);
     int32_t GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 private:
     bool isEnableState_ { false };
     [[ maybe_unused ]] bool isEnable_ { false };
+    bool isDeviceChange_ { false };
     uint32_t devId_ { 0 };
+    sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
