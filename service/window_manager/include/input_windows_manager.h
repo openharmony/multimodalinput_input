@@ -181,7 +181,6 @@ public:
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
     void CleanInvalidPiexMap();
     void HandleWindowPositionChange();
-    void SetFoldState ();
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
