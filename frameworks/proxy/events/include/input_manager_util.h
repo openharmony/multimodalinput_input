@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #ifndef INPUT_MANAGER_UTIL_H
 #define INPUT_MANAGER_UTIL_H
 
@@ -48,7 +48,7 @@ public:
     static std::shared_ptr<PointerEvent> SetupPointerEvent015();
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     static std::shared_ptr<PointerEvent> SetupPointerEvent016();
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
+#endif  // OHOS_BUILD_ENABLE_JOYSTICK
     static std::shared_ptr<PointerEvent> SetupMouseEvent001();
     static std::shared_ptr<PointerEvent> SetupMouseEvent002();
     static std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
@@ -81,6 +81,6 @@ public:
     static void TestInterceptorId(int32_t interceptorId1, int32_t interceptorId2);
     static std::shared_ptr<PointerEvent> SetupTabletToolEvent001();
 };
-} // namespace MMI
-} // namespace OHOS
-#endif // INPUT_MANAGER_UTIL_H
+}  // namespace MMI
+}  // namespace OHOS
+#endif  // INPUT_MANAGER_UTIL_H

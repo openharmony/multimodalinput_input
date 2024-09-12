@@ -1024,9 +1024,9 @@ napi_value JsPointerManager::GetHardwareCursorStats(napi_env env)
     MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d",
         frameCount, vsyncCount);
     napi_value frameNapiCount;
-    CHKRP(napi_create_uint32(env, frameCount, &frameNapiCount), CREATE_UINT32);
+    CHKRP(napi_create_uint32(env, frameCount, &frameNapiCount), CREATE_INT32);
     napi_value vsyncNapiCount;
-    CHKRP(napi_create_uint32(env, vsyncCount, &vsyncNapiCount), CREATE_UINT32);
+    CHKRP(napi_create_uint32(env, vsyncCount, &vsyncNapiCount), CREATE_INT32);
     status = napi_set_named_property(env, result, "frameCount", frameNapiCount);
     if (status != napi_ok) {
         MMI_HILOGE("Napi set frameCount named property is failed");

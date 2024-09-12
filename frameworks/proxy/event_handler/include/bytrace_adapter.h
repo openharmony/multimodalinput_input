@@ -55,11 +55,14 @@ public:
 
     static void StartHandleInput(int32_t code);
     static void StopHandleInput();
-    static void StartPackageEvent(const std::string &msg);
+    static void StartPackageEvent(const std::string& msg);
     static void StopPackageEvent();
 
     static void StartSocketHandle(int32_t msgId);
     static void StopSocketHandle();
+
+    static void StartDevListener(const std::string& type, int32_t deviceId);
+    static void StopDevListener();
 
     static void StartLaunchAbility(int32_t type, const std::string &bundleName);
     static void StopLaunchAbility();

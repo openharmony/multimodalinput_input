@@ -142,7 +142,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -181,7 +181,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -232,7 +232,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
-    if (argc < 1) {
+    if (argc == 0) {
         return jsInputDeviceMgr->GetDeviceIds(env);
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
@@ -265,7 +265,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return jsInputDeviceMgr->GetDevice(env, id);
     }
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Second parameter type is wrong");
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
@@ -371,7 +371,6 @@ napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_inf
         napi_value keyValue = nullptr;
         CHKRP(napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
         if (!JsUtil::TypeOf(env, keyValue, napi_number)) {
-            MMI_HILOGE("Second parameter type error");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyCode", "number");
             return nullptr;
         }
@@ -392,7 +391,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -459,7 +458,7 @@ napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
-    if (argc < 1) {
+    if (argc == 0) {
         return jsInputDeviceMgr->GetDeviceList(env);
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
@@ -476,7 +475,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -535,7 +534,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callb
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -572,7 +571,7 @@ napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callba
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1) {
+    if (argc == 0) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -612,7 +611,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatDelay(napi_env env, napi_callb
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
-    if (argc < 1) {
+    if (argc == 0) {
         return jsInputDeviceMgr->GetKeyboardRepeatDelay(env);
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
@@ -632,7 +631,7 @@ napi_value JsInputDeviceContext::GetKeyboardRepeatRate(napi_env env, napi_callba
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
-    if (argc < 1) {
+    if (argc == 0) {
         return jsInputDeviceMgr->GetKeyboardRepeatRate(env);
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
