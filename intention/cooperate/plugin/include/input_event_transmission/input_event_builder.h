@@ -16,6 +16,7 @@
 #ifndef INPUT_EVENT_BUILDER_H
 #define INPUT_EVENT_BUILDER_H
 
+#include "display_manager.h"
 #include "key_event.h"
 #include "nocopyable.h"
 #include "pointer_event.h"
