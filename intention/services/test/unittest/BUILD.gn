@@ -46,6 +46,7 @@ ohos_unittest("MonitorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "input:libmmi-client",
+    "window_manager:libdm",
   ]
 }
 
@@ -86,6 +87,7 @@ ohos_unittest("EnumeratorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "input:libmmi-client",
+    "window_manager:libdm",
   ]
 }
 
@@ -124,6 +126,7 @@ ohos_unittest("DeviceTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "input:libmmi-client",
+    "window_manager:libdm",
   ]
 }
 
@@ -185,6 +188,7 @@ ohos_unittest("IntentionDeviceManagerTest") {
     "hisysevent:libhisysevent",
     "input:libmmi-client",
     "ipc:ipc_single",
+    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
