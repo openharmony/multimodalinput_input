@@ -31,6 +31,8 @@
             OHOS::MMI::PointerStyleColor*;
             OHOS::MMI::MultimodalEventHandler*;
             OHOS::MMI::MMIClient*;
+            OHOS::MMI::BytraceAdapter::StartDevListener*;
+            OHOS::MMI::BytraceAdapter::StopDevListener*;
             "vtable for OHOS::MMI::MMIClient";
         };
     local:
