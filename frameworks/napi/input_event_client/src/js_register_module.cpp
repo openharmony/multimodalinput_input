@@ -19,6 +19,7 @@
 
 #include "input_manager.h"
 #include "js_register_util.h"
+#include "js_joystick_event.h"
 #include "napi_constants.h"
 #include "util_napi.h"
 #include "util_napi_error.h"

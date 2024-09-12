@@ -170,6 +170,7 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPV(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(keyEvent);
@@ -177,6 +178,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPV(pointerEvent);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(pointerEvent);

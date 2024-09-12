@@ -112,7 +112,6 @@ group("input_jsapi_group") {
     if (input_feature_short_key) {
       deps += [ "frameworks/napi/short_key:shortkey" ]
     }
-    deps += [ "frameworks/napi/infrared_emitter:infraredemitter" ]
   }
 }
 

@@ -80,7 +80,7 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
     JsPointerContext *jsContext = new (std::nothrow) JsPointerContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
-        MMI_HILOGI("Jsvm ends");
+        MMI_HILOGI("jsvm ends");
         JsPointerContext *context = static_cast<JsPointerContext*>(data);
         delete context;
     }, nullptr, nullptr);
@@ -1120,7 +1120,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "First parameter type is invalid");
+        THROWERR(env, "The first parameter type is invalid");
         return nullptr;
     }
 
@@ -1133,7 +1133,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
         return jsPointerMgr->EnterCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Second parameter type is invalid");
+        THROWERR(env, "The second parameter type is invalid");
         return nullptr;
     }
     return jsPointerMgr->EnterCaptureMode(env, windowId, argv[1]);
@@ -1150,7 +1150,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "First parameter type is invalid");
+        THROWERR(env, "The first parameter type is invalid");
         return nullptr;
     }
 
@@ -1164,7 +1164,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         return jsPointerMgr->LeaveCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "Second parameter type is invalid");
+        THROWERR(env, "The second parameter type is invalid");
         return nullptr;
     }
     return jsPointerMgr->LeaveCaptureMode(env, windowId, argv[1]);
@@ -1310,7 +1310,7 @@ napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_inf
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "switchFlag", "boolean");
         return nullptr;
@@ -1341,7 +1341,7 @@ napi_value JsPointerContext::SetTouchpadInt32Data(napi_env env, napi_callback_in
     size_t argc = 2;
     napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "data", "number");
         return nullptr;
