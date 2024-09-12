@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "crown_transform_processor.h"
-
 #include <cinttypes>
 #include <functional>
 
@@ -24,6 +22,8 @@
 #include "input_event_handler.h"
 #include "timer_manager.h"
 #include "util_ex.h"
+
+#include "crown_transform_processor.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_DISPATCH

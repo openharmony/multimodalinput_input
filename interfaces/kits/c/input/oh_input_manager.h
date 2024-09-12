@@ -174,6 +174,26 @@ typedef enum InputEvent_SourceType {
 } InputEvent_SourceType;
 
 /**
+ * @brief Enumerates keyboard types.
+ *
+ * @since 13
+ */
+typedef enum Input_KeyboardType {
+    /** Keyboard without keys */
+    KEYBOARD_TYPE_NONE = 0,
+    /** Keyboard with unknown keys */
+    KEYBOARD_TYPE_UNKNOWN = 1,
+    /** Full keyboard */
+    KEYBOARD_TYPE_ALPHABETIC = 2,
+    /** Digital keyboard */
+    KEYBOARD_TYPE_DIGITAL = 3,
+    /** Stylus */
+    KEYBOARD_TYPE_STYLUS = 4,
+    /** Remote control */
+    KEYBOARD_TYPE_REMOTE_CONTROL = 5,
+} Input_KeyboardType;
+
+/**
  * @brief Defines key information, which identifies a key pressing behavior.
  * For example, the Ctrl key information contains the key value and key type.
  *
@@ -258,6 +278,20 @@ typedef void (*Input_TouchEventCallback)(const Input_TouchEvent* touchEvent);
 typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 
 /**
+ * @brief Defines the callback for device addition events.
+ * @param deviceId Device ID.
+ * @since 13
+ */
+typedef void (*Input_DeviceAddedCallback)(int32_t deviceId);
+
+/**
+ * @brief Defines the callback for device removal events.
+ * @param deviceId Device ID.
+ * @since 13
+ */
+typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId);
+
+/**
  * @brief Defines the structure for the interceptor of event callbacks,
  * including mouseCallback, touchCallback, and axisCallback.
  * @since 12
@@ -272,10 +306,28 @@ typedef struct Input_InterceptorEventCallback {
 } Input_InterceptorEventCallback;
 
 /**
+ * @brief Defines a listener for device insertion and removal events.
+ * @since 13
+ */
+typedef struct Input_DeviceListener {
+    /** Callback for device addition events */
+    Input_DeviceAddedCallback deviceAddedCallback;
+    /** Callback for device removal events */
+    Input_DeviceRemovedCallback deviceRemovedCallback;
+} Input_DeviceListener;
+
+/**
  * @brief Defines event interceptor options.
  * @since 12
  */
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
+
+/**
+ * @brief Represents information about the input device.
+ *
+ * @since 13
+ */
+typedef struct Input_DeviceInfo Input_DeviceInfo;
 
 /**
  * @brief Queries the key state.
@@ -1193,6 +1245,195 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void);
  * @since 12
  */
 Input_Result OH_Input_RemoveInputEventInterceptor(void);
+
+/**
+ * @brief Obtains the IDs of all input devices.
+ *
+ * @param deviceIds Array of input device IDs.
+ * @param inSize Size of the array of input device IDs.
+ * @param outSize Length of the list of input device IDs. The value cannot be greater than the value of inSize.
+ * @return OH_Input_GetDeviceIds result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceIds or outSize is a null pointer or inSize is less than 0.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceIds(int32_t *deviceIds, int32_t inSize, int32_t *outSize);
+
+/**
+ * @brief Obtains the information about an input device.
+ *
+ * @param deviceId Device ID.
+ * @param deviceInfo Pointer to an {@Link Input_DeviceInfo} object.
+ * @return OH_Input_GetDevice result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if the deviceInfo is a null pointer or the deviceId is invalid.
+ * You can use the {@Link OH_Input_GetDeviceIds} interface to query the device IDs supported by the system.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDevice(int32_t deviceId, Input_DeviceInfo **deviceInfo);
+
+/**
+ * @brief Creates a deviceInfo object.
+
+ * @return Pointer to an {@Link Input_DeviceInfo} object if the operation is successful;
+ * a null pointer otherwise (possibly because of a memory allocation failure).
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_DeviceInfo OH_Input_CreateDeviceInfo(void);
+
+/**
+ * @brief Destroys a deviceInfo object.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_DestroyDeviceInfo(Input_DeviceInfo **deviceInfo);
+
+/**
+ * @brief Obtains the keyboard type of an input device.
+ *
+ * @param deviceId Device ID.
+ * @param keyboardType Pointer to the keyboard type of the input device.
+ * @return OH_Input_GetKeyboardType result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if the device ID is invalid or keyboardType is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetKeyboardType(int32_t deviceId, int32_t *keyboardType);
+
+/**
+ * @brief Obtains the ID of an input device.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param id Pointer to the ID of the input device.
+ * @return OH_Input_GetDeviceId result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or id is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceId(Input_DeviceInfo *deviceInfo, int32_t *id);
+
+/**
+ * @brief Obtains the name of an input device.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param name Pointer to the name of the input device.
+ * @return OH_Input_GetDeviceName result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or name is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceName(Input_DeviceInfo *deviceInfo, char **name);
+
+/**
+ * @brief Obtains the capabilities of an input device, for example, a touchscreen, touchpad, or keyboard.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param capabilities Pointer to the capabilities of the input device.
+ * @return OH_Input_GetCapabilities result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or capabilities is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetCapabilities(Input_DeviceInfo *deviceInfo, int32_t *capabilities);
+
+/**
+ * @brief Obtains the version information of an input device.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param version Pointer to the version information of the input device.
+ * @return OH_Input_GetDeviceVersion result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or version is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceVersion(Input_DeviceInfo *deviceInfo, int32_t *version);
+
+/**
+ * @brief Obtains the product information of an input device.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param product Pointer to the product information of the input device.
+ * @return OH_Input_GetDeviceProduct result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or product is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceProduct(Input_DeviceInfo *deviceInfo, int32_t *product);
+
+/**
+ * @brief Obtains the vendor information of an input device.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param vendor Pointer to the vendor information of the input device.
+ * @return OH_Input_GetDeviceVendor result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or vendor is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceVendor(Input_DeviceInfo *deviceInfo, int32_t *vendor);
+
+/**
+ * @brief Obtains the physical address of an input device.
+ *
+ * @param deviceInfo information object. For details, see {@Link Input_DeviceInfo}.
+ * @param address Pointer to the physical address of the input device.
+ * @return OH_Input_GetDeviceAddress result code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;
+ *         {@link INPUT_PARAMETER_ERROR} if deviceInfo or address is a null pointer.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetDeviceAddress(Input_DeviceInfo *deviceInfo, char **address);
+
+/**
+ * @brief Registers a listener for device hot swap events.
+ *
+ * @param listener Pointer to an {@Link Input_DeviceListener} object.
+ *
+ * @return OH_Input_RegisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if listener is NULL;
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener listener);
+
+/**
+ * @brief Unregisters the listener for device hot swap events.
+ *
+ * @param listener Pointer to the listener for device hot swap events. For details, see {@Link Input_DeviceListener}.
+ *
+ * @return OH_Input_UnregisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if listener is NULL or no listener is registered;
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is abnormal.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListener(Input_DeviceListener listener);
+
+/**
+ * @brief Unregisters the listener for all device hot swap events.
+
+ * @return OH_Input_UnregisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is abnormal.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_UnregisterDeviceListeners(void);
 #ifdef __cplusplus
 }
 #endif
