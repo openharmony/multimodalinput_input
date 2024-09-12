@@ -88,7 +88,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetKeyCode() < 0) {
         if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+            MMI_HILOGE("KeyCode is invalid:%{private}u", keyEvent->GetKeyCode());
         }
         return RET_ERR;
     }

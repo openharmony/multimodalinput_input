@@ -30,8 +30,8 @@ public:
     static napi_value Export(napi_env env, napi_value exports);
 private:
     static napi_value GetNapiInt32(napi_env env, int32_t code);
-    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
     static napi_value HandleActionPropertyArr(napi_env env, napi_value exports);
+    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 };
 } // namespace MMI
 } // namespace OHOS
