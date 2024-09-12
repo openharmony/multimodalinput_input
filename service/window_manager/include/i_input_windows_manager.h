@@ -157,6 +157,7 @@ public:
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();
     static void DestroyInstance();
+    virtual void SetFoldState () = 0;
 
 private:
     static std::mutex mutex_;
