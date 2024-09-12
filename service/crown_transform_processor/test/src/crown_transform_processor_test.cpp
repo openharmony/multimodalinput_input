@@ -137,6 +137,28 @@ HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_0
     ASSERT_TRUE(CROWN_EVENT_HDR->IsCrownEvent(event));
 }
 
+
+/**
+ * @tc.name: CrownTransformProcessorTest_NormalizeRotateEvent_003
+ * @tc.desc: Test NormalizeRotateEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotateEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    vCrown_.SendEvent(EV_REL, REL_WHEEL, 5);
+    vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
+    libinput_event *event = GetEvent();
+    ASSERT_TRUE(event != nullptr);
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    std::string name = libinput_device_get_name(dev);
+    MMI_HILOGD("pointer device: %{public}s", name.c_str());
+    int32_t result = CROWN_EVENT_HDR->NormalizeRotateEvent(event);
+    EXPECT_NE(result, RET_OK);
+}
+
 /**
  * @tc.name: CrownTransformProcessorTest_HandleCrownRotateBegin_004
  * @tc.desc: Test HandleCrownRotateBegin

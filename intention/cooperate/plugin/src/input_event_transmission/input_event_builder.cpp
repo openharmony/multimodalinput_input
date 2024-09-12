@@ -136,7 +136,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
         return;
     }
     TagRemoteEvent(pointerEvent_);
-    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent_->GetId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction());
     if (IsActive(pointerEvent_)) {
         env_->GetInput().SimulateInputEvent(pointerEvent_);
@@ -146,7 +146,7 @@ void InputEventBuilder::OnPointerEvent(Msdp::NetPacket &packet)
 void InputEventBuilder::OnKeyEvent(Msdp::NetPacket &packet)
 {
     CHKPV(keyEvent_);
-    keyEvent_->Reset();
+    pointerEvent_->Reset();
     int32_t ret = InputEventSerialization::NetPacketToKeyEvent(packet, keyEvent_);
     if (ret != RET_OK) {
         FI_HILOGE("Failed to deserialize key event");

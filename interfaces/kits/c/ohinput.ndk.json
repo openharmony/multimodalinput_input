@@ -314,5 +314,65 @@
     {
         "first_introduced": "12",
         "name": "OH_Input_RemoveInputEventInterceptor"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceIds"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDevice"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_CreateDeviceInfo"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_DestroyDeviceInfo"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetKeyboardType"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceId"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceName"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetCapabilities"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceVersion"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceProduct"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceVendor"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetDeviceAddress"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_RegisterDeviceListener"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_UnregisterDeviceListener"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_UnregisterDeviceListeners"
     }
 ]
