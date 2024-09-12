@@ -111,7 +111,6 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType)
 {
     CHKPV(key);
-    int32_t keyCode = key->GetKeyCode();
     std::string checkKeyCode;
     switch (handlerType) {
         case KEY_INTERCEPT_EVENT: {
@@ -144,7 +143,6 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
 {
     CHKPV(keyEvent);
     int32_t keyId = keyEvent->GetId();
-    int32_t keyCode = keyEvent->GetKeyCode();
     if (traceBtn == TRACE_START) {
         switch (handlerType) {
             case KEY_INTERCEPT_EVENT: {
@@ -355,6 +353,17 @@ void BytraceAdapter::StartSocketHandle(int32_t msgId)
 }
 
 void BytraceAdapter::StopSocketHandle()
+{
+    FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
+}
+
+void BytraceAdapter::StartDevListener(const std::string& type, int32_t deviceId)
+{
+    StartTrace(HITRACE_TAG_MULTIMODALINPUT,
+        "device listener type:" + type + ", deviceid:" + std::to_string(deviceId));
+}
+
+void BytraceAdapter::StopDevListener()
 {
     FinishTrace(HITRACE_TAG_MULTIMODALINPUT);
 }

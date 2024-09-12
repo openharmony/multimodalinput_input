@@ -123,14 +123,14 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     }
     int32_t finalKey = tempFinalKey.value();
     if (finalKey < 0) {
-        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
+        MMI_HILOGE("finalKey:%{private}d is less 0, can not process", finalKey);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
         return nullptr;
     }
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
-    MMI_HILOGD("FinalKey:%{public}d", finalKey);
+    MMI_HILOGD("FinalKey:%{private}d", finalKey);
     bool isFinalKeyDown;
     if (!GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
         MMI_HILOGE("GetNamedPropertyBool failed");
@@ -197,7 +197,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t infoFinalKey = keyOption->GetFinalKey();
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     bool isFinalKeydown = keyOption->IsFinalKeyDown();
-    MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
+    MMI_HILOGD("infoFinalKey:%{private}d,keyEventFinalKey:%{private}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
         !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
         MMI_HILOGD("Param invalid");

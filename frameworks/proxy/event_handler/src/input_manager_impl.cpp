@@ -381,7 +381,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(int32_t switchType,
     }
     return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(switchType, callback);
 #else
-    MMI_HILOGW("Switch device does not support");
+    MMI_HILOGW("switch device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_SWITCH
 }
@@ -393,7 +393,7 @@ void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(subscriberId);
 #else
-    MMI_HILOGW("Switch device does not support");
+    MMI_HILOGW("switch device does not support");
 #endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
@@ -401,7 +401,7 @@ void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     CHK_PID_AND_TID();
     CHKPV(consumer);
@@ -413,7 +413,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
     CHKPV(eventHandler_);
@@ -513,7 +513,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
-    CALL_DEBUG_ENTER;
     pkt << displayGroupInfo_.width << displayGroupInfo_.height
         << displayGroupInfo_.focusWindowId << displayGroupInfo_.currentUserId;
     if (pkt.ChkRWError()) {
@@ -620,7 +619,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
         int32_t ret = SetPixelMapData(item.id, item.pixelMap);
         if (ret != RET_OK) {
             byteCount = 0;
-            MMI_HILOGE("Failed to set pixel map");
+            MMI_HILOGE("Failed to set pixel map, byteCount:%{public}d", byteCount);
         }
         pkt << byteCount;
         uint32_t uiExtentionWindowInfoNum = static_cast<uint32_t>(item.uiExtentionWindowInfo.size());
@@ -901,7 +900,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent, bo
     if (!EventLogHelper::IsBetaVersion()) {
         MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
     } else {
-        MMI_HILOGI("KeyCode:%{private}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGI("action:%{public}d", keyEvent->GetKeyAction());
     }
     if (MMIEventHdl.InjectEvent(keyEvent, isNativeInject) != RET_OK) {
         MMI_HILOGE("Failed to inject keyEvent");
@@ -964,13 +963,13 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
         return;
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
 #ifndef OHOS_BUILD_ENABLE_TOUCH
         MMI_HILOGW("Touchscreen device does not support");
         return;
-#endif // OHOS_BUILD_ENABLE_TOUCH
+#endif
     }
 #ifndef OHOS_BUILD_ENABLE_JOYSTICK
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
@@ -1586,7 +1585,7 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 
 void InputManagerImpl::OnAnr(int32_t pid, int32_t eventId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHK_PID_AND_TID();
     {
         std::lock_guard<std::mutex> guard(mtx_);
@@ -2162,14 +2161,13 @@ void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher
 
 int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
 {
-    CALL_DEBUG_ENTER;
     ANRHDL->SetLastProcessedEventId(EVENT_TYPE, eventId, actionTime);
     return RET_OK;
 }
 
 int32_t InputManagerImpl::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetKeyState(pressedKeys, specialKeysState);
     if (ret != RET_OK) {
         MMI_HILOGE("Get key state failed, ret:%{public}d", ret);
@@ -2194,6 +2192,20 @@ int32_t InputManagerImpl::CancelInjection()
     return RET_OK;
 }
 
+int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    if (infoId < 0 || pixelMap == nullptr) {
+        MMI_HILOGE("Invalid infoId or pixelMap");
+        return RET_ERR;
+    }
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPixelMapData(infoId, pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pixel map, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t InputManagerImpl::HasIrEmitter(bool &hasIrEmitter)
 {
     CALL_INFO_TRACE;
@@ -2210,20 +2222,6 @@ int32_t InputManagerImpl::TransmitInfrared(int64_t number, std::vector<int64_t>&
 {
     CALL_INFO_TRACE;
     return MULTIMODAL_INPUT_CONNECT_MGR->TransmitInfrared(number, pattern);
-}
-
-int32_t InputManagerImpl::SetPixelMapData(int32_t infoId, void* pixelMap)
-{
-    CALL_DEBUG_ENTER;
-    if (infoId < 0 || pixelMap == nullptr) {
-        MMI_HILOGE("Invalid infoId or pixelMap");
-        return RET_ERR;
-    }
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPixelMapData(infoId, pixelMap);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to set pixel map, ret:%{public}d", ret);
-    }
-    return ret;
 }
 
 int32_t InputManagerImpl::SetCurrentUser(int32_t userId)

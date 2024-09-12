@@ -118,13 +118,13 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{private}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         tIter->GetSubscribeId(), keyOption->GetFinalKey(),
         keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     for (const auto &preKey : preKeys) {
-        MMI_HILOGD("prekey:%{public}d", preKey);
+        MMI_HILOGD("prekey:%{private}d", preKey);
     }
     return tIter->GetSubscribeId();
 }
@@ -133,7 +133,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     if (subscribeId < 0) {
-        MMI_HILOGE("Subscribe id is less than 0");
+        MMI_HILOGE("The subscribe id is less than 0");
         return RET_ERR;
     }
 
@@ -143,7 +143,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         return INVALID_SUBSCRIBE_ID;
     }
     if (subscribeInfos_.empty()) {
-        MMI_HILOGE("Subscribe Infos is empty");
+        MMI_HILOGE("The subscribeInfos is empty");
         return RET_ERR;
     }
 
@@ -179,7 +179,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         return RET_ERR;
     }
     callback(event);
-    MMI_HILOGD("Key event id:%{public}d, keyCode:%{public}d", subscribeId, event->GetKeyCode());
+    MMI_HILOGD("Key event id:%{public}d, keyCode:%{private}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }
 
