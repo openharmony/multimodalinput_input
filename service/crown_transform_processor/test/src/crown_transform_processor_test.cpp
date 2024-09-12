@@ -16,125 +16,89 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "crown_transform_processor.h"
 #include "general_crown.h"
 #include "i_input_windows_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "libinput.h"
-#include "libinput_wrapper.h"
-#include "mmi_log.h"
-#include "window_info.h"
-
-#undef MMI_LOG_TAG
-#define MMI_LOG_TAG "CrownTransformProcessorTest"
-
-namespace OHOS {
-namespace MMI {
-namespace {
-using namespace testing::ext;
-}
-class CrownTransformProcessorTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
-    static void TearDownTestCase(void);
-    static void SetupCrown();
-    static void CloseCrown();
-    static void InitHandler();
-    libinput_event *GetEvent();
+static void SetUpTestCase(void);
+static void TearDownTestCase(void);
+static void SetupCrown();
+static void CloseCrown();
+static void UpdateDisplayInfo();
+static void InitHandler();
+libinput_event *GetEvent();
 
 private:
-    static GeneralCrown vCrown_;
-    static LibinputWrapper libinput_;
-};
-
-GeneralCrown CrownTransformProcessorTest::vCrown_;
-LibinputWrapper CrownTransformProcessorTest::libinput_;
+static GeneralCrown vCrown_;
 
 void CrownTransformProcessorTest::SetUpTestCase(void)
 {
-    ASSERT_TRUE(libinput_.Init());
-    SetupCrown();
-    InitHandler();
+ASSERT_TRUE(libinput_.Init());
+SetupCrown();
+UpdateDisplayInfo();
+
+InitHandler();
 }
 
 void CrownTransformProcessorTest::TearDownTestCase(void)
 {
-    CloseCrown();
+{
+libinput_.RemovePath(vCrown_.GetDevPath());
+vCrown_.Close();
 }
 
-void CrownTransformProcessorTest::SetupCrown()
+void CrownTransformProcessorTest::UpdateDisplayInfo()
 {
-    ASSERT_TRUE(vCrown_.SetUp());
-    MMI_HILOGD("device node name: %{public}s", vCrown_.GetDevPath().c_str());
-    ASSERT_TRUE(libinput_.AddPath(vCrown_.GetDevPath()));
+auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+ASSERT_TRUE(display != nullptr);
 
-    libinput_event *event = libinput_.Dispatch();
-    ASSERT_TRUE(event != nullptr);
-    ASSERT_EQ(libinput_event_get_type(event), LIBINPUT_EVENT_DEVICE_ADDED);
-    struct libinput_device *device = libinput_event_get_device(event);
-    ASSERT_TRUE(device != nullptr);
-    INPUT_DEV_MGR->OnInputDeviceAdded(device);
-}
-
-void CrownTransformProcessorTest::CloseCrown()
-{
-    libinput_.RemovePath(vCrown_.GetDevPath());
-    vCrown_.Close();
+DisplayGroupInfo displays {
+    .width = display->GetWidth(),
+    .height = display->GetHeight(),
+    .focusWindowId = -1,
+};
+displays.displaysInfo.push_back(DisplayInfo {
+    .name = "default display",
+    .width = display->GetWidth(),
+    .height = display->GetHeight(),
+});
+WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void CrownTransformProcessorTest::InitHandler()
 {
-    UDSServer udsServer;
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    ASSERT_NO_FATAL_FAILURE(inputHandler->Init(udsServer));
-}
-
-libinput_event *CrownTransformProcessorTest::GetEvent()
-{
-    libinput_event *event = nullptr;
-    libinput_event *evt = libinput_.Dispatch();
-    while (evt != nullptr) {
-        auto type = libinput_event_get_type(evt);
-        if (type == LIBINPUT_EVENT_POINTER_AXIS) {
-            event = evt;
-        }
-        evt = libinput_.Dispatch();
-    }
-    return event;
+UDSServer udsServer;
+std::shared_ptrOHOS::MMI::InputEventHandler inputHandler = InputHandler;
+ASSERT_NO_FATAL_FAILURE(inputHandler->Init(udsServer));
+std::string name = libinput_device_get_name(dev);
+MMI_HILOGD("pointer device: %{public}s", name.c_str());
+ASSERT_TRUE(CROWN_EVENT_HDR->IsCrownEvent(event));
 }
 
 /**
- * @tc.name: CrownTransformProcessorTest_GetPointerEvent_001
- * @tc.desc: Test GetPointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_GetPointerEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto ret = CROWN_EVENT_HDR->GetPointerEvent();
-    ASSERT_NE(ret, nullptr);
-}
 
-/**
- * @tc.name: CrownTransformProcessorTest_IsCrownEvent_002
- * @tc.desc: Test IsCrownEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_IsCrownEvent_002, TestSize.Level1)
+@tc.name: CrownTransformProcessorTest_NormalizeRotateEvent_003
+@tc.desc: Test NormalizeRotateEvent
+@tc.type: FUNC
+@tc.require:
+*/
+HWTEST_F(CrownTransformProcessorTest, CrownTransformProcessorTest_NormalizeRotateEvent_003, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
-    vCrown_.SendEvent(EV_REL, REL_WHEEL, 5);
-    vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
-    libinput_event *event = GetEvent();
-    ASSERT_TRUE(event != nullptr);
-    struct libinput_device *dev = libinput_event_get_device(event);
-    ASSERT_TRUE(dev != nullptr);
-    std::string name = libinput_device_get_name(dev);
-    MMI_HILOGD("pointer device: %{public}s", name.c_str());
-    ASSERT_TRUE(CROWN_EVENT_HDR->IsCrownEvent(event));
+CALL_TEST_DEBUG;
+vCrown_.SendEvent(EV_REL, REL_WHEEL, 5);
+vCrown_.SendEvent(EV_SYN, SYN_REPORT, 0);
+libinput_event *event = GetEvent();
+ASSERT_TRUE(event != nullptr);
+struct libinput_device *dev = libinput_event_get_device(event);
+ASSERT_TRUE(dev != nullptr);
+std::string name = libinput_device_get_name(dev);
+MMI_HILOGD("pointer device: %{public}s", name.c_str());
+int32_t result = CROWN_EVENT_HDR->NormalizeRotateEvent(event);
+EXPECT_NE(result, RET_OK);
 }
 
 
