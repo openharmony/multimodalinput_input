@@ -86,6 +86,7 @@ void EventManager::DisableCooperate(const DisableCooperateEvent &event)
 
 void EventManager::StartCooperate(const StartCooperateEvent &event)
 {
+    CALL_INFO_TRACE;
     std::shared_ptr<EventInfo> eventInfo = std::make_shared<EventInfo>();
     eventInfo->type = EventType::START;
     eventInfo->msgId = MessageId::COORDINATION_MESSAGE;
@@ -97,6 +98,7 @@ void EventManager::StartCooperate(const StartCooperateEvent &event)
 
 void EventManager::StartCooperateFinish(const DSoftbusStartCooperateFinished &event)
 {
+    CALL_INFO_TRACE;
     std::shared_ptr<EventInfo> eventInfo = calls_[EventType::START];
     CHKPV(eventInfo);
     CooperateNotice notice {
@@ -139,6 +141,7 @@ void EventManager::OnUnchain(const StopCooperateEvent &event)
 
 void EventManager::StopCooperate(const StopCooperateEvent &event)
 {
+    CALL_INFO_TRACE;
     std::shared_ptr<EventInfo> eventInfo = std::make_shared<EventInfo>();
     eventInfo->type = EventType::STOP;
     eventInfo->msgId = MessageId::COORDINATION_MESSAGE;
@@ -149,6 +152,7 @@ void EventManager::StopCooperate(const StopCooperateEvent &event)
 
 void EventManager::StopCooperateFinish(const DSoftbusStopCooperateFinished &event)
 {
+    CALL_INFO_TRACE;
     std::shared_ptr<EventInfo> eventInfo = calls_[EventType::STOP];
     CHKPV(eventInfo);
     CooperateNotice notice {
@@ -229,6 +233,7 @@ void EventManager::OnClientDied(const ClientDiedEvent &event)
 
 void EventManager::NotifyCooperateMessage(const CooperateNotice &notice)
 {
+    CALL_INFO_TRACE;
     auto session = env_->GetSocketSessionManager().FindSessionByPid(notice.pid);
     CHKPV(session);
     NetPacket pkt(notice.msgId);

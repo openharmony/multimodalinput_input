@@ -817,9 +817,9 @@ const int32_t KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER = 10009;
 const int32_t KeyEvent::KEYCODE_CALL_CONTROL_CENTER = 10010;
 
 const int32_t KeyEvent::KEY_ACTION_UNKNOWN = 0X00000000;
-const int32_t KeyEvent::KEY_ACTION_CANCEL = 0X00000001;
+const int32_t KeyEvent::KEY_ACTION_CANCEL = 0x00000001;
 
-const int32_t KeyEvent::KEY_ACTION_DOWN = 0x00000002;
+const int32_t KeyEvent::KEY_ACTION_DOWN = 0X00000002;
 const int32_t KeyEvent::KEY_ACTION_UP = 0X00000003;
 
 const int32_t KeyEvent::INTENTION_UNKNOWN = -1;
@@ -1287,7 +1287,7 @@ bool KeyEvent::GetFunctionKey(int32_t funcKey) const
             return scrollLock_;
         }
         default: {
-            MMI_HILOGW("Unknown function key:%{public}d", funcKey);
+            MMI_HILOGW("Unknown function key:%{private}d", funcKey);
             return false;
         }
     }
@@ -1310,7 +1310,7 @@ int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
             return funcKey;
         }
         default: {
-            MMI_HILOGW("Unknown function key:%{public}d", funcKey);
+            MMI_HILOGW("Unknown function key:%{private}d", funcKey);
             return UNKNOWN_FUNCTION_KEY;
         }
     }
