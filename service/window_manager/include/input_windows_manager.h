@@ -180,6 +180,7 @@ public:
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
     void CleanInvalidPiexMap();
     void HandleWindowPositionChange();
+    void SetFoldState ();
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -380,6 +381,7 @@ private:
     bool isParseConfig_ { false };
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
+    bool IsFoldable_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

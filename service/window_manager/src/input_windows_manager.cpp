@@ -3516,7 +3516,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
-    if (Rosen::DisplayManager::GetInstance().IsFoldable() && IgnoreTouchEvent(pointerEvent)) {
+    if (IsFoldable_ && IgnoreTouchEvent(pointerEvent)) {
         MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
         return RET_OK;
     };
@@ -4350,6 +4350,11 @@ bool InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupI
 int32_t InputWindowsManager::GetCurrentUserId()
 {
     return currentUserId_;
+}
+
+void InputWindowsManager::SetFoldState()
+{
+    IsFoldable_ = Rosen::DisplayManager::GetInstance().IsFoldable();
 }
 } // namespace MMI
 } // namespace OHOS
