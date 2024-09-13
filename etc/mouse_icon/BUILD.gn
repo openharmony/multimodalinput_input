@@ -379,7 +379,7 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_Hand_Pointing",
     ":drawing_pointer_image_Help",
     ":drawing_pointer_image_Horizontal_Text_Cursor",
-    ":drawing_pointer_image_Knuckle_Sprite_360",   
+    ":drawing_pointer_image_Knuckle_Sprite_360",
     ":drawing_pointer_image_Loading",
     ":drawing_pointer_image_MID_Btn_East",
     ":drawing_pointer_image_MID_Btn_North",
