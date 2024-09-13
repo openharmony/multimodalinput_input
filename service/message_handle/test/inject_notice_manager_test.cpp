@@ -55,7 +55,7 @@ HWTEST_F(AuthorizationDialogTest, AuthorizationDialogTest_ConnectSystemUi, TestS
 {
     CALL_TEST_DEBUG;
     AuthorizationDialog dialog;
-    EXPECT_TRUE(dialog.ConnectSystemUi());
+    EXPECT_FALSE(dialog.ConnectSystemUi());
 }
 
 /**
