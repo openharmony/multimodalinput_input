@@ -146,7 +146,7 @@ private:
                     MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%d, DT:%{public}" PRId64
                     ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
                 } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{public}d, DT:%{public}" PRId64
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%d, DT:%{public}" PRId64
                     ", IP:%{public}d,", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
                 }
             }
@@ -160,7 +160,7 @@ private:
             }
             if (IsBetaVersion()) {
                 if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s]", tmpStr.c_str());
                 }
             }
         }
@@ -180,20 +180,23 @@ private:
                 event->GetKeyIntention(), InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                 KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !JudgeMode(event)) {
                 MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
                     ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
                     ", EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
                     InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                     KeyEvent::ActionToString(event->GetKeyAction()),
+                    event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
+                    event->GetActionStartTime(), InputEvent::EventTypeToString(event->GetEventType()),
+                    event->GetFlag(), KeyEvent::ActionToString(event->GetKeyAction()),                    
                     event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
             } else {
-                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{public}d, KI:%{public}d, AT:%{public}" PRId64 ","
-                    "AST:%{public}" PRId64 ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, "
-                    "CL:%{public}d, SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
+                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
+                    ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
+                    ", EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
                     InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                     KeyEvent::ActionToString(event->GetKeyAction()),
@@ -211,9 +214,8 @@ private:
                     MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d",
                         item.GetDeviceId(), item.IsPressed());
                 } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, KC:%{public}d, DT:%{public}" PRId64 ","
-                        "IP:%{public}d, GU:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(),
-                        item.IsPressed(), item.GetUnicode());
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "DN:%{public}d, IP:%{public}d",
+                        item.GetDeviceId(), item.IsPressed());
                 }
             }
         }
@@ -225,7 +227,7 @@ private:
                 tmpStr += ("," + std::to_string(*cItr));
             }
             if (IsBetaVersion()) {
-                if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                if (JudgeMode(event) || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
                 }
             }
@@ -275,13 +277,13 @@ private:
                         item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
                         item.GetOriginPointerId());
                 } else {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, "
-                        "DX:%{public}d, DY:%{public}d, P:%{public}.2f, LA:%{public}d, SA:%{public}d, WI:%{public}d, "
-                        "DXP:%{public}f, DYP:%{public}f, WXP:%{public}f, WYP:%{public}f, OPI:%{public}d, SI:%{public}s",
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d,"
+                        "P:%{public}.2f, LA:%{public}d, SA:%{public}d, WI:%{public}d, DXP:%f, DYP:%f, WXP:%f, WYP:%f, "
+                        "OPI:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetPressure(), item.GetLongAxis(), item.GetShortAxis(), item.GetTargetWindowId(),
                         item.GetDisplayXPos(), item.GetDisplayYPos(), item.GetWindowXPos(), item.GetWindowYPos(),
-                        item.GetOriginPointerId(), isSimulate.c_str());
+                        item.GetOriginPointerId());
                 }
             }
         }
@@ -294,7 +296,7 @@ private:
             }
             if (IsBetaVersion()) {
                 if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
+                    MMI_HILOG_HEADER(LOG_INFO, lh, "%{private}s]", tmpStr.c_str());
                 }
             }
         }
@@ -318,26 +320,30 @@ private:
                 event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(), event->GetPointerId(),
                 pointerIds.size(), event->GetId(), buffer.size(), event->IsMarkEnabled());
         } else {
-            MMI_HILOG_HEADER(LOG_DEBUG, lh, "ET:%{public}s, AT:%{public}" PRId64 ", SIT:%{public}" PRId64
-                ",A:%{public}d, AST:%{public}" PRId64 ", F:%{public}d, PA:%{public}s, ST:%{public}s, BI:%{public}d, "
-                "VAV:%{public}.5f, HAV:%{public}.5f, PAV:%{public}.5f, PAV:%{public}.5f, XAV:%{public}.5f,"
-                "YAV:%{public}.5f, ZAV:%{public}.5f, RZAV:%{public}.5f, GAV:%{public}.5f, BAV:%{public}.5f, "
-                "HXAV:%{public}.5f, HYAV:%{public}.5f, TAV:%{public}.5f,PI:%{public}d, PC:%{public}zu, EN:%{public}d, "
-                "BC:%{public}zu, B:%{public}s, ME:%{public}d",
+            MMI_HILOG_HEADER(LOG_DEBUG, lh, "ET:%{public}s, AT:%{public}" PRId64 ", SIT:%{public}" PRIu64
+                ", A:%{public}d, AST:%{public}" PRId64 ", F:%{public}d, PA:%{public}s, ST:%{public}s, BI:%{public}d, "
+                "VAV:%{public}d, HAV:%{public}d, PAV:%{public}d, PAV:%{public}d, XAV:%{public}d, YAV:%{public}d, "
+                "ZAV:%{public}d, RZAV:%{public}d, GAV:%{public}d, BAV:%{public}d, HXAV:%{public}d, "
+                "HYAV:%{public}d, TAV:%{public}d,PI:%{public}d, PC:%{public}zu, EN:%{public}d, BC:%{public}zu, "
+                "B:%{public}s, ME:%{public}d",
                 InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
                 event->GetSensorInputTime(), event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
                 event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ROTATE),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_BRAKE),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
-                event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE), event->GetPointerId(), pointerIds.size(),
-                event->GetId(), buffer.size(), str.c_str(), event->IsMarkEnabled());
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ROTATE)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_BRAKE)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y)),
+                static_cast<int32_t>(event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE)),
+                event->GetPointerId(), pointerIds.size(), event->GetId(),
+                buffer.size(), str.c_str(), event->IsMarkEnabled());
         }
 
         for (const auto &pointerId : pointerIds) {
@@ -362,11 +368,10 @@ private:
                         item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
                         item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
                 } else {
-                    MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, "
-                        "DX:%{public}d, DY:%{public}d, WX:%{public}d, WY:%{public}d, W:%{public}d, H:%{public}d, "
-                        "TX:%{public}.2f, TY:%{public}.2f, TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, "
-                        "ToolWY:%{public}d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, "
-                        "LA:%{public}d, SA:%{public}d, RawDx:%{public}d, RawDy:%{public}d",
+                    MMI_HILOG_HEADER(LOG_DEBUG, lh,"PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d"
+                        ", WX:%d, WY:%d, W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, "
+                        "ToolWY:%d, ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, "
+                        "LA:%{public}d, SA:%{public}d, RawDx:%d, RawDy:%d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
                         item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
                         item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
@@ -392,18 +397,16 @@ private:
                         item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetRawDx(), item.GetRawDy());
                 } else {
-                    MMI_HILOG_HEADER(LOG_DEBUG, lh,
-                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, DY:%{public}d, "
-                        "WX:%{public}d, WY:%{public}d, W:%{public}d, H:%{public}d, TX:%{public}.2f, TY:%{public}.2f, "
-                        "TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, ToolWY:%{public}d, ToolW:%{public}d, "
-                        "ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, LA:%{public}d, SA:%{public}d, "
-                        "RawDx:%{public}d, RawDy:%{public}d",
+                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d, WX:%d, WY:%d, "
+                        "W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, ToolWY:%d, "
+                        "ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, LA:%{public}d, "
+                        "SA:%{public}d, RawDx:%d, RawDy:%d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
                         item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
                         item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
-                        item.GetRawDx(), item.GetRawDy());
+                        item.GetRawDx(), item.GetRawDy();
                 }
             }
         }
@@ -416,7 +419,7 @@ private:
             }
             if (IsBetaVersion()) {
                 if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                    MMI_HILOG_HEADER(LOG_DEBUG, lh, "%{public}s]", tmpStr.c_str());
+                    MMI_HILOG_HEADER(LOG_DEBUG, lh, "%{private}s]", tmpStr.c_str());
                 }
             }
         }
