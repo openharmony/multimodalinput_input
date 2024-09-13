@@ -23,14 +23,12 @@
 
 #include "nocopyable.h"
 
+#include "gesture_monitor_handler.h"
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 #include "nap_process.h"
-#ifdef PLAYER_FRAMEWORK_EXISTS
-#include "input_screen_capture_monitor_listener.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
@@ -53,8 +51,10 @@ public:
         HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
     void RemoveInputHandler(InputHandlerType handlerType,
         HandleEventType eventType, std::shared_ptr<IInputEventConsumer> callback);
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
-    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
+    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        SessionPtr session, TouchGestureType gestureType = TOUCH_GESTURE_TYPE_NONE, int32_t fingers = 0);
     void MarkConsumed(int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
@@ -64,9 +64,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef PLAYER_FRAMEWORK_EXISTS
-    void RegisterScreenCaptureListener();
-    void OnScreenCaptureStarted(SessionPtr session);
-    void OnScreenCaptureFinished(SessionPtr session);
+    void ProcessScreenCapture(int32_t pid, bool isStart);
 #endif
 
 private:
@@ -74,18 +72,28 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    class SessionHandler {
+    class SessionHandler : public GestureMonitorHandler {
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
             SessionPtr session, std::shared_ptr<IInputEventConsumer> cb = nullptr)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session), callback(cb) {}
+              session_(session), callback_(cb) {}
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType,
+            SessionPtr session, TouchGestureType gestureType, int32_t fingers)
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
+              session_(session)
+        {
+            AddGestureMonitor(gestureType, fingers);
+        }
         SessionHandler(const SessionHandler& other)
         {
             handlerType_ = other.handlerType_;
             eventType_ = other.eventType_;
             session_ = other.session_;
-            callback = other.callback;
+            callback_ = other.callback_;
+            gestureType_ = other.gestureType_;
+            fingers_ = other.fingers_;
+            touchGestureInfo_ = other.touchGestureInfo_;
         }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent, NetPacket &pkt) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent, NetPacket &pkt) const;
@@ -93,10 +101,16 @@ private:
         {
             return (session_ < other.session_);
         }
+        void operator()(const GestureMonitorHandler& other)
+        {
+            gestureType_ = other.gestureType_;
+            fingers_ = other.fingers_;
+            touchGestureInfo_ = other.touchGestureInfo_;
+        }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ { nullptr };
-        std::shared_ptr<IInputEventConsumer> callback {nullptr};
+        std::shared_ptr<IInputEventConsumer> callback_ { nullptr };
     };
 
     class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
@@ -140,9 +154,6 @@ private:
 private:
     bool sessionLostCallbackInitialized_ { false };
     MonitorCollection monitors_;
-#ifdef PLAYER_FRAMEWORK_EXISTS
-    sptr<InputScreenCaptureMonitorListener> screenCaptureMonitorListener_ { nullptr };
-#endif
 };
 } // namespace MMI
 } // namespace OHOS

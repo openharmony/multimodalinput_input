@@ -45,13 +45,11 @@ ohos_unittest("CrownTransformProcessorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
+    "ipc:ipc_core",
     "libinput:libinput-third-mmi",
+    "preferences:native_preferences",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }
 
 ohos_unittest("CrownTransformProcessorExTest") {
@@ -89,8 +87,4 @@ ohos_unittest("CrownTransformProcessorExTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
   ]
-
-  if (enable_player_framework) {
-    external_deps += [ "player_framework:media_client" ]
-  }
 }

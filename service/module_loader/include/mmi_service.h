@@ -90,6 +90,10 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override;
+    int32_t AddGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
@@ -138,11 +142,9 @@ public:
 #endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
-    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
+    int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
-    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies);
-    int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
     int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override;
@@ -151,12 +153,15 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
     int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override;
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
@@ -167,6 +172,10 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    static void ScreenCaptureCallback(int32_t pid, bool isStart);
+    void RegisterScreenCaptureCallback();
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 
     int32_t OnGetAllSystemHotkey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions) override;
@@ -239,17 +248,22 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_COMBINATION_KEY
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
+    void InitPrintClientInfo();
 private:
     MMIService();
     ~MMIService();
 private:
     int32_t CheckPidPermission(int32_t pid);
     void PrintLog(const std::string &flag, int32_t duration, int32_t pid, int32_t tid);
+    void OnSessionDelete(SessionPtr session);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    int32_t shellAssitentPid_ { -1 };
+#endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif // OHOS_RSS_CLIENT
@@ -262,6 +276,15 @@ private:
     std::shared_ptr<DelegateInterface> delegateInterface_ { nullptr };
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };
+    struct ClientInfo {
+        int32_t pid { -1 };
+        uint64_t readThreadId { -1 };
+    };
+    std::map<std::string, ClientInfo> clientInfos_;
+    std::mutex mutex_;
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    bool hasRegisterListener_ { false };
+#endif // OHOS_BUILD_ENABLE_MONITOR && PLAYER_FRAMEWORK_EXISTS
 };
 } // namespace MMI
 } // namespace OHOS

@@ -53,12 +53,19 @@ public:
     uint32_t GetDeviceTags() const;
 
 protected:
+    int32_t AddGestureMonitor(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
+    int32_t RemoveGestureMonitor(int32_t handlerId, InputHandlerType handlerType);
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_KP, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
         uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     int32_t RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
 private:
+    struct GestureHandler {
+        TouchGestureType gestureType { TOUCH_GESTURE_TYPE_NONE };
+        int32_t fingers { 0 };
+    };
     struct Handler {
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
@@ -66,10 +73,18 @@ private:
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
+        GestureHandler gestureHandler_;
     };
 
 private:
     int32_t GetNextId();
+    virtual bool CheckMonitorValid(TouchGestureType type, int32_t fingers)
+    {
+        return false;
+    }
+    bool IsMatchGesture(const Handler &handler, int32_t action, int32_t count) const;
+    int32_t AddGestureToLocal(int32_t handlerId, HandleEventType eventType,
+        TouchGestureType gestureType, int32_t fingers, std::shared_ptr<IInputEventConsumer> consumer);
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);
     int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,

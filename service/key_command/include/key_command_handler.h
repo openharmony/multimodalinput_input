@@ -197,7 +197,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
+    void InitKeyObserver();
 #ifdef UNIT_TEST
 public:
 #else
@@ -291,6 +291,8 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    std::pair<int32_t, int32_t> CalcDrawCoordinate(const DisplayInfo& displayInfo,
+        PointerEvent::PointerItem pointerItem);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);

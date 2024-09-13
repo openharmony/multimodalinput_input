@@ -46,6 +46,8 @@ ohos_unittest("MonitorTest") {
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "input:libmmi-client",
+    "ipc:ipc_core",
+    "preferences:native_preferences",
   ]
 }
 

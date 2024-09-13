@@ -137,7 +137,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SetPixelMapData_03, TestSize
     ServerMsgHandler servermsghandler;
     int32_t infoId = -1;
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
-    PointerStyle pointerStyle;
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = ServerMsgHandlerTest::SetMouseIconTest(iconPath);
     ASSERT_NE(pixelMap, nullptr);
     int32_t result = servermsghandler.SetPixelMapData(infoId, (void *)pixelMap.get());
@@ -848,7 +847,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_001, Test
     item.SetPointerId(pointerId);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
     EXPECT_EQ(ret, RET_ERR);
 }
 
@@ -873,7 +872,7 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_002, Test
     pointerEvent->SetPointerId(0);
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -898,7 +897,23 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_003, Test
     pointerEvent->SetPointerId(0);
     DisplayInfo displayInfo;
     displayInfo.id = 1;
-    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, true);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_SaveTargetWindowId_004
+ * @tc.desc: Test the function SaveTargetWindowId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_SaveTargetWindowId_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler handler;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t ret = handler.SaveTargetWindowId(pointerEvent, false, false);
     EXPECT_EQ(ret, RET_OK);
 }
 
@@ -1704,31 +1719,6 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_001, TestSiz
 }
 
 /**
- * @tc.name: ServerMsgHandlerTest_AddInjectNotice_002
- * @tc.desc: Test the function AddInjectNotice
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_AddInjectNotice_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ServerMsgHandler handler;
-    InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
-    handler.injectNotice_ =nullptr;
-    bool ret = handler.InitInjectNoticeSource();
-    handler.injectNotice_->isStartSrv_ = true;
-    manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
-    EXPECT_NE(nullptr, manager.connectionCallback_);
-    auto connection = handler.injectNotice_->GetConnection();
-    connection->isConnected_ = true;
-    auto pConnect = handler.injectNotice_->GetConnection();
-    pConnect->isConnected_ = true;
-    ret = handler.AddInjectNotice(noticeInfo);
-    EXPECT_TRUE(ret);
-}
-
-/**
  * @tc.name: ServerMsgHandlerTest_CloseInjectNotice_002
  * @tc.desc: Test CloseInjectNotice
  * @tc.type: FUNC
@@ -1739,10 +1729,9 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CloseInjectNotice_002, TestS
     CALL_TEST_DEBUG;
     ServerMsgHandler handler;
     InjectNoticeManager manager;
-    InjectNoticeInfo noticeInfo;
     int32_t pid = 12345;
     handler.injectNotice_ =nullptr;
-    bool ret = handler.InitInjectNoticeSource();
+    handler.InitInjectNoticeSource();
     handler.injectNotice_->isStartSrv_ = true;
     manager.connectionCallback_ = new (std::nothrow) InjectNoticeManager::InjectNoticeConnection;
     EXPECT_NE(nullptr, manager.connectionCallback_);

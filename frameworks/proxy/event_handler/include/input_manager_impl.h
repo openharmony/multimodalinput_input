@@ -98,6 +98,9 @@ public:
     int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_KP);
+    int32_t AddGestureMonitor(std::shared_ptr<IInputEventConsumer> consumer,
+        TouchGestureType type, int32_t fingers);
+    int32_t RemoveGestureMonitor(int32_t monitorId);
 
     int32_t RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
@@ -220,6 +223,7 @@ public:
     void OnWindowStateError(int32_t pid, int32_t windowId);
     int32_t GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval);
+    int32_t ConvertToCapiKeyAction(int32_t keyAction);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

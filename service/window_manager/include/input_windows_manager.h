@@ -67,6 +67,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpDisplayInfo(int32_t fd);
     int32_t GetWindowPid(int32_t windowId, const std::vector<WindowInfo> &windowsInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
@@ -81,6 +82,9 @@ public:
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
     std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
+    int32_t GetCurrentUserId();
+    bool GetCancelEventFlag(std::shared_ptr<PointerEvent> pointerEvent);
+    void SetFoldState ();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -176,6 +180,7 @@ public:
 
     int32_t SetPixelMapData(int32_t infoId, void *pixelMap);
     void CleanInvalidPiexMap();
+    void HandleWindowPositionChange();
 
 private:
     bool IgnoreTouchEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -320,7 +325,7 @@ private:
     bool isUiExtension_ { false };
     int32_t uiExtensionPid_ { -1 };
     int32_t uiExtensionWindowId_ { -1 };
-    int32_t firstBtnDownWindowId_ { -1 };
+    std::pair<int32_t, int32_t> firstBtnDownWindowInfo_ {-1, -1};
     int32_t lastLogicX_ { -1 };
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
@@ -369,6 +374,7 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
+    std::shared_ptr<PointerEvent> lastPointerEventforWindowChange_ { nullptr };
     bool cancelTouchStatus_ { false };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
@@ -377,6 +383,7 @@ private:
     int32_t windowStateNotifyPid_ { -1 };
     std::map<int32_t, std::unique_ptr<Media::PixelMap>> transparentWins_;
     static std::unordered_map<int32_t, int32_t> convertToolTypeMap_;
+    bool IsFoldable_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

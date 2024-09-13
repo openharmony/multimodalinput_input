@@ -26,6 +26,7 @@ namespace {
 constexpr int32_t MIN_DELAY { -1 };
 constexpr int32_t MIN_INTERVAL { 36 };
 constexpr int32_t MAX_INTERVAL_MS { 10000 };
+constexpr int32_t MAX_LONG_INTERVAL_MS { 30000 };
 constexpr int32_t MAX_TIMER_COUNT { 64 };
 constexpr int32_t NONEXISTENT_ID { -1 };
 } // namespace
@@ -35,6 +36,21 @@ TimerManager::~TimerManager() {}
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
+    if (intervalMs < MIN_INTERVAL) {
+        intervalMs = MIN_INTERVAL;
+    } else if (intervalMs > MAX_INTERVAL_MS) {
+        intervalMs = MAX_INTERVAL_MS;
+    }
+    return AddTimerInternal(intervalMs, repeatCount, callback);
+}
+
+int32_t TimerManager::AddLongTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
+{
+    if (intervalMs < MIN_INTERVAL) {
+        intervalMs = MIN_INTERVAL;
+    } else if (intervalMs > MAX_LONG_INTERVAL_MS) {
+        intervalMs = MAX_INTERVAL_MS;
+    }
     return AddTimerInternal(intervalMs, repeatCount, callback);
 }
 
@@ -82,11 +98,6 @@ int32_t TimerManager::TakeNextTimerId()
 
 int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
-    if (intervalMs < MIN_INTERVAL) {
-        intervalMs = MIN_INTERVAL;
-    } else if (intervalMs > MAX_INTERVAL_MS) {
-        intervalMs = MAX_INTERVAL_MS;
-    }
     if (!callback) {
         return NONEXISTENT_ID;
     }

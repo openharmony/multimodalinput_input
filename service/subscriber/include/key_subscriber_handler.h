@@ -65,6 +65,7 @@ private:
         int32_t timerId_ { -1 };
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
         int32_t shortcutId_ { -1 };
+        bool isSystem { true };
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
         std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     };
@@ -105,6 +106,9 @@ private:
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
     int32_t RegisterHotKey(std::shared_ptr<KeyOption> option, int32_t session,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
+    void UnregisterSystemKey(int32_t shortcutId);
+    void UnregisterHotKey(int32_t shortcutId);
+    void DeleteShortcutId(std::shared_ptr<Subscriber> subscriber);
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
     int32_t AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option, bool isSystem);
     int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId, bool isSystem);
@@ -120,6 +124,7 @@ private:
     void PrintKeyOption(const std::shared_ptr<KeyOption> keyOption);
     void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
     void GetForegroundPids(std::set<int32_t> &pidList);
+    void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     SubscriberCollection subscriberMap_;

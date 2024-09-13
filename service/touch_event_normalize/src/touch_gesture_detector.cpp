@@ -31,9 +31,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MAX_FINGERS_COUNT = 5;
-constexpr int32_t FOUR_FINGER_COUNT = 4;
-constexpr int32_t THREE_FINGER_COUNT = 3;
 constexpr int32_t ANGLE_PI = 180;
 
 constexpr double ANGLE_RIGHT_DOWN = -45.0;
@@ -47,7 +44,7 @@ constexpr float MAXIMUM_POINTER_SPACING = 2000;
 constexpr int64_t MAXIMUM_POINTER_INTERVAL = 100000;
 constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 1;
 constexpr double MINIMUM_GRAVITY_OFFSET = 0.5;
-constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 2;
+constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 3;
 constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET = 1;
 } // namespace
 
@@ -100,25 +97,31 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     if (!iter.second) {
         MMI_HILOGE("Insert value failed, duplicated pointerId:%{public}d", pointerId);
     }
-    if (getureType_ == SwipeAdapterType) {
+    if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         isFingerReady_ = HandleFingerDown();
-    } else if (getureType_ == PinchAdapterType) {
+    } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         CalcAndStoreDistance(downPoint_);
     }
-    MMI_HILOGI("getureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, "
+    MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, "
         "pointerId:%{public}d, x:%{private}d, y:%{private}d",
-        getureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId, x, y);
+        gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId, x, y);
 }
 
 void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(event);
+    if (downPoint_.size() < THREE_FINGER_COUNT) {
+        return;
+    }
+    if (!IsMatchGesture(event->GetPointerCount()) && !IsMatchGesture(ALL_FINGER_COUNT)) {
+        return;
+    }
     if (isRecognized_) {
         return;
     }
-    if (getureType_ == SwipeAdapterType) {
+    if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         HandleSwipeMoveEvent(event);
-    } else if (getureType_ == PinchAdapterType) {
+    } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         HandlePinchMoveEvent(event);
     }
 }
@@ -126,14 +129,14 @@ void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
 void TouchGestureDetector::HandleSwipeMoveEvent(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(event);
-    if (downPoint_.size() < THREE_FINGER_COUNT || !isFingerReady_) {
+    if (!isFingerReady_) {
         return;
     }
     auto state = ClacFingerMoveDirection(event);
     if (state == TouchGestureDetector::SlideState::DIRECTION_UNKNOW) {
         return;
     }
-    GetureType type = ChangeToGetureType(state);
+    GestureMode type = ChangeToGestureMode(state);
     if (NotifyGestureEvent(event, type)) {
         isRecognized_ = true;
     }
@@ -162,7 +165,7 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
     }
     if (CalcMultiFingerMovement(movePoints) >
         static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
-        GetureType type = JudgeOperationMode(movePoints);
+        GestureMode type = JudgeOperationMode(movePoints);
         isRecognized_ = AntiJitter(event, type);
     }
 }
@@ -177,6 +180,8 @@ void TouchGestureDetector::HandleUpEvent(std::shared_ptr<PointerEvent> event)
         return;
     }
     downPoint_.erase(iter);
+    MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, pointerId:%{public}d",
+        gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId);
     if (downPoint_.empty()) {
         ReleaseData();
     }
@@ -201,7 +206,6 @@ bool TouchGestureDetector::WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent
         return true;
     }
     if (!gestureEnable_) {
-        MMI_HILOGE("enable is false, discards touch event");
         return true;
     }
     int32_t displayId = event->GetTargetDisplayId();
@@ -303,24 +307,24 @@ TouchGestureDetector::SlideState TouchGestureDetector::GetSlidingDirection(doubl
     }
 }
 
-GetureType TouchGestureDetector::ChangeToGetureType(TouchGestureDetector::SlideState state)
+GestureMode TouchGestureDetector::ChangeToGestureMode(TouchGestureDetector::SlideState state)
 {
     switch (state) {
         case TouchGestureDetector::SlideState::DIRECTION_UP: {
-            return GetureType::ACTION_SWIPE_UP;
+            return GestureMode::ACTION_SWIPE_UP;
         }
         case TouchGestureDetector::SlideState::DIRECTION_DOWN: {
-            return GetureType::ACTION_SWIPE_DOWN;
+            return GestureMode::ACTION_SWIPE_DOWN;
         }
         case TouchGestureDetector::SlideState::DIRECTION_LEFT: {
-            return GetureType::ACTION_SWIPE_LEFT;
+            return GestureMode::ACTION_SWIPE_LEFT;
         }
         case TouchGestureDetector::SlideState::DIRECTION_RIGHT: {
-            return GetureType::ACTION_SWIPE_RIGHT;
+            return GestureMode::ACTION_SWIPE_RIGHT;
         }
         default: {
             MMI_HILOGW("unknow state:%{public}d", state);
-            return GetureType::ACTION_UNKNOW;
+            return GestureMode::ACTION_UNKNOWN;
         }
     }
 }
@@ -451,9 +455,9 @@ int32_t TouchGestureDetector::CalcMultiFingerMovement(std::map<int32_t, Point> &
     return movementCount;
 }
 
-GetureType TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &movePoints)
+GestureMode TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &movePoints)
 {
-    GetureType type = GetureType::ACTION_UNKNOW;
+    GestureMode type = GestureMode::ACTION_UNKNOWN;
     if (downPoint_.size() < FOUR_FINGER_COUNT || !haveLastDistance_) {
         return type;
     }
@@ -490,22 +494,22 @@ GetureType TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &mo
         lastDistance_ = tempDistance;
     }
     if (closeCount >= static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
-        type = GetureType::ACTION_PINCH_CLOSED;
+        type = GestureMode::ACTION_PINCH_CLOSED;
     } else if (openCount >= static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
-        type = GetureType::ACTION_PINCH_OPENED;
+        type = GestureMode::ACTION_PINCH_OPENED;
     }
     return type;
 }
 
-bool TouchGestureDetector::AntiJitter(std::shared_ptr<PointerEvent> event, GetureType mode)
+bool TouchGestureDetector::AntiJitter(std::shared_ptr<PointerEvent> event, GestureMode mode)
 {
-    if (mode == GetureType::ACTION_PINCH_CLOSED) {
+    if (mode == GestureMode::ACTION_PINCH_CLOSED) {
         ++continuousCloseCount_;
         if (continuousCloseCount_ >= MAXIMUM_CONTINUOUS_COUNTS) {
             return NotifyGestureEvent(event, mode);
         }
         continuousOpenCount_ = 0;
-    } else if (mode == GetureType::ACTION_PINCH_OPENED) {
+    } else if (mode == GestureMode::ACTION_PINCH_OPENED) {
         ++continuousOpenCount_;
         if (continuousOpenCount_ >= MAXIMUM_CONTINUOUS_COUNTS) {
             return NotifyGestureEvent(event, mode);
@@ -518,11 +522,63 @@ bool TouchGestureDetector::AntiJitter(std::shared_ptr<PointerEvent> event, Getur
     return false;
 }
 
-bool TouchGestureDetector::NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode)
+void TouchGestureDetector::AddGestureFingers(int32_t fingers)
+{
+    auto iter = fingers_.insert(fingers);
+    if (!iter.second) {
+        MMI_HILOGE("Insert finger failed, finger:%{public}d", fingers);
+        return;
+    }
+    if (!fingers_.empty()) {
+        gestureEnable_ = true;
+    }
+}
+
+void TouchGestureDetector::RemoveGestureFingers(int32_t fingers)
+{
+    auto iter = fingers_.find(fingers);
+    if (iter != fingers_.end()) {
+        fingers_.erase(iter);
+    }
+    if (fingers_.empty()) {
+        gestureEnable_ = false;
+    }
+}
+
+bool TouchGestureDetector::IsMatchGesture(int32_t count) const
+{
+    return fingers_.find(count) != fingers_.end();
+}
+
+bool TouchGestureDetector::IsMatchGesture(GestureMode mode, int32_t count) const
+{
+    if (!IsMatchGesture(count) && !IsMatchGesture(ALL_FINGER_COUNT)) {
+        return false;
+    }
+    switch (mode) {
+        case GestureMode::ACTION_SWIPE_DOWN:
+        case GestureMode::ACTION_SWIPE_UP:
+        case GestureMode::ACTION_SWIPE_LEFT:
+        case GestureMode::ACTION_SWIPE_RIGHT:
+            return gestureType_ == TOUCH_GESTURE_TYPE_SWIPE;
+        case GestureMode::ACTION_PINCH_OPENED:
+        case GestureMode::ACTION_PINCH_CLOSED:
+            return gestureType_ == TOUCH_GESTURE_TYPE_PINCH;
+        default:{
+            MMI_HILOGW("Unknown mode:%{public}d", mode);
+            return false;
+        }
+    }
+}
+
+bool TouchGestureDetector::NotifyGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode)
 {
     CHKPF(event);
     CHKPF(listener_);
-    if (mode == GetureType::ACTION_UNKNOW) {
+    if (!IsMatchGesture(mode, event->GetPointerCount())) {
+        return false;
+    }
+    if (mode == GestureMode::ACTION_UNKNOWN) {
         MMI_HILOGE("Wrong gesture");
         return false;
     }

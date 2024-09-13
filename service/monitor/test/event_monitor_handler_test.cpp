@@ -731,48 +731,48 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_UpdateConsumptionState
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_OnScreenCaptureFinished_001
- * @tc.desc: Test OnScreenCaptureFinished
+ * @tc.name: EventMonitorHandlerTest_ProcessScreenCapture_001
+ * @tc.desc: Test ProcessScreenCapture
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnScreenCaptureFinished_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnScreenCaptureFinished(session));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(g_pid, false));
     EventMonitorHandler::MonitorCollection monitorCollection;
     EventMonitorHandler::SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
     monitorCollection.monitors_.insert(monitor);
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnScreenCaptureFinished(session));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(g_pid, false));
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_OnScreenCaptureStarted_001
- * @tc.desc: Test OnScreenCaptureStarted
+ * @tc.name: EventMonitorHandlerTest_ProcessScreenCapture_002
+ * @tc.desc: Test ProcessScreenCapture
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnScreenCaptureStarted_001, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnScreenCaptureStarted(session));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(g_pid, true));
     EventMonitorHandler::MonitorCollection monitorCollection;
     EventMonitorHandler::SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
     monitorCollection.monitors_.insert(monitor);
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnScreenCaptureStarted(session));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(g_pid, true));
 }
 
 /**
- * @tc.name: EventMonitorHandlerTest_OnScreenCaptureStarted_002
- * @tc.desc: Test OnScreenCaptureStarted
+ * @tc.name: EventMonitorHandlerTest_ProcessScreenCapture_003
+ * @tc.desc: Test ProcessScreenCapture
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnScreenCaptureStarted_002, TestSize.Level1)
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_ProcessScreenCapture_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     EventMonitorHandler eventMonitorHandler;
@@ -782,7 +782,7 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_OnScreenCaptureStarted
     std::set<EventMonitorHandler::SessionHandler> handlerSet;
     handlerSet.insert(handler);
     monitorCollection.endScreenCaptureMonitors_[-1] = handlerSet;
-    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.OnScreenCaptureStarted(session));
+    ASSERT_NO_FATAL_FAILURE(eventMonitorHandler.ProcessScreenCapture(g_pid, true));
 }
 
 /**

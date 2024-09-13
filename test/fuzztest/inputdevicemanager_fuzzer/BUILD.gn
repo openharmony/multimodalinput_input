@@ -70,9 +70,12 @@ ohos_fuzztest("InputDeviceManagerFuzzTest") {
     "ipc:ipc_single",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
-    "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
+
+  if (security_component_enable) {
+    external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
+  }
 }
 
 ###############################################################################

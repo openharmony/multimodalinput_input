@@ -19,7 +19,11 @@
 
 #include "app_state_observer.h"
 #include "bytrace_adapter.h"
+#ifdef CALL_MANAGER_SERVICE_ENABLED
 #include "call_manager_client.h"
+#endif // CALL_MANAGER_SERVICE_ENABLED
+#include "common_event_data.h"
+#include "common_event_manager.h"
 #include "define_multimodal.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
@@ -35,6 +39,7 @@
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 #include "timer_manager.h"
 #include "util_ex.h"
+#include "want.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_HANDLER
@@ -48,7 +53,9 @@ constexpr uint32_t MAX_PRE_KEY_COUNT { 4 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t ACTIVE_EVENT { 2 };
+#ifdef CALL_MANAGER_SERVICE_ENABLED
 std::shared_ptr<OHOS::Telephony::CallManagerClient> callManagerClientPtr = nullptr;
+#endif // CALL_MANAGER_SERVICE_ENABLED
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -249,6 +256,25 @@ int32_t KeySubscriberHandler::RegisterHotKey(std::shared_ptr<KeyOption> option,
     };
     return KEY_SHORTCUT_MGR->RegisterHotKey(hotKey);
 }
+
+void KeySubscriberHandler::UnregisterSystemKey(int32_t shortcutId)
+{
+    KEY_SHORTCUT_MGR->UnregisterSystemKey(shortcutId);
+}
+ 
+void KeySubscriberHandler::UnregisterHotKey(int32_t shortcutId)
+{
+    KEY_SHORTCUT_MGR->UnregisterHotKey(shortcutId);
+}
+ 
+void KeySubscriberHandler::DeleteShortcutId(std::shared_ptr<Subscriber> subscriber)
+{
+    if (subscriber->isSystem) {
+        UnregisterSystemKey(subscriber->shortcutId_);
+    } else {
+        UnregisterHotKey(subscriber->shortcutId_);
+    }
+}
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
 
 int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
@@ -261,11 +287,13 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
 #ifdef SHORTCUT_KEY_MANAGER_ENABLED
     CHKPR(subscriber->sess_, RET_ERR);
     if (isSystem) {
+        subscriber->isSystem = true;
         subscriber->shortcutId_ = RegisterSystemKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
             });
     } else {
+        subscriber->isSystem = false;
         subscriber->shortcutId_ = RegisterHotKey(option, subscriber->sess_->GetPid(),
             [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
                 NotifySubscriber(keyEvent, subscriber);
@@ -273,7 +301,7 @@ int32_t KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscrib
     }
     if (subscriber->shortcutId_ < 0) {
         MMI_HILOGE("Register shortcut fail, error:%{public}d", subscriber->shortcutId_);
-        return RET_ERR;
+        return subscriber->shortcutId_;
     }
 #endif // SHORTCUT_KEY_MANAGER_ENABLED
     for (auto &iter : subscriberMap_) {
@@ -350,8 +378,8 @@ bool KeySubscriberHandler::IsFunctionKey(const std::shared_ptr<KeyEvent> keyEven
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MUTE
         || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SWITCHVIDEOMODE
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_WLAN
-        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_CONFIG) {
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_SEARCH
+        || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_MEDIA_RECORD) {
         return true;
     }
     return false;
@@ -409,6 +437,18 @@ bool KeySubscriberHandler::IsEnableCombineKeySwipe(const std::shared_ptr<KeyEven
     return true;
 }
 
+void KeySubscriberHandler::PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    OHOS::AAFwk::Want want;
+    want.SetAction("multimodal.event.MUTE_KEY_PRESS");
+    want.SetParam("keyCode", keyEvent->GetKeyCode());
+    EventFwk::CommonEventPublishInfo publishInfo;
+    std::vector<std::string> permissionVec {"ohos.permission.NOTIFICATION_CONTROLLER"};
+    publishInfo.SetSubscriberPermissions(permissionVec);
+    EventFwk::CommonEventData commonData {want};
+    EventFwk::CommonEventManager::PublishCommonEvent(commonData, publishInfo);
+}
+
 bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -419,7 +459,9 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("There is no need to set mute");
         return false;
     }
+#ifdef CALL_MANAGER_SERVICE_ENABLED
     int32_t ret = -1;
+    PublishKeyPressCommonEvent(keyEvent);
     if (DEVICE_MONITOR->GetCallState() == StateType::CALL_STATUS_INCOMING) {
         if (callManagerClientPtr == nullptr) {
             callManagerClientPtr = DelayedSingleton<OHOS::Telephony::CallManagerClient>::GetInstance();
@@ -449,6 +491,10 @@ bool KeySubscriberHandler::HandleRingMute(std::shared_ptr<KeyEvent> keyEvent)
         }
     }
     return false;
+#else
+    MMI_HILOGD("call manager service is not enabled, skip");
+    return true;
+#endif // CALL_MANAGER_SERVICE_ENABLED
 }
 
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -516,6 +562,9 @@ void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
         for (auto it = subscribers.begin(); it != subscribers.end();) {
             if ((*it)->sess_ == sess) {
                 ClearTimer(*it);
+#ifdef SHORTCUT_KEY_MANAGER_ENABLED
+                DeleteShortcutId(*it);
+#endif // SHORTCUT_KEY_MANAGER_ENABLED
                 subscribers.erase(it++);
                 continue;
             }
@@ -614,7 +663,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CHKPV(keyOption);
     MMI_HILOGD("Notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        NotifyKeyDownRightNow(keyEvent, subscribers,  keyOption->IsRepeat(), handled);
+        NotifyKeyDownRightNow(keyEvent, subscribers, keyOption->IsRepeat(), handled);
     } else {
         NotifyKeyDownDelay(keyEvent, subscribers, handled);
     }
@@ -832,6 +881,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    KEY_SHORTCUT_MGR->ResetCheckState();
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
@@ -890,7 +940,7 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
 #ifdef SHORTCUT_KEY_RULES_ENABLED
-    if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent)) {
+    if (KEY_SHORTCUT_MGR->HaveShortcutConsumed(keyEvent) || !KEY_SHORTCUT_MGR->IsCheckUpShortcut(keyEvent)) {
         return false;
     }
 #endif // SHORTCUT_KEY_RULES_ENABLED

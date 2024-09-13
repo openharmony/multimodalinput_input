@@ -49,115 +49,6 @@ const std::map<int32_t, uint32_t> KeyShortcutManager::modifiers_ {
     { KeyEvent::KEYCODE_META_RIGHT, SHORTCUT_MODIFIER_LOGO }
 };
 
-const std::list<std::pair<std::set<int32_t>, int32_t>> KeyShortcutManager::systemHotkeys_ {
-    /* 应用列表：logo up */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_UNKNOWN },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_UNKNOWN },
-    /* 显示/前往桌面：Logo + D */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_D },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_D },
-    /* 返回： Logo + Back 左箭头 */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DEL },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DEL },
-    /* 通知中心：Logo + N */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_N },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_N },
-    /* 控制中心：Logo + C */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_C },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_C },
-    /* 应用中心：Logo + A, 短按Logo */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_A },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_A },
-    /* 任务中心（多任务）：Logo + Tab，Logo + ↑ */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
-    /* 应用快捷切换：ALT + Tab, Shift + Alt + Tab（反向） */
-    { { KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_SHIFT_LEFT, KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_TAB },
-    { { KeyEvent::KEYCODE_SHIFT_RIGHT, KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_TAB },
-    /* 最小化窗口：Logo + M */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_M },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_M },
-    /* 关闭窗口：Alt + F4 */
-    { { KeyEvent::KEYCODE_ALT_LEFT }, KeyEvent::KEYCODE_F4 },
-    { { KeyEvent::KEYCODE_ALT_RIGHT }, KeyEvent::KEYCODE_F4 },
-    /* 退出应用：Alt +Shift + F4 */
-    { { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_F4 },
-    { { KeyEvent::KEYCODE_ALT_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_F4 },
-    { { KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_F4 },
-    { { KeyEvent::KEYCODE_ALT_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_F4 },
-    /* 切换全屏应用：Logo + ← or → */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_LEFT },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_LEFT },
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_RIGHT },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_RIGHT },
-    /* 任务中心：Logo + ↑ */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
-    /* 显示应用多实例：Logo + ↓ */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_DPAD_DOWN },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_DPAD_DOWN },
-    /* 焦点切换：Logo + . */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_PERIOD },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_PERIOD },
-    /* 应用切换窗口程序：Logo + Shift + ← or → */
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_LEFT },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_LEFT },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_LEFT },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_LEFT },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_RIGHT },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_RIGHT },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_RIGHT },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_RIGHT },
-    /* 应用全屏或者最小化：Logo + Shift + ↑ or ↓ */
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_UP },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_UP },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_DOWN },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_DOWN },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_DPAD_DOWN },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_DPAD_DOWN },
-    /* 锁定桌面：Logo + L */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_L },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_L },
-    /* 智慧搜索： Logo +S */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_S },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_S },
-    /* 打开文件管理器：Logo + F */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_F },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_F },
-    /* 截图：PrtSc, Logo + Shift + S */
-    { { KeyEvent::KEYCODE_SYSRQ}, KeyEvent::KEYCODE_UNKNOWN },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_S },
-    { { KeyEvent::KEYCODE_META_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_S },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_S },
-    { { KeyEvent::KEYCODE_META_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_S },
-    /* 切换输入发： Ctrl + Shift， Logo + Space */
-    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_UNKNOWN },
-    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_UNKNOWN },
-    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_UNKNOWN },
-    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_UNKNOWN },
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_SPACE },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_SPACE },
-    /* 切换中文/英文：Ctrl + Space */
-    { { KeyEvent::KEYCODE_CTRL_LEFT }, KeyEvent::KEYCODE_SPACE },
-    { { KeyEvent::KEYCODE_CTRL_RIGHT }, KeyEvent::KEYCODE_SPACE },
-    /* 打开任务管理器： Ctrl + Shift + Esc */
-    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_ESCAPE },
-    { { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_ESCAPE },
-    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_LEFT }, KeyEvent::KEYCODE_ESCAPE },
-    { { KeyEvent::KEYCODE_CTRL_RIGHT, KeyEvent::KEYCODE_SHIFT_RIGHT }, KeyEvent::KEYCODE_ESCAPE },
-    /* 快捷键提示：Logo + / */
-    { { KeyEvent::KEYCODE_META_LEFT }, KeyEvent::KEYCODE_SLASH },
-    { { KeyEvent::KEYCODE_META_RIGHT }, KeyEvent::KEYCODE_SLASH }
-};
-
 bool KeyShortcutManager::SystemKey::operator<(const SystemKey &other) const
 {
     uint32_t modifier1 = (modifiers & SHORTCUT_MODIFIER_MASK);
@@ -182,6 +73,14 @@ bool KeyShortcutManager::ExceptionalSystemKey::operator<(const ExceptionalSystem
     return (preKeys < other.preKeys);
 }
 
+bool KeyShortcutManager::SystemHotkey::operator<(const SystemHotkey &other) const
+{
+    if (finalKey != other.finalKey) {
+        return (finalKey < other.finalKey);
+    }
+    return (preKeys < other.preKeys);
+}
+
 std::shared_ptr<KeyShortcutManager> KeyShortcutManager::GetInstance()
 {
     if (instance_ == nullptr) {
@@ -197,21 +96,22 @@ KeyShortcutManager::KeyShortcutManager()
 {
     LoadSystemKeys();
     LoadExceptionalSystemKeys();
+    LoadHotkeys();
 }
 
 int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
 {
     KeyShortcut shortcut {};
+    ExceptionalSystemKey eSysKey {
+        .preKeys = key.modifiers,
+        .finalKey = key.finalKey,
+        .longPressTime = key.longPressTime,
+        .triggerType = key.triggerType,
+    };
 
     if (!CheckSystemKey(key, shortcut)) {
         MMI_HILOGE("Not system key ([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
             FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
-        ExceptionalSystemKey eSysKey {
-            .preKeys = key.modifiers,
-            .finalKey = key.finalKey,
-            .longPressTime = key.longPressTime,
-            .triggerType = key.triggerType,
-        };
         if (IsExceptionalSystemKey(eSysKey)) {
             auto shortcutId = GenerateId();
             MMI_HILOGI("Register exceptional system key [No.%{public}d]"
@@ -222,6 +122,13 @@ int32_t KeyShortcutManager::RegisterSystemKey(const SystemShortcutKey &key)
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
     if (!IsReservedSystemKey(shortcut)) {
+        if (IsExceptionalSystemKey(eSysKey)) {
+            auto shortcutId = GenerateId();
+            MMI_HILOGI("Register exceptional system key [No.%{public}d]"
+                "([%{public}s],FinalKey:%{public}d,PressTime:%{public}d,TriggerType:%{public}d)",
+                shortcutId, FormatModifiers(key.modifiers).c_str(), key.finalKey, key.longPressTime, key.triggerType);
+            return shortcutId;
+        }
         MMI_HILOGE("The system application can only subscribe to reserved shortcuts");
         return KEY_SHORTCUT_ERROR_COMBINATION_KEY;
     }
@@ -852,13 +759,40 @@ void KeyShortcutManager::ResetAll()
     triggering_.clear();
 }
 
+void KeyShortcutManager::ResetCheckState()
+{
+    isCheckShortcut_ = true;
+}
+ 
+static const std::vector<int32_t> specialKeyCodes = {
+    KeyEvent::KEYCODE_ALT_LEFT,
+    KeyEvent::KEYCODE_ALT_RIGHT,
+    KeyEvent::KEYCODE_TAB,
+    KeyEvent::KEYCODE_VOLUME_UP,
+    KeyEvent::KEYCODE_VOLUME_DOWN,
+    KeyEvent::KEYCODE_POWER
+};
+ 
+bool KeyShortcutManager::IsCheckUpShortcut(const std::shared_ptr<KeyEvent> &keyEvent)
+{
+    auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
+    if (it != specialKeyCodes.end() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        return true;
+    }
+    if (isCheckShortcut_) {
+        isCheckShortcut_ = false;
+        return true;
+    }
+    return false;
+}
+
 int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &sysKeys)
 {
     CALL_DEBUG_ENTER;
-    for (const auto &item : systemHotkeys_) {
+    for (const auto &item : hotkeys_) {
         std::unique_ptr<KeyOption> keyOptionPtr = std::make_unique<KeyOption>();
-        keyOptionPtr->SetPreKeys(item.first);
-        keyOptionPtr->SetFinalKey(item.second);
+        keyOptionPtr->SetPreKeys(item.preKeys);
+        keyOptionPtr->SetFinalKey(item.finalKey);
         sysKeys.push_back(std::move(keyOptionPtr));
     }
     return RET_OK;
@@ -866,6 +800,10 @@ int32_t KeyShortcutManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyO
 
 bool KeyShortcutManager::HaveShortcutConsumed(std::shared_ptr<KeyEvent> keyEvent)
 {
+    auto it = std::find(specialKeyCodes.begin(), specialKeyCodes.end(), keyEvent->GetKeyCode());
+    if (it != specialKeyCodes.end() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        return false;
+    }
     return (shortcutConsumed_.find(keyEvent->GetKeyCode()) != shortcutConsumed_.cend());
 }
 
@@ -885,6 +823,7 @@ void KeyShortcutManager::MarkShortcutConsumed(const ShortcutKey &shortcut)
     if (shortcut.triggerType == KeyEvent::KEY_ACTION_DOWN) {
         shortcutConsumed_.emplace(shortcut.finalKey);
     }
+    isCheckShortcut_ = false;
 }
 
 void KeyShortcutManager::MarkShortcutConsumed(const KeyOption &shortcut)
@@ -901,6 +840,7 @@ void KeyShortcutManager::MarkShortcutConsumed(const KeyOption &shortcut)
     shortcutConsumed_.erase(KeyEvent::KEYCODE_VOLUME_UP);
     shortcutConsumed_.erase(KeyEvent::KEYCODE_VOLUME_DOWN);
     shortcutConsumed_.erase(KeyEvent::KEYCODE_POWER);
+    isCheckShortcut_ = false;
 }
 
 void KeyShortcutManager::ResetTriggering(std::shared_ptr<KeyEvent> keyEvent)
@@ -956,6 +896,96 @@ void KeyShortcutManager::ResetTriggering(int32_t shortcutId)
         TimerMgr->RemoveTimer(iter->second);
         triggering_.erase(iter);
     }
+}
+
+void KeyShortcutManager::LoadHotkeys()
+{
+    char cfgName[] { "etc/multimodalinput/system_hotkeys_config.json" };
+    char buf[MAX_PATH_LEN] {};
+    char *cfgPath = ::GetOneCfgFile(cfgName, buf, sizeof(buf));
+
+    if ((cfgPath == nullptr) || (cfgPath[0] == '\0') || (strlen(cfgPath) > MAX_PATH_LEN)) {
+        MMI_HILOGE("No '%{public}s' was found", cfgPath);
+        return;
+    }
+    MMI_HILOGI("Config of hotkey:%{public}s", cfgPath);
+    ReadHotkeys(std::string(cfgPath));
+}
+
+void KeyShortcutManager::ReadHotkeys(const std::string &cfgPath)
+{
+    std::string cfg = ReadJsonFile(cfgPath);
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(cfg.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Not json format");
+        return;
+    }
+    cJSON* jsonHotkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Hotkeys");
+    if (!cJSON_IsArray(jsonHotkeys)) {
+        MMI_HILOGE("JsonHotkeys is not array");
+        return;
+    }
+    int32_t nSysKeys = cJSON_GetArraySize(jsonHotkeys);
+    for (int32_t index = 0; index < nSysKeys; ++index) {
+        cJSON *jsonHotkey = cJSON_GetArrayItem(jsonHotkeys, index);
+        if (ReadHotkey(jsonHotkey) != RET_OK) {
+            MMI_HILOGE("Read hotkey failed");
+            return;
+        }
+    }
+}
+
+int32_t KeyShortcutManager::ReadHotkey(cJSON *jsonHotkey)
+{
+    if (!cJSON_IsObject(jsonHotkey)) {
+        MMI_HILOGE("Not json object");
+        return RET_ERR;
+    }
+    cJSON *jsonPreKeys = cJSON_GetObjectItem(jsonHotkey, "preKeys");
+    if (!cJSON_IsArray(jsonPreKeys)) {
+        MMI_HILOGE("Expect array for PreKeys");
+        return RET_ERR;
+    }
+    std::set<int32_t> preKeys;
+    int32_t nPreKeys = cJSON_GetArraySize(jsonPreKeys);
+
+    for (int32_t index = 0; index < nPreKeys; ++index) {
+        cJSON *jsonPreKey = cJSON_GetArrayItem(jsonPreKeys, index);
+        if (!cJSON_IsNumber(jsonPreKey)) {
+            MMI_HILOGE("Expect number for PreKey");
+            return RET_ERR;
+        }
+        preKeys.insert(static_cast<int32_t>(cJSON_GetNumberValue(jsonPreKey)));
+    }
+    cJSON *jsonFinalKey = cJSON_GetObjectItem(jsonHotkey, "finalKey");
+    if (!cJSON_IsNumber(jsonFinalKey)) {
+        MMI_HILOGE("Expect number for FinalKey");
+        return RET_ERR;
+    }
+    int32_t finalKey = static_cast<int32_t>(cJSON_GetNumberValue(jsonFinalKey));
+    return AddHotkey(preKeys, finalKey);
+}
+
+int32_t KeyShortcutManager::AddHotkey(const std::set<int32_t> &preKeys, int32_t finalKey)
+{
+    SystemHotkey hotkey {
+        .preKeys = preKeys,
+        .finalKey = finalKey,
+    };
+    for (const auto &item : hotkey.preKeys) {
+        if ((modifiers_.find(item) == modifiers_.cend()) && (item != KeyEvent::KEYCODE_SYSRQ)) {
+            MMI_HILOGE("Not hotkeys");
+            return RET_ERR;
+        }
+    }
+
+    if (IsModifier(hotkey.finalKey)) {
+        MMI_HILOGE("FinalKey is modifier");
+        return RET_ERR;
+    }
+    hotkeys_.emplace(hotkey);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

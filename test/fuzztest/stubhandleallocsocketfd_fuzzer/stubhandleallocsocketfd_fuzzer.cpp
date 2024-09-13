@@ -137,15 +137,15 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->OnCancelInjection();
     MMIService::GetInstance()->GetInfraredFrequencies(requencysInf);
     MMIService::GetInstance()->TransmitInfrared(number, patternInt);
-    MMIService::GetInstance()->OnGetInfraredFrequencies(requencysInf);
-    MMIService::GetInstance()->OnTransmitInfrared(infraredFrequency, patternInt);
     MMIService::GetInstance()->SetPixelMapData(infoId, g_pixelMapPtr);
     MMIService::GetInstance()->SetCurrentUser(userId);
     MMIService::GetInstance()->AddVirtualInputDevice(device, deviceId);
     MMIService::GetInstance()->RemoveVirtualInputDevice(tmpfd);
     MMIService::GetInstance()->EnableHardwareCursorStats(g_enableFlag);
     MMIService::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMIService::GetInstance()->GetPointerSnapshot(g_pixelMapPtr);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     MMIService::GetInstance()->state_ = ServiceRunningState::STATE_RUNNING;
     MMIService::GetInstance()->OnRemoteRequest(
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD), datas, reply, option);

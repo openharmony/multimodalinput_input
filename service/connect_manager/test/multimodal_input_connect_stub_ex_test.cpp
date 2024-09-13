@@ -32,8 +32,10 @@ namespace {
 using namespace testing::ext;
 using namespace testing;
 constexpr uint32_t DEFAULT_ICON_COLOR { 0xFF };
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MIDDLE_PIXEL_MAP_WIDTH { 400 };
 constexpr int32_t MIDDLE_PIXEL_MAP_HEIGHT { 400 };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MAX_PIXEL_MAP_WIDTH { 600 };
 constexpr int32_t MAX_PIXEL_MAP_HEIGHT { 600 };
 constexpr int32_t INT32_BYTE { 4 };
@@ -147,6 +149,10 @@ public:
         int32_t priority, uint32_t deviceTags) override { return priority; }
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override { return priority; }
+    int32_t AddGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
+        TouchGestureType gestureType, int32_t fingers) override { return RET_OK; }
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType, HandleEventType eventType,
+        TouchGestureType gestureType, int32_t fingers) override { return RET_OK; }
     int32_t MarkEventConsumed(int32_t eventId) override { return eventId; }
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override { return offsetX; }
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override
@@ -257,12 +263,14 @@ public:
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
     int32_t SetMoveEventFilters(bool flag) { return 0; }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMap) override
     {
         std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMap);
         *newPixelMapPtr = pixelMap_;
         return retSnapshot_;
     }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t SetTouchpadScrollRows(int32_t rows) override
     {
         return touchpadScrollRows_;
@@ -272,6 +280,7 @@ public:
         rows = parameterRows_;
         return touchpadScrollRows_;
     }
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override { return retSetClientInfo_; }
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override { return timeInterval; }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -332,6 +341,7 @@ public:
     int32_t retSetPointerStyle_ = 0;
     int32_t retSetCurrentUser_ = 0;
     int32_t getAllSystemHotkeys_ = 0;
+    int32_t retSetClientInfo_ = 0;
 };
 class RemoteObjectTest : public IRemoteObject {
 public:
@@ -636,6 +646,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_023, TestSize.Level1)
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: OnRemoteRequest_024
  * @tc.desc: Test the function OnRemoteRequest
@@ -654,6 +665,7 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_024, TestSize.Level1)
     uint32_t code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SNAPSHOT);
     EXPECT_NO_FATAL_FAILURE(stub->OnRemoteRequest(code, data, reply, option));
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
  * @tc.name: OnRemoteRequest_025
@@ -2367,13 +2379,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerStyle_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerStyle_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, VerifySystemApp()).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -2392,12 +2400,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerStyle_002, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerStyle_003, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_))
-        .WillOnce(DoAll(SetArgReferee<0>(0), Return(true)))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
@@ -2473,8 +2477,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubClearWindowPointerStyle_003, TestSi
 HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerStyle_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(-1), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(-1), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -2491,13 +2495,9 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerStyle_001, TestSize.Level
 HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerStyle_002, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillOnce(DoAll(SetArgReferee<0>(0), Return(true)));
-    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillOnce(Return(true));
-    EXPECT_CALL(*messageParcelMock_, WriteInt32(_))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true))
-        .WillOnce(Return(true));
+    EXPECT_CALL(*messageParcelMock_, ReadInt32(_)).WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(true)));
+    EXPECT_CALL(*messageParcelMock_, ReadBool(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*messageParcelMock_, WriteInt32(_)).WillRepeatedly(Return(true));
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
@@ -7529,6 +7529,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetTouchpadScrollRows_006, TestSize
     EXPECT_NO_FATAL_FAILURE(stub->StubGetTouchpadScrollRows(data, reply));
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSnapshot
  * @tc.desc: Cover if (!IsRunning()) branch
@@ -7608,6 +7609,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSnapshot(data, reply));
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
 /**

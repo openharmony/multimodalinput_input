@@ -352,7 +352,7 @@ void DfxHisysevent::CalcKeyDispTimes()
 {
     int64_t endTime = GetSysClockTime();
     dispCastTime_.totalTimes++;
-    int64_t castTime = (endTime - dispatchStartTime_)  / CONVERSION_US_TO_MS;
+    int64_t castTime = (endTime - dispatchStartTime_) / CONVERSION_US_TO_MS;
     if (castTime <= TIMES_LEVEL1) {
         dispCastTime_.below10msTimes++;
     } else if (castTime <= TIMES_LEVEL2) {
@@ -368,7 +368,7 @@ void DfxHisysevent::CalcPointerDispTimes()
 {
     int64_t endTime = GetSysClockTime();
     dispCastTime_.sampleCount++;
-    int64_t castTime = (endTime - dispatchStartTime_)  / CONVERSION_US_TO_MS;
+    int64_t castTime = (endTime - dispatchStartTime_) / CONVERSION_US_TO_MS;
     if (dispCastTime_.sampleCount == POINTER_CLEAR_TIMES) {
         dispCastTime_.sampleCount = 0;
         dispCastTime_.totalTimes++;

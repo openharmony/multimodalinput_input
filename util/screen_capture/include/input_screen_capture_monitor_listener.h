@@ -16,6 +16,7 @@
 #define INPUT_SCREEN_CAPTURE_MONITOR_LISTENER_H
 
 #include "screen_capture_monitor.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -24,6 +25,12 @@ public:
 #if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
     void OnScreenCaptureStarted(int32_t pid);
     void OnScreenCaptureFinished(int32_t pid);
+
+public:
+    void SetScreenCaptureCallback(ScreenCaptureCallback callback);
+
+private:
+    ScreenCaptureCallback callback_ { nullptr };
 #endif
 };
 }

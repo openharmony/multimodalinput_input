@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace MMI {
 InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
+
 InputManager *InputManager::GetInstance()
 {
     return instance_;
@@ -135,6 +136,17 @@ int32_t InputManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor, H
 void InputManager::RemoveMonitor(int32_t monitorId)
 {
     InputMgrImpl.RemoveMonitor(monitorId);
+}
+
+int32_t InputManager::AddGestureMonitor(
+    std::shared_ptr<IInputEventConsumer> consumer, TouchGestureType type, int32_t fingers)
+{
+    return InputMgrImpl.AddGestureMonitor(consumer, type, fingers);
+}
+
+int32_t InputManager::RemoveGestureMonitor(int32_t monitorId)
+{
+    return InputMgrImpl.RemoveGestureMonitor(monitorId);
 }
 
 void InputManager::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -639,6 +651,11 @@ int32_t InputManager::GetIntervalSinceLastInput(int64_t &timeInterval)
 int32_t InputManager::GetAllSystemHotkeys(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
 {
     return InputMgrImpl.GetAllSystemHotkeys(keyOptions, count);
+}
+
+int32_t InputManager::ConvertToCapiKeyAction(int32_t keyAction)
+{
+    return InputMgrImpl.ConvertToCapiKeyAction(keyAction);
 }
 } // namespace MMI
 } // namespace OHOS

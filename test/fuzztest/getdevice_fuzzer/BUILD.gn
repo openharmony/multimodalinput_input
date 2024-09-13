@@ -35,7 +35,9 @@ ohos_fuzztest("GetDeviceFuzzTest") {
   ]
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 }
 

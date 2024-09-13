@@ -25,17 +25,27 @@
 
 namespace OHOS {
 namespace MMI {
-TouchGestureAdapter::TouchGestureAdapter(AdapterType type, std::shared_ptr<TouchGestureAdapter> next)
-    : getureType_(type), nextAdapter_(next)
+TouchGestureAdapter::TouchGestureAdapter(TouchGestureType type, std::shared_ptr<TouchGestureAdapter> next)
+    : gestureType_(type), nextAdapter_(next)
 {}
 
-void TouchGestureAdapter::SetGestureEnable(bool isEnable)
+void TouchGestureAdapter::SetGestureCondition(bool flag, TouchGestureType type, int32_t fingers)
 {
-    if (gestureDetector_ != nullptr) {
-        gestureDetector_->SetGestureEnable(isEnable);
+    static bool isAll = false;
+    if (gestureDetector_ != nullptr &&
+        (type == gestureType_ || type == TOUCH_GESTURE_TYPE_ALL)) {
+        if (type == TOUCH_GESTURE_TYPE_ALL) {
+            isAll = flag;
+        }
+        if (flag) {
+            gestureDetector_->AddGestureFingers(fingers);
+        }
+        if (!flag && !isAll) {
+            gestureDetector_->RemoveGestureFingers(fingers);
+        }
     }
     if (nextAdapter_ != nullptr) {
-        nextAdapter_->SetGestureEnable(isEnable);
+        nextAdapter_->SetGestureCondition(flag, type, fingers);
     }
 }
 
@@ -50,7 +60,7 @@ void TouchGestureAdapter::process(std::shared_ptr<PointerEvent> event)
 void TouchGestureAdapter::Init()
 {
     if (gestureDetector_ == nullptr) {
-        gestureDetector_ = std::make_shared<TouchGestureDetector>(getureType_, shared_from_this());
+        gestureDetector_ = std::make_shared<TouchGestureDetector>(gestureType_, shared_from_this());
     }
     if (nextAdapter_ != nullptr) {
         nextAdapter_->Init();
@@ -60,9 +70,9 @@ void TouchGestureAdapter::Init()
 std::shared_ptr<TouchGestureAdapter> TouchGestureAdapter::GetGestureFactory()
 {
     std::shared_ptr<TouchGestureAdapter> pinch =
-        std::make_shared<TouchGestureAdapter>(PinchAdapterType, nullptr);
+        std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_PINCH, nullptr);
     std::shared_ptr<TouchGestureAdapter> swipe =
-        std::make_shared<TouchGestureAdapter>(SwipeAdapterType, pinch);
+        std::make_shared<TouchGestureAdapter>(TOUCH_GESTURE_TYPE_SWIPE, pinch);
     swipe->Init();
     return swipe;
 }
@@ -84,9 +94,9 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
         gestureDetector_->OnTouchEvent(event);
         return;
     }
-    if (getureType_ == SwipeAdapterType) {
+    if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
         OnSwipeGesture(event);
-    } else if (getureType_ == PinchAdapterType) {
+    } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         OnPinchGesture(event);
     }
 
@@ -142,28 +152,28 @@ void TouchGestureAdapter::OnPinchGesture(std::shared_ptr<PointerEvent> event)
     state_ = gestureStarted_ ? GestureState::PINCH : GestureState::IDLE;
 }
 
-bool TouchGestureAdapter::OnGestureEvent(std::shared_ptr<PointerEvent> event, GetureType mode)
+bool TouchGestureAdapter::OnGestureEvent(std::shared_ptr<PointerEvent> event, GestureMode mode)
 {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     auto pointEvent = std::make_shared<PointerEvent>(*event);
     pointEvent->SetHandlerEventType(HANDLE_EVENT_TYPE_TOUCH_GESTURE);
     switch (mode) {
-        case GetureType::ACTION_SWIPE_DOWN:
+        case GestureMode::ACTION_SWIPE_DOWN:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_SWIPE_DOWN);
             break;
-        case GetureType::ACTION_SWIPE_UP:
+        case GestureMode::ACTION_SWIPE_UP:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_SWIPE_UP);
             break;
-        case GetureType::ACTION_SWIPE_LEFT:
+        case GestureMode::ACTION_SWIPE_LEFT:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_SWIPE_LEFT);
             break;
-        case GetureType::ACTION_SWIPE_RIGHT:
+        case GestureMode::ACTION_SWIPE_RIGHT:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_SWIPE_RIGHT);
             break;
-        case GetureType::ACTION_PINCH_CLOSED:
+        case GestureMode::ACTION_PINCH_CLOSED:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_PINCH_CLOSEED);
             break;
-        case GetureType::ACTION_PINCH_OPENED:
+        case GestureMode::ACTION_PINCH_OPENED:
             pointEvent->SetPointerAction(PointerEvent::TOUCH_ACTION_PINCH_OPENED);
             break;
         default:
