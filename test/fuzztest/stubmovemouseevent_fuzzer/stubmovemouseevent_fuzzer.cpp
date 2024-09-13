@@ -41,8 +41,8 @@ bool StubMoveMouseEventFuzzTest(const uint8_t *data, size_t size)
         static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE), datas, reply, option);
     return true;
 }
-} // namespace MMI
-} // namespace OHOS
+} // MMI
+} // OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
