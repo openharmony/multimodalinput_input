@@ -17,6 +17,7 @@
 #include "js_util.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
+#include "bytrace_adapter.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "JsEventTarget"
@@ -89,6 +90,10 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
         napi_close_handle_scope(item->env, scope);
+        BytraceAdapter::StartDevListener(ADD_EVENT, reportData->deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, eventid:%{public}d",
+            REMOVE_EVENT.c_str(), reportData->deviceId);
+        BytraceAdapter::StopDevListener();
     }
 }
 
@@ -136,6 +141,10 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
             scope);
         napi_close_handle_scope(item->env, scope);
+        BytraceAdapter::StartDevListener(REMOVE_EVENT, reportData->deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, eventid:%{public}d",
+            REMOVE_EVENT.c_str(), reportData->deviceId);
+        BytraceAdapter::StopDevListener();
     }
 }
 

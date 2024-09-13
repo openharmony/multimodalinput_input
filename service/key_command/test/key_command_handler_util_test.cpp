@@ -122,7 +122,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_002, Te
     CALL_TEST_DEBUG;
     cJSON* jsonData = cJSON_CreateObject();
     cJSON* preKey = cJSON_CreateArray();
-    for (int32_t i = 0; i < MAX_PREKEYS_NUM + 1; ++i) {
+    for (int i = 0; i < MAX_PREKEYS_NUM + 1; ++i) {
         cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
     }
     cJSON_AddItemToObject(jsonData, "preKey", preKey);
@@ -325,7 +325,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetPreKeys_008, Te
     CALL_TEST_DEBUG;
     cJSON* jsonData = cJSON_CreateObject();
     cJSON* preKey = cJSON_CreateArray();
-    for (int32_t i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i) {
         cJSON_AddItemToArray(preKey, cJSON_CreateNumber(i));
     }
     cJSON_AddItemToObject(jsonData, "preKey", preKey);

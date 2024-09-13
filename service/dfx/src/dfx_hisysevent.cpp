@@ -47,7 +47,7 @@ constexpr int32_t FOLDABLE_DEVICE { 2 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
 const std::string EMPTY_STRING { "" };
 const std::string LCD_PATH { "/sys/class/graphics/fb0/lcd_model" };
-const std::string ACC_PATH { "/sys/devices/platform/_sensor/acc_info" };
+const std::string ACC_PATH { "/sys/devices/platform/huawei_sensor/acc_info" };
 const std::string ACC0_PATH { "/sys/class/sensors/acc_sensor/info" };
 const std::string TP_PATH { "/sys/touchscreen/touch_chip_info" };
 const std::string TP0_PATH { "/sys/touchscreen0/touch_chip_info" };
@@ -661,7 +661,7 @@ void DfxHisysevent::ReportMagicCursorColorChange(std::string fill_Color, std::st
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MMI::MOUSE_ICON mouse_Style)
 {
     int32_t ret = HiSysEventWrite(
@@ -674,7 +674,7 @@ void DfxHisysevent::ReportMagicCursorShapeChange(std::string fill_Code, OHOS::MM
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::string mouse_Size)
 {
     int32_t ret = HiSysEventWrite(

@@ -208,7 +208,7 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
 {
     CALL_DEBUG_ENTER;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
-        MMI_HILOGD("Failed to search for the deviceID");
+        MMI_HILOGE("Failed to search for the deviceID");
         return false;
     }
     auto deviceConfig = KeyRepeat->GetDeviceConfig();
@@ -288,7 +288,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        MMI_HILOGE("Failed to search for the deviceID");
+        MMI_HILOGD("Failed to search for the deviceID");
         return COMMON_PARAMETER_ERROR;
     }
     if (!iter->second.enable) {
@@ -854,23 +854,6 @@ void InputDeviceManager::OnSessionLost(SessionPtr session)
     devListeners_.remove(session);
 }
 
-std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
-{
-    CALL_DEBUG_ENTER;
-    std::vector<int32_t> ids;
-    for (const auto &item : inputDevice_) {
-        auto inputDevice = item.second.inputDeviceOrigin;
-        if (inputDevice == nullptr) {
-            continue;
-        }
-        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
-        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
-            ids.push_back(item.first);
-        }
-    }
-    return ids;
-}
-
 bool InputDeviceManager::IsPointerDevice(std::shared_ptr<InputDevice> inputDevice) const
 {
     CHKPR(inputDevice, false);
@@ -887,6 +870,23 @@ bool InputDeviceManager::IsKeyboardDevice(std::shared_ptr<InputDevice> inputDevi
 {
     CHKPR(inputDevice, false);
     return inputDevice->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
+}
+
+std::vector<int32_t> InputDeviceManager::GetTouchPadIds()
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> ids;
+    for (const auto &item : inputDevice_) {
+        auto inputDevice = item.second.inputDeviceOrigin;
+        if (inputDevice == nullptr) {
+            continue;
+        }
+        enum evdev_device_udev_tags udevTags = libinput_device_get_tags(inputDevice);
+        if ((udevTags & EVDEV_UDEV_TAG_TOUCHPAD) != 0) {
+            ids.push_back(item.first);
+        }
+    }
+    return ids;
 }
 } // namespace MMI
 } // namespace OHOS

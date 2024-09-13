@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
 {
     CHKPV(keyEvent);
     if (OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{private}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;

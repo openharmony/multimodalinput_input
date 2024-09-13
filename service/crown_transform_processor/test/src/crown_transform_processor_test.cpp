@@ -16,6 +16,8 @@
 #include <cstdio>
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "crown_transform_processor.h"
 #include "general_crown.h"
 #include "i_input_windows_manager.h"
@@ -40,6 +42,7 @@ public:
     static void TearDownTestCase(void);
     static void SetupCrown();
     static void CloseCrown();
+    static void UpdateDisplayInfo();
     static void InitHandler();
     libinput_event *GetEvent();
 
@@ -55,6 +58,8 @@ void CrownTransformProcessorTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupCrown();
+    UpdateDisplayInfo();
+
     InitHandler();
 }
 
@@ -81,6 +86,24 @@ void CrownTransformProcessorTest::CloseCrown()
 {
     libinput_.RemovePath(vCrown_.GetDevPath());
     vCrown_.Close();
+}
+
+void CrownTransformProcessorTest::UpdateDisplayInfo()
+{
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    ASSERT_TRUE(display != nullptr);
+
+    DisplayGroupInfo displays {
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+        .focusWindowId = -1,
+    };
+    displays.displaysInfo.push_back(DisplayInfo {
+        .name = "default display",
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+    });
+    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 void CrownTransformProcessorTest::InitHandler()

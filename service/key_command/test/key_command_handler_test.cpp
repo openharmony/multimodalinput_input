@@ -29,8 +29,8 @@
 #include "key_command_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "system_info.h"
 #include "stylus_key_handler.h"
+#include "system_info.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -617,7 +617,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMultiTapTest__002, T
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_001, TestSize.Level1)
 {
-    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "aaa";
     int32_t delay = 0;

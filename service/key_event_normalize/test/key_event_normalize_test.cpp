@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include "display_manager.h"
+
 #include "define_multimodal.h"
 #include "general_keyboard.h"
 #include "input_device_manager.h"
@@ -39,6 +41,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp(){};
     void TearDown(){};
+    static void UpdateDisplayInfo();
 
 private:
     static void SetupKeyboard();
@@ -54,6 +57,7 @@ void KeyEventNormalizeTest::SetUpTestCase(void)
 {
     ASSERT_TRUE(libinput_.Init());
     SetupKeyboard();
+    UpdateDisplayInfo();
 }
 
 void KeyEventNormalizeTest::TearDownTestCase(void)
@@ -78,6 +82,23 @@ void KeyEventNormalizeTest::CloseKeyboard()
 {
     libinput_.RemovePath(vKeyboard_.GetDevPath());
     vKeyboard_.Close();
+}
+
+void KeyEventNormalizeTest::UpdateDisplayInfo()
+{
+    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
+    ASSERT_TRUE(display != nullptr);
+    DisplayGroupInfo displays {
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+        .focusWindowId = -1,
+    };
+    displays.displaysInfo.push_back(DisplayInfo {
+        .name = "default display",
+        .width = display->GetWidth(),
+        .height = display->GetHeight(),
+    });
+    WIN_MGR->UpdateDisplayInfo(displays);
 }
 
 /**
