@@ -189,7 +189,7 @@ private:
                     KeyEvent::ActionToString(event->GetKeyAction()),
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
                     event->GetActionStartTime(), InputEvent::EventTypeToString(event->GetEventType()),
-                    event->GetFlag(), KeyEvent::ActionToString(event->GetKeyAction()),                    
+                    event->GetFlag(), KeyEvent::ActionToString(event->GetKeyAction()),
                     event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
