@@ -112,6 +112,7 @@ declare_args() {
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
     "event_dump/src/event_dump.cpp",
+    "event_dump/src/event_statistic.cpp",
     "event_handler/src/anr_manager.cpp",
     "event_handler/src/event_normalize_handler.cpp",
     "event_handler/src/input_event_handler.cpp",

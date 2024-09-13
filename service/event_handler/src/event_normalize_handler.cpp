@@ -24,6 +24,7 @@
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 #include "event_resample.h"
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#include "event_statistic.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
 #include "fingerprint_event_processor.h"
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -330,6 +331,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
+    EventStatistic::PushEvent(keyEvent);
     WIN_MGR->HandleKeyEventWindowId(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
@@ -424,6 +426,7 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         MMI_HILOGE("Failed to set origin pointerId");
         return RET_ERR;
     }
+    EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
@@ -475,6 +478,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
+    EventStatistic::PushPointerEvent(pointerEvent);
     if (HandleTouchPadTripleTapEvent(pointerEvent)) {
         return RET_OK;
     }
@@ -516,6 +520,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     PointerEventSetPressedKeys(pointerEvent);
+    EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
@@ -564,6 +569,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
     BytraceAdapter::StopPackageEvent();
+    EventStatistic::PushPointerEvent(pointerEvent);
     PointerEventSetPressedKeys(pointerEvent);
 
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
@@ -621,6 +627,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
@@ -641,6 +648,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    EventStatistic::PushPointerEvent(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Joystick device does not support");
@@ -669,6 +677,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
         RestoreTouchPadStatus();
     }
     swEvent->SetSwitchType(switchStatus);
+    EventStatistic::PushEvent(std::move(swEvent));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("Switch device does not support");

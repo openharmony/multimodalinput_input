@@ -1280,6 +1280,8 @@ public:
 
     virtual void Reset() override;
 
+    virtual std::string ToString() override;
+
     /**
      * @brief Obtains the pointer action in this event.
      * @return Returns the pointer action.

@@ -261,6 +261,7 @@ private:
     std::atomic<bool> isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+    std::thread eventMonitorThread_;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t shellAssitentPid_ { -1 };
 #endif // OHOS_BUILD_ENABLE_ANCO

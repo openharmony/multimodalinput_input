@@ -40,6 +40,7 @@
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
+#include "event_statistic.h"
 #include "event_log_helper.h"
 #include "ffrt.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -380,6 +381,8 @@ void MMIService::OnStart()
     AddReloadDeviceTimer();
     t_ = std::thread([this] {this->OnThread();});
     pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
+    eventMonitorThread_ = std::thread(&EventStatistic::WriteEventFile);
+    pthread_setname_np(eventMonitorThread_.native_handle(), "event-monitor");
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
