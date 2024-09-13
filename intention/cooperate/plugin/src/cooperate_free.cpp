@@ -26,6 +26,10 @@ namespace Msdp {
 namespace DeviceStatus {
 namespace Cooperate {
 
+namespace {
+const std::string FINGER_PRINT { "hw_fingerprint_mouse" };
+}
+
 CooperateFree::CooperateFree(IStateMachine &parent, IContext *env)
     : ICooperateState(parent), env_(env)
 {
@@ -47,6 +51,10 @@ void CooperateFree::OnEvent(Context &context, const CooperateEvent &event)
 void CooperateFree::OnEnterState(Context &context)
 {
     CALL_INFO_TRACE;
+    bool hasLocalPointerDevice =  HasLocalPointerDevice();
+    FI_HILOGI("HasLocalPointerDevice:%{public}s", hasLocalPointerDevice ? "true" : "false");
+    bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
+    env_->GetInput().SetPointerVisibility(visible, 1);
 }
 
 void CooperateFree::OnLeaveState(Context &context)
@@ -58,30 +66,32 @@ void CooperateFree::OnLeaveState(Context &context)
     context.UpdateCooperateFlag(event);
 }
 
-void CooperateFree::SetPointerVisible(Context &context)
+bool CooperateFree::HasLocalPointerDevice() const
 {
-    CHKPV(env_);
-    bool hasLocalPointerDevice =  env_->GetDeviceManager().HasLocalPointerDevice();
-    bool visible = !context.NeedHideCursor() && hasLocalPointerDevice;
-    FI_HILOGI("Set pointer visible:%{public}s, HasLocalPointerDevice:%{public}s",
-        visible ? "true" : "false", hasLocalPointerDevice ? "true" : "false");
-    env_->GetInput().SetPointerVisibility(visible, PRIORITY);
+    return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
+        if ((dev == nullptr) || (dev->GetName() == FINGER_PRINT)) {
+            return false;
+        }
+        return (dev->IsPointerDevice() && !dev->IsRemote());
+    });
+}
+
+bool CooperateFree::HasLocalKeyboardDevice() const
+{
+    return env_->GetDeviceManager().AnyOf([this](std::shared_ptr<IDevice> dev) {
+        CHKPR(dev, false);
+        return (dev->IsKeyboard() && !dev->IsRemote());
+    });
 }
 
 void CooperateFree::UnchainConnections(Context &context, const StopCooperateEvent &event) const
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (event.isUnchained) {
         FI_HILOGI("Unchain all connections");
         context.dsoftbus_.CloseAllSessions();
         context.eventMgr_.OnUnchain(event);
     }
-}
-
-void CooperateFree::OnSetCooperatePriv(uint32_t priv)
-{
-    CALL_DEBUG_ENTER;
-    env_->GetDragManager().SetCooperatePriv(priv);
 }
 
 CooperateFree::Initial::Initial(CooperateFree &parent)
@@ -98,9 +108,6 @@ CooperateFree::Initial::Initial(CooperateFree &parent)
     });
     AddHandler(CooperateEventType::DSOFTBUS_START_COOPERATE, [this](Context &context, const CooperateEvent &event) {
         this->OnRemoteStart(context, event);
-    });
-    AddHandler(CooperateEventType::INPUT_POINTER_EVENT, [this](Context &context, const CooperateEvent &event) {
-        this->OnPointerEvent(context, event);
     });
 }
 
@@ -158,14 +165,9 @@ void CooperateFree::Initial::OnStart(Context &context, const CooperateEvent &eve
 
 void CooperateFree::Initial::OnStop(Context &context, const CooperateEvent &event)
 {
-    CALL_DEBUG_ENTER;
-    StopCooperateEvent param = std::get<StopCooperateEvent>(event.event);
-    context.eventMgr_.StopCooperate(param);
-    DSoftbusStopCooperateFinished notice {
-        .normal = true,
-    };
-    context.eventMgr_.StopCooperateFinish(notice);
-    parent_.UnchainConnections(context, param);
+    CALL_INFO_TRACE;
+    StopCooperateEvent notice = std::get<StopCooperateEvent>(event.event);
+    parent_.UnchainConnections(context, notice);
 }
 
 void CooperateFree::Initial::OnAppClosed(Context &context, const CooperateEvent &event)
@@ -179,7 +181,6 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     CALL_INFO_TRACE;
     DSoftbusStartCooperate notice = std::get<DSoftbusStartCooperate>(event.event);
     context.OnRemoteStartCooperate(notice.extra);
-    parent_.OnSetCooperatePriv(notice.extra.priv);
     context.eventMgr_.RemoteStart(notice);
     context.RemoteStartSuccess(notice);
     context.inputEventBuilder_.Enable(context);
@@ -188,19 +189,6 @@ void CooperateFree::Initial::OnRemoteStart(Context &context, const CooperateEven
     FI_HILOGI("[remote start] Cooperation with \'%{public}s\' established", Utility::Anonymize(context.Peer()).c_str());
     TransiteTo(context, CooperateState::COOPERATE_STATE_IN);
     context.OnTransitionIn();
-}
-
-void CooperateFree::Initial::OnPointerEvent(Context &context, const CooperateEvent &event)
-{
-    CALL_DEBUG_ENTER;
-    InputPointerEvent notice = std::get<InputPointerEvent>(event.event);
-    if (InputEventBuilder::IsLocalEvent(notice) && context.NeedHideCursor()) {
-        UpdateCooperateFlagEvent event {
-            .mask = COOPERATE_FLAG_HIDE_CURSOR,
-        };
-        context.UpdateCooperateFlag(event);
-        parent_.SetPointerVisible(context);
-    }
 }
 } // namespace Cooperate
 } // namespace DeviceStatus

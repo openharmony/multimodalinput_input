@@ -232,7 +232,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
                 subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                 keyEvent->GetEventType(), keyEvent->GetFlag());
         } else {
-            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
+            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, "
                 "Action:%{public}d, KeyAction:%{public}d, EventType:%{public}d,Flag:%{public}u",
                 subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
                 keyEvent->GetEventType(), keyEvent->GetFlag());
