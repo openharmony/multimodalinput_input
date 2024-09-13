@@ -60,7 +60,7 @@ private:
     };
 
     bool HasLocalPointerDevice() const;
-    bool HasLocalKeyboardDevice() const;   
+    bool HasLocalKeyboardDevice() const;
     void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
 
     IContext *env_ { nullptr };
