@@ -18,6 +18,7 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "setting_datashare.h"
+#include "key_subscriber_handler.h"
 #include "system_ability_definition.h"
 
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
@@ -85,6 +86,9 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
                 IPointerDrawingManager::GetInstance()->InitPointerObserver();
+                std::shared_ptr<KeySubscriberHandler> keySubscriberHandler = std::make_shared<KeySubscriberHandler>();
+                CHKPV(keySubscriberHandler);
+                keySubscriberHandler->InitDataShareListener();
             }
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
