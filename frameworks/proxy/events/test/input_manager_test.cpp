@@ -3344,7 +3344,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_001, TestSize.Level1)
     auto consumer = GetPtr<InputEventConsumer>();
     ASSERT_TRUE(consumer != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_ALL, 1);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     ASSERT_TRUE(monitorId == INVALID_HANDLER_ID);
+#else
+    ASSERT_TRUE(monitorId == ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -3359,7 +3363,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_002, TestSize.Level1)
     auto consumer = GetPtr<InputEventConsumer>();
     ASSERT_TRUE(consumer != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_PINCH, 3);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     ASSERT_TRUE(monitorId == INVALID_HANDLER_ID);
+#else
+    ASSERT_TRUE(monitorId == ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -3374,10 +3382,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_GestureMonitor_003, TestSize.Level1)
     auto consumer = GetPtr<InputEventConsumer>();
     ASSERT_TRUE(consumer != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddGestureMonitor(consumer, TOUCH_GESTURE_TYPE_ALL, 0);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     ASSERT_TRUE(monitorId != INVALID_HANDLER_ID);
+#else
+    ASSERT_TRUE(monitorId == ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
     int32_t ret = InputManager::GetInstance()->RemoveGestureMonitor(monitorId);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     ASSERT_TRUE(ret == RET_OK);
+#else
+    ASSERT_TRUE(ret == ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 } // namespace MMI
 } // namespace OHOS

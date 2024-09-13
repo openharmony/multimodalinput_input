@@ -42,9 +42,9 @@ constexpr double ANGLE_LEFT_UP = 135.0;
 constexpr int32_t MAXIMUM_SAME_DIRECTION_OFFSET = 1;
 constexpr float MAXIMUM_POINTER_SPACING = 2000;
 constexpr int64_t MAXIMUM_POINTER_INTERVAL = 100000;
-constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 1;
+constexpr double MAXIMUM_SINGLE_SLIDE_DISTANCE = 5;
 constexpr double MINIMUM_GRAVITY_OFFSET = 0.5;
-constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 3;
+constexpr int32_t MAXIMUM_CONTINUOUS_COUNTS = 2;
 constexpr int32_t MINIMUM_FINGER_COUNT_OFFSET = 1;
 } // namespace
 
@@ -105,18 +105,19 @@ void TouchGestureDetector::HandleDownEvent(std::shared_ptr<PointerEvent> event)
     MMI_HILOGI("gestureType:%{public}d, finger count:%{public}zu, isFingerReady:%{public}s, "
         "pointerId:%{public}d, x:%{private}d, y:%{private}d",
         gestureType_, downPoint_.size(), isFingerReady_ ? "true" : "false", pointerId, x, y);
+    movePoint_ = downPoint_;
 }
 
 void TouchGestureDetector::HandleMoveEvent(std::shared_ptr<PointerEvent> event)
 {
     CHKPV(event);
+    if (isRecognized_) {
+        return;
+    }
     if (downPoint_.size() < THREE_FINGER_COUNT) {
         return;
     }
     if (!IsMatchGesture(event->GetPointerCount()) && !IsMatchGesture(ALL_FINGER_COUNT)) {
-        return;
-    }
-    if (isRecognized_) {
         return;
     }
     if (gestureType_ == TOUCH_GESTURE_TYPE_SWIPE) {
@@ -165,6 +166,7 @@ void TouchGestureDetector::HandlePinchMoveEvent(std::shared_ptr<PointerEvent> ev
     }
     if (CalcMultiFingerMovement(movePoints) >
         static_cast<int32_t>(downPoint_.size() - MINIMUM_FINGER_COUNT_OFFSET)) {
+        movePoint_ = movePoints;
         GestureMode type = JudgeOperationMode(movePoints);
         isRecognized_ = AntiJitter(event, type);
     }
@@ -197,6 +199,7 @@ void TouchGestureDetector::ReleaseData()
     continuousOpenCount_ = 0;
     lastDistance_.clear();
     downPoint_.clear();
+    movePoint_.clear();
 }
 
 bool TouchGestureDetector::WhetherDiscardTouchEvent(std::shared_ptr<PointerEvent> event)
@@ -381,8 +384,9 @@ Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
 {
     double xSum = 0.0;
     double ySum = 0.0;
+    double area = 0.0;
     int32_t count = static_cast<int32_t>(points.size());
-    if (count <= 0 || count > MAX_FINGERS_COUNT) {
+    if (count <= FOUR_FINGER_COUNT || count > MAX_FINGERS_COUNT) {
         return Point(static_cast<float>(xSum), static_cast<float>(ySum));
     }
     double **vertices = new (std::nothrow) double *[count];
@@ -390,7 +394,19 @@ Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
         return Point(static_cast<float>(xSum), static_cast<float>(ySum));
     }
     int32_t i = 0;
-    for (const auto &pointData : points) {
+    std::vector<std::pair<int32_t, Point>> sequence(points.begin(), points.end());
+    std::sort(sequence.begin(), sequence.end(),
+        [](std::pair<int32_t, Point> right, std::pair<int32_t, Point> left) {
+        return right.second.x < left.second.x;
+    });
+    auto iter = std::max_element(sequence.begin(), sequence.end(),
+        [](std::pair<int32_t, Point> right, std::pair<int32_t, Point> left) {
+        return right.second.y < left.second.y;
+    });
+    std::pair<int32_t, Point> temp = *iter;
+    sequence.erase(iter);
+    sequence.push_back(temp);
+    for (const auto &pointData : sequence) {
         vertices[i] = new (std::nothrow) double[2];
         if (vertices[i] == nullptr) {
             goto end;
@@ -405,9 +421,13 @@ Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
         double *current = vertices[j];
         double *next = vertices[(j + 1) % count];
         double crossProduct = current[0] * next[1] - next[0] * current[1];
+        area += crossProduct;
         xSum += (current[0] + next[0]) * crossProduct;
         ySum += (current[1] + next[1]) * crossProduct;
     }
+    area /= 2;
+    xSum /= count * area;
+    ySum /= count * area;
 end:
     for (int32_t i = 0; i < count; ++i) {
         if (vertices[i] != nullptr) {
@@ -415,6 +435,7 @@ end:
         }
     }
     delete[] vertices;
+    MMI_HILOGI("cx:%{public}.2f, cy:%{public}.2f", xSum, ySum);
     return Point(static_cast<float>(xSum), static_cast<float>(ySum));
 }
 
@@ -443,7 +464,7 @@ void TouchGestureDetector::CalcAndStoreDistance(std::map<int32_t, Point> &points
 int32_t TouchGestureDetector::CalcMultiFingerMovement(std::map<int32_t, Point> &points)
 {
     int32_t movementCount = 0;
-    for (const auto &[id, point] : downPoint_) {
+    for (const auto &[id, point] : movePoint_) {
         auto movePoints = points.find(id);
         if (movePoints == points.end()) {
             return 0;
@@ -476,7 +497,7 @@ GestureMode TouchGestureDetector::JudgeOperationMode(std::map<int32_t, Point> &m
             return type;
         }
         double lastDistance = distanceIter->second;
-        if (currentDistance <= lastDistance &&
+        if (currentDistance < lastDistance &&
             lastDistance - currentDistance >= MINIMUM_GRAVITY_OFFSET) {
             ++closeCount;
         } else if (currentDistance > lastDistance &&

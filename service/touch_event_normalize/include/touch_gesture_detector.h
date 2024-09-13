@@ -104,6 +104,7 @@ private:
     int32_t continuousCloseCount_ { 0 };
     int32_t continuousOpenCount_ { 0 };
     std::map<int32_t, Point> downPoint_;
+    std::map<int32_t, Point> movePoint_;
     std::map<int32_t, double> lastDistance_;
     std::shared_ptr<GestureListener> listener_ { nullptr };
 };
