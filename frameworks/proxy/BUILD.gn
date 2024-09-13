@@ -354,8 +354,7 @@ ohos_unittest("InputManagerImplTest") {
   ]
 
   if (input_ext_feature_anco) {
-    sources +=
-      [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
+    sources += [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
   }
 
   configs = [
