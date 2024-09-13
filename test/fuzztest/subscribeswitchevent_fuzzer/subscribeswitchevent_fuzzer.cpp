@@ -34,8 +34,8 @@ void SubscribeSwitchEventFuzzTest(const uint8_t* data, size_t size)
     int32_t subscribeId = InputManager::GetInstance()->SubscribeSwitchEvent(fun);
     InputManager::GetInstance()->UnsubscribeSwitchEvent(subscribeId);
 }
-} // namespace MMI
-} // namespace OHOS
+} // MMI
+} // OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
