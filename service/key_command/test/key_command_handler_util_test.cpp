@@ -1472,7 +1472,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_00
     CALL_TEST_DEBUG;
     cJSON* jsonData = cJSON_CreateObject();
     cJSON* sequenceKeys = cJSON_CreateArray();
-    for (int32_t i = 0; i <= MAX_SEQUENCEKEYS_NUM; ++i) {
+    for (int i = 0; i <= MAX_SEQUENCEKEYS_NUM; ++i) {
         cJSON* sequenceKeyJson = cJSON_CreateObject();
         cJSON_AddItemToObject(sequenceKeyJson, "key", cJSON_CreateString("key"));
         cJSON_AddItemToArray(sequenceKeys, sequenceKeyJson);
@@ -1495,7 +1495,7 @@ HWTEST_F(KeyCommandHandlerUtilTest, KeyCommandHandlerUtilTest_GetSequenceKeys_00
     CALL_TEST_DEBUG;
     cJSON* jsonData = cJSON_CreateObject();
     cJSON* sequenceKeys = cJSON_CreateArray();
-    for (int32_t i = 0; i < MAX_SEQUENCEKEYS_NUM; ++i) {
+    for (int i = 0; i < MAX_SEQUENCEKEYS_NUM; ++i) {
         cJSON* sequenceKeyJson = cJSON_CreateObject();
         cJSON_AddItemToObject(sequenceKeyJson, "key", cJSON_CreateString("key"));
         cJSON_AddItemToArray(sequenceKeys, sequenceKeyJson);
