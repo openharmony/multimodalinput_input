@@ -853,7 +853,7 @@ void DfxHisysevent::ReportFailIfKnockTooFast()
     }
 }
 
-void DfxHisysevent::ReportFailIfOneSuccTwoFail(const std::shared_ptr<PointerEvent> touchEvent)
+void DfxHisysevent::ReportFailIfOneSuccTwoFail(std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPV(touchEvent);
     int32_t id = touchEvent->GetPointerId();
