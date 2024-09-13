@@ -108,7 +108,7 @@ int32_t GestureHandler::HandleTouchPadMoveEvent(int32_t seatSlot, double logical
     }
     if (numberOfTouchPadFingerDown_ < FIRST_FINGER || numberOfTouchPadFingerDown_ > SECOND_FINGER) {
         if (isStartRotate_) {
-            MMI_HILOGI("Exceed two fingers, rotate is end");
+            MMI_HILOGD("Exceed two fingers, rotate is end");
             return PointerEvent::POINTER_ACTION_UNKNOWN;
         }
         if (isReady_) {

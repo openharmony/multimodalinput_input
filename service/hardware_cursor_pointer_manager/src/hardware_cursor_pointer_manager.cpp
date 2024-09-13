@@ -43,7 +43,7 @@ bool HardwareCursorPointerManager::IsSupported()
 
 int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
-    MMI_HILOGD("SetPosition, x:%{public}d, y:%{public}d", x, y);
+    MMI_HILOGD("SetPosition, x:%{private}d, y:%{private}d", x, y);
     return RET_OK;
 }
 

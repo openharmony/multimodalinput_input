@@ -44,7 +44,6 @@ public:
     }
 
     virtual ~DisplyChangedReceiver() = default;
-    __attribute__((no_sanitize("cfi")))
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         CALL_DEBUG_ENTER;
@@ -55,7 +54,7 @@ public:
         }
         MMI_HILOGD("Received screen status:%{public}s", action.c_str());
         if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
-            MMI_HILOGI("Display screen on");
+            MMI_HILOGD("Display screen on");
             DISPLAY_MONITOR->SetScreenStatus(action);
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
             STYLUS_HANDLER->IsLaunchAbility();

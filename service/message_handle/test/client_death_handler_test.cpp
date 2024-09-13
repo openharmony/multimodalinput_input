@@ -201,5 +201,38 @@ HWTEST_F(ClientDeathHandlerTest, ClientDeathHandlerTest_FindClientPid_001, TestS
     sptr<RemoteObjectTest> remoteObject = new RemoteObjectTest(u"test1");
     EXPECT_EQ(clientDeathHdl.FindClientPid(remoteObject), INVALID_PID);
 }
+
+/**
+ * @tc.name: ClientDeathHandlerTest_OnDeath
+ * @tc.desc: Test OnDeath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ClientDeathHandlerTest, ClientDeathHandlerTest_OnDeath, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ClientDeathHandler clientDeathHdl;
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    int32_t pid = 1000;
+    clientDeathHdl.clientPidMap_.insert(std::make_pair(pid, remote));
+    wptr<RemoteObjectTest> remoteObject = new RemoteObjectTest(u"test1");
+    EXPECT_NO_FATAL_FAILURE(clientDeathHdl.OnDeath(remoteObject));
+}
+
+/**
+ * @tc.name: ClientDeathHandlerTest_OnDeath_001
+ * @tc.desc: Test OnDeath
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ClientDeathHandlerTest, ClientDeathHandlerTest_OnDeath_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ClientDeathHandler clientDeathHdl;
+    sptr<RemoteObjectTest> remote = new RemoteObjectTest(u"test");
+    int32_t pid = 1000;
+    clientDeathHdl.clientPidMap_.insert(std::make_pair(pid, remote));
+    EXPECT_NO_FATAL_FAILURE(clientDeathHdl.OnDeath(remote));
+}
 } // namespace MMI
 } // namespace OHOS

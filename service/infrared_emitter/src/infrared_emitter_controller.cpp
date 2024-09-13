@@ -101,6 +101,7 @@ bool InfraredEmitterController::Transmit(int64_t carrierFreq, const std::vector<
         tempPattern.push_back(per);
     }
     MMI_HILOGI("irInterface_->Transmit params:%{public}s", context.c_str());
+
     bool outRet = false;
     int32_t ret = irInterface_->Transmit(tempCarrierFreq, tempPattern, outRet);
     MMI_HILOGI("irInterface_->Transmit ret:%{public}d", ret);
@@ -145,7 +146,6 @@ bool InfraredEmitterController::GetFrequencies(std::vector<InfraredFrequencyInfo
         item.min_ = outRange[i].min;
         frequencyInfo.push_back(item);
     }
-    MMI_HILOGI("Data from hdf:%{public}s", context.c_str());
     return true;
 }
 } // namespace MMI
