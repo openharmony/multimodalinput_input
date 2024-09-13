@@ -284,7 +284,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_ReAddInputEventFilter_01, Te
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool visible = true;
     bool ret = InputMgrImpl.IsPointerVisible();
     EXPECT_TRUE(ret);
 }
@@ -298,7 +297,6 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_01, TestSiz
 HWTEST_F(InputManagerImplTest, InputManagerImplTest_IsPointerVisible_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool visible = false;
     bool ret = InputMgrImpl.IsPointerVisible();
     EXPECT_TRUE(ret);
 }
@@ -583,6 +581,94 @@ HWTEST_F(InputManagerImplTest, InputManagerImplTest_EnableInputDevice_01, TestSi
     enable = true;
     int32_t ret2 = InputMgrImpl.EnableInputDevice(enable);
     EXPECT_EQ(ret2, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_ConvertToCapiKeyAction_001
+ * @tc.desc: Test the funcation ConvertToCapiKeyAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_ConvertToCapiKeyAction_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyAction = KeyEvent::KEY_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.ConvertToCapiKeyAction(keyAction));
+    keyAction = KeyEvent::KEY_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.ConvertToCapiKeyAction(keyAction));
+    keyAction = KeyEvent::KEY_ACTION_CANCEL;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.ConvertToCapiKeyAction(keyAction));
+    keyAction = 10;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.ConvertToCapiKeyAction(keyAction));
+}
+
+/**
+ * @tc.name: InputManagerImplTest_GetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the funcation GetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_GetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+    switchFlag = true;
+    ret = InputMgrImpl.GetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetTouchpadThreeFingersTapSwitch_001
+ * @tc.desc: Test the funcation SetTouchpadThreeFingersTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetTouchpadThreeFingersTapSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool switchFlag = true;
+    int32_t ret = InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+    switchFlag = true;
+    ret = InputMgrImpl.SetTouchpadThreeFingersTapSwitch(switchFlag);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_SetCurrentUser_001
+ * @tc.desc: Test the funcation SetCurrentUser
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_SetCurrentUser_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t userId = 1;
+    int32_t ret = InputMgrImpl.SetCurrentUser(userId);
+    EXPECT_EQ(ret, RET_ERR);
+    userId = 0;
+    ret = InputMgrImpl.SetCurrentUser(userId);
+    EXPECT_EQ(ret, RET_ERR);
+    userId = -1;
+    ret = InputMgrImpl.SetCurrentUser(userId);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerImplTest_Authorize_001
+ * @tc.desc: Test the funcation Authorize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerImplTest, InputManagerImplTest_Authorize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool isAuthorize = true;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.Authorize(isAuthorize));
+    isAuthorize = false;
+    ASSERT_NO_FATAL_FAILURE(InputMgrImpl.Authorize(isAuthorize));
 }
 } // namespace MMI
 } // namespace OHOS

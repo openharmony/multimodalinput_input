@@ -94,8 +94,8 @@ private:
     void ScanPointerDevice();
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
-    void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
-    void NotifyDevRemoveCallback(int32_t deviceId,  const InputDeviceInfo &deviceInfo);
+    void NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice);
+    void NotifyDevRemoveCallback(int32_t deviceId, const InputDeviceInfo &deviceInfo);
     int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);

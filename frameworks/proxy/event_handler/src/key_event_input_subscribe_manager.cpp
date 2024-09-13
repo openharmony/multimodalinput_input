@@ -112,10 +112,11 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGW("Subscription is duplicated");
         return tIter->GetSubscribeId();
     }
-    if (MMIEventHdl.SubscribeKeyEvent(*tIter) != RET_OK) {
+    int32_t ret = MMIEventHdl.SubscribeKeyEvent(*tIter);
+    if (ret != RET_OK) {
         MMI_HILOGE("Subscribing key event failed");
         subscribeInfos_.erase(tIter);
-        return INVALID_SUBSCRIBE_ID;
+        return ret;
     }
 
     MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"

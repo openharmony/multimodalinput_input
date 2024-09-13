@@ -73,6 +73,8 @@ protected:
     int32_t StubGetKeyboardRepeatRate(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubAddGestureMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRemoveGestureMonitor(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply);
     int32_t StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply);
@@ -132,9 +134,12 @@ protected:
     int32_t StubRemoveVirtualInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t StubGetPointerSnapshot(MessageParcel &data, MessageParcel &reply);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t StubSetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadScrollRows(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetClientInfo(MessageParcel &data, MessageParcel &reply);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t StubAncoAddChannel(MessageParcel& data, MessageParcel& reply);
     int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);
@@ -146,6 +151,8 @@ protected:
 
 private:
     int32_t VerifyTouchPadSetting(void);
+    int32_t HandleGestureMonitor(MultimodalinputConnectInterfaceCode code,
+        MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS

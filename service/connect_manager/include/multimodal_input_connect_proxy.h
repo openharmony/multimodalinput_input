@@ -76,6 +76,10 @@ public:
         int32_t priority, uint32_t deviceTags) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override;
+    int32_t AddGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
+    int32_t RemoveGestureMonitor(InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent, bool isNativeInject) override;
@@ -129,11 +133,14 @@ public:
     
     int32_t EnableHardwareCursorStats(bool enable) override;
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
+    int32_t SetClientInfo(int32_t pid, uint64_t readThreadId) override;
     int32_t GetIntervalSinceLastInput(int64_t &timeInterval) override;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
@@ -149,6 +156,8 @@ private:
     int32_t GetTouchpadBoolData(bool &date, int32_t type);
     int32_t SetTouchpadInt32Data(int32_t date, int32_t type);
     int32_t GetTouchpadInt32Data(int32_t &date, int32_t type);
+    int32_t HandleGestureMonitor(uint32_t code, InputHandlerType handlerType,
+        HandleEventType eventType, TouchGestureType gestureType, int32_t fingers);
 };
 } // namespace MMI
 } // namespace OHOS

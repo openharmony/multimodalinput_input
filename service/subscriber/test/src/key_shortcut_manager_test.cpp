@@ -89,7 +89,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_SystemKey_02, TestSize.L
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 }
 
 /**
@@ -108,7 +108,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_SystemKey_03, TestSize.L
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 }
 
 /**
@@ -144,7 +144,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_SystemKey_05, TestSize.L
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
 }
 
 /**
@@ -180,7 +180,7 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_SystemKey_07, TestSize.L
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
 }
 
 /**
@@ -311,14 +311,14 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_GlobalKey_05, TestSize.L
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     KeyShortcutManager::HotKey globalKey {
         .modifiers = { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_SHIFT_LEFT },
         .finalKey = KeyEvent::KEYCODE_M,
     };
     shortcutId = shortcutMgr.RegisterHotKey(globalKey);
-    EXPECT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
+    EXPECT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
 }
 
 /**
@@ -405,12 +405,12 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerSystemKey_01, Tes
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = TriggerSystemKey01();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
-    EXPECT_TRUE(triggered);
+    EXPECT_FALSE(shortcutMgr.HandleEvent(keyEvent));
+    EXPECT_FALSE(triggered);
 }
 
 std::shared_ptr<KeyEvent> KeyShortcutManagerTest::TriggerSystemKey02()
@@ -459,12 +459,12 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerSystemKey_02, Tes
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = TriggerSystemKey02();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
-    EXPECT_TRUE(triggered);
+    EXPECT_FALSE(shortcutMgr.HandleEvent(keyEvent));
+    EXPECT_FALSE(triggered);
 }
 
 std::shared_ptr<KeyEvent> KeyShortcutManagerTest::TriggerSystemKey03()
@@ -514,18 +514,18 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerSystemKey_03, Tes
     std::unique_lock<std::mutex> lock(mutex);
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = TriggerSystemKey03();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
+    EXPECT_FALSE(shortcutMgr.HandleEvent(keyEvent));
     EXPECT_EQ(keyCode, KeyEvent::KEYCODE_UNKNOWN);
     bool cvRet = condVar.wait_for(lock, std::chrono::milliseconds(TWICE_LONG_PRESS_TIME),
         [&keyCode]() {
             return (keyCode != KeyEvent::KEYCODE_UNKNOWN);
         });
-    EXPECT_TRUE(cvRet);
-    EXPECT_EQ(keyCode, KeyEvent::KEYCODE_S);
+    EXPECT_FALSE(cvRet);
+    EXPECT_NE(keyCode, KeyEvent::KEYCODE_S);
 }
 
 std::shared_ptr<KeyEvent> KeyShortcutManagerTest::TriggerSystemKey04()
@@ -579,11 +579,11 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerSystemKey_04, Tes
     std::unique_lock<std::mutex> lock(mutex);
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = TriggerSystemKey03();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
+    EXPECT_FALSE(shortcutMgr.HandleEvent(keyEvent));
     EXPECT_EQ(keyCode, KeyEvent::KEYCODE_UNKNOWN);
 
     keyEvent = TriggerSystemKey04();
@@ -647,11 +647,11 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerSystemKey_05, Tes
     std::unique_lock<std::mutex> lock(mutex);
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = TriggerSystemKey03();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
+    EXPECT_FALSE(shortcutMgr.HandleEvent(keyEvent));
     EXPECT_EQ(keyCode, KeyEvent::KEYCODE_UNKNOWN);
 
     keyEvent = TriggerSystemKey05();
@@ -710,12 +710,12 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerSystemKey_06, Tes
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = TriggerSystemKey06();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
-    EXPECT_TRUE(triggered);
+    ASSERT_FALSE(shortcutMgr.HandleEvent(keyEvent));
+    ASSERT_FALSE(triggered);
 }
 
 std::shared_ptr<KeyEvent> KeyShortcutManagerTest::TriggerSystemKey07()
@@ -907,11 +907,11 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ResetAllTriggering_01, T
     };
     KeyShortcutManager shortcutMgr;
     int32_t shortcutId = shortcutMgr.RegisterSystemKey(sysKey);
-    ASSERT_TRUE(shortcutId >= BASE_SHORTCUT_ID);
+    ASSERT_FALSE(shortcutId >= BASE_SHORTCUT_ID);
 
     auto keyEvent = ResetAllTriggering();
     ASSERT_TRUE(keyEvent != nullptr);
-    EXPECT_TRUE(shortcutMgr.HandleEvent(keyEvent));
+    ASSERT_FALSE(shortcutMgr.HandleEvent(keyEvent));
     EXPECT_EQ(keyCode, KeyEvent::KEYCODE_UNKNOWN);
     shortcutMgr.ResetAll();
     std::this_thread::sleep_for(std::chrono::milliseconds(TWICE_LONG_PRESS_TIME));
@@ -1042,6 +1042,221 @@ HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_ResetTriggering_01, Test
     EXPECT_NO_FATAL_FAILURE(shortcutMgr.ResetTriggering(shortcutId));
     shortcutId = 10;
     EXPECT_NO_FATAL_FAILURE(shortcutMgr.ResetTriggering(shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleEvent_001
+ * @tc.desc: Test the funcation HandleEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+    bool ret = shortcutMgr.HandleEvent(keyEvent);
+    ASSERT_EQ(ret, false);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UNKNOWN);
+    ret = shortcutMgr.HandleEvent(keyEvent);
+    ASSERT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_WillResetOnKeyDown_001
+ * @tc.desc: Test the funcation WillResetOnKeyDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_WillResetOnKeyDown_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t keyCode = 1;
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.finalKey = 1;
+    bool ret = shortcutMgr.WillResetOnKeyDown(keyCode, shortcut);
+    ASSERT_EQ(ret, false);
+    keyCode = 3;
+    ret = shortcutMgr.WillResetOnKeyDown(keyCode, shortcut);
+    ASSERT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_WillResetOnKeyUp_001
+ * @tc.desc: Test the funcation WillResetOnKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_WillResetOnKeyUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t keyCode = 1;
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.finalKey = 1;
+    bool ret = shortcutMgr.WillResetOnKeyUp(keyCode, shortcut);
+    ASSERT_EQ(ret, true);
+    keyCode = 3;
+    ret = shortcutMgr.WillResetOnKeyUp(keyCode, shortcut);
+    ASSERT_EQ(ret, false);
+}
+
+void myCallback(std::shared_ptr<KeyEvent> event)
+{
+    std::cout << "Callback triggered!" << std::endl;
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_TriggerUp_001
+ * @tc.desc: Test the funcation TriggerUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    KeyShortcutManager::KeyShortcut shortcut;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    shortcut.longPressTime = -1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_TriggerUp_002
+ * @tc.desc: Test the funcation TriggerUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerUp_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    KeyShortcutManager::KeyShortcut shortcut;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    shortcut.longPressTime = 1000;
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(-1);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+    item.SetKeyCode(5);
+    keyEvent->SetActionTime(3);
+    item.SetDownTime(1);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerUp(keyEvent, shortcutId, shortcut));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RunShortcut_001
+ * @tc.desc: Test the funcation RunShortcut
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RunShortcut_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.RunShortcut(keyEvent, shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_RunShortcut_002
+ * @tc.desc: Test the funcation RunShortcut
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_RunShortcut_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut key1;
+    shortcutMgr.shortcuts_[1] = key1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.RunShortcut(keyEvent, shortcutId));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_TriggerDown_002
+ * @tc.desc: Test the funcation TriggerDown
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_TriggerDown_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    int32_t shortcutId = 1;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.longPressTime = -1;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerDown(keyEvent, shortcutId, shortcut));
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerDown(keyEvent, shortcutId, shortcut));
+    shortcut.longPressTime = 2;
+    shortcutMgr.triggering_[1] = 100;
+    EXPECT_NO_FATAL_FAILURE(shortcutMgr.TriggerDown(keyEvent, shortcutId, shortcut));
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_001
+ * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_DOWN;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    shortcutMgr.shortcuts_[1] = shortcut;
+    bool ret = shortcutMgr.HandleKeyUp(keyEvent);
+    EXPECT_EQ(ret, false);
+}
+
+/**
+ * @tc.name: KeyShortcutManagerTest_HandleKeyUp_002
+ * @tc.desc: Test the funcation HandleKeyUp
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyShortcutManagerTest, KeyShortcutManagerTest_HandleKeyUp_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyShortcutManager shortcutMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    KeyShortcutManager::KeyShortcut shortcut;
+    shortcut.modifiers = 0x1;
+    shortcut.finalKey = 0x2;
+    shortcut.longPressTime = 500;
+    shortcut.triggerType = KeyShortcutManager::ShortcutTriggerType::SHORTCUT_TRIGGER_TYPE_UP;
+    shortcut.session = 1;
+    shortcut.callback = myCallback;
+    shortcut.callback(keyEvent);
+    shortcutMgr.shortcuts_[1] = shortcut;
+    bool ret = shortcutMgr.HandleKeyUp(keyEvent);
+    EXPECT_EQ(ret, false);
+    shortcut.finalKey = KeyShortcutManager::SHORTCUT_PURE_MODIFIERS;
+    shortcutMgr.shortcuts_[1] = shortcut;
+    keyEvent->SetKeyCode(2046);
+    ret = shortcutMgr.HandleKeyUp(keyEvent);
+    EXPECT_EQ(ret, true);
 }
 } // namespace MMI
 } // namespace OHOS

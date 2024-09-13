@@ -214,7 +214,7 @@ void InputDeviceMgr::DispDeviceInfo(std::shared_ptr<IDevice> device)
 {
     CHKPV(device);
     FI_HILOGI("  device %{public}d:%{public}s", device->GetId(), device->GetDevPath().c_str());
-    FI_HILOGI("  sysPath:       \"%{public}s\"", device->GetSysPath().c_str());
+    FI_HILOGI("  sysPath:       \"%{private}s\"", device->GetSysPath().c_str());
     FI_HILOGI("  bus:           %{public}04x", device->GetBus());
     FI_HILOGI("  vendor:        %{public}04x", device->GetVendor());
     FI_HILOGI("  product:       %{public}04x", device->GetProduct());
@@ -245,7 +245,7 @@ int32_t InputDeviceMgr::SerializeDevice(std::shared_ptr<IDevice> device, NetPack
     CALL_INFO_TRACE;
     packet << device->GetId() << device->GetDevPath() << device->GetSysPath() << device->GetBus() <<
     device->GetVendor() << device->GetProduct() << device->GetVersion() << device->GetName() <<
-    device->GetPhys() << device->GetUniq() << device->IsPointerDevice()  << device->IsKeyboard() <<
+    device->GetPhys() << device->GetUniq() << device->IsPointerDevice() << device->IsKeyboard() <<
     static_cast<int32_t> (device->GetKeyboardType());
     if (packet.ChkRWError()) {
         FI_HILOGE("Write packet failed");

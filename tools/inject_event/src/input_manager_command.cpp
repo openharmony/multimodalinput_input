@@ -703,7 +703,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 int64_t time = GetSysClockTime();
+                int32_t count = 0;
+                bool inputText = false;
                 while ((c = getopt_long(argc, argv, "d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
+                    // Prompt when combining other commands after using the text command. Ex: "uinput -d 2017 -t text"
+                    if (inputText) {
+                        std::cout << "The text command cannot be used with other commands." << std::endl;
+                        return RET_ERR;
+                    }
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -938,10 +945,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             break;
                         }
                         case 't': {
-                            int32_t ret = ProcessKeyboardTextInput(argc, argv);
+                            int32_t ret = ProcessKeyboardTextInput(optarg, count);
                             if (ret != ERR_OK) {
                                 return ret;
                             }
+                            inputText = true;
                             break;
                         }
                         default: {
@@ -951,6 +959,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
+                    count++;
                 }
                 for (size_t i = 0; i < downKey.size(); i++) {
                     std::cout << "you have a key " << downKey[i] << " not release" << std::endl;
@@ -1046,7 +1055,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                             std::cout << "invalid coordinate value" << std::endl;
                                             return EVENT_REG_FAIL;
                                     }
-                                    if ((startX < 0) || (startX < 0) || (endX < 0) || (endY < 0)) {
+                                    if ((startX < 0) || (startY < 0) || (endX < 0) || (endY < 0)) {
                                         std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                         return RET_ERR;
                                     }
@@ -1099,6 +1108,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 PointerEvent::PointerItem item;
                                 item.SetDisplayX(fingerList[i].startX);
                                 item.SetDisplayY(fingerList[i].startY);
+                                item.SetRawDisplayX(fingerList[i].startX);
+                                item.SetRawDisplayY(fingerList[i].startY);
                                 item.SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
                                 pointerEvent->AddPointerItem(item);
                                 pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
@@ -1136,6 +1147,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         fingerList[i].startX, fingerList[i].endX));
                                     item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
                                         fingerList[i].startY, fingerList[i].endY));
+                                    item.SetRawDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
+                                        fingerList[i].startX, fingerList[i].endX));
+                                    item.SetRawDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
+                                        fingerList[i].startY, fingerList[i].endY));
                                     pointerEvent->UpdatePointerItem(pointerId, item);
                                     pointerEvent->SetPointerId(pointerId);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1157,6 +1172,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                                 item.SetDisplayX(fingerList[i].endX);
                                 item.SetDisplayY(fingerList[i].endY);
+                                item.SetRawDisplayX(fingerList[i].endX);
+                                item.SetRawDisplayY(fingerList[i].endY);
                                 pointerEvent->UpdatePointerItem(pointerId, item);
                                 pointerEvent->SetPointerId(pointerId);
                                 pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1181,6 +1198,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         }
                                         item.SetDisplayX(fingerList[i].endX);
                                         item.SetDisplayY(fingerList[i].endY);
+                                        item.SetRawDisplayX(fingerList[i].endX);
+                                        item.SetRawDisplayY(fingerList[i].endY);
                                         pointerEvent->UpdatePointerItem(pointerId, item);
                                         pointerEvent->SetPointerId(pointerId);
                                         pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
@@ -1228,8 +1247,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
+                            item.SetRawDisplayY(py1);
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->AddPointerItem(item);
@@ -1256,8 +1277,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
                             item.SetDisplayY(py1);
+                            item.SetRawDisplayY(py1);
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -1305,6 +1328,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayX(px1);
                             item.SetDisplayY(py1);
+                            item.SetRawDisplayX(px1);
+                            item.SetRawDisplayY(py1);
                             item.SetPressed(true);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->AddPointerItem(item);
@@ -1316,6 +1341,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPressed(false);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayY(py1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1394,6 +1421,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
+                            item.SetRawDisplayY(py1);
+                            item.SetRawDisplayX(px1);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1417,6 +1446,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 if (currentTimeMs > downTimeMs) {
                                     item.SetDisplayX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
                                     item.SetDisplayY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
+                                    item.SetRawDisplayX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
+                                    item.SetRawDisplayY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
                                     pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                                     pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1427,6 +1458,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             }
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
+                            item.SetRawDisplayX(px2);
+                            item.SetRawDisplayY(py2);
                             pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1722,12 +1755,15 @@ int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPress
     return RET_OK;
 }
 
-int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[])
+int32_t InputManagerCommand::ProcessKeyboardTextInput(char *optarg, int32_t count)
 {
-    constexpr int32_t argcMin = 4; // 4: min number of command parameters
+    if (count != 0) { // Prompt when combining the text command after using other commands. Ex: "uinput -t text -t text"
+        std::cout << "The text command cannot be used with other commands." << std::endl;
+        return RET_ERR;
+    }
     constexpr int32_t textMaxLen = 2000; // 2000: max number of ascii characters
 
-    int32_t len = strlen(argv[argcMin -1]);
+    int32_t len = strlen(optarg);
     if (len <= 0) {
         std::cout << "The input is empty." << std::endl;
         return RET_ERR;
@@ -1738,11 +1774,11 @@ int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[]
         len = textMaxLen;
     }
 
-    char textChar = argv[argcMin - 1][0];
+    char textChar = optarg[0];
     bool isPressShift = false;
     int32_t keyCode = -1;
     for (int32_t i = 0; i < len; ++i) {
-        textChar = argv[argcMin - 1][i];
+        textChar = optarg[i];
         if ((textChar >= '0') && (textChar <= '9')) {
             isPressShift = false;
             keyCode = textChar - '0' + KeyEvent::KEYCODE_0;
@@ -1753,7 +1789,7 @@ int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[]
             isPressShift = true;
             keyCode = textChar - 'A' + KeyEvent::KEYCODE_A;
         } else if (!IsSpecialChar(textChar, keyCode, isPressShift)) {
-            std::cout << "The "<< i << "th character is an illegal character." << std::endl;
+            std::cout << "The character of index  "<< i << " is invalid." << std::endl;
             return RET_ERR;
         }
 
@@ -1908,6 +1944,8 @@ int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item.SetDisplayX(downX);
     item.SetDisplayY(downY);
+    item.SetRawDisplayX(downX);
+    item.SetRawDisplayY(downY);
     item.SetPressed(true);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -1918,6 +1956,8 @@ int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetPressed(false);
     item.SetDisplayY(downY);
     item.SetDisplayX(downX);
+    item.SetRawDisplayY(downY);
+    item.SetRawDisplayX(downX);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->UpdatePointerItem(0, item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1935,6 +1975,8 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item.SetDisplayX(downX);
     item.SetDisplayY(downY);
+    item.SetRawDisplayX(downX);
+    item.SetRawDisplayY(downY);
     item.SetPressed(true);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
@@ -1943,6 +1985,8 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item2.SetDisplayX(downX);
     item2.SetDisplayY(downY);
+    item2.SetRawDisplayX(downX);
+    item2.SetRawDisplayY(downY);
     item2.SetPressed(true);
     pointerEvent->SetPointerId(1);
     pointerEvent->AddPointerItem(item2);
@@ -1953,10 +1997,14 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     item.SetPressed(false);
     item.SetDisplayY(downY);
     item.SetDisplayX(downX);
+    item.SetRawDisplayY(downY);
+    item.SetRawDisplayX(downX);
     item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     item2.SetPressed(false);
     item2.SetDisplayY(downY);
     item2.SetDisplayX(downX);
+    item2.SetRawDisplayY(downY);
+    item2.SetRawDisplayX(downX);
     item2.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
     pointerEvent->UpdatePointerItem(0, item);
     pointerEvent->UpdatePointerItem(1, item2);
@@ -2302,7 +2350,8 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-t <text>                  --text <text>      -input text content" << std::endl;
+    std::cout << "-t <text>                  --text <text>      -input text content. ";
+    std::cout << "The text command cannot be used with other commands." << std::endl;
 }
 
 void InputManagerCommand::PrintStylusUsage()
@@ -2332,9 +2381,11 @@ void InputManagerCommand::PrintTouchUsage()
     std::cout << std::endl;
     std::cout << "                                                             ms, default value is 0; smooth time:";
     std::cout << std::endl;
-    std::cout << "                                                             move time, default value is 1000 ms";
+    std::cout << "                                                             move time, default value is 1000 ms,";
     std::cout << std::endl;
-    std::cout << "   Support for multiple finger movements at the same time, for example:" << std::endl;
+    std::cout << "                                                             the max value is 15000 ms";
+    std::cout << std::endl;
+    std::cout << "   Supports up to three finger movement at the same time, for example:" << std::endl;
     std::cout << "   uinput -T -m 300 900 600 900 900 900 600 900, (300, 900) move to (600, 900), (900, 900) move to";
     std::cout << std::endl;
     std::cout << "   (600, 900)" << std::endl;

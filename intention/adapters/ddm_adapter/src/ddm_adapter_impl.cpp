@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Msdp {
 namespace DeviceStatus {
 
-#define D_DEV_MGR   DistributedHardware::DeviceManager::GetInstance()
+#define D_DEV_MGR DistributedHardware::DeviceManager::GetInstance()
 constexpr size_t MAX_ONLINE_DEVICE_SIZE = 10000;
 
 DDMAdapterImpl::~DDMAdapterImpl()

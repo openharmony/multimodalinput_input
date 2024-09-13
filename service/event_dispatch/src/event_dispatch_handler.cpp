@@ -19,7 +19,6 @@
 
 #include <linux/input-event-codes.h>
 
-#include "hitrace_meter.h"
 #include "transaction/rs_interfaces.h"
 
 #include "anr_manager.h"
@@ -196,7 +195,8 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     }
     if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
-        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) {
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL ||
+        point->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT) {
         WIN_MGR->ClearTargetWindowId(pointerId);
     }
 }
@@ -262,7 +262,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     auto udsServer = InputHandler->GetUDSServer();
     auto fd = WIN_MGR->GetClientFd(point);
     auto pid = WIN_MGR->GetPidByWindowId(point->GetTargetWindowId());
-    if (udsServer->GetSession(fd) == nullptr && pid != -1 && point->GetTargetWindowId() != -1) {
+    if (WIN_MGR->GetCancelEventFlag(point) && udsServer->GetSession(fd) == nullptr &&
+        pid != -1 && point->GetTargetWindowId() != -1) {
         if (point->GetTargetWindowId() == windowStateErrorInfo_.windowId && pid == windowStateErrorInfo_.pid) {
             if (GetSysClockTime() - windowStateErrorInfo_.startTime >= ERROR_TIME) {
                 SendWindowStateError(pid, point->GetTargetWindowId());

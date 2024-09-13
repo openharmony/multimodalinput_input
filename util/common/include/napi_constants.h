@@ -61,9 +61,13 @@ inline constexpr std::string_view SET_ELEMENT = "napi_set_element";
 inline constexpr std::string_view CREATE_STRING_UTF8 = "napi_create_string_utf8";
 inline const std::string CHANGED_TYPE = "change";
 inline const std::string SUBSCRIBE_TYPE = "key";
+inline const std::string HOTKEY_SUBSCRIBE_TYPE = "hotkeyChange";
 inline constexpr std::string_view DELETE_ASYNC_WORK = "napi_delete_async_work";
 inline constexpr std::string_view COERCE_TO_BOOL = "napi_coerce_to_bool";
 inline constexpr std::string_view CREATE_ERROR = "napi_create_error";
+inline const std::string TOUCH_SWIPE_GESTURE = "touchSwipeGesture";
+inline const std::string TOUCH_PINCH_GESTURE = "touchPinchGesture";
+inline const std::string TOUCH_ALL_GESTURE = "touchAllGesture";
 
 inline constexpr size_t MAX_STRING_LEN { 1024 };
 

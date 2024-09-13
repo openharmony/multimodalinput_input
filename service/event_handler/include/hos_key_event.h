@@ -1111,7 +1111,7 @@ enum HosKeyEventEnum {
     HOS_KEY_NUMPAD_RIGHT_PAREN = 2122,
 
     /**
-     * Key code:  The virtual multitask key
+     * Key code: The virtual multitask key
      *
      * @since 1
      */

@@ -537,8 +537,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_004,
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
-
     libinput_event_tablet_tool event {};
     Direction direction;
     direction = DIRECTION90;
@@ -562,8 +560,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_005,
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
-
     libinput_event_tablet_tool event {};
     Direction direction;
     direction = DIRECTION270;
@@ -587,8 +583,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_TransformTipPoint_006,
     std::shared_ptr<InputWindowsManager> inputWindowsManager =
         std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
     ASSERT_NE(inputWindowsManager, nullptr);
-    auto displayInfo = inputWindowsManager->FindPhysicalDisplayInfo("default0");
-
     libinput_event_tablet_tool event {};
     Direction direction;
     direction = DIRECTION0;
@@ -2526,7 +2520,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_001, 
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
-    inputWindowsManager->firstBtnDownWindowId_ = -1;
+    inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.targetWindowId_ = 2;
     inputWindowsManager->extraData_.appended = true;
@@ -2576,7 +2570,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, 
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     EXPECT_NE(pointerEvent, nullptr);
     pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
-    inputWindowsManager->firstBtnDownWindowId_ = -1;
+    inputWindowsManager->firstBtnDownWindowInfo_.first = -1;
     PointerEvent::PointerItem pointerItem;
     pointerItem.targetWindowId_ = 2;
     inputWindowsManager->extraData_.appended = false;
@@ -2596,7 +2590,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SelectWindowInfo_002, 
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->SelectWindowInfo(logicalX, logicalY, pointerEvent));
-    inputWindowsManager->firstBtnDownWindowId_ = 1;
+    inputWindowsManager->firstBtnDownWindowInfo_.first = 1;
     pointerEvent->pressedButtons_.insert(2);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     inputWindowsManager->extraData_.appended = false;
@@ -3102,6 +3096,62 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_009
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
     inputWindowsManager.displayGroupInfo_.windowsInfo.push_back(winInfo);
     EXPECT_FALSE(inputWindowsManager.IsNeedRefreshLayer(windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    displayInfo.direction = DIRECTION90;
+    inputWindowsManager->cursorPos_.displayId = 100;
+    inputWindowsManager->cursorPos_.direction = DIRECTION0;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_001
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(false));
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    DisplayInfo displayInfo;
+    displayInfo.id = 100;
+    displayInfo.direction = DIRECTION90;
+    inputWindowsManager->cursorPos_.displayId = 100;
+    inputWindowsManager->cursorPos_.direction = DIRECTION90;
+    inputWindowsManager->displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->AdjustDisplayRotation());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AdjustDisplayRotation_002
+ * @tc.desc: Test the funcation AdjustDisplayRotation
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_AdjustDisplayRotation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_CALL(*messageParcelMock_, IsWindowRotation()).WillRepeatedly(Return(true));
+    InputWindowsManager inputWindowsManager;
+    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.AdjustDisplayRotation());
 }
 } // namespace MMI
 } // namespace OHOS

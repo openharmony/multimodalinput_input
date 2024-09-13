@@ -39,6 +39,8 @@
 
 namespace OHOS {
 namespace MMI {
+inline constexpr int32_t DEFUALT_COOPERATE_PRIORITY { 10 };
+
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
@@ -102,7 +104,9 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void InitPointerCallback() override;
     void InitPointerObserver() override;
     void OnSessionLost(int32_t pid) override;
@@ -156,9 +160,12 @@ private:
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     void ForceClearPointerVisiableStatus() override;
     void UpdateSurfaceNodeBounds(int32_t physicalX, int32_t physicalY);
+    void DeletPidInfo(int32_t pid);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     void UpdateBindDisplayId(int32_t displayId);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
@@ -166,6 +173,7 @@ private:
 private:
     struct PidInfo {
         int32_t pid { 0 };
+        int32_t priority { 0 };
         bool visible { false };
     };
     bool hasDisplay_ { false };
@@ -202,7 +210,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     std::shared_ptr<DelegateInterface> delegateProxy_ { nullptr };
     int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
 };

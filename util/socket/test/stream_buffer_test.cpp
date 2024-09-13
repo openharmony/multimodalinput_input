@@ -86,7 +86,7 @@ HWTEST_F(StreamBufferTest, read_Type1_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(StreamBufferTest,  read_Type2_001, TestSize.Level1)
+HWTEST_F(StreamBufferTest, read_Type2_001, TestSize.Level1)
 {
     std::string buf = "";
 
@@ -118,7 +118,7 @@ HWTEST_F(StreamBufferTest, read_Type2_002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(StreamBufferTest,  read_Type3_001, TestSize.Level1)
+HWTEST_F(StreamBufferTest, read_Type3_001, TestSize.Level1)
 {
     StreamBuffer buf;
 

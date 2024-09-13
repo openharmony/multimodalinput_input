@@ -24,6 +24,7 @@
 #include "authorize_helper.h"
 #include "bytrace_adapter.h"
 #include "client_death_handler.h"
+#include "display_event_monitor.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -58,6 +59,8 @@ constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
 [[ maybe_unused ]] constexpr int32_t DEFAULT_POINTER_ID { 10000 };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
+const std::string PRODUCT_TYPE_PC = "2in1";
 [[ maybe_unused ]] constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t COMMON_PERMISSION_CHECK_ERROR { 201 };
 } // namespace
@@ -116,6 +119,15 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (isNativeInject) {
+        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+            MMI_HILOGW("Current device has no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            MMI_HILOGW("Screen locked, no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -128,11 +140,10 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
             LaunchAbility();
-            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-                [&] (int32_t pid) {
-                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-                }
-                );
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -194,6 +205,15 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (isNativeInject) {
+        if (PRODUCT_TYPE != PRODUCT_TYPE_PC) {
+            MMI_HILOGW("Current device has no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
+        bool screenLocked = DISPLAY_MONITOR->GetScreenLocked();
+        if (screenLocked) {
+            MMI_HILOGW("Screen locked, no permission");
+            return COMMON_PERMISSION_CHECK_ERROR;
+        }
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
             auto state = AUTHORIZE_HELPER->GetAuthorizeState();
@@ -206,6 +226,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             InjectionType_ = InjectionType::POINTEREVENT;
             pointerEvent_ = pointerEvent;
             LaunchAbility();
+            AuthorizeExitCallback fnCallback = [&] (int32_t pid) {
+                MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+            };
+            AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, fnCallback);
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -214,6 +238,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         }
     }
     return OnInjectPointerEventExt(pointerEvent, isShell);
+}
+
+bool ServerMsgHandler::IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    return pointerEvent->GetZOrder() > 0;
 }
 
 int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
@@ -225,14 +254,17 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    bool isStoreWindowId = true;
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+            isStoreWindowId = pointerEvent->GetTargetWindowId() <= 0;
             if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), isShell)) {
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY) &&
+                !IsNavigationWindowInjectEvent(pointerEvent)) {
                 TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
             }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -269,7 +301,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             break;
         }
     }
-    return SaveTargetWindowId(pointerEvent, isShell);
+    return SaveTargetWindowId(pointerEvent, isShell, isStoreWindowId);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -279,8 +311,9 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
         (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) ||
         ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) &&
-         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE))) {
-        return RET_OK;
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) &&
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_DOWN))) {
+            return RET_OK;
     }
     PointerEvent::PointerItem pointerItem {};
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
@@ -366,9 +399,13 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
-int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell,
+    bool isStoreWindowId)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!isStoreWindowId) {
+        return RET_OK;
+    }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -410,6 +447,9 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
+    }
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        return true;
     }
     if (isShell) {
         auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
@@ -454,7 +494,8 @@ int32_t ServerMsgHandler::OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& in
             >> extensionInfo.defaultHotAreas >> extensionInfo.pointerHotAreas >> extensionInfo.agentWindowId
             >> extensionInfo.flags >> extensionInfo.action >> extensionInfo.displayId >> extensionInfo.zOrder
             >> extensionInfo.pointerChangeAreas >> extensionInfo.transform >> extensionInfo.windowInputType
-            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag;
+            >> extensionInfo.privacyMode >> extensionInfo.windowType >> extensionInfo.privacyUIFlag
+            >> extensionInfo.rectChangeBySystem;
         info.uiExtentionWindowInfo.push_back(extensionInfo);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read extention window info failed");
@@ -486,6 +527,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.windowInputType >> info.privacyMode >> info.windowType >> byteCount;
 
         OnUiExtentionWindowInfo(pkt, info);
+        pkt >> info.rectChangeBySystem;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -549,6 +591,7 @@ int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
             >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform
             >> info.windowInputType >> info.privacyMode >> info.windowType;
         OnUiExtentionWindowInfo(pkt, info);
+        pkt >> info.rectChangeBySystem;
         windowGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -642,6 +685,33 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+
+int32_t ServerMsgHandler::OnAddGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        return monitorHandler->AddInputHandler(handlerType, eventType, sess, gestureType, fingers);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveGestureMonitor(SessionPtr sess, InputHandlerType handlerType,
+    HandleEventType eventType, TouchGestureType gestureType, int32_t fingers)
+{
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (handlerType == InputHandlerType::MONITOR) {
+        CHKPR(sess, ERROR_NULL_POINTER);
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        monitorHandler->RemoveInputHandler(handlerType, eventType, sess, gestureType, fingers);
+    }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+    return RET_OK;
+}
 
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)

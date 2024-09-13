@@ -2008,6 +2008,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 /**
  * @tc.name: InputWindowsManagerTest_SetPixelMap
  * @tc.desc: Test SetPixelMap
@@ -2021,6 +2022,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPixelMap, TestSiz
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
     ASSERT_NO_FATAL_FAILURE(manager.SetPixelMap(pixelMap));
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 /**
  * @tc.name: PointerDrawingManagerTest_SwitchPointerStyle
