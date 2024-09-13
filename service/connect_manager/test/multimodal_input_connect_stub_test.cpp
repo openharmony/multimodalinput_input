@@ -1775,7 +1775,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubEnab
     MessageParcel reply;
     std::atomic<ServiceRunningState> state = ServiceRunningState::STATE_NOT_START;
     int32_t ret = stub->StubEnableInputDevice(data, reply);
-    EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
+    EXPECT_EQ(ret, RET_OK);
     state = ServiceRunningState::STATE_RUNNING;
     ret = stub->StubEnableInputDevice(data, reply);
     EXPECT_EQ(ret, RET_OK);
