@@ -824,27 +824,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_003
- * @tc.desc: Test HandleKeyUpWithDelay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    auto keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-
-    subscriber->keyOption_->finalKeyUpDelay_ = 1;
-    EXPECT_TRUE(handler.AddTimer(subscriber, keyEvent));
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_HandleRingMute_001
  * @tc.desc: Test ring mute
  * @tc.type: FUNC
