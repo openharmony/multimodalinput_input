@@ -85,8 +85,7 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
         return;
     }
     int32_t action = event->GetPointerAction();
-    if (action == PointerEvent::POINTER_ACTION_DOWN ||
-        action == PointerEvent::POINTER_ACTION_UP) {
+    if (!gestureStarted_ && action == PointerEvent::POINTER_ACTION_DOWN) {
         hasCancel_ = false;
     }
     shouldDeliverToNext_ = true;
@@ -99,9 +98,7 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
     } else if (gestureType_ == TOUCH_GESTURE_TYPE_PINCH) {
         OnPinchGesture(event);
     }
-
-    if (!hasCancel_ && state_ != GestureState::IDLE &&
-        action != PointerEvent::POINTER_ACTION_UP) {
+    if (gestureStarted_ && !hasCancel_ && state_ != GestureState::IDLE) {
         hasCancel_ = true;
         OnGestureSuccessful(event);
     }
@@ -112,8 +109,8 @@ void TouchGestureAdapter::OnTouchEvent(std::shared_ptr<PointerEvent> event)
 
 void TouchGestureAdapter::OnGestureSuccessful(std::shared_ptr<PointerEvent> event)
 {
-    CALL_INFO_TRACE;
     CHKPV(event);
+    MMI_HILOGI("type:%{public}d,state:%{public}d", gestureType_, state_);
     auto items = event->GetAllPointerItems();
     for (const auto &item : items) {
         if (!item.IsPressed()) {

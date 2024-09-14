@@ -17,6 +17,7 @@
 #define TOUCH_GESTURE_DETECTOR_H
 
 #include <map>
+#include <vector>
 
 #include "pointer_event.h"
 
@@ -82,6 +83,7 @@ private:
     void HandlePinchMoveEvent(std::shared_ptr<PointerEvent> event);
     GestureMode JudgeOperationMode(std::map<int32_t, Point> &movePoint);
     bool AntiJitter(std::shared_ptr<PointerEvent> event, GestureMode mode);
+    std::vector<std::pair<int32_t, Point>> SortPoints(std::map<int32_t, Point> &points);
 
     bool HandleFingerDown();
     int64_t GetMaxDownInterval();
@@ -104,6 +106,7 @@ private:
     int32_t continuousCloseCount_ { 0 };
     int32_t continuousOpenCount_ { 0 };
     std::map<int32_t, Point> downPoint_;
+    std::map<int32_t, Point> movePoint_;
     std::map<int32_t, double> lastDistance_;
     std::shared_ptr<GestureListener> listener_ { nullptr };
 };

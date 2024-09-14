@@ -239,7 +239,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubAddGestureMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_GESTURE_MONITOR):
-            ret = StubRemoveInputHandler(data, reply);
+            ret = StubRemoveGestureMonitor(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED):
             ret = StubMarkEventConsumed(data, reply);
