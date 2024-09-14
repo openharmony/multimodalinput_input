@@ -380,20 +380,12 @@ double TouchGestureDetector::CalcTwoPointsDistance(const Point &p1, const Point 
     return sqrt(fabs((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)));
 }
 
-Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
+std::vector<std::pair<int32_t, Point>> TouchGestureDetector::SortPoints(std::map<int32_t, Point> &points)
 {
-    double xSum = 0.0;
-    double ySum = 0.0;
-    double area = 0.0;
-    int32_t count = static_cast<int32_t>(points.size());
-    if (count <= FOUR_FINGER_COUNT || count > MAX_FINGERS_COUNT) {
-        return Point(static_cast<float>(xSum), static_cast<float>(ySum));
+    if (points.empty()) {
+        MMI_HILOGW("Points are empty");
+        return {};
     }
-    double **vertices = new (std::nothrow) double *[count];
-    if (vertices == nullptr) {
-        return Point(static_cast<float>(xSum), static_cast<float>(ySum));
-    }
-    int32_t i = 0;
     std::vector<std::pair<int32_t, Point>> sequence(points.begin(), points.end());
     std::sort(sequence.begin(), sequence.end(),
         [](std::pair<int32_t, Point> right, std::pair<int32_t, Point> left) {
@@ -406,8 +398,31 @@ Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
     std::pair<int32_t, Point> temp = *iter;
     sequence.erase(iter);
     sequence.push_back(temp);
+    return sequence;
+}
+
+Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
+{
+    double xSum = 0.0;
+    double ySum = 0.0;
+    double area = 0.0;
+    const int32_t arrCount = 2;
+    int32_t count = static_cast<int32_t>(points.size());
+    if (count < FOUR_FINGER_COUNT || count > MAX_FINGERS_COUNT) {
+        return Point(static_cast<float>(xSum), static_cast<float>(ySum));
+    }
+    double **vertices = new (std::nothrow) double *[count];
+    if (vertices == nullptr) {
+        return Point(static_cast<float>(xSum), static_cast<float>(ySum));
+    }
+    int32_t i = 0;
+    std::vector<std::pair<int32_t, Point>> sequence = SortPoints(points);
+    if (sequence.empty()) {
+        MMI_HILOGW("Points sorting failed");
+        goto end;
+    }
     for (const auto &pointData : sequence) {
-        vertices[i] = new (std::nothrow) double[2];
+        vertices[i] = new (std::nothrow) double[arrCount];
         if (vertices[i] == nullptr) {
             goto end;
         }
@@ -416,7 +431,6 @@ Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
         vertices[i][1] = value.y;
         ++i;
     }
-
     for (int32_t j = 0; j < count; ++j) {
         double *current = vertices[j];
         double *next = vertices[(j + 1) % count];
@@ -425,13 +439,13 @@ Point TouchGestureDetector::CalcGravityCenter(std::map<int32_t, Point> &points)
         xSum += (current[0] + next[0]) * crossProduct;
         ySum += (current[1] + next[1]) * crossProduct;
     }
-    area /= 2;
+    area /= arrCount;
     xSum /= count * area;
     ySum /= count * area;
 end:
-    for (int32_t i = 0; i < count; ++i) {
-        if (vertices[i] != nullptr) {
-            delete[] vertices[i];
+    for (int32_t n = 0; n < count; ++n) {
+        if (vertices[n] != nullptr) {
+            delete[] vertices[n];
         }
     }
     delete[] vertices;
