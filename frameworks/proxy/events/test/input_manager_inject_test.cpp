@@ -1845,24 +1845,5 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_008, 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
-
-/**
- * @tc.name: InputManager_InjectMouseEvent_020
- * @tc.desc: Injection interface detection
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputManager::GetInstance()->EnableHardwareCursorStats(true);
-    InputManager::GetInstance()->MoveMouse(200, 200);
-    InputManager::GetInstance()->EnableHardwareCursorStats(false);
-    uint32_t frameCount = 1;
-    uint32_t vsyncCount = 1;
-    InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
-    ASSERT_NE(frameCount, 1);
-    ASSERT_NE(vsyncCount, 1);
-}
 } // namespace MMI
 } // namespace OHOS

@@ -55,14 +55,13 @@ private:
         void OnStop(Context &context, const CooperateEvent &event);
         void OnAppClosed(Context &context, const CooperateEvent &event);
         void OnRemoteStart(Context &context, const CooperateEvent &event);
-        void OnPointerEvent(Context &context, const CooperateEvent &event);
 
         CooperateFree &parent_;
     };
 
-    void SetPointerVisible(Context &context);
+    bool HasLocalPointerDevice() const;
+    bool HasLocalKeyboardDevice() const;
     void UnchainConnections(Context &context, const StopCooperateEvent &event) const;
-    void OnSetCooperatePriv(uint32_t priv);
 
     IContext *env_ { nullptr };
     std::shared_ptr<Initial> initial_ { nullptr };
