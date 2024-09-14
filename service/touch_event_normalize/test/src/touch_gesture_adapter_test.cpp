@@ -321,7 +321,7 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_SetGestureEnable_002, 
     touchGestureAdapter->nextAdapter_ = nullptr;
     ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
     touchGestureAdapter->nextAdapter_ = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
-    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));   
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
 }
 
 /**
