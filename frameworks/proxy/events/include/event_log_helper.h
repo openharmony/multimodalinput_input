@@ -394,10 +394,12 @@ private:
                         item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(),
                         item.GetRawDx(), item.GetRawDy());
                 } else {
-                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%d, DY:%d, WX:%d, WY:%d, "
-                        "W:%{public}d, H:%{public}d, TX:%.2f, TY:%.2f, TDX:%d, TDY:%d, ToolWX:%d, ToolWY:%d, "
-                        "ToolW:%{public}d, ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, LA:%{public}d, "
-                        "SA:%{public}d, RawDx:%d, RawDy:%d",
+                    MMI_HILOG_HEADER(LOG_DEBUG, lh,
+                        "PI:%{public}d, DT:%{public}" PRId64 ", IP:%{public}d, DX:%{public}d, DY:%{public}d, "
+                        "WX:%{public}d, WY:%{public}d, W:%{public}d, H:%{public}d, TX:%{public}.2f, TY:%{public}.2f, "
+                        "TDX:%{public}d, TDY:%{public}d, ToolWX:%{public}d, ToolWY:%{public}d, ToolW:%{public}d, "
+                        "ToolH:%{public}d, P:%{public}.2f, ToolType:%{public}d, LA:%{public}d, SA:%{public}d, "
+                        "RawDx:%{public}d, RawDy:%{public}d",
                         pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                         item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
                         item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
