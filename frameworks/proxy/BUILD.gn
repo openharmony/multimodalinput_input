@@ -143,13 +143,11 @@ ohos_shared_library("libmmi-client") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "window_manager:libdm",
   ]
 }
 
@@ -329,10 +327,6 @@ ohos_unittest("InputManagerImplTest") {
     "${mmi_path}/frameworks/proxy/event_handler/include",
   ]
 
-  if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_path}/common/anco/comm/include" ]
-  }
-
   sources = [
     "${mmi_path}/common/anco/comm/src/anco_channel.cpp",
     "${mmi_path}/common/anco/comm/src/anco_channel_stub.cpp",
@@ -352,10 +346,6 @@ ohos_unittest("InputManagerImplTest") {
     "event_handler/src/switch_event_input_subscribe_manager.cpp",
     "event_handler/test/input_manager_impl_test.cpp",
   ]
-
-  if (input_ext_feature_anco) {
-    sources += [ "${mmi_ext_path}/anco_uds_manager/src/input_manager_ext.cpp" ]
-  }
 
   configs = [
     "${mmi_path}:coverage_flags",
