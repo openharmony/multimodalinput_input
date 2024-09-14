@@ -15,6 +15,7 @@
 
 #include "display_event_monitor.h"
 #include "delegate_interface.h"
+#include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "setting_datashare.h"
@@ -86,7 +87,7 @@ public:
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
                 IPointerDrawingManager::GetInstance()->InitPointerObserver();
-                std::shared_ptr<KeySubscriberHandler> keySubscriberHandler = std::make_shared<KeySubscriberHandler>();
+                auto keySubscriberHandler = InputHandler->GetSubscriberHandler();
                 CHKPV(keySubscriberHandler);
                 keySubscriberHandler->InitDataShareListener();
             }
