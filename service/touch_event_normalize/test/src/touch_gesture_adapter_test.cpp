@@ -293,5 +293,71 @@ HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnGestureEvent_001, Te
     ret = touchGestureAdapter->OnGestureEvent(event, mode);
     ASSERT_EQ(ret, false);
 }
+
+/**
+ * @tc.name: TouchGestureAdapterTest_SetGestureEnable_002
+ * @tc.desc: Test the funcation SetGestureEnable
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_SetGestureEnable_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureType adapterType = TOUCH_GESTURE_TYPE_ALL;
+    std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    adapterType = TOUCH_GESTURE_TYPE_SWIPE;
+    touchGestureAdapter->gestureType_ = TOUCH_GESTURE_TYPE_SWIPE;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    adapterType = TOUCH_GESTURE_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    std::shared_ptr<OHOS::MMI::TouchGestureDetector::GestureListener> listener = nullptr;
+    touchGestureAdapter->gestureDetector_ = std::make_shared<TouchGestureDetector>(adapterType, listener);
+    adapterType = TOUCH_GESTURE_TYPE_ALL;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    adapterType = TOUCH_GESTURE_TYPE_PINCH;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    touchGestureAdapter->nextAdapter_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));
+    touchGestureAdapter->nextAdapter_ = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->SetGestureCondition(true, adapterType, 0));   
+}
+
+/**
+ * @tc.name: TouchGestureAdapterTest_OnTouchEvent_003
+ * @tc.desc: Test the funcation OnTouchEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchGestureAdapterTest, TouchGestureAdapterTest_OnTouchEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchGestureType adapterType = 5;
+    std::shared_ptr<TouchGestureAdapter> nextAdapter = nullptr;
+    auto touchGestureAdapter = std::make_shared<TouchGestureAdapter>(adapterType, nextAdapter);
+    std::shared_ptr<PointerEvent> event = PointerEvent::Create();
+    std::shared_ptr<OHOS::MMI::TouchGestureDetector::GestureListener> listener = nullptr;
+    touchGestureAdapter->gestureDetector_ = std::make_shared<TouchGestureDetector>(adapterType, listener);
+    event->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    touchGestureAdapter->gestureType_ = 2;
+    touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::SWIPE;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::IDLE;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    touchGestureAdapter->gestureStarted_ = true;
+    touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::SWIPE;
+    touchGestureAdapter->hasCancel_ = true;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
+    touchGestureAdapter->state_ = TouchGestureAdapter::GestureState::IDLE;
+    event->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    touchGestureAdapter->hasCancel_ = true;
+    ASSERT_NO_FATAL_FAILURE(touchGestureAdapter->OnTouchEvent(event));
+}
 } // namespace MMI
 } // namespace OHOS
