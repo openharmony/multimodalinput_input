@@ -1295,6 +1295,18 @@ HandleEventType PointerEvent::GetHandlerEventType() const
     return handleEventType_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_ANCO
+void PointerEvent::SetAncoDeal(bool ancoDeal)
+{
+    ancoDeal_ = ancoDeal;
+}
+
+bool PointerEvent::GetAncoDeal() const
+{
+    return ancoDeal_;
+}
+#endif // OHOS_BUILD_ENABLE_ANCO
+
 std::string_view PointerEvent::ActionToShortStr(int32_t action)
 {
     // 该函数逻辑简单，功能单一，考虑性能影响，使用switch-case而不是表驱动实现。
