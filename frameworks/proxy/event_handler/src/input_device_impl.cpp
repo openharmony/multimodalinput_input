@@ -20,6 +20,7 @@
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "bytrace_adapter.h"
 #include "napi_constants.h"
 #include "net_packet.h"
 
@@ -111,12 +112,14 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
         return;
     }
     for (const auto &item : iter->second) {
-        MMI_HILOGD("Report device change task, event type:%{public}s", type.c_str());
         if (type == "add") {
             item->OnDeviceAdded(deviceId, type);
             continue;
         }
         item->OnDeviceRemoved(deviceId, type);
+        BytraceAdapter::StartDevListener(type, deviceId);
+        MMI_HILOGI("Report device change task, event type:%{public}s, eventid:%{public}d", type.c_str(), deviceId);
+        BytraceAdapter::StopDevListener();
     }
 }
 
