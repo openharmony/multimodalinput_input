@@ -817,6 +817,31 @@ void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &w
     }
 }
 
+void InputWindowsManager::OnGestureSendEvent(std::shared_ptr<PointerEvent> event)
+{
+    CALL_INFO_TRACE;
+    CHKPV(event);
+    auto pointerEvent = std::make_shared<PointerEvent>(*event);
+    pointerEvent->RemoveAllPointerItems();
+    auto items = event->GetAllPointerItems();
+    for (auto &item : items) {
+        if (!item.IsPressed()) {
+            continue;
+        }
+        int32_t pointerId = item.GetPointerId();
+        pointerEvent->SetPointerId(pointerId);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+        pointerEvent->SetActionTime(GetSysClockTime());
+        pointerEvent->UpdateId();
+        pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
+
+        pointerEvent->AddPointerItem(item);
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+    }
+}
+
 void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
@@ -846,6 +871,11 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
     }
 
     windowsPerDisplay_ = windowsPerDisplay;
+    for (const auto &window : displayGroupInfo.windowsInfo) {
+        if (window.windowInputType == WindowInputType::TRANSPARENT_VIEW && isSendDown) {
+            OnGestureSendEvent(lastTouchEvent_);
+        }
+    }
 }
 
 WINDOW_UPDATE_ACTION InputWindowsManager::UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo)
@@ -2981,7 +3011,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             if (isUiExtentionWindow) {
                 break;
             }
-            if (item.id == targetWindowId) {
+            if (item.id == targetWindowId || item.windowInputType == WindowInputType::TRANSPARENT_VIEW) {
                 touchWindow = &item;
                 break;
             }
