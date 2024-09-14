@@ -168,18 +168,13 @@ HWTEST_F(FingerprintEventProcessorTest,
     struct libinput_device device;
     struct libinput_event_keyboard keyBoardEvent;
     struct libinput_event_pointer rawPointerEvent;
-    EXPECT_CALL(mock, GetDevice)
-        .WillRepeatedly(Return(&device));
-    EXPECT_CALL(mock, DeviceGetName)
-        .WillRepeatedly(Return(const_cast<char*>("hw_fingerprint_mouse")));
-    EXPECT_CALL(mock, LibinputGetPointerEvent)
-        .WillRepeatedly(Return(&rawPointerEvent));
-    EXPECT_CALL(mock, PointerGetDxUnaccelerated)
-        .WillRepeatedly(Return(0));
-    EXPECT_CALL(mock, PointerGetDyUnaccelerated)
-        .WillRepeatedly(Return(0));
-    EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);
     InputHandler->BuildInputHandlerChain();
+    EXPECT_CALL(mock, GetDevice)
+        .WillOnce(Return(&device));
+    EXPECT_CALL(mock, DeviceGetName)
+        .WillOnce(Return(const_cast<char*>("hw_fingerprint_mouse")));
+    EXPECT_CALL(mock, LibinputGetPointerEvent)
+        .WillOnce(Return(&rawPointerEvent));
     EXPECT_EQ(FingerprintEventHdr->HandleFingerprintEvent(&event), RET_OK);
 }
 

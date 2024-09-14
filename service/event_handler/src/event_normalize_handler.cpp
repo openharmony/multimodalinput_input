@@ -110,7 +110,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         return;
     }
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
-        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP)) {
+        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP)) {
         MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
         return;
     }
@@ -450,7 +450,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
-    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP) {
         bool threeFingerSwitch = false;
         TOUCH_EVENT_HDR->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch);
         if (!threeFingerSwitch) {

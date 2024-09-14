@@ -516,7 +516,7 @@ static const std::unordered_map<int32_t, std::string> pointerActionMap = {
     { PointerEvent::POINTER_ACTION_ROTATE_UPDATE, "rotate-update" },
     { PointerEvent::POINTER_ACTION_ROTATE_END, "rotate-end" },
     { PointerEvent::POINTER_ACTION_TRIPTAP, "touchpad-triptap" },
-    { PointerEvent::POINTER_ACTION_QUADTAP, "quadtap" },
+    { PointerEvent::POINTER_ACTION_QUADTAP, "QUAD_TAP" },
     { PointerEvent::POINTER_ACTION_HOVER_MOVE, "hover-move" },
     { PointerEvent::POINTER_ACTION_HOVER_ENTER, "hover-enter" },
     { PointerEvent::POINTER_ACTION_HOVER_EXIT, "hover-exit" },
