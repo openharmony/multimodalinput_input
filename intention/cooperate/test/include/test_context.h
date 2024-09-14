@@ -57,17 +57,6 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
 };
 
-class MockPluginManager : public IPluginManager {
-public:
-    MockPluginManager(IContext *context);
-    ICooperate* LoadCooperate() override;
-    void UnloadCooperate() override;
-    IMotionDrag* LoadMotionDrag() override;
-    void UnloadMotionDrag() override;
-private:
-    std::unique_ptr<IPluginManager> pluginMgr_;
-};
-
 class TestContext final : public IContext {
 public:
     TestContext();

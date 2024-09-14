@@ -787,6 +787,14 @@ public:
          * @since 9
          */
         int32_t GetDisplayX() const;
+
+        /**
+         * @brief Obtains the x coordinate relative to the upper left corner of the screen.
+         * For a touchpad input event, the value is the absolute x coordinate on the touchpad.
+         * For other pointer input events, the value is the x coordinate on the target screen.
+         * @return Returns the x coordinate.
+         * @since 9
+         */
         double GetDisplayXPos() const;
 
         /**
@@ -796,6 +804,13 @@ public:
          * @since 9
          */
         void SetDisplayX(int32_t displayX);
+
+        /**
+         * @brief Sets the x coordinate relative to the upper left corner of the screen.
+         * @param displayX Indicates the x coordinate to set.
+         * @return void
+         * @since 9
+         */
         void SetDisplayXPos(double displayX);
 
         /**
@@ -806,6 +821,14 @@ public:
          * @since 9
          */
         int32_t GetDisplayY() const;
+
+        /**
+         * @brief Obtains the y coordinate relative to the upper left corner of the screen.
+         * For a touchpad input event, the value is the absolute y coordinate on the touchpad.
+         * For other pointer input events, the value is the y coordinate on the target screen.
+         * @return Returns the y coordinate.
+         * @since 9
+         */
         double GetDisplayYPos() const;
 
         /**
@@ -815,6 +838,13 @@ public:
          * @since 9
          */
         void SetDisplayY(int32_t displayY);
+
+        /**
+         * @brief Sets the y coordinate relative to the upper left corner of the screen.
+         * @param displayY Indicates the y coordinate to set.
+         * @return void
+         * @since 9
+         */
         void SetDisplayYPos(double displayY);
 
         /**
@@ -823,6 +853,12 @@ public:
          * @since 9
          */
         int32_t GetWindowX() const;
+
+        /**
+         * @brief Obtains the x coordinate of the active window.
+         * @return Returns the x coordinate.
+         * @since 9
+         */
         double GetWindowXPos() const;
 
         /**
@@ -832,6 +868,13 @@ public:
          * @since 9
          */
         void SetWindowX(int32_t x);
+
+        /**
+         * @brief Sets the x coordinate of the active window.
+         * @param x Indicates the x coordinate to set.
+         * @return void
+         * @since 9
+         */
         void SetWindowXPos(double x);
 
         /**
@@ -840,6 +883,12 @@ public:
          * @since 9
          */
         int32_t GetWindowY() const;
+
+        /**
+         * @brief Obtains the y coordinate of the active window.
+         * @return Returns the y coordinate.
+         * @since 9
+         */
         double GetWindowYPos() const;
 
         /**
@@ -849,6 +898,13 @@ public:
          * @since 9
          */
         void SetWindowY(int32_t y);
+
+        /**
+         * @brief Sets the y coordinate of the active window.
+         * @param y Indicates the y coordinate to set.
+         * @return void
+         * @since 9
+         */
         void SetWindowYPos(double y);
 
         /**
@@ -1144,38 +1200,6 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
-
-         /**
-         * @brief Sets the raw X coordinate of the tool area's center point relative to the
-         * upper left corner of the screen.
-         * @param rawDisplayX Indicates the raw X coordinate to set.
-         * @return void
-         * @since 12
-         */
-        void SetRawDisplayX(int32_t rawDisplayX);
- 
-        /**
-         * @brief Obtains the raw X coordinate relative to the upper left corner of the screen.
-         * @return Returns the raw X coordinate.
-         * @since 12
-         */
-        int32_t GetRawDisplayX() const;
- 
-        /**
-         * @brief Sets the raw Y coordinate of the tool area's center point relative to the
-         * upper left corner of the screen.
-         * @param rawDisplayY Indicates the raw Y coordinate to set.
-         * @return void
-         * @since 12
-         */
- 
-        void SetRawDisplayY(int32_t rawDisplayY);
-        /**
-         * @brief Obtains the raw Y coordinate relative to the upper left corner of the screen..
-         * @return Returns the raw Y coordinate.
-         * @since 12
-         */
-        int32_t GetRawDisplayY() const;
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1207,8 +1231,6 @@ public:
         int32_t originPointerId_ { 0 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
-        int32_t rawDisplayX_ {};
-        int32_t rawDisplayY_ {};
     };
 
 public:
@@ -1549,6 +1571,7 @@ public:
      */
     std::vector<uint8_t> GetEnhanceData() const;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
 public:
     /**
      * @brief Checks whether the axes set represented by <b>axes</b> contains a specified type of axis.
@@ -1582,20 +1605,6 @@ public:
      * @since 9
      */
     bool ReadFromParcel(Parcel &in);
-
-    /**
-     * @brief The number of times the input event is dispatched.
-     * @return Return the event dispatch times.
-     * @since 12
-     */
-    int32_t GetDispatchTimes() const;
-
-    /**
-     * @brief The number of times the same input event was distributed to multiple different windows.
-     * @return void
-     * @since 12
-     */
-    void SetDispatchTimes(int32_t dispatchTimes);
 
     /**
     * @brief Set the handlerEventType for pointerEvent
@@ -1672,6 +1681,20 @@ public:
     double GetFingerprintDistanceY() const;
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
+    /**
+     * @brief The number of times the input event is dispatched.
+     * @return Return the event dispatch times.
+     * @since 12
+     */
+    int32_t GetDispatchTimes() const;
+
+    /**
+     * @brief The number of times the same input event was distributed to multiple different windows.
+     * @return void
+     * @since 12
+     */
+    void SetDispatchTimes(int32_t dispatchTimes);
+
 protected:
     /**
      * @brief Constructs an input event object by using the specified input event type. Generally, this method
@@ -1700,7 +1723,7 @@ private:
     int32_t originPointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
-    float zOrder_ { -1.0f };
+    float zOrder_{ -1.0f};
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     double velocity_ { 0.0 };
