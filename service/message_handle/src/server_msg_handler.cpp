@@ -53,7 +53,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-constexpr int32_t SECURITY_COMPONENT_SERVICE_ID { 3050 };
+constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SEND_NOTICE_OVERTIME { 5 };
 constexpr int32_t DEFAULT_POINTER_ID { 10000 };
@@ -97,13 +97,13 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     BytraceAdapter::StartSocketHandle(static_cast<int32_t>(id));
     auto callback = GetMsgCallback(id);
     if (callback == nullptr) {
-        MMI_HILOGE("Unknown msg id:%{public}d, errCode:%{public}d", id, UNKNOWN_MSG_ID);
+        MMI_HILOGE("Unknown msg id:%{public}d,errCode:%{public}d", id, UNKNOWN_MSG_ID);
         return;
     }
     auto ret = (*callback)(sess, pkt);
     BytraceAdapter::StopSocketHandle();
     if (ret < 0) {
-        MMI_HILOGE("Msg handling failed. id:%{public}d, errCode:%{public}d", id, ret);
+        MMI_HILOGE("Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
 }
 
@@ -152,7 +152,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+        MMI_HILOGD("Inject keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     } else {
         MMI_HILOGD("Inject keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     }
@@ -165,7 +165,7 @@ int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     state = keyEvent->GetFunctionKey(funcKey);
-    MMI_HILOGD("Get the function key:%{public}d status as %{public}s", funcKey, state ? "open" : "close");
+    MMI_HILOGD("Get the function key:%{private}d status as %{public}s", funcKey, state ? "open" : "close");
     return RET_OK;
 }
 
@@ -187,7 +187,7 @@ int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
         MMI_HILOGE("Failed to enable the function key");
         return RET_ERR;
     }
-    MMI_HILOGD("Update function key:%{public}d succeed", funcKey);
+    MMI_HILOGD("Update function key:%{private}d succeed", funcKey);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -335,7 +335,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGD("Cursor move to (x:%{public}.2f, y:%{public}.2f, DisplayId:%{public}d)",
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%{public}d)",
             cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     } else {
         MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
@@ -381,7 +381,6 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
 
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -416,7 +415,6 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
     int32_t action, bool isShell)
 {
-    CHKPF(pointerEvent);
     int32_t targetWindowId = -1;
     int32_t pointerId = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
@@ -854,7 +852,7 @@ bool ServerMsgHandler::InitInjectNoticeSource()
     if (injectNotice_ == nullptr) {
         injectNotice_ = std::make_shared<InjectNoticeManager>();
     }
-    MMI_HILOGD("Injectnotice StartNoticeAbility ok");
+    MMI_HILOGD("Injectnotice StartNoticeAbility end");
     if (!injectNotice_->IsAbilityStart()) {
         MMI_HILOGD("Injectnotice StartNoticeAbility begin");
         bool isStart = injectNotice_->StartNoticeAbility();
@@ -862,7 +860,7 @@ bool ServerMsgHandler::InitInjectNoticeSource()
             MMI_HILOGE("Injectnotice StartNoticeAbility isStart:%{public}d", isStart);
             return false;
         }
-        MMI_HILOGD("Injectnotice StartNoticeAbility ok");
+        MMI_HILOGD("Injectnotice StartNoticeAbility end");
     }
     auto connection = injectNotice_->GetConnection();
     CHKPF(connection);
@@ -873,9 +871,9 @@ bool ServerMsgHandler::InitInjectNoticeSource()
             MMI_HILOGD("Injectnotice ConnectNoticeSrv isConnect:%{public}d", isConnect);
             return false;
         }
-        MMI_HILOGD("Injectnotice ConnectNoticeSrv ok");
+        MMI_HILOGD("Injectnotice ConnectNoticeSrv end");
     }
-    MMI_HILOGD("Injectnotice InitInjectNoticeSource ok");
+    MMI_HILOGD("Injectnotice InitInjectNoticeSource end");
     return true;
 }
 
