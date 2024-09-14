@@ -143,6 +143,7 @@ private:
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
     bool needSkipPowerKeyUp_ { false };
+    bool callBahaviorState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
