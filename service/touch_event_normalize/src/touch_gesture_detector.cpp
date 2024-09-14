@@ -435,7 +435,6 @@ end:
         }
     }
     delete[] vertices;
-    MMI_HILOGI("cx:%{public}.2f, cy:%{public}.2f", xSum, ySum);
     return Point(static_cast<float>(xSum), static_cast<float>(ySum));
 }
 
