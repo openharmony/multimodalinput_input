@@ -180,23 +180,20 @@ private:
                 event->GetKeyIntention(), InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                 KeyEvent::ActionToString(event->GetKeyAction()), event->GetId(), eventItems.size());
         } else {
-            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) && !JudgeMode(event)) {
+            if (event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                 MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
                     ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
                     ", EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
                     InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                     KeyEvent::ActionToString(event->GetKeyAction()),
-                    event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(),
-                    event->GetActionStartTime(), InputEvent::EventTypeToString(event->GetEventType()),
-                    event->GetFlag(), KeyEvent::ActionToString(event->GetKeyAction()),
                     event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
                     event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), event->GetId(), eventItems.size());
             } else {
-                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%d, KI:%{public}d, AT:%{public}" PRId64 ", AST:%{public}" PRId64
-                    ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, CL:%{public}d, SL:%{public}d"
-                    ", EN:%{public}d, KIC:%{public}zu",
+                MMI_HILOG_HEADER(LOG_DEBUG, lh, "KC:%{public}d, KI:%{public}d, AT:%{public}" PRId64 ","
+                    "AST:%{public}" PRId64 ", ET:%{public}s, F:%{public}d, KA:%{public}s, NL:%{public}d, "
+                    "CL:%{public}d, SL:%{public}d, EN:%{public}d, KIC:%{public}zu",
                     event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
                     InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
                     KeyEvent::ActionToString(event->GetKeyAction()),
@@ -227,7 +224,7 @@ private:
                 tmpStr += ("," + std::to_string(*cItr));
             }
             if (IsBetaVersion()) {
-                if (JudgeMode(event) || !event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                if (!event->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
                     MMI_HILOG_HEADER(LOG_INFO, lh, "%{public}s]", tmpStr.c_str());
                 }
             }
