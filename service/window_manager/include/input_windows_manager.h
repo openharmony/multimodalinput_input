@@ -316,6 +316,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     bool OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     WINDOW_UPDATE_ACTION UpdateWindowInfo(DisplayGroupInfo &displayGroupInfo);
+    void OnGestureSendEvent(std::shared_ptr<PointerEvent> event);
 
 private:
     UDSServer* udsServer_ { nullptr };
