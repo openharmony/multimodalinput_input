@@ -62,7 +62,6 @@ const std::string SETTINGS_DATA_SYSTEM_URI {
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true" };
 const std::string SETTINGS_DATA_EXT_URI {
     "datashare:///com.ohos.USER_SETTINGSDATA_100.DataAbility" };
-static bool CALL_BEHAVIOR_STATE { false };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1210,7 +1209,7 @@ bool KeySubscriberHandler::HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
-    if (!CALL_BEHAVIOR_STATE) {
+    if (!callBahaviorState_) {
         MMI_HILOGE("CallBehaviorState is false");
         return false;
     }
@@ -1297,7 +1296,7 @@ void KeySubscriberHandler::InitDataShareListener()
             return;
         }
         MMI_HILOGE("Get incall_power_button_behavior state success:%{public}d", statusValue);
-        CALL_BEHAVIOR_STATE = statusValue;
+        callBahaviorState_ = statusValue;
     };
 
     func(CALL_BEHAVIOR_KEY);
