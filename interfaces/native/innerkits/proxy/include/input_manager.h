@@ -976,8 +976,8 @@ public:
 
     /**
      * @brief 删除一个手势监听器。
-     * @param monitorId 表示手势事件监视器，即AddGestureMonitor的返回值。
-     * @return void
+     * @param monitorId 表示手势事件监视器ID，即AddGestureMonitor的返回值。
+     * @return 如果成功，则返回0；否则返回非0值。
      * @since 13
      */
     int32_t RemoveGestureMonitor(int32_t monitorId);
