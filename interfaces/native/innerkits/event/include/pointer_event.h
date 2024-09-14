@@ -1762,6 +1762,9 @@ private:
     std::vector<uint8_t> enhanceData_;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     HandleEventType handleEventType_ = HANDLE_EVENT_TYPE_POINTER;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    bool ancoDeal_ { false };
+#endif // OHOS_BUILD_ENABLE_ANCO
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

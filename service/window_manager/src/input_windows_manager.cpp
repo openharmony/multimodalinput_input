@@ -2638,6 +2638,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
         MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        pointerEvent->SetAncoDeal(true);
         SimulatePointerExt(pointerEvent);
         return RET_OK;
     }
@@ -3126,6 +3127,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOG_DISPATCHD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        std::vector<int32_t> windowIds;
+        GetTargetWindowIds(pointerId, pointerEvent->GetSourceType(), windowIds);
+        if (windowIds.size() <= 1) {
+            pointerEvent->SetAncoDeal(true);
+        }
         pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         // Simulate uinput automated injection operations (MMI_GE(pointerEvent->GetZOrder(), 0.0f))
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE);
@@ -3154,6 +3160,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         if (displayGroupInfo_.focusWindowId == touchWindow->id) {
             return RET_OK;
         }
+        pointerEvent->SetAncoDeal(false);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
     if (touchWindow->windowInputType == WindowInputType::MIX_LEFT_RIGHT_ANTI_AXIS_MOVE) {
@@ -3567,6 +3574,9 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto source = pointerEvent->GetSourceType();
     pointerActionFlag_ = pointerEvent->GetPointerAction();
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    pointerEvent->SetAncoDeal(false);
+#endif // OHOS_BUILD_ENABLE_ANCO
     if (IsFoldable_ && IgnoreTouchEvent(pointerEvent)) {
         MMI_HILOG_DISPATCHD("Ignore touch event, pointerAction:%{public}d", pointerActionFlag_);
         return RET_OK;
