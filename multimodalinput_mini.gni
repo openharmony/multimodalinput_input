@@ -231,8 +231,6 @@ declare_args() {
     "src/virtual_crown.cpp",
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
-    "src/virtual_fingerprint_key.cpp",
-    "src/virtual_fingerprint_mouse.cpp",
     "src/virtual_gamepad.cpp",
     "src/virtual_joystick.cpp",
     "src/virtual_keyboard.cpp",
