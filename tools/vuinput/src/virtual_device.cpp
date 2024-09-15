@@ -45,8 +45,6 @@
 #include "virtual_pc_touchpad.h"
 #include "virtual_touchscreen.h"
 #include "virtual_trackpad_mouse.h"
-#include "virtual_fingerprint_key.h"
-#include "virtual_fingerprint_mouse.h"
 #include "virtual_crown.h"
 
 namespace OHOS {
@@ -246,14 +244,6 @@ static void StartPen()
     virtualPenKeyboard.SetUp();
 }
 
-static void StartFingerprint()
-{
-    static VirtualFingerprintKey fingerprintKey;
-    fingerprintKey.SetUp();
-    static VirtualFingerprintMouse fingerprintMouse;
-    fingerprintMouse.SetUp();
-}
-
 static void StartCrown()
 {
     static VirtualCrown virtualCrown;
@@ -274,7 +264,6 @@ std::map<std::string, VirtualFun> mapFun = {
     {"pc", &StartPc},
     {"touchscreen", &StartTouchScreen},
     {"pen", &StartPen},
-    {"fingerprint", &StartFingerprint},
     {"crown", &StartCrown}
 };
 
