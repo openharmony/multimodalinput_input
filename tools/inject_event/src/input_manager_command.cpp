@@ -77,12 +77,6 @@ constexpr int32_t MIN_PINCH_FINGER = 2;
 constexpr int32_t MAX_PINCH_FINGER = 5;
 constexpr int32_t MIN_ACTION_FINGER = 2;
 constexpr int32_t MAX_ACTION_FINGER = 5;
-constexpr int32_t FINGER_LOCATION_NUMS = 4;
-constexpr int32_t MOVE_POS_ONE = 1;
-constexpr int32_t MOVE_POS_TWO = 2;
-constexpr int32_t MOVE_POS_THREE = 3;
-constexpr int32_t MAX_KEEP_TIME = 60000;
-constexpr int32_t NUM_KEEP_ARGC = 2;
 
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
@@ -168,7 +162,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"long_press", required_argument, nullptr, 'l'},
         {"repeat", required_argument, nullptr, 'r'},
         {"interval", required_argument, nullptr, 'i'},
-        {"text", required_argument, nullptr, 't'},
         {nullptr, 0, nullptr, 0}
     };
     struct option touchSensorOptions[] = {
@@ -585,7 +578,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t py1 = 0;
                             int32_t px2 = 0;
                             int32_t py2 = 0;
-                            int32_t buttonsId = 0;
+                            int32_t g_buttonId = 0;
                             int32_t totalTimeMs = 1000;
                             if (argc < 7) {
                                 std::cout << "argc:" << argc << std::endl;
@@ -625,17 +618,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
+                            item.SetPointerId(0);
                             item.SetDisplayY(py1);
                             item.SetDisplayX(px1);
                             item.SetPressed(false);
-                            item.SetPointerId(0);
-                            pointerEvent->SetButtonPressed(0);
-                            pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetButtonId(buttonsId);
-                            pointerEvent->SetButtonPressed(buttonsId);
                             pointerEvent->SetPointerId(0);
-                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetButtonPressed(0);
+                            pointerEvent->SetButtonPressed(g_buttonId);
+                            pointerEvent->SetButtonId(g_buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
@@ -703,7 +696,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 int64_t time = GetSysClockTime();
-                while ((c = getopt_long(argc, argv, "d:u:l:r:i:t:", keyboardSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "d:u:l:r:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -893,9 +886,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
                             } else {
-                                MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
-                                    ",KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
+                                MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
                             }
                             InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
@@ -912,9 +903,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
                             } else {
-                                MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
-                                    ",KeyAction:%{public}s, IsRepeat:%{public}s",
-                                    keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                                MMI_HILOGI("KeyAction:%{public}s, IsRepeat:%{public}s",
                                     KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
                             }
                             InputManager::GetInstance()->SimulateInputEvent(keyEvent);
@@ -935,13 +924,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
-                            break;
-                        }
-                        case 't': {
-                            int32_t ret = ProcessKeyboardTextInput(argc, argv);
-                            if (ret != ERR_OK) {
-                                return ret;
-                            }
                             break;
                         }
                         default: {
@@ -969,119 +951,35 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:k", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            std::cout << "number of parameters:" << argc << std::endl;
                             if (argc < moveArgcSeven) {
+                                std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
-                            struct FingerInfo {
-                                int32_t startX = 0;
-                                int32_t startY = 0;
-                                int32_t endX = 0;
-                                int32_t endY = 0;
-                            };
-                            int32_t startX = 0;
-                            int32_t startY = 0;
-                            int32_t endX = 0;
-                            int32_t endY = 0;
-                            int32_t totalTimeMs = 0;
-                            int32_t keepTimeMs = 0;
-                            int32_t fingerCount = 0;
-                            std::vector<FingerInfo> fingerList;
-                            int32_t startPos = optind - MOVE_POS_ONE;
-                            while (true) {
-                                if (argv[startPos] == nullptr) {
-                                    totalTimeMs = TOTAL_TIME_MS;
-                                    optind = startPos;
-                                    break;
-                                }
-                                if (argv[startPos + MOVE_POS_ONE] == nullptr) {
-                                    if (!StrToInt(argv[startPos], totalTimeMs)) {
-                                        std::cout << "invalid total times" << std::endl;
+                            if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
+                                totalTimeMs = TOTAL_TIME_MS;
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
+                                        std::cout << "invalid coordinate value" << std::endl;
                                         return EVENT_REG_FAIL;
-                                    }
-                                    optind = startPos + MOVE_POS_ONE;
-                                    break;
                                 }
-                                if (argv[startPos + MOVE_POS_TWO] == nullptr) {
-                                    totalTimeMs = TOTAL_TIME_MS;
-                                    if ((strlen(argv[startPos]) != NUM_KEEP_ARGC) ||
-                                        (argv[startPos][0] != '-') ||
-                                        (argv[startPos][1] != 'k') ||
-                                        (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs))) {
-                                        std::cout << "invalid keep times" << std::endl;
+                            } else {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2)) ||
+                                    (!StrToInt(argv[optind + 3], totalTimeMs))) {
+                                        std::cout << "invalid coordinate value or total times" << std::endl;
                                         return EVENT_REG_FAIL;
-                                    }
-                                    optind = startPos + MOVE_POS_TWO;
-                                    break;
-                                }
-                                if (argv[startPos + MOVE_POS_THREE] == nullptr) {
-                                    if (strlen(argv[startPos]) == NUM_KEEP_ARGC) {
-                                        if ((argv[startPos][0] != '-') ||
-                                            (argv[startPos][1] != 'k') ||
-                                            (!StrToInt(argv[startPos + MOVE_POS_ONE], keepTimeMs))) {
-                                            std::cout << "invalid keep times" << std::endl;
-                                            return EVENT_REG_FAIL;
-                                        }
-                                        if (!StrToInt(argv[startPos + MOVE_POS_TWO], totalTimeMs)) {
-                                            std::cout << "invalid total times" << std::endl;
-                                            return EVENT_REG_FAIL;
-                                        }
-                                    } else {
-                                        if (!StrToInt(argv[startPos], totalTimeMs)) {
-                                            std::cout << "invalid total times" << std::endl;
-                                            return EVENT_REG_FAIL;
-                                        }
-                                        if ((argv[startPos + MOVE_POS_ONE][0] != '-') ||
-                                            (argv[startPos + MOVE_POS_ONE][1] != 'k') ||
-                                            (!StrToInt(argv[startPos + MOVE_POS_TWO], keepTimeMs))) {
-                                            std::cout << "invalid keep times" << std::endl;
-                                            return EVENT_REG_FAIL;
-                                        }
-                                    }
-                                    optind = startPos + MOVE_POS_THREE;
-                                    break;
-                                }
-                                if (argv[startPos + MOVE_POS_THREE] != nullptr) {
-                                    if ((!StrToInt(argv[startPos], startX)) ||
-                                        (!StrToInt(argv[startPos + MOVE_POS_ONE], startY)) ||
-                                        (!StrToInt(argv[startPos + MOVE_POS_TWO], endX)) ||
-                                        (!StrToInt(argv[startPos + MOVE_POS_THREE], endY))) {
-                                            std::cout << "invalid coordinate value" << std::endl;
-                                            return EVENT_REG_FAIL;
-                                    }
-                                    if ((startX < 0) || (startX < 0) || (endX < 0) || (endY < 0)) {
-                                        std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
-                                        return RET_ERR;
-                                    }
-                                    FingerInfo fingerInfoTemp {
-                                        .startX = startX,
-                                        .startY = startY,
-                                        .endX = endX,
-                                        .endY = endY
-                                    };
-                                    fingerList.push_back(fingerInfoTemp);
-                                    fingerCount += 1;
-                                    startPos += FINGER_LOCATION_NUMS;
-                                    optind += THREE_MORE_COMMAND;
                                 }
                             }
 
-                            for (const auto &finger : fingerList) {
-                                std::cout << "startX:" << finger.startX << ", startY:" << finger.startY <<
-                                ", endX:" << finger.endX << ", endY:" << finger.endY << std::endl;
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
+                                return RET_ERR;
                             }
-                            if (keepTimeMs > MAX_KEEP_TIME || keepTimeMs < 0) {
-                                std::cout << "invalid keep times" << std::endl;
-                                return EVENT_REG_FAIL;
-                            }
-                            if (totalTimeMs < 0) {
-                                std::cout << "invalid total times" << std::endl;
-                                return EVENT_REG_FAIL;
-                            }
-                            std::cout << "fingerCount:" << fingerCount <<std::endl;
-                            std::cout << "keepTimeMs:" << keepTimeMs <<std::endl;
-                            std::cout << "totalTimeMs:" << totalTimeMs <<std::endl;
 
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
@@ -1092,19 +990,20 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
 
+                            std::cout << "start coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
+                            std::cout << "  end coordinate: ("<< px2 << ", "  << py2 << ")" << std::endl;
+                            std::cout << "     total times: " << totalTimeMs << " ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetDisplayY(py1);
+                            item.SetDisplayX(px1);
+                            item.SetPointerId(DEFAULT_POINTER_ID_FIRST);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            pointerEvent->AddPointerItem(item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-                            for (int32_t i = 0; i < fingerCount; i++) {
-                                PointerEvent::PointerItem item;
-                                item.SetDisplayX(fingerList[i].startX);
-                                item.SetDisplayY(fingerList[i].startY);
-                                item.SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
-                                pointerEvent->AddPointerItem(item);
-                                pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST + i);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            }
+                            pointerEvent->SetPointerId(DEFAULT_POINTER_ID_FIRST);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
                             int64_t startTimeMs = startTimeUs / TIME_TRANSITION;
@@ -1118,30 +1017,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int64_t nowSysTimeMs = 0;
                             int64_t sleepTimeMs = 0;
 
-                            std::vector<int32_t> pointerIds = pointerEvent->GetPointerIds();
-                            if (pointerIds.size() != static_cast<size_t>(fingerCount)) {
-                                std::cout << "pointerIds size is error" << std::endl;
-                                return EVENT_REG_FAIL;
-                            }
-                            
-                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             while (currentTimeMs < endTimeMs) {
-                                for (size_t i = 0; i < pointerIds.size(); i++) {
-                                    int32_t pointerId = pointerIds[i];
-                                    PointerEvent::PointerItem item;
-                                    if (!pointerEvent->GetPointerItem(pointerId, item)) {
-                                        std::cout << "Invalid pointer:" << pointerId << std::endl;
-                                        return EVENT_REG_FAIL;
-                                    }
-                                    item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
-                                        fingerList[i].startX, fingerList[i].endX));
-                                    item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs,
-                                        fingerList[i].startY, fingerList[i].endY));
-                                    pointerEvent->UpdatePointerItem(pointerId, item);
-                                    pointerEvent->SetPointerId(pointerId);
-                                    pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                }
+                                item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
+                                item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
+                                pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 nowSysTimeUs = GetSysClockTime();
                                 nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
                                 sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - nowSysTimeMs;
@@ -1149,66 +1031,21 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 currentTimeMs += BLOCK_TIME_MS;
                             }
 
-                            for (size_t i = 0; i < pointerIds.size(); i++) {
-                                int32_t pointerId = pointerIds[i];
-                                PointerEvent::PointerItem item;
-                                if (!pointerEvent->GetPointerItem(pointerId, item)) {
-                                    std::cout << "Invalid pointer:" << pointerId << std::endl;
-                                    return EVENT_REG_FAIL;
-                                }
-                                item.SetDisplayX(fingerList[i].endX);
-                                item.SetDisplayY(fingerList[i].endY);
-                                pointerEvent->UpdatePointerItem(pointerId, item);
-                                pointerEvent->SetPointerId(pointerId);
-                                pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            }
+                            item.SetDisplayY(py2);
+                            item.SetDisplayX(px2);
+                            pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
-                            if (keepTimeMs > 0) {
-                                currentTimeMs = GetSysClockTime() / TIME_TRANSITION;
-                                int64_t keepEndTimeMs = 0;
-                                if (!AddInt64(currentTimeMs, keepTimeMs, keepEndTimeMs)) {
-                                    std::cout << "system time error." << std::endl;
-                                    return EVENT_REG_FAIL;
-                                }
-                                while (currentTimeMs < keepEndTimeMs) {
-                                    for (size_t i = 0; i < pointerIds.size(); i++) {
-                                        int32_t pointerId = pointerIds[i];
-                                        PointerEvent::PointerItem item;
-                                        if (!pointerEvent->GetPointerItem(pointerId, item)) {
-                                            std::cout << "Invalid pointer:" << pointerId << std::endl;
-                                            return EVENT_REG_FAIL;
-                                        }
-                                        item.SetDisplayX(fingerList[i].endX);
-                                        item.SetDisplayY(fingerList[i].endY);
-                                        pointerEvent->UpdatePointerItem(pointerId, item);
-                                        pointerEvent->SetPointerId(pointerId);
-                                        pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
-                                        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                    }
-                                    nowSysTimeUs = GetSysClockTime();
-                                    nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
-                                    sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - nowSysTimeMs;
-                                    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
-                                    currentTimeMs += BLOCK_TIME_MS;
-                                }
-                            }
-                            
+                            item.SetDisplayX(px2);
+                            item.SetDisplayY(py2);
+                            pointerEvent->UpdatePointerItem(DEFAULT_POINTER_ID_FIRST, item);
                             pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-                            for (size_t i = 0; i < pointerIds.size(); i++) {
-                                int32_t pointerId = pointerIds[i];
-                                PointerEvent::PointerItem item;
-                                if (!pointerEvent->GetPointerItem(pointerId, item)) {
-                                    std::cout << "Invalid pointer:" << pointerId << std::endl;
-                                    return EVENT_REG_FAIL;
-                                }
-                                pointerEvent->UpdatePointerItem(pointerId, item);
-                                pointerEvent->SetPointerId(pointerId);
-                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                                pointerEvent->RemovePointerItem(pointerId);
-                            }
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            optind = optind + THREE_MORE_COMMAND;
                             break;
                         }
                         case 'd': {
@@ -1625,144 +1462,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
     return ERR_OK;
-}
-
-struct SpecialChar {
-    int32_t keyCode = 0;
-    bool isPressShift = false;
-};
-
-const std::map<char, SpecialChar> CHAR_TO_KEYCODE = {
-    { ' ',  { KeyEvent::KEYCODE_SPACE, false} },
-    { '!',  { KeyEvent::KEYCODE_1, true} },
-    { '\"', { KeyEvent::KEYCODE_APOSTROPHE, true} },
-    { '#',  { KeyEvent::KEYCODE_POUND, false} },
-    { '$',  { KeyEvent::KEYCODE_4, true} },
-    { '%',  { KeyEvent::KEYCODE_5, true} },
-    { '&',  { KeyEvent::KEYCODE_7, true} },
-    { '\'', { KeyEvent::KEYCODE_APOSTROPHE, false} },
-    { '(',  { KeyEvent::KEYCODE_NUMPAD_LEFT_PAREN, false} },
-    { ')',  { KeyEvent::KEYCODE_NUMPAD_RIGHT_PAREN, false} },
-    { '*',  { KeyEvent::KEYCODE_STAR, false} },
-    { '+',  { KeyEvent::KEYCODE_PLUS, false} },
-    { ',',  { KeyEvent::KEYCODE_COMMA, false} },
-    { '-',  { KeyEvent::KEYCODE_MINUS, false} },
-    { '.',  { KeyEvent::KEYCODE_PERIOD, false} },
-    { '/',  { KeyEvent::KEYCODE_SLASH, false} },
-    { ':',  { KeyEvent::KEYCODE_SEMICOLON, true} },
-    { ';',  { KeyEvent::KEYCODE_SEMICOLON, false} },
-    { '<',  { KeyEvent::KEYCODE_COMMA, true} },
-    { '=',  { KeyEvent::KEYCODE_EQUALS, false} },
-    { '>',  { KeyEvent::KEYCODE_PERIOD, true} },
-    { '?',  { KeyEvent::KEYCODE_SLASH, true} },
-    { '@',  { KeyEvent::KEYCODE_AT, false} },
-    { '[',  { KeyEvent::KEYCODE_LEFT_BRACKET, false} },
-    { '\\', { KeyEvent::KEYCODE_BACKSLASH, false} },
-    { ']',  { KeyEvent::KEYCODE_RIGHT_BRACKET, false} },
-    { '^',  { KeyEvent::KEYCODE_6, true} },
-    { '_',  { KeyEvent::KEYCODE_MINUS, true} },
-    { '`',  { KeyEvent::KEYCODE_GRAVE, false} },
-    { '{',  { KeyEvent::KEYCODE_LEFT_BRACKET, true} },
-    { '|',  { KeyEvent::KEYCODE_BACKSLASH, true} },
-    { '}',  { KeyEvent::KEYCODE_RIGHT_BRACKET, true} },
-    { '~',  { KeyEvent::KEYCODE_GRAVE, true} },
-};
-
-bool InputManagerCommand::IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift)
-{
-    CALL_DEBUG_ENTER;
-    auto iter = CHAR_TO_KEYCODE.find(character);
-    if (iter == CHAR_TO_KEYCODE.end()) {
-        return false;
-    }
-    keyCode = iter->second.keyCode;
-    isPressShift = iter->second.isPressShift;
-    return true;
-}
-
-int32_t InputManagerCommand::PrintKeyboardTextChar(int32_t keyCode, bool isPressShift)
-{
-    auto keyEvent = KeyEvent::Create();
-    if (keyEvent == nullptr) {
-        std::cout << "Failed to create input event object" << std::endl;
-        return RET_ERR;
-    }
-    KeyEvent::KeyItem item;
-
-    if (isPressShift) {
-        keyEvent->SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
-        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-        item.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
-        item.SetPressed(true);
-        keyEvent->AddKeyItem(item);
-        InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-    }
-
-    keyEvent->SetKeyCode(keyCode);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    item.SetKeyCode(keyCode);
-    item.SetPressed(true);
-    keyEvent->AddKeyItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
-
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    item.SetPressed(false);
-    keyEvent->AddKeyItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-
-    if (isPressShift) {
-        keyEvent->SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
-        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        item.SetKeyCode(KeyEvent::KEYCODE_SHIFT_LEFT);
-        item.SetPressed(false);
-        keyEvent->AddKeyItem(item);
-        InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-    }
-    return RET_OK;
-}
-
-int32_t InputManagerCommand::ProcessKeyboardTextInput(int32_t argc, char *argv[])
-{
-    constexpr int32_t argcMin = 4; // 4: min number of command parameters
-    constexpr int32_t textMaxLen = 2000; // 2000: max number of ascii characters
-
-    int32_t len = strlen(argv[argcMin -1]);
-    if (len <= 0) {
-        std::cout << "The input is empty." << std::endl;
-        return RET_ERR;
-    } else if (len > textMaxLen) {
-        std::cout << "The input text length is "<< len;
-        std::cout << ", and it is processed according to the maximum processing length of ";
-        std::cout << textMaxLen << " bytes." << std::endl;
-        len = textMaxLen;
-    }
-
-    char textChar = argv[argcMin - 1][0];
-    bool isPressShift = false;
-    int32_t keyCode = -1;
-    for (int32_t i = 0; i < len; ++i) {
-        textChar = argv[argcMin - 1][i];
-        if ((textChar >= '0') && (textChar <= '9')) {
-            isPressShift = false;
-            keyCode = textChar - '0' + KeyEvent::KEYCODE_0;
-        } else if ((textChar >= 'a') && (textChar <= 'z')) {
-            isPressShift = false;
-            keyCode = textChar - 'a' + KeyEvent::KEYCODE_A;
-        } else if ((textChar >= 'A') && (textChar <= 'Z')) {
-            isPressShift = true;
-            keyCode = textChar - 'A' + KeyEvent::KEYCODE_A;
-        } else if (!IsSpecialChar(textChar, keyCode, isPressShift)) {
-            std::cout << "The "<< i << "th character is an illegal character." << std::endl;
-            return RET_ERR;
-        }
-
-        if (PrintKeyboardTextChar(keyCode, isPressShift) == RET_ERR) {
-            return RET_ERR;
-        }
-    }
-    return RET_OK;
 }
 
 int32_t InputManagerCommand::KnuckleGestureInputProcess(int32_t argc, char *argv[], int32_t c, int32_t optionIndex)
@@ -2200,7 +1899,6 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-t <text>                  --text <text>      -input text content" << std::endl;
 }
 
 void InputManagerCommand::PrintStylusUsage()
@@ -2224,18 +1922,9 @@ void InputManagerCommand::PrintTouchUsage()
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [-k keep time] [smooth time]      --smooth movement, keep time:keep time";
-    std::cout << std::endl;
-    std::cout << "                                                             after moving, the max value is 60000 ";
-    std::cout << std::endl;
-    std::cout << "                                                             ms, default value is 0; smooth time:";
-    std::cout << std::endl;
-    std::cout << "                                                             move time, default value is 1000 ms";
-    std::cout << std::endl;
-    std::cout << "   Support for multiple finger movements at the same time, for example:" << std::endl;
-    std::cout << "   uinput -T -m 300 900 600 900 900 900 600 900, (300, 900) move to (600, 900), (900, 900) move to";
-    std::cout << std::endl;
-    std::cout << "   (600, 900)" << std::endl;
+    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
+    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
     std::cout << "-k --knuckle                                                  " << std::endl;
     std::cout << "commands for knucle:                                          " << std::endl;
