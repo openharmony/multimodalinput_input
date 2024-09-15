@@ -206,6 +206,35 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Star
 }
 
 /**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DrawGraphic
+ * @tc.name: KnuckleDrawingManagerTest_DrawGraphic
+ * @tc.desc: Test Overrides DrawGraphic function branches
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DrawGraphic, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KnuckleDynamicDrawingManager knuckleDynamicDrawMgr;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(1);
+
+    knuckleDynamicDrawMgr.canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(knuckleDynamicDrawMgr.canvasNode_, nullptr);
+    knuckleDynamicDrawMgr.displayInfo_.width = 200;
+    knuckleDynamicDrawMgr.displayInfo_.height = 200;
+    std::string imagePath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
+    auto pixelMap = DecodeImageToPixelMap(imagePath);
+    knuckleDynamicDrawMgr.glowTraceSystem_ =
+        std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, pixelMap, MAX_DIVERGENCE_NUM);
+    knuckleDynamicDrawMgr.isDrawing_ = false;
+    ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_OK);
+    knuckleDynamicDrawMgr.isDrawing_ = true;
+    ASSERT_EQ(knuckleDynamicDrawMgr.DrawGraphic(pointerEvent), RET_ERR);
+}
+
+/**
  * @tc.name: KnuckleDynamicDrawingManagerTest_CreateTouchWindow
  * @tc.desc: Test Overrides CreateTouchWindow function branches
  * @tc.type: Function
@@ -439,6 +468,26 @@ HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_Upda
     DisplayInfo displayInfo;
     knuckleDynamicDrawingMgr->UpdateDisplayInfo(displayInfo);
     EXPECT_EQ(knuckleDynamicDrawingMgr->displayInfo_.width, 0);
+}
+
+/**
+ * @tc.name: KnuckleDynamicDrawingManagerTest_DestoryWindow_002
+ * @tc.desc: Test DestoryWindow
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(KnuckleDynamicDrawingManagerTest, KnuckleDynamicDrawingManagerTest_DestoryWindow_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    knuckleDynamicDrawingMgr->canvasNode_ = nullptr;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "knuckle window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    knuckleDynamicDrawingMgr->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_NE(knuckleDynamicDrawingMgr->surfaceNode_, nullptr);
+    knuckleDynamicDrawingMgr->canvasNode_ = Rosen::RSCanvasDrawingNode::Create();
+    ASSERT_NE(knuckleDynamicDrawingMgr->canvasNode_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(knuckleDynamicDrawingMgr->DestoryWindow());
 }
 } // namespace MMI
 } // namespace OHOS

@@ -1833,10 +1833,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             targetMouseWinIds_.clear();
         }
         for (const auto &item : windowsInfo) {
-            if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
-                winId2ZorderMap.insert({item.id, item.zOrder});
-                MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window");
-                continue;
+            if (transparentWins_.find(item.id) != transparentWins_.end()) {
+                if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
+                    winId2ZorderMap.insert({item.id, item.zOrder});
+                    MMI_HILOG_DISPATCHE("It's an abnormal window and pointer find the next window");
+                    continue;
+                }
             }
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
                 !IsValidZorderWindow(item, pointerEvent)) {
@@ -2568,10 +2570,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             winMap.insert({item.id, item});
             continue;
         }
-        if (IsTransparentWin(item.pixelMap, logicalX - item.area.x, logicalY - item.area.y)) {
-            MMI_HILOG_DISPATCHE("It's an abnormal window and touchscreen find the next window");
-            winMap.insert({item.id, item});
-            continue;
+        if (transparentWins_.find(item.id) != transparentWins_.end()) {
+            if (IsTransparentWin(transparentWins_[item.id], logicalX - item.area.x, logicalY - item.area.y)) {
+                MMI_HILOG_DISPATCHE("It's an abnormal window and touchscreen find the next window");
+                winMap.insert({item.id, item});
+                continue;
+            }
         }
         if (SkipAnnotationWindow(item.flags, pointerItem.GetToolType())) {
             winMap.insert({item.id, item});
@@ -3678,7 +3682,8 @@ void InputWindowsManager::SendCancelEventWhenLock()
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int32_t logicalY)
+bool InputWindowsManager::IsTransparentWin(
+    std::unique_ptr<Media::PixelMap> &pixelMap, int32_t logicalX, int32_t logicalY)
     __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
@@ -3688,15 +3693,13 @@ bool InputWindowsManager::IsTransparentWin(void* pixelMap, int32_t logicalX, int
 
     uint32_t dst = 0;
     OHOS::Media::Position pos { logicalY, logicalX };
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
-    CHKPF(pixelMapPtr);
-    uint32_t result = pixelMapPtr->ReadPixel(pos, dst);
+    uint32_t result = pixelMap->ReadPixel(pos, dst);
     if (result != RET_OK) {
         MMI_HILOGE("Failed to read pixelmap");
         return false;
     }
     MMI_HILOGD("dst:%{public}d, byteCount:%{public}d, width:%{public}d, height:%{public}d",
-        dst, pixelMapPtr->GetByteCount(), pixelMapPtr->GetWidth(), pixelMapPtr->GetHeight());
+        dst, pixelMap->GetByteCount(), pixelMap->GetWidth(), pixelMap->GetHeight());
     return dst == RET_OK;
 }
 
