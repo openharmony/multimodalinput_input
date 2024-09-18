@@ -169,8 +169,8 @@ private:
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };
     int32_t imageHeight_ { 0 };
-    int32_t canvasWidth_ = 64;
-    int32_t canvasHeight_ = 64;
+    int32_t canvasWidth_ { 64 };
+    int32_t canvasHeight_ { 64 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     std::list<PidInfo> hapPidInfos_;

@@ -687,7 +687,7 @@ void DfxHisysevent::ReportMagicCursorSizeChange(std::string fill_Code, std::stri
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
 }
- 
+
 void DfxHisysevent::ReportMagicCursorFault(std::string error_Code, std::string error_Name)
 {
     int32_t ret = HiSysEventWrite(

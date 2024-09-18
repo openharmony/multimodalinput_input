@@ -44,6 +44,7 @@ public:
     }
 
     virtual ~DisplyChangedReceiver() = default;
+
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         CALL_DEBUG_ENTER;
@@ -68,6 +69,7 @@ public:
             MMI_HILOGD("Display screen off");
             DISPLAY_MONITOR->SetScreenStatus(action);
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
+                MMI_HILOGI("Disable fingerSense");
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
             DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();

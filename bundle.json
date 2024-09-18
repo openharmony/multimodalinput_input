@@ -49,8 +49,8 @@
     "deps": {
       "components": [
         "window_manager",
-        "hisysevent",
         "start",
+        "hisysevent",
         "napi",
         "c_utils",
         "ipc",
