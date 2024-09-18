@@ -146,7 +146,6 @@ group("mmi_tests") {
     "service:EventHandlerTest",
     "service:EventNormalizeHandlerTest",
     "service:InfraredEmitterTest",
-    "service:InputWindowsManagerEXTest",
     "service:InputWindowsManagerTest",
     "service:InterceptorExTest",
     "service:InterceptorTest",

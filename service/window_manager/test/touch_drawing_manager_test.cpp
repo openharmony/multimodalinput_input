@@ -153,6 +153,82 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, Tes
 }
 
 /**
+ * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_001
+ * @tc.desc: Test DrawBubbleHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    EXPECT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->pointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_002
+ * @tc.desc: Test DrawBubbleHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    EXPECT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->pointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubbleHandler_003
+ * @tc.desc: Test DrawBubbleHandler
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubbleHandler_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    EXPECT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->pointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubbleHandler());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubble_001
+ * @tc.desc: Test DrawBubble
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubble());
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_DrawBubble_002
+ * @tc.desc: Test DrawBubble
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    EXPECT_NE(pointerEvent, nullptr);
+    TOUCH_DRAWING_MGR->pointerEvent_ = pointerEvent;
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawBubble());
+}
+
+/**
  * @tc.name: TouchDrawingManagerTest_DrawPointerPositionHandler_001
  * @tc.desc: Test DrawPointerPositionHandler
  * @tc.type: Function
