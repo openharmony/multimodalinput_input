@@ -25,11 +25,16 @@ ohos_source_set("libinput_interface_sources") {
     debug = false
   }
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
+  ]
 
   sources = [ "src/libinput_interface.cpp" ]
 
   public_configs = [ ":libinput_interface_sources_public_config" ]
+
+  deps = [ "//third_party/libinput/patch:apply_patch" ]
 
   public_deps = [ "${mmi_path}/libudev:mmi_libudev" ]
 
