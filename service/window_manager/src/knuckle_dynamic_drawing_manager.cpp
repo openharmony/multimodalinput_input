@@ -381,7 +381,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId_ = FOLD_SCREEN_MAIN_ID;
     }
-    MMI_HILOGI("screenId_: %{public}"zu, screenId_);
+    MMI_HILOGI("screenId_: %{public}zu", screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     CHKPV(knuckleDrawMgr_);
     if (knuckleDrawMgr_->CheckRotatePolicy(displayInfo_)) {
