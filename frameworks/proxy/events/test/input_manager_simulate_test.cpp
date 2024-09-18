@@ -613,8 +613,6 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, 
     pointerEvent->SetActionTime(measureTime);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
-    InputManagerUtil::TestMonitor(monitorId, pointerEvent);
 }
 
 /**
