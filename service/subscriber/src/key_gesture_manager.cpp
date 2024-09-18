@@ -245,7 +245,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             output << "[LongPressCombinationKey] ";
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("%{public}s is active now", output.str().c_str());
+                MMI_HILOGI("%s is active now", output.str().c_str());
             } else {
                 MMI_HILOGI("%s is active now", output.str().c_str());
             }
@@ -256,7 +256,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             output << "[LongPressCombinationKey] Switch off ";
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("%{public}s", output.str().c_str());
+                MMI_HILOGI("%s switch off", output.str().c_str());
             } else {
                 MMI_HILOGI("%s switch off", output.str().c_str());
             }
@@ -267,7 +267,7 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             output << "[LongPressCombinationKey] No handler for ";
             Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("%{public}s", output.str().c_str());
+                MMI_HILOGI("No handler for %s", output.str().c_str());
             } else {
                 MMI_HILOGI("No handler for %s", output.str().c_str());
             }
@@ -323,7 +323,7 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     output << "[LongPressCombinationKey] trigger ";
     Dump(output);
     if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-        MMI_HILOGI("%{public}s", output.str().c_str());
+        MMI_HILOGI("%s trigger", output.str().c_str());
     } else {
         MMI_HILOGI("%s trigger", output.str().c_str());
     }
@@ -410,7 +410,7 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
             std::ostringstream output;
             (*iter)->Dump(output);
             if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
-                MMI_HILOGI("Intercepted by %{public}s", output.str().c_str());
+                MMI_HILOGI("Intercepted by %s", output.str().c_str());
             } else {
                 MMI_HILOGI("Intercepted by %s", output.str().c_str());
             }

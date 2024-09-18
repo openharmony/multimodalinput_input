@@ -17,6 +17,7 @@
 
 #include "cooperate_context.h"
 #include "devicestatus_define.h"
+#include "display_manager.h"
 #include "input_event_transmission/input_event_serialization.h"
 #include "utility.h"
 
@@ -93,15 +94,6 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGI("Reset to origin action:%{public}d", static_cast<int32_t>(originAction));
         pointerEvent->SetPointerAction(originAction);
     }
-    if ((pointerEvent->GetSourceType() == MMI::PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (pointerEvent->GetPointerAction() == MMI::PointerEvent::POINTER_ACTION_BUTTON_UP)) {
-        timerId_ = env_->GetTimerManager().AddTimer(UP_WAIT_TIMEOUT, REPEAT_ONCE, [this]() {
-            if (env_->GetDragManager().GetCooperatePriv() & MOTION_DRAG_PRIV) {
-                FI_HILOGW("There is an up event when dragging");
-                env_->GetDragManager().SetAllowStartDrag(false);
-            }
-        });
-    }
     NetPacket packet(MessageId::DSOFTBUS_INPUT_POINTER_EVENT);
 
     int32_t ret = InputEventSerialization::Marshalling(pointerEvent, packet);
@@ -109,7 +101,7 @@ void InputEventInterceptor::OnPointerEvent(std::shared_ptr<MMI::PointerEvent> po
         FI_HILOGE("Failed to serialize pointer event");
         return;
     }
-    FI_HILOGD("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
+    FI_HILOGI("PointerEvent(No:%{public}d,Source:%{public}s,Action:%{public}s)",
         pointerEvent->GetId(), pointerEvent->DumpSourceType(), pointerEvent->DumpPointerAction());
     env_->GetDSoftbus().SendPacket(remoteNetworkId_, packet);
 }
