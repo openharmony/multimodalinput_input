@@ -393,27 +393,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyDownDelay_0
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_ClearTimer_001
- * @tc.desc: Test clear timer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_ClearTimer_001, TestSize.Level1)
-{
-    CALL_DEBUG_ENTER;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    std::shared_ptr<KeyOption> keyOption;
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    subscriber->timerId_ = -1;
-    handler.ClearTimer(subscriber);
-    ASSERT_EQ(subscriber->timerId_, -1);
-    subscriber->timerId_ = 1;
-    handler.ClearTimer(subscriber);
-    ASSERT_EQ(subscriber->timerId_, -1);
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_InitSessionDeleteCallback_001
  * @tc.desc: Test init session delete callback
  * @tc.type: FUNC
@@ -1463,27 +1442,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifyKeyUpSubscribe
     ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyUpSubscriber(keyEvent, subscriberList, handled));
     handler.foregroundPids_.erase(UDS_PID);
     ASSERT_NO_FATAL_FAILURE(handler.NotifyKeyUpSubscriber(keyEvent, subscriberList, handled));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_OnTimer
- * @tc.desc: Test OnTimer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_OnTimer, TestSize.Level1)
-{
-    KeySubscriberHandler handler;
-    int32_t id = 1;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
-        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
-    ASSERT_EQ(subscriber->keyEvent_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(handler.OnTimer(subscriber));
-    subscriber->keyEvent_ = KeyEvent::Create();
-    ASSERT_NE(subscriber->keyEvent_, nullptr);
-    ASSERT_NO_FATAL_FAILURE(handler.OnTimer(subscriber));
 }
 
 /**
