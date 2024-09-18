@@ -1494,7 +1494,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
     ASSERT_EQ(ret, RET_OK);
     visible = true;
     priority = 1;
-        ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
+    ret = pointerDrawingManager->SetPointerVisible(pid, visible, priority, false);
     ASSERT_EQ(ret, RET_OK);
     visible = false;
     priority = 1;
