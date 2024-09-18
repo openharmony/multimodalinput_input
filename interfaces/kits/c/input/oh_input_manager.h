@@ -179,17 +179,17 @@ typedef enum InputEvent_SourceType {
  * @since 13
  */
 typedef enum Input_KeyboardType {
-    /** 表示无按键设备。 */
+    /** Keyboard without keys */
     KEYBOARD_TYPE_NONE = 0,
-    /** 表示未知按键设备。 */
+    /** Keyboard with unknown keys */
     KEYBOARD_TYPE_UNKNOWN = 1,
-    /** 表示全键盘设备。 */
+    /** Full keyboard */
     KEYBOARD_TYPE_ALPHABETIC = 2,
-    /** 表示数字键盘设备。 */
+    /** Digital keyboard */
     KEYBOARD_TYPE_DIGITAL = 3,
-    /** 表示手写笔设备。 */
+    /** Stylus */
     KEYBOARD_TYPE_STYLUS = 4,
-    /** 表示遥控器设备。 */
+    /** Remote control */
     KEYBOARD_TYPE_REMOTE_CONTROL = 5,
 } Input_KeyboardType;
 
@@ -295,15 +295,15 @@ typedef void (*Input_AxisEventCallback)(const Input_AxisEvent* axisEvent);
 typedef void (*Input_HotkeyCallback)(Input_Hotkey* hotkey);
 
 /**
- * @brief 回调函数，用于回调输入设备的上线事件。
- * @param deviceId 设备的id。
+ * @brief Defines the callback for device addition events.
+ * @param deviceId deviceId Device ID.
  * @since 13
  */
 typedef void (*Input_DeviceAddedCallback)(int32_t deviceId);
 
 /**
- * @brief 回调函数，用于回调输入设备的下线事件。
- * @param deviceId 设备的id。
+ * @brief Defines the callback for device removal events.
+ * @param deviceId Device ID.
  * @since 13
  */
 typedef void (*Input_DeviceRemovedCallback)(int32_t deviceId);
@@ -323,13 +323,13 @@ typedef struct Input_InterceptorEventCallback {
 } Input_InterceptorEventCallback;
 
 /**
- * @brief 定义一个结构体用于监听设备热插拔
+ * @brief Defines a listener for device insertion and removal events.
  * @since 13
  */
 typedef struct Input_DeviceListener {
-    /** 定义一个回调函数用于回调设备上线事件 */
+    /** Callback for device addition events */
     Input_DeviceAddedCallback deviceAddedCallback;
-    /** 定义一个回调函数用于回调设备下线事件 */
+    /** Callback for device removal events */
     Input_DeviceRemovedCallback deviceRemovedCallback;
 } Input_DeviceListener;
 
@@ -340,7 +340,7 @@ typedef struct Input_DeviceListener {
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
 
 /**
- * @brief 输入设备信息。
+ * @brief Represents information about the input device.
  *
  * @since 13
  */
@@ -1383,27 +1383,28 @@ void OH_Input_DestroyAllSystemHotkeys(Input_Hotkey **hotkeys, int32_t count);
 Input_Result OH_Input_GetAllSystemHotkeys(Input_Hotkey **hotkey, int32_t *count);
 
 /**
- * @brief 注册设备热插拔的监听器
+ * @brief Registers a listener for device hot swap events.
  *
- * @param listener 指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
+ * @param listener Pointer to an {@Link Input_DeviceListener} object.
  *
- * @return OH_Input_RegisterDeviceListener 的返回值, 具体如下:
- *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为NULL
+ * @return OH_Input_RegisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if listener is NULL;
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
 Input_Result OH_Input_RegisterDeviceListener(Input_DeviceListener* listener);
 
 /**
- * @brief 取消注册设备热插拔的监听
+ * @brief Unregisters the listener for device hot swap events.
  *
- * @param listener  指向设备热插拔监听器{@Link Input_DeviceListener}的指针.
+ * @param listener Pointer to the listener for device hot swap events. For details, see {@Link Input_DeviceListener}.
  *
- * @return OH_Input_UnregisterDeviceListener 的返回值, 具体如下:
- *         {@link INPUT_SUCCESS} 调用成功;\n
- *         {@link INPUT_PARAMETER_ERROR} listener 为 NULL 或者 listener 未被注册
- *         {@link INPUT_SERVICE_EXCEPTION} 由于服务异常调用失败
+ * @return OH_Input_UnregisterDeviceListener status code, specifically,
+ *         {@link INPUT_SUCCESS} if the operation is successful;\n
+ *         {@link INPUT_PARAMETER_ERROR} if listener is NULL or no listener is registered;
+ *         {@link INPUT_SERVICE_EXCEPTION} if the service is abnormal.
+
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */

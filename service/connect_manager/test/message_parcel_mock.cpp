@@ -169,6 +169,11 @@ bool PermissionHelper::CheckInputEventFilter()
     return DfsMessageParcel::messageParcel->CheckInputEventFilter();
 }
 
+bool PermissionHelper::CheckInjectPermission()
+{
+    return DfsMessageParcel::messageParcel->CheckInjectPermission();
+}
+
 bool PermissionHelper::CheckInterceptor()
 {
     return DfsMessageParcel::messageParcel->CheckInterceptor();

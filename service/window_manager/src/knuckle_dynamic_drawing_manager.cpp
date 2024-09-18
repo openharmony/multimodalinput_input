@@ -84,10 +84,9 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
         .width = DESIRED_SIZE,
         .height = DESIRED_SIZE
     };
- 
+
     decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
-
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     CHKPL(pixelMap);
     return pixelMap;
@@ -382,7 +381,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId_ = FOLD_SCREEN_MAIN_ID;
     }
-    MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
+    MMI_HILOGI("screenId_: %{public}"zu, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
     CHKPV(knuckleDrawMgr_);
     if (knuckleDrawMgr_->CheckRotatePolicy(displayInfo_)) {
