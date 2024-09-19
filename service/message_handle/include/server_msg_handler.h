@@ -125,6 +125,7 @@ private:
     void CalculateOffset(Direction direction, Offset &offset);
     int32_t OnUiExtentionWindowInfo(NetPacket &pkt, WindowInfo& info);
     bool CloseInjectNotice(int32_t pid);
+
 private:
     UDSServer *udsServer_ { nullptr };
     std::map<int32_t, int32_t> nativeTargetWindowIds_;
