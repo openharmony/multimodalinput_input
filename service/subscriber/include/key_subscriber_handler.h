@@ -41,6 +41,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     bool IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType);
+    void InitDataShareListener();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
@@ -125,6 +126,9 @@ private:
     void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
     void GetForegroundPids(std::set<int32_t> &pidList);
     void PublishKeyPressCommonEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleCallEnded(std::shared_ptr<KeyEvent> keyEvent);
+    void HangUpCallProcess();
+    void RejectCallProcess();
 
 private:
     SubscriberCollection subscriberMap_;
@@ -139,6 +143,7 @@ private:
     std::set<int32_t> foregroundPids_ {};
     bool isForegroundExits_ { false };
     bool needSkipPowerKeyUp_ { false };
+    bool callBahaviorState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
