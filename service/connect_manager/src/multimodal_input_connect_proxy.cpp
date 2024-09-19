@@ -2118,7 +2118,7 @@ int32_t MultimodalInputConnectProxy::GetHardwareCursorStats(uint32_t &frameCount
     MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
     READUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
     READUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
-    return ret;    
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::GetPointerSnapshot(void *pixelMapPtr)
