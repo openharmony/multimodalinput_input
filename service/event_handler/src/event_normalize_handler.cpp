@@ -111,13 +111,13 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     }
     if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
         (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLE_TAP)) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+        MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         return;
     }
     if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
         auto iter = std::find(ALL_EVENT_TYPES.begin(), ALL_EVENT_TYPES.end(), static_cast<int32_t>(type));
         if (iter != ALL_EVENT_TYPES.end()) {
-            MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+            MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault();
         }
     }
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
@@ -479,7 +479,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         g_isSwipeInward = false;
     }
     if (buttonIds_.empty()) {
-        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
+        MULTI_FINGERTAP_HDR->SetMultiFingersTapHdrDefault(false);
     }
     return RET_OK;
 #else
