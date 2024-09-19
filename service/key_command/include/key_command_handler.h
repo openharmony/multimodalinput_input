@@ -398,6 +398,7 @@ private:
     int64_t previousUpTime_ { 0 };
     int32_t tappingCount_ { 0 };
     std::mutex mutex_;
+    std::map<int32_t, int64_t> lastPointerDownTime_;
 };
 } // namespace MMI
 } // namespace OHOS
