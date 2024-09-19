@@ -30,18 +30,18 @@ namespace OHOS {
 namespace MMI {
 bool PermissionHelper::VerifySystemApp()
 {
-    MMI_HILOGD("verify system App");
+    MMI_HILOGD("Verify system App");
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
+    MMI_HILOGD("Token type is %{public}d", static_cast<int32_t>(tokenType));
     if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE
         || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        MMI_HILOGD("called tokenType is native, verify success");
+        MMI_HILOGD("Called tokenType is native, verify success");
         return true;
     }
     uint64_t accessTokenIdEx = IPCSkeleton::GetCallingFullTokenID();
     if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(accessTokenIdEx)) {
-        MMI_HILOGE("system api is called by non-system app");
+        MMI_HILOGE("System api is called by non-system app");
         return false;
     }
     return true;
@@ -93,26 +93,6 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
         return false;
     }
     MMI_HILOGD("Check hap permission success");
-    return true;
-}
-
-bool PermissionHelper::CheckInjectPermission()
-{
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    MMI_HILOGD("Token type is %{public}d", static_cast<int32_t>(tokenType));
-    if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
-        MMI_HILOGD("called tokenType is shell, verify success");
-        return true;
-    }
-    std::string injectPermissionCode = "ohos.permission.INJECT_INPUT_EVENT";
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, injectPermissionCode);
-    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("Check Permission: %{public}s fail for appId:%{public}d, and ret:%{public}d",
-                   injectPermissionCode.c_str(), tokenId, ret);
-        return false;
-    }
-    MMI_HILOGD("Check permission( %{public}s) permission success", injectPermissionCode.c_str());
     return true;
 }
 
