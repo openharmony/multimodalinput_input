@@ -26,7 +26,6 @@
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "util.h"
-#include "xcollie/watchdog.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIClient"

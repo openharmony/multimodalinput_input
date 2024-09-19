@@ -622,7 +622,7 @@ int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch 
     CALL_DEBUG_ENTER;
     CHKPR(event, RET_ERR);
     // if is not multifigners tap, return.
-    if (tapTrends_ == TapTrends::NOMULTAP) {
+    if (tapTrends_ == TapTrends::NO_MULTAP) {
         MMI_HILOGD("The tapsTrends is MOMULTAP");
         return RET_OK;
     }
