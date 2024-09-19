@@ -157,14 +157,6 @@ public:
     {
         return subscribeId;
     }
-    int32_t SetTouchpadThreeFingersTapSwitch(bool switchFlag) override
-    {
-        return static_cast<int32_t>(switchFlag);
-    }
-    int32_t GetTouchpadThreeFingersTapSwitch(bool &switchFlag) override
-    {
-        return retGetTouchpadThreeFingersTapSwitch_;
-    }
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override { return subscribeId; }
     int32_t SubscribeSwitchEvent(int32_t subscribeId, int32_t switchType) override { return subscribeId; }
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId) override { return subscribeId; }
@@ -263,15 +255,6 @@ public:
         *newPixelMapPtr = pixelMap_;
         return retSnapshot_;
     }
-    int32_t SetTouchpadScrollRows(int32_t rows) override
-    {
-        return touchpadScrollRows_;
-    }
-    int32_t GetTouchpadScrollRows(int32_t &rows) override
-    {
-        rows = parameterRows_;
-        return touchpadScrollRows_;
-    }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override { return retChannel_; }
@@ -281,10 +264,6 @@ public:
         return retTransferBinderClientSrv_;
     }
     std::shared_ptr<Media::PixelMap> CreatePixelMap(int32_t width, int32_t height);
-    int32_t SkipPointerLayer(bool isSkip) override
-    {
-        return skipMouseLayer_;
-    }
 
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t rows_ = 0;
