@@ -157,12 +157,10 @@ int32_t FingerprintEventProcessor::AnalyseKeyEvent(struct libinput_event *event)
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGD("Fingerprint key:%{public}d", pointerEvent->GetPointerAction());
-#ifdef OHOS_BUILD_ENABLE_MONITOR
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {
         eventMonitorHandler_->OnHandleEvent(pointerEvent);
     }
-#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -184,12 +182,10 @@ int32_t FingerprintEventProcessor::AnalysePointEvent(libinput_event * event)
     pointerEvent->SetPointerId(0);
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     MMI_HILOGD("Fingerprint key:%{public}d, ux:%f, uy:%f", pointerEvent->GetPointerAction(), ux, uy);
-#ifdef OHOS_BUILD_ENABLE_MONITOR
     auto eventMonitorHandler_ = InputHandler->GetMonitorHandler();
     if (eventMonitorHandler_ != nullptr) {
         eventMonitorHandler_->OnHandleEvent(pointerEvent);
     }
-#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
