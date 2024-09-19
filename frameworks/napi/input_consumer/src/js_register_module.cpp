@@ -38,8 +38,8 @@ constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
 constexpr int32_t OCCUPIED_BY_OTHER = -4;
 } // namespace
 
-static Callbacks callbacks = {};
-static Callbacks hotkeyCallbacks = {};
+static Callbacks callbacks;
+static Callbacks hotkeyCallbacks;
 static std::mutex sCallBacksMutex;
 static const std::vector<int32_t> pressKeyCodes = {
     KeyEvent::KEYCODE_ALT_LEFT,
@@ -83,7 +83,7 @@ void JsCommon::ThrowError(napi_env env, int32_t code)
     }
 }
 
-napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -169,7 +169,7 @@ napi_value GetHotkeyEventInfo(napi_env env, napi_callback_info info, KeyEventMon
     return ret;
 }
 
-napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -269,7 +269,7 @@ static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
     return false;
 }
 
-static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
+static bool MatchCombinationKeys(sptr<KeyEventMonitorInfo> monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitorInfo);
@@ -363,7 +363,7 @@ static void SubHotkeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
     }
 }
 
-napi_value SubscribeKey(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+napi_value SubscribeKey(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -397,7 +397,7 @@ napi_value SubscribeKey(napi_env env, napi_callback_info info, KeyEventMonitorIn
     return ret;
 }
 
-napi_value SubscribeHotkey(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+napi_value SubscribeHotkey(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -438,7 +438,7 @@ napi_value SubscribeHotkey(napi_env env, napi_callback_info info, KeyEventMonito
     return ret;
 }
 
-bool GetEventType(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event, std::string &keyType)
+bool GetEventType(napi_env env, napi_callback_info info, sptr<KeyEventMonitorInfo> event, std::string &keyType)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
@@ -488,10 +488,8 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(sCallBacksMutex);
-    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
-        .env = env,
-        .asyncWork = nullptr,
-    };
+    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
+    event->env = env;
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
@@ -501,24 +499,20 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     if (argc < INPUT_PARAMETER_MAX) {
         MMI_HILOGE("Parameter number error argc:%{public}zu", argc);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter number error");
-        delete event;
         return nullptr;
     }
     if (!GetEventType(env, info, event, keyType)) {
         MMI_HILOGE("GetEventType fail, type must be key or hotkeyChange");
-        delete event;
         return nullptr;
     }
     event->name = keyType;
     if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
         if (SubscribeHotkey(env, info, event, keyOption) == nullptr) {
-            delete event;
             MMI_HILOGE("SubscribeHotkey failed");
             return nullptr;
         }
     } else {
         if (SubscribeKey(env, info, event, keyOption) == nullptr) {
-            delete event;
             MMI_HILOGE("SubscribeKey failed");
             return nullptr;
         }
@@ -530,10 +524,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(sCallBacksMutex);
-    KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
-        .env = env,
-        .asyncWork = nullptr,
-    };
+    sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
+    event->env = env;
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
@@ -545,23 +537,19 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     int32_t subscribeId = -1;
     if (keyType == HOTKEY_SUBSCRIBE_TYPE) {
         if (GetHotkeyEventInfo(env, info, event, keyOption) == nullptr) {
-            delete event;
             MMI_HILOGE("GetHotkeyEventInfo failed");
             return nullptr;
         }
         if (DelEventCallback(env, hotkeyCallbacks, event, subscribeId) < 0) {
-            delete event;
             MMI_HILOGE("DelEventCallback failed");
             return nullptr;
         }
     } else {
         if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-            delete event;
             MMI_HILOGE("GetEventInfoAPI9 failed");
             return nullptr;
         }
         if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
-            delete event;
             MMI_HILOGE("DelEventCallback failed");
             return nullptr;
         }
@@ -571,7 +559,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
-    delete event;
     return nullptr;
 }
 
@@ -685,17 +672,7 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
 }
 
 KeyEventMonitorInfo::~KeyEventMonitorInfo()
-{
-    if (callback == nullptr) {
-        return;
-    }
-    uint32_t refcount = 0;
-    CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
-    if (refcount == 0) {
-        CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
-    }
-    callback = nullptr;
-}
+{}
 
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)

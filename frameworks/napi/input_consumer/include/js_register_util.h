@@ -49,10 +49,10 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
 std::string GetNamedPropertyString(const napi_env &env, const napi_value &object, const std::string &name);
 std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name);
 napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params);
-int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event);
-int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event);
-int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event, int32_t &subscribeId);
-void EmitAsyncCallbackWork(KeyEventMonitorInfo *event);
+int32_t GetPreSubscribeId(Callbacks &callbacks, sptr<KeyEventMonitorInfo> event);
+int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event);
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event, int32_t &subscribeId);
+void EmitAsyncCallbackWork(sptr<KeyEventMonitorInfo> event);
 
 napi_value ConvertHotkeyToNapiValue(napi_env env, const KeyOption &keyOption);
 napi_value ConvertHotkeysToNapiArray(sptr<CallbackInfo> cb);

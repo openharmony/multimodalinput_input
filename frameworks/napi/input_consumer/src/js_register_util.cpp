@@ -141,7 +141,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
     return ret;
 }
 
-int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
+int32_t GetPreSubscribeId(Callbacks &callbacks, sptr<KeyEventMonitorInfo> event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto it = callbacks.find(event->eventType);
@@ -153,7 +153,7 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
     return it->second.front()->subscribeId;
 }
 
-int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *> &info,
+int32_t DelEventCallbackRef(const napi_env &env, std::list<sptr<KeyEventMonitorInfo>> &info,
     napi_value handler, int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
@@ -169,31 +169,29 @@ int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *
             bool isEquals = false;
             CHKRR(napi_strict_equals(env, handler, iterHandler, &isEquals), STRICT_EQUALS, JS_CALLBACK_EVENT_FAILED);
             if (isEquals) {
-                KeyEventMonitorInfo *monitorInfo = *iter;
+                sptr<KeyEventMonitorInfo> monitorInfo = *iter;
                 info.erase(iter++);
                 if (info.empty()) {
                     subscribeId = monitorInfo->subscribeId;
                 }
-                delete monitorInfo;
                 MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
                 return JS_CALLBACK_EVENT_SUCCESS;
             }
             ++iter;
             continue;
         }
-        KeyEventMonitorInfo *monitorInfo = *iter;
+        sptr<KeyEventMonitorInfo> monitorInfo = *iter;
         info.erase(iter++);
         if (info.empty()) {
             subscribeId = monitorInfo->subscribeId;
         }
-        delete monitorInfo;
         MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
     }
     MMI_HILOGD("Callback size:%{public}zu", info.size());
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
+int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -210,7 +208,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     auto it = callbacks.find(event->eventType);
     for (const auto &iter: it->second) {
         napi_value handler2 = nullptr;
-        status = napi_get_reference_value(env, (*iter).callback, &handler2);
+        status = napi_get_reference_value(env, iter->callback, &handler2);
         if (status != napi_ok) {
             MMI_HILOGE("Handler2 get reference value failed");
             return JS_CALLBACK_EVENT_FAILED;
@@ -230,7 +228,8 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event, int32_t &subscribeId)
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, sptr<KeyEventMonitorInfo> event,
+    int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -274,106 +273,62 @@ static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOptio
     MMI::SetNamedProperty(env, result, "isRepeat", static_cast<int32_t>(keyOption->IsRepeat()));
 }
 
-struct KeyEventMonitorInfoWorker {
-    napi_env env{nullptr};
-    napi_ref callback{nullptr};
-    std::string name;
-    std::shared_ptr<KeyOption> keyOption{nullptr};
-
-    ~KeyEventMonitorInfoWorker()
-    {
-        if (callback == nullptr) {
-            return;
-        }
-        uint32_t refcount = 0;
-        CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
-        if (refcount == 0) {
-            CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
-        }
-        callback = nullptr;
-    }
-};
-
 void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     CHKPV(work);
     if (work->data == nullptr) {
+        DeletePtr<uv_work_t *>(work);
         MMI_HILOGE("Check data is nullptr");
-        delete work;
-        work = nullptr;
         return;
     }
     (void)status;
-    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
-    delete work;
-    work = nullptr;
-    napi_env env = dataWorker->env;
+    sptr<KeyEventMonitorInfo> dataWorker(static_cast<KeyEventMonitorInfo *>(work->data));
+    DeletePtr<uv_work_t *>(work);
+    dataWorker->DecStrongRef(nullptr);
+    CHKPV(dataWorker->env);
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
+    napi_open_handle_scope(dataWorker->env, &scope);
     if (scope == nullptr) {
-        delete dataWorker;
         MMI_HILOGE("Scope is nullptr");
         return;
     }
     napi_value callback = nullptr;
     MMI_HILOGD("deliver uv work from %{public}d", GetPid());
     if (dataWorker->callback == nullptr) {
-        delete dataWorker;
         MMI_HILOGE("dataWorker->callback is nullptr");
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(dataWorker->env, scope);
         return;
     }
-    if ((napi_get_reference_value(env, dataWorker->callback, &callback)) != napi_ok) {
-        delete dataWorker;
+    if ((napi_get_reference_value(dataWorker->env, dataWorker->callback, &callback)) != napi_ok) {
         MMI_HILOGE("%{public}s failed", std::string(GET_REFERENCE_VALUE).c_str());
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(dataWorker->env, scope);
         return;
     }
     napi_value result = nullptr;
-    AsyncWorkFn(env, dataWorker->keyOption, result, dataWorker->name);
+    AsyncWorkFn(dataWorker->env, dataWorker->keyOption, result, dataWorker->name);
     napi_value callResult = nullptr;
-    if ((napi_call_function(env, nullptr, callback, 1, &result, &callResult)) != napi_ok) {
-        delete dataWorker;
+    if ((napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult)) != napi_ok) {
         MMI_HILOGE("%{public}s failed", std::string(CALL_FUNCTION).c_str());
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(dataWorker->env, scope);
         return;
     }
-    delete dataWorker;
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(dataWorker->env, scope);
 }
 
-void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
+void EmitAsyncCallbackWork(sptr<KeyEventMonitorInfo> reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
-    auto *dataWorker = new(std::nothrow) KeyEventMonitorInfoWorker();
-    if (dataWorker == nullptr) {
-        MMI_HILOGE("dataWorker is nullptr");
-        return;
-    }
-
-    dataWorker->env = reportEvent->env;
-    dataWorker->callback = reportEvent->callback;
-    dataWorker->name = reportEvent->name;
-    // `callback` is "owned" by `reportEvent`, now `dataWorker` also reference to it, so add refcount.
-    // `callback` reference will be released in destructor of `KeyEventMonitorInfo` or `KeyEventMonitorInfoWorker`.
-    // it's up to which one has longer lifetime.
-    if ((napi_reference_ref(dataWorker->env, dataWorker->callback, nullptr)) != napi_ok) {
-        delete dataWorker;
-        MMI_HILOGE("%{public}s failed", std::string(REFERENCE_REF).c_str());
-        return;
-    }
-    dataWorker->keyOption = reportEvent->keyOption;
-    auto *work = new (std::nothrow) uv_work_t;
+    uv_work_t *work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         MMI_HILOGE("work is nullptr");
-        delete dataWorker;
         return;
     }
-    work->data = static_cast<void *>(dataWorker);
+    reportEvent->IncStrongRef(nullptr);
+    work->data = reportEvent.GetRefPtr();
     int32_t ret = uv_queue_work_with_qos(
         loop, work,
         [](uv_work_t *work) {
@@ -381,8 +336,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         },
         UvQueueWorkAsyncCallback, uv_qos_user_initiated);
     if (ret != 0) {
-        delete dataWorker;
-        delete work;
+        DeletePtr<uv_work_t *>(work);
     }
 }
 
