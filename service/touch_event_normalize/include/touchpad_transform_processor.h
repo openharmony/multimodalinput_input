@@ -44,7 +44,7 @@ public:
         BEGIN = 0,
         DOWNING = 1,
         UPING = 2,
-        NOMULTAP = 3,
+        NO_MULTAP = 3,
     };
 
     int32_t HandleMulFingersTap(struct libinput_event_touch *event, int32_t type);
