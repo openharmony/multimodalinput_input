@@ -2707,7 +2707,6 @@ int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
 {
-    rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
