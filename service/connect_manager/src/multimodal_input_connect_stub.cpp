@@ -2357,7 +2357,7 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
         MMI_HILOGE("GetHapTokenInfo failed");
         return RET_ERR;
     }
-    callingTokenName = callingTokenInfo.bundleName;   
+    callingTokenName = callingTokenInfo.bundleName;
     int32_t callingUid = GetCallingUid();
     if (callingUid < UID_TRANSFORM_DIVISOR) {
         MMI_HILOGE("CallingUid is not within the range:%{public}d", callingUid);
