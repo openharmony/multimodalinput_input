@@ -2547,20 +2547,6 @@ void MMIService::InitPreferences()
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
 }
 
-int32_t MMIService::SetMoveEventFilters(bool flag)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputEventHandler::SetMoveEventFilters, InputHandler, flag));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to set move event filter flag, ret:%{public}d", ret);
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
-    return RET_OK;
-}
-
 int32_t MMIService::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
@@ -2707,6 +2693,11 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
     int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+}
+
+void MMIService::PrintLog(const std::string &flag, int32_t duration)
+{
+    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
 } // namespace MMI
 } // namespace OHOS
