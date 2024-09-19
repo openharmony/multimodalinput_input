@@ -28,7 +28,6 @@ enum class ReturnType {
     BOOL,
     NUMBER,
 };
-constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 }
 
 bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
@@ -973,30 +972,6 @@ napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value ha
     return GetTouchpadBoolData(env, handle, rotateSwitch, ret);
 }
 
-napi_value JsPointerManager::SetMoveEventFilters(napi_env env, bool flag)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = InputManager::GetInstance()->SetMoveEventFilters(flag);
-    napi_value result = nullptr;
-    CHKRP(napi_create_int32(env, ret, &result), CREATE_INT32);
-    return result;
-}
-
-napi_value JsPointerManager::SetTouchpadThreeFingersTapSwitch(napi_env env, bool switchFlag, napi_value handle)
-{
-    CALL_DEBUG_ENTER;
-    int32_t ret = InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(switchFlag);
-    return SetTouchpadData(env, handle, ret);
-}
-
-napi_value JsPointerManager::GetTouchpadThreeFingersTapSwitch(napi_env env, napi_value handle)
-{
-    CALL_DEBUG_ENTER;
-    bool switchFlag = true;
-    int32_t ret = InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(switchFlag);
-    return GetTouchpadBoolData(env, handle, switchFlag, ret);
-}
-
 napi_value JsPointerManager::EnableHardwareCursorStats(napi_env env, bool enable)
 {
     CALL_DEBUG_ENTER;
@@ -1024,9 +999,9 @@ napi_value JsPointerManager::GetHardwareCursorStats(napi_env env)
     MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d",
         frameCount, vsyncCount);
     napi_value frameNapiCount;
-    CHKRP(napi_create_uint32(env, frameCount, &frameNapiCount), CREATE_INT32);
+    NAPI_CALL(env, napi_create_uint32(env, frameCount, &frameNapiCount));
     napi_value vsyncNapiCount;
-    CHKRP(napi_create_uint32(env, vsyncCount, &vsyncNapiCount), CREATE_INT32);
+    NAPI_CALL(env, napi_create_uint32(env, vsyncCount, &vsyncNapiCount));
     status = napi_set_named_property(env, result, "frameCount", frameNapiCount);
     if (status != napi_ok) {
         MMI_HILOGE("Napi set frameCount named property is failed");
@@ -1038,60 +1013,6 @@ napi_value JsPointerManager::GetHardwareCursorStats(napi_env env)
         return nullptr;
     }
     return result;
-}
-
-napi_value JsPointerManager::SetTouchpadScrollRows(napi_env env, int32_t rows, napi_value handle)
-{
-    CALL_DEBUG_ENTER;
-    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    CHKPP(asyncContext);
-    asyncContext->errorCode = InputManager::GetInstance()->SetTouchpadScrollRows(rows);
-    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("Non system applications use system API");
-        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-        return nullptr;
-    }
-    asyncContext->reserve << ReturnType::VOID;
-    napi_value promise = nullptr;
-    if (handle != nullptr) {
-        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        if (napi_get_undefined(env, &promise) != napi_ok) {
-            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
-            return nullptr;
-        }
-    } else {
-        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
-    }
-    AsyncCallbackWork(asyncContext);
-    return promise;
-}
-
-napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value handle)
-{
-    CALL_DEBUG_ENTER;
-    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    CHKPP(asyncContext);
-    int32_t rows = TOUCHPAD_SCROLL_ROWS;
-    asyncContext->errorCode = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
-    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
-        MMI_HILOGE("Non system applications use system API");
-        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
-        return nullptr;
-    }
-    asyncContext->reserve << ReturnType::NUMBER << rows;
-    napi_value promise = nullptr;
-    uint32_t initialRefCount = 1;
-    if (handle != nullptr) {
-        CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
-        if (napi_get_undefined(env, &promise) != napi_ok) {
-            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
-            return nullptr;
-        }
-    } else {
-        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
-    }
-    AsyncCallbackWork(asyncContext);
-    return promise;
 }
 } // namespace MMI
 } // namespace OHOS

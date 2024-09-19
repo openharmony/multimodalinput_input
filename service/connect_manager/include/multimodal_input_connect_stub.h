@@ -36,7 +36,6 @@ public:
     virtual ~MultimodalInputConnectStub() = default;
 
     virtual bool IsRunning() const = 0;
-    virtual void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) = 0;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
         MessageOption& options) override;
 

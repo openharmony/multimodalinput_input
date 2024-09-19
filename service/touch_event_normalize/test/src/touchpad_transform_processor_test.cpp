@@ -263,19 +263,19 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_HandleMu
 }
 
 /**
- * @tc.name: TouchPadTransformProcessorTest_SetMULTI_FINGERTAP_HDRDefault_001
- * @tc.desc: Test the behavior of SetMULTI_FINGERTAP_HDRDefault
+ * @tc.name: TouchPadTransformProcessorTest_SetMultiFingersTapHdrDefault_001
+ * @tc.desc: Test the behavior of SetMultiFingersTapHdrDefault
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(TouchPadTransformProcessorTest, SetMULTI_FINGERTAP_HDRDefault_001, TestSize.Level1)
+HWTEST_F(TouchPadTransformProcessorTest, SetMultiFingersTapHdrDefault_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     MultiFingersTapHandler processor;
     bool isAlldefault = true;
-    ASSERT_NO_FATAL_FAILURE(processor.SetMULTI_FINGERTAP_HDRDefault(isAlldefault));
+    ASSERT_NO_FATAL_FAILURE(processor.SetMultiFingersTapHdrDefault(isAlldefault));
     isAlldefault = false;
-    ASSERT_NO_FATAL_FAILURE(processor.SetMULTI_FINGERTAP_HDRDefault(isAlldefault));
+    ASSERT_NO_FATAL_FAILURE(processor.SetMultiFingersTapHdrDefault(isAlldefault));
 }
 
 /**
