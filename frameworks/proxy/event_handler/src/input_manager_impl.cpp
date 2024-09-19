@@ -631,7 +631,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt) __attribute__((no_sanit
             PackUiExtentionWindowInfo(item.uiExtentionWindowInfo, pkt);
             PrintWindowInfo(item.uiExtentionWindowInfo);
         }
-        pkt << item.rectChangeBySystem;       
+        pkt << item.rectChangeBySystem;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
