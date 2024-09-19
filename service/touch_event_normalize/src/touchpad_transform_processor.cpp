@@ -342,7 +342,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerItem.SetDisplayY(sumY / fingerCount);
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);   
+    pointerEvent_->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent_->UpdatePointerItem(DEFAULT_POINTER_ID, pointerItem);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
 
