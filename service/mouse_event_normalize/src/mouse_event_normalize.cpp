@@ -107,7 +107,6 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
     }
-    CHKPR(processor, RET_ERR);
     return processor->Normalize(event);
 }
 
@@ -145,7 +144,7 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
     CHKPR(device, RET_ERR);
     int32_t deviceId = INPUT_DEV_MGR->FindInputDeviceId(device);
     if (deviceId < 0) {
-        MMI_HILOGE("The deviceId is invalid, deviceId:%{public}d", deviceId);
+        MMI_HILOGE("The deviceId is invalid, deviceId: %{public}d", deviceId);
         return RET_ERR;
     }
     SetCurrentDeviceId(deviceId);
@@ -156,7 +155,6 @@ int32_t MouseEventNormalize::NormalizeRotateEvent(struct libinput_event *event, 
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
     }
-    CHKPR(processor, RET_ERR);
     return processor->NormalizeRotateEvent(event, type, angle);
 }
 
