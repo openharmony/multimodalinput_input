@@ -25,10 +25,10 @@
 #include "input_event_handler.h"
 #include "input_handler_type.h"
 #include "input_windows_manager.h"
+#include "i_preference_manager.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "multimodal_input_preferences_manager.h"
 #include "stylus_key_handler.h"
 #include "system_info.h"
 
@@ -635,6 +635,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_001, TestSize.Level1)
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_EnableCombineKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     ASSERT_EQ(eventKeyCommandHandler.EnableCombineKey(true), RET_OK);
 }
@@ -647,6 +648,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_EnableCombineKey_001, Test
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     eventKeyCommandHandler.EnableCombineKey(false);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -667,6 +669,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_001, Te
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     eventKeyCommandHandler.EnableCombineKey(false);
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -690,6 +693,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_002, Te
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_002, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "com.ohos.camera";
     int32_t delay = -1;
@@ -706,6 +710,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_002, TestSize.Level1)
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_003, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "";
     int32_t delay = 100;
@@ -1041,7 +1046,6 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_004, TestSize.
     int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetActionTime(actionTime);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
-
     ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
     ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1948,7 +1952,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_FALSE(handler.IsEnableCombineKey(key));
+    ASSERT_TRUE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));

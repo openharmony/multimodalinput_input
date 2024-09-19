@@ -137,6 +137,8 @@ bool StubHandleAllocSocketFdFuzzTest(const uint8_t *data, size_t size)
     MMIService::GetInstance()->OnCancelInjection();
     MMIService::GetInstance()->GetInfraredFrequencies(requencysInf);
     MMIService::GetInstance()->TransmitInfrared(number, patternInt);
+    MMIService::GetInstance()->OnGetInfraredFrequencies(requencysInf);
+    MMIService::GetInstance()->OnTransmitInfrared(infraredFrequency, patternInt);
     MMIService::GetInstance()->SetPixelMapData(infoId, g_pixelMapPtr);
     MMIService::GetInstance()->SetCurrentUser(userId);
     MMIService::GetInstance()->AddVirtualInputDevice(device, deviceId);

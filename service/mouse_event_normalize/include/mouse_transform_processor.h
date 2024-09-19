@@ -40,7 +40,6 @@ extern "C" {
         DEVICE_KLV = 1,
         DEVICE_SOFT_HARDEN = 2,
         DEVICE_HARD_HARDEN = 3,
-        DEVICE_WEBER = 4,
     };
     int32_t HandleMotionAccelerateMouse(const Offset* offset, bool mode, double* abs_x, double* abs_y,
         int32_t speed, int32_t deviceType);
@@ -108,7 +107,6 @@ private:
     DeviceType CheckDeviceType(int32_t width, int32_t height);
     void DeletePressedButton(uint32_t originButton);
     void DumpInner();
-
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static void GetConfigDataFromDatabase(std::string &key, bool &value);
     static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
@@ -138,7 +136,6 @@ public:
 
 private:
     static int32_t globalPointerSpeed_;
-
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     int32_t buttonId_ { -1 };
