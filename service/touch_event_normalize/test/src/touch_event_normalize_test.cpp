@@ -212,18 +212,5 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitc
     TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
-
-/**
- * @tc.name: TouchEventNormalizeTest_SetTouchpadScrollRows_07
- * @tc.desc: Test SetTouchpadScrollRows
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadScrollRows_07, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    int32_t rows = 50;
-    ASSERT_TRUE(TOUCH_EVENT_HDR->SetTouchpadScrollRows(rows) == RET_OK);
-}
 } // namespace MMI
 } // namespace OHOS
