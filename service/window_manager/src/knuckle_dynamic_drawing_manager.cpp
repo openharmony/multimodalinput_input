@@ -37,7 +37,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
-const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
+const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Knuckle_Sprite_360.png";
 constexpr int32_t DENSITY_BASELINE { 160 };
 constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
 constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
@@ -362,6 +362,8 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     CHKPV(surfaceNode_);
+
+    surfaceNode_->SetSkipLayer(true);
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, scaleW_, scaleH_);

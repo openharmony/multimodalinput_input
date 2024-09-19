@@ -114,6 +114,7 @@ public:
     static constexpr uint32_t EVENT_FLAG_RAW_POINTER_MOVEMENT = 0x00000010;
     static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
     static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
+    static constexpr uint32_t EVENT_FLAG_SHELL = 0x00000080;
     static constexpr uint32_t EVENT_FLAG_ACCESSIBILITY = 0x00000100;
 
 public:
@@ -335,12 +336,6 @@ public:
      */
     void ClearFlag();
 
-    /**
-     * @brief Clears all flags of an input event.
-     * @param flag Indicates the flag of the input event.
-     * @return void
-     * @since 12
-     */
     void ClearFlag(uint32_t flag);
 
     /**
