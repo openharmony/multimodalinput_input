@@ -459,6 +459,7 @@ void TouchGestureDetector::CalcAndStoreDistance(std::map<int32_t, Point> &points
     }
     int64_t interval = GetMaxDownInterval();
     if (interval > MAXIMUM_POINTER_INTERVAL) {
+        haveLastDistance_ = false;
         MMI_HILOGE("The pointers down time interval is too long");
         return;
     }
