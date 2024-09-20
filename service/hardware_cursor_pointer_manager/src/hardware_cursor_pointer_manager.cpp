@@ -26,23 +26,62 @@
 
 namespace OHOS {
 namespace MMI {
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 void HardwareCursorPointerManager::SetTargetDevice(uint32_t devId)
 {
     if (devId != devId_) {
         devId_ = devId;
         MMI_HILOGI("SetTargetDevice devId_ changed");
         isEnableState_ = false;
+        isDeviceChange_ = false;
     }
+}
+
+void HardwareCursorPointerManager::SetHdiServiceState(bool hdiServiceState)
+{
+    isEnable_ = hdiServiceState;
 }
 
 bool HardwareCursorPointerManager::IsSupported()
 {
-    isEnableState_ = true;
-    return true;
+    if (isEnable_ && isEnableState_) {
+        return true;
+    }
+    if (isEnable_ && isDeviceChange_ && !isEnableState_) {
+        return false;
+    }
+    if (!isEnable_) {
+        MMI_HILOGI("Get hdi display composer service start");
+        powerInterface_ = OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface::Get(false);
+        MMI_HILOGI("Get hdi display composer service end");
+        isEnable_ = true;
+    }
+    CHKPF(powerInterface_);
+    uint64_t value = 0;
+    MMI_HILOGD("Get display property");
+    auto ret = powerInterface_->GetDisplayProperty(devId_,
+        HDI::Display::Composer::V1_2::DISPLAY_CAPBILITY_HARDWARE_CURSOR, value);
+    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Get display property is error, ret:%{public}d", ret);
+        isDeviceChange_ = true;
+        return false;
+    }
+    if (value) {
+        MMI_HILOGI("Get display property is support");
+        isEnableState_ = true;
+    }
+    isDeviceChange_ = true;
+    return isEnableState_;
 }
 
 int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 {
+    CHKPR(powerInterface_, RET_ERR);
+    auto ret = powerInterface_->SetHardwareCursorPosition(devId_, x, y);
+    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Set hardware cursor position is error, ret:%{public}d", ret);
+        return RET_ERR;
+    }
     MMI_HILOGD("SetPosition, x:%{private}d, y:%{private}d", x, y);
     return RET_OK;
 }
@@ -50,6 +89,12 @@ int32_t HardwareCursorPointerManager::SetPosition(int32_t x, int32_t y)
 int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(powerInterface_, RET_ERR);
+    auto ret = powerInterface_->EnableHardwareCursorStats(devId_, enable);
+    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Enable hardware cursor stats is error, ret:%{public}d", ret);
+        return RET_ERR;
+    }
     MMI_HILOGD("EnableStats, enable:%{public}d", enable);
     return RET_OK;
 }
@@ -57,8 +102,15 @@ int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 int32_t HardwareCursorPointerManager::GetCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(powerInterface_, RET_ERR);
+    auto ret = powerInterface_->GetHardwareCursorStats(devId_, frameCount, vsyncCount);
+    if (ret != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
+        MMI_HILOGE("Get hardware cursor stats is error, ret:%{public}d", ret);
+        return RET_ERR;
+    }
     MMI_HILOGD("Get hardware cursor stats, frameCount:%{private}d, vsyncCount:%{private}d", frameCount, vsyncCount);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 } // namespace MMI
 } // namespace OHOS
