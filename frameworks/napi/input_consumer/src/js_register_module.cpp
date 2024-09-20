@@ -38,8 +38,8 @@ constexpr int32_t OCCUPIED_BY_SYSTEM = -3;
 constexpr int32_t OCCUPIED_BY_OTHER = -4;
 } // namespace
 
-static Callbacks callbacks;
-static Callbacks hotkeyCallbacks;
+static Callbacks callbacks = {};
+static Callbacks hotkeyCallbacks = {};
 static std::mutex sCallBacksMutex;
 static const std::vector<int32_t> pressKeyCodes = {
     KeyEvent::KEYCODE_ALT_LEFT,
@@ -489,8 +489,8 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(sCallBacksMutex);
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
-    event->env = env;
     CHKPP(event);
+    event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
     size_t argc = 3;
@@ -525,8 +525,8 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     std::lock_guard guard(sCallBacksMutex);
     sptr<KeyEventMonitorInfo> event = new (std::nothrow) KeyEventMonitorInfo();
-    event->env = env;
     CHKPP(event);
+    event->env = env;
     auto keyOption = std::make_shared<KeyOption>();
     std::string keyType;
     if (!GetEventType(env, info, event, keyType)) {
