@@ -243,6 +243,8 @@ bool TouchDrawingManager::IsWindowRotation()
 
 PointerDrawingManager::PointerDrawingManager() {}
 
+PointerDrawingManager::~PointerDrawingManager() {}
+
 std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 {
     if (iPointDrawMgr_ == nullptr) {
