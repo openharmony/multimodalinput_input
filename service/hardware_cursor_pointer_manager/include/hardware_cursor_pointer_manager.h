@@ -40,7 +40,7 @@ private:
     [[ maybe_unused ]] bool isEnable_ { false };
     bool isDeviceChange_ { false };
     uint32_t devId_ { 0 };
-    sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
+    sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
