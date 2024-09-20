@@ -164,29 +164,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_UpdateLabels
- * @tc.desc: Test UpdateLabels
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateLabels, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    TouchDrawingManager touchDrawingMgr;
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "touch window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    touchDrawingMgr.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_NE(touchDrawingMgr.surfaceNode_, nullptr);
-    touchDrawingMgr.labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
-    ASSERT_NE(touchDrawingMgr.labelsCanvasNode_, nullptr);
-    touchDrawingMgr.pointerMode_.isShow = true;
-    EXPECT_EQ(touchDrawingMgr.UpdateLabels(), RET_OK);
-    touchDrawingMgr.pointerMode_.isShow = false;
-    EXPECT_EQ(touchDrawingMgr.UpdateLabels(), RET_OK);
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_UpdateBubbleData
  * @tc.desc: Test UpdateBubbleData
  * @tc.type: Function

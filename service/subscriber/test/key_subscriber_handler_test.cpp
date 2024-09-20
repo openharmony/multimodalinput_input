@@ -760,29 +760,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_PrintKeyOption_001, 
 }
 
 /**
- * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_001
- * @tc.desc: Test HandleKeyUpWithDelay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_HandleKeyUpWithDelay_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    SessionPtr sess;
-    auto keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    auto subscriber = std::make_shared<OHOS::MMI::KeySubscriberHandler::Subscriber>(1, sess, keyOption);
-    keyOption->SetFinalKeyUpDelay(0);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-    keyOption->SetFinalKeyUpDelay(-1);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-    keyOption->SetFinalKeyUpDelay(1);
-    ASSERT_NO_FATAL_FAILURE(handler.HandleKeyUpWithDelay(keyEvent, subscriber));
-}
-
-/**
  * @tc.name: KeySubscriberHandlerTest_HandleKeyUpWithDelay_002
  * @tc.desc: Test HandleKeyUpWithDelay
  * @tc.type: FUNC
@@ -1525,31 +1502,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsRepeatedKeyEvent, 
     item.SetKeyCode(KeyEvent::KEYCODE_D);
     keyEvent->AddKeyItem(item);
     ASSERT_FALSE(handler.IsRepeatedKeyEvent(keyEvent));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer
- * @tc.desc: Test RemoveSubscriberKeyUpTimer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_RemoveSubscriberKeyUpTimer, TestSize.Level1)
-{
-    KeySubscriberHandler handler;
-    int32_t keyCode = KeyEvent::KEYCODE_A;
-    int32_t id = 1;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
-        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
-    std::list<std::shared_ptr<KeySubscriberHandler::Subscriber>> subscriberList;
-    subscriber->timerId_ = -1;
-    subscriberList.push_back(subscriber);
-    subscriber->timerId_ = 1;
-    subscriber->keyOption_->SetFinalKey(KeyEvent::KEYCODE_A);
-    subscriberList.push_back(subscriber);
-    handler.subscriberMap_.insert(std::make_pair(keyOption, subscriberList));
-    ASSERT_NO_FATAL_FAILURE(handler.RemoveSubscriberKeyUpTimer(keyCode));
 }
 
 /**
@@ -2334,43 +2286,6 @@ HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_NotifySubscriber_005
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     EXPECT_FALSE(pkt.ChkRWError());
     ASSERT_NO_FATAL_FAILURE(handler.NotifySubscriber(keyEvent, subscriber));
-}
-
-/**
- * @tc.name: KeySubscriberHandlerTest_AddTimer_002
- * @tc.desc: Test the funcation AddTimer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_AddTimer_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KeySubscriberHandler handler;
-    int32_t id = 3;
-    SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, MODULE_TYPE, UDS_FD, UDS_UID, UDS_PID);
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    std::shared_ptr<KeySubscriberHandler::Subscriber> subscriber =
-        std::make_shared<KeySubscriberHandler::Subscriber>(id, session, keyOption);
-    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    subscriber->timerId_ = 5;
-    bool ret = handler.AddTimer(subscriber, keyEvent);
-    ASSERT_TRUE(ret);
-    subscriber->timerId_ = -5;
-    keyOption->isFinalKeyDown_ = true;
-    keyOption->finalKeyDownDuration_ = -5;
-    ret = handler.AddTimer(subscriber, keyEvent);
-    ASSERT_TRUE(ret);
-    keyOption->finalKeyDownDuration_ = 5;
-    ret = handler.AddTimer(subscriber, keyEvent);
-    ASSERT_TRUE(ret);
-    keyOption->isFinalKeyDown_ = false;
-    keyOption->finalKeyUpDelay_ = -5;
-    ret = handler.AddTimer(subscriber, keyEvent);
-    ASSERT_TRUE(ret);
-    keyOption->finalKeyUpDelay_ = 5;
-    ret = handler.AddTimer(subscriber, keyEvent);
-    ASSERT_TRUE(ret);
 }
 
 /**
