@@ -47,25 +47,6 @@ bool PermissionHelper::VerifySystemApp()
     return true;
 }
 
-bool PermissionHelper::CheckPermission(uint32_t required)
-{
-    CALL_DEBUG_ENTER;
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
-        return CheckHapPermission(tokenId, required);
-    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
-        MMI_HILOGD("Token type is native");
-        return true;
-    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGI("Token type is shell");
-        return true;
-    } else {
-        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
-        return false;
-    }
-}
-
 bool PermissionHelper::CheckMonitor()
 {
     CALL_DEBUG_ENTER;
@@ -79,23 +60,6 @@ bool PermissionHelper::CheckInterceptor()
     std::string interceptorPermissionCode = "ohos.permission.INTERCEPT_INPUT_EVENT";
     return CheckHapPermission(interceptorPermissionCode);
 }
-
-bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
-{
-    OHOS::Security::AccessToken::HapTokenInfo findInfo;
-    if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
-        MMI_HILOGE("GetHapTokenInfo failed");
-        return false;
-    }
-    if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("Check hap permission failed, name:%{public}s, apl:%{public}d, required:%{public}d",
-            findInfo.bundleName.c_str(), findInfo.apl, required);
-        return false;
-    }
-    MMI_HILOGD("Check hap permission success");
-    return true;
-}
-
 
 bool PermissionHelper::CheckInfraredEmmit()
 {
